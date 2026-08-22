@@ -1,0 +1,332 @@
+import { Link, useNavigate } from "react-router";
+import { useBrachNhaStore } from "@/lib/store";
+import { useShallow } from "zustand/react/shallow";
+import { useT } from "@/data/translations";
+import type { TranslationKey } from "@/data/translations";
+import {
+  buildRoadmapPhases,
+  computeDailyMission,
+  GRADE_HOURS,
+  type RoadmapPhase,
+} from "@/utils/roadmap";
+import type { Tasks } from "@/types";
+import { PLEDGE_COPY } from "@/features/commitment/copy";
+import { CommitmentBanner } from "./commitment-banner";
+
+function PathConnector({ flip }: { flip: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 300 70"
+      preserveAspectRatio="none"
+      className={`h-[70px] w-full drop-shadow-[0_0_10px_rgba(139,43,226,0.75)] ${flip ? "scale-x-[-1]" : ""}`}
+    >
+      <path
+        d="M40,0 C40,35 260,35 260,70"
+        fill="none"
+        stroke="url(#roadmapPathGrad)"
+        strokeWidth={4}
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+const GLOW_PINK = {
+  "--glow-color": "rgba(233,30,140,0.45)",
+  "--glow-color-strong": "rgba(233,30,140,0.65)",
+} as React.CSSProperties;
+
+const GLOW_GOLD = {
+  "--glow-color": "rgba(245,158,11,0.45)",
+  "--glow-color-strong": "rgba(245,158,11,0.65)",
+} as React.CSSProperties;
+
+function PhaseNode({
+  phase,
+  isFirst,
+  isLast,
+}: {
+  phase: RoadmapPhase;
+  isFirst: boolean;
+  isLast: boolean;
+}) {
+  const nodeClasses = isFirst
+    ? "bg-linear-to-br from-pink via-purple to-blue animate-fab-pulse"
+    : isLast
+      ? "bg-linear-to-br from-yellow to-pink animate-fab-pulse"
+      : "bg-purple/10 animate-fab-pulse";
+
+  return (
+    <div
+      style={isFirst ? GLOW_PINK : isLast ? GLOW_GOLD : undefined}
+      className={`ring-4 ring-white flex size-16 shrink-0 items-center justify-center rounded-full text-3xl ${nodeClasses}`}
+    >
+      {phase.icon}
+    </div>
+  );
+}
+
+export function RoadmapView() {
+  const {
+    lang,
+    userData,
+    tasks,
+    completeTask,
+    pendingPlacementTests,
+    commitment,
+    setPledgeOpen,
+  } = useBrachNhaStore(
+    useShallow((s) => ({
+      lang: s.lang,
+      userData: s.userData,
+      tasks: s.tasks,
+      completeTask: s.completeTask,
+      pendingPlacementTests: s.pendingPlacementTests,
+      commitment: s.commitment,
+      setPledgeOpen: s.setPledgeOpen,
+    }))
+  );
+  const t = useT(lang);
+  const navigate = useNavigate();
+
+  const hrs = GRADE_HOURS[userData.grade] || 2;
+
+  const phases = buildRoadmapPhases(
+    userData.weaknesses,
+    userData.months,
+    (s) => t[s as TranslationKey] ?? s,
+    lang
+  );
+
+  const mission = computeDailyMission(userData.grade, userData.months);
+  const missionRows: {
+    key: keyof Tasks;
+    icon: string;
+    label: string;
+    count: number;
+    href: string;
+  }[] = [
+    {
+      key: "lesson",
+      icon: "📚",
+      label: lang === "en" ? "Lessons" : "មេរៀន",
+      count: mission.lessons,
+      href: "/lessons",
+    },
+    {
+      key: "practice",
+      icon: "✏️",
+      label: lang === "en" ? "Practice" : "អនុវត្ត",
+      count: mission.practice,
+      href: "/exam",
+    },
+    {
+      key: "flashcards",
+      icon: "🗂️",
+      label: lang === "en" ? "Flashcards" : "កាតទន្លាប់",
+      count: mission.flashcards,
+      href: "/lessons",
+    },
+  ];
+  const allMissionsDone = missionRows.every((row) => tasks[row.key]);
+
+  return (
+    <div className="px-4 pt-4 pb-36">
+      <div className="mb-5 pr-14">
+        <div className="font-heading bg-linear-to-r from-pink via-purple to-blue bg-clip-text text-xl font-extrabold text-transparent">
+          {t.yourRoadmap} 🗺️
+        </div>
+        <div className="text-xs font-bold text-muted">{t.bacStudy}</div>
+      </div>
+
+      {commitment && (
+        <CommitmentBanner
+          commitment={commitment}
+          lang={lang}
+          onResign={() => setPledgeOpen(true)}
+        />
+      )}
+
+      {/* Target grade + time left + recommended hours */}
+      <div className="mb-4 rounded-2xl border border-purple/10 bg-white p-4 shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
+        <div className="mb-3.5 flex items-center gap-2.5">
+          <span className="text-xl">🎯</span>
+          <div>
+            <div className="text-[11px] font-extrabold tracking-widest text-muted uppercase">
+              Target Grade
+            </div>
+            <div className="font-heading text-xl font-extrabold text-yellow">
+              {userData.grade || "—"}
+            </div>
+          </div>
+          <div className="ml-auto text-right">
+            <div className="text-[11px] font-extrabold tracking-widest text-muted uppercase">
+              Time Left
+            </div>
+            <div className="font-heading text-xl font-extrabold text-pink">
+              {userData.months || "—"} {lang === "en" ? "months" : "ខែ"}
+            </div>
+          </div>
+        </div>
+        <div className="rounded-xl bg-purple/5 p-3.5 text-center">
+          <div className="mb-1.5 text-[11px] font-extrabold tracking-widest text-muted uppercase">
+            ⏰ {t.recommendedTime}
+          </div>
+          <div className="font-heading bg-linear-to-br from-pink to-yellow bg-clip-text text-4xl font-bold text-transparent">
+            {hrs}
+          </div>
+          <div className="text-sm font-bold text-muted">{t.hoursPerDay}</div>
+          <div className="mt-1 text-[11px] text-muted">{t.basedOn}</div>
+        </div>
+      </div>
+
+      {/* Pending placement tests */}
+      {pendingPlacementTests.length > 0 && (
+        <div className="mb-4 rounded-2xl border border-purple/10 bg-white p-4 shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
+          <div className="mb-3 flex items-center gap-1.5 font-heading text-sm font-extrabold">
+            📅 {t.pendingTests}
+          </div>
+          <div className="flex flex-col gap-2">
+            {pendingPlacementTests.map((p) => {
+              const overdue = new Date(p.scheduledDate) <= new Date();
+              return (
+                <div
+                  key={p.subject}
+                  className="flex items-center gap-3 rounded-xl bg-purple/5 px-3 py-2.5"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-extrabold">
+                      {t[p.subject as TranslationKey] ?? p.subject}
+                    </div>
+                    <div
+                      className={`text-xs font-bold ${overdue ? "text-pink" : "text-muted"}`}
+                    >
+                      {overdue
+                        ? t.overdue
+                        : `${t.scheduledFor} ${new Date(p.scheduledDate).toLocaleDateString()}`}
+                    </div>
+                  </div>
+                  <Link
+                    to={`/placement-test/${p.subject}`}
+                    className="shrink-0 rounded-full bg-linear-to-r from-pink to-purple px-2.5 py-1 text-[11px] font-extrabold text-white"
+                  >
+                    {t.takeTestNow}
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Daily Mission */}
+      <div className="mb-4 rounded-2xl border border-purple/10 bg-white p-4 shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
+        <div className="mb-3 flex items-center gap-1.5 font-heading text-sm font-extrabold">
+          🎯 {t.dailyMission}
+        </div>
+        {!allMissionsDone ? (
+          <div className="flex flex-col gap-2">
+            {missionRows.map((row) => {
+              const done = tasks[row.key];
+              return (
+                <div
+                  key={row.key}
+                  className="flex items-center gap-3 rounded-xl bg-purple/5 px-3 py-2.5"
+                >
+                  <span className="text-xl">{row.icon}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-extrabold">{row.label}</div>
+                    <div className="text-xs font-bold text-muted">
+                      {done
+                        ? lang === "en"
+                          ? "Done ✓"
+                          : "ធ្វើរួច ✓"
+                        : `${row.count} ${lang === "en" ? "today" : "ថ្ងៃនេះ"}`}
+                    </div>
+                  </div>
+                  {!done && (
+                    <>
+                      <Link
+                        to={row.href}
+                        className="shrink-0 rounded-full bg-purple/10 px-2.5 py-1 text-[11px] font-extrabold text-purple"
+                      >
+                        {lang === "en" ? "Go →" : "ទៅ →"}
+                      </Link>
+                      <button
+                        onClick={() => completeTask(row.key)}
+                        className="shrink-0 rounded-full bg-linear-to-r from-pink to-purple px-2.5 py-1 text-[11px] font-extrabold text-white"
+                      >
+                        {lang === "en" ? "Done" : "ចប់"}
+                      </button>
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="py-2 text-center text-sm font-extrabold text-mint">
+            {t.missionDone}
+          </div>
+        )}
+      </div>
+
+      {/* Phases */}
+      <div className="mb-4">
+        <div className="mb-3 font-heading text-sm font-extrabold">
+          🗺️ {t.roadmapPhases}
+        </div>
+        <svg width="0" height="0" className="absolute" aria-hidden="true">
+          <defs>
+            <linearGradient id="roadmapPathGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="var(--color-pink)" />
+              <stop offset="50%" stopColor="var(--color-purple)" />
+              <stop offset="100%" stopColor="var(--color-blue)" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <div className="flex flex-col">
+          {phases.map((p, i) => {
+            const isFirst = i === 0;
+            const isLast = i === phases.length - 1;
+            const isMissingContent = p.subjects.length > 0 && !p.hasLessonContent;
+            const onRight = i % 2 === 1;
+
+            return (
+              <div key={i}>
+                {i > 0 && <PathConnector flip={i % 2 === 0} />}
+                <Link
+                  to={p.hasLessonContent ? "/lessons" : "/exam"}
+                  className={`flex items-center gap-3 ${onRight ? "flex-row-reverse" : ""}`}
+                >
+                  <PhaseNode phase={p} isFirst={isFirst} isLast={isLast} />
+                  <div className="max-w-[210px] rounded-2xl border border-purple/10 bg-white p-3 shadow-[0_2px_10px_rgba(139,43,226,0.06)]">
+                    <div className="text-[11px] font-extrabold text-muted">
+                      {t.month} {p.month}
+                      {isMissingContent && ` · ${t.comingSoon}`}
+                    </div>
+                    <div className="text-sm font-extrabold">{p.title}</div>
+                    {isFirst && (
+                      <div className="mt-1 inline-block rounded-full bg-pink/10 px-2 py-0.5 text-[10px] font-extrabold text-pink">
+                        {lang === "en" ? "Start now" : "ចាប់ផ្តើមឥឡូវនេះ"}
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Unsigned students are asked to commit to the plan they just read
+          before they start; once signed, this is the plain "start" CTA again. */}
+      <button
+        onClick={() => (commitment ? navigate("/") : setPledgeOpen(true))}
+        className="w-full rounded-2xl bg-linear-to-r from-pink via-purple to-blue bg-[length:200%_auto] px-6 py-3.5 text-sm font-extrabold text-white shadow-[0_6px_18px_rgba(139,43,226,0.35)] animate-shimmer"
+      >
+        {commitment ? t.studyNow : PLEDGE_COPY[lang].readyToCommit}
+      </button>
+    </div>
+  );
+}
