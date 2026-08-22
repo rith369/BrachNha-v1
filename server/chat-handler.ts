@@ -1,6 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
-import type { Lang, ChatMsg } from "@/types";
-import { buildSystemPrompt, type ChatProfile } from "@/utils/chat-prompt";
+// Relative imports, not the @/ alias, all the way down this file's import
+// graph. Vite resolves the alias fine, but the Vercel function bundler
+// (api/chat.ts) reads the root tsconfig.json — a solution file that carries no
+// `paths` — so an aliased import here fails the deploy build. Relative paths
+// work in both. See the same note in src/utils/chat-prompt.ts.
+import type { Lang, ChatMsg } from "../src/types";
+import { buildSystemPrompt, type ChatProfile } from "../src/utils/chat-prompt";
 import { checkRateLimit } from "./rate-limit";
 
 /**

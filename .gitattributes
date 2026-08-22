@@ -1,0 +1,12 @@
+# Normalise line endings. Without this, files authored on Linux and checked out
+# on Windows show up as wholly-rewritten in `git status` (every line changed)
+# the moment an editor saves them — which is exactly what happened right after
+# the Vite migration landed.
+* text=auto eol=lf
+
+# Binary — never touch these.
+*.png binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary

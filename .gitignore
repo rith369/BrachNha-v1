@@ -17,6 +17,13 @@ dist-ssr
 .env.*
 !.env.example
 
+# Claude Code local settings — machine-specific paths and permissions.
+# .claude/settings.json (shared, if you make one) stays tracked.
+.claude/settings.local.json
+
+# Vercel
+.vercel
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
