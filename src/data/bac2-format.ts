@@ -1,4 +1,4 @@
-import type { Bac2Example } from "@/types";
+import type { Bac2Example } from "../types/index.js";
 
 /**
  * What a "real Bac II answer" looks like.

@@ -1,10 +1,10 @@
 // Relative imports, not the @/ alias: this module is reachable from the Vercel
 // serverless function (api/chat.ts -> server/chat-handler.ts -> here), and that
 // bundler cannot resolve the alias. Keep it alias-free.
-import type { Lang } from "../types";
-import { LESSONS, FOUNDATION, FLASHCARDS, PRACTICE } from "../data/lessons";
-import { MOCK_QS } from "../data/questions";
-import { BAC2_ANSWER_RULES, BAC2_EXAMPLES } from "../data/bac2-format";
+import type { Lang } from "../types/index.js";
+import { LESSONS, FOUNDATION, FLASHCARDS, PRACTICE } from "../data/lessons.js";
+import { MOCK_QS } from "../data/questions.js";
+import { BAC2_ANSWER_RULES, BAC2_EXAMPLES } from "../data/bac2-format.js";
 
 /**
  * Builds the system instruction for the AI Mentor (see app/api/chat/route.ts).

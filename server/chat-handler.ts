@@ -4,9 +4,9 @@ import { GoogleGenAI } from "@google/genai";
 // (api/chat.ts) reads the root tsconfig.json — a solution file that carries no
 // `paths` — so an aliased import here fails the deploy build. Relative paths
 // work in both. See the same note in src/utils/chat-prompt.ts.
-import type { Lang, ChatMsg } from "../src/types";
-import { buildSystemPrompt, type ChatProfile } from "../src/utils/chat-prompt";
-import { checkRateLimit } from "./rate-limit";
+import type { Lang, ChatMsg } from "../src/types/index.js";
+import { buildSystemPrompt, type ChatProfile } from "../src/utils/chat-prompt.js";
+import { checkRateLimit } from "./rate-limit.js";
 
 /**
  * AI Mentor endpoint. Started life as a Netlify function, then a Next.js route

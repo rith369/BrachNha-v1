@@ -1,4 +1,4 @@
-import { handleChat } from "../server/chat-handler";
+import { handleChat } from "../server/chat-handler.js";
 
 /**
  * The AI Mentor endpoint on Vercel.

@@ -1,4 +1,4 @@
-import type { Lesson, Flashcard, PracticeQuestion } from "@/types";
+import type { Lesson, Flashcard, PracticeQuestion } from "../types/index.js";
 
 export const LESSONS: Record<string, Record<string, Lesson>> = {
   math: {

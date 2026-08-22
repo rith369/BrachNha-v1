@@ -1,4 +1,4 @@
-import type { MockExamQuestion, Lang } from "@/types";
+import type { MockExamQuestion, Lang } from "../types/index.js";
 
 export const MOCK_QS: MockExamQuestion[] = [
   // ── MATH ──
