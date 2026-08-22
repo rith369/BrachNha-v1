@@ -5,9 +5,14 @@ import { handleChat } from "../server/chat-handler.js";
  *
  * `vite build` produces a static `dist/` with no server, so in production this
  * file is what makes the mentor answer. Vercel treats every file under `api/`
- * as a Serverless Function, and its Node runtime accepts a web-standard
- * `Request -> Response` handler — which is exactly the shape
- * server/chat-handler.ts already has, so there is nothing to adapt.
+ * as a Serverless Function, and its Node runtime accepts web-standard
+ * `Request -> Response` handlers — but ONLY as named HTTP-method exports
+ * (`GET`, `POST`, ...) or a `fetch` export. A bare `export default function`
+ * is treated as the legacy `(req, res) => void` signature instead: the
+ * `Response` it returns is silently discarded (no error), so the client just
+ * hangs until Vercel kills the invocation at maxDuration. The client only
+ * ever sends `POST /api/chat` (see chat-overlay.tsx / vite-chat-plugin.ts),
+ * so exporting `POST` is enough.
  *
  * The same handler is served in local dev by server/vite-chat-plugin.ts, so
  * `POST /api/chat` behaves identically in both places and there is only one
@@ -21,6 +26,6 @@ import { handleChat } from "../server/chat-handler.js";
  * maxDuration is set in vercel.json: the reply streams, and the default 10s
  * would cut off long answers mid-sentence.
  */
-export default function handler(request: Request): Promise<Response> {
+export function POST(request: Request): Promise<Response> {
   return handleChat(request);
 }
