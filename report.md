@@ -17,9 +17,83 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 23 Aug 2026 — Lessons and tests now take over the whole screen
+
+*Landed in commit `3ae15c8`.*
+
+**Why.** A student in the middle of a lesson had the menu button, the bottom tabs and the
+AI Mentor button all still sitting on screen, quietly inviting them to tap away. The
+apps our students already use — Duolingo above all — remove every exit while you're
+working, and finish the task before handing the navigation back.
+
+**What changed.** The moment a student starts a lesson, a mock exam or a placement test,
+the screen becomes just the task: a close (✕) button and a progress bar along the top,
+the question or content in the middle, and one action button pinned to the bottom. The
+menu, the bottom tabs and the chat button are all gone until they're finished or they
+leave.
+
+**Leaving is always possible.** The ✕ is the way out and it's on every one of those
+screens. On the mock exam it asks once — "Leave and lose progress?" — because quitting
+part-way through throws that attempt away. Lessons and placement tests just close.
+
+**The three screens now share one design.** The lesson flow, the mock exam and the
+placement test each used to draw their own progress bar and their own buttons, which is
+why they'd slowly stopped looking like each other. They're now one piece, so they stay
+consistent from here on.
+
+**What is *not* affected.** The Lessons *list* is a normal page with full navigation —
+only an open lesson takes over. And the placement test you can take inside the survey
+still sits in the survey card as before; it doesn't swallow the screen there.
+
+**What to re-test.** Open a lesson and walk it end to end, checking there's no menu, no
+bottom tabs and no chat button at any step, and that the progress bar fills as you go.
+Tap the ✕ half way and confirm you land back on the Lessons list with everything back.
+Start a mock exam: the intro screen should still be a normal page with your past results,
+and only answering should take over. Tap ✕ mid-exam, choose "Keep going", then tap ✕
+again and choose "Leave". Then press the phone's back button mid-exam and confirm the
+navigation comes back rather than leaving you stuck. Finally run a placement test both
+ways — from inside the survey, and from the Roadmap card.
+
+---
+
+## 23 Aug 2026 — The app finally uses the space on a tablet or laptop
+
+*Landed in commit `3ae15c8`.*
+
+**Why.** The app was built for a phone and stayed a narrow phone-width strip on every
+other device, with a wide band of empty background either side. Teachers demo it on a
+laptop and some students revise on a tablet, and it looked unfinished there.
+
+**What changed, by device.**
+
+- **Phone — nothing at all.** This is worth saying plainly: every change is switched off
+  below tablet width. Same screens, same order, same spacing.
+- **Tablet.** Card screens — Home, Progress, Battle, Grade Prediction and the Lessons
+  list — lay out in two columns instead of one long scroll. The bottom tabs and the ☰
+  menu stay exactly as they are.
+- **Laptop and desktop.** The navigation moves into a **permanent sidebar** down the left,
+  carrying the same list as the ☰ menu plus the Language and Theme switches. The bottom
+  tabs, the ☰ button and the floating chat button all disappear, since the sidebar
+  replaces them. On a very wide monitor the app stops growing rather than stretching, and
+  centres itself.
+
+**Reading screens go narrower, not wider.** Lesson content, exam questions, the survey,
+the Roadmap, sign-in, Profile and the AI Mentor conversation all stay in a comfortable
+single column even on a big screen. Text stretched across a whole laptop is genuinely
+harder to read, so widening those would have made the app worse, not better.
+
+**What to re-test.** On a laptop, drag the browser window slowly from narrow to full
+width and watch the app change shape twice — one column with bottom tabs, then two
+columns, then the sidebar appearing and the bottom tabs going. Click every item in the
+sidebar and confirm the current page is highlighted, and that Language and Theme still
+work from there. Check no page has a strip of dead space along the bottom where the
+tabs used to be. Then open it on a real phone and confirm it is completely unchanged.
+
+---
+
 ## 23 Aug 2026 — The app has a dark theme you can switch on
 
-*Landed in commit `TBD`.*
+*Landed in commit `3ae15c8`.*
 
 **Why.** Students revise at night, mostly on a phone. The app was near-white on every
 screen, which is uncomfortable to look at in a dark room and burns more battery on the
@@ -57,7 +131,7 @@ flash while it loads.
 
 ## 22 Aug 2026 — Students can't skip past the commitment pledge any more
 
-*Landed in commit `TBD`.*
+*Landed in commit `3ae15c8`.*
 
 **The problem.** Right after finishing the survey, students land on their Roadmap. The
 intention is that they read their plan and then tap the big button at the bottom to sign
