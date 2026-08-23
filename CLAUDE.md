@@ -11,9 +11,10 @@ Next.js 15 App Router app (`brachnha-next`), and now lives here on Vite. Every
 screen was ported faithfully at each step, fixing real bugs along the way rather
 than copy-pasting.
 
-**`brachnha-next` still exists on disk as a reference/fallback. It is NOT this
-repo and is no longer maintained. Do not edit it, and do not copy its
-framework-specific patterns back in.**
+**`brachnha-next` no longer exists on disk** — the reference copy was not carried
+across when this project moved folders. The "Migrated off Next.js — the mapping"
+table below is now the only record of what moved where, so keep it accurate. The
+warning it carried still stands: do not copy Next.js-specific patterns back in.
 
 ## Tech stack (final decision, with reasoning)
 
@@ -46,6 +47,74 @@ each stack and the browser resolves it *per glyph*: Latin keeps Nunito, Khmer
 picks up Noto, and mixed strings like "មេរៀនគ្រឹះ & ទី១២" render correctly from
 one stack. **Removing that fallback silently breaks every Khmer string in the
 app.** Weights 400/600/700/800 only — `font-black` has zero usages.
+
+### Theming: two accent scales, and why one isn't enough
+
+The app ships light **and** dark, **light by default**. `theme: "dark" | "light"`
+lives on the store (persisted, and deliberately **not** cleared by `logout()` —
+it's a device preference, not account data). Dark was briefly the default and
+that value is still in older payloads, so `persist` is at `version: 2` with a
+`migrate` that resets v1 `theme` to light — the stored "dark" there is the old
+default rather than anyone's choice, and without the reset flipping the default
+would change nothing for anyone who had already opened the app. This is the
+first migration that actually fires; see the `merge` comment for why v0 data
+could never use one.
+
+`AppShell` toggles a `dark` class on `<html>` in an effect next to the existing
+`lang` one, and `index.html` carries a blocking inline script that applies the
+same class from localStorage **before first paint** — without it, choosing dark
+flashes light for a frame on every load. That script repeats the migration's
+`version >= 2` guard on purpose: without it a stale v1 "dark" paints dark and
+then snaps to light when the migration runs, which is the exact flash the script
+exists to prevent. Both it and the effect also write `<meta name="theme-color">`,
+which is a single value rather than a `prefers-color-scheme` pair because the
+app has its own setting and deliberately does not follow the OS. Tailwind v4
+points `dark:` at `prefers-color-scheme` by default, so `globals.css` re-points
+it with `@custom-variant dark (&:where(.dark, .dark *))`.
+
+Because `@theme inline` resolves `var(--color-*)` at use site, redefining the
+`:root` values under `.dark` flips ~160 token usages across 50 files with zero
+component edits. That only works if **every themed value is declared in `:root`,
+never literally inside `@theme`** — a literal in there is unreachable by `.dark`.
+`--color-border`, `--color-secondary`, `--color-accent` and `--color-destructive`
+used to be literals and were moved out for exactly this reason. Keep them out.
+
+**There are two accent scales and they are not interchangeable:**
+
+- `--brand-pink/purple/blue/mint/yellow` — **identical in both themes.** The only
+  correct choice where the colour is a *fill sitting under white text*: gradient
+  buttons, the FAB, the Roadmap phase nodes, the wordmark.
+- `--color-pink/purple/blue/mint/yellow` — **lifted in `.dark`.** Text, icons,
+  borders, tints, chart series, progress fills.
+
+The split is forced, not stylistic. `#8b2be2` as text on a dark card is ~2:1.
+Lifting it to `#b47cf5` fixes that but drops white-on-purple to 2.8:1. No single
+value clears AA in both roles, so don't try to merge them. The lift also means
+every existing `bg-purple/8` / `border-purple/10` tint becomes correct subtle
+elevation on dark for free — **don't "fix" those alphas per theme.**
+
+Surfaces are four intentional steps, not a computed ramp: `--color-bg` (page) →
+`--color-surface` (cards) → `--color-elevated` (popover/tooltip) →
+`--color-control`. `--color-control` exists because the math keyboard's keys need
+opposite treatment per theme — a faint tint *below* the white panel in light, a
+step *above* it in dark, or the keys read as holes punched in the keyboard.
+
+Shadows are tokens (`shadow-panel`, `shadow-panel-sm`, `shadow-cta`,
+`shadow-cta-lg`, `shadow-drawer`, `shadow-mint-cta`), purple glows in light and
+real black shadows in dark. **New components use `bg-surface` and
+`shadow-panel` — never `bg-white`, never a `shadow-[0_2px_12px_rgba(...)]`
+literal.** Those two mistakes are what made this change a 35-file sweep.
+
+Things a class toggle cannot reach, all now tokenised — check them when touching
+charts: Recharts `<Tooltip contentStyle>` (it defaults to a solid **white** panel
+and sets `itemStyle`/`labelStyle` independently, so all three need naming), grid
+and axis strokes, the two hand-coded SVG donut tracks, both conic-gradient score
+rings, and `--drawer-header` / `--scrim` / `--path-glow`. `ActivityHeatmap`'s
+`LEVELS` is the one place a hand-tuned per-theme ramp was unavoidable — a scale
+built to darken away from white has no useful bottom end when it's brightening
+instead. `SignaturePad` redraws its canvas in a `requestAnimationFrame` on theme
+change: it reads `--color-purple` off the element, and React runs child effects
+before `AppShell`'s, so a synchronous redraw would read the outgoing theme.
 
 ### Directory rules — keep enforcing these
 
@@ -175,15 +244,27 @@ constant to go back to answering in the student's chosen language.
 ## What's fully built and working
 
 **Shell:** `AppShell` (`src/components/shell/app-shell.tsx`) — deliberately NOT
-a phone mockup: no frame, notch, or status bar, just a `mx-auto max-w-lg h-dvh`
-container that centres on desktop and goes full-bleed on a phone. It was renamed
-from `PhoneShell` because that name kept implying a device frame that has never
-existed; don't add one. Also `TopBar` (a floating absolutely-positioned
+a phone mockup: no frame, notch, or status bar, just a `mx-auto h-dvh` container
+that goes full-bleed on a phone. It was renamed from `PhoneShell` because that
+name kept implying a device frame that has never existed; don't add one. Also
+`TopBar` (a floating absolutely-positioned
 hamburger button, not a bar — nothing reserves space for it), `Drawer`
 (Sheet-based, built from one shared `src/lib/nav-items.ts` config), `BottomNav`,
 `FabChat`, `ChatOverlay`. `AppShell` also syncs `document.documentElement.lang`
 from the store in an effect, because `index.html` ships `lang="en"` and the real
 value isn't known until React mounts.
+
+`AppShell` takes an optional `hideChrome` prop that unmounts `TopBar` and
+`FabChat`, leaving the page's own CTA as the only way forward. `ShellLayout`
+(`src/app.tsx`) is what decides when — `pathname === "/roadmap" && !commitment
+&& !pledgeSeen` — because `AppShell` deliberately doesn't read the router (see
+the comment there); the prop defaults to `false` so `AppShell` stays usable
+outside a route. The rule exists because a student fresh out of the survey lands
+on the Roadmap, which renders no `BottomNav`, and would otherwise tap the
+hamburger and never reach the commitment pledge. `pledgeSeen` (persisted, set in
+`CommitmentOverlay`'s single `close()`) is what un-hides it again — gating on
+`commitment !== null` alone would strip the page forever for a student who taps
+"Maybe later", which is an allowed choice.
 
 **Page top-spacing convention:** pages start at `pt-4` and put `pr-14` on their
 header block, so the page title sits on the same row as the floating hamburger
@@ -192,6 +273,154 @@ button's ~31px). Bottom padding is `pb-20` on pages that render `BottomNav` and
 `pb-36` on those that don't (roadmap/profile/lesson-detail), so content clears
 the FAB at `bottom-20`. The old `pt-14` convention was removed on purpose — it
 existed only to dodge the hamburger and left a 56px dead band above every header.
+
+### Responsive layout — two rules, and they pull in opposite directions
+
+The app was phone-only until this convention landed (it had exactly **one**
+responsive breakpoint in 69 component files). The shell is a **column on phone
+and tablet and a ROW from `lg`**, where a permanent sidebar sits beside the
+content: `max-w-lg` → `md:max-w-3xl` → `lg:max-w-[1600px] lg:flex-row`. The
+1600px ceiling exists so an ultra-wide monitor doesn't stretch cards absurdly;
+`mx-auto` centres whatever is left beyond it.
+
+**The number the whole system rests on:** these cards already render at **288px**
+on a 320px phone, so anything from ~290px up is inside their working range.
+That is why multi-column is safe at tablet width and why *nothing inside a card
+needs a breakpoint*. If a card seems to need internal breakpoints, the page grid
+is wrong, not the card.
+
+| viewport | nav | columns | card width |
+| --- | --- | --- | --- |
+| 320–767 | bottom nav + hamburger | 1 | 288–431px |
+| 768–1023 (tablet) | bottom nav + hamburger | 2 | ~352px |
+| 1024+ (laptop) | **sidebar**, no bottom nav | 2 | ~470–620px |
+
+What goes inside splits into two kinds, and **which kind a screen is decides the
+treatment**:
+
+- **Dashboards / card stacks widen into columns.** Home, Progress, Battle,
+  Grade Prediction and the lessons list use
+  `grid grid-cols-1 items-start gap-4 md:grid-cols-2`, with `md:col-span-2` on
+  the card that heads the page (score donut, live battle, prediction hero).
+  **Two columns is the ceiling, and the limit is card HEIGHT, not width.** A
+  third column at `2xl` was tried and reverted: `SubjectBreakdown` is a long
+  list next to two short charts, so three columns left a *bigger* hole than two.
+  Before adding a card to a grid, check the shape — a compact one-row card or a
+  `grid-cols-N` stat strip takes `md:col-span-2` and reads as a banner; a list
+  or chart pairs with its neighbour — and then check that the un-spanned cards
+  are **even in number**, or the last row holes.
+- **Reading and answering screens get NARROWER, not wider.** Lesson content,
+  mock exam, placement test, profile, roadmap, login, survey, the chat
+  conversation and the math keyboard all cap at `mx-auto w-full max-w-2xl`
+  (672px). Prose and exam questions have an optimal line length; stretching them
+  across a laptop actively hurts. The roadmap stays one column for a second
+  reason — it's a sequential path, and two columns would break the order.
+
+`max-w-2xl` is the single content-column width across every screen in that
+second group. Keep using it rather than introducing a second number.
+
+**One nav at a time.** `components/shell/sidebar-nav.tsx` exports `SidebarNav`
+(the list) and `Sidebar` (the `hidden lg:flex` column). `Drawer` renders the
+*same* `SidebarNav` inside its Sheet, so the two navs are one component and
+cannot drift — add a route to `lib/nav-items.ts` and it appears in both.
+`BottomNav` and `TopBar` carry `lg:hidden` on their own roots rather than on the
+9 pages that render them. `FabChat` and page `pb-20`/`pb-36` both exist to clear
+the bottom nav, so both get `lg:` overrides — without them desktop has ~80px of
+dead space under every page.
+
+**Full-bleed is phone-only.** `AiInsights` uses `-mx-4 px-4` to cancel the page
+padding so its carousel reaches both screen edges. From `md` the card sits in a
+grid column where bleeding outward overlaps its neighbour — and the page padding
+is `px-6`/`px-8` there anyway, so `-mx-4` lines up with nothing. It resets with
+`md:mx-0 md:px-0`. Any future bleed needs the same reset.
+
+**Mobile is the baseline and must not shift.** Every rule above is `md:`/`lg:`
+only, and DOM order is unchanged — e.g. Home still has the grade card between
+`StatPills` and `LessonPreviewList`, which is why the masthead is wrapped in one
+`md:col-span-2` block rather than the children being reordered.
+
+**Verify with `node scripts/shots.mjs`** (needs `npm run dev` running). It drives
+the installed Chrome through `playwright-core` — no browser download — seeds a
+logged-in profile into `localStorage`, then walks 9 routes × 9 widths
+(320/375/390/430/768/1024/1280/1440/1920), writes a PNG each and asserts nothing
+overflows. It separates **hard** failures (the page scrolls sideways, or an
+element juts past the viewport with no scrollable ancestor) from **soft** ones
+(an element measures wider than its own box — which a deliberate full-bleed
+child does too, so Progress reports soft hits at phone widths and that is
+correct). Exit code follows hard failures only.
+
+### Focus mode — lessons and tests take over the screen
+
+Modelled on Duolingo: the moment a student is mid-task, **every** navigation
+affordance goes (sidebar, bottom nav, hamburger, chat FAB) and the screen becomes
+a top bar with an X and a progress bar, the exercise centred, and one action
+button pinned to the bottom.
+
+`components/shell/focus-layout.tsx` is that frame — `FocusLayout` plus
+`FocusButton` — and it is deliberately shared by the lesson flow, the mock exam
+and the placement test. Those three each used to hand-roll a progress bar and
+inline buttons, which is exactly how they drifted apart; change the task
+experience here, not in three places. The body uses
+`min-h-full` + `justify-center`, which is what makes a short step sit in the
+middle of a laptop screen while a long one still scrolls from the top.
+
+**Whether focus is on comes from two sources, combined in one hook**
+(`hooks/use-focus-mode.ts`), because the two kinds of task announce themselves
+differently:
+
+- **Route** — `utils/focus-routes.ts`'s `isFocusRoute()` for screens that are
+  nothing but a task from the moment you land: `/lessons/:id`, `/placement-test/:subject`.
+  It tests `startsWith("/lessons/")` **with the trailing slash**, so the
+  `/lessons` LIST stays an ordinary page with full navigation. Don't loosen that.
+- **Store** — `focusMode`, for the mock exam, where `/exam` is an ordinary
+  destination (its intro screen shows past results) until the student actually
+  starts answering. `MockExam` sets it in an effect keyed on `started && !done`,
+  **with a cleanup that clears it** — without that, a browser-back out of a
+  running exam leaves the whole app with no navigation at all. It is excluded
+  from `partialize` for the same reason: a persisted `true` would strand a
+  returning student on a screen with no way out.
+
+Consumers are `ShellLayout` (ORs it into the existing `hideChrome`, which already
+drops `TopBar`/`FabChat`/`Sidebar` for the roadmap onboarding lock) and
+`BottomNav` (returns `null`), which is checked in the component rather than in
+the 6 pages that render it.
+
+**Every focus screen must have a working exit.** The exam's answering screen had
+none before this — survivable only because the nav was still there to escape
+through. It now passes `confirmExit`, which shows a two-tap confirm first,
+because leaving discards the attempt.
+
+`PlacementTestRunner` takes an opt-in `focus` prop that **defaults to false**:
+the survey's `WeaknessStep` renders the same component inline inside a step card,
+where a full-screen takeover would swallow the survey itself. Only the
+`/placement-test/:subject` route passes `focus`.
+
+**Focus mode scales with the screen; the phone does not move.** It first shipped
+with fixed phone sizes at every width, so a 1920px laptop rendered 16px type
+stranded in the middle of the screen. `utils/focus-styles.ts` now holds the
+ladder as shared class strings — `focusCard`, `focusKicker`, `focusPrompt`,
+`focusBody`, `focusLabel`, `focusOption` — used by all three task screens so
+they can't drift. Sizes were taken from a real Duolingo lesson: a **~24px
+prompt, ~18px options about 60px tall, in a ~768px column** (`md:max-w-3xl`,
+applied to `FocusLayout`'s top bar, body **and** footer so their edges stay
+aligned).
+
+Two rules when touching it:
+- **Base classes are the phone and are not to be edited.** Every step up is
+  `md:`/`lg:`-only. The check that this held is a pixel diff of the 320/390/430
+  focus screenshots before and after — they must be byte-identical.
+- The constants live in a `.ts` file, not in `focus-layout.tsx`, because a
+  non-component export from a `.tsx` trips oxlint's `only-export-components`
+  fast-refresh rule (the repo carries that warning once already, in
+  `components/ui/button.tsx`, and shouldn't grow a second).
+
+`PlacementTestRunner` branches on `focus` before applying any of them: inline in
+the survey it keeps plain phone classes, because that copy sits inside a step
+card and would otherwise scale itself out of its container.
+
+Duolingo's flat no-card look, split SKIP/CHECK footer and option number badges
+were considered and **declined** — the card-and-shadow style is the app's
+identity everywhere else.
 
 **Login** (`features/login`) — name + language choice (both required) plus
 email/age/location (all optional), shown before the survey; `AppShell` renders
@@ -352,8 +581,8 @@ normally. `partialize` is a named function purely so `merge` can borrow its type
 **Survey persists across reloads**, same as Login — `surveyed` and `userData`
 are in `lib/store.ts`'s `partialize` (`lang`, `userName`/`userEmail`/`userAge`/
 `userLocation`, `userLanguage`, `surveyed`, `userData`, `pendingPlacementTests`,
-`commitment`, `xp`, `level`, `streak`, `tasks`, `examResults`, `conversations`,
-`activeConversationId`; `chatOpen`/`drawerOpen`/`pledgeOpen` deliberately
+`commitment`, `pledgeSeen`, `xp`, `level`, `streak`, `tasks`, `examResults`,
+`conversations`, `activeConversationId`; `chatOpen`/`drawerOpen`/`pledgeOpen` deliberately
 excluded as UI state). This reverses the original app's behavior; it was
 explicitly changed once Logout existed. The only way back to a blank
 Login/Survey is Profile → Logout. Don't reintroduce "always re-show on reload".

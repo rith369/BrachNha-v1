@@ -16,7 +16,7 @@ export function HomeHeader() {
   return (
     <div className="flex items-center justify-between pr-14">
       <div>
-        <div className="font-heading flex items-center gap-1 bg-linear-to-r from-pink via-purple to-blue bg-clip-text text-xl font-extrabold text-transparent">
+        <div className="font-heading flex items-center gap-1 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
           BrachNha
           <Sparkles className="size-4 text-purple" strokeWidth={2.5} />
         </div>

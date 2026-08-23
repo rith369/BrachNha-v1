@@ -49,13 +49,13 @@ export function MathKeyboard({
   return (
     <div
       className={cn(
-        "flex shrink-0 flex-col border-t border-purple/10 bg-white",
+        "flex shrink-0 flex-col border-t border-purple/10 bg-surface",
         PANEL_HEIGHT
       )}
     >
       {/* Tabs. Five Khmer labels do not fit across a 360px screen, so the strip
           scrolls sideways rather than wrapping to a second row or truncating. */}
-      <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-purple/10 px-2 py-1.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="mx-auto flex w-full max-w-2xl shrink-0 gap-1.5 overflow-x-auto border-b border-purple/10 px-2 py-1.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {MATH_TABS.map((s) => (
           <button
             key={s.id}
@@ -64,7 +64,7 @@ export function MathKeyboard({
             className={cn(
               "flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-extrabold whitespace-nowrap transition",
               s.id === tab
-                ? "bg-linear-to-r from-pink to-purple text-white"
+                ? "bg-brand text-white"
                 : "bg-purple/8 text-purple hover:bg-purple/15"
             )}
           >
@@ -75,7 +75,10 @@ export function MathKeyboard({
       </div>
 
       {/* Keys */}
-      <div className="min-h-0 flex-1 overflow-y-auto p-2">
+      {/* Capped to match the composer above it. Six keys stretched across a
+          1024px laptop would each be ~165px wide — the panel would stop reading
+          as a keyboard. */}
+      <div className="mx-auto w-full min-h-0 max-w-2xl flex-1 overflow-y-auto p-2">
         <div className="grid grid-cols-6 gap-1.5">
           {keys.map((key, i) => (
             <button
@@ -83,7 +86,7 @@ export function MathKeyboard({
               onPointerDown={(e) => e.preventDefault()}
               onClick={() => onInsert(key)}
               className={cn(
-                "flex h-11 items-center justify-center rounded-xl border border-purple/12 bg-bg text-base font-bold text-text transition active:scale-95 active:bg-purple/15",
+                "flex h-11 items-center justify-center rounded-xl border border-purple/12 bg-control text-base font-bold text-text transition active:scale-95 active:bg-purple/15",
                 key.wide && "col-span-2 text-sm"
               )}
             >
@@ -106,7 +109,7 @@ export function MathKeyboard({
         <button
           onPointerDown={(e) => e.preventDefault()}
           onClick={() => onInsert({ label: " " })}
-          className="h-11 flex-1 rounded-xl border border-purple/12 bg-bg text-xs font-extrabold text-muted transition active:scale-95 active:bg-purple/15"
+          className="h-11 flex-1 rounded-xl border border-purple/12 bg-control text-xs font-extrabold text-muted transition active:scale-95 active:bg-purple/15"
         >
           {t.spaceKey}
         </button>

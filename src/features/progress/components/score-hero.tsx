@@ -7,7 +7,7 @@ export function ScoreHero() {
   const dash = (overallReadiness.pct / 100) * CIRC;
 
   return (
-    <div className="rounded-2xl border border-purple/10 bg-white p-4 shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
+    <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
       <div className="flex items-center gap-4">
         <div className="flex-1">
           <div className="text-[11px] font-extrabold tracking-widest text-muted uppercase">
@@ -39,7 +39,7 @@ export function ScoreHero() {
               cy="50"
               r={R}
               fill="none"
-              stroke="rgba(139,43,226,0.1)"
+              stroke="var(--color-chart-track)"
               strokeWidth="10"
             />
             <circle

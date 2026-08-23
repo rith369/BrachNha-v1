@@ -32,7 +32,7 @@ export function LanguageSwitcher() {
                 "flex items-center justify-center gap-2 rounded-2xl border px-3 py-2.5 text-sm font-extrabold transition",
                 active
                   ? "border-purple/30 bg-linear-to-r from-pink/10 to-purple/10 text-purple"
-                  : "border-purple/10 bg-white text-text hover:bg-purple/8"
+                  : "border-purple/10 bg-surface text-text hover:bg-purple/8"
               )}
             >
               <Flag code={option.code} className="size-4.5" />

@@ -24,38 +24,45 @@ export function PlacementTestPage({ subject }: { subject: string }) {
     navigate("/roadmap");
   }
 
+  // The runner owns the whole screen in focus mode (its own top bar carries the
+  // X and progress), so it is returned bare — wrapping it in the padded column
+  // below would cap its height and strand the pinned footer mid-page.
+  if (isValid) {
+    return (
+      <PlacementTestRunner
+        focus
+        subject={subject}
+        lang={lang}
+        onComplete={(_pct, isWeak) => {
+          resolvePlacementTest(subject, isWeak);
+          back();
+        }}
+        onCancel={back}
+      />
+    );
+  }
+
+  // Subject with no questions yet (physics/chemistry today) — an ordinary page,
+  // so it keeps the heading and normal padding.
   return (
-    <div className="px-4 pt-4 pb-36">
-      <div className="font-heading mb-0.5 bg-linear-to-r from-pink via-purple to-blue bg-clip-text pr-14 text-xl font-extrabold text-transparent">
+    <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-36 lg:pb-10">
+      <div className="font-heading mb-0.5 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
         🎯 {t.placementTest}
       </div>
-      <div className="mb-4 pr-14 text-xs font-bold text-muted">
+      <div className="mb-4 text-xs font-bold text-muted">
         {t[subject as TranslationKey] ?? subject}
       </div>
-
-      {isValid ? (
-        <PlacementTestRunner
-          subject={subject}
-          lang={lang}
-          onComplete={(_pct, isWeak) => {
-            resolvePlacementTest(subject, isWeak);
-            back();
-          }}
-          onCancel={back}
-        />
-      ) : (
-        <div className="rounded-2xl border border-purple/10 bg-white p-6 text-center shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
-          <div className="mb-3 text-sm font-bold text-muted">
-            🔬 {t.testComingSoon}
-          </div>
-          <button
-            onClick={back}
-            className="rounded-2xl bg-linear-to-r from-pink to-purple px-6 py-3 text-sm font-extrabold text-white shadow-[0_6px_18px_rgba(139,43,226,0.35)]"
-          >
-            ← {lang === "en" ? "Back to Roadmap" : "ត្រឡប់ទៅផែនទី"}
-          </button>
+      <div className="rounded-2xl border border-purple/10 bg-surface p-6 text-center shadow-panel">
+        <div className="mb-3 text-sm font-bold text-muted">
+          🔬 {t.testComingSoon}
         </div>
-      )}
+        <button
+          onClick={back}
+          className="rounded-2xl bg-brand px-6 py-3 text-sm font-extrabold text-white shadow-cta"
+        >
+          ← {lang === "en" ? "Back to Roadmap" : "ត្រឡប់ទៅផែនទី"}
+        </button>
+      </div>
     </div>
   );
 }

@@ -271,10 +271,15 @@ export function ChatOverlay() {
       transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
       className="absolute inset-0 z-50 flex flex-col bg-bg"
     >
-      {/* Header */}
-      <div className="flex shrink-0 items-start justify-between px-5.5 pt-4 pb-3">
+      {/* Header.
+          The overlay backdrop covers the whole shell, but the conversation
+          itself is capped at max-w-2xl and centred: message bubbles are already
+          max-w-[80%], and 80% of a 1024px laptop is an 819px line of text that
+          is genuinely hard to read. Header, messages and composer all share the
+          same cap so their left edges line up. */}
+      <div className="mx-auto flex w-full max-w-2xl shrink-0 items-start justify-between px-5.5 pt-4 pb-3">
         <div>
-          <div className="font-heading bg-linear-to-r from-pink via-purple to-blue bg-clip-text text-lg font-extrabold text-transparent">
+          <div className="font-heading bg-brand-tri bg-clip-text text-lg font-extrabold text-transparent">
             🤖 {lang === "en" ? "AI Mentor" : "គ្រូ AI"}
           </div>
           <div className="text-xs font-bold text-muted">
@@ -317,11 +322,11 @@ export function ChatOverlay() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 space-y-3 overflow-y-auto px-4 pb-3">
+      <div className="mx-auto w-full max-w-2xl flex-1 space-y-3 overflow-y-auto px-4 pb-3">
         {msgs.length === 0 && (
           <>
             <div className="flex justify-start">
-              <div className="max-w-[80%] rounded-2xl border border-purple/10 bg-white px-4 py-2.5 text-sm font-semibold text-text">
+              <div className="max-w-[80%] rounded-2xl border border-purple/10 bg-surface px-4 py-2.5 text-sm font-semibold text-text">
                 {greeting}
               </div>
             </div>
@@ -334,7 +339,7 @@ export function ChatOverlay() {
                   <button
                     key={q}
                     onClick={() => send(q)}
-                    className="rounded-full border border-purple/15 bg-white px-3 py-1.5 text-left text-xs font-bold text-purple transition hover:bg-purple/10"
+                    className="rounded-full border border-purple/15 bg-surface px-3 py-1.5 text-left text-xs font-bold text-purple transition hover:bg-purple/10"
                   >
                     {q}
                   </button>
@@ -356,8 +361,8 @@ export function ChatOverlay() {
               <div
                 className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm font-semibold whitespace-pre-wrap ${
                   m.role === "user"
-                    ? "bg-linear-to-r from-pink to-purple text-white"
-                    : "border border-purple/10 bg-white text-text"
+                    ? "bg-brand text-white"
+                    : "border border-purple/10 bg-surface text-text"
                 }`}
               >
                 {/* Bot replies carry LaTeX (see data/bac2-format.ts); the
@@ -370,7 +375,7 @@ export function ChatOverlay() {
 
         {loading && !msgs[msgs.length - 1]?.text && (
           <div className="flex justify-start">
-            <div className="flex items-center gap-1.5 rounded-2xl border border-purple/10 bg-white px-4 py-2.5">
+            <div className="flex items-center gap-1.5 rounded-2xl border border-purple/10 bg-surface px-4 py-2.5">
               <Bot className="size-3.5 text-purple" />
               <span className="text-xs font-bold text-muted">...</span>
             </div>
@@ -380,7 +385,7 @@ export function ChatOverlay() {
       </div>
 
       {/* Input */}
-      <div className="flex shrink-0 items-center gap-2 border-t border-purple/10 p-3">
+      <div className="mx-auto flex w-full max-w-2xl shrink-0 items-center gap-2 border-t border-purple/10 p-3">
         <button
           onPointerDown={(e) => e.preventDefault()}
           onClick={toggleMode}
@@ -388,7 +393,8 @@ export function ChatOverlay() {
           className={cn(
             iconBtn,
             "size-10",
-            mode === "symbols" && "bg-purple text-white hover:bg-purple"
+            mode === "symbols" &&
+              "bg-[var(--brand-purple)] text-on-brand hover:bg-[var(--brand-purple)]"
           )}
         >
           {mode === "symbols" ? (
@@ -404,13 +410,13 @@ export function ChatOverlay() {
           onKeyDown={(e) => e.key === "Enter" && send()}
           inputMode={mode === "symbols" ? "none" : "text"}
           placeholder={t.askQuestion}
-          className="min-w-0 flex-1 rounded-full border border-purple/15 bg-white px-4 py-2.5 text-sm font-semibold outline-none focus:border-purple/40"
+          className="min-w-0 flex-1 rounded-full border border-purple/15 bg-surface px-4 py-2.5 text-sm font-semibold outline-none focus:border-purple/40"
         />
         <button
           onClick={() => send()}
           disabled={loading || !input.trim()}
           aria-label={t.send}
-          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-linear-to-r from-pink to-purple text-white disabled:opacity-40"
+          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand text-white disabled:opacity-40"
         >
           <Send className="size-4.5" />
         </button>
@@ -479,7 +485,7 @@ function HistoryPanel({
       transition={{ duration: 0.24, ease: [0.4, 0, 0.2, 1] }}
       className="absolute inset-0 z-10 flex flex-col bg-bg"
     >
-      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-purple/10 px-4 pt-4 pb-3">
+      <div className="mx-auto flex w-full max-w-2xl shrink-0 items-center justify-between gap-2 border-b border-purple/10 px-4 pt-4 pb-3">
         <button
           onClick={onBack}
           className="flex items-center gap-1.5 rounded-full bg-purple/10 px-3 py-1.5 text-xs font-extrabold text-purple transition hover:bg-purple/20"
@@ -492,14 +498,14 @@ function HistoryPanel({
         </div>
         <button
           onClick={onNew}
-          className="flex items-center gap-1.5 rounded-full bg-linear-to-r from-pink to-purple px-3 py-1.5 text-xs font-extrabold text-white"
+          className="flex items-center gap-1.5 rounded-full bg-brand px-3 py-1.5 text-xs font-extrabold text-white"
         >
           <Plus className="size-3.5" strokeWidth={2.75} />
           {t.newChat}
         </button>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto p-3">
+      <div className="mx-auto w-full min-h-0 max-w-2xl flex-1 overflow-y-auto p-3">
         {conversations.length === 0 ? (
           <div className="px-4 py-10 text-center text-sm font-bold text-muted">
             {t.noConversations}
@@ -541,7 +547,7 @@ function HistoryPanel({
                     <div className="flex shrink-0 items-center gap-1.5">
                       <button
                         onClick={() => setConfirmingId(null)}
-                        className="rounded-full border border-purple/20 bg-white px-2.5 py-1 text-[11px] font-extrabold text-purple"
+                        className="rounded-full border border-purple/20 bg-surface px-2.5 py-1 text-[11px] font-extrabold text-purple"
                       >
                         {t.cancelDelete}
                       </button>
@@ -550,7 +556,7 @@ function HistoryPanel({
                           onDelete(c.id);
                           setConfirmingId(null);
                         }}
-                        className="rounded-full bg-pink px-2.5 py-1 text-[11px] font-extrabold text-white"
+                        className="rounded-full bg-[var(--brand-pink)] px-2.5 py-1 text-[11px] font-extrabold text-on-brand"
                       >
                         {t.deleteChat}
                       </button>

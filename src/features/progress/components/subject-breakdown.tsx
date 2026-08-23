@@ -10,7 +10,7 @@ export function SubjectBreakdown() {
         {subjectBreakdown.map((s) => (
           <div
             key={s.name}
-            className="rounded-2xl border border-purple/10 bg-white p-3.5 shadow-[0_2px_12px_rgba(139,43,226,0.06)]"
+            className="rounded-2xl border border-purple/10 bg-surface p-3.5 shadow-panel-sm"
           >
             <div className="mb-2.5 flex items-center gap-2.5">
               <span className="text-xl">{s.emoji}</span>

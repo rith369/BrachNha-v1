@@ -6,7 +6,7 @@ export function BattleStatsCard() {
       <div className="mb-3 font-heading text-sm font-extrabold">
         My Battle Stats 🏅
       </div>
-      <div className="rounded-2xl border border-purple/10 bg-white p-4 shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
+      <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
         <div className="grid grid-cols-4 gap-2 text-center">
           <div>
             <div className="font-heading text-lg font-extrabold text-mint">

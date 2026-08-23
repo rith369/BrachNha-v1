@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from "react";
 import { TopBar } from "./top-bar";
 import { Drawer } from "./drawer";
+import { Sidebar } from "./sidebar-nav";
 import { FabChat } from "./fab-chat";
 import { LoginView } from "@/features/login/components/login-view";
 import { SurveyView } from "@/features/survey/components/survey-view";
@@ -19,13 +20,30 @@ const ChatOverlay = lazy(() =>
 );
 
 // Not a phone mockup — no frame, notch, or status bar. This is just the app's
-// outer container: centred on desktop at max-w-lg, full-bleed on a phone.
-export function AppShell({ children }: { children: React.ReactNode }) {
+// outer container: full-bleed on a phone, then widening in steps so a laptop
+// gets a real layout instead of a 512px ribbon down the middle of the screen.
+//
+// The ladder is max-w-lg (phone) → md:max-w-3xl (tablet) → lg:max-w-5xl
+// (laptop). Everything inside is mobile-first, so a page only opts into the
+// extra width where a wider layout actually reads better — see the page-level
+// card grids. Widening here alone would just stretch cards, not improve them.
+//
+// `hideChrome` drops the hamburger and the chat FAB, leaving the page's own CTA
+// as the only way forward. ShellLayout decides when (it's the piece that knows
+// the route); the default keeps AppShell usable outside a router.
+export function AppShell({
+  children,
+  hideChrome = false,
+}: {
+  children: React.ReactNode;
+  hideChrome?: boolean;
+}) {
   const chatOpen = useBrachNhaStore((s) => s.chatOpen);
   const pledgeOpen = useBrachNhaStore((s) => s.pledgeOpen);
   const userName = useBrachNhaStore((s) => s.userName);
   const surveyed = useBrachNhaStore((s) => s.surveyed);
   const lang = useBrachNhaStore((s) => s.lang);
+  const theme = useBrachNhaStore((s) => s.theme);
 
   // index.html ships lang="en" because `lang` lives in the persisted store and
   // isn't known until React mounts; we correct the attribute here. Both "en"
@@ -35,25 +53,47 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     document.documentElement.lang = lang;
   }, [lang]);
 
+  // Same idea for the theme: index.html's inline script sets this class before
+  // first paint from localStorage, and this effect keeps it in sync afterwards
+  // when the student toggles. classList.toggle rather than className — <html>
+  // also carries h-full and antialiased.
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    // Keep the mobile browser chrome in step with the page it frames.
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", theme === "dark" ? "#100e18" : "#faf5ff");
+  }, [theme]);
+
   return (
-    <div className="mx-auto flex h-dvh w-full max-w-lg flex-col overflow-hidden bg-bg">
+    // Phone and tablet stack vertically inside a centred column. From lg the
+    // shell becomes a ROW — permanent sidebar beside the content — and drops the
+    // narrow cap so the content actually fills a laptop. The 1600px ceiling
+    // keeps an ultra-wide monitor from stretching cards to absurd widths, and
+    // mx-auto centres what's left beyond it.
+    <div className="mx-auto flex h-dvh w-full max-w-lg flex-col overflow-hidden bg-bg md:max-w-3xl lg:max-w-[1600px] lg:flex-row">
       {!userName ? (
         <LoginView />
       ) : !surveyed ? (
         <SurveyView />
       ) : (
-        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-          <TopBar />
-          <Drawer />
-          <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
-          {!chatOpen && !pledgeOpen && <FabChat />}
-          {chatOpen && (
-            <Suspense fallback={null}>
-              <ChatOverlay />
-            </Suspense>
-          )}
-          {pledgeOpen && <CommitmentOverlay />}
-        </div>
+        <>
+          {/* Hidden below lg by the component itself. hideChrome drops it too,
+              so the roadmap's one-way onboarding stays one-way on desktop. */}
+          {!hideChrome && <Sidebar />}
+          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+            {!hideChrome && <TopBar />}
+            <Drawer />
+            <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+            {!chatOpen && !pledgeOpen && !hideChrome && <FabChat />}
+            {chatOpen && (
+              <Suspense fallback={null}>
+                <ChatOverlay />
+              </Suspense>
+            )}
+            {pledgeOpen && <CommitmentOverlay />}
+          </div>
+        </>
       )}
     </div>
   );

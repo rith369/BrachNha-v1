@@ -12,8 +12,9 @@ export default defineConfig({
     babel({ presets: [reactCompilerPreset()] }),
     tailwindcss(),
     // Serves POST /api/chat during `vite dev` / `vite preview`, so the Gemini
-    // key stays server-side and never reaches the browser bundle. See
-    // server/README.md for how to host the same handler in production.
+    // key stays server-side and never reaches the browser bundle. The same
+    // handler is mounted in production by api/chat.ts on Vercel — see
+    // "The AI Mentor endpoint — one handler, two mounts" in CLAUDE.md.
     chatApi(),
   ],
   resolve: {

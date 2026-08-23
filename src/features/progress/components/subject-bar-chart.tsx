@@ -10,7 +10,7 @@ import { questionsPerSubject } from "../demo-data";
 
 export function SubjectBarChart() {
   return (
-    <div className="rounded-2xl border border-purple/10 bg-white p-4 shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
+    <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
       <div className="mb-3">
         <div className="font-heading text-sm font-extrabold">
           Questions Answered 📊
@@ -30,13 +30,20 @@ export function SubjectBarChart() {
               tickLine={false}
             />
             <Tooltip
-              cursor={{ fill: "rgba(139,43,226,0.05)" }}
+              cursor={{ fill: "var(--color-chart-grid)" }}
               contentStyle={{
                 borderRadius: 12,
-                border: "1px solid rgba(139,43,226,0.15)",
+                border: "1px solid var(--color-border)",
+                // Recharts defaults its tooltip panel to a solid white box and
+                // sets item/label colours independently of contentStyle, so all
+                // three have to be named or the panel stays light-mode.
+                background: "var(--color-tooltip-bg)",
+                color: "var(--color-text)",
                 fontSize: 12,
                 fontWeight: 700,
               }}
+              itemStyle={{ color: "var(--color-text)" }}
+              labelStyle={{ color: "var(--color-muted)" }}
             />
             <Bar dataKey="value" radius={[8, 8, 0, 0]}>
               {questionsPerSubject.map((s) => (

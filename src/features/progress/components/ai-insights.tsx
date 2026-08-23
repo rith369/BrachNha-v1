@@ -12,7 +12,13 @@ export function AiInsights() {
       <div className="mb-3 font-heading text-sm font-extrabold">
         AI Insights 🤖✨
       </div>
-      <div className="-mx-4 flex gap-2.5 overflow-x-auto px-4 pb-1">
+      {/* Full-bleed carousel on a phone: -mx-4 cancels the page's px-4 so the
+          cards run to both screen edges, which is what makes it read as
+          scrollable. From md the card sits inside a grid column instead, where
+          bleeding outward would push it over its neighbour — the page padding
+          is also px-6/px-8 there, so -mx-4 would no longer line up with
+          anything. Reset it and scroll within the column. */}
+      <div className="-mx-4 flex gap-2.5 overflow-x-auto px-4 pb-1 md:mx-0 md:px-0">
         {aiInsights.map((ins) => (
           <div
             key={ins.title}

@@ -1,5 +1,7 @@
-import { Outlet, Route, Routes } from "react-router";
+import { Outlet, Route, Routes, useLocation } from "react-router";
 import { AppShell } from "@/components/shell/app-shell";
+import { useFocusMode } from "@/hooks/use-focus-mode";
+import { useBrachNhaStore } from "@/lib/store";
 import HomePage from "@/pages/home";
 import BattlePage from "@/pages/battle";
 import ExamPage from "@/pages/exam";
@@ -18,8 +20,25 @@ import NotFoundPage from "@/pages/not-found";
  * the only thing that knows about <Outlet />.
  */
 function ShellLayout() {
+  const { pathname } = useLocation();
+  const commitment = useBrachNhaStore((s) => s.commitment);
+  const pledgeSeen = useBrachNhaStore((s) => s.pledgeSeen);
+
+  // Fresh out of the survey the roadmap is a one-way screen: its commit CTA is
+  // the only way off it, because a hamburger tap there means the student never
+  // reaches the pledge at all. Once they've seen it — signed or skipped — the
+  // roadmap is an ordinary page again.
+  const roadmapLock = pathname === "/roadmap" && !commitment && !pledgeSeen;
+
+  // Lessons and tests hide the same chrome, for a different reason: mid-task the
+  // screen should be the exercise and nothing else. Both cases drop TopBar,
+  // FabChat and the Sidebar, so they share one prop. BottomNav reads
+  // useFocusMode() itself since the pages, not the shell, render it.
+  const focusMode = useFocusMode();
+  const hideChrome = roadmapLock || focusMode;
+
   return (
-    <AppShell>
+    <AppShell hideChrome={hideChrome}>
       <Outlet />
     </AppShell>
   );

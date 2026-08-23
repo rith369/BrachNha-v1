@@ -16,7 +16,7 @@ function toggleIn(list: string[], value: string) {
 }
 
 function chipClass(selected: boolean, tone: "pink" | "mint" | "purple") {
-  if (!selected) return "border-purple/10 bg-white text-text hover:bg-purple/5";
+  if (!selected) return "border-purple/10 bg-surface text-text hover:bg-purple/5";
   return {
     pink: "border-pink/40 bg-pink/10 text-pink",
     mint: "border-mint/40 bg-mint/10 text-mint",
@@ -122,19 +122,19 @@ export function WeaknessStep({
                     min={todayISO}
                     value={scheduleDate}
                     onChange={(e) => setScheduleDate(e.target.value)}
-                    className="mb-2 w-full rounded-xl border border-purple/10 bg-white px-3.5 py-2.5 text-sm font-bold text-text outline-none focus:border-purple/40"
+                    className="mb-2 w-full rounded-xl border border-purple/10 bg-surface px-3.5 py-2.5 text-sm font-bold text-text outline-none focus:border-purple/40"
                   />
                   <div className="flex gap-2">
                     <button
                       onClick={closePanel}
-                      className="flex-1 rounded-xl border border-purple/20 bg-white px-3 py-2 text-xs font-extrabold text-purple"
+                      className="flex-1 rounded-xl border border-purple/20 bg-surface px-3 py-2 text-xs font-extrabold text-purple"
                     >
                       ← {lang === "en" ? "Back" : "ត្រឡប់"}
                     </button>
                     <button
                       disabled={!scheduleDate}
                       onClick={confirmSchedule}
-                      className="flex-1 rounded-xl bg-linear-to-r from-pink to-purple px-3 py-2 text-xs font-extrabold text-white disabled:opacity-40"
+                      className="flex-1 rounded-xl bg-brand px-3 py-2 text-xs font-extrabold text-white disabled:opacity-40"
                     >
                       {t.confirmSchedule}
                     </button>
@@ -184,7 +184,7 @@ export function WeaknessStep({
                       <div className="mt-2 flex gap-2">
                         <button
                           onClick={() => setActiveMode("test")}
-                          className="flex-1 rounded-lg bg-linear-to-r from-pink to-purple px-2 py-2 text-[11px] font-extrabold text-white"
+                          className="flex-1 rounded-lg bg-brand px-2 py-2 text-[11px] font-extrabold text-white"
                         >
                           {t.testMeNow}
                         </button>
@@ -193,7 +193,7 @@ export function WeaknessStep({
                             setActiveMode("schedule");
                             setScheduleDate("");
                           }}
-                          className="flex-1 rounded-lg border border-purple/20 bg-white px-2 py-2 text-[11px] font-extrabold text-purple"
+                          className="flex-1 rounded-lg border border-purple/20 bg-surface px-2 py-2 text-[11px] font-extrabold text-purple"
                         >
                           {t.scheduleForLater}
                         </button>
@@ -241,7 +241,7 @@ export function WeaknessStep({
               "rounded-xl border px-3 py-2.5 text-sm font-bold transition " +
               (weaknesses.includes(s)
                 ? "border-pink/40 bg-pink/10 text-pink"
-                : "border-purple/10 bg-white text-text hover:bg-purple/5")
+                : "border-purple/10 bg-surface text-text hover:bg-purple/5")
             }
           >
             {t[s as TranslationKey]}

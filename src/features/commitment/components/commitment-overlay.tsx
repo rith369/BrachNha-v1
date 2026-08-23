@@ -19,17 +19,25 @@ const CONFIRM_MS = 1400;
 // reason ChatOverlay lives there, and the same reason neither uses ui/sheet,
 // which portals to document.body and escapes the max-w-lg frame.
 export function CommitmentOverlay() {
-  const { lang, userName, userData, commitment, signCommitment, setPledgeOpen } =
-    useBrachNhaStore(
-      useShallow((s) => ({
-        lang: s.lang,
-        userName: s.userName,
-        userData: s.userData,
-        commitment: s.commitment,
-        signCommitment: s.signCommitment,
-        setPledgeOpen: s.setPledgeOpen,
-      }))
-    );
+  const {
+    lang,
+    userName,
+    userData,
+    commitment,
+    signCommitment,
+    setPledgeOpen,
+    markPledgeSeen,
+  } = useBrachNhaStore(
+    useShallow((s) => ({
+      lang: s.lang,
+      userName: s.userName,
+      userData: s.userData,
+      commitment: s.commitment,
+      signCommitment: s.signCommitment,
+      setPledgeOpen: s.setPledgeOpen,
+      markPledgeSeen: s.markPledgeSeen,
+    }))
+  );
   const c = PLEDGE_COPY[lang];
   const navigate = useNavigate();
 
@@ -51,8 +59,11 @@ export function CommitmentOverlay() {
       ? value.signature.trim().length > 0
       : !isBlankSignature(value.signature);
 
+  // The single exit for all four paths — X, "Maybe later", and the post-commit
+  // timer — which is why marking the pledge seen belongs here and nowhere else.
   function close() {
     setPledgeOpen(false);
+    markPledgeSeen();
     if (!hadCommitment) navigate("/");
   }
 
@@ -76,7 +87,7 @@ export function CommitmentOverlay() {
     const id = setTimeout(close, CONFIRM_MS);
     return () => clearTimeout(id);
     // close() only reads values fixed for this mount (hadCommitment, navigate,
-    // setPledgeOpen); re-running on every render would restart the timer.
+    // and the store actions); re-running on every render would restart the timer.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [confirming]);
 
@@ -96,7 +107,7 @@ export function CommitmentOverlay() {
       {confirming ? (
         <div className="flex flex-1 flex-col items-center justify-center px-6">
           <div className="animate-banner-in flex flex-col items-center">
-            <div className="mb-4 flex size-16 items-center justify-center rounded-full bg-linear-to-br from-pink via-purple to-blue text-white shadow-[0_6px_20px_rgba(139,43,226,0.4)]">
+            <div className="mb-4 flex size-16 items-center justify-center rounded-full bg-linear-to-br from-[var(--brand-pink)] via-[var(--brand-purple)] to-[var(--brand-blue)] text-on-brand shadow-cta-lg">
               <Check className="size-8" strokeWidth={3} />
             </div>
             <div className="font-heading text-xl font-extrabold">
@@ -105,16 +116,16 @@ export function CommitmentOverlay() {
             <div className="mt-1 text-center text-xs font-bold text-muted">
               {c.committedSub}
             </div>
-            <div className="mt-5 flex h-20 w-56 items-center justify-center rounded-2xl border border-purple/10 bg-white px-4">
+            <div className="mt-5 flex h-20 w-56 items-center justify-center rounded-2xl border border-purple/10 bg-surface px-4">
               <SignatureDisplay kind={value.kind} signature={value.signature} />
             </div>
           </div>
         </div>
       ) : (
         <>
-          <div className="flex shrink-0 items-start justify-between px-5 pt-4 pb-3">
+          <div className="mx-auto flex w-full max-w-2xl shrink-0 items-start justify-between px-5 pt-4 pb-3">
             <div>
-              <div className="font-heading bg-linear-to-r from-pink via-purple to-blue bg-clip-text text-lg font-extrabold text-transparent">
+              <div className="font-heading bg-brand-tri bg-clip-text text-lg font-extrabold text-transparent">
                 ✍️ {c.title}
               </div>
               <div className="text-xs font-bold text-muted">{c.subtitle}</div>
@@ -122,14 +133,14 @@ export function CommitmentOverlay() {
             <button
               onClick={close}
               aria-label={c.close}
-              className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full border border-purple/10 bg-white text-purple active:scale-95"
+              className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full border border-purple/10 bg-surface text-purple active:scale-95"
             >
               <X className="size-4" strokeWidth={2.5} />
             </button>
           </div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-4">
-            <div className="mb-4 rounded-2xl border border-purple/10 bg-white p-4 shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
+          <div className="mx-auto w-full min-h-0 max-w-2xl flex-1 overflow-y-auto px-5 pb-4">
+            <div className="mb-4 rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
               <p className="text-sm font-bold text-text">
                 {splitEmphasis(c.pledge({
                   name: userName,
@@ -155,7 +166,7 @@ export function CommitmentOverlay() {
               {pills.map((pill) => (
                 <div
                   key={pill.label}
-                  className="rounded-2xl border border-purple/10 bg-white p-3 text-center shadow-[0_2px_10px_rgba(139,43,226,0.06)]"
+                  className="rounded-2xl border border-purple/10 bg-surface p-3 text-center shadow-panel-sm"
                 >
                   <div className="font-heading text-lg font-extrabold text-purple">
                     {pill.value}
@@ -178,7 +189,7 @@ export function CommitmentOverlay() {
             <button
               onClick={commit}
               disabled={!canCommit}
-              className="w-full rounded-2xl bg-linear-to-r from-pink via-purple to-blue bg-[length:200%_auto] px-6 py-3.5 text-sm font-extrabold text-white shadow-[0_6px_18px_rgba(139,43,226,0.35)] animate-shimmer disabled:opacity-40"
+              className="w-full rounded-2xl bg-brand-tri bg-[length:200%_auto] px-6 py-3.5 text-sm font-extrabold text-white shadow-cta animate-shimmer disabled:opacity-40"
             >
               {c.commit} ✍️
             </button>

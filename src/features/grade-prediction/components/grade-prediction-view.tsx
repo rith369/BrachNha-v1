@@ -47,23 +47,31 @@ export function GradePredictionView() {
     : "—";
 
   return (
-    <div className="flex flex-col gap-4">
+    // Two columns from md — see pages/progress.tsx for why the
+    // cards need no internal changes. The banner and the hero span the full
+    // width: one is an alert that must not be missed, the other is the headline
+    // this whole page explains.
+    <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
       {lastChange && (
-        <PredictionUpdatedBanner
-          lang={lang}
-          change={lastChange}
-          onDismiss={dismissChange}
-        />
+        <div className="md:col-span-2">
+          <PredictionUpdatedBanner
+            lang={lang}
+            change={lastChange}
+            onDismiss={dismissChange}
+          />
+        </div>
       )}
 
-      <PredictionHero
-        lang={lang}
-        mostLikelyGrade={prediction.mostLikely}
-        mostLikelyPct={prediction.probabilities[prediction.mostLikely] ?? 0}
-        targetGrade={userData.grade}
-        daysRemaining={daysRemaining}
-        comparison={comparison}
-      />
+      <div className="md:col-span-2">
+        <PredictionHero
+          lang={lang}
+          mostLikelyGrade={prediction.mostLikely}
+          mostLikelyPct={prediction.probabilities[prediction.mostLikely] ?? 0}
+          targetGrade={userData.grade}
+          daysRemaining={daysRemaining}
+          comparison={comparison}
+        />
+      </div>
 
       <GradeProbabilityBars
         lang={lang}

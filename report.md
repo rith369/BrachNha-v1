@@ -9,11 +9,87 @@ developers. Newest entries first.
 
 Each entry lists the commit it landed in, so you can match it to a version of the site.
 
+> **Note on the older commit codes.** When the project moved to its new folder, the repo
+> was started fresh and the whole history up to 22 Aug 2026 was collapsed into a single
+> commit, `2d20f12`. The codes shown on entries below that date (`1e4916b`, `8469c05`,
+> `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
+> record of the order things happened, not as something you can look up.
+
+---
+
+## 23 Aug 2026 — The app has a dark theme you can switch on
+
+*Landed in commit `TBD`.*
+
+**Why.** Students revise at night, mostly on a phone. The app was near-white on every
+screen, which is uncomfortable to look at in a dark room and burns more battery on the
+phones our students actually own.
+
+**What changed.** Every screen now has a dark version — dark grey-purple backgrounds,
+slightly lighter cards, and text that stays comfortable to read rather than glaring. The
+pink/purple/blue BrachNha look is unchanged: same buttons, same gradients, same icons,
+same wording, same layout. Nothing moved and nothing was removed.
+
+**It's a choice, and it's remembered.** Open the menu (☰) and you'll find a new **Theme**
+switch — Dark or Light — sitting just above the existing Language switch. **The app still
+opens bright**, exactly as it always has; dark is there for students who want it.
+Whatever you pick is remembered on that phone, including after you close the app or log
+out.
+
+If you tried an early build of this and it opened dark, that's been corrected — it will
+open bright again on its own, with no need to clear anything.
+
+**One detail worth knowing.** Colours that carry white text — the big gradient buttons,
+the BrachNha logo — deliberately stay exactly as they were in both themes, because
+lightening them would have made the white writing on top hard to read. Colours used for
+*text* and icons are brightened in dark mode for the opposite reason. So the app looks
+consistent, but the two are handled differently behind the scenes.
+
+**What to re-test.** Walk through the app in **both** themes, switching between them as
+you go — sign-in, the survey (especially the Weak / Not weak / Not sure chips), a lesson
+end to end, a mock exam and its score circle, the Progress and Grade Prediction charts
+(**hover a chart to check the little pop-up box isn't white**), the Roadmap, the
+commitment signature pad, and the AI Mentor including a question with maths in it. Also
+close and reopen the app to confirm your theme choice stuck, and check there's no white
+flash while it loads.
+
+---
+
+## 22 Aug 2026 — Students can't skip past the commitment pledge any more
+
+*Landed in commit `TBD`.*
+
+**The problem.** Right after finishing the survey, students land on their Roadmap. The
+intention is that they read their plan and then tap the big button at the bottom to sign
+their study commitment. But the menu button (the ☰ in the top-right) and the AI Mentor
+chat button were both sitting on that screen, so a lot of students simply tapped the menu,
+wandered off into the app, and never saw the pledge at all.
+
+**What changed.** On that first visit to the Roadmap, the menu button and the chat button
+are hidden. The "Ready to commit" button at the bottom is the only way forward, so the
+student actually reaches the signature screen.
+
+**Nobody gets trapped.** Once they've been shown the pledge screen, the Roadmap goes back
+to normal permanently — menu and chat both there, on every future visit. That applies
+whether they signed it *or* tapped "Maybe later"; declining is still allowed, and they can
+sign later from the same button. It also survives closing and reopening the app.
+
+Everything else about the pledge is unchanged: after signing (or skipping) for the first
+time you're still taken to Home, the signed banner still appears on the Roadmap
+afterwards, and "Re-sign" from that banner still leaves you on the Roadmap.
+
+**What to re-test.** Log out from Profile, sign up again and finish the survey. Check the
+Roadmap has no ☰ and no chat button. Reload the page — it should stay that way. Then tap
+the bottom button and choose "Maybe later"; go back to the Roadmap and confirm both
+buttons are back. Repeat once more but actually sign, and confirm the same. Finally, on an
+account that has already signed, check the Roadmap looks completely normal from the moment
+it loads.
+
 ---
 
 ## 22 Aug 2026 — The app moved to a new toolchain, and it can now go live on Vercel
 
-*Not committed yet — still local.*
+*Landed in commit `2d20f12`.*
 
 **What changed.** Nothing you can see. The app looks and behaves exactly as it did
 yesterday; what changed is the machinery underneath it.
@@ -50,7 +126,7 @@ changes what the mentor is told and needs someone to re-check answer quality aft
 
 ## 21 Aug 2026 — Maths keyboard in the chat, and proper formulas in the answers
 
-*Not committed yet — still local.*
+*Landed in commit `2d20f12`.*
 
 **What changed.** Two things, both in the AI Mentor chat.
 
@@ -92,7 +168,7 @@ reverse — hard to read, easy to misread.
 
 ## 21 Aug 2026 — AI Mentor now always answers in Khmer
 
-*Not committed yet — still local.*
+*Landed in commit `2d20f12`.*
 
 **What changed.** The AI Mentor now replies in Khmer every time, even when the student types
 their question in English. Before, it replied in whichever language the app was set to.
