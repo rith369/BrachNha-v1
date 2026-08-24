@@ -17,6 +17,253 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 24 Aug 2026 — The chatbot is now called KruAI
+
+*Landed in commit `TBD`.*
+
+**Why.** "AI Mentor" describes what it is; it isn't a name. KruAI is a name students can
+remember and ask for.
+
+**What changed.** Everywhere the chatbot appears it is now **KruAI** — the chat header,
+the button that opens it, its greeting, and the messages shown if it's ever unavailable.
+It introduces itself as *"Hi! I am KruAI, your BrachNha study mentor."*
+
+**The name is spelled the same in Khmer.** The Khmer used to read **គ្រូ AI**, which is
+literally "teacher AI" — and that is where the name comes from (**គ្រូ** = *kru* =
+teacher). Rather than translating it, the Khmer now shows **KruAI** in Latin letters too,
+so the chatbot has one name in both languages instead of two. Khmer students read គ្រូ
+every day, so the name still reads naturally to them.
+
+**It also knows its own name now.** The instructions the chatbot follows were updated so
+that if a student asks who or what it is, it answers that it is KruAI, BrachNha's study
+mentor. It is also now explicitly told **never to name the AI company or service behind
+it**, even if asked directly — which closes the gap left by the previous change. That one
+removed the credit from the screen; a student could still have simply asked the chatbot
+what it was.
+
+**Nothing about the answers changed** — same subjects, same style, same speed.
+
+**What to re-test.** Open the chatbot and check the header reads **KruAI** and the
+greeting names it, in **both English and Khmer**. Then, because its instructions were
+edited, ask it two or three real Bac II questions — a limits problem and a probability
+one — and confirm the answers are still laid out properly and still come back in Khmer.
+Finally ask it directly, *"What are you?"* and *"Which AI are you built on?"*, and check
+it says it is KruAI without naming any company.
+
+---
+
+## 24 Aug 2026 — The AI Mentor no longer names the AI service behind it
+
+*Landed in commit `TBD`.*
+
+**Why.** The mentor's header carried a "Powered by Gemini AI" credit. We would rather not
+advertise which AI service the app runs on.
+
+**What changed.** That line is gone. The header subtitle now simply reads **"Ask
+anything"** (**សួរអ្វីក៏បាន** in Khmer). Everything else about the mentor is untouched —
+same answers, same speed, same behaviour.
+
+**It is properly gone, not just hidden.** That credit turned out to be the *only* place
+the service was named in anything the app sends to a phone or browser. We checked the
+built app afterwards and the name now appears nowhere in it, so it can't be found by
+someone poking around in the browser either.
+
+**One thing already handled before this.** If the app is ever running without its AI
+connection set up, a student sees only *"The AI Mentor is temporarily unavailable. Please
+try again shortly."* The detailed setup message naming the service appears solely on a
+developer's own machine, never on the live site.
+
+**Worth flagging.** This hides the service from students and from anyone inspecting the
+site. It is not a secret from the company providing it, and it does not change any
+agreement we have with them — if there is ever a contractual requirement to display a
+credit, that is a separate question to check.
+
+**What to re-test.** Open the AI Mentor and confirm the header reads "AI Mentor" with
+"Ask anything" underneath and no mention of any AI company. Check the same in Khmer. Ask
+it a question and confirm replies still work normally.
+
+---
+
+## 24 Aug 2026 — The Leaderboard is live
+
+*Landed in commit `TBD`.*
+
+**Why.** "Leaderboard" had been sitting in the menu as a greyed-out *Soon* item
+since the start. It is now a real screen at **Menu → Leaderboard**.
+
+**The one thing to understand about it: there are three separate leaderboards,
+not one leaderboard with three numbers on it.**
+
+- **🔥 Streak** — who has studied the most days in a row.
+- **⭐ XP** — who has earned the most points from actual learning: lessons,
+  practice, quizzes, daily goals.
+- **⏱ Study Time** — who has put in the most productive study time.
+
+They are ranked completely independently, so the same student can be **#12 on
+streak, #18 on XP and #24 on study time at the same time**. That is not a bug —
+it is the whole point. Three different kinds of effort, three different boards,
+and no combined "overall" score anywhere.
+
+**Why no combined score.** A single blended ranking would mean the student who
+leaves the app open longest can climb it. Study time is shown because effort
+deserves to be seen, but it is kept in its own board so it can never be traded
+against learning. The Study Time board says so on screen: *"Only lessons,
+practice and exams count — leaving the app open does not."*
+
+**What a student sees**, top to bottom: their own progress card (rank, the
+metric being ranked, the other two as smaller numbers, and how many places they
+have climbed) → the three metric buttons → Weekly / Monthly / All-time → a
+one-line explanation of what the current board ranks → a top-3 podium → the rest
+of the ranking → and their own row pinned at the bottom of the screen whenever
+it has scrolled out of view.
+
+**Everything really does change when you switch.** Tapping a different metric or
+a different time period re-sorts the whole board, re-orders the podium and
+rewrites the personal card. The demo student sits at **#18** on XP weekly with
+2,430 XP and *"Only 60 XP to reach #17"*; tap Streak and they are **#12** with a
+12-day streak and *"Keep studying tomorrow to reach 13 days"*; tap Study Time and
+they are **#24** with 8h 42m and *"48m to reach #23"*.
+
+**Titles.** Every student carries a progression title — Beginner, Learner,
+Scholar, Achiever, Expert, Master — based on their lifetime learning, not on the
+board being viewed, so it does not change as you tap between tabs.
+
+**The tone is deliberate.** Messages only ever point forward: *"You're #18 this
+week"*, *"You're climbing! ↑ 3 positions"*, *"Only 60 XP to reach #17"*. There is
+nothing that tells a student they are falling behind, and their own card never
+shows a downward arrow. Other students' rows do show movement both ways, in
+plain grey rather than red.
+
+**The data is fake, on purpose** — 30 invented classmates, same approach already
+used on Progress, Game and Grade Prediction. A real leaderboard needs a server
+that can compare students, and a way to measure genuine study time rather than
+"the app was open". The one real thing on the page is **the student's own name**,
+which comes from their profile. 24 new student pictures were added for the
+roster.
+
+**What to re-test.** Tap all three metric buttons and all three time periods and
+check the podium and the list re-order each time. Scroll down and check your own
+row is highlighted with a "You" tag, and that the pinned card at the bottom
+appears once it scrolls away and disappears when it comes back. Check it in
+Khmer, in dark mode, and on a phone, a tablet and a laptop — the layout was
+checked at nine screen widths and nothing overflows.
+
+---
+
+## 23 Aug 2026 — A real maths keyboard in the AI Mentor
+
+*Landed in commit `TBD`.*
+
+**Why.** The maths keyboard in the chat was one we built and maintained ourselves. It
+could only type loose characters — √, x², H₂O — so a student asking about a fraction or
+a limit had to write it out flat, like `(x^2-4)/(x-2)`. Adding any new symbol meant a
+code change. MathLive is a free, widely-used maths editor that already does all of this
+properly, so we have adopted it instead of continuing to build our own.
+
+**What changed for students.** Tapping the Σ button still swaps the normal keyboard for
+a maths one, exactly as before. The difference is what you get: a proper editing area
+where a fraction looks like a fraction and a limit sits under the `lim`, with a maths
+keyboard beneath it. When the formula is right, one button drops it into your message.
+
+**You can still mix Khmer and maths in one message**, which was the point of the old
+keyboard and is preserved: type your question in Khmer, add the formula, keep typing.
+The formula now appears properly typeset in your own message bubble too, not just in
+the mentor's reply.
+
+**Two things to be aware of.**
+
+1. **The chemistry and physics tabs are gone.** The old keyboard had tabs with one-tap
+   H₂O, m/s², mol and lim(x→). MathLive's keyboards do not, so those now have to be
+   built up from its symbol and Greek keys. Everything is still typeable; some things
+   take an extra tap or two. If teachers find this a real loss, we can add a custom
+   Bac II tab back — it is a small change now, not a rebuild.
+2. **The first tap of Σ downloads the editor** (about a quarter of a megabyte). It
+   happens once and is then cached on that phone. It is deliberately not downloaded
+   when you open the mentor, so students who only type questions never pay for it.
+
+**What to re-test.** Open the mentor and tap Σ. Build a fraction and a limit, and check
+they look right in the editing area. Tap the insert button and confirm the formula
+lands in your message where the cursor was. Type Khmer before and after it, send, and
+check your own bubble shows Khmer text with proper maths in the middle — **no dollar
+signs and no empty boxes anywhere**. Then tap the message box and confirm the maths
+keyboard puts itself away and the normal keyboard comes back, and that Σ brings it back.
+Do all of that in both light and dark themes, and on a real phone if you can.
+
+---
+
+## 23 Aug 2026 — "Battle" is now "Game"
+
+*Landed in commit `TBD`.*
+
+**Why.** "Battle" sounded like a fight. "Game" is what students actually want to tap.
+
+**What changed.** The feature is called **Game** everywhere a student can see it — the
+menu, the bottom tab, the page title, the button on the Home screen, and all the wording
+inside the page. The crossed-swords icon (⚔️) is now a game controller (🎮). In Khmer the
+label went from **ប្រយុទ្ធ** (fight) to **ហ្គេម** (game).
+
+**The web address changed too**, from `/battle` to `/game`. Nothing inside the app links
+to the old address any more, but if anyone has bookmarked it or pasted it into a chat,
+that old link will now show the "page not found" screen.
+
+**Where "Battle" became "Play".** English needs a verb in a few places and "Game" isn't
+one, so the button on each opponent row now reads **🎮 Play**, and the line under the
+title reads "Play against other students" rather than "Battle other students".
+
+**Nothing else moved.** Same page, same cards, same order, same numbers — only the
+wording and the icon.
+
+**One thing left alone on purpose.** The crossed swords on the sign-in screen and in
+"Welcome, Hero! ⚔️" are the app's own branding, not part of this feature, so they stay.
+Say the word if you'd like those changed as well.
+
+**What to re-test.** Check the menu, the bottom tab and the Home screen chip all say Game
+with the controller icon, in **both English and Khmer**. Open the page and confirm the
+title reads "Game 🎮" and nothing anywhere still says Battle. Tap a Play button on an
+opponent row.
+
+---
+
+## 23 Aug 2026 — The AI Mentor is back during lessons, and locked out of tests
+
+*Landed in commit `TBD`.*
+
+**Why.** When lessons and tests were changed to take over the whole screen, the AI Mentor
+button went away along with the rest of the navigation. That was right for a test and
+wrong for a lesson: the moment a student is most likely to be stuck on something is while
+they're reading it, and we'd just removed the button that helps.
+
+**What changed.** The Mentor button is back on the lesson screen — through the reading
+steps, the flashcards and the practice quiz. Tap it and the Mentor opens over the lesson;
+close it and you're exactly where you were, on the same step, with nothing lost.
+
+**It stays locked out of tests.** During a **mock exam** and during a **placement test**
+there is no Mentor button, and a conversation left open beforehand is closed for you when
+the test starts. A student can't have an AI answering questions while being assessed.
+
+**Placement tests are included deliberately** — you asked about the mock exam, and we
+applied the same rule to the placement test as well. It isn't graded, it's what decides
+which subjects get marked "weak", so a student who looks up answers there gets told
+they're fine in a subject they're struggling with, and the whole study plan built from it
+is wrong. Nothing later on catches that, so it's the more damaging of the two.
+
+**Where the Mentor is unaffected.** Everywhere else it behaves exactly as before —
+including the mock exam's **start screen** and its **results screen**. Only the part where
+questions are actually on screen is locked.
+
+**A small bonus.** The Mentor's maths keyboard now opens on the right tab for the lesson
+you're in — calculus symbols inside the limits lesson, chemistry symbols in a chemistry
+lesson. That was already built but had no way of being used until now.
+
+**What to re-test.** Open a lesson and check the Mentor button appears on every step and
+sits clear of the Continue button at the bottom; ask it something, close it, and confirm
+you're still on the same step. Start a mock exam and confirm the button is gone. Then the
+important one: open the Mentor on the exam **start** screen, leave it open, tap Start, and
+confirm the chat closes itself. Do the same for a placement test from the Roadmap card.
+Finally check the Mentor still works normally on Home, and on the exam results screen.
+
+---
+
 ## 23 Aug 2026 — Lessons and tests now take over the whole screen
 
 *Landed in commit `3ae15c8`.*

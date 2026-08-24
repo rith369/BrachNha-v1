@@ -9,7 +9,7 @@ import { buildSystemPrompt, type ChatProfile } from "../src/utils/chat-prompt";
 import { checkRateLimit } from "./rate-limit";
 
 /**
- * AI Mentor endpoint. Started life as a Netlify function, then a Next.js route
+ * KruAI endpoint. Started life as a Netlify function, then a Next.js route
  * handler (`app/api/chat/route.ts`); it is now a plain
  * `Request -> Promise<Response>` function with no framework in it at all.
  *
@@ -156,11 +156,11 @@ export async function handleChat(req: Request): Promise<Response> {
     return textResponse(
       lang === "km"
         ? devHint
-          ? "🔑 គ្រូ AI មិនទាន់ភ្ជាប់នៅឡើយទេ។ សូមបញ្ចូល GEMINI_API_KEY ក្នុងឯកសារ .env.local រួចចាប់ផ្តើម server ឡើងវិញ។"
-          : "🔑 គ្រូ AI មិនអាចប្រើបានបណ្តោះអាសន្ន។ សូមព្យាយាមម្ដងទៀតនៅពេលបន្តិចទៀត។"
+          ? "🔑 KruAI មិនទាន់ភ្ជាប់នៅឡើយទេ។ សូមបញ្ចូល GEMINI_API_KEY ក្នុងឯកសារ .env.local រួចចាប់ផ្តើម server ឡើងវិញ។"
+          : "🔑 KruAI មិនអាចប្រើបានបណ្តោះអាសន្ន។ សូមព្យាយាមម្ដងទៀតនៅពេលបន្តិចទៀត។"
         : devHint
-          ? "🔑 The AI Mentor is not connected yet. Add GEMINI_API_KEY to .env.local and restart the dev server."
-          : "🔑 The AI Mentor is temporarily unavailable. Please try again shortly.",
+          ? "🔑 KruAI is not connected yet. Add GEMINI_API_KEY to .env.local and restart the dev server."
+          : "🔑 KruAI is temporarily unavailable. Please try again shortly.",
       503
     );
   }

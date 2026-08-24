@@ -1,9 +1,9 @@
 // ============================================================
-// DEMO DATA — Battle
+// DEMO DATA — Game
 // ------------------------------------------------------------
 // Same approach as the Progress dashboard: deliberately fake,
 // fixed data ported from the original kruai-competition.html
-// static demo. Real matchmaking/live battles are Month 3 work
+// static demo. Real matchmaking/live games are Month 3 work
 // per the project roadmap — this keeps the screen polished and
 // crash-proof until that backend exists.
 // ============================================================
@@ -24,13 +24,13 @@ export const liveOpponent = {
   hpPct: 38,
 };
 
-export const liveBattle = {
+export const liveGame = {
   subject: "⚗️ Chemistry",
   questionProgress: "Q7/10",
   timer: "01:24",
 };
 
-export const battleStats = {
+export const gameStats = {
   wins: 24,
   losses: 8,
   draws: 3,
@@ -94,7 +94,7 @@ export const opponents: Opponent[] = [
   },
 ];
 
-export interface BattleHistoryItem {
+export interface GameHistoryItem {
   result: "WIN" | "LOSS" | "DRAW";
   opponentName: string;
   avatarSeed: string;
@@ -103,7 +103,7 @@ export interface BattleHistoryItem {
   date: string;
 }
 
-export const battleHistory: BattleHistoryItem[] = [
+export const gameHistory: GameHistoryItem[] = [
   {
     result: "WIN",
     opponentName: "Visal Prum",

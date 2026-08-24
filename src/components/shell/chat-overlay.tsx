@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, lazy, Suspense } from "react";
 import { useLocation } from "react-router";
 import { motion } from "framer-motion";
 import {
@@ -16,13 +16,19 @@ import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
 import { useT } from "@/data/translations";
 import { relativeDay } from "@/utils/chat-history";
-import { applyBackspace, applyInsert, defaultMathTab } from "@/utils/math-input";
+import { applyInsert, defaultMathLayout } from "@/utils/math-input";
 import { cn } from "@/utils/cn";
-import { MathKeyboard } from "./math-keyboard";
 import { MathText } from "./math-text";
-import type { MathKey, MathTabId } from "@/data/math-keys";
 import type { ChatProfile } from "@/utils/chat-prompt";
 import type { ChatMsg, Conversation } from "@/types";
+
+// MathLive is ~840KB of JS plus its font files. Split off behind React.lazy so
+// it downloads the first time a student taps Σ, not when the mentor opens —
+// most questions are typed, and this is Cambodian mobile data. See the header
+// of math-field-panel.tsx.
+const MathFieldPanel = lazy(() =>
+  import("./math-field-panel").then((m) => ({ default: m.MathFieldPanel }))
+);
 
 // Tappable starter questions, restored from the original prototype. They show
 // only on an empty chat, and map onto content the app actually has.
@@ -98,11 +104,11 @@ export function ChatOverlay() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // "symbols" swaps the OS keyboard out for the math panel. AppShell unmounts
-  // this whole overlay on close, so the lazy initialiser runs once per open —
-  // which is exactly when we want to read the page underneath.
-  const [mode, setMode] = useState<"text" | "symbols">("text");
-  const [mathTab, setMathTab] = useState<MathTabId>(() => defaultMathTab(pathname));
+  // "math" swaps the OS keyboard out for MathLive's. AppShell unmounts this
+  // whole overlay on close, so the lazy initialiser runs once per open — which
+  // is exactly when we want to read the page underneath.
+  const [mode, setMode] = useState<"text" | "math">("text");
+  const [mathLayout] = useState(() => defaultMathLayout(pathname));
 
   const active = conversations.find((c) => c.id === activeConversationId);
   const msgs = active?.msgs ?? NO_MSGS;
@@ -114,51 +120,55 @@ export function ChatOverlay() {
     return { start, end: el?.selectionEnd ?? start };
   }
 
-  /** React has to commit the new value before setSelectionRange will stick. */
-  function restoreCaret(caret: number) {
+  /**
+   * React has to commit the new value before setSelectionRange will stick.
+   *
+   * `refocus` is false when the caret is being restored after a formula lands
+   * from the math panel: focus belongs to the MathLive field then, and stealing
+   * it back would trip the input's onFocus below and close the panel the
+   * student is still using. setSelectionRange works on an unfocused input, so
+   * the caret is waiting in the right place whenever they do come back to it.
+   */
+  function restoreCaret(caret: number, refocus = true) {
     requestAnimationFrame(() => {
       const el = inputRef.current;
       if (!el) return;
-      el.focus();
+      if (refocus) el.focus();
       el.setSelectionRange(caret, caret);
     });
   }
 
-  function insertKey(key: MathKey) {
+  /**
+   * Drop a MathLive formula into the message at the cursor.
+   *
+   * The padding goes OUTSIDE the dollars, never inside. splitMath applies the
+   * standard TeX rule that inline math may not be hugged by whitespace, so
+   * `$ x^2 $` is not math — it would reach the bubble as literal dollar signs.
+   */
+  function insertLatex(latex: string) {
     const { start, end } = selection();
-    const next = applyInsert(input, start, end, key);
-    setInput(next.value);
-    restoreCaret(next.caret);
-  }
+    const before = input.slice(0, Math.min(start, end));
+    const after = input.slice(Math.max(start, end));
+    const lead = before && !/\s$/.test(before) ? " " : "";
+    const trail = after && !/^\s/.test(after) ? " " : "";
 
-  function backspace() {
-    const { start, end } = selection();
-    const next = applyBackspace(input, start, end);
+    const next = applyInsert(input, start, end, `${lead}$${latex}$${trail}`);
     setInput(next.value);
-    restoreCaret(next.caret);
+    restoreCaret(next.caret, false);
   }
 
   /**
-   * Swap between the OS keyboard and the symbol panel.
+   * Swap between the OS keyboard and MathLive's.
    *
-   * `inputMode="none"` is the right mechanism, but flipping it on an element
-   * that is ALREADY focused does not make the OS reconsider — the keyboard was
-   * summoned by the previous focus event and stays up. So the input is blurred
-   * and re-focused with its selection restored: focus blinks for a frame, the
-   * caret does not move, and the student just sees one keyboard replace the
-   * other. If a device ignores `inputMode="none"` outright, the failure mode is
-   * both keyboards showing — cramped, but nothing breaks.
+   * No `inputMode` juggling: the panel focuses its own field on mount, so the
+   * OS keyboard goes away because focus left the input — and the input's
+   * onFocus brings it back the same way. One keyboard at a time, enforced by
+   * focus rather than by an attribute the OS may or may not honour.
    */
   function toggleMode() {
-    const { start, end } = selection();
-    setMode(mode === "text" ? "symbols" : "text");
-    inputRef.current?.blur();
-    requestAnimationFrame(() => {
-      const el = inputRef.current;
-      if (!el) return;
-      el.focus();
-      el.setSelectionRange(start, end);
-    });
+    const next = mode === "text" ? "math" : "text";
+    setMode(next);
+    if (next === "text") inputRef.current?.focus();
   }
 
   useEffect(() => {
@@ -169,8 +179,8 @@ export function ChatOverlay() {
 
   const greeting =
     lang === "en"
-      ? "👋 Hi! I am BrachNha AI Mentor. Ask me anything about your Bac II subjects!"
-      : "👋 សួស្ដី! ខ្ញុំជាគ្រូ AI BrachNha។ សួរខ្ញុំអ្វីក៏បានអំពី Bac II!";
+      ? "👋 Hi! I am KruAI, your BrachNha study mentor. Ask me anything about your Bac II subjects!"
+      : "👋 សួស្ដី! ខ្ញុំជា KruAI គ្រូជំនួយសិក្សា BrachNha។ សួរខ្ញុំអ្វីក៏បានអំពី Bac II!";
 
   async function send(question?: string) {
     const text = (question ?? input).trim();
@@ -202,9 +212,9 @@ export function ChatOverlay() {
     setInput("");
     setLoading(true);
 
-    // Drop back to text mode so the 268px panel isn't covering the reply. Only
+    // Drop back to text mode so the math panel isn't covering the reply. Only
     // when it was open — sending in text mode keeps the keyboard up, as before.
-    if (mode === "symbols") {
+    if (mode === "math") {
       setMode("text");
       inputRef.current?.blur();
     }
@@ -280,12 +290,16 @@ export function ChatOverlay() {
       <div className="mx-auto flex w-full max-w-2xl shrink-0 items-start justify-between px-5.5 pt-4 pb-3">
         <div>
           <div className="font-heading bg-brand-tri bg-clip-text text-lg font-extrabold text-transparent">
-            🤖 {lang === "en" ? "AI Mentor" : "គ្រូ AI"}
+            {/* Brand name — deliberately identical in both languages. */}
+            🤖 KruAI
           </div>
+          {/* No vendor attribution here by product decision — the model behind
+              the mentor is deliberately not named anywhere the student can see.
+              This string was the ONLY occurrence of "gemini" in the client
+              bundle; keep it that way, and don't reintroduce the provider name
+              into anything under src/ that ships to the browser. */}
           <div className="text-xs font-bold text-muted">
-            {lang === "en"
-              ? "Powered by Gemini AI • Ask anything"
-              : "ដំណើរការដោយ Gemini AI"}
+            {lang === "en" ? "Ask anything" : "សួរអ្វីក៏បាន"}
           </div>
         </div>
         <div className="mt-0.5 flex shrink-0 items-center gap-2">
@@ -365,9 +379,11 @@ export function ChatOverlay() {
                     : "border border-purple/10 bg-surface text-text"
                 }`}
               >
-                {/* Bot replies carry LaTeX (see data/bac2-format.ts); the
-                    student's own text is Unicode and stays as typed. */}
-                {m.role === "bot" ? <MathText text={m.text} /> : m.text}
+                {/* Both sides carry LaTeX now: the model writes it (see
+                    data/bac2-format.ts) and the math panel inserts it. Khmer
+                    prose around a formula is safe — splitMath refuses to
+                    typeset any $…$ containing Khmer. */}
+                <MathText text={m.text} />
               </div>
             </div>
           );
@@ -387,17 +403,16 @@ export function ChatOverlay() {
       {/* Input */}
       <div className="mx-auto flex w-full max-w-2xl shrink-0 items-center gap-2 border-t border-purple/10 p-3">
         <button
-          onPointerDown={(e) => e.preventDefault()}
           onClick={toggleMode}
-          aria-label={mode === "symbols" ? t.textKeyboard : t.mathKeyboard}
+          aria-label={mode === "math" ? t.textKeyboard : t.mathKeyboard}
           className={cn(
             iconBtn,
             "size-10",
-            mode === "symbols" &&
+            mode === "math" &&
               "bg-[var(--brand-purple)] text-on-brand hover:bg-[var(--brand-purple)]"
           )}
         >
-          {mode === "symbols" ? (
+          {mode === "math" ? (
             <Keyboard className="size-4.5" strokeWidth={2.25} />
           ) : (
             <Sigma className="size-4.5" strokeWidth={2.5} />
@@ -408,7 +423,9 @@ export function ChatOverlay() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && send()}
-          inputMode={mode === "symbols" ? "none" : "text"}
+          // Typing prose and building a formula are separate acts; reaching for
+          // one puts the other keyboard away.
+          onFocus={() => setMode("text")}
           placeholder={t.askQuestion}
           className="min-w-0 flex-1 rounded-full border border-purple/15 bg-surface px-4 py-2.5 text-sm font-semibold outline-none focus:border-purple/40"
         />
@@ -422,15 +439,20 @@ export function ChatOverlay() {
         </button>
       </div>
 
-      {mode === "symbols" && (
-        <MathKeyboard
-          lang={lang}
-          tab={mathTab}
-          onTabChange={setMathTab}
-          onInsert={insertKey}
-          onBackspace={backspace}
-          onHide={toggleMode}
-        />
+      {mode === "math" && (
+        <Suspense
+          fallback={
+            <div className="mx-auto flex h-[332px] w-full max-w-2xl shrink-0 items-center justify-center border-t border-purple/10 bg-surface text-xs font-bold text-muted">
+              {t.mathKeyboard}…
+            </div>
+          }
+        >
+          <MathFieldPanel
+            lang={lang}
+            layout={mathLayout}
+            onInsert={insertLatex}
+          />
+        </Suspense>
       )}
 
       {view === "history" && (

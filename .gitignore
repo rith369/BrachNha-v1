@@ -24,6 +24,12 @@ dist-ssr
 # Vercel
 .vercel
 
+# Screenshot output from scripts/shots.mjs. Its default --out is ./shots, and a
+# run aimed at one feature uses a suffixed dir (shots-lb). Regenerated on demand
+# and several MB a run, so it is verification output rather than source.
+shots/
+shots-*/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

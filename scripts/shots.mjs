@@ -56,8 +56,9 @@ const ROUTES = [
   { name: "lesson-detail", path: "/lessons/math-limits" },
   { name: "exam", path: "/exam" },
   { name: "progress", path: "/progress" },
-  { name: "battle", path: "/battle" },
+  { name: "game", path: "/game" },
   { name: "grade-prediction", path: "/grade-prediction" },
+  { name: "leaderboard", path: "/leaderboard" },
   { name: "roadmap", path: "/roadmap" },
   { name: "profile", path: "/profile" },
 

@@ -12,5 +12,26 @@
 export function isFocusRoute(pathname: string): boolean {
   // startsWith("/lessons/") and NOT "/lessons": the lessons LIST is an ordinary
   // page and must keep its nav. Only a lesson with an id is a task.
-  return pathname.startsWith("/lessons/") || pathname.startsWith("/placement-test/");
+  return pathname.startsWith("/lessons/") || isAssessmentRoute(pathname);
+}
+
+/**
+ * Routes where the student is being MEASURED rather than taught, and the AI
+ * mentor therefore has to be out of reach.
+ *
+ * This is a strict subset of isFocusRoute, and the gap between the two is the
+ * point: a lesson hides the navigation but KEEPS the mentor, because asking
+ * "why is this step true?" mid-lesson is the product working as intended. An
+ * assessment hides both.
+ *
+ * The placement test counts for a reason that's easy to miss — it is not graded,
+ * it decides which subjects get marked weak. A student who looks up answers here
+ * is marked strong in a subject they're weak in, and every phase of the roadmap
+ * built from that is wrong, with nothing downstream to catch it.
+ *
+ * The mock exam is absent for the same reason it's absent above: it isn't
+ * identifiable by URL. use-focus-mode.ts ORs the store flag in.
+ */
+export function isAssessmentRoute(pathname: string): boolean {
+  return pathname.startsWith("/placement-test/");
 }

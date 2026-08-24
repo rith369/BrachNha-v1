@@ -28,22 +28,35 @@ const ChatOverlay = lazy(() =>
 // extra width where a wider layout actually reads better — see the page-level
 // card grids. Widening here alone would just stretch cards, not improve them.
 //
-// `hideChrome` drops the hamburger and the chat FAB, leaving the page's own CTA
-// as the only way forward. ShellLayout decides when (it's the piece that knows
-// the route); the default keeps AppShell usable outside a router.
+// `hideChrome` drops the hamburger and the Sidebar, leaving the page's own CTA
+// as the only way forward. `hideMentor` drops the chat FAB. They are two props
+// rather than one because a lesson wants them to disagree: no navigation, but
+// the mentor still one tap away. ShellLayout decides both (it's the piece that
+// knows the route); the defaults keep AppShell usable outside a router.
 export function AppShell({
   children,
   hideChrome = false,
+  hideMentor = false,
 }: {
   children: React.ReactNode;
   hideChrome?: boolean;
+  hideMentor?: boolean;
 }) {
   const chatOpen = useBrachNhaStore((s) => s.chatOpen);
+  const setChatOpen = useBrachNhaStore((s) => s.setChatOpen);
   const pledgeOpen = useBrachNhaStore((s) => s.pledgeOpen);
   const userName = useBrachNhaStore((s) => s.userName);
   const surveyed = useBrachNhaStore((s) => s.surveyed);
   const lang = useBrachNhaStore((s) => s.lang);
   const theme = useBrachNhaStore((s) => s.theme);
+
+  // Hiding the FAB is not enough on its own. `chatOpen` is global and survives
+  // navigation, so a student could open the mentor on the exam INTRO screen and
+  // still have it sitting there once they tap Start. Close it as soon as the
+  // mentor becomes off-limits.
+  useEffect(() => {
+    if (hideMentor && chatOpen) setChatOpen(false);
+  }, [hideMentor, chatOpen, setChatOpen]);
 
   // index.html ships lang="en" because `lang` lives in the persisted store and
   // isn't known until React mounts; we correct the attribute here. Both "en"
@@ -85,8 +98,11 @@ export function AppShell({
             {!hideChrome && <TopBar />}
             <Drawer />
             <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
-            {!chatOpen && !pledgeOpen && !hideChrome && <FabChat />}
-            {chatOpen && (
+            {!chatOpen && !pledgeOpen && !hideMentor && <FabChat />}
+            {/* !hideMentor here too, not just on the FAB: the effect above
+                closes an open chat, but this makes the overlay unrenderable
+                during an assessment rather than relying on that to have run. */}
+            {chatOpen && !hideMentor && (
               <Suspense fallback={null}>
                 <ChatOverlay />
               </Suspense>

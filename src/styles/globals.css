@@ -286,6 +286,69 @@ h1, h2, h3, h4, .font-heading {
   animation: shimmer 3s linear infinite;
 }
 
+/* ── MathLive, dressed as the rest of the app ──
+   MathLive styles its field and virtual keyboard from CSS custom properties,
+   which it reads off an ancestor. The panel scopes them here in terms of our
+   own tokens, so ONE block covers both themes: `.dark` redefines --color-* at
+   :root and these follow. No literal colours, same rule as everywhere else.
+
+   --color-control is exactly the token for this — it exists because keycaps
+   need a faint tint below the panel in light and a step above it in dark, or
+   the keyboard reads as holes punched in the surface. */
+.mathkb {
+  --keyboard-accent-color: var(--color-purple);
+  --keyboard-background: var(--color-surface);
+  --keyboard-border: transparent;
+  --keyboard-toolbar-background: var(--color-surface);
+  --keyboard-toolbar-background-hover: var(--color-control);
+  --keyboard-toolbar-background-selected: var(--color-control);
+  --keyboard-toolbar-text: var(--color-muted);
+  --keyboard-toolbar-text-active: var(--color-purple);
+  --keyboard-horizontal-rule: var(--color-border);
+
+  /* MathLive's default keycap is 60px, which makes the numeric layout ~330px
+     tall and clips its bottom row inside our fixed-height box. 44px matches the
+     h-11 keys the hand-built keyboard used and leaves the whole layout visible
+     in 268px. Change one of these two numbers and you must re-check the other. */
+  --keycap-height: 44px;
+
+  --keycap-background: var(--color-control);
+  --keycap-background-hover: var(--color-secondary);
+  --keycap-border: var(--color-border);
+  --keycap-border-bottom: var(--color-border);
+  --keycap-text: var(--color-text);
+  --keycap-shift-text: var(--color-pink);
+  --keycap-primary-background: var(--brand-purple);
+  --keycap-primary-text: var(--color-on-brand);
+  --keycap-secondary-background: var(--color-secondary);
+  --keycap-secondary-text: var(--color-text);
+  --keycap-secondary-border: var(--color-border);
+  --keycap-secondary-border-bottom: var(--color-border);
+
+  /* The MathLive field itself. */
+  --caret-color: var(--color-purple);
+  --selection-background-color: var(--color-secondary);
+  --contains-highlight-background-color: var(--color-control);
+  color: var(--color-text);
+}
+
+/* MathLive's own rule sizes the keyboard to its container UNLESS it is a direct
+   child of <body>. We append it to a fixed-height box instead (so the message
+   list doesn't jump), and pin it flush to the bottom of that box in case a
+   future version changes its mind about the default. */
+.mathkb .ML__keyboard {
+  position: absolute;
+  inset: 0;
+}
+
+/* The field ships its own keyboard-toggle and menu buttons. Both are wrong
+   here: the panel IS the keyboard, so the toggle just empties the box below
+   with no obvious way back, and the menu is English-only in a Khmer app. */
+.mathkb math-field::part(virtual-keyboard-toggle),
+.mathkb math-field::part(menu-toggle) {
+  display: none;
+}
+
 /* Grade Prediction's "Prediction Updated" banner — a one-shot slide+fade
    entrance, not a loop like the two keyframes above. */
 @keyframes bannerIn {

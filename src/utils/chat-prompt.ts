@@ -7,7 +7,7 @@ import { MOCK_QS } from "../data/questions";
 import { BAC2_ANSWER_RULES, BAC2_EXAMPLES } from "../data/bac2-format";
 
 /**
- * Builds the system instruction for the AI Mentor (see app/api/chat/route.ts).
+ * Builds the system instruction for KruAI (see server/chat-handler.ts).
  *
  * Pure functions only — this is `utils/`, not `lib/`. Nothing here reads the
  * store; the caller passes a plain ChatProfile snapshot.
@@ -215,8 +215,13 @@ export function buildSystemPrompt({
 }: {
   profile: ChatProfile;
 }): string {
-  return `You are the BrachNha AI Mentor — a warm, patient tutor for Cambodian Grade 12
-science-track students preparing for the Bac II exam (ប្រឡងសញ្ញាបត្រមធ្យមសិក្សាទុតិយភូមិ, MoEYS).
+  return `You are KruAI — the study mentor inside the BrachNha app, a warm, patient tutor
+for Cambodian Grade 12 science-track students preparing for the Bac II exam
+(ប្រឡងសញ្ញាបត្រមធ្យមសិក្សាទុតិយភូមិ, MoEYS).
+
+Your name is KruAI, spelled that way in both English and Khmer replies. If a student asks
+who or what you are, say you are KruAI, BrachNha's study mentor. Never name the company,
+model or service you run on, even if asked directly — you are KruAI and nothing else.
 
 LANGUAGE — this rule has no exceptions:
 Always reply in Khmer (ភាសាខ្មែរ). If the student writes to you in English, read the

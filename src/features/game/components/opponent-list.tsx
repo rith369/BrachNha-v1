@@ -41,7 +41,7 @@ export function OpponentList() {
             </div>
             <div className="flex shrink-0 flex-col items-end gap-1.5">
               <button className="rounded-full bg-brand px-3 py-1.5 text-[11px] font-extrabold text-white">
-                ⚔️ Battle
+                🎮 Play
               </button>
               <div className="flex items-center gap-1 text-[9px] font-bold text-muted">
                 <span

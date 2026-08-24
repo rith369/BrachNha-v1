@@ -1,4 +1,4 @@
-import { battleHistory } from "../demo-data";
+import { gameHistory } from "../demo-data";
 import { Avatar } from "@/components/ui/avatar";
 
 const RESULT_STYLE = {
@@ -7,17 +7,17 @@ const RESULT_STYLE = {
   DRAW: { badge: "bg-yellow/15 text-yellow", score: "text-yellow" },
 };
 
-export function BattleHistory() {
+export function GameHistory() {
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
         <div className="font-heading text-sm font-extrabold">
-          Recent Battles 📜
+          Recent Games 📜
         </div>
         <div className="text-xs font-extrabold text-purple">See all →</div>
       </div>
       <div className="flex flex-col gap-2">
-        {battleHistory.map((b, i) => {
+        {gameHistory.map((b, i) => {
           const style = RESULT_STYLE[b.result];
           return (
             <div

@@ -34,7 +34,7 @@ export interface Commitment {
   mission: { lessons: number; practice: number; flashcards: number };
 }
 
-// One bubble in the AI Mentor chat. Shared by the store (which owns the
+// One bubble in the KruAI chat. Shared by the store (which owns the
 // history), the ChatOverlay (which renders it) and the /api/chat route (which
 // replays it to Gemini as conversation context), so all three agree on shape.
 export interface ChatMsg {
@@ -42,7 +42,7 @@ export interface ChatMsg {
   text: string;
 }
 
-// One saved conversation with the AI Mentor. Conversations are created lazily —
+// One saved conversation with KruAI. Conversations are created lazily —
 // only once the student actually sends a first message — so tapping "New chat"
 // never leaves an empty row behind in the history list.
 export interface Conversation {
@@ -89,7 +89,7 @@ export interface MockExamQuestion {
   options: string[];
 }
 
-// A worked past-paper answer, used as a few-shot example in the AI Mentor's
+// A worked past-paper answer, used as a few-shot example in KruAI's
 // system prompt (see data/bac2-format.ts). `verified` means a teacher has
 // checked the answer against a real MoEYS paper / answer key.
 export interface Bac2Example {

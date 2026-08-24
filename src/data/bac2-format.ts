@@ -4,7 +4,7 @@ import type { Bac2Example } from "@/types";
  * What a "real Bac II answer" looks like.
  *
  * This file is pure content — no logic. It is the single place to tune how the
- * AI Mentor writes, and it is where real exam material goes:
+ * KruAI writes, and it is where real exam material goes:
  *
  *   • BAC2_ANSWER_RULES — the answer skeleton the model must follow. Injected
  *     verbatim into the system prompt by utils/chat-prompt.ts.
@@ -46,9 +46,9 @@ WRITING RULES:
 - Chemistry uses \mathrm: $\mathrm{H_2O}$, $2\mathrm{H_2} + \mathrm{O_2} \to 2\mathrm{H_2O}$.
 - Do not wrap bare numbers or short units in dollar signs — write 25%, 9.8 m/s², not
   $25$%. Dollar signs are for expressions, not for every digit.
-- The student may type their question with plain characters (x², √, lim(x→2), H₂O)
-  because that is what the app's symbol keyboard gives them. Read that fine, and still
-  answer in LaTeX.
+- The student's question may already contain LaTeX between dollar signs, because the
+  app's math keyboard writes it that way. It may also contain plain characters
+  (x², √, lim(x→2), H₂O) typed by hand. Read either, and still answer in LaTeX.
 - Keep the whole answer readable on a phone screen. Short lines, no long paragraphs.
 - Keep the key technical term in English in brackets after the Khmer term when the Khmer
   term is uncommon, e.g. "សេរេបែល (Cerebellum)". Cambodian Bac II papers do this too.
@@ -81,8 +81,9 @@ WRITING RULES:
   និង ^ _ សម្រាប់ស្វ័យគុណនិងសន្ទស្សន៍។ កុំប្រើ \begin{align} កុំដាក់ខ្មែរក្នុង \text{}។
 - គីមីប្រើ \mathrm៖ $\mathrm{H_2O}$, $2\mathrm{H_2} + \mathrm{O_2} \to 2\mathrm{H_2O}$។
 - កុំដាក់លេខធម្មតា ឬឯកតាខ្លីៗ ក្នុងសញ្ញា $ ដូចជាសរសេរ 25%, 9.8 m/s²។
-- សិស្សអាចវាយសំណួរដោយតួអក្សរធម្មតា (x², √, lim(x→2), H₂O) ព្រោះនោះជាអ្វីដែលក្តារចុច
-  សញ្ញាគណិតរបស់កម្មវិធីផ្តល់ឲ្យ។ អានវាឲ្យយល់ ហើយនៅតែឆ្លើយជា LaTeX។
+- សំណួររបស់សិស្សអាចមាន LaTeX ក្នុងសញ្ញា $ រួចហើយ ព្រោះក្តារចុចគណិតរបស់កម្មវិធីសរសេរបែបនោះ។
+  វាក៏អាចជាតួអក្សរធម្មតា (x², √, lim(x→2), H₂O) ដែលវាយដោយដៃដែរ។ អានបានទាំងពីរ
+  ហើយនៅតែឆ្លើយជា LaTeX។
 - ធ្វើឲ្យចម្លើយអានបានងាយនៅលើទូរស័ព្ទ។ បន្ទាត់ខ្លីៗ កុំសរសេរកថាខណ្ឌវែង។
 - ដាក់ពាក្យបច្ចេកទេសជាភាសាអង់គ្លេសក្នុងវង់ក្រចកបន្ទាប់ពីពាក្យខ្មែរ ពេលពាក្យខ្មែរមិនសូវប្រើ
   ដូចជា "សេរេបែល (Cerebellum)"។ វិញ្ញាសា Bac II ពិតក៏ធ្វើដូច្នេះដែរ។
@@ -97,9 +98,10 @@ export const BAC2_EXAMPLES: Bac2Example[] = [
   {
     subject: "math",
     verified: false,
-    // The question is written the way the app's symbol keyboard produces it —
-    // plain Unicode — while the answer is LaTeX. That pairing is deliberate: it
-    // is what teaches the model to read one and reply in the other.
+    // The question is written in plain Unicode while the answer is LaTeX. That
+    // pairing is deliberate: it is what teaches the model to read one and reply
+    // in the other. Kept as-is now the math keyboard emits LaTeX, because a
+    // student can still type this by hand and it is the harder case to read.
     question: {
       en: "Calculate lim(x→2) (x²-4)/(x-2).",
       km: "គណនា lim(x→2) (x²-4)/(x-2)។",

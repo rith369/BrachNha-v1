@@ -5,7 +5,7 @@ import {
   ClipboardList,
   Layers,
   Map,
-  Swords,
+  Gamepad2,
   Trophy,
   Library,
   Flame,
@@ -57,10 +57,10 @@ export const featureNavItems: NavItem[] = [
     icon: LineChart,
   },
   {
-    id: "battle",
-    href: "/battle",
-    label: { en: "Battle", km: "ប្រយុទ្ធ" },
-    icon: Swords,
+    id: "game",
+    href: "/game",
+    label: { en: "Game", km: "ហ្គេម" },
+    icon: Gamepad2,
   },
   {
     id: "roadmap",
@@ -76,7 +76,7 @@ export const featureNavItems: NavItem[] = [
   },
   {
     id: "leaderboard",
-    href: null,
+    href: "/leaderboard",
     label: { en: "Leaderboard", km: "ចំណាត់ថ្នាក់" },
     icon: Trophy,
   },
@@ -106,5 +106,5 @@ export const bottomNavItems: NavItem[] = [
   mainNavItems[2], // Lessons
   mainNavItems[1], // Exams
   featureNavItems[0], // Progress
-  featureNavItems[1], // Battle
+  featureNavItems[1], // Game
 ];
