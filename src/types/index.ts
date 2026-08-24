@@ -1,10 +1,12 @@
 export type Lang = "en" | "km";
 
+// No `months` here on purpose: the time left is derived from the fixed exam
+// date (utils/exam-date.ts), not asked for and stored. A stored answer goes
+// stale the day after it is given.
 export interface UserData {
   strengths: string[];
   weaknesses: string[];
   grade: string;
-  months: string;
 }
 
 export interface Tasks {
@@ -29,6 +31,8 @@ export interface Commitment {
   signature: string;
   signedAt: string;
   grade: string;
+  /** Months left AT SIGNING TIME. A snapshot, unlike everywhere else — see
+   *  utils/exam-date.ts. Do not turn this into a live countdown. */
   months: string;
   hoursPerDay: number;
   mission: { lessons: number; practice: number; flashcards: number };

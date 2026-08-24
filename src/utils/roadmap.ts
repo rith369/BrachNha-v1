@@ -9,11 +9,6 @@ export const GRADE_HOURS: Record<string, number> = {
   E: 1,
 };
 
-export function parseMonthsLeft(months: string, fallback = 6): number {
-  const parsed = parseInt(months, 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
-}
-
 export interface DailyMission {
   lessons: number;
   practice: number;
@@ -37,12 +32,13 @@ const URGENCY_MAX = 1.6;
 const FLASHCARDS_MIN = 2;
 const FLASHCARDS_MAX = 6;
 
+/** `monthsLeft` comes from monthsUntilExam() (utils/exam-date.ts), which
+ *  guarantees >= 1 — this divides by it. */
 export function computeDailyMission(
   grade: string,
-  monthsStr: string
+  monthsLeft: number
 ): DailyMission {
   const minutesPerDay = (GRADE_HOURS[grade] ?? 2) * 60;
-  const monthsLeft = parseMonthsLeft(monthsStr);
   const urgency = Math.min(
     URGENCY_MAX,
     Math.max(URGENCY_MIN, BASELINE_MONTHS / monthsLeft)
@@ -95,11 +91,10 @@ function chunk<T>(items: T[], count: number): T[][] {
 
 export function buildRoadmapPhases(
   weaknesses: string[],
-  monthsStr: string,
+  months: number,
   subjectLabel: (subject: string) => string,
   lang: Lang
 ): RoadmapPhase[] {
-  const months = parseMonthsLeft(monthsStr);
   const contentMonths = Math.max(1, months - 1);
   const uniqueWeak = Array.from(new Set(weaknesses));
 

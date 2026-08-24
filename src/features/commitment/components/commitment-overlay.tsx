@@ -5,6 +5,7 @@ import { X, Check } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
 import { GRADE_HOURS, computeDailyMission } from "@/utils/roadmap";
+import { monthsUntilExam } from "@/utils/exam-date";
 import { isBlankSignature } from "@/utils/signature";
 import type { Commitment } from "@/types";
 import { PLEDGE_COPY, splitEmphasis } from "../copy";
@@ -52,7 +53,10 @@ export function CommitmentOverlay() {
   const [confirming, setConfirming] = useState(false);
 
   const hours = GRADE_HOURS[userData.grade] || 2;
-  const mission = computeDailyMission(userData.grade, userData.months);
+  // Read live for the pledge text the student is about to sign, then frozen
+  // into the Commitment below — that snapshot is what they actually agreed to.
+  const monthsLeft = monthsUntilExam();
+  const mission = computeDailyMission(userData.grade, monthsLeft);
 
   const canCommit =
     value.kind === "typed"
@@ -74,7 +78,7 @@ export function CommitmentOverlay() {
       signedAt: new Date().toISOString(),
       // Snapshot, not a live read — see the Commitment type.
       grade: userData.grade,
-      months: userData.months,
+      months: String(monthsLeft),
       hoursPerDay: hours,
       mission,
     };
@@ -94,7 +98,7 @@ export function CommitmentOverlay() {
   const pills = [
     { label: c.targetGrade, value: userData.grade || "—" },
     { label: c.hoursADay, value: `${hours}` },
-    { label: c.monthsLeft, value: userData.months || "—" },
+    { label: c.monthsLeft, value: String(monthsLeft) },
   ];
 
   return (
@@ -145,7 +149,7 @@ export function CommitmentOverlay() {
                 {splitEmphasis(c.pledge({
                   name: userName,
                   grade: userData.grade,
-                  months: userData.months,
+                  months: String(monthsLeft),
                   hours,
                   lessons: mission.lessons,
                   practice: mission.practice,

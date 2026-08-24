@@ -96,7 +96,8 @@ const seeded = (theme) => ({
       strengths: ["math"],
       weaknesses: ["math", "biology"],
       grade: "A",
-      months: "6",
+      // No `months` — the timeline is derived from the fixed exam date now
+      // (src/utils/exam-date.ts), not stored per student.
     },
     pendingPlacementTests: [],
     commitment: null,

@@ -513,8 +513,8 @@ this whenever `userName` is empty, then falls through to the survey. Language
 lives on the store as `userLanguage` (sibling to `userName`/`userEmail`/etc.),
 not inside `userData` — it's account-level identity, not a survey answer.
 
-**Survey** (`features/survey`) — 4-step onboarding (liked subjects → weak
-subjects → target grade → months left); the 7 real subjects are math, physics,
+**Survey** (`features/survey`) — 3-step onboarding (liked subjects → weak
+subjects → target grade); the 7 real subjects are math, physics,
 chemistry, biology, history, khmer, and whichever language (English/French) was
 chosen at Login. The weak-subjects step (`WeaknessStep`) treats the 3 foundation
 subjects — math/physics/chemistry — differently from the other 4: a Weak / Not
@@ -545,8 +545,8 @@ results screen with conic-gradient score ring.
 Tests" card (only rendered when `pendingPlacementTests` is non-empty, flags
 "Overdue" once the scheduled date has passed), a "Daily Mission" quota card, and
 the phase path. The phase plan is dynamically generated from real
-`userData.weaknesses`/`months` (`buildRoadmapPhases` in `utils/roadmap.ts`)
-rather than a fixed list; phases with real lesson content link to Lessons,
+`userData.weaknesses` plus `monthsUntilExam()` (`buildRoadmapPhases` in
+`utils/roadmap.ts`) rather than a fixed list; phases with real lesson content link to Lessons,
 others to Mock Exam. Daily Mission (`computeDailyMission`, same file) derives
 lesson/practice/flashcard counts from a time-budget model — `GRADE_HOURS` scaled
 by an urgency multiplier based on months left, split across the three activities
@@ -800,6 +800,24 @@ are in `lib/store.ts`'s `partialize` (`lang`, `userName`/`userEmail`/`userAge`/
 excluded as UI state). This reverses the original app's behavior; it was
 explicitly changed once Logout existed. The only way back to a blank
 Login/Survey is Profile → Logout. Don't reintroduce "always re-show on reload".
+
+**The exam countdown is DERIVED, never stored.** Bac II is a national exam on
+one fixed date, so `utils/exam-date.ts` holds it (`BAC2_EXAM_DATE`, currently
+10 Aug 2027) and everything else calls `daysUntilExam()` / `monthsUntilExam()`.
+The survey used to ask "months until Bac II?" as a 1–12 grid and keep the answer
+in `userData.months`; that was both a guess and stale the next day — a student
+who answered "12" in August still read "12 months left" a year later. The field
+is gone from `UserData` (an old persisted copy is simply ignored, no migration
+needed), the survey step with it, and `parseMonthsLeft` is deleted.
+`computeDailyMission` and `buildRoadmapPhases` now take a `number`, so the daily
+quota tightens on its own as the exam nears. Home's hero and Grade Prediction
+show a real day count instead of the old `months × 30` approximation.
+
+Two things to keep straight. **`Commitment.months` is the one deliberate
+snapshot** — the pledge has to keep saying what the student agreed to, so it is
+frozen at signing time and must not become a live read. And `monthsUntilExam()`
+is floored at 1 because callers divide by it. Rolling the app to the next cohort
+is a one-line edit to `BAC2_EXAM_DATE`.
 
 **Placement testing (math/physics/chemistry only) is a deliberate scope
 choice**, not a content oversight — biology has question data in `MOCK_QS` too,

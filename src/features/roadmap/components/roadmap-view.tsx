@@ -9,6 +9,11 @@ import {
   GRADE_HOURS,
   type RoadmapPhase,
 } from "@/utils/roadmap";
+import {
+  daysUntilExam,
+  formatExamDate,
+  monthsUntilExam,
+} from "@/utils/exam-date";
 import type { Tasks } from "@/types";
 import { PLEDGE_COPY } from "@/features/commitment/copy";
 import { CommitmentBanner } from "./commitment-banner";
@@ -99,14 +104,19 @@ export function RoadmapView() {
 
   const hrs = GRADE_HOURS[userData.grade] || 2;
 
+  // Both derived from the fixed exam date, so the plan tightens on its own as
+  // the exam approaches instead of holding whatever the student once typed.
+  const daysLeft = daysUntilExam();
+  const monthsLeft = monthsUntilExam();
+
   const phases = buildRoadmapPhases(
     userData.weaknesses,
-    userData.months,
+    monthsLeft,
     (s) => t[s as TranslationKey] ?? s,
     lang
   );
 
-  const mission = computeDailyMission(userData.grade, userData.months);
+  const mission = computeDailyMission(userData.grade, monthsLeft);
   const missionRows: {
     key: keyof Tasks;
     icon: string;
@@ -172,10 +182,15 @@ export function RoadmapView() {
           </div>
           <div className="ml-auto text-right">
             <div className="text-[11px] font-extrabold tracking-widest text-muted uppercase">
-              Time Left
+              {t.examDate}
             </div>
+            {/* The count carries the emphasis and the words ride small beside
+                it — at 320px "350 Days Left" all at text-xl wraps mid-phrase. */}
             <div className="font-heading text-xl font-extrabold text-pink">
-              {userData.months || "—"} {lang === "en" ? "months" : "ខែ"}
+              {daysLeft} <span className="text-xs">{t.daysLeft}</span>
+            </div>
+            <div className="text-[11px] font-bold text-muted">
+              {formatExamDate(lang)}
             </div>
           </div>
         </div>

@@ -39,8 +39,9 @@ export interface ChatProfile {
   language: "" | "english" | "french";
   /** Target grade, "A".."E". */
   grade: string;
-  /** Months left until the exam, "1".."12". */
-  months: string;
+  /** Whole days until the Bac II exam, counted from the fixed exam date
+   *  (utils/exam-date.ts) rather than anything the student typed. */
+  daysToExam: number;
   strengths: string[];
   weaknesses: string[];
   level: number;
@@ -142,8 +143,12 @@ export function buildStudentBlock(profile: ChatProfile): string {
   const lines: string[] = [`Name: ${name}.`];
 
   if (profile.grade) lines.push(`Target grade: ${clean(profile.grade, 2)}.`);
-  if (profile.months) {
-    lines.push(`Time until the Bac II exam: ${clean(profile.months, 2)} month(s).`);
+  if (Number.isFinite(profile.daysToExam) && profile.daysToExam > 0) {
+    const days = Math.round(profile.daysToExam);
+    const months = Math.max(1, Math.round(days / 30.44));
+    lines.push(
+      `Time until the Bac II exam: ${days} days (about ${months} month(s)).`
+    );
   }
 
   const weak = cleanList(profile.weaknesses);

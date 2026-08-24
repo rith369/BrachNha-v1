@@ -144,7 +144,6 @@ const emptyUserData: UserData = {
   strengths: [],
   weaknesses: [],
   grade: "",
-  months: "",
 };
 
 // Named rather than inline so `migrate` can borrow its return type — the two

@@ -4,18 +4,18 @@ import { Sparkles, Map, ClipboardList, LineChart, Gamepad2 } from "lucide-react"
 import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { QUOTES } from "@/data/questions";
-import { parseMonthsLeft } from "@/utils/roadmap";
+import { daysUntilExam } from "@/utils/exam-date";
 
 export function MotivationHero() {
-  const { lang, userData, userName } = useBrachNhaStore(
+  const { lang, userName } = useBrachNhaStore(
     useShallow((s) => ({
       lang: s.lang,
-      userData: s.userData,
       userName: s.userName,
     }))
   );
 
-  const daysLeft = parseMonthsLeft(userData.months, 5) * 30;
+  // A real count to the exam date, not months × 30.
+  const daysLeft = daysUntilExam();
 
   // Pick the quote client-side only (after mount) to avoid a server/client
   // hydration mismatch: the server and the browser would roll different values.

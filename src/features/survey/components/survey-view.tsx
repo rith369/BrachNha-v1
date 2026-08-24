@@ -19,14 +19,12 @@ const FIXED_SUBJECTS = [
 ] as const;
 
 const GRADES = ["A", "B", "C", "D", "E"];
-const MONTHS = Array.from({ length: 12 }, (_, i) => String(i + 1));
 
 interface FormState {
   liked: string[];
   weaknesses: string[];
   foundationStatus: Record<string, FoundationStatus>;
   grade: string;
-  months: string;
 }
 
 function toggleIn(list: string[], value: string) {
@@ -53,10 +51,12 @@ export function SurveyView() {
     weaknesses: [],
     foundationStatus: {},
     grade: "",
-    months: "",
   });
 
-  const pct = ((step - 1) / 3) * 100;
+  // Three steps: liked → weak → target grade. There used to be a fourth asking
+  // how many months were left, which is now derived from the fixed exam date
+  // (utils/exam-date.ts) rather than guessed at by the student.
+  const pct = ((step - 1) / 2) * 100;
   const subjectOptions: string[] = userLanguage
     ? [...FIXED_SUBJECTS, userLanguage]
     : [...FIXED_SUBJECTS];
@@ -74,7 +74,6 @@ export function SurveyView() {
       strengths: form.liked,
       weaknesses: [...form.weaknesses, ...foundationWeak],
       grade: form.grade,
-      months: form.months,
     });
     navigate("/roadmap");
   }
@@ -211,45 +210,6 @@ export function SurveyView() {
               </button>
               <button
                 disabled={!form.grade}
-                onClick={() => setStep(4)}
-                className="flex-1 rounded-2xl bg-brand px-6 py-3 text-sm font-extrabold text-white shadow-cta disabled:opacity-40"
-              >
-                {lang === "en" ? "Next →" : "បន្ត →"}
-              </button>
-            </div>
-          </>
-        )}
-
-        {step === 4 && (
-          <>
-            <div className="mb-3 text-sm font-extrabold">
-              📅 {t.monthsLeft}
-            </div>
-            <div className="mb-4 grid grid-cols-4 gap-2">
-              {MONTHS.map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setForm((f) => ({ ...f, months: m }))}
-                  className={
-                    "rounded-xl border py-2.5 text-sm font-extrabold transition " +
-                    (form.months === m
-                      ? "border-blue/40 bg-blue/10 text-blue"
-                      : "border-purple/10 bg-surface text-text hover:bg-purple/5")
-                  }
-                >
-                  {m}
-                </button>
-              ))}
-            </div>
-            <div className="flex gap-2.5">
-              <button
-                onClick={() => setStep(3)}
-                className="flex-1 rounded-2xl border border-purple/20 bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
-              >
-                ← {lang === "en" ? "Back" : "ថយ"}
-              </button>
-              <button
-                disabled={!form.months}
                 onClick={finish}
                 className="flex-1 rounded-2xl bg-brand-tri bg-[length:200%_auto] px-6 py-3 text-sm font-extrabold text-white shadow-cta animate-shimmer disabled:opacity-40"
               >

@@ -17,6 +17,50 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 25 Aug 2026 — The exam countdown works itself out
+
+*Landed in commit `TBD`.*
+
+**Why.** The last question in the sign-up survey asked students how many months were
+left until Bac II, from a grid of 1 to 12. Two problems with that. It asked a student
+to work out something the app already knows — Bac II is a national exam on one fixed
+date, the same for everybody. And the answer was frozen the moment it was given: a
+student who chose "12" in August was still being told they had 12 months left the
+following year, with a study plan built on that wrong number.
+
+**What changed.** The app now knows the exam is on **10 August 2027** and counts down
+to it by itself. The survey is **three steps instead of four** — favourite subjects,
+weak subjects, target grade — and finishing the third one goes straight to the roadmap.
+
+**Where students see the countdown.**
+
+- **Home** now shows the real number of days left instead of an estimate. It used to
+  multiply the months they picked by 30, so it was always a round number and usually
+  wrong by a week or two.
+- **The Roadmap** card shows the days left with the exam date underneath it, in place
+  of the old "6 months".
+- **The daily mission** (how many lessons, practice questions and flashcards a day)
+  now gets more demanding on its own as the exam gets closer, instead of staying
+  wherever the student's original answer put it.
+- **The AI Mentor** is told the exact number of days remaining, so advice about pacing
+  is based on the real timeline.
+
+**The signed commitment does not change.** The pledge students sign still records the
+months they had left on the day they signed it — that is a promise they made at a
+moment in time, and it would be wrong to quietly rewrite it later.
+
+**When the date needs changing** for next year's students, it is a one-line change in
+one file. Nothing else stores a timeline.
+
+**What to re-test.** Sign up as a new student and confirm the survey now ends at the
+target-grade step, with the "Generate Quest Map" button there and no months question.
+Check Home and the Roadmap show the same number of days, and that the date reads
+10 August 2027 in both English and Khmer. Then check an **existing** account that was
+created before this change — it should show the correct countdown too, not whatever
+months figure it had stored.
+
+---
+
 ## 24 Aug 2026 — The BrachNha logo now sits next to the app name
 
 *Landed in commit `1f08709`.*

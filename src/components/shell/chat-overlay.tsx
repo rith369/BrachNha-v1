@@ -17,6 +17,7 @@ import { useBrachNhaStore } from "@/lib/store";
 import { useT } from "@/data/translations";
 import { relativeDay } from "@/utils/chat-history";
 import { applyInsert, defaultMathLayout } from "@/utils/math-input";
+import { daysUntilExam } from "@/utils/exam-date";
 import { cn } from "@/utils/cn";
 import { MathText } from "./math-text";
 import type { ChatProfile } from "@/utils/chat-prompt";
@@ -190,7 +191,7 @@ export function ChatOverlay() {
       name: userName,
       language: userLanguage,
       grade: userData.grade,
-      months: userData.months,
+      daysToExam: daysUntilExam(),
       strengths: userData.strengths,
       weaknesses: userData.weaknesses,
       level,

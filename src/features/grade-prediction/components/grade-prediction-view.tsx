@@ -2,7 +2,7 @@ import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { useT } from "@/data/translations";
 import { computeGradePrediction, compareToTarget } from "@/utils/gradePrediction";
-import { parseMonthsLeft } from "@/utils/roadmap";
+import { daysUntilExam } from "@/utils/exam-date";
 import { useGradePrediction } from "../use-grade-prediction";
 import { recommendations, consistencyPct } from "../demo-data";
 import { PredictionHero } from "./prediction-hero";
@@ -38,7 +38,7 @@ export function GradePredictionView() {
 
   const { subjects } = computeGradePrediction(subjectPerformance, languageKey);
   const comparison = compareToTarget(prediction.mostLikely, userData.grade);
-  const daysRemaining = parseMonthsLeft(userData.months, 4) * 30;
+  const daysRemaining = daysUntilExam();
 
   const core = subjects.filter((s) => s.countsTowardOverall);
   const weakest = [...core].sort((a, b) => a.pct - b.pct)[0];

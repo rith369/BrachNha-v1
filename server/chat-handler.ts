@@ -181,7 +181,7 @@ export async function handleChat(req: Request): Promise<Response> {
     name: "",
     language: "",
     grade: "",
-    months: "",
+    daysToExam: 0,
     strengths: [],
     weaknesses: [],
     level: 1,
