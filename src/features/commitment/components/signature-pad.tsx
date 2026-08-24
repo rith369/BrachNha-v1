@@ -11,6 +11,7 @@ import {
   type Stroke,
 } from "@/utils/signature";
 import { SignatureDisplay } from "./signature-display";
+import { useBrachNhaStore } from "@/lib/store";
 
 export interface SignatureValue {
   kind: "drawn" | "typed";
@@ -20,7 +21,7 @@ export interface SignatureValue {
 const PEN_WIDTH = 5; // matches SignatureDisplay's strokeWidth exactly
 
 const inputClasses =
-  "w-full rounded-xl border border-purple/10 bg-white px-3.5 py-3 text-sm font-bold text-text outline-none focus:border-purple/40";
+  "w-full rounded-xl border border-purple/10 bg-surface px-3.5 py-3 text-sm font-bold text-text outline-none focus:border-purple/40";
 
 export function SignaturePad({
   lang,
@@ -32,6 +33,7 @@ export function SignaturePad({
   onChange: (value: SignatureValue) => void;
 }) {
   const c = PLEDGE_COPY[lang];
+  const theme = useBrachNhaStore((s) => s.theme);
   const [tab, setTab] = useState<"draw" | "typed">("draw");
   const [typedName, setTypedName] = useState(defaultName);
 
@@ -82,15 +84,28 @@ export function SignaturePad({
     }
   }, []);
 
+  // `theme` is in the deps purely to re-stroke on a theme flip: strokeStyle is
+  // read from the live --color-purple at draw time, so an already-drawn
+  // signature would otherwise keep the old theme's ink until the next resize.
+  //
+  // The rAF is load-bearing. AppShell is the component that puts the `dark`
+  // class on <html>, and React runs child effects before parent ones — so on a
+  // theme change this effect fires while the OLD class is still applied, and a
+  // synchronous redraw would read back the colour we're trying to leave.
   useEffect(() => {
     if (tab !== "draw") return;
-    redraw();
+    const frame = requestAnimationFrame(redraw);
     const canvas = canvasRef.current;
-    if (!canvas || typeof ResizeObserver === "undefined") return;
+    if (!canvas || typeof ResizeObserver === "undefined") {
+      return () => cancelAnimationFrame(frame);
+    }
     const observer = new ResizeObserver(() => redraw());
     observer.observe(canvas);
-    return () => observer.disconnect();
-  }, [tab, redraw]);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [tab, redraw, theme]);
 
   function pointFromEvent(e: React.PointerEvent<HTMLCanvasElement>): Point {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -146,7 +161,7 @@ export function SignaturePad({
     }`;
 
   return (
-    <div className="rounded-2xl border border-purple/10 bg-white p-3 shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
+    <div className="rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel">
       <div className="mb-3 flex gap-1 rounded-xl bg-purple/5 p-1">
         <button
           type="button"

@@ -17,7 +17,7 @@ export default function NotFoundPage() {
       </p>
       <Link
         to="/"
-        className="mt-2 rounded-full bg-purple px-5 py-2 text-sm font-bold text-white"
+        className="mt-2 rounded-full bg-[var(--brand-purple)] px-5 py-2 text-sm font-bold text-on-brand"
       >
         Back to Home
       </Link>

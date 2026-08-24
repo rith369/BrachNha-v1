@@ -11,7 +11,7 @@ const buttonVariants = cva(
       variant: {
         // Primary brand gradient button — matches the current app's .btn-primary
         default:
-          "bg-linear-to-r from-pink to-purple text-white shadow-[0_6px_18px_rgba(139,43,226,0.35)] hover:brightness-105",
+          "bg-brand text-white shadow-cta hover:brightness-105",
         secondary:
           "bg-purple/10 text-purple hover:bg-purple/15 border border-purple/20",
         outline:

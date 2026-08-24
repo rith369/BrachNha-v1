@@ -71,12 +71,15 @@ export function LessonsList() {
   return (
     <div>
       <div className="mb-5 pr-14">
-        <div className="font-heading bg-linear-to-r from-pink via-purple to-blue bg-clip-text text-xl font-extrabold text-transparent">
+        <div className="font-heading bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
           📚 {t.lessons}
         </div>
         <div className="text-xs font-bold text-muted">{t.lessonsSubtitle}</div>
       </div>
-      <div className="flex flex-col gap-2">
+      {/* These are compact rows — icon, two lines of text, chevron. Left in one
+          column they would stretch to ~960px on a laptop with the chevron
+          stranded far from the title, so they pair up from lg. */}
+      <div className="grid grid-cols-1 items-start gap-2 md:grid-cols-2">
         {cards.map((c) => (
           <Link key={c.id} to={`/lessons/${c.id}`}>
             <Card className="relative flex-row items-center gap-3 p-3">

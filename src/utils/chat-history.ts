@@ -1,7 +1,7 @@
 import type { Lang } from "@/types";
 
 /**
- * Pure helpers for the AI Mentor's conversation list. No store access — the
+ * Pure helpers for KruAI's conversation list. No store access — the
  * caller passes plain values in (this is `utils/`, not `lib/`).
  */
 

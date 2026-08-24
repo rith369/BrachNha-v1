@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { Sparkles, Map, ClipboardList, LineChart, Swords } from "lucide-react";
+import { Sparkles, Map, ClipboardList, LineChart, Gamepad2 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { QUOTES } from "@/data/questions";
@@ -65,11 +65,11 @@ export function MotivationHero() {
           {lang === "en" ? "Progress" : "ការរីកចម្រើន"}
         </Link>
         <Link
-          to="/battle"
+          to="/game"
           className="flex items-center gap-1.5 rounded-full bg-yellow/15 px-3.5 py-1.5 text-xs font-extrabold text-yellow transition-transform active:scale-[0.98]"
         >
-          <Swords className="size-3.5" strokeWidth={2.5} />
-          {lang === "en" ? "Battle" : "ប្រយុទ្ធ"}
+          <Gamepad2 className="size-3.5" strokeWidth={2.5} />
+          {lang === "en" ? "Game" : "ហ្គេម"}
         </Link>
       </div>
     </div>

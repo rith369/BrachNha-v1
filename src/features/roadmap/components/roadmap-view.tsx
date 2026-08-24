@@ -18,7 +18,7 @@ function PathConnector({ flip }: { flip: boolean }) {
     <svg
       viewBox="0 0 300 70"
       preserveAspectRatio="none"
-      className={`h-[70px] w-full drop-shadow-[0_0_10px_rgba(139,43,226,0.75)] ${flip ? "scale-x-[-1]" : ""}`}
+      className={`h-[70px] w-full drop-shadow-[0_0_10px_var(--path-glow)] ${flip ? "scale-x-[-1]" : ""}`}
     >
       <path
         d="M40,0 C40,35 260,35 260,70"
@@ -31,14 +31,17 @@ function PathConnector({ flip }: { flip: boolean }) {
   );
 }
 
+// Derived from the live accent tokens rather than repeating their hexes, so the
+// pulse follows the theme — the raw rgba these replaced were hardcoded copies
+// of the light-mode pink and yellow.
 const GLOW_PINK = {
-  "--glow-color": "rgba(233,30,140,0.45)",
-  "--glow-color-strong": "rgba(233,30,140,0.65)",
+  "--glow-color": "color-mix(in oklab, var(--color-pink) 45%, transparent)",
+  "--glow-color-strong": "color-mix(in oklab, var(--color-pink) 65%, transparent)",
 } as React.CSSProperties;
 
 const GLOW_GOLD = {
-  "--glow-color": "rgba(245,158,11,0.45)",
-  "--glow-color-strong": "rgba(245,158,11,0.65)",
+  "--glow-color": "color-mix(in oklab, var(--color-yellow) 45%, transparent)",
+  "--glow-color-strong": "color-mix(in oklab, var(--color-yellow) 65%, transparent)",
 } as React.CSSProperties;
 
 function PhaseNode({
@@ -50,16 +53,21 @@ function PhaseNode({
   isFirst: boolean;
   isLast: boolean;
 }) {
+  // Brand fills, not the lifted accents: these are saturated discs carrying an
+  // emoji, and the dark-mode accents would make them shout. The middle node is
+  // a tint, so it correctly follows the lifted token instead.
   const nodeClasses = isFirst
-    ? "bg-linear-to-br from-pink via-purple to-blue animate-fab-pulse"
+    ? "bg-linear-to-br from-[var(--brand-pink)] via-[var(--brand-purple)] to-[var(--brand-blue)] animate-fab-pulse"
     : isLast
-      ? "bg-linear-to-br from-yellow to-pink animate-fab-pulse"
+      ? "bg-linear-to-br from-[var(--brand-yellow)] to-[var(--brand-pink)] animate-fab-pulse"
       : "bg-purple/10 animate-fab-pulse";
 
   return (
     <div
       style={isFirst ? GLOW_PINK : isLast ? GLOW_GOLD : undefined}
-      className={`ring-4 ring-white flex size-16 shrink-0 items-center justify-center rounded-full text-3xl ${nodeClasses}`}
+      // ring-bg, not ring-white: the halo's job is to knock the node out of the
+      // path connector running behind it, so it has to match the page.
+      className={`ring-4 ring-bg flex size-16 shrink-0 items-center justify-center rounded-full text-3xl ${nodeClasses}`}
     >
       {phase.icon}
     </div>
@@ -131,9 +139,12 @@ export function RoadmapView() {
   const allMissionsDone = missionRows.every((row) => tasks[row.key]);
 
   return (
-    <div className="px-4 pt-4 pb-36">
+    // Capped and centred rather than widened into columns: the roadmap is a
+    // sequential path through phases, and reading it as one top-to-bottom
+    // journey is the point. Two columns would break that order.
+    <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-36 lg:pb-10">
       <div className="mb-5 pr-14">
-        <div className="font-heading bg-linear-to-r from-pink via-purple to-blue bg-clip-text text-xl font-extrabold text-transparent">
+        <div className="font-heading bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
           {t.yourRoadmap} 🗺️
         </div>
         <div className="text-xs font-bold text-muted">{t.bacStudy}</div>
@@ -148,7 +159,7 @@ export function RoadmapView() {
       )}
 
       {/* Target grade + time left + recommended hours */}
-      <div className="mb-4 rounded-2xl border border-purple/10 bg-white p-4 shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
+      <div className="mb-4 rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
         <div className="mb-3.5 flex items-center gap-2.5">
           <span className="text-xl">🎯</span>
           <div>
@@ -182,7 +193,7 @@ export function RoadmapView() {
 
       {/* Pending placement tests */}
       {pendingPlacementTests.length > 0 && (
-        <div className="mb-4 rounded-2xl border border-purple/10 bg-white p-4 shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
+        <div className="mb-4 rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
           <div className="mb-3 flex items-center gap-1.5 font-heading text-sm font-extrabold">
             📅 {t.pendingTests}
           </div>
@@ -208,7 +219,7 @@ export function RoadmapView() {
                   </div>
                   <Link
                     to={`/placement-test/${p.subject}`}
-                    className="shrink-0 rounded-full bg-linear-to-r from-pink to-purple px-2.5 py-1 text-[11px] font-extrabold text-white"
+                    className="shrink-0 rounded-full bg-brand px-2.5 py-1 text-[11px] font-extrabold text-white"
                   >
                     {t.takeTestNow}
                   </Link>
@@ -220,7 +231,7 @@ export function RoadmapView() {
       )}
 
       {/* Daily Mission */}
-      <div className="mb-4 rounded-2xl border border-purple/10 bg-white p-4 shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
+      <div className="mb-4 rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
         <div className="mb-3 flex items-center gap-1.5 font-heading text-sm font-extrabold">
           🎯 {t.dailyMission}
         </div>
@@ -254,7 +265,7 @@ export function RoadmapView() {
                       </Link>
                       <button
                         onClick={() => completeTask(row.key)}
-                        className="shrink-0 rounded-full bg-linear-to-r from-pink to-purple px-2.5 py-1 text-[11px] font-extrabold text-white"
+                        className="shrink-0 rounded-full bg-brand px-2.5 py-1 text-[11px] font-extrabold text-white"
                       >
                         {lang === "en" ? "Done" : "ចប់"}
                       </button>
@@ -300,7 +311,7 @@ export function RoadmapView() {
                   className={`flex items-center gap-3 ${onRight ? "flex-row-reverse" : ""}`}
                 >
                   <PhaseNode phase={p} isFirst={isFirst} isLast={isLast} />
-                  <div className="max-w-[210px] rounded-2xl border border-purple/10 bg-white p-3 shadow-[0_2px_10px_rgba(139,43,226,0.06)]">
+                  <div className="max-w-[210px] rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel-sm">
                     <div className="text-[11px] font-extrabold text-muted">
                       {t.month} {p.month}
                       {isMissingContent && ` · ${t.comingSoon}`}
@@ -323,7 +334,7 @@ export function RoadmapView() {
           before they start; once signed, this is the plain "start" CTA again. */}
       <button
         onClick={() => (commitment ? navigate("/") : setPledgeOpen(true))}
-        className="w-full rounded-2xl bg-linear-to-r from-pink via-purple to-blue bg-[length:200%_auto] px-6 py-3.5 text-sm font-extrabold text-white shadow-[0_6px_18px_rgba(139,43,226,0.35)] animate-shimmer"
+        className="w-full rounded-2xl bg-brand-tri bg-[length:200%_auto] px-6 py-3.5 text-sm font-extrabold text-white shadow-cta animate-shimmer"
       >
         {commitment ? t.studyNow : PLEDGE_COPY[lang].readyToCommit}
       </button>

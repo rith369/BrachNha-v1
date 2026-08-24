@@ -2,12 +2,17 @@ import { activityHeatmap } from "../demo-data";
 
 const DAYS = ["S", "M", "T", "W", "T", "F", "S"];
 
-// Intensity 0-4 → color (mirrors the original app's --pink-tinted scale)
+// Intensity 0-4 → color (mirrors the original app's --pink-tinted scale).
+//
+// The one place a hand-tuned per-theme ramp is unavoidable. The light scale
+// darkens away from white, so its bottom steps are near-transparent — on a dark
+// surface those simply vanish into the card. The dark scale needs a visible
+// floor and a shallower climb, because it is brightening rather than darkening.
 const LEVELS = [
-  "bg-purple/6",
-  "bg-purple/20",
-  "bg-purple/40",
-  "bg-purple/65",
+  "bg-purple/6 dark:bg-purple/14",
+  "bg-purple/20 dark:bg-purple/28",
+  "bg-purple/40 dark:bg-purple/45",
+  "bg-purple/65 dark:bg-purple/70",
   "bg-purple",
 ];
 

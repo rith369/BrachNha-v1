@@ -21,9 +21,9 @@ export function ProfileView() {
   const [confirming, setConfirming] = useState(false);
 
   return (
-    <div className="px-4 pt-4 pb-36">
+    <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-36 lg:pb-10">
       <div className="mb-5 pr-14">
-        <div className="font-heading bg-linear-to-r from-pink via-purple to-blue bg-clip-text text-xl font-extrabold text-transparent">
+        <div className="font-heading bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
           {t.yourProfile} 🎓
         </div>
         <div className="text-xs font-bold text-muted">{userName}</div>
@@ -68,7 +68,7 @@ export function ProfileView() {
           <div className="flex gap-2.5">
             <button
               onClick={() => setConfirming(false)}
-              className="flex-1 rounded-2xl border border-purple/20 bg-white px-6 py-3 text-sm font-extrabold text-purple"
+              className="flex-1 rounded-2xl border border-purple/20 bg-surface px-6 py-3 text-sm font-extrabold text-purple"
             >
               {lang === "en" ? "Cancel" : "បោះបង់"}
             </button>

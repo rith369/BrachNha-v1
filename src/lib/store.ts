@@ -41,6 +41,8 @@ export interface ExamResult {
   date: string;
 }
 
+export type Theme = "dark" | "light";
+
 export interface LoginData {
   name: string;
   language: "english" | "french";
@@ -63,6 +65,11 @@ interface BrachNhaState {
   /** null until the student signs their roadmap pledge. Skippable, so a
    *  surveyed student can stay null indefinitely. */
   commitment: Commitment | null;
+  /** True once the pledge overlay has been opened and closed — signed OR
+   *  skipped. NOT the same as `commitment !== null`: the roadmap hides its
+   *  hamburger and chat FAB until this flips, so gating that on the signature
+   *  alone would strip the page forever for a student who declines. */
+  pledgeSeen: boolean;
 
   // ── progression (was scattered useState in App() before) ──
   xp: number;
@@ -72,6 +79,10 @@ interface BrachNhaState {
   examResults: ExamResult[];
 
   // ── ui ──
+  /** Device preference, not account data — deliberately NOT reset by logout().
+   *  Written onto <html> as a class by AppShell; index.html applies the same
+   *  value before first paint so there's no light flash on load. */
+  theme: Theme;
   chatOpen: boolean;
   drawerOpen: boolean;
   /** The commitment overlay. Lives here (not in RoadmapView's useState) because
@@ -79,6 +90,14 @@ interface BrachNhaState {
    *  container, so an absolute panel inside it would anchor to scrolled
    *  content instead of the app frame. Same reasoning as chatOpen. */
   pledgeOpen: boolean;
+  /** True while the student is mid-question in the mock exam, which hides every
+   *  navigation affordance. Route-based tasks (a lesson, a placement test) are
+   *  detected from the pathname instead — see utils/focus-routes.ts — because
+   *  they have no equivalent "started" state. useFocusMode() ORs the two.
+   *
+   *  Deliberately NOT persisted: a stale `true` restored on next load would
+   *  strand a student on a page with no way to navigate anywhere. */
+  focusMode: boolean;
 
   // ── ai mentor chat ──
   // Lives here rather than in ChatOverlay's useState because AppShell unmounts
@@ -100,9 +119,12 @@ interface BrachNhaState {
   completeTask: (task: keyof Tasks) => void;
   addExamResult: (result: ExamResult) => void;
   resetDailyTasks: () => void;
+  setTheme: (theme: Theme) => void;
   setChatOpen: (open: boolean) => void;
   setDrawerOpen: (open: boolean) => void;
   setPledgeOpen: (open: boolean) => void;
+  setFocusMode: (on: boolean) => void;
+  markPledgeSeen: () => void;
   addChatMsg: (msg: ChatMsg) => void;
   appendChatChunk: (text: string) => void;
   startNewChat: () => void;
@@ -138,14 +160,18 @@ const partializeState = (state: BrachNhaState) => ({
   userData: state.userData,
   pendingPlacementTests: state.pendingPlacementTests,
   commitment: state.commitment,
+  pledgeSeen: state.pledgeSeen,
   xp: state.xp,
   level: state.level,
   streak: state.streak,
   tasks: state.tasks,
   examResults: state.examResults,
+  theme: state.theme,
   conversations: state.conversations,
   activeConversationId: state.activeConversationId,
-  // chatOpen/drawerOpen/pledgeOpen intentionally excluded — UI state
+  // chatOpen/drawerOpen/pledgeOpen/focusMode intentionally excluded — UI state.
+  // focusMode especially: persisting it would restore a student into a screen
+  // with every navigation control hidden and no way back out.
 });
 
 type PersistedState = ReturnType<typeof partializeState>;
@@ -163,6 +189,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       userData: emptyUserData,
       pendingPlacementTests: [],
       commitment: null,
+      pledgeSeen: false,
 
       xp: 0,
       level: 1,
@@ -170,9 +197,11 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       tasks: emptyTasks,
       examResults: [],
 
+      theme: "light",
       chatOpen: false,
       drawerOpen: false,
       pledgeOpen: false,
+      focusMode: false,
       conversations: [],
       activeConversationId: null,
 
@@ -242,9 +271,14 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       addExamResult: (result) =>
         set((state) => ({ examResults: [...state.examResults, result] })),
 
+      setTheme: (theme) => set({ theme }),
       setChatOpen: (open) => set({ chatOpen: open }),
       setDrawerOpen: (open) => set({ drawerOpen: open }),
       setPledgeOpen: (open) => set({ pledgeOpen: open }),
+      setFocusMode: (on) => set({ focusMode: on }),
+      // One-way: the student has now been shown the pledge, so the roadmap
+      // stops hiding its chrome whether or not they went through with it.
+      markPledgeSeen: () => set({ pledgeSeen: true }),
 
       // Creates the conversation lazily on the first message, so "New chat"
       // never leaves an empty row in the history list.
@@ -342,6 +376,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           userData: emptyUserData,
           pendingPlacementTests: [],
           commitment: null,
+          pledgeSeen: false,
           xp: 0,
           level: 1,
           streak: 3,
@@ -355,9 +390,24 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       name: "brachnha", // same localStorage key as the current prototype
       partialize: partializeState,
 
-      // Stamps new writes so a future schema change CAN use `migrate`. Note it
-      // does NOT help with the v0 data already in students' browsers — see below.
-      version: 1,
+      // v1 stamped writes so a future schema change COULD use `migrate`; v2 is
+      // the first one that actually does. Note neither helps with the v0 data
+      // already in students' browsers — see the `merge` note below.
+      version: 2,
+
+      // v1 → v2: dark shipped as the default for a few hours and got written
+      // into everyone's localStorage before the default flipped to light. That
+      // stored "dark" is the old default rather than a choice anyone made, so
+      // it's cleared — otherwise flipping the default changes nothing for the
+      // people who already opened the app. A deliberate pick made from the
+      // drawer after this lands is stamped v2 and is left alone.
+      migrate: (persisted, version) => {
+        const state = persisted as Partial<PersistedState>;
+        if (version < 2) {
+          return { ...state, theme: "light" as const };
+        }
+        return state;
+      },
 
       // The legacy conversion lives in `merge`, not `migrate`, on purpose.
       // zustand only calls `migrate` when the stored payload carries a numeric

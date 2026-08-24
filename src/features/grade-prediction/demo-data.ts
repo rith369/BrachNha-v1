@@ -75,7 +75,7 @@ export interface MockExamAttempt {
 }
 
 // Separate from the store's real examResults (which starts empty for a new
-// user) — same reason Progress/Battle use fake data: a blank chart would
+// user) — same reason Progress/Game use fake data: a blank chart would
 // undersell the feature in a demo.
 export const mockExamAttempts: MockExamAttempt[] = [
   { pct: 72, date: "2026-07-10" },

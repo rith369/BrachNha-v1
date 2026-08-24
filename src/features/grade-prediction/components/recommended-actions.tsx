@@ -19,7 +19,7 @@ export function RecommendedActions({
   const t = useT(lang);
 
   return (
-    <div className="rounded-2xl border border-purple/10 bg-white p-4 shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
+    <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
       <div className="mb-3 flex items-center gap-1.5 font-heading text-sm font-extrabold">
         <Rocket className="size-4 text-pink" strokeWidth={2.5} />
         {t.recommendedActions}
@@ -58,7 +58,7 @@ export function RecommendedActions({
       <div className="flex gap-2">
         <button
           onClick={() => onSimulate("good")}
-          className="flex-1 rounded-xl bg-linear-to-r from-mint to-blue px-3 py-2.5 text-xs font-extrabold text-white shadow-[0_4px_14px_rgba(16,185,129,0.3)] transition-transform active:scale-[0.97]"
+          className="flex-1 rounded-xl bg-linear-to-r from-[var(--brand-mint)] to-[var(--brand-blue)] px-3 py-2.5 text-xs font-extrabold text-on-brand shadow-mint-cta transition-transform active:scale-[0.97]"
         >
           {lang === "en" ? "✓ Complete a Physics Quiz" : "✓ បញ្ចប់លំហាត់រូបវិទ្យា"}
         </button>
@@ -79,7 +79,7 @@ export function RecommendedActions({
         </div>
         <Link
           to="/roadmap"
-          className="flex items-center justify-center gap-1.5 rounded-xl bg-linear-to-r from-pink via-purple to-blue px-4 py-2.5 text-xs font-extrabold text-white"
+          className="flex items-center justify-center gap-1.5 rounded-xl bg-brand-tri px-4 py-2.5 text-xs font-extrabold text-white"
         >
           <Map className="size-3.5" strokeWidth={2.5} />
           {t.viewRoadmap}

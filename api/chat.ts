@@ -1,7 +1,7 @@
 import { handleChat } from "../server/chat-handler.js";
 
 /**
- * The AI Mentor endpoint on Vercel.
+ * The KruAI endpoint on Vercel.
  *
  * `vite build` produces a static `dist/` with no server, so in production this
  * file is what makes the mentor answer. Vercel treats every file under `api/`

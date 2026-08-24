@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Flag } from "@/components/ui/flag";
+import { Wordmark } from "@/components/shell/wordmark";
 import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { useT } from "@/data/translations";
@@ -36,7 +37,7 @@ const PROVINCES = [
 const OTHER_LOCATION = "__other";
 
 const inputClasses =
-  "w-full rounded-xl border border-purple/10 bg-white px-3.5 py-3 text-sm font-bold text-text outline-none focus:border-purple/40";
+  "w-full rounded-xl border border-purple/10 bg-surface px-3.5 py-3 text-sm font-bold text-text outline-none focus:border-purple/40";
 
 export function LoginView() {
   const { lang, setLang, completeLogin } = useBrachNhaStore(
@@ -72,14 +73,13 @@ export function LoginView() {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto px-4 pt-8 pb-6">
+    <div className="mx-auto flex h-full w-full max-w-2xl flex-col overflow-y-auto px-4 pt-8 pb-6">
       <div className="mb-5 flex items-center justify-between">
-        <div>
-          <div className="font-heading bg-linear-to-r from-pink via-purple to-blue bg-clip-text text-xl font-extrabold text-transparent">
-            BrachNha ⚔️
-          </div>
-          <div className="text-xs font-bold text-muted">Bac II Quest</div>
-        </div>
+        <Wordmark
+          subtitle={
+            <div className="text-xs font-bold text-muted">Bac II Quest</div>
+          }
+        />
         <button
           onClick={() => setLang(lang === "en" ? "km" : "en")}
           className="flex items-center gap-1.5 rounded-full border border-purple/20 bg-purple/8 px-3 py-1.5 text-xs font-extrabold text-purple"
@@ -97,7 +97,7 @@ export function LoginView() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-purple/10 bg-white p-4 shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
+      <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
         <div className="mb-3">
           <label className="mb-1.5 block text-xs font-extrabold text-muted">
             {t.enterName} *
@@ -125,7 +125,7 @@ export function LoginView() {
                   "rounded-xl border px-3 py-2.5 text-sm font-bold transition " +
                   (language === choice
                     ? "border-blue/40 bg-blue/10 text-blue"
-                    : "border-purple/10 bg-white text-text hover:bg-purple/5")
+                    : "border-purple/10 bg-surface text-text hover:bg-purple/5")
                 }
               >
                 {t[choice as TranslationKey]}
@@ -192,7 +192,7 @@ export function LoginView() {
         <button
           disabled={!canSubmit}
           onClick={submit}
-          className="w-full rounded-2xl bg-linear-to-r from-pink via-purple to-blue bg-[length:200%_auto] px-6 py-3 text-sm font-extrabold text-white shadow-[0_6px_18px_rgba(139,43,226,0.35)] animate-shimmer disabled:opacity-40"
+          className="w-full rounded-2xl bg-brand-tri bg-[length:200%_auto] px-6 py-3 text-sm font-extrabold text-white shadow-cta animate-shimmer disabled:opacity-40"
         >
           {lang === "en" ? "Continue →" : "បន្ត →"}
         </button>

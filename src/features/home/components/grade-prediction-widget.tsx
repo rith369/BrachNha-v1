@@ -17,7 +17,7 @@ export function GradePredictionWidget() {
   return (
     <Link
       to="/grade-prediction"
-      className="flex items-center gap-3 rounded-2xl border border-purple/10 bg-white p-4 shadow-[0_2px_12px_rgba(139,43,226,0.08)] transition-transform active:scale-[0.99]"
+      className="flex items-center gap-3 rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel transition-transform active:scale-[0.99]"
     >
       <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-pink/15 via-purple/15 to-blue/15">
         <Gauge className="size-5 text-purple" strokeWidth={2.5} />

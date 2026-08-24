@@ -3,7 +3,7 @@ import { loadEnv } from "vite";
 import type { ServerResponse } from "node:http";
 
 /**
- * Mounts the AI Mentor endpoint on Vite's own dev server.
+ * Mounts the KruAI endpoint on Vite's own dev server.
  *
  * Under Next.js, app/api/chat/route.ts was a server route: the Gemini key was
  * read from the environment on the server and never reached the browser. Vite
@@ -116,7 +116,7 @@ export function chatApi(): Plugin {
           if (!res.headersSent) {
             res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
           }
-          res.end("The AI Mentor is unavailable in this dev session.");
+          res.end("KruAI is unavailable in this dev session.");
         }
       });
     },

@@ -21,7 +21,7 @@ export function OpponentList() {
         {opponents.map((o) => (
           <div
             key={o.name}
-            className="flex items-center gap-3 rounded-2xl border border-purple/10 bg-white p-3 shadow-[0_2px_12px_rgba(139,43,226,0.06)]"
+            className="flex items-center gap-3 rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel-sm"
           >
             <Avatar
               seed={o.avatarSeed}
@@ -40,8 +40,8 @@ export function OpponentList() {
               </div>
             </div>
             <div className="flex shrink-0 flex-col items-end gap-1.5">
-              <button className="rounded-full bg-linear-to-r from-pink to-purple px-3 py-1.5 text-[11px] font-extrabold text-white">
-                ⚔️ Battle
+              <button className="rounded-full bg-brand px-3 py-1.5 text-[11px] font-extrabold text-white">
+                🎮 Play
               </button>
               <div className="flex items-center gap-1 text-[9px] font-bold text-muted">
                 <span

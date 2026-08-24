@@ -1,7 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { useT } from "@/data/translations";
+import { FocusLayout, FocusButton } from "@/components/shell/focus-layout";
+import {
+  focusCard,
+  focusKicker,
+  focusPrompt,
+  focusOption,
+} from "@/utils/focus-styles";
 import { MOCK_QS } from "@/data/questions";
 
 function scoreColor(pct: number) {
@@ -16,14 +23,16 @@ function scoreColorHex(pct: number) {
 }
 
 export function MockExam() {
-  const { lang, addXp, examResults, addExamResult } = useBrachNhaStore(
-    useShallow((s) => ({
-      lang: s.lang,
-      addXp: s.addXp,
-      examResults: s.examResults,
-      addExamResult: s.addExamResult,
-    }))
-  );
+  const { lang, addXp, examResults, addExamResult, setFocusMode } =
+    useBrachNhaStore(
+      useShallow((s) => ({
+        lang: s.lang,
+        addXp: s.addXp,
+        examResults: s.examResults,
+        addExamResult: s.addExamResult,
+        setFocusMode: s.setFocusMode,
+      }))
+    );
   const t = useT(lang);
 
   const [started, setStarted] = useState(false);
@@ -33,6 +42,16 @@ export function MockExam() {
   const [lastResult, setLastResult] = useState<
     (typeof examResults)[number] | null
   >(null);
+
+  // Unlike a lesson, /exam is an ordinary destination until the student
+  // actually starts answering, so the route alone can't tell the shell to hide
+  // its navigation — this flag does. The cleanup is the part that matters: a
+  // browser-back out of a running exam would otherwise leave the whole app with
+  // every nav control hidden and no way to reach anything.
+  useEffect(() => {
+    setFocusMode(started && !done);
+    return () => setFocusMode(false);
+  }, [started, done, setFocusMode]);
 
   function startExam() {
     setStarted(true);
@@ -62,15 +81,15 @@ export function MockExam() {
   // ── Screen 1: intro + previous results ──
   if (!started) {
     return (
-      <div className="px-4 pt-4 pb-20">
-        <div className="font-heading mb-0.5 bg-linear-to-r from-pink via-purple to-blue bg-clip-text pr-14 text-xl font-extrabold text-transparent">
+      <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-20 lg:pb-8">
+        <div className="font-heading mb-0.5 bg-brand-tri bg-clip-text pr-14 text-xl font-extrabold text-transparent">
           📝 {t.mockExam}
         </div>
         <div className="mb-4 pr-14 text-xs font-bold text-muted">
           Bac II Simulation
         </div>
 
-        <div className="mb-4 rounded-2xl border border-purple/10 bg-white p-7 text-center shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
+        <div className="mb-4 rounded-2xl border border-purple/10 bg-surface p-7 text-center shadow-panel">
           <div className="mb-3 text-5xl">🎯</div>
           <div className="mb-2 text-lg font-extrabold">
             {t.startMockExam}
@@ -84,14 +103,14 @@ export function MockExam() {
           <div className="mb-5 text-xs font-bold text-muted">Questions</div>
           <button
             onClick={startExam}
-            className="rounded-2xl bg-linear-to-r from-pink to-purple px-6 py-3 text-sm font-extrabold text-white shadow-[0_6px_18px_rgba(139,43,226,0.35)]"
+            className="rounded-2xl bg-brand px-6 py-3 text-sm font-extrabold text-white shadow-cta"
           >
             {t.startMockExam}
           </button>
         </div>
 
         {examResults.length > 0 && (
-          <div className="rounded-2xl border border-purple/10 bg-white p-4 shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
+          <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
             <div className="mb-3 text-sm font-extrabold">
               {lang === "en" ? "Previous Results" : "លទ្ធផលមុន"}
             </div>
@@ -144,11 +163,11 @@ export function MockExam() {
             : "ប្រឹងសិក្សា!";
 
     return (
-      <div className="px-4 pt-4 pb-20 text-center">
+      <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-20 lg:pb-8 text-center">
         <div
           className="mx-auto mb-5 flex size-32 items-center justify-center rounded-full"
           style={{
-            background: `conic-gradient(${scoreColorHex(pct)} ${deg}deg, rgba(139,43,226,0.1) ${deg}deg)`,
+            background: `conic-gradient(${scoreColorHex(pct)} ${deg}deg, var(--color-chart-track) ${deg}deg)`,
           }}
         >
           <div className="flex size-24 flex-col items-center justify-center rounded-full bg-bg">
@@ -178,7 +197,7 @@ export function MockExam() {
         </div>
         <button
           onClick={startExam}
-          className="mb-2.5 block w-full rounded-2xl bg-linear-to-r from-pink to-purple px-6 py-3 text-sm font-extrabold text-white shadow-[0_6px_18px_rgba(139,43,226,0.35)]"
+          className="mb-2.5 block w-full rounded-2xl bg-brand px-6 py-3 text-sm font-extrabold text-white shadow-cta"
         >
           {t.retakeExam}
         </button>
@@ -197,37 +216,53 @@ export function MockExam() {
   const answeredCount = Object.keys(answers).length;
 
   return (
-    <div className="px-4 pt-4 pb-20">
-      <div className="mb-2.5 flex items-center justify-between pr-14">
-        <div className="text-xs font-bold text-muted">
-          Q{idx + 1} / {MOCK_QS.length}
+    // Focus mode: no sidebar, bottom nav, hamburger or chat FAB while a question
+    // is on screen. confirmExit because leaving discards every answer so far —
+    // and note this screen previously had NO exit at all, which was only
+    // survivable because the nav was still there to escape through.
+    <FocusLayout
+      progressPct={((idx + 1) / MOCK_QS.length) * 100}
+      onExit={() => setStarted(false)}
+      confirmExit
+      meta={`Q${idx + 1}/${MOCK_QS.length} · ${answeredCount} ${lang === "en" ? "done" : "រួច"}`}
+      footer={
+        <div className="flex gap-2.5">
+          {idx > 0 && (
+            <FocusButton variant="secondary" onClick={() => setIdx(idx - 1)}>
+              ← {lang === "en" ? "Prev" : "មុន"}
+            </FocusButton>
+          )}
+          {idx < MOCK_QS.length - 1 ? (
+            <FocusButton onClick={() => setIdx(idx + 1)}>
+              {lang === "en" ? "Next →" : "បន្ត →"}
+            </FocusButton>
+          ) : (
+            <FocusButton
+              onClick={submit}
+              disabled={answeredCount < MOCK_QS.length}
+            >
+              {t.submitExam}
+            </FocusButton>
+          )}
         </div>
-        <div className="text-xs font-extrabold text-purple">
-          {answeredCount} answered
-        </div>
-      </div>
-      <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-purple/10">
-        <div
-          className="h-full rounded-full bg-linear-to-r from-pink to-purple transition-all duration-300"
-          style={{ width: `${((idx + 1) / MOCK_QS.length) * 100}%` }}
-        />
-      </div>
-
-      <div className="mb-4 rounded-2xl border border-purple/10 bg-white p-4 shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
-        <div className="mb-2.5 text-[11px] font-extrabold tracking-widest text-purple uppercase">
+      }
+    >
+      <div className={focusCard}>
+        <div className={`mb-2.5 text-purple ${focusKicker}`}>
           {q.subj === "math" ? t.math : t.biology}
         </div>
-        <div className="mb-4 text-base font-extrabold">{q.q[lang]}</div>
-        <div className="flex flex-col gap-2">
+        <div className={`mb-4 md:mb-6 ${focusPrompt}`}>{q.q[lang]}</div>
+        <div className="flex flex-col gap-2 md:gap-3">
           {q.options.map((opt) => (
             <button
               key={opt}
               onClick={() => setAnswers({ ...answers, [idx]: opt })}
               className={
-                "rounded-xl border px-4 py-3 text-left text-sm font-bold transition " +
+                focusOption +
+                " " +
                 (answers[idx] === opt
                   ? "border-purple/40 bg-purple/10 text-purple"
-                  : "border-purple/10 bg-white text-text hover:bg-purple/5")
+                  : "border-purple/10 bg-surface text-text hover:bg-purple/5")
               }
             >
               {opt}
@@ -236,32 +271,6 @@ export function MockExam() {
         </div>
       </div>
 
-      <div className="flex gap-2.5">
-        {idx > 0 && (
-          <button
-            onClick={() => setIdx(idx - 1)}
-            className="flex-1 rounded-2xl border border-purple/20 bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
-          >
-            ← {lang === "en" ? "Prev" : "មុន"}
-          </button>
-        )}
-        {idx < MOCK_QS.length - 1 ? (
-          <button
-            onClick={() => setIdx(idx + 1)}
-            className="flex-1 rounded-2xl bg-linear-to-r from-pink to-purple px-6 py-3 text-sm font-extrabold text-white shadow-[0_6px_18px_rgba(139,43,226,0.35)]"
-          >
-            {lang === "en" ? "Next →" : "បន្ត →"}
-          </button>
-        ) : (
-          <button
-            disabled={answeredCount < MOCK_QS.length}
-            onClick={submit}
-            className="flex-1 rounded-2xl bg-linear-to-r from-pink to-purple px-6 py-3 text-sm font-extrabold text-white shadow-[0_6px_18px_rgba(139,43,226,0.35)] disabled:opacity-50"
-          >
-            {t.submitExam}
-          </button>
-        )}
-      </div>
-    </div>
+    </FocusLayout>
   );
 }

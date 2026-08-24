@@ -49,11 +49,19 @@ export function PredictionFactors({
   ];
 
   return (
-    <div className="rounded-2xl border border-purple/10 bg-white p-4 shadow-[0_2px_12px_rgba(139,43,226,0.08)]">
+    <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
       <div className="mb-3 font-heading text-sm font-extrabold">
         {t.whatsAffecting}
       </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      {/* These breakpoints track the PAGE GRID, not the viewport, because the
+          grid is what decides this card's real width:
+            sm (640)  — page is still one full-width column, so two lists fit
+            md (768)  — card drops into a 2-col grid at ~352px: back to one list
+            2xl(1536) — still 2-col, but the shell is wide enough that a column
+                        is ~600px, so two lists fit again
+          Without the md reset the lists render at ~176px each on a tablet, far
+          narrower than the 288px a 320px phone already gives them. */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-1 2xl:grid-cols-2">
         <div>
           <div className="mb-1.5 text-[11px] font-extrabold tracking-wide text-mint uppercase">
             {t.positiveFactors}

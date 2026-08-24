@@ -11,7 +11,9 @@ export function TopBar() {
     <button
       onClick={() => setDrawerOpen(true)}
       aria-label="Open menu"
-      className="absolute top-3 right-4 z-40 flex h-9.5 w-9.5 flex-col items-center justify-center gap-1.5 rounded-xl border border-purple/20 bg-purple/10 transition hover:bg-purple/20"
+      // Hidden from lg up: the permanent Sidebar replaces the drawer there, so
+      // the hamburger would open a second copy of navigation already on screen.
+      className="absolute top-3 right-4 z-40 flex h-9.5 w-9.5 flex-col items-center justify-center gap-1.5 rounded-xl border border-purple/20 bg-purple/10 transition hover:bg-purple/20 lg:hidden"
     >
       <Menu className="size-4.5 text-purple" strokeWidth={2.5} />
     </button>

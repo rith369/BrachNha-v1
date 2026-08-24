@@ -9,6 +9,45 @@
       name="description"
       content="AI-powered Bac II exam prep for Cambodian Grade 12 students"
     />
+    <!-- Single value, not a prefers-color-scheme pair: the app has its own
+         theme setting and deliberately does NOT follow the OS, so a media-based
+         pair would tint the browser chrome dark while the page renders light.
+         The script below keeps this in sync with the real theme. -->
+    <meta name="theme-color" content="#faf5ff" />
+
+    <!--
+      Applies the saved theme BEFORE first paint. The store hydrates from
+      localStorage synchronously, but AppShell's effect only runs after the
+      first frame — without this, choosing dark would flash light for a frame on
+      every load. Must stay inline and blocking; a module script would be
+      deferred and defeat the point. Light is the default, so only an explicit
+      "dark" opts in. classList.add rather than className: <html> already
+      carries h-full and antialiased.
+
+      The `version >= 2` guard mirrors the store's v1 → v2 migration. Dark was
+      briefly the default and is still sitting in older payloads; without the
+      guard this would paint dark and then snap to light once the migration
+      runs, which is the exact flash the script exists to prevent.
+    -->
+    <script>
+      (function () {
+        var dark = false;
+        try {
+          var saved = JSON.parse(localStorage.getItem("brachnha") || "{}");
+          dark =
+            !!saved.state &&
+            saved.state.theme === "dark" &&
+            saved.version >= 2;
+        } catch (e) {
+          // Private mode, disabled storage, or corrupt JSON — fall back to the
+          // default theme rather than blocking the app from booting.
+          dark = false;
+        }
+        document.documentElement.classList.toggle("dark", dark);
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute("content", dark ? "#100e18" : "#faf5ff");
+      })();
+    </script>
 
     <!--
       next/font/google used to self-host these and hand the app CSS variables.

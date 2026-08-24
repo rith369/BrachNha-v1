@@ -1,18 +1,91 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Tailwind v4 points `dark:` at prefers-color-scheme by default. The theme is a
+   persisted store value written onto <html> by AppShell (and by the pre-paint
+   script in index.html), so the variant has to follow that class instead. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ────────────────────────────────────────────────────────────────────────────
+   LIGHT THEME — the default. Every themed value lives here in :root, never
+   inside @theme, because `@theme inline` is not a cascade layer: a value
+   written literally in there cannot be overridden by `.dark`. The @theme block
+   below only ALIASES these, which is what lets one selector flip the whole app.
+   ──────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* ── BrachNha brand palette (ported from the current prototype) ── */
+  color-scheme: light;
+
+  /* ── Brand fills — IDENTICAL in both themes, do not lighten ──
+     These are the only colours that sit UNDERNEATH white text: the gradient
+     buttons and the tri-colour wordmark. #8b2be2 carries white at 5.6:1; the
+     lifted dark-mode purple below would drop that to 2.8:1 and fail. That
+     conflict is unresolvable in one token, which is why there are two sets. */
+  --brand-pink: #e91e8c;
+  --brand-purple: #8b2be2;
+  --brand-blue: #0284c7;
+  --brand-mint: #10b981;
+  --brand-yellow: #f59e0b;
+
+  /* ── Accent roles — text, icons, borders, tints, chart series ──
+     Lifted in .dark so they stay readable ON a dark surface. Because they are
+     lifted, every existing low-alpha tint (bg-purple/8, border-purple/10, …)
+     turns into correct subtle elevation on dark with no per-class edits. */
   --color-pink: #e91e8c;
   --color-purple: #8b2be2;
   --color-blue: #0284c7;
   --color-mint: #10b981;
   --color-yellow: #f59e0b;
 
+  /* ── Surfaces: three intentional steps, page → card → elevated ── */
   --color-bg: #faf5ff;
   --color-surface: #ffffff;
+  --color-elevated: #ffffff;
+  /* Raised controls sitting ON a surface — the math keyboard's keys. Distinct
+     from --color-elevated because the two themes want opposite directions: in
+     light a key is a faint tint *below* the white panel, in dark it has to be a
+     step *above* it or the keyboard reads as holes punched in the panel. */
+  --color-control: #faf5ff;
   --color-text: #1e1033;
   --color-muted: #8b7ca3;
+
+  /* ── shadcn-style roles. These used to be literals inside @theme; they were
+     moved out here so .dark can reach them. ── */
+  --color-secondary: #f3e8ff;
+  --color-accent: #f3e8ff;
+  --color-border: rgba(139, 43, 226, 0.15);
+  --color-input: rgba(139, 43, 226, 0.15);
+  --color-destructive: #ef4444;
+  /* Text that sits on a --brand-* fill. White in both themes, named so the
+     intent is legible at the call site. */
+  --color-on-brand: #ffffff;
+
+  /* ── Chart chrome. Recharts and the hand-coded SVG gauges take colours as
+     props, not classes, so they need variables rather than utilities. ── */
+  --color-chart-grid: rgba(139, 43, 226, 0.08);
+  --color-chart-track: rgba(139, 43, 226, 0.1);
+  --color-tooltip-bg: #ffffff;
+
+  /* ── Shadows. Purple-tinted glows read as depth on a lavender page; on dark
+     they are invisible, so .dark swaps them for real black shadows. ── */
+  --shadow-panel: 0 2px 12px rgba(139, 43, 226, 0.08);
+  --shadow-panel-sm: 0 2px 12px rgba(139, 43, 226, 0.06);
+  --shadow-cta: 0 6px 18px rgba(139, 43, 226, 0.35);
+  --shadow-cta-lg: 0 6px 20px rgba(139, 43, 226, 0.45);
+  --shadow-drawer: 8px 0 40px rgba(139, 43, 226, 0.15);
+  --shadow-mint-cta: 0 4px 14px rgba(16, 185, 129, 0.3);
+  /* Glow on the Roadmap's SVG path connector. */
+  --path-glow: rgba(139, 43, 226, 0.75);
+
+  /* Default tint for the fabPulse keyframe. Derived from --color-purple rather
+     than restated as a hex, so it follows the theme without needing a .dark
+     counterpart — RoadmapView still overrides it inline per node. */
+  --glow-color: color-mix(in oklab, var(--color-purple) 45%, transparent);
+  --glow-color-strong: color-mix(in oklab, var(--color-purple) 65%, transparent);
+
+  /* Consumed via arbitrary values (bg-[var(--scrim)]) — not theme namespaces,
+     so no utility is generated for them. */
+  --drawer-header: linear-gradient(to bottom right, #f5eeff, #ede0ff);
+  --scrim: rgba(30, 10, 60, 0.35);
 
   /* ── Font families ──
      next/font/google used to inject these four variables. The faces are now
@@ -25,6 +98,60 @@
   --font-caveat: "Caveat";
 }
 
+/* ────────────────────────────────────────────────────────────────────────────
+   DARK THEME — the default for new students, toggled from the drawer footer.
+   Deliberately NOT an inversion: #100e18 / #1a1726 / #241f33 are deep
+   purple-tinted neutrals rather than black, so the app keeps its warmth at
+   night, and each surface is a chosen step rather than a computed one.
+   ──────────────────────────────────────────────────────────────────────────── */
+.dark {
+  color-scheme: dark;
+
+  /* Lifted accents. Contrast against --color-surface (#1a1726):
+     purple 5.8:1 · pink 6.2:1 · blue 8.1:1 · mint 9.0:1 · yellow 10.3:1 */
+  --color-pink: #ff5fb0;
+  --color-purple: #b47cf5;
+  --color-blue: #38bdf8;
+  --color-mint: #34d399;
+  --color-yellow: #fbbf24;
+
+  --color-bg: #100e18;
+  --color-surface: #1a1726;
+  --color-elevated: #241f33;
+  --color-control: #241f33;
+  --color-text: #ece9f5; /* 14.3:1 on surface — near-white, not pure white */
+  --color-muted: #9b93b0; /* 6.0:1 — muted without dropping below AA */
+
+  --color-secondary: #2a2340;
+  --color-accent: #2a2340;
+  /* Keyed off the LIFTED purple: a border built from #8b2be2 at 16% over
+     #1a1726 is indistinguishable from the card it is supposed to outline. */
+  --color-border: rgba(180, 124, 245, 0.16);
+  --color-input: rgba(180, 124, 245, 0.16);
+  --color-destructive: #ff6b6b;
+
+  --color-chart-grid: rgba(180, 124, 245, 0.12);
+  --color-chart-track: rgba(180, 124, 245, 0.14);
+  --color-tooltip-bg: #241f33;
+
+  /* Real shadows, not glows. On dark, depth comes from occlusion plus the
+     surface step — a coloured halo just looks like a rendering artefact. */
+  --shadow-panel: 0 2px 14px rgba(0, 0, 0, 0.5);
+  --shadow-panel-sm: 0 1px 8px rgba(0, 0, 0, 0.4);
+  --shadow-cta: 0 6px 18px rgba(0, 0, 0, 0.55);
+  --shadow-cta-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-drawer: 8px 0 40px rgba(0, 0, 0, 0.6);
+  --shadow-mint-cta: 0 4px 14px rgba(0, 0, 0, 0.5);
+  /* Brighter than the light-mode glow: a 75% #8b2be2 halo disappears against
+     #100e18, and the path connector is the Roadmap's main visual thread. */
+  --path-glow: rgba(180, 124, 245, 0.55);
+
+  --drawer-header: linear-gradient(to bottom right, #241f33, #1a1726);
+  /* Much darker than the light scrim: a 35% wash over an already-dark page
+     leaves the drawer floating with no separation from what is behind it. */
+  --scrim: rgba(6, 4, 12, 0.66);
+}
+
 @theme inline {
   --color-pink: var(--color-pink);
   --color-purple: var(--color-purple);
@@ -33,8 +160,24 @@
   --color-yellow: var(--color-yellow);
   --color-bg: var(--color-bg);
   --color-surface: var(--color-surface);
+  --color-elevated: var(--color-elevated);
+  --color-control: var(--color-control);
   --color-text: var(--color-text);
   --color-muted: var(--color-muted);
+  --color-on-brand: var(--color-on-brand);
+
+  --color-chart-grid: var(--color-chart-grid);
+  --color-chart-track: var(--color-chart-track);
+  --color-tooltip-bg: var(--color-tooltip-bg);
+
+  /* The --shadow-* namespace generates shadow-panel / shadow-cta / … utilities,
+     which is why these are variables rather than @utility rules. */
+  --shadow-panel: var(--shadow-panel);
+  --shadow-panel-sm: var(--shadow-panel-sm);
+  --shadow-cta: var(--shadow-cta);
+  --shadow-cta-lg: var(--shadow-cta-lg);
+  --shadow-drawer: var(--shadow-drawer);
+  --shadow-mint-cta: var(--shadow-mint-cta);
 
   /* Khmer is listed as a fallback, not applied conditionally: the Latin fonts
      have no Khmer glyphs, so the browser reaches for Noto per glyph. Mixed
@@ -52,22 +195,42 @@
   --color-background: var(--color-bg);
   --color-foreground: var(--color-text);
   --color-primary: var(--color-purple);
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #f3e8ff;
+  --color-primary-foreground: var(--color-on-brand);
+  --color-secondary: var(--color-secondary);
   --color-secondary-foreground: var(--color-purple);
   --color-muted-foreground: var(--color-muted);
-  --color-border: rgba(139, 43, 226, 0.15);
-  --color-input: rgba(139, 43, 226, 0.15);
+  --color-border: var(--color-border);
+  --color-input: var(--color-input);
   --color-ring: var(--color-purple);
-  --color-accent: #f3e8ff;
+  --color-accent: var(--color-accent);
   --color-accent-foreground: var(--color-purple);
-  --color-destructive: #ef4444;
-  --color-destructive-foreground: #ffffff;
+  --color-destructive: var(--color-destructive);
+  --color-destructive-foreground: var(--color-on-brand);
   --color-card: var(--color-surface);
   --color-card-foreground: var(--color-text);
-  --color-popover: var(--color-surface);
+  --color-popover: var(--color-elevated);
   --color-popover-foreground: var(--color-text);
   --radius: 1rem;
+}
+
+/* The two brand gradients, which appeared verbatim in ~56 places. They resolve
+   --brand-* rather than --color-*, so they look identical in both themes and
+   keep carrying white text safely. */
+@utility bg-brand {
+  background-image: linear-gradient(
+    to right,
+    var(--brand-pink),
+    var(--brand-purple)
+  );
+}
+
+@utility bg-brand-tri {
+  background-image: linear-gradient(
+    to right,
+    var(--brand-pink),
+    var(--brand-purple),
+    var(--brand-blue)
+  );
 }
 
 body {
@@ -79,10 +242,28 @@ body {
      arbitrary text-[Npx] sizes — Tailwind's named sizes (text-xs, text-xl, …)
      ship their own line-height and are unaffected. */
   line-height: 1.5;
+  /* Softens the theme toggle. Deliberately only on the page itself — putting a
+     transition on every element makes the flip feel laggy rather than smooth. */
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 h1, h2, h3, h4, .font-heading {
   font-family: var(--font-heading), sans-serif;
+}
+
+/* Firefox dims placeholders to 54% on its own, which on a dark field lands
+   under the contrast floor. Pin both the colour and the opacity so a hint stays
+   legible without ever being mistaken for a filled-in value. */
+::placeholder {
+  color: var(--color-muted);
+  opacity: 1;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--color-purple) 30%, transparent);
+  color: var(--color-text);
 }
 
 /* ── Floating AI mentor pulse (ported 1:1 from the current prototype) ──
@@ -103,6 +284,69 @@ h1, h2, h3, h4, .font-heading {
 }
 .animate-shimmer {
   animation: shimmer 3s linear infinite;
+}
+
+/* ── MathLive, dressed as the rest of the app ──
+   MathLive styles its field and virtual keyboard from CSS custom properties,
+   which it reads off an ancestor. The panel scopes them here in terms of our
+   own tokens, so ONE block covers both themes: `.dark` redefines --color-* at
+   :root and these follow. No literal colours, same rule as everywhere else.
+
+   --color-control is exactly the token for this — it exists because keycaps
+   need a faint tint below the panel in light and a step above it in dark, or
+   the keyboard reads as holes punched in the surface. */
+.mathkb {
+  --keyboard-accent-color: var(--color-purple);
+  --keyboard-background: var(--color-surface);
+  --keyboard-border: transparent;
+  --keyboard-toolbar-background: var(--color-surface);
+  --keyboard-toolbar-background-hover: var(--color-control);
+  --keyboard-toolbar-background-selected: var(--color-control);
+  --keyboard-toolbar-text: var(--color-muted);
+  --keyboard-toolbar-text-active: var(--color-purple);
+  --keyboard-horizontal-rule: var(--color-border);
+
+  /* MathLive's default keycap is 60px, which makes the numeric layout ~330px
+     tall and clips its bottom row inside our fixed-height box. 44px matches the
+     h-11 keys the hand-built keyboard used and leaves the whole layout visible
+     in 268px. Change one of these two numbers and you must re-check the other. */
+  --keycap-height: 44px;
+
+  --keycap-background: var(--color-control);
+  --keycap-background-hover: var(--color-secondary);
+  --keycap-border: var(--color-border);
+  --keycap-border-bottom: var(--color-border);
+  --keycap-text: var(--color-text);
+  --keycap-shift-text: var(--color-pink);
+  --keycap-primary-background: var(--brand-purple);
+  --keycap-primary-text: var(--color-on-brand);
+  --keycap-secondary-background: var(--color-secondary);
+  --keycap-secondary-text: var(--color-text);
+  --keycap-secondary-border: var(--color-border);
+  --keycap-secondary-border-bottom: var(--color-border);
+
+  /* The MathLive field itself. */
+  --caret-color: var(--color-purple);
+  --selection-background-color: var(--color-secondary);
+  --contains-highlight-background-color: var(--color-control);
+  color: var(--color-text);
+}
+
+/* MathLive's own rule sizes the keyboard to its container UNLESS it is a direct
+   child of <body>. We append it to a fixed-height box instead (so the message
+   list doesn't jump), and pin it flush to the bottom of that box in case a
+   future version changes its mind about the default. */
+.mathkb .ML__keyboard {
+  position: absolute;
+  inset: 0;
+}
+
+/* The field ships its own keyboard-toggle and menu buttons. Both are wrong
+   here: the panel IS the keyboard, so the toggle just empties the box below
+   with no obvious way back, and the menu is English-only in a Khmer app. */
+.mathkb math-field::part(virtual-keyboard-toggle),
+.mathkb math-field::part(menu-toggle) {
+  display: none;
 }
 
 /* Grade Prediction's "Prediction Updated" banner — a one-shot slide+fade

@@ -1,13 +1,13 @@
-import { myFighter, liveOpponent, liveBattle } from "../demo-data";
+import { myFighter, liveOpponent, liveGame } from "../demo-data";
 import { Avatar } from "@/components/ui/avatar";
 
-export function LiveBattleCard() {
+export function LiveGameCard() {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-purple/10 bg-linear-to-br from-purple/8 via-pink/6 to-blue/8 p-4">
-      <div className="mb-3 flex w-fit items-center gap-1.5 rounded-full bg-white/70 px-2.5 py-1">
+      <div className="mb-3 flex w-fit items-center gap-1.5 rounded-full bg-surface/70 px-2.5 py-1">
         <span className="size-1.5 animate-pulse rounded-full bg-pink" />
         <span className="text-[10px] font-extrabold text-pink">
-          Live Battle
+          Live Game
         </span>
       </div>
 
@@ -51,11 +51,11 @@ export function LiveBattleCard() {
         <div className="mb-1.5 flex items-center justify-between text-[10px] font-extrabold">
           <span className="text-pink">You {myFighter.hpPct}%</span>
           <span className="text-muted">
-            {liveBattle.subject} · {liveBattle.questionProgress}
+            {liveGame.subject} · {liveGame.questionProgress}
           </span>
           <span className="text-blue">{liveOpponent.hpPct}% {liveOpponent.name}</span>
         </div>
-        <div className="flex h-2 overflow-hidden rounded-full bg-white/60">
+        <div className="flex h-2 overflow-hidden rounded-full bg-surface/60">
           <div
             className="h-full bg-pink"
             style={{ width: `${myFighter.hpPct}%` }}
@@ -68,13 +68,13 @@ export function LiveBattleCard() {
       </div>
 
       <div className="mt-3 flex items-center justify-between text-[11px] font-bold text-muted">
-        <span>{liveBattle.subject}</span>
-        <span>{liveBattle.questionProgress.replace("Q", "")} of 10 questions</span>
-        <span>{liveBattle.timer} ⏱</span>
+        <span>{liveGame.subject}</span>
+        <span>{liveGame.questionProgress.replace("Q", "")} of 10 questions</span>
+        <span>{liveGame.timer} ⏱</span>
       </div>
 
-      <button className="mt-4 w-full rounded-2xl bg-linear-to-r from-pink to-purple py-3 text-sm font-extrabold text-white shadow-[0_6px_18px_rgba(139,43,226,0.35)]">
-        ⚔️ Join Battle Now!
+      <button className="mt-4 w-full rounded-2xl bg-brand py-3 text-sm font-extrabold text-white shadow-cta">
+        🎮 Join Game Now!
       </button>
     </div>
   );
