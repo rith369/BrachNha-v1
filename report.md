@@ -19,7 +19,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 24 Aug 2026 — The BrachNha logo now sits next to the app name
 
-*Landed in commit `TBD`.*
+*Landed in commit `1f08709`.*
 
 **Why.** The app had a name but no mark. Wherever "BrachNha" appeared, a decorative emoji
 was standing in for a logo — and it wasn't even the same emoji twice.
