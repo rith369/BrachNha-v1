@@ -19,7 +19,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 24 Aug 2026 — The chatbot is now called KruAI
 
-*Landed in commit `TBD`.*
+*Landed in commit `11dca95`.*
 
 **Why.** "AI Mentor" describes what it is; it isn't a name. KruAI is a name students can
 remember and ask for.
@@ -54,7 +54,7 @@ it says it is KruAI without naming any company.
 
 ## 24 Aug 2026 — The AI Mentor no longer names the AI service behind it
 
-*Landed in commit `TBD`.*
+*Landed in commit `11dca95`.*
 
 **Why.** The mentor's header carried a "Powered by Gemini AI" credit. We would rather not
 advertise which AI service the app runs on.
@@ -86,7 +86,7 @@ it a question and confirm replies still work normally.
 
 ## 24 Aug 2026 — The Leaderboard is live
 
-*Landed in commit `TBD`.*
+*Landed in commit `11dca95`.*
 
 **Why.** "Leaderboard" had been sitting in the menu as a greyed-out *Soon* item
 since the start. It is now a real screen at **Menu → Leaderboard**.
@@ -152,7 +152,7 @@ checked at nine screen widths and nothing overflows.
 
 ## 23 Aug 2026 — A real maths keyboard in the AI Mentor
 
-*Landed in commit `TBD`.*
+*Landed in commit `11dca95`.*
 
 **Why.** The maths keyboard in the chat was one we built and maintained ourselves. It
 could only type loose characters — √, x², H₂O — so a student asking about a fraction or
@@ -193,7 +193,7 @@ Do all of that in both light and dark themes, and on a real phone if you can.
 
 ## 23 Aug 2026 — "Battle" is now "Game"
 
-*Landed in commit `TBD`.*
+*Landed in commit `11dca95`.*
 
 **Why.** "Battle" sounded like a fight. "Game" is what students actually want to tap.
 
@@ -226,7 +226,7 @@ opponent row.
 
 ## 23 Aug 2026 — The AI Mentor is back during lessons, and locked out of tests
 
-*Landed in commit `TBD`.*
+*Landed in commit `11dca95`.*
 
 **Why.** When lessons and tests were changed to take over the whole screen, the AI Mentor
 button went away along with the rest of the navigation. That was right for a test and
