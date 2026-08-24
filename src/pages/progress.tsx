@@ -33,8 +33,22 @@ export default function ProgressPage() {
           </div>
           <ScoreTrendChart />
           <SubjectBarChart />
-          <SubjectBreakdown />
-          <FocusAreas />
+          {/* SubjectBreakdown grows with the number of subjects (up to 7 rows)
+              and has no naturally similar-height neighbour left to pair with,
+              so it spans full width rather than stretching a short card next
+              to it into a tall row with a lot of dead space below that card —
+              which is exactly what was leaving FocusAreas (and whatever
+              followed it) sitting under the floating chat button at md/lg
+              widths. */}
+          <div className="md:col-span-2">
+            <SubjectBreakdown />
+          </div>
+          {/* Same reasoning as StatPills/GameStatsCard elsewhere: a fixed
+              2x2 stat grid reads as a banner across the full width, not as a
+              column item next to a variable-height list. */}
+          <div className="md:col-span-2">
+            <FocusAreas />
+          </div>
           <ActivityHeatmap />
           <AiInsights />
         </div>

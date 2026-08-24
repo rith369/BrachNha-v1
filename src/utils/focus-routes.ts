@@ -35,3 +35,18 @@ export function isFocusRoute(pathname: string): boolean {
 export function isAssessmentRoute(pathname: string): boolean {
   return pathname.startsWith("/placement-test/");
 }
+
+/**
+ * Routes whose page does NOT render BottomNav. Roadmap is a single sequential
+ * journey rather than a tab destination, and Profile is a short settings page
+ * — neither pages/roadmap.tsx nor pages/profile.tsx mount one.
+ *
+ * FabChat needs to know this: its resting bottom offset is calibrated to float
+ * just above BottomNav's reserved space (see fab-chat.tsx). Where BottomNav is
+ * absent there is nothing to float above, so that same offset instead lands
+ * inside ordinary scrollable content — confirmed on Roadmap, where it sat
+ * directly on top of the Daily Mission list's Done button.
+ */
+export function isBottomNavRoute(pathname: string): boolean {
+  return pathname !== "/roadmap" && pathname !== "/profile";
+}

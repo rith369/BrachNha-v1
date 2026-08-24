@@ -1,6 +1,10 @@
 import { useLocation } from "react-router";
 import { useBrachNhaStore } from "@/lib/store";
-import { isAssessmentRoute, isFocusRoute } from "@/utils/focus-routes";
+import {
+  isAssessmentRoute,
+  isBottomNavRoute,
+  isFocusRoute,
+} from "@/utils/focus-routes";
 
 /**
  * Is the student mid-task right now?
@@ -37,4 +41,14 @@ export function useMentorBlocked(): boolean {
   const { pathname } = useLocation();
   const examInProgress = useBrachNhaStore((s) => s.focusMode);
   return isAssessmentRoute(pathname) || examInProgress;
+}
+
+/**
+ * Does the current route render BottomNav? FabChat is the one thing that
+ * needs to ask this — see isBottomNavRoute for why its resting position
+ * depends on the answer.
+ */
+export function useHasBottomNav(): boolean {
+  const { pathname } = useLocation();
+  return isBottomNavRoute(pathname);
 }
