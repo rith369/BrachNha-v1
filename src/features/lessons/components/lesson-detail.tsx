@@ -150,8 +150,13 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
             <div className="mb-3 text-xs font-extrabold text-muted md:mb-4 md:text-sm">
               📖 {lang === "en" ? "Lesson Content" : "មាតិកា"}
             </div>
+            {/* whitespace-pre-line so a lesson can be written as real
+                paragraphs. HTML collapses newlines by default, which turned
+                the multi-paragraph brain lesson into one unreadable run-on
+                block. Lessons with no blank lines in them render identically
+                either way, so this is safe for all of them. */}
             <div
-              className={`mb-3 rounded-2xl border border-blue/15 bg-blue/8 p-4 text-blue md:mb-4 md:p-6 ${focusBody}`}
+              className={`mb-3 rounded-2xl border border-blue/15 bg-blue/8 p-4 text-blue whitespace-pre-line md:mb-4 md:p-6 ${focusBody}`}
             >
               {ld.content[lang]}
             </div>
@@ -159,7 +164,9 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
               <div className={`mb-1 text-purple ${focusLabel}`}>
                 📝 {t.summary}
               </div>
-              <div className={focusBody}>{ld.summary[lang]}</div>
+              <div className={`whitespace-pre-line ${focusBody}`}>
+                {ld.summary[lang]}
+              </div>
             </div>
           </div>
         )}

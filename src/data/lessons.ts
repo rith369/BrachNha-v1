@@ -71,25 +71,63 @@ export const LESSONS: Record<string, Record<string, Lesson>> = {
         km: "អ្នកមានឆ្អឹងក ដូចហ្សីរ៉ាហ្វ: 7 កង!",
       },
     },
+    // The longest lesson in the app, and deliberately so — it is the worked
+    // example of how much a `content` field can carry. Paragraphs are separated
+    // by blank lines, which only render as breaks because the content and
+    // summary blocks in lesson-detail.tsx carry `whitespace-pre-line`. Strings
+    // are flush-left inside the template literal on purpose: indenting them
+    // would put a leading space on every rendered line.
     brain: {
       title: { en: "Human Brain", km: "ខួរក្បាលមនុស្ស" },
       importance: "70%",
       icon: "🧠",
       content: {
-        en: "The human brain controls all body functions through billions of neurons. Understanding neuron structure is critical for Bac II.",
-        km: "ខួរក្បាលគ្រប់គ្រងមុខងារទាំងអស់តាមរយៈណឺរ៉ូន។",
+        en: `The brain is the control centre of the nervous system. It weighs about 1.4 kg — roughly 2% of body weight — yet uses around 20% of the body's energy. It holds an estimated 86 billion neurons, and it is protected by the skull, by three membranes called the meninges, and by cerebrospinal fluid that cushions it against shock.
+
+1. CEREBRUM — the largest part. It is split into left and right hemispheres joined by the corpus callosum, and its deeply folded surface increases the area that fits inside the skull. Each hemisphere has four lobes: the frontal lobe (thinking, planning, decisions, voluntary movement), the parietal lobe (touch, temperature, pain), the temporal lobe (hearing, language, memory) and the occipital lobe (vision). Note that each hemisphere controls the OPPOSITE side of the body.
+
+2. CEREBELLUM — sits below and behind the cerebrum. It does not start movement; it refines it. It controls balance, posture and the smooth coordination of muscles. Damage here causes unsteady, jerky movement rather than paralysis.
+
+3. BRAIN STEM — connects the brain to the spinal cord, and is made of the midbrain, the pons and the medulla oblongata. It runs the automatic functions you never think about: breathing, heart rate, blood pressure, swallowing, and reflexes such as coughing. Because it controls breathing and heartbeat, damage to the brain stem is life-threatening.
+
+THE NEURON — the brain's working unit. A neuron has dendrites that receive signals, a cell body (soma) holding the nucleus, and one long axon that carries the signal away. Most axons are wrapped in a fatty myelin sheath, which insulates the fibre and makes the impulse travel far faster.
+
+THE SYNAPSE — neurons never actually touch. At the synapse there is a tiny gap. When the electrical impulse reaches the axon terminal it releases chemical neurotransmitters, which cross the gap and pass the signal to the next neuron. So the signal is electrical ALONG a neuron and chemical BETWEEN neurons — a point Bac II papers ask about often.`,
+        km: `ខួរក្បាលគឺជាមជ្ឈមណ្ឌលបញ្ជានៃប្រព័ន្ធសរសៃប្រសាទ។ វាមានទម្ងន់ប្រហែល 1.4 គីឡូក្រាម គឺប្រហែល 2% នៃទម្ងន់រាងកាយ ប៉ុន្តែប្រើថាមពលរបស់រាងកាយដល់ទៅ 20%។ វាមានណឺរ៉ូន (neuron) ប្រហែល 86 ពាន់លាន ហើយត្រូវបានការពារដោយលលាដ៍ក្បាល ស្រទាប់ស្រោមបីជាន់ (meninges) និងទឹករាវ cerebrospinal fluid ដែលការពារពីការប៉ះទង្គិច។
+
+1. សេរេប្រុម (Cerebrum) — ជាផ្នែកធំជាងគេ។ វាបែងចែកជាអឌ្ឍគោលឆ្វេង និងស្តាំ ភ្ជាប់គ្នាដោយ corpus callosum ហើយផ្ទៃរបស់វាមានផ្នត់ជ្រៅៗ ដើម្បីឲ្យផ្ទៃដីធំអាចផ្ទុកនៅក្នុងលលាដ៍ក្បាលបាន។ អឌ្ឍគោលនីមួយៗមានបួន lobe៖ frontal lobe (ការគិត ការរៀបចំផែនការ ការសម្រេចចិត្ត ចលនាតាមបំណង), parietal lobe (ការប៉ះ សីតុណ្ហភាព ការឈឺចាប់), temporal lobe (ការស្តាប់ ភាសា ការចងចាំ) និង occipital lobe (ការមើល)។ ចំណាំ៖ អឌ្ឍគោលម្ខាងគ្រប់គ្រងរាងកាយម្ខាងទៀត។
+
+2. សេរេបែល (Cerebellum) — ស្ថិតនៅខាងក្រោម និងខាងក្រោយសេរេប្រុម។ វាមិនចាប់ផ្តើមចលនាទេ តែធ្វើឲ្យចលនារលូន។ វាគ្រប់គ្រងតុល្យភាព ឥរិយាបថ និងការសម្របសម្រួលសាច់ដុំ។ បើផ្នែកនេះខូច អ្នកជំងឺនឹងដើរមិនស្មើ និងញ័រ មិនមែនស្លាប់សរសៃទេ។
+
+3. ដើមខួរ (Brain stem) — ភ្ជាប់ខួរក្បាលទៅខួរឆ្អឹងខ្នង ផ្សំឡើងពី midbrain, pons និង medulla oblongata។ វាគ្រប់គ្រងមុខងារស្វ័យប្រវត្តិដែលយើងមិនបាច់គិត៖ ដង្ហើម ចង្វាក់បេះដូង សម្ពាធឈាម ការលេប និងការក្អក។ ដោយសារវាគ្រប់គ្រងដង្ហើម និងបេះដូង ការខូចខាតនៅដើមខួរគឺគ្រោះថ្នាក់ដល់អាយុជីវិត។
+
+ណឺរ៉ូន (Neuron) — ជាឯកតាធ្វើការរបស់ខួរក្បាល។ ណឺរ៉ូនមានដេនឌ្រីត (dendrite) សម្រាប់ទទួលសញ្ញា មានតួកោសិកា (cell body) ដែលផ្ទុកនុយក្លេអ៊ែរ និងមានអាក់សូន (axon) វែងមួយសម្រាប់បញ្ជូនសញ្ញាចេញ។ អាក់សូនភាគច្រើនត្រូវបានរុំដោយស្រទាប់ខ្លាញ់ myelin ដែលធ្វើឲ្យសញ្ញាធ្វើដំណើរលឿនជាងមុន។
+
+ស៊ីណាប់ (Synapse) — ណឺរ៉ូនមិនប៉ះគ្នាដោយផ្ទាល់ទេ។ នៅចន្លោះមានគម្លាតតូចមួយ។ ពេលសញ្ញាអគ្គិសនីមកដល់ចុងអាក់សូន វាបញ្ចេញសារធាតុគីមី neurotransmitter ដែលឆ្លងកាត់គម្លាតនោះ ដើម្បីបញ្ជូនសញ្ញាបន្តទៅណឺរ៉ូនបន្ទាប់។ ដូច្នេះ សញ្ញាគឺអគ្គិសនីនៅតាមបណ្តោយណឺរ៉ូន និងគីមីនៅចន្លោះណឺរ៉ូន — ជាចំណុចដែលវិញ្ញាសា Bac II ចូលចិត្តសួរ។`,
       },
       summary: {
-        en: "Main parts: Cerebrum (thinking), Cerebellum (coordination), Brain stem (vital). Neurons communicate via synapses.",
-        km: "ផ្នែក: សេរេប្រុម (គំនិត), សេរេបែល (សម្របសម្រួល), ដើម (សំខាន់)។",
+        en: `Three main parts: Cerebrum (thought, voluntary movement, memory, language), Cerebellum (balance and coordination), Brain stem (breathing, heartbeat, blood pressure).
+
+Cerebrum lobes: frontal = thinking and movement; parietal = touch; temporal = hearing and memory; occipital = vision. Each hemisphere controls the opposite side of the body.
+
+Neuron: dendrites receive → cell body → axon transmits. The myelin sheath speeds the impulse up.
+
+Signal: electrical ALONG a neuron, chemical (neurotransmitters) ACROSS the synapse between neurons.`,
+        km: `ផ្នែកសំខាន់បី៖ សេរេប្រុម (ការគិត ចលនាតាមបំណង ការចងចាំ ភាសា), សេរេបែល (តុល្យភាព និងការសម្របសម្រួល), ដើមខួរ (ដង្ហើម ចង្វាក់បេះដូង សម្ពាធឈាម)។
+
+Lobe នៃសេរេប្រុម៖ frontal = ការគិត និងចលនា; parietal = ការប៉ះ; temporal = ការស្តាប់ និងការចងចាំ; occipital = ការមើល។ អឌ្ឍគោលម្ខាងគ្រប់គ្រងរាងកាយម្ខាងទៀត។
+
+ណឺរ៉ូន៖ ដេនឌ្រីតទទួល → តួកោសិកា → អាក់សូនបញ្ជូន។ ស្រទាប់ myelin ធ្វើឲ្យសញ្ញាលឿន។
+
+សញ្ញា៖ អគ្គិសនីនៅតាមបណ្តោយណឺរ៉ូន គីមីនៅឯស៊ីណាប់។`,
       },
       funFact: {
         en: "Your brain uses 20% of your body's energy but is only 2% of body weight!",
         km: "ខួរក្បាលប្រើ 20% ថាមពលប៉ុន្តែ 2% ទម្ងន់!",
       },
       tip: {
-        en: "Connect brain parts to functions using stories — sticks better than memorization!",
-        km: "ភ្ជាប់ផ្នែករឿង — ស្អិតជាងការចងចាំ!",
+        en: "Exam questions usually ask you to NAME a part and GIVE its function, so learn them as pairs rather than as a list. If you are asked which part is damaged, work backwards from the symptom: lost balance → cerebellum; breathing failure → brain stem; lost memory or speech → cerebrum.",
+        km: "វិញ្ញាសាតែងសួរឲ្យប្រាប់ឈ្មោះផ្នែក និងមុខងាររបស់វា ដូច្នេះត្រូវរៀនជាគូ មិនមែនជាបញ្ជីទេ។ បើគេសួរថាផ្នែកណាខូច សូមគិតត្រឡប់ពីរោគសញ្ញា៖ បាត់តុល្យភាព → សេរេបែល; ដកដង្ហើមមិនបាន → ដើមខួរ; បាត់ការចងចាំ ឬការនិយាយ → សេរេប្រុម។",
       },
       didYouKnow: {
         en: "You have enough neurons to count every star in the Milky Way!",
