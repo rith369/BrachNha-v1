@@ -17,6 +17,50 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 24 Aug 2026 — The BrachNha logo now sits next to the app name
+
+*Landed in commit `TBD`.*
+
+**Why.** The app had a name but no mark. Wherever "BrachNha" appeared, a decorative emoji
+was standing in for a logo — and it wasn't even the same emoji twice.
+
+**What changed.** The logo now appears beside the **BrachNha** name in all four places the
+name is shown:
+
+- the **Home** screen header, above your level and XP
+- the **menu** — both the slide-out menu on a phone and the permanent sidebar on a laptop
+- the **sign-up** screen
+- the **survey** screen that follows it
+
+**The emoji next to the name are gone.** They were doing the logo's job, and a logo plus an
+emoji looks cluttered. Worth knowing: the four screens had each drifted to a *different*
+decoration — crossed swords on sign-up and survey, a sparkle in the menu, and a slightly
+different sparkle on Home. All four now show the one logo.
+
+**The large crossed-swords picture in the middle of the sign-up and survey screens is
+untouched.** That is a separate illustration, not the name, so it was left alone. If you'd
+like the logo there too, that's a quick follow-up.
+
+**How it looks in dark mode.** The logo artwork has a white background baked into it, so it
+shows as a white rounded tile — like an app icon on a phone home screen — in both light and
+dark. That is deliberate, and it's checked in both themes.
+
+**Please re-test:** the Home header and the menu on a phone, and the sign-up and survey
+screens, in **both light and dark**. Confirmed already: nothing overflows or gets cut off at
+any screen size down to a 320px-wide phone.
+
+**One thing to decide.** The logo file is large for what it is — 431 KB, because it was
+auto-traced from a picture rather than drawn as a clean vector. It's downloaded once and
+then cached by the browser, so it isn't a repeat cost, but on Cambodian mobile data it makes
+the very first visit slower than it needs to be. It can be reduced substantially, most
+simply by also supplying the logo as a small PNG for on-screen use. Not urgent, and nothing
+is broken — flagging it as a known trade-off.
+
+**The browser tab icon has not changed yet** — it's still the old favicon. That's a separate
+file and a separate change; say the word and it can use the new logo too.
+
+---
+
 ## 24 Aug 2026 — The chatbot is now called KruAI
 
 *Landed in commit `11dca95`.*

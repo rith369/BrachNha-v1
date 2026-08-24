@@ -343,6 +343,38 @@ cannot drift — add a route to `lib/nav-items.ts` and it appears in both.
 the bottom nav, so both get `lg:` overrides — without them desktop has ~80px of
 dead space under every page.
 
+**One name lockup, for the same reason.** `components/shell/wordmark.tsx` owns
+the logo + "BrachNha" + optional subtitle, and is the ONLY place that gradient
+wordmark is spelled out. Its four consumers are `HomeHeader`, `SidebarNav` (so
+the drawer and the desktop sidebar both get it), `LoginView` and `SurveyView`.
+They had already drifted before it existed — four hand-written copies carrying
+four *different* decorations beside the name (⚔️ on login and survey, ✨ in the
+sidebar, a Lucide `<Sparkles>` on Home). The logo is the decoration now; don't
+add an emoji back beside it, and don't re-inline the gradient classes.
+
+`subtitle` is a `ReactNode`, not a string, because Home passes its level/XP row
+with Lucide icons in it while the other three pass plain text.
+
+The mark is `public/logo/brachnha.svg` through a plain `<img>`, the same
+bundled-in-`public/` approach as `ui/avatar.tsx`. Two things about it:
+
+- **The artwork has an opaque white background baked in** — it was supplied as
+  an app-icon tile, and the outermost path is a full-canvas white rect. That is
+  what `rounded-[26%]` is for: it clips the square into the tile shape so the
+  mark reads as an app icon rather than a white block sitting on the dark
+  theme's surface. Deliberately no `dark:` variant — a light badge in both
+  themes is correct here, and this is the one place that's true.
+- **It is 431KB of auto-traced paths** (426 of them, ~170KB gzipped) for
+  something rendered at 40px. It's cached after first paint, but the audience is
+  on Cambodian mobile data — see the `index.html` preconnect comment, same
+  concern. A hand-drawn vector or a small PNG for on-screen use would be a large
+  win; left as-is because replacing the artwork is the user's call, not a silent
+  edit. The big centred `⚔️` on the login and survey screens is a separate
+  illustration and was deliberately not touched.
+
+`public/favicon.ico` is still the OLD icon — it does not come from this file and
+was left alone.
+
 **Full-bleed is phone-only.** `AiInsights` uses `-mx-4 px-4` to cancel the page
 padding so its carousel reaches both screen edges. From `md` the card sits in a
 grid column where bleeding outward overlaps its neighbour — and the page padding

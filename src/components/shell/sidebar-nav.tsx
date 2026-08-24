@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router";
 import { LanguageSwitcher } from "./language-switcher";
 import { ThemeSwitcher } from "./theme-switcher";
+import { Wordmark } from "./wordmark";
 import { useBrachNhaStore } from "@/lib/store";
 import { mainNavItems, featureNavItems, type NavItem } from "@/lib/nav-items";
 import { cn } from "@/utils/cn";
@@ -67,12 +68,13 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
       <div className="shrink-0 border-b border-purple/10 bg-[image:var(--drawer-header)] px-6 pt-13 pb-5 lg:pt-6">
-        <div className="bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
-          BrachNha ✨
-        </div>
-        <div className="text-xs font-bold text-muted">
-          {lang === "en" ? "Hero" : "វីរបុរស"}
-        </div>
+        <Wordmark
+          subtitle={
+            <div className="text-xs font-bold text-muted">
+              {lang === "en" ? "Hero" : "វីរបុរស"}
+            </div>
+          }
+        />
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-3">

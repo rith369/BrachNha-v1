@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Flag } from "@/components/ui/flag";
+import { Wordmark } from "@/components/shell/wordmark";
 import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { useT } from "@/data/translations";
@@ -74,12 +75,11 @@ export function LoginView() {
   return (
     <div className="mx-auto flex h-full w-full max-w-2xl flex-col overflow-y-auto px-4 pt-8 pb-6">
       <div className="mb-5 flex items-center justify-between">
-        <div>
-          <div className="font-heading bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
-            BrachNha ⚔️
-          </div>
-          <div className="text-xs font-bold text-muted">Bac II Quest</div>
-        </div>
+        <Wordmark
+          subtitle={
+            <div className="text-xs font-bold text-muted">Bac II Quest</div>
+          }
+        />
         <button
           onClick={() => setLang(lang === "en" ? "km" : "en")}
           className="flex items-center gap-1.5 rounded-full border border-purple/20 bg-purple/8 px-3 py-1.5 text-xs font-extrabold text-purple"

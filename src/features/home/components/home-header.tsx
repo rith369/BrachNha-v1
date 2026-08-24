@@ -1,6 +1,7 @@
-import { Sparkles, Zap } from "lucide-react";
+import { Zap } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
+import { Wordmark } from "@/components/shell/wordmark";
 import { T } from "@/data/translations";
 
 export function HomeHeader() {
@@ -15,17 +16,15 @@ export function HomeHeader() {
 
   return (
     <div className="flex items-center justify-between pr-14">
-      <div>
-        <div className="font-heading flex items-center gap-1 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
-          BrachNha
-          <Sparkles className="size-4 text-purple" strokeWidth={2.5} />
-        </div>
-        <div className="flex items-center gap-1 text-xs font-bold text-muted">
-          {t.level} {level} &nbsp;·&nbsp;
-          <Zap className="size-3 text-pink" strokeWidth={2.5} />
-          {xp} XP
-        </div>
-      </div>
+      <Wordmark
+        subtitle={
+          <div className="flex items-center gap-1 text-xs font-bold text-muted">
+            {t.level} {level} &nbsp;·&nbsp;
+            <Zap className="size-3 text-pink" strokeWidth={2.5} />
+            {xp} XP
+          </div>
+        }
+      />
     </div>
   );
 }
