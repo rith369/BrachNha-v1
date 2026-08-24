@@ -81,7 +81,15 @@ export function GradePredictionView() {
 
       <PredictionTrendChart lang={lang} data={trendChartData} />
 
-      <SubjectGradeBreakdown lang={lang} subjects={subjects} subjectTrend={subjectTrend} />
+      {/* Same reasoning as SubjectBreakdown on pages/progress.tsx: this list
+          grows with the number of subjects and has no naturally similar-height
+          neighbour, so it spans full width rather than stretching a short
+          card (PredictionFactors) into a tall row with a lot of dead space
+          below it — which is exactly what was leaving RecommendedActions
+          sitting under that dead space at md/lg widths. */}
+      <div className="md:col-span-2">
+        <SubjectGradeBreakdown lang={lang} subjects={subjects} subjectTrend={subjectTrend} />
+      </div>
 
       <PredictionFactors
         lang={lang}
