@@ -19,7 +19,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 25 Aug 2026 — The survey asks whether you've studied already
 
-*Landed in commit `d237b61`.*
+*Landed in commit `8295b45`.*
 
 **Why.** Sign-up never asked whether a student had already covered some of the syllabus
 — everyone was treated as starting from zero. That matters, because a student who has
