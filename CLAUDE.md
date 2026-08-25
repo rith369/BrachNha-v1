@@ -388,7 +388,9 @@ only, and DOM order is unchanged — e.g. Home still has the grade card between
 
 **Verify with `node scripts/shots.mjs`** (needs `npm run dev` running). It drives
 the installed Chrome through `playwright-core` — no browser download — seeds a
-logged-in profile into `localStorage`, then walks 10 routes × 9 widths
+logged-in profile into `localStorage` (that seed mirrors `partializeState`, so any
+new field that gates what a page renders has to be added to it or the screenshots
+quietly become of some other screen), then walks 10 routes × 9 widths
 (320/375/390/430/768/1024/1280/1440/1920), writes a PNG each and asserts nothing
 overflows. It separates **hard** failures (the page scrolls sideways, or an
 element juts past the viewport with no scrollable ancestor) from **soft** ones
@@ -513,21 +515,48 @@ this whenever `userName` is empty, then falls through to the survey. Language
 lives on the store as `userLanguage` (sibling to `userName`/`userEmail`/etc.),
 not inside `userData` — it's account-level identity, not a survey answer.
 
-**Survey** (`features/survey`) — 3-step onboarding (liked subjects → weak
-subjects → target grade); the 7 real subjects are math, physics,
-chemistry, biology, history, khmer, and whichever language (English/French) was
-chosen at Login. The weak-subjects step (`WeaknessStep`) treats the 3 foundation
-subjects — math/physics/chemistry — differently from the other 4: a Weak / Not
-weak / Not sure chip per subject, where "Not sure" offers either an inline
-placement test (`PlacementTestRunner`, ≥80% correct → not weak, else weak;
-scoring in `utils/placement.ts`) or scheduling it for later (writes immediately
-to the store's `pendingPlacementTests`, so it survives a reload before the survey
-is finished; resolved later from a Roadmap card via the
-`/placement-test/:subject` route). Biology/history/khmer/language keep the
-original plain toggle grid, unchanged. Today only Math has a live test —
-`MOCK_QS` (`data/questions.ts`) has zero physics/chemistry questions — so those
-two show a "coming soon" fallback until content is added; the mechanism is
-generic and needs no code change once questions exist.
+**Survey** (`features/survey`) — 4-step onboarding: **studied? → liked subjects →
+weak subjects → target grade**. The 7 real subjects are math, physics, chemistry,
+biology, history, khmer, and whichever language (English/French) was chosen at
+Login. Step state lives in one `FormState` in `SurveyView` and **commits once, in
+`finish()`, with no exceptions** — nothing in the survey writes to the store
+before that any more.
+
+**Step 1 (`StudiedStep`) is a fork with one live branch.** "Not yet" advances
+into the survey as it always worked; "I've studied some" is a labelled stub for a
+per-subject/per-lesson "did you study this lesson?" pass ending in a test, which
+is blocked on real lesson names from the user. Three things not to "tidy":
+- **It is a `<div>`, not a `<button>`** — same as how `sidebar-nav.tsx` renders
+  its `href: null` routes. It does nothing, and a button whose tap answers with
+  silence reads as broken. (An earlier pass made it a button with
+  `aria-disabled`; Playwright refused to click it, which was the right
+  complaint — a control that's disabled to assistive tech but carries the only
+  explanation on screen is a contradiction.)
+- **`t.studiedNote` is rendered unconditionally, not on tap.** It states what the
+  branch will do *and* that it's coming soon. The whole point is that someone
+  reading the screen — a student deciding, or someone evaluating the app — learns
+  what the option is for without pressing a greyed-out control to find out.
+- The answer still commits, as `UserData.studied`. Only `false` is reachable
+  today; the field exists so the branch has its value waiting. Don't wire the
+  control up "temporarily" — it stays dead until the lesson content exists.
+
+**Step 3 (`WeaknessStep`)** treats the 3 foundation subjects —
+math/physics/chemistry — differently from the other 4: a Weak / Not weak / Not
+sure chip per subject. Biology/history/khmer/language keep the plain toggle grid.
+
+**All three foundation subjects take the same path.** "Not sure" expands to the
+`testComingSoon` note plus a Weak / Not-weak self-report, and that is the only
+thing it can do. Math briefly had an inline `PlacementTestRunner` (it is the only
+subject with questions in `MOCK_QS`) and all three briefly had a "Schedule for
+later" that booked a date; **both were removed at the user's request**. A live
+test on one subject out of three reads as a bug rather than a feature, and
+booking a day for a test nobody can sit promises something the app can't keep.
+"Not sure" deliberately isn't a final answer — nothing downstream knows what to
+do with it — so it asks again in gentler terms rather than leaving the row
+unresolved, which is what keeps `allFoundationResolved` reachable.
+
+`FoundationStatus` is therefore `"weak" | "notWeak"`; there is no `"pending"`.
+The component takes no store slice at all.
 
 **Home** (`features/home`) — header, motivation hero w/ daily quote + nav chips,
 stat pills, grade-prediction widget, lesson preview list, daily tasks (that
@@ -542,8 +571,8 @@ flashcard flip → fun fact → did-you-know → quiz → completion).
 results screen with conic-gradient score ring.
 
 **Roadmap** (`features/roadmap`) — target grade/hours card, a "Pending Placement
-Tests" card (only rendered when `pendingPlacementTests` is non-empty, flags
-"Overdue" once the scheduled date has passed), a "Daily Mission" quota card, and
+Tests" card (only rendered for pending tests that **have a date** — an undated
+one would render `Invalid Date`; flags "Overdue" once that date has passed), a "Daily Mission" quota card, and
 the phase path. The phase plan is dynamically generated from real
 `userData.weaknesses` plus `monthsUntilExam()` (`buildRoadmapPhases` in
 `utils/roadmap.ts`) rather than a fixed list; phases with real lesson content link to Lessons,
@@ -555,6 +584,20 @@ inventory by days left, which would produce near-zero counts. Flashcards are
 hard-clamped to 2–6/day regardless of budget; lessons/practice have a floor, no
 ceiling. Marking a mission row done calls the same `completeTask(key)` as Home's
 daily checklist, so the two views share one real completion state.
+
+**Nothing books a placement test any more**, so `pendingPlacementTests` is only
+ever non-empty for an account that scheduled one before that was removed. The
+pending card, `schedulePlacementTest`/`resolvePlacementTest`,
+`/placement-test/:subject` and `PlacementTestRunner` all still work and were left
+in place — the route is reachable by URL and by that card. Its `scheduledTests`
+filter (entries with a truthy `scheduledDate`) stays as a guard: undated entries
+can no longer be created, but one left in a browser from the scrapped scheduling
+work would otherwise render `Invalid Date`.
+
+`PlacementTestRunner`'s `focus={false}` mode now has no caller —
+`placement-test-page.tsx` always passes `focus`. The dual-mode branch is kept
+rather than collapsed, so the inline mode is there if a test returns to the
+survey.
 
 **Progress dashboard** (`features/progress`) — score hero (SVG donut), Recharts
 trend line + bar chart, subject breakdown w/ sparklines, focus areas, activity
@@ -822,11 +865,14 @@ is a one-line edit to `BAC2_EXAM_DATE`.
 **Placement testing (math/physics/chemistry only) is a deliberate scope
 choice**, not a content oversight — biology has question data in `MOCK_QS` too,
 but the user scoped test-backed weakness detection to the 3 foundation subjects,
-so biology stays on the plain self-report toggle. A "Scheduled for later"
-placement test is the one part of Survey that writes to the store immediately
-(`schedulePlacementTest`), breaking the otherwise strict "Survey only commits
-once, in `finish()`" rule — necessary because `pendingPlacementTests` must
-survive even if the user never finishes the survey. Placement-test attempts
+so biology stays on the plain self-report toggle. Both test-backed paths — the
+inline test and scheduling one for later — have since been pulled out of the
+survey entirely (see the Survey section), so today the scope note is academic:
+**no subject gets test-backed weakness detection**, all three foundation subjects
+self-report. The scoring layer in `utils/placement.ts` is untouched and correct
+for when questions exist.
+
+Placement-test attempts
 never write into `examResults`/`addExamResult` — that array feeds Home's stat
 pill captioned "from mock exams", and folding placement attempts in would make
 that caption wrong.

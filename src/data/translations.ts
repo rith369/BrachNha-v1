@@ -34,6 +34,11 @@ export const T = {
     pendingTests: "Pending Placement Tests",
     testComingSoon:
       "Placement test coming soon — answer based on how you feel:",
+    studiedQuestion: "Have you already studied any Bac II lessons?",
+    notStudiedYet: "Not yet — I'm starting fresh",
+    alreadyStudied: "I've studied some",
+    studiedNote:
+      "If you've studied some lessons already, we'll ask which ones and give you a short test on them. Coming soon — choose \"Not yet\" to continue.",
     placementTest: "Placement Test",
     yourScore: "Your Score",
     seeResult: "See My Result",
@@ -207,6 +212,11 @@ export const T = {
     takeTestNow: "ធ្វើតេស្តឥឡូវនេះ",
     pendingTests: "តេស្តវាយតម្លៃរង់ចាំ",
     testComingSoon: "តេស្តវាយតម្លៃនឹងមកដល់ឆាប់ៗ — សូមឆ្លើយតាមអារម្មណ៍របស់អ្នក៖",
+    studiedQuestion: "តើអ្នកបានសិក្សាមេរៀន Bac II ខ្លះហើយឬនៅ?",
+    notStudiedYet: "មិនទាន់ — ខ្ញុំចាប់ផ្តើមពីដំបូង",
+    alreadyStudied: "ខ្ញុំបានសិក្សាខ្លះហើយ",
+    studiedNote:
+      "ប្រសិនបើអ្នកបានសិក្សាមេរៀនខ្លះហើយ យើងនឹងសួរថាមេរៀនណាខ្លះ រួចធ្វើតេស្តខ្លីលើមេរៀនទាំងនោះ។ នឹងមកដល់ឆាប់ៗ — សូមជ្រើសរើស «មិនទាន់» ដើម្បីបន្ត។",
     placementTest: "តេស្តវាយតម្លៃ",
     yourScore: "ពិន្ទុរបស់អ្នក",
     seeResult: "មើលលទ្ធផល",

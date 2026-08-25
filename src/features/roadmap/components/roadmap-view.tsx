@@ -102,6 +102,11 @@ export function RoadmapView() {
   const t = useT(lang);
   const navigate = useNavigate();
 
+  // Nothing in the survey books a placement test any more, so this is only ever
+  // non-empty for an account that scheduled one before that changed. Undated
+  // entries are dropped rather than rendered — `new Date("")` is Invalid Date.
+  const scheduledTests = pendingPlacementTests.filter((p) => p.scheduledDate);
+
   const hrs = GRADE_HOURS[userData.grade] || 2;
 
   // Both derived from the fixed exam date, so the plan tightens on its own as
@@ -206,14 +211,16 @@ export function RoadmapView() {
         </div>
       </div>
 
-      {/* Pending placement tests */}
-      {pendingPlacementTests.length > 0 && (
+      {/* Pending placement tests. Undated entries are filtered out rather than
+          rendered — `new Date("")` is Invalid Date, and a test with no day has
+          nothing useful to say here anyway. */}
+      {scheduledTests.length > 0 && (
         <div className="mb-4 rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
           <div className="mb-3 flex items-center gap-1.5 font-heading text-sm font-extrabold">
             📅 {t.pendingTests}
           </div>
           <div className="flex flex-col gap-2">
-            {pendingPlacementTests.map((p) => {
+            {scheduledTests.map((p) => {
               const overdue = new Date(p.scheduledDate) <= new Date();
               return (
                 <div

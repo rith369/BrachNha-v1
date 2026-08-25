@@ -8,6 +8,7 @@ import { useT } from "@/data/translations";
 import type { TranslationKey } from "@/data/translations";
 import { FOUNDATION_SUBJECTS } from "@/utils/placement";
 import { WeaknessStep, type FoundationStatus } from "./weakness-step";
+import { StudiedStep } from "./studied-step";
 
 const FIXED_SUBJECTS = [
   "math",
@@ -21,6 +22,7 @@ const FIXED_SUBJECTS = [
 const GRADES = ["A", "B", "C", "D", "E"];
 
 interface FormState {
+  studied: boolean;
   liked: string[];
   weaknesses: string[];
   foundationStatus: Record<string, FoundationStatus>;
@@ -47,16 +49,17 @@ export function SurveyView() {
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormState>({
+    studied: false,
     liked: [],
     weaknesses: [],
     foundationStatus: {},
     grade: "",
   });
 
-  // Three steps: liked → weak → target grade. There used to be a fourth asking
-  // how many months were left, which is now derived from the fixed exam date
-  // (utils/exam-date.ts) rather than guessed at by the student.
-  const pct = ((step - 1) / 2) * 100;
+  // Four steps: studied? → liked → weak → target grade. There used to be one
+  // asking how many months were left, which is now derived from the fixed exam
+  // date (utils/exam-date.ts) rather than guessed at.
+  const pct = ((step - 1) / 3) * 100;
   const subjectOptions: string[] = userLanguage
     ? [...FIXED_SUBJECTS, userLanguage]
     : [...FIXED_SUBJECTS];
@@ -66,14 +69,14 @@ export function SurveyView() {
   );
 
   function finish() {
-    const foundationWeak = FOUNDATION_SUBJECTS.filter((s) => {
-      const status = form.foundationStatus[s];
-      return status === "weak" || status === "pending";
-    });
+    const foundationWeak = FOUNDATION_SUBJECTS.filter(
+      (s) => form.foundationStatus[s] === "weak"
+    );
     completeSurvey({
       strengths: form.liked,
       weaknesses: [...form.weaknesses, ...foundationWeak],
       grade: form.grade,
+      studied: form.studied,
     });
     navigate("/roadmap");
   }
@@ -110,6 +113,16 @@ export function SurveyView() {
         </div>
 
         {step === 1 && (
+          <StudiedStep
+            lang={lang}
+            onAnswer={(studied) => {
+              setForm((f) => ({ ...f, studied }));
+              setStep(2);
+            }}
+          />
+        )}
+
+        {step === 2 && (
           <>
             <div className="mb-3 text-sm font-extrabold">
               ❤️{" "}
@@ -135,17 +148,25 @@ export function SurveyView() {
                 </button>
               ))}
             </div>
-            <button
-              disabled={!form.liked.length}
-              onClick={() => setStep(2)}
-              className="w-full rounded-2xl bg-brand px-6 py-3 text-sm font-extrabold text-white shadow-cta disabled:opacity-40"
-            >
-              {lang === "en" ? "Next →" : "បន្ត →"}
-            </button>
+            <div className="flex gap-2.5">
+              <button
+                onClick={() => setStep(1)}
+                className="flex-1 rounded-2xl border border-purple/20 bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
+              >
+                ← {lang === "en" ? "Back" : "ថយ"}
+              </button>
+              <button
+                disabled={!form.liked.length}
+                onClick={() => setStep(3)}
+                className="flex-1 rounded-2xl bg-brand px-6 py-3 text-sm font-extrabold text-white shadow-cta disabled:opacity-40"
+              >
+                {lang === "en" ? "Next →" : "បន្ត →"}
+              </button>
+            </div>
           </>
         )}
 
-        {step === 2 && (
+        {step === 3 && (
           <>
             <WeaknessStep
               lang={lang}
@@ -164,14 +185,14 @@ export function SurveyView() {
             />
             <div className="flex gap-2.5">
               <button
-                onClick={() => setStep(1)}
+                onClick={() => setStep(2)}
                 className="flex-1 rounded-2xl border border-purple/20 bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
               >
                 ← {lang === "en" ? "Back" : "ថយ"}
               </button>
               <button
                 disabled={!allFoundationResolved}
-                onClick={() => setStep(3)}
+                onClick={() => setStep(4)}
                 className="flex-1 rounded-2xl bg-brand px-6 py-3 text-sm font-extrabold text-white shadow-cta disabled:opacity-40"
               >
                 {lang === "en" ? "Next →" : "បន្ត →"}
@@ -180,7 +201,7 @@ export function SurveyView() {
           </>
         )}
 
-        {step === 3 && (
+        {step === 4 && (
           <>
             <div className="mb-3 text-sm font-extrabold">
               🎯 {t.targetGrade}
@@ -203,7 +224,7 @@ export function SurveyView() {
             </div>
             <div className="flex gap-2.5">
               <button
-                onClick={() => setStep(2)}
+                onClick={() => setStep(3)}
                 className="flex-1 rounded-2xl border border-purple/20 bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
               >
                 ← {lang === "en" ? "Back" : "ថយ"}

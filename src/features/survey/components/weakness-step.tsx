@@ -1,13 +1,10 @@
 import { useState } from "react";
-import { useBrachNhaStore } from "@/lib/store";
-import { useShallow } from "zustand/react/shallow";
 import { useT } from "@/data/translations";
 import type { TranslationKey } from "@/data/translations";
 import type { Lang } from "@/types";
-import { FOUNDATION_SUBJECTS, getQuestionsBySubject } from "@/utils/placement";
-import { PlacementTestRunner } from "./placement-test-runner";
+import { FOUNDATION_SUBJECTS } from "@/utils/placement";
 
-export type FoundationStatus = "weak" | "notWeak" | "pending";
+export type FoundationStatus = "weak" | "notWeak";
 
 function toggleIn(list: string[], value: string) {
   return list.includes(value)
@@ -24,6 +21,20 @@ function chipClass(selected: boolean, tone: "pink" | "mint" | "purple") {
   }[tone];
 }
 
+/**
+ * Survey step 3. The 3 foundation subjects — math/physics/chemistry — get a
+ * Weak / Not weak / Not sure row each; the other 4 keep the plain toggle grid.
+ *
+ * All three foundation subjects take the SAME path: "Not sure" expands to a
+ * "placement test coming soon" note and asks the student to answer on instinct
+ * instead. Math briefly had a live inline test and a way to book one for later,
+ * and both were pulled — a test that exists for one subject out of three reads
+ * as a bug rather than a feature, and booking a day for a test nobody can sit
+ * yet promises something the app can't keep.
+ *
+ * Fully controlled, and deliberately touches no store: every answer goes up
+ * through the callbacks and the survey commits once, in `finish()`.
+ */
 export function WeaknessStep({
   lang,
   subjectOptions,
@@ -40,18 +51,9 @@ export function WeaknessStep({
   onChangeFoundationStatus: (subject: string, status: FoundationStatus) => void;
 }) {
   const t = useT(lang);
-  const { schedulePlacementTest, pendingPlacementTests } = useBrachNhaStore(
-    useShallow((s) => ({
-      schedulePlacementTest: s.schedulePlacementTest,
-      pendingPlacementTests: s.pendingPlacementTests,
-    }))
-  );
 
+  // Which subject's "Not sure" row is expanded. Nothing else opens a panel now.
   const [activeSubject, setActiveSubject] = useState<string | null>(null);
-  const [activeMode, setActiveMode] = useState<"test" | "schedule" | null>(
-    null
-  );
-  const [scheduleDate, setScheduleDate] = useState("");
 
   const foundationSet: readonly string[] = FOUNDATION_SUBJECTS;
   const foundationSubjects = subjectOptions.filter((s) =>
@@ -61,18 +63,9 @@ export function WeaknessStep({
     (s) => !foundationSet.includes(s)
   );
 
-  const todayISO = new Date().toISOString().slice(0, 10);
-
-  function closePanel() {
+  function answer(subject: string, status: FoundationStatus) {
+    onChangeFoundationStatus(subject, status);
     setActiveSubject(null);
-    setActiveMode(null);
-  }
-
-  function confirmSchedule() {
-    if (!activeSubject || !scheduleDate) return;
-    schedulePlacementTest(activeSubject, scheduleDate);
-    onChangeFoundationStatus(activeSubject, "pending");
-    closePanel();
   }
 
   return (
@@ -82,150 +75,73 @@ export function WeaknessStep({
       <div className="mb-4 flex flex-col gap-2.5">
         {foundationSubjects.map((subject) => {
           const status = foundationStatus[subject];
-          const hasQuestions = getQuestionsBySubject(subject).length > 0;
           const isActive = activeSubject === subject;
-          const pending = pendingPlacementTests.find(
-            (p) => p.subject === subject
-          );
 
           return (
             <div
               key={subject}
               className="rounded-xl border border-purple/10 bg-purple/4 p-3"
             >
-              <div className="mb-2 flex items-center justify-between">
-                <div className="text-sm font-extrabold">
-                  {t[subject as TranslationKey]}
-                </div>
-                {status === "pending" && pending && (
-                  <div className="rounded-full bg-yellow/15 px-2 py-0.5 text-[10px] font-extrabold text-yellow">
-                    📅 {t.scheduledFor}{" "}
-                    {new Date(pending.scheduledDate).toLocaleDateString()}
-                  </div>
-                )}
+              <div className="mb-2 text-sm font-extrabold">
+                {t[subject as TranslationKey]}
               </div>
 
-              {isActive && activeMode === "test" ? (
-                <PlacementTestRunner
-                  subject={subject}
-                  lang={lang}
-                  onComplete={(_pct, isWeak) => {
-                    onChangeFoundationStatus(subject, isWeak ? "weak" : "notWeak");
-                    closePanel();
-                  }}
-                  onCancel={closePanel}
-                />
-              ) : isActive && activeMode === "schedule" ? (
-                <div>
-                  <input
-                    type="date"
-                    min={todayISO}
-                    value={scheduleDate}
-                    onChange={(e) => setScheduleDate(e.target.value)}
-                    className="mb-2 w-full rounded-xl border border-purple/10 bg-surface px-3.5 py-2.5 text-sm font-bold text-text outline-none focus:border-purple/40"
-                  />
-                  <div className="flex gap-2">
+              <div className="grid grid-cols-3 gap-1.5">
+                {(["weak", "notWeak", "notSure"] as const).map((choice) => {
+                  const tone =
+                    choice === "weak"
+                      ? "pink"
+                      : choice === "notWeak"
+                        ? "mint"
+                        : "purple";
+                  const selected =
+                    choice === "notSure" ? isActive : status === choice;
+                  return (
                     <button
-                      onClick={closePanel}
-                      className="flex-1 rounded-xl border border-purple/20 bg-surface px-3 py-2 text-xs font-extrabold text-purple"
+                      key={choice}
+                      onClick={() => {
+                        if (choice === "notSure") {
+                          setActiveSubject((prev) =>
+                            prev === subject ? null : subject
+                          );
+                        } else {
+                          answer(subject, choice);
+                        }
+                      }}
+                      className={
+                        "rounded-lg border px-2 py-2 text-[11px] font-bold transition " +
+                        chipClass(selected, tone)
+                      }
                     >
-                      ← {lang === "en" ? "Back" : "ត្រឡប់"}
+                      {t[choice]}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* "Not sure" can't be a final answer — nothing downstream knows
+                  what to do with it — so it asks again in gentler terms rather
+                  than leaving the row unresolved. */}
+              {isActive && (
+                <div className="mt-2">
+                  <div className="mb-1.5 text-[11px] font-bold text-muted">
+                    🔬 {t.testComingSoon}
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <button
+                      onClick={() => answer(subject, "weak")}
+                      className="rounded-lg border border-pink/30 bg-pink/8 px-2 py-2 text-[11px] font-bold text-pink"
+                    >
+                      {t.weak}
                     </button>
                     <button
-                      disabled={!scheduleDate}
-                      onClick={confirmSchedule}
-                      className="flex-1 rounded-xl bg-brand px-3 py-2 text-xs font-extrabold text-white disabled:opacity-40"
+                      onClick={() => answer(subject, "notWeak")}
+                      className="rounded-lg border border-mint/30 bg-mint/8 px-2 py-2 text-[11px] font-bold text-mint"
                     >
-                      {t.confirmSchedule}
+                      {t.notWeak}
                     </button>
                   </div>
                 </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {(["weak", "notWeak", "notSure"] as const).map((choice) => {
-                      const tone =
-                        choice === "weak"
-                          ? "pink"
-                          : choice === "notWeak"
-                            ? "mint"
-                            : "purple";
-                      const selected =
-                        choice === "notSure"
-                          ? isActive || status === "pending"
-                          : status === choice;
-                      return (
-                        <button
-                          key={choice}
-                          onClick={() => {
-                            if (choice === "notSure") {
-                              setActiveMode(null);
-                              setActiveSubject((prev) =>
-                                prev === subject ? null : subject
-                              );
-                            } else {
-                              onChangeFoundationStatus(subject, choice);
-                              closePanel();
-                            }
-                          }}
-                          className={
-                            "rounded-lg border px-2 py-2 text-[11px] font-bold transition " +
-                            chipClass(selected, tone)
-                          }
-                        >
-                          {t[choice]}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {isActive &&
-                    (hasQuestions ? (
-                      <div className="mt-2 flex gap-2">
-                        <button
-                          onClick={() => setActiveMode("test")}
-                          className="flex-1 rounded-lg bg-brand px-2 py-2 text-[11px] font-extrabold text-white"
-                        >
-                          {t.testMeNow}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setActiveMode("schedule");
-                            setScheduleDate("");
-                          }}
-                          className="flex-1 rounded-lg border border-purple/20 bg-surface px-2 py-2 text-[11px] font-extrabold text-purple"
-                        >
-                          {t.scheduleForLater}
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="mt-2">
-                        <div className="mb-1.5 text-[11px] font-bold text-muted">
-                          🔬 {t.testComingSoon}
-                        </div>
-                        <div className="grid grid-cols-2 gap-1.5">
-                          <button
-                            onClick={() => {
-                              onChangeFoundationStatus(subject, "weak");
-                              closePanel();
-                            }}
-                            className="rounded-lg border border-pink/30 bg-pink/8 px-2 py-2 text-[11px] font-bold text-pink"
-                          >
-                            {t.weak}
-                          </button>
-                          <button
-                            onClick={() => {
-                              onChangeFoundationStatus(subject, "notWeak");
-                              closePanel();
-                            }}
-                            className="rounded-lg border border-mint/30 bg-mint/8 px-2 py-2 text-[11px] font-bold text-mint"
-                          >
-                            {t.notWeak}
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                </>
               )}
             </div>
           );

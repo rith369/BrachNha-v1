@@ -17,9 +17,66 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 25 Aug 2026 — The survey asks whether you've studied already
+
+*Landed in commit `d237b61`.*
+
+**Why.** Sign-up never asked whether a student had already covered some of the syllabus
+— everyone was treated as starting from zero. That matters, because a student who has
+already worked through half the year needs a different plan from one opening the book
+for the first time.
+
+**What changed.** Sign-up is now **four steps** instead of three, with a new question
+first:
+
+1. **Have you already studied any Bac II lessons?** — new
+2. Favourite subjects
+3. Weak subjects
+4. Target grade
+
+**The new question is deliberately half-built, and says so.** "Not yet — I'm starting
+fresh" works and leads into the survey exactly as before. **"I've studied some" is
+switched off** — greyed out with a "Soon" tag — and a note sits under it, visible
+without tapping anything, explaining what it will do:
+
+> 📝 If you've studied some lessons already, we'll ask which ones and give you a short
+> test on them. Coming soon — choose "Not yet" to continue.
+
+That note is there so anyone looking at the screen — a student deciding, or anyone
+evaluating the app — can see what the feature is meant to do without having to press a
+greyed-out button to find out. The branch itself needs the lesson list and the tests,
+which don't exist yet.
+
+**The weak-subjects step is now the same for all three main subjects.** Math, physics
+and chemistry each offer Weak / Not weak / Not sure, and "Not sure" shows:
+
+> 🔬 Placement test coming soon — answer based on how you feel:
+
+with Weak and Not weak underneath. Math used to be the odd one out — it was the only
+subject with a real test built in, and it also let you book a test for a future date.
+Both were removed. A test that works for one subject out of three reads as a bug rather
+than a feature, and booking a day for a test nobody can sit yet promises something the
+app can't keep. Nothing in sign-up asks for a date any more.
+
+**What to re-test.**
+
+- Sign up as a new student. The first question should be about prior study, with the
+  note readable straight away. Tapping "I've studied some" should do nothing at all;
+  "Not yet" should move on.
+- On the weak-subjects step, check math, physics and chemistry all behave the same way
+  — "Not sure" shows the coming-soon line and asks you to pick Weak or Not weak. There
+  should be no "Test me now", no "Schedule for later" and no date box anywhere.
+- The progress bar should fill in three equal moves, ending on the target-grade step.
+- Finishing should go straight to a normal, fully generated roadmap.
+- Check the whole flow in **Khmer** as well as English. The Khmer wording of the new
+  note has not been reviewed by a Khmer speaker yet — please read it and tell us
+  anything that sounds wrong.
+
+---
+
 ## 25 Aug 2026 — The exam countdown works itself out
 
-*Landed in commit `TBD`.*
+*Landed in commit `1051829`.*
 
 **Why.** The last question in the sign-up survey asked students how many months were
 left until Bac II, from a grid of 1 to 12. Two problems with that. It asked a student

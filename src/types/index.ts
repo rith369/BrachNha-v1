@@ -7,6 +7,12 @@ export interface UserData {
   strengths: string[];
   weaknesses: string[];
   grade: string;
+  /** Whether the student has already studied some Bac II material. Only `false`
+   *  is reachable today — the survey's "I've studied some" branch is a labelled
+   *  stub pending real lesson names — but the answer is committed anyway so the
+   *  branch has its value waiting when it's built. Absent from older persisted
+   *  copies, which read as undefined → falsy → "not yet", the correct default. */
+  studied: boolean;
 }
 
 export interface Tasks {
