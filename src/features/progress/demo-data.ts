@@ -130,12 +130,15 @@ export const focusAreas = [
   },
 ];
 
-// 4 weeks x 7 days, intensity 0-4 (matches the "Less → More" legend)
+// 4 weeks x 7 days (Sun..Sat), REAL question counts rather than a pre-bucketed
+// 0-4 level. utils/activity-heatmap.ts derives both the colour level and the
+// calendar date each cell represents from this, so the number in a cell's tap
+// tooltip and the shade it's painted can never disagree with each other.
 export const activityHeatmap: number[][] = [
-  [0, 1, 2, 3, 2, 4, 0],
-  [2, 4, 3, 4, 3, 2, 0],
-  [1, 3, 4, 4, 4, 3, 0],
-  [2, 4, 3, 4, 2, 0, 0],
+  [0, 2, 5, 9, 5, 13, 0],
+  [5, 13, 9, 13, 9, 5, 0],
+  [2, 9, 13, 13, 13, 9, 0],
+  [5, 13, 9, 13, 5, 0, 0],
 ];
 
 export const aiInsights = [

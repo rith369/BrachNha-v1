@@ -32,22 +32,65 @@ warning it carried still stands: do not copy Next.js-specific patterns back in.
 | **KaTeX** | ✅ Use | Typesets both sides of the KruAI conversation. Pulled in through a lazy import of `ChatOverlay` so its JS and web fonts stay out of the first-paint bundle |
 | **MathLive** | ✅ Use | The math keyboard and formula editor in the chat composer, replacing ~570 lines of hand-built Unicode keyboard. Lazy-imported one level deeper than KaTeX — see the mentor section below, the boundary is load-bearing |
 | **Zustand (+ persist)** | ✅ Use | Single global store; replaces scattered `useState` + manual localStorage |
-| **Google Fonts via `<link>` in `index.html`** | ✅ Use | Nunito = body, Space Grotesk = headings, Noto Sans Khmer = every Khmer glyph, Caveat = typed signature only. See the font note below — it matters |
+| **Google Fonts via `<link>` in `index.html`** | ✅ Use | Nunito = body, Space Grotesk = headings, Battambang = every Khmer glyph, Caveat = typed signature only. See the font note below — it matters |
 
 ### Fonts: the one thing you must not "simplify"
 
 `next/font/google` used to self-host these and inject four CSS variables. Now
 `index.html` loads them from Google Fonts and `src/styles/globals.css` defines
 the same four variables (`--font-nunito`, `--font-space-grotesk`,
-`--font-noto-khmer`, `--font-caveat`) by hand, which `@theme` then composes into
+`--font-khmer`, `--font-caveat`) by hand, which `@theme` then composes into
 `--font-heading` / `--font-body` / `--font-signature`.
 
+`--font-khmer` is named for its **role**, not its family, and used to be
+`--font-noto-khmer` — which is precisely how it went stale the moment the face
+changed. Keep it role-named.
+
 Neither Nunito nor Space Grotesk nor Caveat ships Khmer glyphs — Khmer isn't
-even an available subset for them. Noto Sans Khmer sits as a **fallback** in
-each stack and the browser resolves it *per glyph*: Latin keeps Nunito, Khmer
-picks up Noto, and mixed strings like "មេរៀនគ្រឹះ & ទី១២" render correctly from
+even an available subset for them. Battambang sits as a **fallback** in each
+stack and the browser resolves it *per glyph*: Latin keeps Nunito, Khmer picks
+up Battambang, and mixed strings like "មេរៀនគ្រឹះ & ទី១២" render correctly from
 one stack. **Removing that fallback silently breaks every Khmer string in the
-app.** Weights 400/600/700/800 only — `font-black` has zero usages.
+app.** Weights 400/600/700/800 only — `font-black` has zero usages, which is
+why Nunito is requested as `wght@400..800` and not `400..900`.
+
+**Why Battambang and not Khmer OS Siemreap — don't relitigate this.** The ask
+was Siemreap, which *is* on Google Fonts (OFL, Danh Hong of the KhmerOS project)
+and is what students see in printed MoEYS material. It ships **one weight, 400**.
+This app has ~373 `font-semibold`/`font-bold`/`font-extrabold` sites across 63
+files and nearly every string in them is bilingual, so a 400-only Khmer face
+hands all of them to the browser's synthetic bold — which on Khmer smears the
+coeng subscripts and vowel signs together at the `text-xs`/`text-sm` sizes the
+nav labels, stat pills and focus-mode kickers use. Battambang is the same
+designer, same OFL licence, same KhmerOS lineage and traditional printed feel,
+with **real 400 and 700 statics**. Per CSS font matching those cover the whole
+ladder without synthesis: 500 → 400, 600 → 700, 700 → 700, 800 → 700. Adding
+`font-synthesis-weight: none` would therefore be inert — don't.
+
+The cost, stated honestly: two static khmer-subset files (~40KB + ~38KB) against
+Noto's single variable one (~59KB), so **+19KB and one extra request on first
+paint**, on an audience on Cambodian mobile data. That is the price of real
+bold, and it was accepted deliberately. Battambang's `900` was considered and
+declined — another ~36KB, and Battambang Black beside Nunito 800 reads far
+heavier than the Latin half of the same string.
+
+Note the Khmer request is `wght@400;700`, a discrete **list** — the exact
+opposite of the Nunito rule below, because there is no variable Battambang.
+`400..700` would fetch the same two statics while implying an axis that doesn't
+exist.
+
+**`index.html`'s link carries THREE families, not four.** Caveat is fetched on
+demand by `src/lib/load-signature-font.ts`, called from `SignatureDisplay`'s
+typed branch — it is the only face in the app that isn't on every screen, and
+that link blocks first paint. It is asked for from `SignatureDisplay` rather
+than from `CommitmentOverlay` because the roadmap's commitment banner renders a
+typed signature with the overlay never mounted. `--font-caveat` and
+`--font-signature` still exist in `globals.css` exactly as before; only the
+fetch moved. Don't "tidy" Caveat back into the blocking link.
+
+A narrowed **range** (`400..800`), not a discrete weight list (`400;600;700;800`)
+— Google serves one variable file for a range and four static instances for a
+list, and the variable file is the smaller of the two here.
 
 ### Theming: two accent scales, and why one isn't enough
 
@@ -127,6 +170,9 @@ before `AppShell`'s, so a synchronous redraw would read the outgoing theme.
 - `public/` = URL-referenced assets; `src/assets/` = imported-into-component assets
 - `server/` = code that runs on a server, never in the browser
 - `api/` = Vercel serverless entry points, thin wrappers over `server/`
+- `design/` = master artwork, **never served and never bundled**. It is outside
+  `public/` precisely so it can't be. Sources live here; what ships is the
+  derived asset in `public/`. See `design/README.md`.
 
 Don't let these blur together.
 
@@ -355,8 +401,9 @@ add an emoji back beside it, and don't re-inline the gradient classes.
 `subtitle` is a `ReactNode`, not a string, because Home passes its level/XP row
 with Lucide icons in it while the other three pass plain text.
 
-The mark is `public/logo/brachnha.svg` through a plain `<img>`, the same
-bundled-in-`public/` approach as `ui/avatar.tsx`. Two things about it:
+The mark is a `<picture>` over `public/logo/brachnha.webp` with a `.png`
+fallback, the same bundled-in-`public/` approach as `ui/avatar.tsx`. Three
+things about it:
 
 - **The artwork has an opaque white background baked in** — it was supplied as
   an app-icon tile, and the outermost path is a full-canvas white rect. That is
@@ -364,16 +411,25 @@ bundled-in-`public/` approach as `ui/avatar.tsx`. Two things about it:
   mark reads as an app icon rather than a white block sitting on the dark
   theme's surface. Deliberately no `dark:` variant — a light badge in both
   themes is correct here, and this is the one place that's true.
-- **It is 431KB of auto-traced paths** (426 of them, ~170KB gzipped) for
-  something rendered at 40px. It's cached after first paint, but the audience is
-  on Cambodian mobile data — see the `index.html` preconnect comment, same
-  concern. A hand-drawn vector or a small PNG for on-screen use would be a large
-  win; left as-is because replacing the artwork is the user's call, not a silent
-  edit. The big centred `⚔️` on the login and survey screens is a separate
-  illustration and was deliberately not touched.
+- **It is a 96px RASTER, and the source SVG is deliberately not shipped.** The
+  supplied file is 431KB of auto-traced paths (426 of them, ~169KB gzipped) for
+  something rendered at 40px — more than half the weight of the entire JS
+  bundle, on an audience on Cambodian mobile data. The WebP is **4.6KB** and is
+  indistinguishable at 40px. 96px is 2.4× the display size, so 2× and 3× DPI are
+  covered, and the raster is cropped square to agree with the `object-cover`
+  rather than fight it.
+- **The master SVG lives in `design/`, outside `public/`, so it is never
+  served.** `design/README.md` records how to re-render it — via the Chrome that
+  `playwright-core` already provides for `scripts/shots.mjs`, so no image
+  tooling was added to the repo. If the artwork is ever replaced, regenerate
+  **both** formats; `<picture>` needs the pair.
 
-`public/favicon.ico` is still the OLD icon — it does not come from this file and
-was left alone.
+`width`/`height` are set on the `<img>` so the box is reserved before the image
+lands — without them the name beside it shifts on first paint.
+
+The big centred `⚔️` on the login and survey screens is a separate illustration
+and was deliberately not touched. `public/favicon.ico` is still the OLD icon —
+it does not come from this file and was left alone.
 
 **Full-bleed is phone-only.** `AiInsights` uses `-mx-4 px-4` to cancel the page
 padding so its carousel reaches both screen edges. From `md` the card sits in a
@@ -707,6 +763,91 @@ DiceBear `adventurer` style and default params as the existing six). The rule in
 the Game section still holds: a new `avatarSeed` needs a matching SVG on disk,
 there is no live-generation fallback.
 
+## Performance — the four rules, and why each one exists
+
+The app was slow, and the reported symptom was **navigation**, not first load.
+That distinction is what makes this section worth reading before "optimising"
+anything: the biggest *bytes* problem and the biggest *felt* problem were
+different problems, and fixing only the first would not have helped.
+
+Measured first-paint cost went **487KB → 183KB gzipped**. But the navigation lag
+came almost entirely from per-frame and per-mount work, not from bytes.
+
+**1. A route is a fresh MOUNT. Anything that animates on mount replays forever.**
+Recharts animates on mount by default, for 1500ms. Progress mounts two charts
+and Grade Prediction one, so every visit redrew the page and then spent a second
+and a half sweeping lines in. All three now pass `isAnimationActive={false}`.
+The data is fixed demo data that never transitions, so nothing was being
+communicated. **If a chart ever gets live data, turn animation back on for the
+UPDATE, not the mount.**
+
+**2. Animate `transform` and `opacity`. Nothing else.** `fabPulse` used to
+animate `box-shadow`, which is a paint property and cannot run on the
+compositor — every frame forced a real repaint, forever, on an element mounted
+on every screen. It is now split: the element animates `transform`, and a
+`::after` layer carries the glow and animates `opacity` (`fabGlow`). Both
+compositor-only. See the long comment in `globals.css`; don't fold the two
+keyframes back together.
+
+Consumers must be **positioned** for the `::after` to anchor. The FAB already is
+(`absolute`); the Roadmap node carries `relative` for exactly this and nothing
+else. `.animate-fab-pulse` sets `isolation: isolate` so the `z-index: -1` glow
+sits behind that element's own background instead of escaping behind an
+ancestor's.
+
+**Count the animating elements, not just the animation.** The Roadmap put the
+pulse on *every* phase node, and `buildRoadmapPhases` returns roughly one per
+month until the exam — about twelve at once, on the screen a student lands on
+straight out of the survey. Only `isFirst`/`isLast` pulse now. The middle nodes
+never set `--glow-color` either, so they had been borrowing the FAB's purple by
+accident.
+
+A `prefers-reduced-motion` block turns both loops off entirely.
+
+**3. One scroll container per screen.** `AppShell`'s children wrapper is
+`overflow-hidden`, NOT `overflow-y-auto`. Every page already owns its scroller —
+the ones rendering `BottomNav` must, since that pattern is `flex h-full
+flex-col` + `min-h-0 flex-1 overflow-y-auto` + `<BottomNav />`, and the focus
+routes get theirs from `FocusLayout`. A scroller at both levels meant two nested
+ones on every screen, so every touch drag cost a scroll-chaining resolution
+before anything moved. `min-h-0 flex-1` stays on that wrapper — it is what gives
+the pages' `h-full` a definite height to resolve against. `not-found.tsx` has no
+scroller and needs none.
+
+**4. `backdrop-filter` is not free, and it re-runs while content moves.**
+`BottomNav` and the Leaderboard's sticky card are opaque (`bg-surface`,
+`bg-elevated`) rather than translucent-plus-blur. Both sat over scrolling
+content, which is the worst case, and `BottomNav` is `lg:hidden` — so the blur
+only ever ran on the phones least able to afford it. Don't reintroduce it on
+anything that scrolls behind.
+
+### Code splitting — and why the prefetch is not optional
+
+`src/app.tsx` holds every split route in ONE `routeModules` map; `lazy()` and
+the idle prefetch both read from it, so they cannot drift. Adding a route there
+splits and prefetches it in the same edit. Import specifiers must stay literal
+for the bundler to see them — that is what the arrow functions are for.
+
+**Home and NotFound stay eager.** Home is the landing route, so splitting it
+only adds a round trip in front of first paint; NotFound imports nothing.
+
+**`usePrefetchRoutes` is load-bearing.** Splitting alone makes the first tap on
+each tab wait on a network round trip — i.e. it makes the actual complaint
+*worse*. Warming the chunks on `requestIdleCallback` after first paint is what
+buys the smaller entry chunk without paying for it at the moment of navigation.
+Rejections are swallowed on purpose: it is a speculative fetch, and going
+offline between load and tap should fall through to the normal Suspense path,
+not throw now.
+
+Recharts lands in its own shared chunk (`LineChart-*.js`, ~103KB gzip) used only
+by Progress and Grade Prediction. **Check after any build that
+`math-field-panel-*.js` is still its own chunk** — that lazy boundary is
+described in the mentor section and a stray static import undoes it silently.
+
+`<Suspense fallback={null}>`, matching how `AppShell` mounts `ChatOverlay`: the
+prefetch means it almost never renders, and a spinner that flashes for a frame
+reads worse than a blank one.
+
 ## Still not built
 
 Flashcards/Quiz (ការអនុវត្ត), Document Library,
@@ -887,6 +1028,31 @@ with timestamps, a daily activity log, and **active** study minutes with idle
 time excluded — counting "app is open" would make leaving a phone unlocked a
 winning strategy, which is exactly what that screen is built to argue against.
 Its one live read is the student's own name.
+
+**The Study Activity heatmap's dates are the exception to "fixed demo data"** —
+they're derived, not fixed, same pattern as `daysUntilExam()`. The COUNTS in
+`features/progress/demo-data.ts` are still hand-authored fixed numbers like
+everything else on this page, but `utils/activity-heatmap.ts`'s
+`buildHeatmapWeeks()` maps them onto real calendar dates at render time, anchored
+so the last row is always the current Sun–Sat week. A cell whose date is after
+today is `isFuture` and renders as an empty dashed outline rather than a
+coloured square — the fixed data has a placeholder number sitting there, but it
+is deliberately ignored so a screen full of demo data still can't claim a
+student did anything on a day that hasn't happened yet. The colour level
+(0–4, feeding the `LEVELS` scale in `activity-heatmap.tsx`) is bucketed from
+the count via `levelForCount()` rather than being its own hand-authored number,
+so the shade a cell is painted and the count its tap tooltip shows can never
+disagree with each other — they used to be two unrelated numbers.
+
+Each past/today cell is a real `<button>`, not a decorative `<div>` — tapping
+toggles a small tooltip (`formatHeatmapCellLabel()`: "Today · 13 questions" /
+"Sun 2 Aug · No activity") positioned above the cell. Horizontal placement is
+clamped by day-of-week column (`di <= 1` → left-anchored, `di >= 5` →
+right-anchored, else centered) so the tooltip can't run off the card at either
+edge — verified down to the 320px floor. Closing is a `pointerdown`+`keydown`
+listener added to `document` **only while a tooltip is open**, not on every
+render of a page most students never tap into; it checks the click landed
+outside the grid's own ref rather than assuming any outside tap means "close".
 
 **Mock Exam results DO use real data** (`examResults` in the store, persisted) —
 a deliberate improvement over the original, where exam history lived in

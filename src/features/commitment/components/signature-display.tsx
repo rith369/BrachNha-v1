@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { SIGNATURE_VIEWBOX } from "@/utils/signature";
+import { loadSignatureFont } from "@/lib/load-signature-font";
 import { cn } from "@/utils/cn";
 
 // Renders either half of the Commitment shape — SVG path data for a drawn
@@ -13,6 +15,19 @@ export function SignatureDisplay({
   signature: string;
   className?: string;
 }) {
+  // Caveat is no longer in index.html's font link — it is the only face in the
+  // app that isn't on every screen, so it is fetched the first time a typed
+  // signature actually renders. This is the right component to ask from rather
+  // than CommitmentOverlay: the roadmap banner renders a typed signature too,
+  // without the overlay ever being mounted.
+  //
+  // Called unconditionally, before the `kind` branch below, because hooks
+  // cannot sit behind a condition; the loader itself is a no-op for a drawn
+  // signature and after the first call.
+  useEffect(() => {
+    if (kind === "typed") loadSignatureFont();
+  }, [kind]);
+
   if (kind === "typed") {
     return (
       <div

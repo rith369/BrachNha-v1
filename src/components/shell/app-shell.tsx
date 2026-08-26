@@ -97,7 +97,21 @@ export function AppShell({
           <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
             {!hideChrome && <TopBar />}
             <Drawer />
-            <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+            {/* overflow-HIDDEN, not auto. Every page already owns its own
+                scroll container — they have to, because the ones rendering
+                BottomNav need it pinned below a scrolling body (`flex h-full
+                flex-col` + `min-h-0 flex-1 overflow-y-auto` + <BottomNav />),
+                and the focus screens get theirs from FocusLayout. A scroller
+                here as well made two nested ones on every single screen, so
+                every touch drag cost the browser a scroll-chaining resolution
+                before it could move anything — which is felt as lag.
+
+                min-h-0 flex-1 stays: that is what gives this box a definite
+                height for the pages' `h-full` to resolve against. The three
+                routes with no scroller of their own (not-found, and the two
+                focus routes that delegate to FocusLayout) are all either short
+                enough not to need one or bring their own. */}
+            <div className="min-h-0 flex-1 overflow-hidden">{children}</div>
             {!chatOpen && !pledgeOpen && !hideMentor && <FabChat />}
             {/* !hideMentor here too, not just on the FAB: the effect above
                 closes an open chat, but this makes the overlay unrenderable

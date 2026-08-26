@@ -45,7 +45,10 @@ export function SubjectBarChart() {
               itemStyle={{ color: "var(--color-text)" }}
               labelStyle={{ color: "var(--color-muted)" }}
             />
-            <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+            {/* See the note in score-trend-chart.tsx — mount animation off, for
+                the same reason and to keep the two charts on this page in step
+                with each other. */}
+            <Bar dataKey="value" radius={[8, 8, 0, 0]} isAnimationActive={false}>
               {questionsPerSubject.map((s) => (
                 <Cell key={s.subject} fill={s.color} />
               ))}

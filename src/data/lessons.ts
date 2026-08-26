@@ -133,6 +133,10 @@ Lobe នៃសេរេប្រុម៖ frontal = ការគិត និង
         en: "You have enough neurons to count every star in the Milky Way!",
         km: "ណឺរ៉ូនរបស់អ្នកគ្រប់គ្រាន់ដើម្បីរាប់ផ្កាយ Milky Way!",
       },
+      model3d: {
+        src: "/models/brain.glb",
+        credit: '"Brain Diagram" by Aeceus — CC BY 4.0, via Sketchfab',
+      },
     },
   },
 };

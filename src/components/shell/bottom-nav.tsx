@@ -15,13 +15,21 @@ export function BottomNav() {
   if (focusMode) return null;
 
   return (
-    // The bar itself spans the full app width so its top border and blur read
-    // as one edge; the tabs inside stay phone-width and centred. Letting
+    // The bar itself spans the full app width so its top border reads as one
+    // edge; the tabs inside stay phone-width and centred. Letting
     // justify-around spread five tabs across a 1024px laptop would push them
     // into the far corners, which looks accidental rather than designed.
     // lg:hidden lives here rather than on each of the 9 pages that render this,
     // so the desktop Sidebar and the phone tab bar are never both on screen.
-    <div className="shrink-0 border-t border-purple/10 bg-surface/90 backdrop-blur-sm lg:hidden">
+    //
+    // Opaque bg-surface, NOT bg-surface/90 + backdrop-blur-sm. backdrop-filter
+    // re-runs every frame the content behind it moves, and this bar sits over a
+    // scrolling body on 7 screens — on the mid-range Android this app is built
+    // for, that is one of the most expensive things on the page. It is also
+    // lg:hidden, so the blur only ever ran where it cost the most and never
+    // where there was headroom for it. The bar is fully opaque now, which is
+    // what the translucency was approximating anyway.
+    <div className="shrink-0 border-t border-purple/10 bg-surface lg:hidden">
       <div className="mx-auto flex w-full max-w-lg items-center justify-around px-2 pt-2 pb-5">
         {bottomNavItems.map((item) => {
           const active = item.href && pathname === item.href;

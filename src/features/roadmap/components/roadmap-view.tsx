@@ -61,18 +61,26 @@ function PhaseNode({
   // Brand fills, not the lifted accents: these are saturated discs carrying an
   // emoji, and the dark-mode accents would make them shout. The middle node is
   // a tint, so it correctly follows the lifted token instead.
+  //
+  // ONLY the two endpoints pulse. Every node used to, which meant the number of
+  // animating discs tracked the months left on the countdown — around twelve of
+  // them glowing at once on the screen a student lands on straight out of the
+  // survey. A path where everything pulses points at nothing, and the middle
+  // nodes never even set --glow-color, so they were borrowing the FAB's purple
+  // glow by accident. The start and finish markers are what the eye needs here.
   const nodeClasses = isFirst
     ? "bg-linear-to-br from-[var(--brand-pink)] via-[var(--brand-purple)] to-[var(--brand-blue)] animate-fab-pulse"
     : isLast
       ? "bg-linear-to-br from-[var(--brand-yellow)] to-[var(--brand-pink)] animate-fab-pulse"
-      : "bg-purple/10 animate-fab-pulse";
+      : "bg-purple/10";
 
   return (
     <div
       style={isFirst ? GLOW_PINK : isLast ? GLOW_GOLD : undefined}
       // ring-bg, not ring-white: the halo's job is to knock the node out of the
       // path connector running behind it, so it has to match the page.
-      className={`ring-4 ring-bg flex size-16 shrink-0 items-center justify-center rounded-full text-3xl ${nodeClasses}`}
+      // `relative` anchors .animate-fab-pulse's glow layer — see globals.css.
+      className={`relative ring-4 ring-bg flex size-16 shrink-0 items-center justify-center rounded-full text-3xl ${nodeClasses}`}
     >
       {phase.icon}
     </div>

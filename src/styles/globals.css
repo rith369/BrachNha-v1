@@ -94,7 +94,11 @@
      and every font-* utility read exactly as they did under Next. */
   --font-nunito: "Nunito";
   --font-space-grotesk: "Space Grotesk";
-  --font-noto-khmer: "Noto Sans Khmer";
+  /* Named for its ROLE, not its family — this used to be --font-noto-khmer and
+     that is exactly how it went stale when the face changed. Battambang is
+     Danh Hong's, OFL, from the same KhmerOS lineage students read in printed
+     textbooks, and unlike Siemreap it ships a real 700. */
+  --font-khmer: "Battambang";
   --font-caveat: "Caveat";
 }
 
@@ -180,16 +184,17 @@
   --shadow-mint-cta: var(--shadow-mint-cta);
 
   /* Khmer is listed as a fallback, not applied conditionally: the Latin fonts
-     have no Khmer glyphs, so the browser reaches for Noto per glyph. Mixed
-     strings like "មេរៀនគ្រឹះ & ទី១២" render correctly from one stack. */
-  --font-heading: var(--font-space-grotesk), var(--font-noto-khmer);
-  --font-body: var(--font-nunito), var(--font-noto-khmer);
+     have no Khmer glyphs, so the browser reaches for Battambang per glyph.
+     Mixed strings like "មេរៀនគ្រឹះ & ទី១២" render correctly from one stack. */
+  --font-heading: var(--font-space-grotesk), var(--font-khmer);
+  --font-body: var(--font-nunito), var(--font-khmer);
 
   /* Typed signatures on the commitment pledge. Same per-glyph fallback rule as
      above and it matters just as much here: Caveat has no Khmer coverage, so a
      student typing ស without the fallback would sign their name in tofu. Khmer
-     lands on Noto — upright rather than handwritten, but legible and correct. */
-  --font-signature: var(--font-caveat), var(--font-noto-khmer);
+     lands on Battambang — upright rather than handwritten, but legible and
+     correct. */
+  --font-signature: var(--font-caveat), var(--font-khmer);
 
   /* shadcn-style tokens so ui/* components resolve correctly */
   --color-background: var(--color-bg);
@@ -266,16 +271,52 @@ h1, h2, h3, h4, .font-heading {
   color: var(--color-text);
 }
 
-/* ── Floating AI mentor pulse (ported 1:1 from the current prototype) ──
-   Shadow color reads from --glow-color so other elements (e.g. Roadmap's
-   current/finish nodes) can reuse this same pulse with their own tint,
-   without duplicating the keyframe. Unset, it defaults to the FAB's purple. */
+/* ── Floating AI mentor pulse ──
+   Glow colour reads from --glow-color / --glow-color-strong so other elements
+   (Roadmap's current and finish nodes) reuse this same pulse with their own
+   tint. Both are defined at :root above, so there are no fallbacks here.
+
+   THE SPLIT INTO TWO ANIMATIONS IS THE WHOLE POINT — don't fold it back into
+   one keyframe. This used to animate `box-shadow` on the element itself, which
+   is a PAINT property: unlike transform and opacity it cannot run on the
+   compositor, so every frame forced a real repaint, forever, on an element
+   that is mounted on every single screen (the FAB) — and, before the change
+   below, on all ~12 Roadmap phase nodes at once. That constant repaint work
+   competed with route transitions and made moving between pages feel slow.
+
+   Now the element animates only `transform`, and the glow lives on a ::after
+   layer that crossfades with `opacity`. Both are compositor-only, so the pulse
+   costs effectively nothing per frame while looking the same.
+
+   0.7 x --glow-color-strong (65%) lands at ~45%, which is exactly what
+   --glow-color was, so the low end of the fade matches the old weak state. The
+   old 20px -> 26px blur change is dropped; at this size it is imperceptible,
+   and blur radius cannot be animated on the compositor. */
 @keyframes fabPulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 6px 20px var(--glow-color, rgba(139, 43, 226, 0.45)); }
-  50% { transform: scale(1.08); box-shadow: 0 6px 26px var(--glow-color-strong, rgba(139, 43, 226, 0.65)); }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+@keyframes fabGlow {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
 }
 .animate-fab-pulse {
   animation: fabPulse 2.4s ease-in-out infinite;
+  /* Gives the element its own stacking context so the z-index:-1 layer below
+     sits behind THIS element's background rather than escaping behind an
+     ancestor's. The FAB already had one via z-40; the Roadmap node does not. */
+  isolation: isolate;
+}
+/* Consumers must be positioned for this to anchor — the FAB is `absolute`
+   already, the Roadmap node carries `relative` for exactly this reason. */
+.animate-fab-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  box-shadow: 0 6px 26px var(--glow-color-strong);
+  animation: fabGlow 2.4s ease-in-out infinite;
 }
 
 @keyframes shimmer {
@@ -284,6 +325,17 @@ h1, h2, h3, h4, .font-heading {
 }
 .animate-shimmer {
   animation: shimmer 3s linear infinite;
+}
+
+/* Both loops above run forever. Someone who has asked their device for less
+   motion should get the finished state, not an endless animation — and on a
+   low-end phone that is a real amount of work saved as well. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fab-pulse,
+  .animate-fab-pulse::after,
+  .animate-shimmer {
+    animation: none;
+  }
 }
 
 /* ── MathLive, dressed as the rest of the app ──

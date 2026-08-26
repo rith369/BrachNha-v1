@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { useNavigate } from "react-router";
 import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
@@ -13,6 +13,15 @@ import {
 } from "@/utils/focus-styles";
 import { LESSONS, FOUNDATION, FLASHCARDS, PRACTICE } from "@/data/lessons";
 import type { Lesson } from "@/types";
+
+// Three.js + react-three-fiber + drei together are a meaningfully large
+// dependency, only needed for the one lesson with a 3D model. Split off
+// behind React.lazy so it downloads only when that lesson is opened, not on
+// every visit to the lessons feature. See the header of
+// brain-model-viewer.tsx.
+const BrainModelViewer = lazy(() =>
+  import("./brain-model-viewer").then((m) => ({ default: m.BrainModelViewer }))
+);
 
 const TOTAL_STEPS = 6;
 
@@ -147,6 +156,23 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
         {/* Step 1 — Content + summary */}
         {step === 1 && (
           <div>
+            {ld.model3d && (
+              <Suspense
+                fallback={
+                  <div
+                    className={`mb-3 flex h-64 items-center justify-center md:mb-4 md:h-80 lg:h-96 ${focusCard}`}
+                  >
+                    {lang === "en"
+                      ? "Loading 3D model…"
+                      : "កំពុងផ្ទុកម៉ូឌែល 3D…"}
+                  </div>
+                }
+              >
+                <div className="mb-3 h-64 w-full overflow-hidden rounded-2xl border border-purple/15 bg-surface md:mb-4 md:h-80 lg:h-96">
+                  <BrainModelViewer model={ld.model3d} lang={lang} />
+                </div>
+              </Suspense>
+            )}
             <div className="mb-3 text-xs font-extrabold text-muted md:mb-4 md:text-sm">
               📖 {lang === "en" ? "Lesson Content" : "មាតិកា"}
             </div>

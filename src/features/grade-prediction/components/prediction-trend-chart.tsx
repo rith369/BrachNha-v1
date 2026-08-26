@@ -82,7 +82,11 @@ export function PredictionTrendChart({
               strokeWidth={2.5}
               dot={{ r: 4, fill: "var(--color-pink)", strokeWidth: 0 }}
               activeDot={{ r: 6 }}
-              isAnimationActive
+              // Was explicitly ON, which is the one chart that had opted in.
+              // Recharts animates on MOUNT, and a route is a fresh mount, so it
+              // replayed a 1500ms sweep every time this page was opened rather
+              // than once when the data changed. See score-trend-chart.tsx.
+              isAnimationActive={false}
             />
           </LineChart>
         </ResponsiveContainer>

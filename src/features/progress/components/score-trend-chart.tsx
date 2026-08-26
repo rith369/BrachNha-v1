@@ -63,6 +63,14 @@ export function ScoreTrendChart() {
               itemStyle={{ color: "var(--color-text)" }}
               labelStyle={{ color: "var(--color-muted)" }}
             />
+            {/* isAnimationActive={false} on every series here and in the two
+                other charts. Recharts animates on MOUNT by default, for 1500ms,
+                and a page is a fresh mount every time it is navigated to — so
+                opening Progress used to draw the page and then spend a second
+                and a half sweeping three charts in. That reads as the app being
+                slow to switch pages, which is exactly what it was. The data is
+                fixed demo data that never transitions, so there is nothing the
+                animation was communicating. */}
             <Line
               type="monotone"
               dataKey="target"
@@ -70,6 +78,7 @@ export function ScoreTrendChart() {
               strokeWidth={1.5}
               strokeDasharray="6 4"
               dot={false}
+              isAnimationActive={false}
             />
             <Line
               type="monotone"
@@ -78,6 +87,7 @@ export function ScoreTrendChart() {
               strokeWidth={2.5}
               dot={{ r: 4, fill: "var(--color-purple)", strokeWidth: 0 }}
               activeDot={{ r: 6 }}
+              isAnimationActive={false}
             />
           </LineChart>
         </ResponsiveContainer>

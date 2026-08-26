@@ -1,19 +1,95 @@
+import { lazy, Suspense, useEffect } from "react";
 import { Outlet, Route, Routes, useLocation } from "react-router";
 import { AppShell } from "@/components/shell/app-shell";
 import { useFocusMode, useMentorBlocked } from "@/hooks/use-focus-mode";
 import { useBrachNhaStore } from "@/lib/store";
 import HomePage from "@/pages/home";
-import GamePage from "@/pages/game";
-import ExamPage from "@/pages/exam";
-import GradePredictionPage from "@/pages/grade-prediction";
-import LeaderboardPage from "@/pages/leaderboard";
-import LessonsPage from "@/pages/lessons";
-import LessonDetailPage from "@/pages/lesson-detail";
-import PlacementTestRoute from "@/pages/placement-test";
-import ProfilePage from "@/pages/profile";
-import ProgressPage from "@/pages/progress";
-import RoadmapPage from "@/pages/roadmap";
 import NotFoundPage from "@/pages/not-found";
+
+/**
+ * Every route except the two below, behind its own chunk.
+ *
+ * The app used to import all twelve pages statically, which put Recharts,
+ * Framer Motion, all the demo data and the whole lesson corpus into a single
+ * 1MB entry chunk that every student downloaded before seeing anything.
+ *
+ * They are held in ONE map, and `lazy()` and the prefetch below both read from
+ * it, so the two can never fall out of step — a route added here is split and
+ * prefetched by the same edit. The import specifiers have to be literal for the
+ * bundler to see them, which is what the arrow functions are for.
+ *
+ * Home and NotFound stay EAGER on purpose. Home is the landing route, so
+ * splitting it would only add a round trip in front of first paint; NotFound is
+ * twenty lines and imports nothing, so a chunk of its own would cost more in
+ * request overhead than it saves.
+ */
+const routeModules = {
+  game: () => import("@/pages/game"),
+  exam: () => import("@/pages/exam"),
+  gradePrediction: () => import("@/pages/grade-prediction"),
+  leaderboard: () => import("@/pages/leaderboard"),
+  lessons: () => import("@/pages/lessons"),
+  lessonDetail: () => import("@/pages/lesson-detail"),
+  placementTest: () => import("@/pages/placement-test"),
+  profile: () => import("@/pages/profile"),
+  progress: () => import("@/pages/progress"),
+  roadmap: () => import("@/pages/roadmap"),
+};
+
+const GamePage = lazy(routeModules.game);
+const ExamPage = lazy(routeModules.exam);
+const GradePredictionPage = lazy(routeModules.gradePrediction);
+const LeaderboardPage = lazy(routeModules.leaderboard);
+const LessonsPage = lazy(routeModules.lessons);
+const LessonDetailPage = lazy(routeModules.lessonDetail);
+const PlacementTestRoute = lazy(routeModules.placementTest);
+const ProfilePage = lazy(routeModules.profile);
+const ProgressPage = lazy(routeModules.progress);
+const RoadmapPage = lazy(routeModules.roadmap);
+
+/**
+ * Warms every split chunk once the browser is idle.
+ *
+ * This is not optional garnish — without it the split above would make the
+ * thing it is meant to help WORSE. Splitting alone means the first tap on each
+ * tab waits on a network round trip, and slow navigation is the actual
+ * complaint. Fetching during the idle time right after first paint means the
+ * chunk is in the module cache before any tab is tapped, so navigation stays
+ * instant while first paint no longer carries all twelve pages.
+ *
+ * Failures are swallowed: this is a speculative fetch, and a student who goes
+ * offline between load and tap should get the normal Suspense path when they
+ * navigate, not an unhandled rejection now.
+ */
+function usePrefetchRoutes() {
+  useEffect(() => {
+    let cancelled = false;
+
+    const warm = () => {
+      if (cancelled) return;
+      for (const load of Object.values(routeModules)) {
+        load().catch(() => {});
+      }
+    };
+
+    // requestIdleCallback is still missing on older Safari; the timeout is the
+    // fallback, and is long enough to stay clear of first paint either way.
+    const ric = window.requestIdleCallback;
+    if (typeof ric === "function") {
+      const id = ric(warm, { timeout: 3000 });
+      return () => {
+        cancelled = true;
+        window.cancelIdleCallback?.(id);
+      };
+    }
+
+    const id = window.setTimeout(warm, 1200);
+    return () => {
+      cancelled = true;
+      clearTimeout(id);
+    };
+  }, []);
+}
 
 /**
  * Replaces app/layout.tsx. AppShell still takes `children` rather than reading
@@ -51,7 +127,12 @@ function ShellLayout() {
 
   return (
     <AppShell hideChrome={hideChrome} hideMentor={hideMentor}>
-      <Outlet />
+      {/* fallback={null} rather than a spinner, matching how AppShell mounts
+          ChatOverlay. The prefetch above means this almost never renders; a
+          spinner that flashes for a frame reads worse than a blank one. */}
+      <Suspense fallback={null}>
+        <Outlet />
+      </Suspense>
     </AppShell>
   );
 }
@@ -62,6 +143,8 @@ function ShellLayout() {
  * at the same URLs.
  */
 export default function App() {
+  usePrefetchRoutes();
+
   return (
     <Routes>
       <Route element={<ShellLayout />}>

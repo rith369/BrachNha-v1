@@ -17,6 +17,144 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 26 Aug 2026 — The Study Activity calendar on Progress now actually does something
+
+*Not yet committed.*
+
+**Why.** The calendar-style grid on the Progress page (Study Activity) was decoration —
+30-odd coloured squares with no real meaning behind the colour, and tapping one did
+nothing. It looked like it should work like GitHub's contribution graph, but wasn't
+wired up to.
+
+**What changed.**
+
+- **Every square is now a real day, and tapping one shows what happened that day.** Tap
+  a square and a small label pops up above it — "Today · 13 questions", or "Sun 2 Aug ·
+  No activity" for a quiet day. Tap it again, tap anywhere else, or press Escape to close
+  it.
+- **The grid now lines up with real dates**, ending on today, rather than being 28
+  arbitrary squares with no calendar behind them. Today's square gets a small ring around
+  it so it's easy to find at a glance.
+- **Days that haven't happened yet are shown differently on purpose** — an empty dashed
+  outline instead of a coloured square — so "no activity yet because it's the future" no
+  longer looks the same as "studied nothing that day."
+- The colour of each square is now driven by a real number of questions answered, the
+  same number the tap popup shows — before, the colour was just a made-up 0–4 value with
+  nothing backing it.
+
+**What to re-test.** Open Progress, scroll to Study Activity, and tap a few different
+squares — including ones near the left and right edges of the grid, to make sure the
+popup stays on-screen rather than running off the card. Check it in both light and dark,
+and on a phone-width screen.
+
+---
+
+## 26 Aug 2026 — Khmer text now uses a Cambodian-made font
+
+*Not yet committed.*
+
+**Why.** The Khmer font in the app was Noto Sans Khmer — Google's neutral,
+international font. It is perfectly correct, but it is not what students actually
+read. Cambodian textbooks and printed exam papers use the KhmerOS family of fonts,
+so the app looked subtly foreign next to the material students study from.
+
+**What changed.** Khmer text is now set in **Battambang**, a KhmerOS font by the
+Cambodian type designer Danh Hong. Free to use, and much closer in feel to printed
+Khmer. English text is unchanged — it still uses Nunito and Space Grotesk exactly
+as before. Only Khmer letters moved.
+
+**A note on which font we picked.** The request was for **Khmer OS Siemreap**
+specifically. We tried to use it and hit a real problem: Siemreap is published in
+one weight only — regular. It has no bold. The app has roughly 373 places where
+text is bold or semi-bold (nearly every heading, button, score, name and nav
+label), and with no real bold available the browser has to *fake* it by
+artificially thickening the regular letters. Khmer stacks its vowel marks above
+and its subscript consonants below each letter, packed tightly, so fake bold
+smears those marks together — worst exactly where the app uses small text, like
+the bottom nav labels and the stat chips.
+
+Battambang is by the same designer, from the same KhmerOS family, with the same
+traditional printed look — but it ships a **real bold**. So bold Khmer is properly
+drawn rather than stretched. If Siemreap specifically is a firm requirement, say
+so and we can revisit, but it means accepting the smeared bold everywhere.
+
+**The one trade-off.** Battambang comes as two separate files (regular and bold)
+where the old font was a single file covering every weight, so first load pulls
+about **19KB more**. Small, but worth naming given many students are on mobile
+data. It only affects the very first visit; after that it is cached.
+
+**What you need to know.** Nothing to do — but if you have the site open on your
+phone, do a hard refresh so the new font loads. Worth a look on a real phone in
+Khmer: check that nothing looks cramped or clipped in the small labels along the
+bottom bar and in the score chips on the Home page.
+
+---
+
+## 25 Aug 2026 — The app is much faster, especially moving between pages
+
+*Not yet committed.*
+
+**Why.** The app felt slow, most of all when tapping from one page to another. The logo
+was the suspect. It turned out to be a real problem but not the main one — it is only
+paid once, on the first load, and then cached. Four other things were being paid **every
+single time you changed page**.
+
+**What was actually wrong, and what changed.**
+
+**1. The charts replayed their animation every time you opened Progress.** Progress has
+two charts and Grade Prediction has one, and each drew itself in over a second and a
+half — every visit, not just the first. So the page appeared and then sat there
+animating before it looked finished. The charts now appear immediately, fully drawn. The
+data on them is fixed demo data that never changes, so the animation was not telling
+anyone anything.
+
+**2. Everything on the Quest Map was pulsing at once.** The glowing pulse was on *every*
+phase marker — with the exam a year out, that is around twelve glowing circles animating
+non-stop, on the screen students land on straight after sign-up. It was also drawn in a
+way phones find expensive. **Only the start and finish markers pulse now**, and the
+pulse itself was rebuilt so phones can hand it to the graphics chip instead of redrawing
+it sixty times a second. The FAB (the chat button, on every screen) got the same fix.
+
+**3. Every screen had two scrollbars stacked on top of each other** — one belonging to
+the page, one belonging to the app frame around it. Every drag of a finger made the
+browser work out which one you meant before anything moved. The outer one is gone.
+
+**4. The frosted-glass blur behind the bottom tab bar** was being recalculated on every
+frame while you scrolled — one of the most expensive things you can ask a phone to do.
+The bar is now solid, which is what the frosting was imitating anyway. Same for the
+floating "your ranking" card on the Leaderboard.
+
+**The logo, separately.** It was supplied as an app-icon tile made of 426 traced shapes —
+431 KB — and displayed at the size of a fingernail. It is now a small picture instead:
+**4.6 KB, down from 431 KB**, and it looks the same. The original artwork is kept safely
+in the project under `design/` and is no longer sent to phones.
+
+**The app is also split up now.** It used to send every screen to your phone before
+showing you anything — one 1 MB file. Each screen is now its own piece, and the rest
+quietly download in the background once the first screen is up, so tapping a tab is
+still instant.
+
+**One font stopped being downloaded by everyone.** Caveat — the handwriting font — is
+only ever used for the signature on the commitment pledge, but every student was
+downloading it on every visit. It is now fetched only when a signature is actually shown.
+
+**The result.** What a phone downloads before it can show the first screen went from
+**487 KB to 183 KB — a 62% cut.**
+
+**What to re-test.**
+
+- Tap around between Home, Study, Mock Exam, Progress, Game, Leaderboard, Quest Map and
+  Grade Prediction. It should feel immediate. Charts should already be drawn.
+- Scroll every page hard, on a phone, and check nothing sticks or scrolls the wrong box.
+- Check the Quest Map: only the first and last markers should glow.
+- Switch to Khmer and check the menu, the Quest Map and a lesson still read correctly.
+  **This is the most important check** — the font change is the one that could break
+  Khmer text.
+- Sign the commitment pledge and check your typed name still appears in handwriting.
+- Check the logo still looks right on Home, in the menu, and on the sign-in screen.
+
+---
+
 ## 25 Aug 2026 — The survey asks whether you've studied already
 
 *Landed in commit `8295b45`.*

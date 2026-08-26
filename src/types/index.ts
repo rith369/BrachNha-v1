@@ -68,6 +68,13 @@ export interface Conversation {
 // ── Content types (used once data/lessons.ts, data/questions.ts,
 //    data/translations.ts are ported from the old content-*.js files) ──
 
+export interface Model3DRef {
+  /** public/-relative path, e.g. "/models/brain.glb" — loaded by URL, not imported. */
+  src: string;
+  /** License credit line, rendered under the viewer. */
+  credit: string;
+}
+
 export interface Lesson {
   title: { en: string; km: string };
   importance: string;
@@ -77,6 +84,10 @@ export interface Lesson {
   funFact: { en: string; km: string };
   tip: { en: string; km: string };
   didYouKnow?: { en: string; km: string };
+  /** Only set on lessons with an interactive 3D model (currently just the
+   *  Human Brain lesson). Absent everywhere else — no other lesson's render
+   *  path changes. */
+  model3d?: Model3DRef;
 }
 
 export interface Flashcard {
