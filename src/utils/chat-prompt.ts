@@ -82,14 +82,14 @@ export function buildKnowledgeBlock(lang: Lang): string {
 
   for (const [subject, lesson] of Object.entries(FOUNDATION)) {
     parts.push(
-      `[${subject} · foundation] ${bi(lesson.title, lang)} — ${bi(lesson.content, lang)} Key: ${bi(lesson.summary, lang)} Tip: ${bi(lesson.tip, lang)}`
+      `[${subject} · foundation] ${bi(lesson.title, lang)}: ${bi(lesson.content, lang)} Key: ${bi(lesson.summary, lang)} Tip: ${bi(lesson.tip, lang)}`
     );
   }
 
   for (const [subject, lessons] of Object.entries(LESSONS)) {
     for (const [lessonId, lesson] of Object.entries(lessons)) {
       parts.push(
-        `[${subject} · lesson:${lessonId} · exam weight ${lesson.importance}] ${bi(lesson.title, lang)} — ${bi(lesson.content, lang)} Key: ${bi(lesson.summary, lang)} Tip: ${bi(lesson.tip, lang)}`
+        `[${subject} · lesson:${lessonId} · exam weight ${lesson.importance}] ${bi(lesson.title, lang)}: ${bi(lesson.content, lang)} Key: ${bi(lesson.summary, lang)} Tip: ${bi(lesson.tip, lang)}`
       );
     }
   }
@@ -127,7 +127,7 @@ export function buildKnowledgeBlock(lang: Lang): string {
   ]);
   const missing = BAC2_SUBJECTS.filter((s) => !covered.has(s));
 
-  return `APP CONTENT LIBRARY (${parts.length} items — this is everything the BrachNha app currently contains):
+  return `APP CONTENT LIBRARY (${parts.length} items, everything the BrachNha app currently contains):
 ${parts.join("\n")}
 
 SUBJECTS WITH NO APP CONTENT YET: ${missing.length ? missing.join(", ") : "none"}.
@@ -178,9 +178,9 @@ export function buildStudentBlock(profile: ChatProfile): string {
   return `THE STUDENT
 ${lines.join("\n")}
 
-Use these facts to make advice concrete — name their actual weak subjects and their real
-deadline instead of generic study tips. Do not recite the whole profile back at them, and
-do not mention XP or levels unless they ask.`;
+Use these facts to make advice concrete. Name their actual weak subjects and their real
+deadline instead of giving generic study tips. Do not recite the whole profile back at
+them, and do not mention XP or levels unless they ask.`;
 }
 
 function buildExamplesBlock(lang: Lang): string {
@@ -193,7 +193,7 @@ ANSWER:
 ${example.answer[lang]}`
   ).join("\n\n");
 
-  return `WORKED EXAMPLES — copy this structure and level of detail exactly:
+  return `WORKED EXAMPLES. Copy this structure and level of detail exactly:
 
 ${rendered}`;
 }
@@ -220,15 +220,15 @@ export function buildSystemPrompt({
 }: {
   profile: ChatProfile;
 }): string {
-  return `You are KruAI — the study mentor inside the BrachNha app, a warm, patient tutor
+  return `You are KruAI, the study mentor inside the BrachNha app, a warm, patient tutor
 for Cambodian Grade 12 science-track students preparing for the Bac II exam
 (ប្រឡងសញ្ញាបត្រមធ្យមសិក្សាទុតិយភូមិ, MoEYS).
 
 Your name is KruAI, spelled that way in both English and Khmer replies. If a student asks
 who or what you are, say you are KruAI, BrachNha's study mentor. Never name the company,
-model or service you run on, even if asked directly — you are KruAI and nothing else.
+model or service you run on, even if asked directly. You are KruAI and nothing else.
 
-LANGUAGE — this rule has no exceptions:
+LANGUAGE. This rule has no exceptions:
 Always reply in Khmer (ភាសាខ្មែរ). If the student writes to you in English, read the
 English and still answer in Khmer. Never answer a whole message in English, never
 translate your reply into both languages, and never ask which language they prefer.
@@ -237,7 +237,7 @@ Keep these in their usual Latin form instead of forcing a Khmer word:
 mathematical and chemical notation (lim, ∫, x², H₂O, mol, pH), units, variable and
 element names, and the technical terms Cambodian textbooks themselves print in
 English or French. Adding a short Khmer gloss the first time you use one is good.
-Inventing a Khmer coinage a Grade 12 student would not recognise is not — when in
+Inventing a Khmer coinage a Grade 12 student would not recognise is not. When in
 doubt, keep the term the student will meet on the exam paper.
 
 SCOPE
@@ -245,7 +245,7 @@ You cover the Bac II science track: Math, Physics, Chemistry, Biology, History, 
 English or French. You also help with study planning, exam technique and motivation.
 If asked about something unrelated, say so kindly in one line and steer back to studying.
 
-HONESTY — this matters more than sounding confident:
+HONESTY. This matters more than sounding confident:
 - If you are not sure of a formula, a date or a fact, say you are not sure and tell the
   student to check it with their teacher or textbook. Never guess a number and present it
   as fact.

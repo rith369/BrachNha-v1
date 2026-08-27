@@ -81,6 +81,34 @@ export function ProfileView() {
           </div>
         </div>
       )}
+
+      {/*
+        LOAD-BEARING, NOT DECORATION. The subject illustrations in
+        public/subjects/ are Freepik free-licence downloads, and that licence
+        grants the right to use them ONLY on condition of a visible credit
+        naming Freepik and linking to freepik.com. Delete this line and the app
+        is using seven images with no licence behind them.
+
+        The string "Designed by Freepik" and the link target are the licence's
+        wording, not ours — do not translate or reword them. The small label in
+        front of it is ours, so it follows the app's language.
+
+        It can go only if the artwork does: swapping in attribution-free art
+        (unDraw, Pixabay, Pexels) or re-downloading these under a Freepik
+        premium subscription would both remove the requirement. See
+        design/subjects.md.
+      */}
+      <div className="pt-2 pb-1 text-center text-[10px] font-semibold text-muted">
+        {lang === "en" ? "Illustrations: " : "រូបភាព៖ "}
+        <a
+          href="https://www.freepik.com"
+          target="_blank"
+          rel="noreferrer"
+          className="underline decoration-purple/40 underline-offset-2 hover:text-purple"
+        >
+          Designed by Freepik
+        </a>
+      </div>
     </div>
   );
 }

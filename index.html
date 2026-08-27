@@ -55,9 +55,9 @@
       same four variables in src/styles/globals.css. Preconnect matters here:
       the audience is on Cambodian mobile data, and it saves a round trip.
 
-      Battambang is not optional decoration — neither Nunito nor Space Grotesk
-      ships Khmer glyphs, so without it every Khmer string falls back to
-      whatever the device happens to have.
+      Noto Sans Khmer is not optional decoration — neither Nunito nor Space
+      Grotesk ships Khmer glyphs, so without it every Khmer string falls back
+      to whatever the device happens to have.
 
       Only the three faces that appear on EVERY screen are requested here, and
       this link blocks first paint, so what is in it is load-bearing:
@@ -70,21 +70,11 @@
         zero font-black usages, so the top of the axis was never rendered.
         A narrowed RANGE, not a discrete weight list: one variable file is
         smaller than four static instances of the same family.
-      - Battambang is `400;700`, a discrete LIST — the exact opposite of the
-        Nunito rule above, and deliberately so. There is no variable Battambang;
-        the family is statics only, so `400..700` would resolve to the same two
-        files while implying an axis that does not exist. Don't "fix" it to
-        match Nunito.
-
-        Two weights, not one, is the whole reason this is Battambang rather than
-        Siemreap — see the font section in CLAUDE.md. 400 and 700 are both real
-        faces, so the ~373 font-semibold/bold/extrabold sites in the app render
-        Khmer bold properly instead of having the browser stretch the regular.
     -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Nunito:wght@400..800&family=Space+Grotesk:wght@500..700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400..800&family=Nunito:wght@400..800&family=Space+Grotesk:wght@500..700&display=swap"
       rel="stylesheet"
     />
   </head>

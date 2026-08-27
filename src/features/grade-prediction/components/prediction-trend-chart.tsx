@@ -45,7 +45,13 @@ export function PredictionTrendChart({
 
       <div className="h-36">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+          {/* margin.left: 0, width: 34 below — not the old -20/28 pair. That
+              combo left only ~8px for right-aligned Y-axis tick text, which
+              rendered fully off the card's left edge (confirmed by dumping the
+              chart's SVG: the numbers existed in the DOM, positioned at x=0
+              with the whole -20 margin behind them). See the identical fix and
+              full explanation in weekly-activity-chart.tsx. */}
+          <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid vertical={false} stroke="var(--color-chart-grid)" />
             <XAxis
               dataKey="week"
@@ -58,7 +64,7 @@ export function PredictionTrendChart({
               tick={{ fontSize: 10, fontWeight: 700, fill: "var(--color-muted)" }}
               axisLine={false}
               tickLine={false}
-              width={28}
+              width={34}
             />
             <Tooltip
               contentStyle={{

@@ -17,6 +17,189 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 27 Aug 2026 — Mock Exam is now split into past papers and practice papers
+
+*Not yet committed.*
+
+**Why.** The Mock Exam tab was a single "start the exam" button over one fixed
+10-question practice set. It had nowhere to put real past exam papers. It is now
+organised the same way the Study page was, so the real Bac II papers have a home
+to arrive into.
+
+**What changed.**
+
+- **Two tabs.** *វិញ្ញាសារឆ្នាំចាស់* (past-year papers) is the new default. *វិញ្ញាសារបង្កើតថ្មី*
+  holds the practice exam that was already there — same questions, same scoring,
+  same history. Nothing was removed.
+- **Past papers are browsed by year, then by subject.** A row of exam-session
+  chips across the top (២០២៥ down to ២០២១) and, under each, one card per subject
+  with a picture, its name and a *តេស្ត* button.
+- **Every past paper is empty right now, and that is on purpose.** The screen is
+  built and waiting; the questions come from you. A paper with no content yet
+  shows a *ឆាប់ៗនេះ* ("coming soon") tag, and tapping *តេស្ត* says the content is
+  being prepared rather than doing nothing. **When you send the questions, they
+  drop straight in — the cards turn on by themselves, no redesign needed.**
+- **The page is in Khmer, always**, matching the Study page. The questions inside
+  an exam still follow the app's language toggle, as they always did.
+- **The page title is fixed.** In Khmer it used to read *ប្រឡងល្បិច*, which means
+  "trick exam" — a mistranslation. It now reads *វិញ្ញាសារត្រៀមប្រឡងបាក់ឌុប*, matching
+  the menu.
+- **A wrong subject label is fixed.** In the practice exam, physics and chemistry
+  questions were both labelled "Biology". They now show their own subject.
+
+**What to re-test.**
+
+1. Open Mock Exam. It should land on *វិញ្ញាសារឆ្នាំចាស់* with ២០២៥ selected. Tapping
+   a different year should change the heading and the cards under it.
+2. Tap *តេស្ត* on any card — a short "being prepared" note should appear under
+   that one card only.
+3. Switch to *វិញ្ញាសារបង្កើតថ្មី* and run the practice exam end to end. Your score,
+   your XP and the "previous results" list should behave exactly as before.
+4. **The important one:** start the practice exam, then press your browser's back
+   button. The menus and bottom bar must come back. (While an exam is running
+   they are deliberately hidden so nothing distracts you.)
+5. Check the page in dark mode and at a small phone width.
+
+**Worth knowing.** Past-paper attempts will be kept separate from practice-exam
+results — they will not be mixed into the "from mock exams" figure on the home
+screen, because a real past paper and a 10-question practice set are not the same
+thing. Past papers will earn XP just the same.
+
+---
+
+## 27 Aug 2026 — The Study page is now a grid of subject cards
+
+*Not yet committed.*
+
+**Why.** The Study page listed individual lessons as plain rows. That meant it grew a row
+every time a lesson was added, and a subject had no page presence of its own. Rebuilt to a
+supplied reference design so the page is ready for the real Grade 12 lesson content that
+is coming.
+
+**What changed.**
+
+- **Two tabs.** *មូលដ្ឋានគ្រឹះ* (Foundation) shows **only math, physics and chemistry**, as
+  requested. *មុខវិជ្ជា* shows all Grade 12 subjects — those three plus biology, history,
+  Khmer literature and whichever language was chosen at sign-up.
+- **Each subject is a card** with its name, a picture, a short description, and how many
+  lessons it holds with a rough total time. Cards stagger into two columns on a phone and
+  spread to three or four on a bigger screen.
+- **The page is in Khmer, always** — even if the app is switched to English. That was asked
+  for deliberately. The menu and tab bar around it still follow the language toggle, so in
+  English mode you will see English navigation around a Khmer page. That is expected.
+- **The streak counter** now appears at the top of the page, next to the title. It is your
+  real streak, not a placeholder.
+- **Every subject now has its own colour** — Math blue, Physics indigo, Chemistry teal,
+  History amber, Biology green, English red, French pink, Khmer orange. The card's tint,
+  border, icons and play button all follow it, so a student can recognise a subject by
+  colour before reading its name.
+
+**One adjustment to the colours you supplied, and why.** The eight hex values are perfect
+as *fills* — they are used exactly as given on the play button, a solid circle with a white
+arrow. But used as small text or small icons they were too pale to read: measured against
+the page background, all eight fell below the accessibility standard, some as low as
+2.1 against a required 4.5. So the small icons and text use a slightly deeper shade of the
+same colour, and dark mode uses a slightly lighter one. Same colour identity, readable in
+both themes. Every value was measured rather than eyeballed.
+
+**To change a picture later**, drop a replacement into `public/subjects/` named after the
+subject — `math.webp`, `physics.webp` and so on. It appears automatically with no further
+work. A subject with no file simply shows a coloured tile with its icon instead, so a
+missing picture never looks broken. `design/subjects.md` explains the naming and sizes.
+
+**Name the files in lowercase**, exactly matching the list in that document. The name is
+the only link between a file and its card, and a mismatch fails quietly — the card simply
+keeps its coloured tile rather than showing anything broken. So if a picture doesn't turn
+up, check the capitalisation first.
+
+**The images are WebP, and there is now a converter for them.** WebP is a modern picture
+format that is typically 25–35% smaller than PNG or JPG at the same quality, which matters
+on mobile data. Your stock art will arrive as PNG or JPG, so the project now has a script
+that converts it:
+
+```
+node scripts/webp.mjs art/*.png
+```
+
+That reads a folder of pictures, crops them to the right shape, resizes them, converts them
+to WebP and puts them straight into `public/subjects/`. It prints the size of every file
+before and after, and warns you if one comes out too big. Only one file per subject is
+needed — eight in total, not sixteen.
+
+**Please keep those images small — around 40 KB each.** This is the one thing that can
+quietly undo recent work: the app logo arrived at 431 KB and shrinking it was a large part
+of cutting the first load from 487 KB to 183 KB. Eight full-size stock illustrations would
+put that straight back. The converter warns you when a file goes over.
+
+**Most subjects say "ឆាប់ៗនេះ" (coming soon)** because they genuinely have no lessons yet —
+only math and biology do. Those cards are deliberately not tappable, so they cannot look
+broken by responding to a tap with nothing. As you supply lessons, the counts, the times
+and the play buttons appear on their own.
+
+**All eight subject pictures are now in**, totalling 199 KB for the whole set — less than
+the app sends before showing its first screen, and they only download when someone opens
+Study.
+
+**There is now one small credit line at the bottom of the Profile page**, reading
+*"រូបភាព៖ Designed by Freepik"*. It is there because the illustrations came from Freepik's
+free tier, and that free licence only permits using them if Freepik is credited somewhere
+visible. Without the line the app would be using the pictures with no permission behind
+them, which is the kind of thing that surfaces during funding or partnership checks.
+
+It is deliberately out of the way — not on the cards, not on the Study page — and no
+student is likely to notice it. **Please don't remove it while these pictures are in use.**
+If you would rather it were gone entirely, one month of Freepik Premium (around €12,
+cancellable straight after) permanently licenses whatever you download during it with no
+credit required, and the line can then come out.
+
+**Two notes on the French picture.** Its original file has "designed by freepik.com"
+printed across the bottom; the way the picture is cropped for the card removes it, so it
+is not visible in the app. It is also a greeting-card design rather than a study
+illustration — it has placeholder nonsense text on it and is about Paris rather than
+learning French. Too small to read on the card, but worth swapping if French ever becomes
+a real option for students.
+
+**No lesson content was written or deleted** — that is yours to provide. The existing
+biology foundation lesson was left in place.
+
+**What to re-test.** Open Study, switch between both tabs, and tap a subject that has
+lessons (គណិតវិទ្យា or ជីវវិទ្យា) to check it opens. Check both light and dark, and check a
+narrow phone. Then switch the app to English and confirm the Study page stays in Khmer.
+
+---
+
+## 26 Aug 2026 — Score Trend replaced with a Weekly Learning Activity chart
+
+*Not yet committed.*
+
+**Why.** Asked to rebuild the Score Trend chart on the Progress page to match a specific
+reference design exactly — not just borrow its style. The reference was a whole different
+card: a "Weekly Learning Activity" chart with an icon badge, a toggle between XP Points
+and Study Hours, and a Mon–Sun week instead of a 4-week trend.
+
+**What changed.** The card is a new one, replacing Score Trend rather than restyling it:
+
+- **A small gradient icon badge** now sits next to the title, matching the reference.
+- **The toggle switches between XP Points and Study Hours** — two real things students
+  earn each day — instead of the old Score vs Target comparison. Each has its own scale
+  (XP runs 20–120, Study Hours runs in fractions of an hour), and the chart's numbered
+  gridlines adjust to whichever is showing.
+- **The chart now covers one week, Monday to Sunday**, instead of 4 calendar weeks.
+- **The gradient fill under the line and the bigger ring-style dots** carry over from the
+  first pass at this.
+- **The footer line reads "Highest productivity on Sat (120 XP)"** with a green dot, plus
+  a "+28% vs last week" badge in the corner — both update when you switch the toggle.
+- Fixed a pre-existing bug found while rebuilding this: **the numbers along the left side
+  of the chart (20, 45, 70…) were not showing at all**, on this chart and its Grade
+  Prediction sibling, cut off past the left edge of the card. That's now fixed everywhere
+  it applied.
+
+**What to re-test.** Open Progress, scroll to Weekly Learning Activity, and tap between
+XP Points and Study Hours — check the chart, the left-side numbers, and the footer line
+all update together. Check it in dark mode and on a phone-width screen.
+
+---
+
 ## 26 Aug 2026 — The Study Activity calendar on Progress now actually does something
 
 *Not yet committed.*
@@ -46,47 +229,6 @@ wired up to.
 squares — including ones near the left and right edges of the grid, to make sure the
 popup stays on-screen rather than running off the card. Check it in both light and dark,
 and on a phone-width screen.
-
----
-
-## 26 Aug 2026 — Khmer text now uses a Cambodian-made font
-
-*Not yet committed.*
-
-**Why.** The Khmer font in the app was Noto Sans Khmer — Google's neutral,
-international font. It is perfectly correct, but it is not what students actually
-read. Cambodian textbooks and printed exam papers use the KhmerOS family of fonts,
-so the app looked subtly foreign next to the material students study from.
-
-**What changed.** Khmer text is now set in **Battambang**, a KhmerOS font by the
-Cambodian type designer Danh Hong. Free to use, and much closer in feel to printed
-Khmer. English text is unchanged — it still uses Nunito and Space Grotesk exactly
-as before. Only Khmer letters moved.
-
-**A note on which font we picked.** The request was for **Khmer OS Siemreap**
-specifically. We tried to use it and hit a real problem: Siemreap is published in
-one weight only — regular. It has no bold. The app has roughly 373 places where
-text is bold or semi-bold (nearly every heading, button, score, name and nav
-label), and with no real bold available the browser has to *fake* it by
-artificially thickening the regular letters. Khmer stacks its vowel marks above
-and its subscript consonants below each letter, packed tightly, so fake bold
-smears those marks together — worst exactly where the app uses small text, like
-the bottom nav labels and the stat chips.
-
-Battambang is by the same designer, from the same KhmerOS family, with the same
-traditional printed look — but it ships a **real bold**. So bold Khmer is properly
-drawn rather than stretched. If Siemreap specifically is a firm requirement, say
-so and we can revisit, but it means accepting the smeared bold everywhere.
-
-**The one trade-off.** Battambang comes as two separate files (regular and bold)
-where the old font was a single file covering every weight, so first load pulls
-about **19KB more**. Small, but worth naming given many students are on mobile
-data. It only affects the very first visit; after that it is cached.
-
-**What you need to know.** Nothing to do — but if you have the site open on your
-phone, do a hard refresh so the new font loads. Worth a look on a real phone in
-Khmer: check that nothing looks cramped or clipped in the small labels along the
-bottom bar and in the score chips on the Home page.
 
 ---
 

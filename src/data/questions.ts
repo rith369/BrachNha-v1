@@ -82,7 +82,7 @@ export const QUOTES: Record<Lang, string[]> = {
     "The expert in anything was once a beginner.",
     "Study hard now, celebrate later!",
     "Your future self will thank you for today's effort.",
-    "Don't watch the clock; do what it does — keep going!",
+    "Don't watch the clock; do what it does. Keep going!",
     "A little progress each day adds up to big results.",
   ],
   km: [
@@ -91,6 +91,6 @@ export const QUOTES: Record<Lang, string[]> = {
     "ប្រឹងឥឡូវ អបអរពេលក្រោយ!",
     "ខ្លួនឯងអនាគតនឹងថ្លែងអំណរគុណ។",
     "រីកចម្រើនតិចៗប្រចាំថ្ងៃ នាំឲ្យលទ្ធផលធំ!",
-    "កុំមើលនាឡិកា ធ្វើអ្វីដែលវាធ្វើ — បន្ត!",
+    "កុំមើលនាឡិកា ធ្វើអ្វីដែលវាធ្វើ។ បន្តទៅមុខ!",
   ],
 };

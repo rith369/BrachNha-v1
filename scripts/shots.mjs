@@ -54,6 +54,7 @@ const ROUTES = [
   { name: "home", path: "/" },
   { name: "lessons", path: "/lessons" },
   { name: "lesson-detail", path: "/lessons/math-limits" },
+  // /exam now has two tabs and lands on the past-papers one.
   { name: "exam", path: "/exam" },
   { name: "progress", path: "/progress" },
   { name: "game", path: "/game" },
@@ -61,12 +62,20 @@ const ROUTES = [
   { name: "leaderboard", path: "/leaderboard" },
   { name: "roadmap", path: "/roadmap" },
   { name: "profile", path: "/profile" },
+  // Tab B of /exam. Ordinary navigation is still on screen here — this is
+  // NOT a focus route; only the running exam below is.
+  {
+    name: "exam-generated",
+    path: "/exam",
+    clicks: ['button:has-text("វិញ្ញាសារបង្កើតថ្មី")'],
+  },
 
   // ── focus mode: nav must be gone on all of these ──
   // Scoped to `button:has-text`, NOT a bare `text=`: both screens show their
   // title and their CTA with the same words, and a bare text selector picks the
   // heading (a div), so the click silently does nothing and the shot is of the
-  // intro screen.
+  // intro screen. Still true now that the exam CTA is Khmer: the generated-exam
+  // card renders the same words as a heading div AND as the button.
   {
     name: "focus-lesson-content",
     path: "/lessons/math-limits",
@@ -75,7 +84,7 @@ const ROUTES = [
   {
     name: "focus-exam",
     path: "/exam",
-    clicks: ['button:has-text("Start Mock Exam")'],
+    clicks: ['button:has-text("វិញ្ញាសារបង្កើតថ្មី")', 'button:has-text("ចាប់ផ្តើមប្រឡង")'],
   },
   { name: "focus-placement", path: "/placement-test/math" },
 ];

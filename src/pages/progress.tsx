@@ -1,5 +1,5 @@
 import { ScoreHero } from "@/features/progress/components/score-hero";
-import { ScoreTrendChart } from "@/features/progress/components/score-trend-chart";
+import { WeeklyActivityChart } from "@/features/progress/components/weekly-activity-chart";
 import { SubjectBarChart } from "@/features/progress/components/subject-bar-chart";
 import { SubjectBreakdown } from "@/features/progress/components/subject-breakdown";
 import { FocusAreas } from "@/features/progress/components/focus-areas";
@@ -31,7 +31,7 @@ export default function ProgressPage() {
           <div className="md:col-span-2">
             <ScoreHero />
           </div>
-          <ScoreTrendChart />
+          <WeeklyActivityChart />
           <SubjectBarChart />
           {/* SubjectBreakdown grows with the number of subjects (up to 7 rows)
               and has no naturally similar-height neighbour left to pair with,

@@ -32,52 +32,23 @@ warning it carried still stands: do not copy Next.js-specific patterns back in.
 | **KaTeX** | ✅ Use | Typesets both sides of the KruAI conversation. Pulled in through a lazy import of `ChatOverlay` so its JS and web fonts stay out of the first-paint bundle |
 | **MathLive** | ✅ Use | The math keyboard and formula editor in the chat composer, replacing ~570 lines of hand-built Unicode keyboard. Lazy-imported one level deeper than KaTeX — see the mentor section below, the boundary is load-bearing |
 | **Zustand (+ persist)** | ✅ Use | Single global store; replaces scattered `useState` + manual localStorage |
-| **Google Fonts via `<link>` in `index.html`** | ✅ Use | Nunito = body, Space Grotesk = headings, Battambang = every Khmer glyph, Caveat = typed signature only. See the font note below — it matters |
+| **Google Fonts via `<link>` in `index.html`** | ✅ Use | Nunito = body, Space Grotesk = headings, Noto Sans Khmer = every Khmer glyph, Caveat = typed signature only. See the font note below — it matters |
 
 ### Fonts: the one thing you must not "simplify"
 
 `next/font/google` used to self-host these and inject four CSS variables. Now
 `index.html` loads them from Google Fonts and `src/styles/globals.css` defines
 the same four variables (`--font-nunito`, `--font-space-grotesk`,
-`--font-khmer`, `--font-caveat`) by hand, which `@theme` then composes into
+`--font-noto-khmer`, `--font-caveat`) by hand, which `@theme` then composes into
 `--font-heading` / `--font-body` / `--font-signature`.
 
-`--font-khmer` is named for its **role**, not its family, and used to be
-`--font-noto-khmer` — which is precisely how it went stale the moment the face
-changed. Keep it role-named.
-
 Neither Nunito nor Space Grotesk nor Caveat ships Khmer glyphs — Khmer isn't
-even an available subset for them. Battambang sits as a **fallback** in each
-stack and the browser resolves it *per glyph*: Latin keeps Nunito, Khmer picks
-up Battambang, and mixed strings like "មេរៀនគ្រឹះ & ទី១២" render correctly from
+even an available subset for them. Noto Sans Khmer sits as a **fallback** in
+each stack and the browser resolves it *per glyph*: Latin keeps Nunito, Khmer
+picks up Noto, and mixed strings like "មេរៀនគ្រឹះ & ទី១២" render correctly from
 one stack. **Removing that fallback silently breaks every Khmer string in the
 app.** Weights 400/600/700/800 only — `font-black` has zero usages, which is
 why Nunito is requested as `wght@400..800` and not `400..900`.
-
-**Why Battambang and not Khmer OS Siemreap — don't relitigate this.** The ask
-was Siemreap, which *is* on Google Fonts (OFL, Danh Hong of the KhmerOS project)
-and is what students see in printed MoEYS material. It ships **one weight, 400**.
-This app has ~373 `font-semibold`/`font-bold`/`font-extrabold` sites across 63
-files and nearly every string in them is bilingual, so a 400-only Khmer face
-hands all of them to the browser's synthetic bold — which on Khmer smears the
-coeng subscripts and vowel signs together at the `text-xs`/`text-sm` sizes the
-nav labels, stat pills and focus-mode kickers use. Battambang is the same
-designer, same OFL licence, same KhmerOS lineage and traditional printed feel,
-with **real 400 and 700 statics**. Per CSS font matching those cover the whole
-ladder without synthesis: 500 → 400, 600 → 700, 700 → 700, 800 → 700. Adding
-`font-synthesis-weight: none` would therefore be inert — don't.
-
-The cost, stated honestly: two static khmer-subset files (~40KB + ~38KB) against
-Noto's single variable one (~59KB), so **+19KB and one extra request on first
-paint**, on an audience on Cambodian mobile data. That is the price of real
-bold, and it was accepted deliberately. Battambang's `900` was considered and
-declined — another ~36KB, and Battambang Black beside Nunito 800 reads far
-heavier than the Latin half of the same string.
-
-Note the Khmer request is `wght@400;700`, a discrete **list** — the exact
-opposite of the Nunito rule below, because there is no variable Battambang.
-`400..700` would fetch the same two statics while implying an axis that doesn't
-exist.
 
 **`index.html`'s link carries THREE families, not four.** Caveat is fetched on
 demand by `src/lib/load-signature-font.ts`, called from `SignatureDisplay`'s
@@ -446,7 +417,7 @@ only, and DOM order is unchanged — e.g. Home still has the grade card between
 the installed Chrome through `playwright-core` — no browser download — seeds a
 logged-in profile into `localStorage` (that seed mirrors `partializeState`, so any
 new field that gates what a page renders has to be added to it or the screenshots
-quietly become of some other screen), then walks 10 routes × 9 widths
+quietly become of some other screen), then walks 11 routes × 9 widths (plus 3 click-driven states)
 (320/375/390/430/768/1024/1280/1440/1920), writes a PNG each and asserts nothing
 overflows. It separates **hard** failures (the page scrolls sideways, or an
 element juts past the viewport with no scrollable ancestor) from **soft** ones
@@ -479,9 +450,13 @@ differently:
   `/lessons` LIST stays an ordinary page with full navigation. Don't loosen that.
 - **Store** — `focusMode`, for the mock exam, where `/exam` is an ordinary
   destination (its intro screen shows past results) until the student actually
-  starts answering. `MockExam` sets it in an effect keyed on `started && !done`,
-  **with a cleanup that clears it** — without that, a browser-back out of a
-  running exam leaves the whole app with no navigation at all. It is excluded
+  starts answering. `ExamRunner` sets it in a **mount/unmount** effect — that
+  component is rendered if and only if a question is on screen, so mount means
+  focus on and unmount means focus off, with no condition to get wrong. (It
+  used to be keyed on `started && !done` inside a component that was ALSO
+  mounted for the intro and results screens.) **The cleanup is the load-bearing
+  half** — without it, a browser-back out of a running exam leaves the whole app
+  with no navigation at all. It is excluded
   from `partialize` for the same reason: a persisted `true` would strand a
   returning student on a screen with no way out.
 
@@ -619,12 +594,229 @@ stat pills, grade-prediction widget, lesson preview list, daily tasks (that
 order is what `pages/home.tsx` renders; the grade card sits between `StatPills`
 and `LessonPreviewList`).
 
-**Lessons** (`features/lessons`) — subject-grouped list + dynamic
+**Lessons** (`features/lessons`) — a two-tab grid of SUBJECT tiles + dynamic
 `/lessons/:lessonId` route with the full 7-step lesson flow (intro → content →
 flashcard flip → fun fact → did-you-know → quiz → completion).
 
-**Mock Exam** (`features/exam`) — intro/history screen, live question flow,
-results screen with conic-gradient score ring.
+### The Study page is subject-first, and Khmer-only
+
+`lessons-list.tsx` used to be a flat list of individual LESSONS — one compact row
+per lesson, assembled by hand from whatever happened to exist in
+`data/lessons.ts`. It grew a row per lesson and gave a subject no identity of its
+own. It is now a two-tab, staggered grid of subject tiles, which is the shape
+that survives real content arriving.
+
+**`features/lessons/subjects.ts` is the catalog** — id, Khmer name, blurb,
+accent, Lucide icon — plus the derivations. Four things there are load-bearing:
+
+- **`LESSONS_PAGE_LANG = "km"`. This page renders Khmer even when the app is set
+  to English**, and that is a product decision, not missing translation work —
+  the same call already made for KruAI, which always answers in Khmer whatever
+  the student typed (`ANSWER_LANG` in `utils/chat-prompt.ts`). Strings here are
+  Khmer literals, NOT `{ en, km }` pairs behind `T[lang]`. Don't "fix" them.
+  The constant exists so the decision is greppable and reversible in one edit.
+- **Lesson counts and durations are DERIVED, never authored.** `lessonCountFor()`
+  counts `LESSONS[id]`, so a card's number cannot drift from the content it
+  describes — the same reason `levelForCount()` replaced a hand-authored level in
+  `utils/activity-heatmap.ts`. `MINUTES_PER_LESSON` is one named constant rather
+  than eight fake per-subject numbers; replace it with real timings when lesson
+  content lands.
+- **The Foundation tab derives from `FOUNDATION_SUBJECTS`** (`utils/placement.ts`,
+  already exactly math/physics/chemistry and shared with the survey), rather than
+  hardcoding a second list that can drift. Note `FOUNDATION` in `data/lessons.ts`
+  still holds math + **biology**, which predates that constant; the biology entry
+  is unreferenced by this page but still reachable at `/lessons/biology-foundation`.
+- `english` and `french` are both in the catalog; `allSubjects()` renders whichever
+  `userLanguage` chose and drops the other.
+
+**Every subject has its OWN colour, and there are TWO scales per subject.** They
+are not drawn from the five shared brand accents any more — eight subjects
+cycling through five accents collided three times, and colour is useless as a
+subject cue if chemistry and Khmer are both mint. `SubjectMeta` therefore carries
+no `accent` field; the colour is keyed off `id`.
+
+The supplied palette is Tailwind-500 shades, which are designed as **fills**. As
+small text on `--color-bg` **all eight fail AA** (2.1:1 to 4.2:1), so the same
+split that governs `--brand-*` vs `--color-*` applies here, for the same reason —
+no single value clears AA in both roles:
+
+| token | theme-dependent? | correct for |
+| --- | --- | --- |
+| `--subject-{id}` | **no** — one value, both themes | a fill sitting under white text. Today: the play button, and only that |
+| `--color-subj-{id}` | **yes** — darkened light, lifted dark | small text, icons, borders, the `/8` card tints |
+
+Only `--color-subj-*` is mapped into `@theme`, which is what generates
+`bg-subj-math` / `text-subj-math` / `border-subj-math` with alpha. `--subject-*`
+is deliberately NOT mapped — it is referenced as a bare `var()` at its one use
+site so it cannot be reached by accident for text. Every value in both rows was
+measured; the ratios are recorded beside the tokens in `globals.css`.
+
+`subject-card.tsx`'s `SUBJECT` map spells all eight variants out because
+**Tailwind cannot see a class assembled at runtime** — `bg-subj-${id}` produces
+no CSS. Adding a subject means a row there, a pair of tokens in `globals.css`,
+and a `@theme` line.
+
+**Most subjects have NO lessons and that is the normal state today.** A subject
+with zero lessons renders as a plain `<div>`, dimmed, with a `ឆាប់ៗនេះ` chip and
+no play button — never a disabled `<Link>`. Same precedent as `sidebar-nav.tsx`'s
+`href: null` rows and the survey's `StudiedStep`: a control that answers a tap
+with silence reads as broken, so it must not look tappable.
+
+**The artwork slot needs no files to exist.** `SubjectArt` renders a single
+`<img>` at `/subjects/{id}.webp` on top of a gradient-plus-icon placeholder, and
+the `<img>` hides itself via `onError`. Without that handler a missing file
+paints the browser's broken-image glyph over the gradient.
+
+**WebP only here — deliberately NOT the `<picture>` + PNG pair `wordmark.tsx`
+uses.** That pair is right for the logo: one image, on every screen, where a
+second file is cheap insurance. Subjects are eight images, so a fallback means
+sixteen files to maintain for a format ~99% of handsets have supported for years
+(Android Chrome since 2014, iOS Safari since 14). A browser too old for WebP
+keeps the placeholder, which is a designed state rather than a failure.
+
+**The artwork is Freepik free-licence, and the credit line at the bottom of
+`features/profile/components/profile-view.tsx` is LOAD-BEARING.** That licence
+grants use only on condition of a visible credit, so deleting the line leaves
+eight images with no licence behind them. It looks exactly like removable
+clutter, which is why it carries a comment saying otherwise. It can go only when
+the artwork does — premium re-download or attribution-free replacements. Full
+provenance, including the fact that `french`'s source has a watermark the 4:3
+crop happens to remove, is in `design/subjects.md`.
+
+`design/subjects.md` carries the naming and the 40KB budget — it is in `design/`
+rather than beside the images because anything under `public/` is served, and a
+README there ships to production at `/subjects/README.md`. Eight
+stock-art files would undo the first-paint work recorded above.
+
+### `scripts/webp.mjs` — PNG/JPG → WebP
+
+Dev tooling, outside `src/` so it never bundles. **No image library was added**:
+it drives the Chrome `playwright-core` already provides for `shots.mjs` and
+encodes through a canvas, the same route the logo raster was made by (see
+`design/README.md`). Resolves Chrome with the same `CHROME_CANDIDATES` list.
+
+```bash
+node scripts/webp.mjs art/*.png                      # -> public/subjects/, 600x450
+node scripts/webp.mjs art/algebra.jpg --name math    # rename on the way out
+node scripts/webp.mjs logo.png --width 96 --square --out public/logo
+```
+
+Defaults (600px, 4:3, quality 0.82) match the subject cards: 600px is 2× the
+largest size a card ever draws, and the centred crop reproduces the card's own
+`object-cover` rather than fighting it. It **warns** rather than fails over the
+40KB budget — a deliberately detailed illustration may justify it, but it should
+be a decision. `--square --width 96` reproduces the logo raster.
+
+**Two deliberate departures from the reference design**, both because this is a
+bottom-nav tab inside existing chrome rather than a standalone screen: there is
+**no back arrow** (you don't go back from a tab), and the **streak chip is not
+top-right** — `TopBar`'s floating hamburger already owns `absolute top-3 right-4`,
+so the header keeps the app's title-left + `pr-14` convention with the streak
+inside that reserved space.
+
+**The grid is `columns-2 md:columns-3 lg:columns-4`, not a grid** — the staggered
+look comes from cards of differing height flowing into balanced columns, which is
+what CSS multi-column does natively and `grid` does not. Cards need
+`break-inside-avoid` or they slice across the column boundary. **Two columns at
+phone width is a deliberate exception** to the `grid-cols-1 md:grid-cols-2` rule:
+that rule protects dense stat cards needing ~288px, while these are image tiles
+that read fine at ~144px. 320px is the floor and is checked. The accent tints are
+the `/8` scale, correct in both themes with no `dark:` override — see the
+two-accent-scale note.
+
+**Mock Exam** (`features/exam`) — a two-tab screen; see its own section below.
+
+### The Mock Exam page is two tabs over one subject catalog
+
+`/exam` was a single "start the 10-question mock exam" card plus the last three
+results. It is now **វិញ្ញាសារឆ្នាំចាស់** (real MoEYS past papers, browsed by exam
+session then by subject) and **វិញ្ញាសារបង្កើតថ្មី** (that original flow, unchanged),
+built on the same pieces as the Study page so the two screens cannot drift.
+
+**KHMER-ONLY, behind `EXAM_PAGE_LANG` in `features/exam/papers.ts`** — the same
+decision as `LESSONS_PAGE_LANG` and KruAI's `ANSWER_LANG`. It governs the exam
+feature's own copy and has **two carve-outs that are not oversights**: question
+text (`q.q[lang]`) and the runner's subject kicker stay bilingual, because that
+is authored data shared with the placement test and `MOCK_QS`'s km column is
+visibly abbreviated against its en; and `FocusLayout`'s exit-confirm stays
+`lang`-driven because it is shared with the lesson flow and must not read Khmer
+on the exam and English on a lesson in the same session. The now-unused
+`t.mockExam` / `t.startMockExam` / `t.examScore` / `t.retakeExam` /
+`t.bacReadiness` / `t.examInstructions` keys were deliberately **left in**
+`translations.ts` so the decision stays reversible in one edit. (`t.mockExam`'s
+Khmer was `ប្រឡងល្បិច`, "trick exam" — a mistranslation this change retires.)
+
+**Past papers are DERIVED, never authored.** `data/past-papers.ts` holds
+`PAST_PAPER_YEARS` and a `PAST_PAPER_QUESTIONS` record keyed `"{year}-{subjectId}"`
+that is **empty today, and that is the normal state**. `papersForYear()` builds
+one paper per subject from `allSubjects(userLanguage)` — so a session is 7 cards,
+not 8 — and looks the questions up. Filtering to subjects that *have* content
+would render zero cards, and zero cards is not a screen. The payoff: dropping one
+entry into that record turns a card on, and `paper.questions.length === 0` in
+`PastPapersPanel.handleTest` is the only line whose behaviour changes. Don't add
+an authored question count (it's `questions.length`) or a duration (there is no
+timer, and a "១៨០ នាទី" label on an untimed paper is the scrapped
+placement-scheduling failure again). `data/past-papers.ts` imports nothing from
+`features/`; the typed `paperKey()` lives in `features/exam/papers.ts`.
+
+**The `តេស្ត` button stays tappable on an empty paper** — a deliberate departure
+from this app's dim-and-don't-tap precedent (`sidebar-nav.tsx`'s `href: null`
+rows, the survey's `StudiedStep`, `subject-card.tsx`'s zero-lesson tile). It was
+chosen: the tap is not silent, it explains itself, and the `ឆាប់ៗនេះ` chip means
+the state is legible **without** tapping — the same principle as `studiedNote`
+being rendered unconditionally. The button's two looks carry the real signal:
+neutral outline pill while pending, subject fill under white text once the paper
+has questions. Every paper is pending today, so the screen matches the reference
+design now and gains the distinction for free later.
+
+**The banner holds its CROP RATIO, not its height** (`aspect-[11/4] max-h-44`).
+The card triples in width from 288px to the 672px content cap, so a fixed height
+meant a 2.8:1 band on a phone and a 5.25:1 slot on a laptop — and the art is 4:3,
+so that wide a crop decapitated every illustration. It still needs no internal
+breakpoint: the ratio does the work one would. `max-h-44` stops the banner
+ballooning into a hero image that fits one card per laptop screen.
+
+**Three pieces were extracted so Study and Exam share them rather than drift:**
+
+| moved to | what | why there |
+| --- | --- | --- |
+| `features/lessons/subject-styles.ts` | the 8-row `SUBJECT_STYLE` map | `.ts`, not `.tsx` — a non-component export from a `.tsx` trips oxlint's `only-export-components`, the rule `utils/focus-styles.ts` exists for |
+| `features/lessons/components/subject-art.tsx` | `SubjectArt` + its `onError` hide | takes a `className` that overrides shape only; `cn()` is `twMerge`, so the override wins |
+| `components/ui/underline-tabs.tsx` | `UnderlineTabs<T>` | generic over the id so both callers keep their literal union; `subject-tabs.tsx` is deleted |
+
+They live under `features/lessons`, **not** `components/ui/`: that directory holds
+primitives with zero domain knowledge, and both are keyed on `SubjectId` and know
+the `/subjects/{id}.webp` convention. Cross-feature import precedent is Profile
+reusing Home's `StatPills`. Artwork is reused from `/subjects/` rather than a new
+`/exams/` set — one crop of one file, not sixteen files to keep in step.
+
+**`ExamRunner` performs no store writes.** It reports out through
+`onSubmit({score,total,pct})` and `ExamView` decides what the attempt counted as
+— the shape `PlacementTestRunner` already uses, and what keeps "which attempts
+land in `examResults`" one readable branch. It also fixes a real bug: the kicker
+was `q.subj === "math" ? t.math : t.biology`, which labelled every physics and
+chemistry question "Biology". It is now `t[q.subj]`, which typechecks with no
+cast because all four `MockExamSubject` values are already translation keys.
+
+**`ExamView` owns its own frame**, unlike the Study page where `pages/lessons.tsx`
+supplies the padding, because the two branches need different frames: the tabbed
+and results screens want a padded scroller, the runner brings `FocusLayout`'s and
+must not be nested inside a second one — which `pages/exam.tsx` had been doing.
+Single column at every width, `max-w-2xl` throughout: this is a reading-and-
+answering screen, the page must not have two widths per tab, halving a *wide
+banner* card defeats it, and 7 cards is odd so a 2-column last row would hole.
+
+`ExamQuestion` (in `types/`) is `MockExamQuestion` with `subj` made optional, and
+`MockExamQuestion extends` it with `subj` required. A past paper is one subject
+end to end and labels the paper, and `MockExamSubject` cannot express a Khmer or
+History paper — which the catalog has cards for.
+
+**Two follow-ups, deliberately not done here:** a separate persisted
+`pastPaperResults` so Tab A grows its own history, and feeding past papers into
+`buildKnowledgeBlock` / `BAC2_EXAMPLES` once content exists. The second edit is
+also the right moment to fix the known `no-useless-escape` backslash bug in
+`BAC2_ANSWER_RULES`, which needs an answer-quality re-test rather than a silent
+change.
 
 **Roadmap** (`features/roadmap`) — target grade/hours card, a "Pending Placement
 Tests" card (only rendered for pending tests that **have a date** — an undated
@@ -1016,7 +1208,13 @@ for when questions exist.
 Placement-test attempts
 never write into `examResults`/`addExamResult` — that array feeds Home's stat
 pill captioned "from mock exams", and folding placement attempts in would make
-that caption wrong.
+that caption wrong. **Past-paper attempts are excluded for the same reason and
+two more**: `chat-prompt.ts` derives "average mock-exam percentage" from that
+array and states it to KruAI as a fact about the student, and the generated-exam
+tab renders it UNFILTERED as "Previous Results" — so a past-paper attempt would
+surface under the wrong tab on the same screen. XP *is* awarded for both. When
+past papers deserve a history of their own it should be a separate persisted
+field, not a widening of this one.
 
 **Progress, Game, Grade Prediction and Leaderboard intentionally use fake, fixed
 demo data** (`features/*/demo-data.ts`), not live store data. An explicit user

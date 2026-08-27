@@ -103,11 +103,26 @@ export interface PracticeQuestion {
   explanation: { en: string; km: string };
 }
 
-export interface MockExamQuestion {
-  subj: "math" | "biology" | "chemistry" | "physics";
+export type MockExamSubject = "math" | "biology" | "chemistry" | "physics";
+
+/**
+ * One multiple-choice question in an exam.
+ *
+ * `subj` is OPTIONAL here because a past paper is ONE subject end to end and
+ * carries its label on the paper rather than repeating it per question — and
+ * MockExamSubject cannot express a Khmer or History paper anyway, which the
+ * past-paper catalog has entries for.
+ */
+export interface ExamQuestion {
+  subj?: MockExamSubject;
   q: { en: string; km: string };
   correct: string;
   options: string[];
+}
+
+/** A question in the generated mock exam, where the subject is always known. */
+export interface MockExamQuestion extends ExamQuestion {
+  subj: MockExamSubject;
 }
 
 // A worked past-paper answer, used as a few-shot example in KruAI's

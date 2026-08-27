@@ -24,13 +24,33 @@ export const miniMetrics = [
   { label: "XP Earned", value: "1,240", color: "text-yellow" },
 ];
 
-// Weekly average score over 4 weeks, trending toward this month's 83%.
-export const scoreTrend = [
-  { week: "Wk 1", score: 58, target: 75 },
-  { week: "Wk 2", score: 64, target: 75 },
-  { week: "Wk 3", score: 71, target: 75 },
-  { week: "Wk 4", score: 83, target: 75 },
+export interface DailyActivity {
+  day: string;
+  xp: number;
+  /** Study time, in hours, to one decimal place. */
+  hours: number;
+}
+
+// One week, Mon..Sun, both metrics WeeklyActivityChart's toggle can show.
+export const weeklyActivity: DailyActivity[] = [
+  { day: "Mon", xp: 20, hours: 0.5 },
+  { day: "Tue", xp: 45, hours: 1.2 },
+  { day: "Wed", xp: 35, hours: 0.8 },
+  { day: "Thu", xp: 70, hours: 1.8 },
+  { day: "Fri", xp: 85, hours: 2.2 },
+  { day: "Sat", xp: 120, hours: 3.0 },
+  { day: "Sun", xp: 100, hours: 2.5 },
 ];
+
+// The chart's footer compares this week to LAST week — a week that, unlike
+// "Highest productivity", was never plotted, so there's nothing in
+// weeklyActivity to derive it from. Fixed, same idiom as
+// overallReadiness.change above, rather than fabricated data for a week that
+// doesn't exist on screen.
+export const weeklyActivityChangePct: Record<"xp" | "hours", number> = {
+  xp: 28,
+  hours: 15,
+};
 
 export const questionsPerSubject = [
   { subject: "Math", value: 98, color: "var(--color-purple)" },

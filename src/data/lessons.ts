@@ -19,8 +19,8 @@ export const LESSONS: Record<string, Record<string, Lesson>> = {
         km: "លីមីតត្រូវបានបង្កើតឡើងឲ្យគណិតវិទូអាចចែកដោយសូន្យ... ប៉ុន្តែឲ្យមានសុវត្ថិភាព!",
       },
       tip: {
-        en: "Always check left and right limits — they might not match!",
-        km: "ពិនិត្យលីមីតខាងឆ្វេងនិងស្តាំ — ពួកវាប្រហែលជាមិនដូចគ្នា!",
+        en: "Always check left and right limits. They might not match!",
+        km: "ពិនិត្យលីមីតខាងឆ្វេងនិងស្តាំ។ ពួកវាប្រហែលជាមិនដូចគ្នា!",
       },
     },
     probability: {
@@ -36,12 +36,12 @@ export const LESSONS: Record<string, Record<string, Lesson>> = {
         km: "P(ព្រឹត្តិការណ៍) = អំណោយផល / សរុប។ ប្រើដ្យាក្រាមដើមឈើ។",
       },
       funFact: {
-        en: "Flipping heads 10 times doesn't make tails more likely — each flip is independent!",
+        en: "Flipping heads 10 times doesn't make tails more likely. Each flip is independent!",
         km: "បោះក្បាល 10 ដងមិនធ្វើឲ្យកន្ទុយមានលទ្ធភាពច្រើននោះទេ!",
       },
       tip: {
-        en: "Draw tree diagrams — much faster and you won't miss cases!",
-        km: "គូរដ្យាក្រាមដើមឈើ — រហ័សជាង!",
+        en: "Draw tree diagrams. Much faster, and you won't miss cases!",
+        km: "គូរដ្យាក្រាមដើមឈើ។ រហ័សជាង!",
       },
     },
   },
@@ -63,8 +63,8 @@ export const LESSONS: Record<string, Record<string, Lesson>> = {
         km: "ក្រពះរបស់អ្នកទទួលស្រទាប់ថ្មីរៀងរាល់ 3-4 ថ្ងៃ!",
       },
       tip: {
-        en: "Draw body system diagrams with different colors — much easier to remember!",
-        km: "គូរដ្យាក្រាមជាមួយពណ៌ផ្សេងៗ — ងាយចងចាំ!",
+        en: "Draw body system diagrams with different colors. Much easier to remember!",
+        km: "គូរដ្យាក្រាមជាមួយពណ៌ផ្សេងៗ។ ងាយចងចាំ!",
       },
       didYouKnow: {
         en: "You have the same number of neck bones as a giraffe: 7 cervical vertebrae!",
@@ -82,28 +82,28 @@ export const LESSONS: Record<string, Record<string, Lesson>> = {
       importance: "70%",
       icon: "🧠",
       content: {
-        en: `The brain is the control centre of the nervous system. It weighs about 1.4 kg — roughly 2% of body weight — yet uses around 20% of the body's energy. It holds an estimated 86 billion neurons, and it is protected by the skull, by three membranes called the meninges, and by cerebrospinal fluid that cushions it against shock.
+        en: `The brain is the control centre of the nervous system. It weighs about 1.4 kg, roughly 2% of body weight, yet uses around 20% of the body's energy. It holds an estimated 86 billion neurons, and it is protected by the skull, by three membranes called the meninges, and by cerebrospinal fluid that cushions it against shock.
 
-1. CEREBRUM — the largest part. It is split into left and right hemispheres joined by the corpus callosum, and its deeply folded surface increases the area that fits inside the skull. Each hemisphere has four lobes: the frontal lobe (thinking, planning, decisions, voluntary movement), the parietal lobe (touch, temperature, pain), the temporal lobe (hearing, language, memory) and the occipital lobe (vision). Note that each hemisphere controls the OPPOSITE side of the body.
+1. CEREBRUM: the largest part. It is split into left and right hemispheres joined by the corpus callosum, and its deeply folded surface increases the area that fits inside the skull. Each hemisphere has four lobes: the frontal lobe (thinking, planning, decisions, voluntary movement), the parietal lobe (touch, temperature, pain), the temporal lobe (hearing, language, memory) and the occipital lobe (vision). Note that each hemisphere controls the OPPOSITE side of the body.
 
-2. CEREBELLUM — sits below and behind the cerebrum. It does not start movement; it refines it. It controls balance, posture and the smooth coordination of muscles. Damage here causes unsteady, jerky movement rather than paralysis.
+2. CEREBELLUM: sits below and behind the cerebrum. It does not start movement; it refines it. It controls balance, posture and the smooth coordination of muscles. Damage here causes unsteady, jerky movement rather than paralysis.
 
-3. BRAIN STEM — connects the brain to the spinal cord, and is made of the midbrain, the pons and the medulla oblongata. It runs the automatic functions you never think about: breathing, heart rate, blood pressure, swallowing, and reflexes such as coughing. Because it controls breathing and heartbeat, damage to the brain stem is life-threatening.
+3. BRAIN STEM: connects the brain to the spinal cord, and is made of the midbrain, the pons and the medulla oblongata. It runs the automatic functions you never think about: breathing, heart rate, blood pressure, swallowing, and reflexes such as coughing. Because it controls breathing and heartbeat, damage to the brain stem is life-threatening.
 
-THE NEURON — the brain's working unit. A neuron has dendrites that receive signals, a cell body (soma) holding the nucleus, and one long axon that carries the signal away. Most axons are wrapped in a fatty myelin sheath, which insulates the fibre and makes the impulse travel far faster.
+THE NEURON: the brain's working unit. A neuron has dendrites that receive signals, a cell body (soma) holding the nucleus, and one long axon that carries the signal away. Most axons are wrapped in a fatty myelin sheath, which insulates the fibre and makes the impulse travel far faster.
 
-THE SYNAPSE — neurons never actually touch. At the synapse there is a tiny gap. When the electrical impulse reaches the axon terminal it releases chemical neurotransmitters, which cross the gap and pass the signal to the next neuron. So the signal is electrical ALONG a neuron and chemical BETWEEN neurons — a point Bac II papers ask about often.`,
+THE SYNAPSE: neurons never actually touch. At the synapse there is a tiny gap. When the electrical impulse reaches the axon terminal it releases chemical neurotransmitters, which cross the gap and pass the signal to the next neuron. So the signal is electrical ALONG a neuron and chemical BETWEEN neurons. Bac II papers ask about this often.`,
         km: `ខួរក្បាលគឺជាមជ្ឈមណ្ឌលបញ្ជានៃប្រព័ន្ធសរសៃប្រសាទ។ វាមានទម្ងន់ប្រហែល 1.4 គីឡូក្រាម គឺប្រហែល 2% នៃទម្ងន់រាងកាយ ប៉ុន្តែប្រើថាមពលរបស់រាងកាយដល់ទៅ 20%។ វាមានណឺរ៉ូន (neuron) ប្រហែល 86 ពាន់លាន ហើយត្រូវបានការពារដោយលលាដ៍ក្បាល ស្រទាប់ស្រោមបីជាន់ (meninges) និងទឹករាវ cerebrospinal fluid ដែលការពារពីការប៉ះទង្គិច។
 
-1. សេរេប្រុម (Cerebrum) — ជាផ្នែកធំជាងគេ។ វាបែងចែកជាអឌ្ឍគោលឆ្វេង និងស្តាំ ភ្ជាប់គ្នាដោយ corpus callosum ហើយផ្ទៃរបស់វាមានផ្នត់ជ្រៅៗ ដើម្បីឲ្យផ្ទៃដីធំអាចផ្ទុកនៅក្នុងលលាដ៍ក្បាលបាន។ អឌ្ឍគោលនីមួយៗមានបួន lobe៖ frontal lobe (ការគិត ការរៀបចំផែនការ ការសម្រេចចិត្ត ចលនាតាមបំណង), parietal lobe (ការប៉ះ សីតុណ្ហភាព ការឈឺចាប់), temporal lobe (ការស្តាប់ ភាសា ការចងចាំ) និង occipital lobe (ការមើល)។ ចំណាំ៖ អឌ្ឍគោលម្ខាងគ្រប់គ្រងរាងកាយម្ខាងទៀត។
+1. សេរេប្រុម (Cerebrum)៖ ជាផ្នែកធំជាងគេ។ វាបែងចែកជាអឌ្ឍគោលឆ្វេង និងស្តាំ ភ្ជាប់គ្នាដោយ corpus callosum ហើយផ្ទៃរបស់វាមានផ្នត់ជ្រៅៗ ដើម្បីឲ្យផ្ទៃដីធំអាចផ្ទុកនៅក្នុងលលាដ៍ក្បាលបាន។ អឌ្ឍគោលនីមួយៗមានបួន lobe៖ frontal lobe (ការគិត ការរៀបចំផែនការ ការសម្រេចចិត្ត ចលនាតាមបំណង), parietal lobe (ការប៉ះ សីតុណ្ហភាព ការឈឺចាប់), temporal lobe (ការស្តាប់ ភាសា ការចងចាំ) និង occipital lobe (ការមើល)។ ចំណាំ៖ អឌ្ឍគោលម្ខាងគ្រប់គ្រងរាងកាយម្ខាងទៀត។
 
-2. សេរេបែល (Cerebellum) — ស្ថិតនៅខាងក្រោម និងខាងក្រោយសេរេប្រុម។ វាមិនចាប់ផ្តើមចលនាទេ តែធ្វើឲ្យចលនារលូន។ វាគ្រប់គ្រងតុល្យភាព ឥរិយាបថ និងការសម្របសម្រួលសាច់ដុំ។ បើផ្នែកនេះខូច អ្នកជំងឺនឹងដើរមិនស្មើ និងញ័រ មិនមែនស្លាប់សរសៃទេ។
+2. សេរេបែល (Cerebellum)៖ ស្ថិតនៅខាងក្រោម និងខាងក្រោយសេរេប្រុម។ វាមិនចាប់ផ្តើមចលនាទេ តែធ្វើឲ្យចលនារលូន។ វាគ្រប់គ្រងតុល្យភាព ឥរិយាបថ និងការសម្របសម្រួលសាច់ដុំ។ បើផ្នែកនេះខូច អ្នកជំងឺនឹងដើរមិនស្មើ និងញ័រ មិនមែនស្លាប់សរសៃទេ។
 
-3. ដើមខួរ (Brain stem) — ភ្ជាប់ខួរក្បាលទៅខួរឆ្អឹងខ្នង ផ្សំឡើងពី midbrain, pons និង medulla oblongata។ វាគ្រប់គ្រងមុខងារស្វ័យប្រវត្តិដែលយើងមិនបាច់គិត៖ ដង្ហើម ចង្វាក់បេះដូង សម្ពាធឈាម ការលេប និងការក្អក។ ដោយសារវាគ្រប់គ្រងដង្ហើម និងបេះដូង ការខូចខាតនៅដើមខួរគឺគ្រោះថ្នាក់ដល់អាយុជីវិត។
+3. ដើមខួរ (Brain stem)៖ ភ្ជាប់ខួរក្បាលទៅខួរឆ្អឹងខ្នង ផ្សំឡើងពី midbrain, pons និង medulla oblongata។ វាគ្រប់គ្រងមុខងារស្វ័យប្រវត្តិដែលយើងមិនបាច់គិត៖ ដង្ហើម ចង្វាក់បេះដូង សម្ពាធឈាម ការលេប និងការក្អក។ ដោយសារវាគ្រប់គ្រងដង្ហើម និងបេះដូង ការខូចខាតនៅដើមខួរគឺគ្រោះថ្នាក់ដល់អាយុជីវិត។
 
-ណឺរ៉ូន (Neuron) — ជាឯកតាធ្វើការរបស់ខួរក្បាល។ ណឺរ៉ូនមានដេនឌ្រីត (dendrite) សម្រាប់ទទួលសញ្ញា មានតួកោសិកា (cell body) ដែលផ្ទុកនុយក្លេអ៊ែរ និងមានអាក់សូន (axon) វែងមួយសម្រាប់បញ្ជូនសញ្ញាចេញ។ អាក់សូនភាគច្រើនត្រូវបានរុំដោយស្រទាប់ខ្លាញ់ myelin ដែលធ្វើឲ្យសញ្ញាធ្វើដំណើរលឿនជាងមុន។
+ណឺរ៉ូន (Neuron)៖ ជាឯកតាធ្វើការរបស់ខួរក្បាល។ ណឺរ៉ូនមានដេនឌ្រីត (dendrite) សម្រាប់ទទួលសញ្ញា មានតួកោសិកា (cell body) ដែលផ្ទុកនុយក្លេអ៊ែរ និងមានអាក់សូន (axon) វែងមួយសម្រាប់បញ្ជូនសញ្ញាចេញ។ អាក់សូនភាគច្រើនត្រូវបានរុំដោយស្រទាប់ខ្លាញ់ myelin ដែលធ្វើឲ្យសញ្ញាធ្វើដំណើរលឿនជាងមុន។
 
-ស៊ីណាប់ (Synapse) — ណឺរ៉ូនមិនប៉ះគ្នាដោយផ្ទាល់ទេ។ នៅចន្លោះមានគម្លាតតូចមួយ។ ពេលសញ្ញាអគ្គិសនីមកដល់ចុងអាក់សូន វាបញ្ចេញសារធាតុគីមី neurotransmitter ដែលឆ្លងកាត់គម្លាតនោះ ដើម្បីបញ្ជូនសញ្ញាបន្តទៅណឺរ៉ូនបន្ទាប់។ ដូច្នេះ សញ្ញាគឺអគ្គិសនីនៅតាមបណ្តោយណឺរ៉ូន និងគីមីនៅចន្លោះណឺរ៉ូន — ជាចំណុចដែលវិញ្ញាសា Bac II ចូលចិត្តសួរ។`,
+ស៊ីណាប់ (Synapse)៖ ណឺរ៉ូនមិនប៉ះគ្នាដោយផ្ទាល់ទេ។ នៅចន្លោះមានគម្លាតតូចមួយ។ ពេលសញ្ញាអគ្គិសនីមកដល់ចុងអាក់សូន វាបញ្ចេញសារធាតុគីមី neurotransmitter ដែលឆ្លងកាត់គម្លាតនោះ ដើម្បីបញ្ជូនសញ្ញាបន្តទៅណឺរ៉ូនបន្ទាប់។ ដូច្នេះ សញ្ញាគឺអគ្គិសនីនៅតាមបណ្តោយណឺរ៉ូន និងគីមីនៅចន្លោះណឺរ៉ូន។ វិញ្ញាសា Bac II ចូលចិត្តសួរចំណុចនេះ។`,
       },
       summary: {
         en: `Three main parts: Cerebrum (thought, voluntary movement, memory, language), Cerebellum (balance and coordination), Brain stem (breathing, heartbeat, blood pressure).
@@ -135,7 +135,7 @@ Lobe នៃសេរេប្រុម៖ frontal = ការគិត និង
       },
       model3d: {
         src: "/models/brain.glb",
-        credit: '"Brain Diagram" by Aeceus — CC BY 4.0, via Sketchfab',
+        credit: '"Brain Diagram" by Aeceus, CC BY 4.0, via Sketchfab',
       },
     },
   },
@@ -211,8 +211,8 @@ export const FLASHCARDS: Record<string, Flashcard[]> = {
     {
       q: { en: "What is 0/0 in limits?", km: "0/0 ក្នុងលីមីត?" },
       a: {
-        en: "Indeterminate — use factoring or L'Hôpital's rule",
-        km: "មិនកំណត់ — ប្រើដាក់កត្តា",
+        en: "Indeterminate. Use factoring or L'Hôpital's rule",
+        km: "មិនកំណត់។ ប្រើដាក់កត្តា",
       },
       topic: "limits",
     },

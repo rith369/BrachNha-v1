@@ -33,7 +33,7 @@ export function useFocusMode(): boolean {
  * mentor on tap during a test measures the mentor, not the student.
  *
  * The store's `focusMode` is read here as "a mock exam is being answered right
- * now", which is the only thing that sets it (mock-exam.tsx). If a future screen
+ * now", which is the only thing that sets it (exam-runner.tsx). If a future screen
  * starts setting that flag for some other reason, this rule needs its own flag
  * rather than borrowing that one — the two questions would have come apart.
  */

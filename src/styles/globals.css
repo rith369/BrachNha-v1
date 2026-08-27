@@ -36,6 +36,42 @@
   --color-mint: #10b981;
   --color-yellow: #f59e0b;
 
+  /* ── Per-subject identity colours (Study page) ──────────────────────────
+     TWO SCALES, for the same reason --brand-* and --color-* are two scales.
+     Do not merge them; no single value clears AA in both roles.
+
+     --subject-*      the supplied palette, IDENTICAL in both themes. Correct
+                      only where the colour is a FILL sitting under white text —
+                      today that is the play button on a subject card.
+     --color-subj-*   the same hue corrected for contrast, per theme. For small
+                      text, icons, borders and the /8 card tints.
+
+     The supplied hexes are Tailwind-500 shades, which are designed as fills:
+     as small text on --color-bg every one of the eight fails AA (2.1:1 to
+     4.2:1). The --color-subj-* row below is the nearest darker shade of the
+     SAME hue that passes, so the subject still reads as "its" colour.
+
+     Contrast on --color-bg (#faf5ff):
+       math 4.82 · physics 5.86 · chemistry 5.10 · history 4.68
+       biology 4.67 · english 4.50 · french 5.63 · khmer 4.83          */
+  --subject-math: #3b82f6;
+  --subject-physics: #6366f1;
+  --subject-chemistry: #14b8a6;
+  --subject-history: #d97706;
+  --subject-biology: #22c55e;
+  --subject-english: #ef4444;
+  --subject-french: #ec4899;
+  --subject-khmer: #f97316;
+
+  --color-subj-math: #2563eb;
+  --color-subj-physics: #4f46e5;
+  --color-subj-chemistry: #0f766e;
+  --color-subj-history: #b45309;
+  --color-subj-biology: #15803d;
+  --color-subj-english: #dc2626;
+  --color-subj-french: #be185d;
+  --color-subj-khmer: #c2410c;
+
   /* ── Surfaces: three intentional steps, page → card → elevated ── */
   --color-bg: #faf5ff;
   --color-surface: #ffffff;
@@ -94,11 +130,7 @@
      and every font-* utility read exactly as they did under Next. */
   --font-nunito: "Nunito";
   --font-space-grotesk: "Space Grotesk";
-  /* Named for its ROLE, not its family — this used to be --font-noto-khmer and
-     that is exactly how it went stale when the face changed. Battambang is
-     Danh Hong's, OFL, from the same KhmerOS lineage students read in printed
-     textbooks, and unlike Siemreap it ships a real 700. */
-  --font-khmer: "Battambang";
+  --font-noto-khmer: "Noto Sans Khmer";
   --font-caveat: "Caveat";
 }
 
@@ -118,6 +150,21 @@
   --color-blue: #38bdf8;
   --color-mint: #34d399;
   --color-yellow: #fbbf24;
+
+  /* Lifted subject accents. --subject-* is deliberately NOT redefined here:
+     it is a fill under white text, and lifting it would drop that pairing
+     below AA — the same reason --brand-* is theme-independent.
+     Contrast against --color-surface (#1a1726):
+       math 6.92 · physics 5.89 · chemistry 9.44 · history 10.53
+       biology 10.09 · english 6.36 · french 6.64 · khmer 7.77          */
+  --color-subj-math: #60a5fa;
+  --color-subj-physics: #818cf8;
+  --color-subj-chemistry: #2dd4bf;
+  --color-subj-history: #fbbf24;
+  --color-subj-biology: #4ade80;
+  --color-subj-english: #f87171;
+  --color-subj-french: #f472b6;
+  --color-subj-khmer: #fb923c;
 
   --color-bg: #100e18;
   --color-surface: #1a1726;
@@ -162,6 +209,19 @@
   --color-blue: var(--color-blue);
   --color-mint: var(--color-mint);
   --color-yellow: var(--color-yellow);
+
+  /* Generates bg-subj-math / text-subj-math / border-subj-math, alpha included.
+     Only the contrast-corrected scale is mapped — --subject-* is referenced
+     directly as var() at its one use site, so it cannot be reached by accident
+     for text. */
+  --color-subj-math: var(--color-subj-math);
+  --color-subj-physics: var(--color-subj-physics);
+  --color-subj-chemistry: var(--color-subj-chemistry);
+  --color-subj-history: var(--color-subj-history);
+  --color-subj-biology: var(--color-subj-biology);
+  --color-subj-english: var(--color-subj-english);
+  --color-subj-french: var(--color-subj-french);
+  --color-subj-khmer: var(--color-subj-khmer);
   --color-bg: var(--color-bg);
   --color-surface: var(--color-surface);
   --color-elevated: var(--color-elevated);
@@ -184,17 +244,16 @@
   --shadow-mint-cta: var(--shadow-mint-cta);
 
   /* Khmer is listed as a fallback, not applied conditionally: the Latin fonts
-     have no Khmer glyphs, so the browser reaches for Battambang per glyph.
-     Mixed strings like "មេរៀនគ្រឹះ & ទី១២" render correctly from one stack. */
-  --font-heading: var(--font-space-grotesk), var(--font-khmer);
-  --font-body: var(--font-nunito), var(--font-khmer);
+     have no Khmer glyphs, so the browser reaches for Noto per glyph. Mixed
+     strings like "មេរៀនគ្រឹះ & ទី១២" render correctly from one stack. */
+  --font-heading: var(--font-space-grotesk), var(--font-noto-khmer);
+  --font-body: var(--font-nunito), var(--font-noto-khmer);
 
   /* Typed signatures on the commitment pledge. Same per-glyph fallback rule as
      above and it matters just as much here: Caveat has no Khmer coverage, so a
      student typing ស without the fallback would sign their name in tofu. Khmer
-     lands on Battambang — upright rather than handwritten, but legible and
-     correct. */
-  --font-signature: var(--font-caveat), var(--font-khmer);
+     lands on Noto — upright rather than handwritten, but legible and correct. */
+  --font-signature: var(--font-caveat), var(--font-noto-khmer);
 
   /* shadcn-style tokens so ui/* components resolve correctly */
   --color-background: var(--color-bg);
