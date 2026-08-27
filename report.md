@@ -19,7 +19,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 27 Aug 2026 — Mock Exam is now split into past papers and practice papers
 
-*Not yet committed.*
+*Landed in commit `6b62c4e`.*
 
 **Why.** The Mock Exam tab was a single "start the exam" button over one fixed
 10-question practice set. It had nowhere to put real past exam papers. It is now
@@ -69,7 +69,7 @@ thing. Past papers will earn XP just the same.
 
 ## 27 Aug 2026 — The Study page is now a grid of subject cards
 
-*Not yet committed.*
+*Landed in commit `6b62c4e`.*
 
 **Why.** The Study page listed individual lessons as plain rows. That meant it grew a row
 every time a lesson was added, and a subject had no page presence of its own. Rebuilt to a
@@ -170,7 +170,7 @@ narrow phone. Then switch the app to English and confirm the Study page stays in
 
 ## 26 Aug 2026 — Score Trend replaced with a Weekly Learning Activity chart
 
-*Not yet committed.*
+*Landed in commit `6b62c4e`.*
 
 **Why.** Asked to rebuild the Score Trend chart on the Progress page to match a specific
 reference design exactly — not just borrow its style. The reference was a whole different
@@ -202,7 +202,7 @@ all update together. Check it in dark mode and on a phone-width screen.
 
 ## 26 Aug 2026 — The Study Activity calendar on Progress now actually does something
 
-*Not yet committed.*
+*Landed in commit `6c82931`.*
 
 **Why.** The calendar-style grid on the Progress page (Study Activity) was decoration —
 30-odd coloured squares with no real meaning behind the colour, and tapping one did
@@ -234,7 +234,7 @@ and on a phone-width screen.
 
 ## 25 Aug 2026 — The app is much faster, especially moving between pages
 
-*Not yet committed.*
+*Landed in commit `6c82931`.*
 
 **Why.** The app felt slow, most of all when tapping from one page to another. The logo
 was the suspect. It turned out to be a real problem but not the main one — it is only
