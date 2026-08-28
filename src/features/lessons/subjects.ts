@@ -173,3 +173,15 @@ export function allSubjects(userLanguage: string | undefined): SubjectMeta[] {
     return true;
   });
 }
+
+/**
+ * Resolve a route param to a subject, or null for an unknown id.
+ *
+ * Lives here rather than beside SubjectPathView because a non-component export
+ * from a .tsx trips oxlint's only-export-components fast-refresh rule — the same
+ * reason utils/focus-styles.ts is a .ts file. The repo carries that warning once
+ * already and should not grow a second.
+ */
+export function findSubject(id: string | undefined): SubjectMeta | null {
+  return SUBJECTS.find((s) => s.id === id) ?? null;
+}

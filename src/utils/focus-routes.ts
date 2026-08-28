@@ -12,7 +12,16 @@
 export function isFocusRoute(pathname: string): boolean {
   // startsWith("/lessons/") and NOT "/lessons": the lessons LIST is an ordinary
   // page and must keep its nav. Only a lesson with an id is a task.
-  return pathname.startsWith("/lessons/") || isAssessmentRoute(pathname);
+  //
+  // "/sections/" is the same kind of thing one level down — one section of the
+  // real curriculum, run by SectionDetail. Note "/subjects/" is deliberately NOT
+  // here: a subject path is where a student CHOOSES what to do, so it keeps its
+  // navigation.
+  return (
+    pathname.startsWith("/lessons/") ||
+    pathname.startsWith("/sections/") ||
+    isAssessmentRoute(pathname)
+  );
 }
 
 /**

@@ -74,9 +74,23 @@ interface BrachNhaState {
   // ── progression (was scattered useState in App() before) ──
   xp: number;
   level: number;
+  /**
+   * A spendable currency, earned alongside XP. XP measures how far the student
+   * has come and only ever rises; coins are the same effort expressed as
+   * something they can hold. Kept as a REAL persisted number awarded by the
+   * same helper that grants XP — never a decorative figure on a header.
+   * Nothing spends them yet.
+   */
+  coins: number;
   streak: number;
   tasks: Tasks;
   examResults: ExamResult[];
+  /**
+   * Lesson ids the student has finished, which is what turns a session node on
+   * the subject path from "next" into "done". Holds lesson ids rather than a
+   * separate session id so it cannot drift from the lesson flow that sets it.
+   */
+  completedSessions: string[];
 
   // ── ui ──
   /** Device preference, not account data — deliberately NOT reset by logout().
@@ -117,6 +131,7 @@ interface BrachNhaState {
   signCommitment: (commitment: Commitment) => void;
   addXp: (amount: number) => void;
   completeTask: (task: keyof Tasks) => void;
+  completeSession: (lessonId: string) => void;
   addExamResult: (result: ExamResult) => void;
   resetDailyTasks: () => void;
   setTheme: (theme: Theme) => void;
@@ -131,6 +146,30 @@ interface BrachNhaState {
   openConversation: (id: string) => void;
   deleteConversation: (id: string) => void;
   logout: () => void;
+}
+
+/**
+ * The single place XP, level and coins are granted together.
+ *
+ * Both addXp and completeTask route through this so the three can never drift —
+ * the level rule used to be written out twice, once in each, which is exactly
+ * how a third caller ends up levelling differently.
+ *
+ * COINS_PER_XP is deliberately a plain ratio rather than a per-action table:
+ * coins are the same earned effort as XP in a spendable form, so anything that
+ * grants XP grants coins in proportion, with no second set of rules to keep in
+ * step. Math.floor means small XP grants can round to zero coins, which is
+ * correct — it should take real work to earn one.
+ */
+const COINS_PER_XP = 0.25;
+
+function award(state: { xp: number; level: number; coins: number }, amount: number) {
+  const xp = state.xp + amount;
+  return {
+    xp,
+    level: xp >= state.level * 100 ? state.level + 1 : state.level,
+    coins: state.coins + Math.floor(amount * COINS_PER_XP),
+  };
 }
 
 const emptyTasks: Tasks = {
@@ -163,9 +202,11 @@ const partializeState = (state: BrachNhaState) => ({
   pledgeSeen: state.pledgeSeen,
   xp: state.xp,
   level: state.level,
+  coins: state.coins,
   streak: state.streak,
   tasks: state.tasks,
   examResults: state.examResults,
+  completedSessions: state.completedSessions,
   theme: state.theme,
   conversations: state.conversations,
   activeConversationId: state.activeConversationId,
@@ -193,9 +234,11 @@ export const useBrachNhaStore = create<BrachNhaState>()(
 
       xp: 0,
       level: 1,
+      coins: 0,
       streak: 3,
       tasks: emptyTasks,
       examResults: [],
+      completedSessions: [],
 
       theme: "light",
       chatOpen: false,
@@ -245,26 +288,25 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       // one re-snapshots whatever the plan says today.
       signCommitment: (commitment) => set({ commitment }),
 
-      addXp: (amount) =>
-        set((state) => {
-          const nextXp = state.xp + amount;
-          const nextLevel =
-            nextXp >= state.level * 100 ? state.level + 1 : state.level;
-          return { xp: nextXp, level: nextLevel };
-        }),
+      addXp: (amount) => set((state) => award(state, amount)),
 
       completeTask: (task) =>
         set((state) => {
           if (state.tasks[task]) return state; // already done, no-op
-          const nextXp = state.xp + 20;
-          const nextLevel =
-            nextXp >= state.level * 100 ? state.level + 1 : state.level;
           return {
             tasks: { ...state.tasks, [task]: true },
-            xp: nextXp,
-            level: nextLevel,
+            ...award(state, 20),
           };
         }),
+
+      // Idempotent: finishing a lesson a second time must not stack rewards,
+      // and the path only needs to know that it is done.
+      completeSession: (lessonId) =>
+        set((state) =>
+          state.completedSessions.includes(lessonId)
+            ? state
+            : { completedSessions: [...state.completedSessions, lessonId] }
+        ),
 
       resetDailyTasks: () => set({ tasks: emptyTasks }),
 
@@ -379,9 +421,11 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           pledgeSeen: false,
           xp: 0,
           level: 1,
+          coins: 0,
           streak: 3,
           tasks: emptyTasks,
           examResults: [],
+          completedSessions: [],
           conversations: [],
           activeConversationId: null,
         }),

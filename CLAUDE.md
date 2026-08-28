@@ -724,6 +724,260 @@ that read fine at ~144px. 320px is the floor and is checked. The accent tints ar
 the `/8` scale, correct in both themes with no `dark:` override — see the
 two-accent-scale note.
 
+### The subject path — `/subjects/:subjectId`
+
+Tapping a subject card no longer jumps into a lesson. It opens that subject's
+**session path**: a Duolingo/Mimo-style winding trail of short sessions, which is
+the screen a student picks work from. `subject-card.tsx` links here, not to
+`firstLessonId()` — going straight to lesson one would skip the choice and hide
+every other session.
+
+**Its own top-level route, deliberately not nested under `/lessons`.** A lesson id
+is `subject-topic` (`biology-brain`), so `/lessons/:lessonId` and a bare
+`/lessons/:subjectId` would be two patterns matching one segment. An unknown id
+`<Navigate>`s to `/lessons` rather than erroring — it is only reachable by a typed
+URL or a stale link. It is **not** a focus route: the student is choosing, not
+mid-task, so the nav stays.
+
+**The reference design was a dark space-themed game map. Only the STRUCTURE was
+taken** — winding path, numbered nodes, locks, a stat bar. Deliberately not
+copied: the starfield, planet artwork, both side rails of icon buttons, the
+premium badge, the mascot, and the keys/energy/gems currency bar. The page renders
+in the app's own identity, in the subject's colour, and works in both themes.
+
+**`CENTRES` in `subject-path-view.tsx` is the single source of truth for the
+layout.** Each node is placed with `paddingLeft: X%` plus `-translate-x-1/2` so its
+CENTRE lands on that percentage, and the connector SVG is drawn between two of the
+same numbers in a `0 0 100 40` viewBox with `preserveAspectRatio="none"`. The first
+version drew a fixed curve independent of the offsets and the trail visibly missed
+every node. Values stay inside 12–88 because a 64px node at the 320px floor needs
+~11% of clearance or it clips.
+
+Those bounds have already moved once, and the reason is the trap: **the widest
+part of a node is its LABEL BLOCK, not the disc.** Once section titles started
+rendering under the nodes the block went to `w-28` (112px), needing 56px of
+clearance — ~19% of a 288px column — so `CENTRES` went `[22, 50, 78, 50]` →
+`[30, 50, 70, 50]`. Because `CENTRES` drives node placement *and* the connector
+endpoints, the curve followed with no second edit; that is the whole point of
+keeping one array. Measured at the 320px floor: nodes span 46→274 in a 16→304
+column.
+
+### The path has THREE levels, because the textbooks do
+
+`ជំពូក` (chapter) → `មេរៀន` (lesson) → `ផ្នែក` (section). A section is one node and
+one run of the 7-step lesson flow. `features/lessons/sessions.ts` models exactly
+that: `Chapter { lessons }` → `PathLesson { sessions }` → `Session`.
+
+Naming, both bits of which look like mistakes and are not:
+
+- **`PathLesson`, not `Lesson`** — `types/index.ts` already exports a `Lesson`,
+  which is the content object a section routes *into*. Different things.
+- **`Session` keeps its name although the curriculum says "section".** The store
+  persists `completedSessions` and exposes `completeSession()`; renaming the type
+  invites renaming a persisted field, which needs a migration and buys nothing.
+
+**The page renders ONE BANNER PER LESSON, with the chapter as its kicker** —
+`ជំពូក ៣ · តម្រូវផ្សេងៗរបស់សារពាង្គកាយ` over `តម្រូវប្រសាទ`. The third level has to
+surface somewhere and that is Duolingo's own unit-header shape. The kicker used to
+repeat the subject name, which the header card directly above already says. A
+chapter whose real title hasn't been supplied carries `title: ""` and the banner
+shows `ជំពូក ១` alone — an empty string is the "pending" marker, deliberately,
+because a made-up Khmer title is worse than none.
+
+**Node labels are `{chapter}.{lesson}.{section}` in Arabic digits** (`3.1.1`),
+matching the numbering printed in the textbook, and are GENERATED from position by
+`sectionsFor()` so a label cannot drift from where the node sits. Prose on the
+page keeps Khmer numerals via `utils/khmer-num.ts` — that split is intentional.
+
+**The section TITLE renders under the node, not just in the `aria-label`.**
+Duolingo gets away with bare numbers because its content is known; here the
+curriculum names are the whole point of the screen. Two consequences: the wrapper
+widened (see `CENTRES` above), and the title carries `[overflow-wrap:anywhere]`
+rather than a Tailwind `break-*` utility, because **Khmer has no spaces** — a
+section name is one unbreakable run and renders as a single line wider than the
+node's box without it. A three-line title only pushes the next connector down; the
+connector is its own fixed-height element between rows, so no geometry breaks.
+
+**Session structure is DERIVED until it is authored.** `SUBJECT_SESSIONS` holds
+the authored structure — the same shape as `PAST_PAPER_QUESTIONS`, and most
+subjects are absent, which is the normal state. `chaptersFor()` falls back to one
+session per lesson that genuinely exists in `data/lessons.ts` plus
+`PLACEHOLDER_SESSIONS` locked nodes, wrapped in one chapter and one lesson so the
+shape matches, so a node can never claim content the app lacks.
+
+**Biology is the first real curriculum**, entered from the Grade 12 table of
+contents: 3 chapters, 7 lessons, 6 sections each = 42 nodes, **every one locked**,
+because no content is written behind any of them. Chapters 1–2 are titleless
+pending a legible scan. Two things follow that are easy to mistake for bugs:
+
+- **An authored structure REPLACES the derived fallback wholesale**, so
+  `biology-body` and `biology-brain` no longer appear on the biology path. Both
+  are still reachable at `/lessons/biology-body` and `/lessons/biology-brain`, and
+  the 3D brain lesson is intact.
+- **`lessonCountFor("biology")` still says 2**, because it counts `LESSONS`. The
+  Study card therefore reads "២ មេរៀន" while the path shows 7 locked lessons.
+  Left alone on purpose: making the card count *authored* lessons would have it
+  claim seven lessons of content that does not exist, which is the rule that
+  function exists to enforce. Revisit when content lands, not before.
+
+**The page does NOT open at the top.** A path is long — biology is 43 nodes — so
+landing at the very top means scrolling past everything already behind you to
+reach today's work. `SubjectPathView` scrolls its own container on mount to put a
+lesson BANNER at the top, banner first because the banner names the thing about to
+be done. The target has two sources and the order is load-bearing:
+
+1. the lesson holding the first unfinished playable session — the same session the
+   START bubble points at, so landing and bubble cannot disagree;
+2. failing that, a lesson flagged `openHere` in the authored data.
+
+`openHere` exists because a path with no content yet has no playable session for
+rule 1 to find; biology carries it on ជំពូក ៣ · មេរៀនទី ១, the lesson being
+authored. **It retires itself** — the day that lesson has content, rule 1 returns
+the same lesson and the flag stops being consulted. That is why it is the fallback
+and not an override. The scroll is instant, never smooth (an animated scroll on
+first paint reads as a glitch), measured from bounding rects rather than
+`offsetTop` so it does not depend on which ancestor happens to be positioned, and
+keyed on `subject.id` alone so finishing a session cannot yank the page.
+
+**The `pt-10` above a lesson's first node is not decoration.** The START bubble
+sits at `-top-8`, so anything less and it collides with the banner it is meant to
+hang under. Banner separation is `mt-8 first:mt-0`.
+
+### Section content — the curriculum shape, and why it is not `Lesson`
+
+A SECTION is one node on a path and the unit real content is written in:
+**មេរៀនសង្ខេប → ឧទាហរណ៍ → ចំណាំសំខាន់ៗ → កំហុស**, optionally then a quiz.
+`data/sections.ts` holds `SECTION_CONTENT` keyed by the id `sectionsFor()`
+generates (`"biology-3-1-1"`); the types live in `types/index.ts` beside `Lesson`.
+**One entry today** — ៣.១.១ សេចក្ដីផ្ដើម — and nearly-empty is the normal state,
+same as `PAST_PAPER_QUESTIONS`.
+
+**This is deliberately NOT `Lesson`, and `SectionDetail` is deliberately not a
+branch inside `lesson-detail.tsx`.** That component runs the older
+content/summary/funFact/tip/didYouKnow flow for the two legacy lessons. One
+component serving both shapes would be a permanent fork down the middle of every
+step. What is shared instead is the *frame*: `FocusLayout`/`FocusButton` and the
+`utils/focus-styles.ts` ladder, which exist precisely so task screens cannot
+drift. `Misconception` is the clearest case for the separate type — `wrong` and
+`right` are two fields because the pairing IS the teaching, and one blob of text
+could not render the halves differently.
+
+**Khmer-only strings, not `{ en, km }` pairs** — same decision as
+`LESSONS_PAGE_LANG`, `EXAM_PAGE_LANG` and `ANSWER_LANG`. The content exists in
+Khmer; an English column would be fabrication dressed as data.
+
+**`components/callout.tsx` is the left-border card** every block renders in. One
+component, not four hand-rolled cards, for the reason `shell/wordmark.tsx` exists.
+Tones come from the per-theme `--color-*` scale, never `--brand-*` — borders and
+text rather than fills under white text — which is also why every tone is correct
+in dark with no `dark:` override. `TONE` spells all five variants out because
+Tailwind cannot see a runtime-assembled class.
+
+**The colour is the STRIPE and only the stripe.** Card body is `bg-surface` with a
+neutral `border-border` hairline, and the label is ordinary `text-text`. The first
+version tinted the background and the label as well; with four of these stacked on
+one screen the page read as a colour chart and the stripe stopped working as the
+thing that tells one block from another. One coloured element per card — don't
+reintroduce a `bg-{tone}/8`. The single exception is the ✍️ ការពិត card nested
+inside a ❌ card, which takes `bg-control` so it has something other than its own
+stripe separating it from the surface it sits on.
+
+**`Session.lessonId` is now `Session.href`.** A section and a lesson route to
+different places, so the field answering "is this playable, and where does it go"
+had to stop being lesson-specific — ONE field rather than two that drift:
+
+- authored section → `/sections/{id}` **iff `SECTION_CONTENT[id]` exists**
+- derived fallback → `/lessons/{subject}-{topic}`
+
+That `iff` is the rule: playability is DERIVED from content existing, never
+authored beside it. `completedSessions` is untouched — it matches on
+`session.id`, and for derived paths `id` already is the lesson id.
+
+**The landing rule's two sources must be TWO PASSES, not one loop.** Interleaved,
+an `openHere` on an earlier lesson beats a real unfinished session further down —
+the fallback beating the rule it stands in for. Rule 2 may only run once rule 1
+has been ruled out across the whole path. (Caught by the end-to-end test, not by
+types.)
+
+`/sections/:sectionId` is a focus route (nav hidden) but **not** an assessment
+route, so KruAI stays reachable — same rule as a lesson. `defaultMathLayout`
+matches `/(?:lessons|sections)/` since the subject is the first id segment of
+both.
+
+**`LESSON_TAIL` — កំហុស / សេចក្តីសង្ខេប / តេស្ត — is appended to EVERY lesson.**
+Those three are structural rather than topic-specific, so only sections 1–3 differ
+per lesson. It is an inference from the one lesson whose sections were supplied,
+and it is one constant to change if wrong. `កំហុស` is a plain locked node today:
+it names a mistakes-collection feature that does not exist yet, and reserves its
+position and nothing more.
+
+`sessionStatus()` is derived, never stored — a stored status would drift from
+`completedSessions` the first time a lesson id changed. Note **"locked" means "not
+written yet", NOT "not earned"**: gating a session on finishing the previous one
+needs the real chapter structure first, or it would lock content that exists.
+
+**`completedSessions` holds LESSON ids, not a separate session id.** That is what
+lets `LessonDetail`'s `finishQuiz` mark the path node done with the id it already
+has, with nothing to keep in step. `completeSession` is idempotent so re-finishing
+a lesson cannot stack.
+
+### The Duolingo look, and where its limits are
+
+The path deliberately borrows Duolingo's *visual grammar*, and almost all of it
+is CSS — no artwork was needed:
+
+- **The "lip" is the whole look.** A node is a solid disc sitting on a darker
+  slab of the same colour (`0 5px 0` box-shadow — a hard offset with NO blur, so
+  it reads as an edge rather than a shadow), and it presses into that slab on
+  `:active` by exactly the distance the lip shrinks. The unit banner carries the
+  same lip so the page reads as one material.
+- **The lip colour is `color-mix(… black)`, never `--color-subj-*`.** That scale
+  is *lighter* than the fill in dark mode, which would light the button from
+  below. Mixing toward black is the only rule correct in both themes.
+- **`startBob`** (globals.css) bobs the START bubble. Transform-only and in the
+  `prefers-reduced-motion` block, like every other loop here.
+
+**The curve was wrong once and the fix is worth keeping.** The connector is a
+CUBIC with both control points vertically aligned with their own endpoint. A
+quadratic through one midpoint leaves each endpoint aimed *diagonally*, so
+consecutive segments disagreed on tangent and every node had a visible kink
+through it. Vertical control points make each segment leave and arrive straight
+up and down, so segments share a tangent and read as one continuous snake.
+
+**The mascot is the one thing CSS cannot do**, which is why `Mascot` is a hole
+rather than an invention: an `<img>` at `/mascot/idle.webp` that `remove()`s
+itself on error, so nothing renders until artwork exists. `hidden md:block` —
+on a 320px phone a character would cover the very nodes it is meant to cheer on.
+
+**The banner's count is PER LESSON** — not per chapter, and not per path. It has
+been wrong at both wider scopes, and each widening hid it one level longer,
+because with a single lesson in a single chapter all three numbers coincide. It
+would only have surfaced once a real curriculum landed and every banner claimed
+the same total.
+
+**This pulls the page away from the rest of the app on purpose, and only so far.**
+Chunky pressable buttons live here and nowhere else; Home, Progress and
+Leaderboard stay flat. Note this partly reverses the earlier call recorded in the
+focus-mode section, where Duolingo's flat no-card look was considered and
+declined — that decision still stands for the lesson flow itself.
+
+### Coins
+
+`coins` is a real persisted store field, added for this page's stat bar. It is
+awarded by `award()` in `lib/store.ts` — the ONE place XP, level and coins are
+granted together, which both `addXp` and `completeTask` now route through. The
+level rule used to be written out twice, once in each; that is exactly how a third
+caller ends up levelling differently.
+
+`COINS_PER_XP` is a flat ratio rather than a per-action table: coins are the same
+earned effort as XP in spendable form, so anything granting XP grants coins in
+proportion with no second rule set. `Math.floor` means small grants round to zero,
+which is correct. **Nothing spends them yet.**
+
+There is deliberately **no energy/hearts meter** despite the reference having one.
+A decorative one is a promise the product does not keep, and a real one needs
+refill-over-time rules and a paywall story nobody has designed.
+
 **Mock Exam** (`features/exam`) — a two-tab screen; see its own section below.
 
 ### The Mock Exam page is two tabs over one subject catalog

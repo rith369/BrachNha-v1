@@ -103,6 +103,60 @@ export interface PracticeQuestion {
   explanation: { en: string; km: string };
 }
 
+// ── Section content ──
+//
+// A SECTION is one node on a subject path and the unit the real curriculum is
+// written in: មេរៀនសង្ខេប → ឧទាហរណ៍ → ចំណាំសំខាន់ៗ → កំហុស. That is deliberately
+// NOT the shape of `Lesson` above, which is the older
+// content/summary/funFact/tip/didYouKnow flow and stays as it is for the two
+// legacy lessons. Bending one into the other would lose what makes each work —
+// most visibly `Misconception`, where the pairing IS the teaching.
+//
+// Every string here is KHMER ONLY, not an { en, km } pair. Same decision as
+// LESSONS_PAGE_LANG, EXAM_PAGE_LANG and KruAI's ANSWER_LANG: the content exists
+// in Khmer, and inventing an English column for it would be fabrication dressed
+// as data.
+
+export interface SectionItem {
+  /** Bold lead-in before the colon — "សរីរាង្គវិញ្ញាណ៖ …". */
+  label?: string;
+  body: string;
+  /** Nested bullets, e.g. រំញោច / ការឆ្លើយតប under the stimulus note. */
+  items?: string[];
+}
+
+export interface SectionBlock {
+  /** Optional lead paragraph above the items. */
+  intro?: string;
+  items: SectionItem[];
+}
+
+/** An ❌ / ✍️ pair. Two fields rather than free text: the contrast is the point,
+ *  and a single blob could not render the two halves differently. */
+export interface Misconception {
+  wrong: string;
+  right: string;
+}
+
+/** Khmer-only sibling of PracticeQuestion. */
+export interface SectionQuestion {
+  q: string;
+  options: string[];
+  correct: string;
+  explanation: string;
+}
+
+export interface SectionContent {
+  title: string;
+  lesson: SectionBlock;
+  examples: SectionBlock;
+  notes: SectionBlock;
+  mistakes: Misconception[];
+  /** Absent until a question is written. The step is skipped while undefined,
+   *  the same way lesson-detail.tsx skips `didYouKnow`. */
+  quiz?: SectionQuestion;
+}
+
 export type MockExamSubject = "math" | "biology" | "chemistry" | "physics";
 
 /**

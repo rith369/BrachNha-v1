@@ -36,14 +36,16 @@ export function applyInsert(
  * The overlay is global — `chatOpen` is a bare boolean in the store and the FAB
  * renders on every page — so the route is the only honest signal of what the
  * student was looking at. Lesson ids are `<subject>-<topic>` (see
- * getLessonData in features/lessons/components/lesson-detail.tsx).
+ * getLessonData in features/lessons/components/lesson-detail.tsx) and section
+ * ids are `<subject>-<chapter>-<lesson>-<n>`, so the subject is the first
+ * segment of both and one regex covers the two routes.
  *
  * These are MathLive's stock layout names, so the mapping is coarser than the
  * five hand-built tabs it replaces: physics and chemistry both want Greek
  * letters within reach, everything else starts on the digits.
  */
 export function defaultMathLayout(pathname: string | null): VirtualKeyboardName {
-  const match = pathname?.match(/^\/lessons\/([^/?#]+)/);
+  const match = pathname?.match(/^\/(?:lessons|sections)\/([^/?#]+)/);
   if (!match) return "numeric";
 
   const [subject] = decodeURIComponent(match[1]).split("-");

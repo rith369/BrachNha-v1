@@ -17,6 +17,121 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 28 Aug 2026 — The first real lesson content: ៣.១.១ សេចក្ដីផ្ដើម
+
+*Not yet committed.*
+
+**Why.** The biology path was structure only — every node locked, nothing to open.
+The first section's content has now been written, so ៣.១.១ សេចក្ដីផ្ដើម is a real,
+playable lesson.
+
+**What changed.**
+
+- **៣.១.១ សេចក្ដីផ្ដើម is now open and tappable.** It is the only unlocked node on
+  the biology path; the other 42 are still waiting for their content.
+- **A section runs in four steps**, tapping បន្ត between each, with the progress
+  bar filling in quarters: **មេរៀនសង្ខេប → ឧទាហរណ៍ → ចំណាំសំខាន់ៗ → កំហុស**.
+- **Each part is a plain white card with one coloured stripe down its left edge**
+  — blue for the lesson, yellow for examples, purple for notes, pink for a
+  misunderstanding with the ✍️ ការពិត answer nested inside it in green. The colour
+  is deliberately kept to the stripe alone: an earlier version tinted the whole
+  card and the screen turned into a colour chart, which made the stripes stop
+  meaning anything. Keeping the ❌ and ✍️ halves in one card is also deliberate —
+  a student should not be able to read the wrong version on its own.
+- **Finishing gives +20 XP and coins**, and the node comes back marked done with
+  the counter at ១/៤៣ — the same rewards the older lessons give.
+- **The path now opens on ៣.១.១ by itself.** Last round that needed a manual
+  pointer; now that the section has content, the page finds it the normal way —
+  "open at whatever is unfinished". The pointer is no longer doing the work.
+
+**Things to know.**
+
+- **The test at the end is built but hidden.** You said the question is coming
+  later. When you send it, the section becomes five steps instead of four and the
+  progress bar adjusts on its own — nothing else needs changing.
+- **One typo was corrected.** The last item of the ក្រុមការងារទាំង ៤ list ended in
+  a Japanese full stop (。) rather than a Khmer ។. Everything else is exactly as
+  you wrote it.
+- **The two old lessons are untouched.** ខួរក្បាល with its 3D brain still runs its
+  own older six-step format at its own address. New content uses the new shape.
+
+**What to re-test.** Study → ជីវវិទ្យា. The path should open on ជំពូក ៣ · តម្រូវប្រសាទ
+with a ចាប់ផ្តើម bubble on ៣.១.១. Tap it and read all four steps, checking the Khmer
+against your original. Finish it, confirm the XP goes up and the node turns green,
+then reopen the path and check the counter says ១/៤៣.
+
+**What I need from you next.** The quiz question for ៣.១.១ (question, choices,
+correct answer, explanation), and the content for ៣.១.២ onwards.
+
+---
+
+## 27 Aug 2026 — The biology learning path now follows the real textbook
+
+*Not yet committed.*
+
+**Why.** Up to now the subject path made up its own structure, because there was no
+real curriculum to follow. The Grade 12 biology table of contents has now been
+entered, so the path shows the actual chapters and lessons a student will study.
+
+**What changed.**
+
+- **The path has three levels now**, matching the book: **ជំពូក** (chapter) →
+  **មេរៀន** (lesson) → **ផ្នែក** (section). Each green banner is one lesson, with
+  its chapter named in small text above it, and the round nodes below it are that
+  lesson's sections.
+- **Biology has all 3 chapters and all 7 lessons** — 43 nodes in total. Numbering
+  matches the book exactly: **3.1.1**, **3.1.2** and so on.
+- **ជំពូក ៣ · តម្រូវប្រសាទ has its real section names**, the seven you sent:
+  សេចក្ដីផ្ដើម, តម្រូវប្រសាទសត្វឥតឆ្អឹងកង, តម្រូវប្រសាទសត្វឆ្អឹងកង,
+  ប្រព័ន្ធប្រសាទរបស់មនុស្ស, កំហុស, សេចក្តីសង្ខេប, តេស្ត. Adding one at the front
+  renumbered the rest on its own — the numbers come from position, so they can
+  never fall out of step with the order.
+- **The section name is now printed under each node**, not just the number. That
+  is new — before this, a node showed only "1.1" and you could not tell what it
+  was. It also means the maths and other paths now show their lesson names.
+- **កំហុស / សេចក្តីសង្ខេប / តេស្ត are added to the end of every lesson**, since those
+  three are the same for any topic. Only the first three sections change per
+  lesson, and those are placeholders (ផ្នែកទី ១, ២, ៣) until you send the names. A
+  lesson can hold any number of sections — តម្រូវប្រសាទ has seven, the rest six.
+
+- **Opening ជីវវិទ្យា now jumps straight to ជំពូក ៣ · តម្រូវប្រសាទ**, instead of
+  starting at chapter 1 and making you scroll past twenty locked nodes. Once
+  lessons have real content this happens on its own — the page will open at
+  whatever you have not finished yet. Until then it is pointed at ជំពូក ៣ · មេរៀនទី ១
+  deliberately, because that is the lesson being written.
+- **More space between a lesson's green banner and the first circle below it**,
+  which were nearly touching.
+
+**Things to know.**
+
+- **Every node is locked, on purpose.** This is the structure, not the content —
+  nothing is tappable yet because no lesson has been written behind it. That was
+  the point of this round: check the shape is right before content is written
+  against it.
+- **The two old biology lessons (រាងកាយមនុស្ស and ខួរក្បាល, the one with the 3D
+  brain) no longer appear on the biology path.** They were stand-ins from before
+  the real curriculum existed and are not part of the book's chapter list.
+  Neither has been deleted — both still open at their own address, and the 3D
+  brain is untouched.
+- **The Study page card still says "២ មេរៀន" for biology.** That number counts
+  lessons that have real content, and there are still only two. It will start
+  matching the path once lessons are actually written.
+- **Chapters 1 and 2 have no names yet** — the scan was too blurry to read the
+  Khmer safely, so the banners show ជំពូក ១ and ជំពូក ២ on their own rather than a
+  guessed title. Send the names and they drop straight in.
+- **កំហុស is a placeholder for a feature that does not exist yet** — collecting the
+  mistakes a student makes. Its place in the path is reserved; nothing is built.
+
+**What to re-test.** Open Study → ជីវវិទ្យា. Scroll the whole path: three chapters,
+seven lesson banners, six nodes under each, all locked. Check ជំពូក ៣ · តម្រូវប្រសាទ
+shows your seven names on nodes 3.1.1 to 3.1.7. Then open a different subject
+(គណិតវិទ្យា) and confirm its path is unchanged and still playable.
+
+**What I need from you next.** The chapter 1 and 2 titles, their lesson titles, and
+the section names for the other six lessons.
+
+---
+
 ## 27 Aug 2026 — Mock Exam is now split into past papers and practice papers
 
 *Landed in commit `6b62c4e`.*
@@ -64,6 +179,64 @@ to arrive into.
 results — they will not be mixed into the "from mock exams" figure on the home
 screen, because a real past paper and a 10-question practice set are not the same
 thing. Past papers will earn XP just the same.
+
+---
+
+## 27 Aug 2026 — Tapping a subject now opens a learning path
+
+*Not yet committed.*
+
+**Why.** Tapping a subject went straight into its first lesson, which hid everything else
+the subject contained and gave the student no choice. Rebuilt around a supplied reference
+so a subject opens a **path of short sessions**, the way Duolingo and Mimo work.
+
+**What changed.**
+
+- **Tapping a subject card opens that subject's path** instead of a lesson. Each stop on
+  the path is one short session; tapping a stop opens the lesson as before.
+- **The path winds down the screen** with dashed lines joining the stops, in the subject's
+  own colour — biology's path is green, chemistry's teal, and so on.
+- **Stops show their state.** A green play button means ready, a tick means finished, a
+  dashed padlock means the content is not written yet. Locked stops are deliberately not
+  tappable, so they cannot look broken.
+- **Finishing a lesson now ticks its stop off** and fills the progress bar at the top of
+  the path. That progress is saved.
+- **A small stat bar** sits at the top showing XP, streak and coins.
+
+**Coins are new, and they are real.** They are earned automatically alongside XP — every
+20 XP of work also earns 5 coins — and they are saved with the rest of your progress.
+**Nothing spends them yet**; that is a separate decision about what they should buy.
+
+**Two things from the reference were deliberately not copied.** The reference is a dark
+space-themed game, and copying its look would have made this the only screen in the app
+that does not match the others — so the page uses BrachNha's own colours and works in
+light and dark like everything else. And the reference's energy/keys/gems meters were left
+out: the app has no such system, and putting fake ones on screen would promise something
+the product does not do. Everything in the stat bar is a real, saved number.
+
+**Most stops are locked, because the lesson content is not written yet.** Biology has two
+real sessions, maths has two; every other subject shows locked placeholders. As you supply
+lessons, real stops appear in their place automatically.
+
+**The path now has a Duolingo-style look.** The stops are chunky buttons that sit on a
+darker edge and press down when tapped, each unit has a coloured banner across the top, and
+a small bobbing **ចាប់ផ្តើម** ("start") bubble points at whichever stop you should do next.
+The dashed trail between stops was redrawn — it used to kink slightly at every stop, and
+now flows as one smooth line.
+
+**None of that needed pictures.** Almost everything that makes Duolingo look like Duolingo
+is styling rather than artwork, so it was all built in code.
+
+**The one exception is a mascot** — a character beside the path. That genuinely cannot be
+done without a drawing. The space for it is built and waiting: put a picture at
+`public/mascot/idle.webp` and it appears beside the path on tablet and desktop. Until then
+nothing shows and nothing looks broken. It is deliberately hidden on phones, where a
+character would cover the very stops it is meant to cheer on.
+
+**What to re-test.** Open Study, tap ជីវវិទ្យា (biology), and check the path appears. Tap
+the first stop, finish the lesson to the end, and confirm the stop turns into a tick, the
+progress bar moves, and your coins go up. Check the back arrow returns you to Study. Try
+it in both light and dark, and on a narrow phone.
 
 ---
 

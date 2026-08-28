@@ -30,6 +30,8 @@ const routeModules = {
   leaderboard: () => import("@/pages/leaderboard"),
   lessons: () => import("@/pages/lessons"),
   lessonDetail: () => import("@/pages/lesson-detail"),
+  sectionDetail: () => import("@/pages/section-detail"),
+  subjectPath: () => import("@/pages/subject-path"),
   placementTest: () => import("@/pages/placement-test"),
   profile: () => import("@/pages/profile"),
   progress: () => import("@/pages/progress"),
@@ -42,6 +44,8 @@ const GradePredictionPage = lazy(routeModules.gradePrediction);
 const LeaderboardPage = lazy(routeModules.leaderboard);
 const LessonsPage = lazy(routeModules.lessons);
 const LessonDetailPage = lazy(routeModules.lessonDetail);
+const SectionDetailPage = lazy(routeModules.sectionDetail);
+const SubjectPathPage = lazy(routeModules.subjectPath);
 const PlacementTestRoute = lazy(routeModules.placementTest);
 const ProfilePage = lazy(routeModules.profile);
 const ProgressPage = lazy(routeModules.progress);
@@ -155,6 +159,8 @@ export default function App() {
         <Route path="leaderboard" element={<LeaderboardPage />} />
         <Route path="lessons" element={<LessonsPage />} />
         <Route path="lessons/:lessonId" element={<LessonDetailPage />} />
+        <Route path="sections/:sectionId" element={<SectionDetailPage />} />
+        <Route path="subjects/:subjectId" element={<SubjectPathPage />} />
         <Route path="placement-test/:subject" element={<PlacementTestRoute />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="progress" element={<ProgressPage />} />

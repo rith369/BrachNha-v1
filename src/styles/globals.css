@@ -386,13 +386,26 @@ h1, h2, h3, h4, .font-heading {
   animation: shimmer 3s linear infinite;
 }
 
+/* The "START" bubble over the next session on a subject path.
+   TRANSFORM ONLY, like every other loop here — a bubble that animated its
+   offset or shadow would repaint on every frame, and this sits on a scrolling
+   page. Small travel on purpose: it should catch the eye, not wave at it. */
+@keyframes startBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.animate-start-bob {
+  animation: startBob 1.6s ease-in-out infinite;
+}
+
 /* Both loops above run forever. Someone who has asked their device for less
    motion should get the finished state, not an endless animation — and on a
    low-end phone that is a real amount of work saved as well. */
 @media (prefers-reduced-motion: reduce) {
   .animate-fab-pulse,
   .animate-fab-pulse::after,
-  .animate-shimmer {
+  .animate-shimmer,
+  .animate-start-bob {
     animation: none;
   }
 }

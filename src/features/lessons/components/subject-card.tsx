@@ -91,7 +91,11 @@ export function SubjectCard({ subject }: { subject: SubjectMeta }) {
   }
 
   return (
-    <Link to={`/lessons/${href}`} className={cn(shell, "transition hover:brightness-[1.03]")}>
+    <Link
+      // The card opens the subject's SESSION PATH, not a lesson directly. The
+      // path is where a student picks which session to do; jumping straight
+      // into the first one would skip that choice and hide the rest.
+      to={`/subjects/${subject.id}`} className={cn(shell, "transition hover:brightness-[1.03]")}>
       {body}
     </Link>
   );

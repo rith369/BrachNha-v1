@@ -42,10 +42,11 @@ function getCategoryAndTopic(lessonId: string) {
 
 export function LessonDetail({ lessonId }: { lessonId: string }) {
   const navigate = useNavigate();
-  const { lang, completeTask } = useBrachNhaStore(
+  const { lang, completeTask, completeSession } = useBrachNhaStore(
     useShallow((s) => ({
       lang: s.lang,
       completeTask: s.completeTask,
+      completeSession: s.completeSession,
     }))
   );
   const t = useT(lang);
@@ -66,6 +67,11 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
 
   function finishQuiz() {
     completeTask("lesson");
+    // Marks this lesson's node done on the subject path. completedSessions
+    // holds lesson ids, so this is the same string the path matches on — there
+    // is no separate session id to keep in step. Idempotent in the store, so
+    // re-finishing a lesson does not stack anything.
+    completeSession(lessonId);
     setStep(6);
   }
 
