@@ -19,7 +19,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 28 Aug 2026 — The first real lesson content: ៣.១.១ សេចក្ដីផ្ដើម
 
-*Not yet committed.*
+*Landed in commit `6f57162`.*
 
 **Why.** The biology path was structure only — every node locked, nothing to open.
 The first section's content has now been written, so ៣.១.១ សេចក្ដីផ្ដើម is a real,
@@ -67,7 +67,7 @@ correct answer, explanation), and the content for ៣.១.២ onwards.
 
 ## 27 Aug 2026 — The biology learning path now follows the real textbook
 
-*Not yet committed.*
+*Landed in commit `6f57162`.*
 
 **Why.** Up to now the subject path made up its own structure, because there was no
 real curriculum to follow. The Grade 12 biology table of contents has now been
@@ -184,7 +184,7 @@ thing. Past papers will earn XP just the same.
 
 ## 27 Aug 2026 — Tapping a subject now opens a learning path
 
-*Not yet committed.*
+*Landed in commit `6f57162`.*
 
 **Why.** Tapping a subject went straight into its first lesson, which hid everything else
 the subject contained and gave the student no choice. Rebuilt around a supplied reference
