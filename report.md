@@ -29,8 +29,33 @@ playable lesson.
 
 - **៣.១.១ សេចក្ដីផ្ដើម is now open and tappable.** It is the only unlocked node on
   the biology path; the other 42 are still waiting for their content.
-- **A section runs in four steps**, tapping បន្ត between each, with the progress
-  bar filling in quarters: **មេរៀនសង្ខេប → ឧទាហរណ៍ → ចំណាំសំខាន់ៗ → កំហុស**.
+- **A section runs in two screens**, tapping បន្ត between them:
+  - **screen 1** — សេចក្ដីផ្ដើម, ឧទាហរណ៍, the **3D brain**, then **two questions**
+  - **screen 2** — មេរៀន, then ចំណាំសំខាន់ៗ, then កំហុស
+
+  សេចក្ដីផ្ដើម and មេរៀន show no heading: the section name sits above the first,
+  and the second was asked to drop its label.
+- **The 3D brain is on screen 1**, under the examples — the same model as the old
+  ខួរក្បាល lesson, not a second copy of the file, so it costs nothing extra to
+  download and only loads on sections that actually use one.
+- **A counter bar sits at the top of every lesson** — XP, streak, coins, and a
+  light/dark button — the same one already on the subject path. It is deliberately
+  **not** shown during the mock exam or placement test: a running score in front
+  of someone being measured changes what the test measures.
+- **The 3D brain is now labelled ខួរក្បាលរបស់មនុស្ស** in its top-left corner.
+- **A correct answer earns 10 XP and 5 coins**, added the moment you tap it, and
+  once per question. A wrong answer earns nothing — the right answer appears
+  straight away, so paying for a guess would make guessing worth as much as
+  thinking. Finishing the section still gives its own +20 XP on top.
+- **Two questions follow it**, each with its ស្ថានភាព scenario. Tapping an answer
+  shows straight away whether it was right, with the reason. **បន្ត stays greyed
+  out until both are answered** — nothing is scored, so there is no reason to let
+  a student walk past them.
+- **The lists have bullet points now.** The four points in សេចក្ដីផ្ដើម, the four
+  systems in មេរៀន and the two ឧទាហរណ៍ were running together as plain paragraphs.
+- **No emoji anywhere in a section.** The headings use proper icons instead, so
+  they look the same on every phone rather than changing shape between Android
+  and iPhone. The finished screen uses a trophy for the same reason.
 - **Each part is a plain white card with one coloured stripe down its left edge**
   — blue for the lesson, yellow for examples, purple for notes, pink for a
   misunderstanding with the ✍️ ការពិត answer nested inside it in green. The colour
@@ -38,6 +63,9 @@ playable lesson.
   card and the screen turned into a colour chart, which made the stripes stop
   meaning anything. Keeping the ❌ and ✍️ halves in one card is also deliberate —
   a student should not be able to read the wrong version on its own.
+- **A back button** sits to the left of បន្ត, so a student can return to an
+  earlier part to re-read it. It is hidden on the first part (the ✕ closes the
+  section there) and on the finished screen.
 - **Finishing gives +20 XP and coins**, and the node comes back marked done with
   the counter at ១/៤៣ — the same rewards the older lessons give.
 - **The path now opens on ៣.១.១ by itself.** Last round that needed a manual

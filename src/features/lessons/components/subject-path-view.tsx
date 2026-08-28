@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router";
-import { ArrowLeft, Coins, Flame, Zap } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
-import { useShallow } from "zustand/react/shallow";
 import { cn } from "@/utils/cn";
 import { toKhmerDigits } from "@/utils/khmer-num";
+import { StatBar } from "@/components/shell/stat-bar";
 import { SubjectArt } from "./subject-art";
 import { SessionNode } from "./session-node";
 import { SUBJECT_STYLE } from "../subject-styles";
@@ -28,44 +28,6 @@ import { allSessions, chaptersFor, pathProgress, sessionStatus } from "../sessio
  *
  * KHMER-ONLY, like the rest of the Study feature. See LESSONS_PAGE_LANG.
  */
-
-/**
- * XP, streak and coins.
- *
- * Every number is real and persisted. There is no energy/hearts meter because
- * the app has no such system — a decorative one would be a promise the product
- * does not keep, and a real one needs refill-over-time rules and a paywall story
- * that nobody has designed. Coins were added to the store for this bar and are
- * awarded by the same helper that grants XP, so they cannot drift from it.
- */
-function StatBar() {
-  const { xp, streak, coins } = useBrachNhaStore(
-    useShallow((s) => ({ xp: s.xp, streak: s.streak, coins: s.coins }))
-  );
-
-  const items = [
-    { icon: Zap, tone: "text-purple", value: xp, label: "XP" },
-    { icon: Flame, tone: "text-pink", value: streak, label: "ថ្ងៃ" },
-    { icon: Coins, tone: "text-yellow", value: coins, label: "កាក់" },
-  ];
-
-  return (
-    <div className="flex items-center gap-1.5">
-      {items.map((it) => (
-        <div
-          key={it.label}
-          className="flex items-center gap-1 rounded-full border border-purple/15 bg-surface px-2 py-1 shadow-panel-sm"
-        >
-          <it.icon
-            className={cn("size-3.5 shrink-0", it.tone)}
-            strokeWidth={2.5}
-          />
-          <span className="text-xs font-extrabold text-text">{it.value}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 /**
  * Where each node's CENTRE sits, as a percentage across the column. Cycling

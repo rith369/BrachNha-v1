@@ -129,7 +129,8 @@ interface BrachNhaState {
   schedulePlacementTest: (subject: string, scheduledDate: string) => void;
   resolvePlacementTest: (subject: string, isWeak: boolean) => void;
   signCommitment: (commitment: Commitment) => void;
-  addXp: (amount: number) => void;
+  /** `coins` overrides the default XP→coins ratio; see `award`. */
+  addXp: (amount: number, coins?: number) => void;
   completeTask: (task: keyof Tasks) => void;
   completeSession: (lessonId: string) => void;
   addExamResult: (result: ExamResult) => void;
@@ -155,20 +156,31 @@ interface BrachNhaState {
  * the level rule used to be written out twice, once in each, which is exactly
  * how a third caller ends up levelling differently.
  *
- * COINS_PER_XP is deliberately a plain ratio rather than a per-action table:
- * coins are the same earned effort as XP in a spendable form, so anything that
- * grants XP grants coins in proportion, with no second set of rules to keep in
- * step. Math.floor means small XP grants can round to zero coins, which is
+ * COINS_PER_XP is the DEFAULT, not a universal law. Coins are the same earned
+ * effort as XP in a spendable form, so anything granting XP grants coins in
+ * proportion unless it says otherwise, and there is no per-action table to keep
+ * in step. Math.floor means small XP grants can round to zero coins, which is
  * correct — it should take real work to earn one.
+ *
+ * `coins` overrides that ratio for a caller whose reward was set by hand. Today
+ * that is exactly one: a correct quiz answer, specified as 10 XP + 5 coins,
+ * which is twice the ratio. It is an argument rather than a second constant so
+ * the exception stays visible at the call site instead of hiding in a table
+ * here — if a third or fourth caller ever needs one, that is the signal the
+ * ratio itself is wrong and should be re-set, not worked around again.
  */
 const COINS_PER_XP = 0.25;
 
-function award(state: { xp: number; level: number; coins: number }, amount: number) {
+function award(
+  state: { xp: number; level: number; coins: number },
+  amount: number,
+  coins?: number
+) {
   const xp = state.xp + amount;
   return {
     xp,
     level: xp >= state.level * 100 ? state.level + 1 : state.level,
-    coins: state.coins + Math.floor(amount * COINS_PER_XP),
+    coins: state.coins + (coins ?? Math.floor(amount * COINS_PER_XP)),
   };
 }
 
@@ -288,7 +300,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       // one re-snapshots whatever the plan says today.
       signCommitment: (commitment) => set({ commitment }),
 
-      addXp: (amount) => set((state) => award(state, amount)),
+      addXp: (amount, coins) => set((state) => award(state, amount, coins)),
 
       completeTask: (task) =>
         set((state) => {

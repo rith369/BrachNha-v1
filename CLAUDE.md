@@ -503,6 +503,41 @@ mode on a lesson, since the shell doesn't render it on the assessments at all.
 layout off `/lessons/:id`. That branch was unreachable until the mentor was
 allowed inside lessons — it was written for this and is now live.
 
+**`FocusLayout`'s `showStats` puts the XP / streak / coins counters and a
+light-dark toggle above the progress bar.** It is opt-in and the LESSONS opt in —
+`LessonDetail` and `SectionDetail` — while the mock exam and placement test do
+not: a live XP counter mid-exam turns a measurement into a scoreboard, and a
+theme toggle one tap from an answer that counts is a settings control in the
+wrong place. The counters get their OWN row rather than joining the X + progress
+row, because at the 320px floor that row is already a 32px button, a flexible bar
+and a "1 / 2" — three chips and a toggle alongside would leave the progress bar a
+few pixels wide.
+
+**`components/shell/stat-bar.tsx` is that row, and it is shared.** It began as a
+local function inside `subject-path-view.tsx` and was lifted the moment a second
+caller appeared — same reason `shell/wordmark.tsx` exists. Its `theme` prop adds
+a single toggle rather than reusing `ThemeSwitcher`: that is a two-option
+segmented control built for the drawer footer, and with exactly two themes a
+toggle says the same thing in a third of the width.
+
+**Back is a SEPARATE affordance from exit, and `FocusLayout` owns both.** The X
+leaves the task; `onBack` steps within it. It is an opt-in prop rendering a
+compact button at the start of the FOOTER row (not beside the X — two icons in
+one corner and neither reads), and it lives in the shared frame rather than in
+each screen's own `footer` node so a back control cannot end up looking
+different on the three task screens the way their progress bars once did. The
+row is `items-stretch` so the button takes its height from the action button
+beside it, and `footer` sits in a `flex-1` wrapper so `FocusButton` stays
+full-width on the screens that pass no `onBack`.
+
+Only `SectionDetail` passes it today, where it is absent on the first step (the
+X is the only way out) and on the completion screen (the XP is already banked;
+stepping back into the quiz from there would let it be re-answered). **The lesson
+flow deliberately does NOT have it yet**: its `afterFunFact`/`afterDidYouKnow`
+handlers skip steps a lesson has no content for, so a naive `step - 1` would land
+on a step that lesson never renders. Adding it there means mirroring the skip
+logic, not passing the prop.
+
 **Every focus screen must have a working exit.** The exam's answering screen had
 none before this — survivable only because the nav was still there to escape
 through. It now passes `confirmExit`, which shows a two-tap confirm first,
@@ -845,8 +880,44 @@ hang under. Banner separation is `mt-8 first:mt-0`.
 
 ### Section content — the curriculum shape, and why it is not `Lesson`
 
-A SECTION is one node on a path and the unit real content is written in:
-**មេរៀនសង្ខេប → ឧទាហរណ៍ → ចំណាំសំខាន់ៗ → កំហុស**, optionally then a quiz.
+A SECTION is one node on a path and the unit real content is written in five
+blocks — **សេចក្ដីផ្ដើម, មេរៀន, ឧទាហរណ៍, ចំណាំសំខាន់ៗ, កំហុស** — optionally then a
+quiz.
+
+**Those blocks render across TWO steps.** Step 0 is សេចក្ដីផ្ដើម → ឧទាហរណ៍ →
+optional 3D model → សំណួរ (orientation: why this matters, what it looks like in
+life, then "now you try"); step 1 is មេរៀន then ចំណាំសំខាន់ៗ then កំហុស (the
+substance).
+
+**The quiz is INSIDE step 0, not a step of its own**, and step 0 will not advance
+until every question is answered — `quizDone`. `SectionContent.quiz` is an ARRAY
+(the first authored section has two questions), answers are held in a
+`Record<index, string>`, and `SectionQuestion.scenario` carries the ស្ថានភាព
+set-up above the prompt in muted text. `correct` is compared by string equality,
+so the ក./ខ./គ./ឃ. prefix has to be repeated there — a mismatch silently marks
+every answer wrong.
+
+`Model3DRef.title` captions the viewer's top-left corner (ខួរក្បាលរបស់មនុស្ស on
+this section). Authored rather than hardcoded in the viewer, since the viewer is
+shared and a second model would need a different name; top-left because the drag
+hint already owns top-right and at 320px a centred caption would meet it.
+
+**`SectionContent.model3d` reuses `Model3DRef` and `BrainModelViewer` as-is**,
+including the same `/models/brain.glb` and credit string the Human Brain lesson
+uses — one asset referenced twice, not a second copy. It is behind the same
+`React.lazy` boundary, so both routes share one `brain-model-viewer-*.js` chunk
+and a section without a model never downloads three.js. **Check that chunk still
+exists after touching either file.** It ran as five
+one-block steps first and was cut back deliberately. Merging cost nothing
+structurally because each block still renders in its own `Callout` — only the
+step boundaries moved — so regrouping is a change to the render, never to the
+data.
+
+**`SectionBlock.items` renders as a BULLETED list**, with nested `item.items` as
+`list-[circle]` under it. Every one of these blocks is a list, and without a
+marker the items ran together into a wall of Khmer with only the bold label
+breaking them up. `list-outside` keeps wrapped lines aligned under the text
+rather than under the bullet, which matters here because Khmer lines wrap often.
 `data/sections.ts` holds `SECTION_CONTENT` keyed by the id `sectionsFor()`
 generates (`"biology-3-1-1"`); the types live in `types/index.ts` beside `Lesson`.
 **One entry today** — ៣.១.១ សេចក្ដីផ្ដើម — and nearly-empty is the normal state,
@@ -872,6 +943,18 @@ Tones come from the per-theme `--color-*` scale, never `--brand-*` — borders a
 text rather than fills under white text — which is also why every tone is correct
 in dark with no `dark:` override. `TONE` spells all five variants out because
 Tailwind cannot see a runtime-assembled class.
+
+**សេចក្ដីផ្ដើម and មេរៀន carry NO heading, and that is deliberate.** The section
+title rendered above the first is already its heading, and មេរៀនសង្ខេប was
+explicitly asked to lose its label. Within each step the unlabelled block leads
+and the labelled ones follow, which is also what keeps a step reading as one flow
+rather than a stack of equal cards.
+
+**NO EMOJI in section content or its headings.** `Callout` takes a `LucideIcon`,
+not a character — the same swap the rest of the app made, because emoji render
+differently on every handset. The completion screen uses `Trophy` for the same
+reason. The icon is tinted to the stripe colour: one small glyph reinforces the
+stripe rather than competing with it the way the old tinted backgrounds did.
 
 **The colour is the STRIPE and only the stripe.** Card body is `bg-surface` with a
 neutral `border-border` hairline, and the label is ordinary `text-text`. The first
@@ -969,10 +1052,21 @@ granted together, which both `addXp` and `completeTask` now route through. The
 level rule used to be written out twice, once in each; that is exactly how a third
 caller ends up levelling differently.
 
-`COINS_PER_XP` is a flat ratio rather than a per-action table: coins are the same
+`COINS_PER_XP` is the DEFAULT rather than a universal law: coins are the same
 earned effort as XP in spendable form, so anything granting XP grants coins in
-proportion with no second rule set. `Math.floor` means small grants round to zero,
-which is correct. **Nothing spends them yet.**
+proportion unless it says otherwise, with no per-action table to keep in step.
+`Math.floor` means small grants round to zero, which is correct.
+
+`addXp(amount, coins?)` lets a caller override that ratio. **Exactly one does**:
+a correct section-quiz answer, set by hand at 10 XP + 5 coins (twice the ratio),
+in `section-detail.tsx`'s `QUIZ_XP`/`QUIZ_COINS`. It is an argument rather than a
+second constant in the store so the exception stays visible at the call site — and
+if a third or fourth caller ever needs one, that is the signal the ratio itself is
+wrong and should be re-set, not worked around again. A wrong answer earns nothing
+at all rather than a smaller amount: the correct option is revealed immediately,
+so a consolation payout would make guessing worth as much as thinking.
+
+**Nothing spends them yet.**
 
 There is deliberately **no energy/hearts meter** despite the reference having one.
 A decorative one is a promise the product does not keep, and a real one needs

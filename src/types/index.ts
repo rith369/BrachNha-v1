@@ -73,6 +73,10 @@ export interface Model3DRef {
   src: string;
   /** License credit line, rendered under the viewer. */
   credit: string;
+  /** Optional caption naming what the model shows, over the top-left corner.
+   *  Authored rather than hardcoded in the viewer, because the viewer is shared
+   *  and a second model would need a different name. */
+  title?: string;
 }
 
 export interface Lesson {
@@ -129,6 +133,8 @@ export interface SectionBlock {
   /** Optional lead paragraph above the items. */
   intro?: string;
   items: SectionItem[];
+  /** Optional closing paragraph below the items. */
+  outro?: string;
 }
 
 /** An ❌ / ✍️ pair. Two fields rather than free text: the contrast is the point,
@@ -140,21 +146,34 @@ export interface Misconception {
 
 /** Khmer-only sibling of PracticeQuestion. */
 export interface SectionQuestion {
+  /** Optional ស្ថានភាព setting the question up. Rendered above the prompt in a
+   *  quieter style, because it is the situation rather than the question. */
+  scenario?: string;
   q: string;
   options: string[];
+  /** Must match one of `options` EXACTLY — the comparison is string equality,
+   *  so the ក./ខ./គ./ឃ. prefix has to be carried here too. */
   correct: string;
   explanation: string;
 }
 
 export interface SectionContent {
   title: string;
+  /** Opens the section — why the topic matters and what it covers. Rendered
+   *  first, with no heading of its own: the section title above it is the
+   *  heading, and a second one would just repeat it. */
+  intro: SectionBlock;
   lesson: SectionBlock;
   examples: SectionBlock;
   notes: SectionBlock;
   mistakes: Misconception[];
-  /** Absent until a question is written. The step is skipped while undefined,
-   *  the same way lesson-detail.tsx skips `didYouKnow`. */
-  quiz?: SectionQuestion;
+  /** Interactive 3D model, shown under the examples. Same shape and the same
+   *  viewer the Human Brain lesson uses — absent on every section without one,
+   *  so no other section pays for the three.js chunk. */
+  model3d?: Model3DRef;
+  /** Absent until questions are written; the block simply doesn't render. An
+   *  ARRAY because a section can ask several — the first one authored has two. */
+  quiz?: SectionQuestion[];
 }
 
 export type MockExamSubject = "math" | "biology" | "chemistry" | "physics";

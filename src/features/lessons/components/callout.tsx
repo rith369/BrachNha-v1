@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
 import { cn } from "@/utils/cn";
 
 /**
@@ -28,26 +29,36 @@ import { cn } from "@/utils/cn";
  */
 export type CalloutTone = "blue" | "yellow" | "purple" | "pink" | "mint";
 
-const TONE: Record<CalloutTone, string> = {
-  blue: "border-l-blue",
-  yellow: "border-l-yellow",
-  purple: "border-l-purple",
-  pink: "border-l-pink",
-  mint: "border-l-mint",
+const TONE: Record<CalloutTone, { edge: string; icon: string }> = {
+  blue: { edge: "border-l-blue", icon: "text-blue" },
+  yellow: { edge: "border-l-yellow", icon: "text-yellow" },
+  purple: { edge: "border-l-purple", icon: "text-purple" },
+  pink: { edge: "border-l-pink", icon: "text-pink" },
+  mint: { edge: "border-l-mint", icon: "text-mint" },
 };
 
 export function Callout({
   tone,
+  icon: Icon,
   label,
   children,
   className,
 }: {
   tone: CalloutTone;
+  /**
+   * Lucide icon for the heading row. Deliberately a LucideIcon rather than an
+   * emoji: emoji render differently on every handset, which is the reason the
+   * app swapped its icons out in the first place. Tinted to match the stripe —
+   * a single small glyph, which reinforces the stripe rather than competing
+   * with it the way the old tinted backgrounds did.
+   */
+  icon?: LucideIcon;
   /** Optional heading row above the body. */
   label?: ReactNode;
   children: ReactNode;
   className?: string;
 }) {
+  const c = TONE[tone];
   return (
     <div
       className={cn(
@@ -55,12 +66,18 @@ export function Callout({
         // card, the hairline just closes the other three sides. Both are `border`
         // so the left edge overrides rather than adds.
         "rounded-xl border border-border border-l-4 bg-surface p-4 md:p-5",
-        TONE[tone],
+        c.edge,
         className
       )}
     >
-      {label && (
-        <div className="mb-2 text-xs font-extrabold text-text md:text-sm">
+      {(label || Icon) && (
+        <div className="mb-2 flex items-center gap-1.5 text-xs font-extrabold text-text md:text-sm">
+          {Icon && (
+            <Icon
+              className={cn("size-4 shrink-0 md:size-4.5", c.icon)}
+              strokeWidth={2.5}
+            />
+          )}
           {label}
         </div>
       )}

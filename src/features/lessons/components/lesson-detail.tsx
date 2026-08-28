@@ -136,6 +136,7 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
     <FocusLayout
       progressPct={pct}
       onExit={goBack}
+      showStats
       meta={`${step} / ${TOTAL_STEPS}`}
       footer={footer}
     >

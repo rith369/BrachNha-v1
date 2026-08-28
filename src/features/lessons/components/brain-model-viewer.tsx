@@ -111,6 +111,14 @@ export function BrainModelViewer({
         </Suspense>
         <OrbitControls enablePan={false} makeDefault />
       </Canvas>
+      {/* Names what the model shows. Top-LEFT, so it can never collide with the
+          drag hint opposite it — the two are the only things over the canvas at
+          that edge, and on a 320px phone a centred title would meet the hint. */}
+      {model.title && (
+        <div className="pointer-events-none absolute top-1 left-1 rounded bg-black/40 px-1.5 py-0.5 text-[10px] font-extrabold text-white">
+          {model.title}
+        </div>
+      )}
       <div className="pointer-events-none absolute bottom-1 left-1 rounded bg-black/40 px-1.5 py-0.5 text-[9px] text-white/80">
         {model.credit}
       </div>

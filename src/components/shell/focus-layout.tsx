@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { X } from "lucide-react";
+import { ChevronLeft, X } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
+import { StatBar } from "./stat-bar";
 
 /**
  * The full-screen task shell used by every lesson and test — Duolingo's lesson
@@ -18,6 +19,8 @@ import { useBrachNhaStore } from "@/lib/store";
 export function FocusLayout({
   progressPct,
   onExit,
+  onBack,
+  showStats = false,
   confirmExit = false,
   meta,
   footer,
@@ -26,6 +29,27 @@ export function FocusLayout({
   /** 0–100. Drives the top bar; the caller keeps owning what "progress" means. */
   progressPct: number;
   onExit: () => void;
+  /**
+   * Step BACKWARDS within the task. Distinct from onExit, which leaves it
+   * entirely — the X is "I'm done here", this is "let me re-read that".
+   *
+   * Opt-in, and it lives here rather than in each screen's own footer node so a
+   * back control cannot end up looking different on the three task screens the
+   * way their progress bars once did. Pass `undefined` on the first step and on
+   * any screen with nothing behind it; the button is then simply absent rather
+   * than present and dead.
+   */
+  onBack?: () => void;
+  /**
+   * Show the XP / streak / coins counters and the light-dark toggle above the
+   * progress bar.
+   *
+   * Opt-in, and the LESSONS opt in — not the assessments. Dangling a running XP
+   * counter in front of someone mid-exam turns a measurement into a scoreboard,
+   * and the theme toggle is a settings control that has no business being one
+   * tap from an answer that counts.
+   */
+  showStats?: boolean;
   /** Ask before leaving. For screens where exiting discards work (the exam). */
   confirmExit?: boolean;
   /** Optional right-hand status, e.g. "3 answered" or "Q2 / 10". */
@@ -77,6 +101,16 @@ export function FocusLayout({
           with its contents capped to the same width as the body below — all
           three bands carry the identical max-w so their edges stay aligned. */}
       <div className="shrink-0 border-b border-purple/10">
+        {/* Counters get their OWN row rather than joining the X + progress row.
+            At the 320px floor that row is already a 32px button, a flexible bar
+            and a "1 / 2" — three chips and a toggle squeezed alongside would
+            leave the progress bar a few pixels wide. justify-end puts them under
+            the meta on the right, where the eye already is. */}
+        {showStats && (
+          <div className="mx-auto flex w-full max-w-2xl justify-end px-4 pt-3 md:max-w-3xl md:px-6 md:pt-4">
+            <StatBar theme />
+          </div>
+        )}
         <div className="mx-auto flex w-full max-w-2xl items-center gap-3 px-4 py-3 md:max-w-3xl md:gap-4 md:px-6 md:py-4">
           <button
             onClick={() => (confirmExit ? setConfirming(true) : onExit())}
@@ -111,8 +145,21 @@ export function FocusLayout({
 
       {footer && (
         <div className="shrink-0 border-t border-purple/10 bg-surface">
-          <div className="mx-auto w-full max-w-2xl px-4 py-3 md:max-w-3xl md:px-6 md:py-4">
-            {footer}
+          {/* items-stretch, so the back button takes its height from the action
+              button beside it rather than needing the two kept in step by hand.
+              The footer node sits in a flex-1 wrapper, which is what keeps
+              FocusButton full-width on the screens that pass no onBack. */}
+          <div className="mx-auto flex w-full max-w-2xl items-stretch gap-2.5 px-4 py-3 md:max-w-3xl md:gap-3 md:px-6 md:py-4">
+            {onBack && (
+              <button
+                onClick={onBack}
+                aria-label={lang === "en" ? "Back" : "ថយក្រោយ"}
+                className="flex shrink-0 items-center justify-center rounded-2xl border border-purple/20 bg-purple/8 px-4 text-purple transition hover:bg-purple/15 md:px-5"
+              >
+                <ChevronLeft className="size-5 md:size-6" strokeWidth={2.5} />
+              </button>
+            )}
+            <div className="min-w-0 flex-1">{footer}</div>
           </div>
         </div>
       )}
