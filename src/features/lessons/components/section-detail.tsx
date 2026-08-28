@@ -19,6 +19,7 @@ import {
   focusPrompt,
 } from "@/utils/focus-styles";
 import { Callout } from "./callout";
+import { SectionVideoPlayer } from "./section-video";
 import type { SectionBlock, SectionContent, SectionQuestion } from "@/types";
 
 // three.js + react-three-fiber + drei is a large dependency needed only by the
@@ -287,6 +288,7 @@ export function SectionDetail({
             <div className="text-xl font-extrabold md:text-3xl">
               {section.title}
             </div>
+            {section.video && <SectionVideoPlayer video={section.video} />}
             <Callout tone="mint">
               <Block block={section.intro} />
             </Callout>

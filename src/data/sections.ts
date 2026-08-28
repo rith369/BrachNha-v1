@@ -15,6 +15,13 @@ export const SECTION_CONTENT: Record<string, SectionContent> = {
   "biology-3-1-1": {
     title: "សេចក្ដីផ្ដើម",
 
+    // Poster only — no video is recorded yet. Freepik free licence, covered by
+    // the existing credit line on the Profile page.
+    video: {
+      poster: "/sections/biology-3-1-1.webp",
+      durationSec: 199,
+    },
+
     intro: {
       intro: `នៅក្នុងជីវិតប្រចាំថ្ងៃ រាងកាយរបស់មនុស្សយើងត្រូវការឆ្លើយតបទៅនឹងបម្រែបម្រួលផ្សេងៗនៃបរិស្ថានជុំវិញខ្លួនជានិច្ច ដូចជាការគេចចេញពីកម្ដៅ ការស្តាប់សំឡេង ឬការទទួលដឹងរសជាតិអាហារ។ ដំណើរការទាំងនេះអាចប្រព្រឹត្តទៅបានយ៉ាងរលូន ដោយសារមានការធ្វើការងារយ៉ាងជិតស្និទ្ធ និងមានប្រសិទ្ធភាពនៃ ប្រព័ន្ធប្រសាទ (Nervous System)។
 

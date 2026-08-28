@@ -897,6 +897,25 @@ set-up above the prompt in muted text. `correct` is compared by string equality,
 so the ក./ខ./គ./ឃ. prefix has to be repeated there — a mismatch silently marks
 every answer wrong.
 
+**`SectionVideoPlayer` is a player for a video that does not exist.** The design
+calls for one at the top of a section; none are recorded, so `SectionContent.video`
+carries a poster and a duration and the component draws the chrome — poster, play
+button, ០:០០ / duration, fullscreen glyph, scrub bar. Same idea as the mascot slot
+and the empty past papers: build the shape now, drop the real thing in later.
+
+**NOTHING IN IT IS INTERACTIVE.** It first shipped with a real `<button>` under
+the play glyph plus a ឆាប់ៗនេះ chip and a "video is being prepared" notice; the
+chip and notice were removed at the user's request, so the button went with them.
+A `<button>` that answers a tap with silence is the broken-app pattern
+`sidebar-nav.tsx` and the survey's `StudiedStep` both exist to avoid — with the
+explanation gone, plain spans are the only honest form. Identical on screen, no
+pointer cursor, no focus ring, nothing announced as pressable. **Don't reinstate
+the `<button>` without reinstating something for it to say.** Elapsed reads ០:០០
+and the scrub sits at zero because both are true — a pre-filled bar would invent a
+state the app cannot know. Posters live in `public/sections/` named by section id, 16:9
+at 800px (not the cards' 4:3 at 600px — the player is ~720px wide at `max-w-3xl`);
+see `design/subjects.md`.
+
 `Model3DRef.title` captions the viewer's top-left corner (ខួរក្បាលរបស់មនុស្ស on
 this section). Authored rather than hardcoded in the viewer, since the viewer is
 shared and a second model would need a different name; top-left because the drag

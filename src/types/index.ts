@@ -157,8 +157,20 @@ export interface SectionQuestion {
   explanation: string;
 }
 
+/** Poster + duration for a section's video. There is no video file yet; see
+ *  SectionVideoPlayer for why the player is built anyway. */
+export interface SectionVideo {
+  /** public/-relative poster image, e.g. "/sections/biology-3-1-1.webp". */
+  poster: string;
+  /** Run time in seconds, formatted for display. A number rather than a string
+   *  so a malformed "3:9" cannot be typed in. */
+  durationSec: number;
+}
+
 export interface SectionContent {
   title: string;
+  /** Shown at the top of the section, under the title. */
+  video?: SectionVideo;
   /** Opens the section — why the topic matters and what it covers. Rendered
    *  first, with no heading of its own: the section title above it is the
    *  heading, and a second one would just repeat it. */

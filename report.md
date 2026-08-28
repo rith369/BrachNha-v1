@@ -35,6 +35,11 @@ playable lesson.
 
   សេចក្ដីផ្ដើម and មេរៀន show no heading: the section name sits above the first,
   and the second was asked to drop its label.
+- **A video player sits at the top of screen 1**, with your illustration as its
+  picture, a play button, the run time and a scrub bar — the design you sent.
+  **There is no video behind it yet**, so it is a picture of a player rather than
+  a working one: nothing in it responds to a tap. Record a video later and these
+  become its real controls.
 - **The 3D brain is on screen 1**, under the examples — the same model as the old
   ខួរក្បាល lesson, not a second copy of the file, so it costs nothing extra to
   download and only loads on sections that actually use one.

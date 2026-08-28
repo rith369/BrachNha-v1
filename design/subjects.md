@@ -123,3 +123,30 @@ broken-image glyph over the gradient.
 
 `scripts/webp.mjs` creates `public/subjects/` if it is missing, so the empty
 directory does not need to be kept in git.
+
+## Section video posters — `public/sections/`
+
+A second, separate set: the poster frame behind each section's video player. Named
+by SECTION ID (`biology-3-1-1.webp`), so a section's poster is findable from its id
+with no lookup table, exactly as the subject art is named by subject id.
+
+**16:9 at 800px, not the subject cards' 4:3 at 600px.** A video is 16:9 by
+convention and the player renders the poster at up to ~720px wide inside
+`FocusLayout`'s `max-w-3xl` column, so 600px would be soft on a laptop:
+
+```bash
+node scripts/webp.mjs poster.jpg --name biology-3-1-1 --out public/sections --ratio 16:9 --width 800
+```
+
+| file | source | licence |
+| --- | --- | --- |
+| `biology-3-1-1.webp` | `flat-design-biotechnology-concept-illustrated.zip` → `5178591.jpg` (3000×2000) | Freepik free |
+
+Freepik free again, so the **existing credit line on the Profile page already
+covers it** — one line covers every Freepik image regardless of count, so no
+attribution change was needed. Note the 3:2 source is cropped to 16:9, which
+trims the top and bottom; check the framing when adding a poster whose subject
+sits near an edge.
+
+**There is no video file.** `SectionVideoPlayer` draws the player chrome around
+the poster; nothing in it is interactive — see the comment there.
