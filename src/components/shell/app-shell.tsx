@@ -7,6 +7,7 @@ import { LoginView } from "@/features/login/components/login-view";
 import { SurveyView } from "@/features/survey/components/survey-view";
 import { CommitmentOverlay } from "@/features/commitment/components/commitment-overlay";
 import { useBrachNhaStore } from "@/lib/store";
+import { useSupabaseSync } from "@/hooks/use-supabase-sync";
 
 // The mentor pulls in KaTeX and its web fonts for typesetting replies. It is
 // only mounted when chatOpen is true, but a static import would still ship all
@@ -49,6 +50,14 @@ export function AppShell({
   const surveyed = useBrachNhaStore((s) => s.surveyed);
   const lang = useBrachNhaStore((s) => s.lang);
   const theme = useBrachNhaStore((s) => s.theme);
+
+  // Signs the student in (anonymously) and keeps the store backed up to
+  // Supabase. Renders nothing and returns nothing — it is mounted here rather
+  // than in a page because it has to outlive every navigation, the same reason
+  // the chat conversation lives in the store. If Supabase is unconfigured or
+  // unreachable it is a no-op and the app stays entirely local, which is the
+  // supported state, not a degraded one.
+  useSupabaseSync();
 
   // Hiding the FAB is not enough on its own. `chatOpen` is global and survives
   // navigation, so a student could open the mentor on the exam INTRO screen and

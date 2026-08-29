@@ -32,6 +32,7 @@ warning it carried still stands: do not copy Next.js-specific patterns back in.
 | **KaTeX** | ✅ Use | Typesets both sides of the KruAI conversation. Pulled in through a lazy import of `ChatOverlay` so its JS and web fonts stay out of the first-paint bundle |
 | **MathLive** | ✅ Use | The math keyboard and formula editor in the chat composer, replacing ~570 lines of hand-built Unicode keyboard. Lazy-imported one level deeper than KaTeX — see the mentor section below, the boundary is load-bearing |
 | **Zustand (+ persist)** | ✅ Use | Single global store; replaces scattered `useState` + manual localStorage |
+| **Supabase** (`@supabase/supabase-js`) | ✅ Use | Postgres + auth behind the store. A durable SECOND copy — the app still reads localStorage first and works with Supabase absent. Lazily imported so it stays out of the entry chunk; see its own section below |
 | **Google Fonts via `<link>` in `index.html`** | ✅ Use | Nunito = body, Space Grotesk = headings, Noto Sans Khmer = every Khmer glyph, Caveat = typed signature only. See the font note below — it matters |
 
 ### Fonts: the one thing you must not "simplify"
@@ -141,6 +142,9 @@ before `AppShell`'s, so a synchronous redraw would read the outgoing theme.
 - `public/` = URL-referenced assets; `src/assets/` = imported-into-component assets
 - `server/` = code that runs on a server, never in the browser
 - `api/` = Vercel serverless entry points, thin wrappers over `server/`
+- `supabase/` = database schema as timestamped SQL migrations, plus how to
+  apply them. Never edited from the dashboard's Table Editor — a change made
+  there works and then nothing in the repo records that it happened
 - `design/` = master artwork, **never served and never bundled**. It is outside
   `public/` precisely so it can't be. Sources live here; what ships is the
   derived asset in `public/`. See `design/README.md`.
@@ -266,6 +270,150 @@ prompt tells the model to keep notation/units/established technical terms in
 Latin form (lim, ∫, H₂O, mol, pH) with a Khmer gloss on first use, rather than
 invent Khmer coinages a student won't meet on the exam paper. Flip the one
 constant to go back to answering in the student's chosen language.
+
+## Supabase — the database, and why the app does not read from it
+
+`localStorage["brachnha"]` is still the app's live copy. Supabase is a SECOND
+copy that trails behind it by a couple of seconds. Nothing in the UI awaits it,
+no screen renders differently because of it, and the whole thing being absent —
+unconfigured, unreachable, or a project whose migrations were never applied — is
+a supported state rather than a broken one.
+
+That direction is deliberate and is the thing to not "fix". Reading from the
+database directly would mean every screen has a loading state, an error state
+and a stale state it does not have today, on an app whose audience is on
+Cambodian mobile data. The store already solves the hard part; Supabase makes it
+durable.
+
+**Files, and what each is for:**
+
+| file | role |
+| --- | --- |
+| `supabase/migrations/*.sql` | the schema. Source of truth, checked into git |
+| `supabase/README.md` | how to apply them, and the two dashboard steps |
+| `src/types/database.ts` | hand-written mirror of the SQL, `Row`/`Insert`/`Update` |
+| `src/lib/supabase.ts` | lazily-imported client, or null |
+| `src/lib/supabase-sync.ts` | store ↔ row mapping, push and pull |
+| `src/hooks/use-supabase-sync.ts` | auth + when to push. Mounted once, in `AppShell` |
+| `scripts/supabase-check.mjs` | `npm run db:check` — env → reachability → auth → tables |
+
+### Four things here that look wrong and are not
+
+**1. `getSupabase()` is an async function, not an exported client.** The SDK is
+~40KB gzipped and `AppShell` mounts the sync hook on every screen, so a static
+import puts all of it in the entry chunk — 168KB gzipped, arrived at
+deliberately (see the performance section). `import type` is erased, so the only
+real import is the dynamic one inside the function. Same boundary as KaTeX,
+MathLive and three.js. **Check `dist/assets/` still has a separate Supabase
+chunk after touching that file**; a stray static `import { createClient }`
+anywhere undoes it silently, exactly like `math-field-panel`.
+
+**2. `Relationships` on every table in `database.ts` is mandatory, not
+decoration.** It is a required member of postgrest-js's `GenericTable`. A table
+missing it fails the `GenericSchema` constraint, and the client then degrades
+every query's type to `never` instead of erroring at the definition — so the
+build breaks in `supabase-sync.ts` with two dozen "not assignable to parameter
+of type `never[]`" errors pointing at correct code. The entries also drive
+embedded selects: the `conversations → chat_messages` embed in `pullRemoteState`
+typechecks only because `chat_messages` declares a relationship back.
+
+**3. Local always wins, except once.** The only pull is into an EMPTY store
+(`userName === ""`) that has a live session — a cleared cache or a reinstall. A
+wrong pull silently overwrites work the student just did with a stale server
+copy and they cannot get it back; a wrong push overwrites a backup of that same
+device. The costs are not symmetrical, so the tie does not go to the middle.
+
+**4. `conversations.id` is `text`, not `uuid`.** The id is minted client-side by
+`newId()` in `store.ts`, which falls back to a `c<base36>` string when
+`crypto.randomUUID` is unavailable. A uuid column would reject those and every
+id already sitting in a student's localStorage.
+
+### Identity is ANONYMOUS, and that is what keeps the login screen intact
+
+`signInAnonymously()` mints a real `auth.users` row with no email and no
+password, so `auth.uid()` exists and RLS works, while the student still just
+types a name and picks a language. BrachNha's "login" has never been an
+authentication step and turning it into one would be a product change nobody
+asked for.
+
+**This means the sync is a BACKUP, not multi-device sync.** An anonymous session
+lives in one browser's localStorage; a second device gets a different anonymous
+user and an empty account. Real roaming needs
+`supabase.auth.updateUser({ email })` to convert that same user into a permanent
+one — which keeps the uid and therefore every row already written against it.
+Nothing in the schema or `supabase-sync.ts` changes when that happens;
+`use-supabase-sync.ts` is the only file that would.
+
+**An anonymous user has no email, and that surprises people.** The
+Authentication → Users board shows the row with a blank Email column, because
+`auth.users.email` is genuinely empty — that is what anonymous means. The
+address a student types on the login screen is optional profile data, and it
+goes to `profiles.email`, visible in Table Editor → profiles. Putting it on the
+auth user instead means `updateUser({ email })`, which converts the anonymous
+user into a permanent one and, with `mailer_autoconfirm` off, sends a
+confirmation link the student has to click before it applies. That is a product
+decision about whether BrachNha wants an email step at all — not a bug to fix.
+
+**Anonymous sign-ins are OFF by default** (Authentication → Sign In / Providers).
+With them off, `signInAnonymously()` returns 422 and the hook takes the same path
+as "no network". Verified against the live project: the settings endpoint reports
+this at `external.anonymous_users`, NOT a flat `external_anonymous_users` — the
+flat name is simply absent from the payload, so reading it always says
+"disabled". `scripts/supabase-check.mjs` carries a comment saying so.
+
+### Two places the schema deliberately does more than mirror the store
+
+**`daily_activity` has a date.** The store's `tasks` is only ever today —
+`resetDailyTasks()` wipes it and nothing survives. One row per student per day
+is the "daily activity log" that `features/progress/demo-data.ts` and
+`utils/leaderboard.ts` both name as the missing piece before the heatmap and the
+study-time board can stop being demo data. Its `questions_answered` /
+`xp_earned` / `study_minutes` columns are written by nothing yet and are there
+so the row has somewhere to put them; an empty column costs nothing, a migration
+on a live table costs a deploy. When `study_minutes` is finally populated it
+must mean ACTIVE minutes — see the leaderboard section for why.
+
+**`exam_results` has a `kind`.** The store's `examResults` holds generated mock
+exams ONLY, and three things depend on that: Home's "from mock exams" stat pill,
+the average `chat-prompt.ts` states to KruAI as fact, and the generated-exam
+tab rendering the array unfiltered. `kind` lets past-paper and placement
+attempts be recorded without ever being mistaken for a mock — the client filters
+`kind = 'mock'` when it rebuilds the array. This is the "separate persisted
+`pastPaperResults`" follow-up flagged in the Mock Exam section, done as a column
+because the row shape is identical.
+
+### RLS: own rows only, and the one screen that does not fit
+
+Every table denies by default and then allows exactly `auth.uid() = user_id`
+(`= id` on `profiles`), with `(select auth.uid())` so Postgres evaluates it once
+per statement rather than once per row.
+
+The leaderboard needs cross-user reads and is fixed demo data partly for that
+reason. When it goes live it wants a view or a `security definer` function
+exposing rank and display name only — **not** a "profiles are readable by
+everyone" policy, which hands out email, age and location with it.
+
+### Content stays in `src/data/`
+
+Lessons, sections, subjects, past papers are NOT in the database. Most subjects
+have no content yet and the curriculum shape is still moving; a schema would
+make every content edit a migration. Revisit when content settles, not before.
+
+### Keeping the three copies in step
+
+The schema, `database.ts` and the sync layer are three descriptions of one
+thing. Two invariants worth re-checking after any change to the store:
+
+- every key in `partializeState` (`lib/store.ts`) appears in
+  `syncRelevantChange` (`use-supabase-sync.ts`), or that field silently never
+  reaches the server;
+- every column in the SQL appears in the matching `Row` type.
+
+Both were verified mechanically when this landed — 21/21 fields, 74/74 columns
+across 8 tables — and both are the kind of thing that rots quietly.
+
+`@supabase/ssr` is in `package.json` and is unused: it is for frameworks with a
+server-rendered request cycle, which this app does not have. Safe to remove.
 
 ## What's fully built and working
 
@@ -1641,6 +1789,25 @@ anymore, so adding a new `avatarSeed` means downloading a matching SVG into
 
 ## Bugs found and fixed during the build (know these patterns)
 
+**StrictMode double-mounted the sync effect into two anonymous users.**
+`main.tsx` wraps the app in `<StrictMode>`, so in development every effect runs
+twice. Both passes of `useSupabaseSync` awaited `getSession()`, both were
+correctly told "no session" because the first sign-in had not come back yet, and
+both then called `signInAnonymously()`. One page load created TWO `auth.users`
+rows; only the second kept a session, so the first was an orphan that no profile
+data was ever pushed to — visible in the Authentication board as a blank row
+that nothing explains. Fixed with a MODULE-LEVEL single-flight promise
+(`signInInFlight` in `use-supabase-sync.ts`), not a ref: the two passes have
+different refs, and the whole point is that they share one request. Cleared on
+failure so a retry is possible, and on sign-out so the next student is not
+handed the previous one's id.
+
+The general pattern: an effect that CREATES a remote resource cannot dedupe with
+a ref or a `cancelled` flag, because StrictMode's second pass gets its own copy
+of both. Anything that must happen once per browser, not once per mount, needs
+module scope.
+
+
 **1. Zustand infinite-loop bug (the big one).** Any selector shaped like
 `useBrachNhaStore((s) => ({ a: s.a, b: s.b }))` creates a new object every
 render, breaks Zustand's reference-equality check, and causes an infinite
@@ -1713,3 +1880,13 @@ npx oxlint          # NOT eslint — there is no eslint config in this repo
 `npm run build` runs `tsc -b && vite build` and must also pass. For anything
 touching the mentor, additionally exercise `POST /api/chat` against a running
 dev server — with and without a key — since neither typecheck nor lint covers it.
+
+For anything touching Supabase, additionally:
+
+```bash
+npm run db:check     # env → reachability → anonymous sign-ins → all 8 tables
+```
+
+and check `dist/assets/` still contains a separate Supabase chunk, for the same
+reason `math-field-panel-*.js` is checked — a static import undoes the lazy
+boundary silently and only the bundle output shows it.

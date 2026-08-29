@@ -17,6 +17,76 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 28 Aug 2026 — A real database behind the app (Supabase)
+
+*Not yet committed. The two Supabase dashboard steps have now been done, and saving was confirmed working end to end on 28 Aug.*
+
+**Why.** Everything a student had — their name, XP, streak, finished lessons, exam
+scores, every KruAI conversation — lived only in the browser they used. Clearing
+the browser's data, or switching phones, lost all of it, and there was no way for
+anyone to see how students were actually doing. The app now has a real database
+behind it.
+
+**What changed.**
+
+- **Nothing looks different.** No new screens, no login step, no sign-up form. The
+  app behaves exactly as it did; the difference is that the work is now also saved
+  somewhere that survives the browser.
+- **Students still don't have to make an account.** They type their name and pick a
+  language as before. Behind that, an invisible account is created for them so their
+  work has somewhere to belong.
+- **The app still works completely offline.** Every screen reads from the browser
+  first, exactly as before, and the database is written to in the background a few
+  seconds later. If the phone has no signal, or the database is down, or it was
+  never set up — nothing breaks and nothing is lost. This matters for students on
+  patchy mobile data, and it is the reason the app was not simply rewired to read
+  from the database directly.
+- **Eight tables** now hold: the profile and survey answers, XP/level/coins/streak,
+  scheduled placement tests, signed roadmap pledges, daily tasks, mock exam results,
+  finished lessons, and the KruAI conversations.
+- **Each student can only ever see their own data.** This is enforced by the
+  database itself, not by the app being careful — even a modified copy of the app
+  cannot read anyone else's rows.
+- **Two things were quietly upgraded on the way**, because the database made them
+  nearly free:
+  - **Daily tasks are now kept per day**, not just for today. That is the missing
+    piece the Progress heatmap needs to show real activity instead of sample data.
+  - **Exam attempts are now labelled** by where they came from — mock exam, past
+    paper, or placement test. Past-paper results can now be recorded without being
+    counted as mock exam scores, which would have made the Home screen's
+    "from mock exams" number wrong.
+
+**What this does NOT do yet.** It is a **backup**, not sync between devices. The
+same student on a phone and a laptop still gets two separate accounts. Making one
+account follow them needs an email or phone sign-in step, which is a product
+decision nobody has made yet — the database is already built for it, so it is a
+small change when you want it.
+
+**Where a student's email lives — and why the Authentication page looks empty.**
+The Authentication → Users page shows each account with a **blank Email column**.
+That is correct, not a fault: accounts are created invisibly, with no email and no
+password, which is what lets students in without a sign-up step. The email address
+they optionally type on the login screen is saved as ordinary profile information —
+**Table Editor → profiles → the `email` column** — along with their name, age and
+province. That is the page to look at to see who is using the app.
+
+Putting the address on the account itself is possible, but it turns the login into a
+real sign-up: the student would get a confirmation email and have to click a link
+before anything saved. Worth doing the day BrachNha wants one account to follow a
+student across their phone and their laptop; not worth it before then.
+
+**Setup is done.** Both one-time dashboard steps have been completed and
+`npm run db:check` passes all four checks. `supabase/README.md` has the steps written
+out for the next environment.
+
+**What to re-test.** Mostly that nothing regressed: log in, do a lesson, take a mock
+exam, chat with KruAI, close the tab and reopen it. Everything should behave as
+before. Then, in the Supabase dashboard's Table Editor, the same information should
+be visible in the tables. Logging out should stop the syncing and start a fresh
+account on the next login.
+
+---
+
 ## 28 Aug 2026 — The first real lesson content: ៣.១.១ សេចក្ដីផ្ដើម
 
 *Landed in commit `6f57162`.*
