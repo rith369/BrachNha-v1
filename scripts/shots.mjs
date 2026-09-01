@@ -57,6 +57,8 @@ const ROUTES = [
   { name: "subject-path", path: "/subjects/biology" },
   { name: "section-detail", path: "/sections/biology-3-1-1" },
   // /exam now has two tabs and lands on the past-papers one.
+  { name: "practice", path: "/practice" },
+  { name: "practice-subject", path: "/practice/flashcards/biology" },
   { name: "exam", path: "/exam" },
   { name: "progress", path: "/progress" },
   { name: "game", path: "/game" },

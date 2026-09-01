@@ -42,7 +42,10 @@ export const mainNavItems: NavItem[] = [
   },
   {
     id: "flashcards",
-    href: null,
+    // Was `null` — a disabled "Soon" placeholder — until the practice feature
+    // landed. No shortLabel: that field only serves the 5-tab BottomNav, and
+    // this item is a drawer/sidebar destination, not one of those five.
+    href: "/practice",
     label: { en: "Flashcards/Quiz", km: "ការអនុវត្ត" },
     icon: Layers,
   },

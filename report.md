@@ -17,6 +17,129 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 1 Sep 2026 — XP, streak and coins now show on every screen
+
+*Landed in commit `PENDING`.*
+
+**Why.** The small "⚡130 🔥3 🪙5" counter row only showed up inside lessons and
+on the subject path. You asked for it everywhere, since it's the core of the
+app's reward loop.
+
+**What changed.**
+
+- That counter row now sits at the top-right of every ordinary screen — Home,
+  Study, ការអនុវត្ត, Mock Exam, Progress, Game, Roadmap, Grade Prediction,
+  Leaderboard, Profile, the subject path — not just inside a lesson.
+- It also gained a fourth pill: your Level, matching what Home's own header
+  already showed, leading the row ahead of XP.
+- It stays OFF the screens where it was already deliberately hidden: while
+  actually answering a mock exam or a placement test (so it can't turn a test
+  into a scoreboard), and on the one-way roadmap screen right after signup.
+  Lessons, sections, flashcards and quizzes still show their own copy exactly
+  as before.
+- Nothing about how XP, streak or coins are earned changed — this is purely
+  about where the numbers are visible.
+
+**What to re-test.** Open a few different pages and confirm the counters show
+up top-right and stay in sync with each other (earning XP from a flashcard/quiz
+should update the number everywhere, since it's all one number under the hood).
+Confirm a running mock exam still hides it.
+
+---
+
+## 1 Sep 2026 — A new look for physics' Quiz path (design sample)
+
+*Landed in commit `PENDING`.*
+
+**Why.** You asked to see the "path" style used for lessons re-done in the style
+of the Mimo app for the Quiz tab, using the subject's own colour — before
+supplying the real physics chapter, lesson and quiz names.
+
+**What changed.**
+
+- Open ការអនុវត្ត → Quiz and the Physics (រូបវិទ្យា) tile is now the one lit-up
+  card on the page — tap it and you land on a winding trail of square tiles
+  connected by rounded lines, on a dotted background, in physics' blue.
+- The top of that screen now matches the closer reference you sent: an
+  illustration card with a progress bar, a solid blue banner naming the current
+  chapter and lesson with a count badge, and a small "ចាប់ផ្តើម" (Start) tag
+  pointing at the next tile.
+- This is still a look-and-feel sample. The six tiles are placeholders with
+  made-up names and are not tappable yet — there is no real physics quiz
+  content behind any of them. Once you send over the real chapter, lesson and
+  quiz names, this gets filled in with the actual content and the tiles become
+  tappable.
+- Every other subject, and Physics' own Flashcard tab, are unchanged.
+
+**What to re-test.** Open ការអនុវត្ត → Quiz → រូបវិទ្យា and confirm the new
+path renders correctly in both light and dark mode, and that every other
+subject/tab combination still shows the plain list as before.
+
+---
+
+## 1 Sep 2026 — Flashcards & Quiz: the ការអនុវត្ត page is now real
+
+*Landed in commit `PENDING`.*
+
+**Why.** "Flashcards/Quiz" had been sitting in the side menu as a greyed-out
+"Soon" item since the app was built. Flashcards only existed as one step buried
+inside a lesson, and practice questions as another — there was no way to sit down
+and just revise. This builds the page.
+
+**What changed.**
+
+- **A new ការអនុវត្ត page.** Open it from the side menu (it is no longer greyed
+  out). It works like the Mock Exam page: two tabs across the top, and a grid of
+  subject cards underneath.
+- **Tab 1 — Flashcard** covers four subjects: រូបវិទ្យា, គីមីវិទ្យា, ជីវវិទ្យា and
+  ប្រវត្តិវិទ្យា. These are the subjects you revise by remembering things, which
+  is what flashcards are good for.
+- **Tab 2 — Quiz** covers every subject, including គណិតវិទ្យា, ភាសាខ្មែរ and
+  whichever language you chose when you signed up.
+- **Everything is organised by lesson.** Tap a subject and you get that subject's
+  lessons, grouped under their chapters — exactly the same list the subject's
+  study path shows, so the two screens always agree. Each lesson has its own set
+  of flashcards and its own quiz.
+- **Doing a deck or a quiz takes over the screen**, the same way a lesson does:
+  the menus disappear so there is nothing to do but the work. **KruAI stays
+  available** — you can still ask it why an answer is what it is. That is on
+  purpose: this is revision, not a test.
+- **The quiz tells you straight away** whether you were right, and shows the
+  explanation, rather than making you wait for a score at the end. A correct
+  answer earns XP and coins.
+- **Finishing a deck or a quiz now ticks off the "flashcards" and "practice"
+  rows** on your daily checklist on the Home page and in the Roadmap's Daily
+  Mission. Until now those two rows could only be ticked by hand — there was
+  nothing in the app that actually completed them.
+- **Practice scores do NOT appear in your mock exam history.** That list is for
+  mock exams only, and it feeds KruAI's picture of how you are doing on real exam
+  papers. Practice is deliberately kept separate.
+
+**What to re-test.**
+
+- The side menu: ការអនុវត្ត should be tappable now, and no longer show "Soon".
+- Both tabs, and a few subjects in each. Check the subject artwork and colours
+  look right in both light and dark mode.
+- Tap into ជីវវិទ្យា: you should see all 7 lessons under their 3 chapters, the
+  same as its study path.
+- Nothing else on the app should have changed. The Home, Study, Mock Exam,
+  Progress and Roadmap pages were not touched.
+
+**One thing to know before you look.** **There is no flashcard or quiz content
+yet.** Every subject card shows "ឆាប់ៗនេះ", is greyed out, and **cannot be
+tapped** — exactly like the subjects with no lessons on the Study page. So right
+now the page opens, both tabs work, but nothing can be entered. That is
+deliberate rather than unfinished: a card you can tap that leads nowhere useful
+reads as a broken app, so a card with nothing behind it does not look tappable at
+all. It is the same rule the Study page already follows.
+
+The page, the tabs, the subject cards and the lesson lists are all real and
+finished — what is missing is the questions and cards themselves, which have to
+be written. The moment content is written for a lesson, that subject and that
+lesson turn on by themselves with no further work. The screens that run a deck
+and a quiz are built and were tested with stand-in content before it was
+removed.
+
 ## 28 Aug 2026 — The first real lesson content: ៣.១.១ សេចក្ដីផ្ដើម
 
 *Landed in commit `6f57162`.*

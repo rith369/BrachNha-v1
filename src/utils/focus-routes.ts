@@ -20,8 +20,36 @@ export function isFocusRoute(pathname: string): boolean {
   return (
     pathname.startsWith("/lessons/") ||
     pathname.startsWith("/sections/") ||
+    isPracticeRunRoute(pathname) ||
     isAssessmentRoute(pathname)
   );
+}
+
+/**
+ * A flashcard deck or a practice quiz that is actually being worked through.
+ *
+ * The practice feature has THREE levels and only the deepest is a task:
+ *
+ *   /practice                              the hub — choosing a subject
+ *   /practice/:mode/:subjectId             the lesson list — choosing a lesson
+ *   /practice/:mode/:subjectId/:lessonRef  the deck or quiz — a task
+ *
+ * So this counts segments rather than using startsWith, which is what the two
+ * routes above rely on. The first two are places, not tasks, and keep their
+ * navigation — the same call /subjects/:subjectId already makes.
+ *
+ * DELIBERATELY NOT ADDED TO isAssessmentRoute BELOW. A practice quiz reveals the
+ * answer and its explanation on the spot and pays out as it goes; it teaches
+ * rather than measures, so KruAI stays reachable exactly as it does inside a
+ * lesson. That gap is also why this is detected by pathname at all instead of by
+ * the store's `focusMode` flag — see the note on useMentorBlocked().
+ */
+export function isPracticeRunRoute(pathname: string): boolean {
+  if (!pathname.startsWith("/practice/")) return false;
+  // "/practice/quiz/biology/3-1" → ["practice","quiz","biology","3-1"]. A
+  // trailing slash yields an empty last part, which filter drops, so
+  // "/practice/quiz/biology/" stays a list rather than becoming a task.
+  return pathname.split("/").filter(Boolean).length >= 4;
 }
 
 /**

@@ -188,6 +188,22 @@ export interface SectionContent {
   quiz?: SectionQuestion[];
 }
 
+/**
+ * One flashcard in a lesson's practice deck.
+ *
+ * Deliberately NOT the older `Flashcard` above, which carries `{ en, km }` pairs
+ * and a `topic` string tying it to the legacy 7-step lesson flow. The practice
+ * feature is Khmer-only (PRACTICE_PAGE_LANG in features/practice/practice.ts) and
+ * keys its content by LESSON rather than by topic, so an English column here
+ * would be fabrication dressed as data — the same call SectionContent made.
+ */
+export interface PracticeCard {
+  /** The prompt side — a term, a question, a formula to recall. */
+  front: string;
+  /** The answer side, revealed on flip. */
+  back: string;
+}
+
 export type MockExamSubject = "math" | "biology" | "chemistry" | "physics";
 
 /**

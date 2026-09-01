@@ -4,7 +4,6 @@ import { ArrowLeft } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
 import { toKhmerDigits } from "@/utils/khmer-num";
-import { StatBar } from "@/components/shell/stat-bar";
 import { SubjectArt } from "./subject-art";
 import { SessionNode } from "./session-node";
 import { SUBJECT_STYLE } from "../subject-styles";
@@ -23,8 +22,10 @@ import { allSessions, chaptersFor, pathProgress, sessionStatus } from "../sessio
  *
  * Specifically NOT copied from the reference, all deliberate: the starfield, the
  * planet artwork, the two side rails of icon buttons, the premium badge, the
- * mascot, and the keys/energy/gems currency bar. The stat bar here shows only
- * what the app genuinely tracks — see StatBar.
+ * mascot, and the keys/energy/gems currency bar. What survived is real: the
+ * XP/streak/coins row now shown app-wide by AppShell's global StatBar (see
+ * app-shell.tsx) — this screen used to render its own copy inline here, removed
+ * once that landed so there is exactly one, not two that could disagree.
  *
  * KHMER-ONLY, like the rest of the Study feature. See LESSONS_PAGE_LANG.
  */
@@ -187,19 +188,15 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
   return (
     <div className="flex h-full flex-col">
       {/* A back arrow IS correct here, unlike on the Study tab: this is a pushed
-          screen rather than a bottom-nav destination. pr-14 clears TopBar's
-          floating hamburger, the app's standard header convention. */}
+          screen rather than a bottom-nav destination. */}
       <div className="shrink-0 px-4 pt-4 pb-3">
-        <div className="mb-3 flex items-center justify-between gap-2 pr-14">
-          <Link
-            to="/lessons"
-            aria-label="ត្រឡប់"
-            className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-purple/20 bg-purple/8 text-purple transition hover:bg-purple/15"
-          >
-            <ArrowLeft className="size-4.5" strokeWidth={2.5} />
-          </Link>
-          <StatBar />
-        </div>
+        <Link
+          to="/lessons"
+          aria-label="ត្រឡប់"
+          className="mb-3 flex size-9 shrink-0 items-center justify-center rounded-xl border border-purple/20 bg-purple/8 text-purple transition hover:bg-purple/15"
+        >
+          <ArrowLeft className="size-4.5" strokeWidth={2.5} />
+        </Link>
 
         <div
           className={cn(

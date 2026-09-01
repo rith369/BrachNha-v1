@@ -33,6 +33,9 @@ const routeModules = {
   sectionDetail: () => import("@/pages/section-detail"),
   subjectPath: () => import("@/pages/subject-path"),
   placementTest: () => import("@/pages/placement-test"),
+  practice: () => import("@/pages/practice"),
+  practiceSubject: () => import("@/pages/practice-subject"),
+  practiceRun: () => import("@/pages/practice-run"),
   profile: () => import("@/pages/profile"),
   progress: () => import("@/pages/progress"),
   roadmap: () => import("@/pages/roadmap"),
@@ -47,6 +50,9 @@ const LessonDetailPage = lazy(routeModules.lessonDetail);
 const SectionDetailPage = lazy(routeModules.sectionDetail);
 const SubjectPathPage = lazy(routeModules.subjectPath);
 const PlacementTestRoute = lazy(routeModules.placementTest);
+const PracticePage = lazy(routeModules.practice);
+const PracticeSubjectPage = lazy(routeModules.practiceSubject);
+const PracticeRunPage = lazy(routeModules.practiceRun);
 const ProfilePage = lazy(routeModules.profile);
 const ProgressPage = lazy(routeModules.progress);
 const RoadmapPage = lazy(routeModules.roadmap);
@@ -162,6 +168,17 @@ export default function App() {
         <Route path="sections/:sectionId" element={<SectionDetailPage />} />
         <Route path="subjects/:subjectId" element={<SubjectPathPage />} />
         <Route path="placement-test/:subject" element={<PlacementTestRoute />} />
+        {/* Four segments for the runner, not three, so it cannot collide with
+            the lesson-list pattern above it — see pages/practice-run.tsx. */}
+        <Route path="practice" element={<PracticePage />} />
+        <Route
+          path="practice/:mode/:subjectId"
+          element={<PracticeSubjectPage />}
+        />
+        <Route
+          path="practice/:mode/:subjectId/:lessonRef"
+          element={<PracticeRunPage />}
+        />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="progress" element={<ProgressPage />} />
         <Route path="roadmap" element={<RoadmapPage />} />

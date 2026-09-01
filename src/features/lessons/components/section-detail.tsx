@@ -18,6 +18,9 @@ import {
   focusOption,
   focusPrompt,
 } from "@/utils/focus-styles";
+// Shared with the practice quiz, so the two cannot pay differently for the same
+// action. See the header of utils/rewards.ts.
+import { QUIZ_COINS, QUIZ_XP } from "@/utils/rewards";
 import { Callout } from "./callout";
 import { SectionVideoPlayer } from "./section-video";
 import type { SectionBlock, SectionContent, SectionQuestion } from "@/types";
@@ -73,10 +76,6 @@ const BrainModelViewer = lazy(() =>
  * KHMER-ONLY, like the rest of the Study feature. The content itself only exists
  * in Khmer; see the note on SectionContent in types/index.ts.
  */
-
-/** Reward for one correct quiz answer. See `answerQuestion`. */
-const QUIZ_XP = 10;
-const QUIZ_COINS = 5;
 
 /** Renders a lesson/example/note block: optional lead paragraph, then items. */
 function Block({ block }: { block: SectionBlock }) {
@@ -225,15 +224,12 @@ export function SectionDetail({
   const quizDone = quiz.every((_, i) => answers[i]);
 
   /**
-   * A correct answer is worth 10 XP and 5 coins — twice the usual XP→coins
-   * ratio, set by hand, which is why `addXp` takes the coin figure explicitly.
+   * The reward figures and the reasoning behind them live in utils/rewards.ts,
+   * shared with the practice quiz.
    *
    * Awarded ONCE per question and only on the first tap, which is guaranteed
    * rather than guarded: `answers[i]` is set in the same handler and the option
    * buttons are `disabled` from then on, so a question cannot be re-answered.
-   * The reward for a wrong answer is nothing at all, not a smaller amount —
-   * with the correct option revealed immediately, a consolation payout would
-   * make guessing worth as much as thinking.
    */
   function answerQuestion(index: number, option: string) {
     if (answers[index]) return;

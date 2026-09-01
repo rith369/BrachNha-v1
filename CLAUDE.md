@@ -295,6 +295,52 @@ hamburger and never reach the commitment pledge. `pledgeSeen` (persisted, set in
 `commitment !== null` alone would strip the page forever for a student who taps
 "Maybe later", which is an allowed choice.
 
+### The global stat bar — level/XP/streak/coins, on every ordinary screen
+
+`AppShell` renders `StatBar` (no `theme` prop, so no light/dark toggle) as its
+own row, right-aligned, at the top of the content column — above `TopBar`, so it
+appears on every screen that isn't hidden-chrome, without any individual page
+knowing it exists. This was a deliberate widening: `StatBar` used to appear only
+where a screen opted in (`FocusLayout`'s `showStats` prop, and one inline call in
+`subject-path-view.tsx`), and the product call was that these numbers are the
+core of the app's gamification loop and belong somewhere the student sees them
+constantly, not just mid-lesson.
+
+**Four pills, not three: `Lv{level}` leads the row**, added right after the bar
+went global — level was the one number Home's own header already showed
+(`កម្រិត 2 · 130 XP`) that the bar itself was still missing. It reuses
+`StatPills`' `Target` icon for level, so there's one visual convention for "what
+level am I" rather than two, and is given its own `text-blue` tone (the app's
+`text-purple`/`text-pink`/`text-yellow` were already spoken for by XP, streak and
+coins) so four adjacent pills stay scannable rather than reading as a single
+repeated colour.
+
+**Gated on the exact same `!hideChrome` that already hides `Sidebar`/`TopBar`**,
+which is what makes this correct with zero new logic: focus tasks, the mock exam
+and placement test (where a live counter would turn a measurement into a
+scoreboard — the same reasoning `FocusLayout`'s own `showStats` already encodes,
+and which stays true here since those routes hide chrome too), and the roadmap's
+one-way onboarding lock all correctly stay clear of it for the reasons they
+already hide the rest of the chrome.
+
+**`subject-path-view.tsx`'s own inline `<StatBar />` was removed** the moment
+this landed — leaving it would have shown the counters twice on that one screen.
+`FocusLayout`'s `showStats` StatBar is a SEPARATE instance and was deliberately
+left alone: those routes have `hideChrome = true`, so the global one is absent
+there and the task screen's own copy is the only one rendering — no double-up,
+and no shared state to keep in step since both read the same store.
+
+**The tricky part was the hamburger, not the bar.** `TopBar`'s button is
+`absolute top-3 right-4`, measured from its nearest positioned ancestor — so a
+new row placed INSIDE that same ancestor would sit in normal flow while the
+button stayed pinned to the ancestor's original top edge, and the two would
+overlap. The fix was to nest: the stat-bar row is a sibling BEFORE a `relative`
+wrapper, not a child inside it, so it pushes that wrapper's top edge down as a
+whole, and the hamburger's `top-3` — still measured from the same wrapper — moves
+down by exactly the bar's height along with it. That keeps it aligned with each
+page's own `pt-4` title row exactly as before, just both shifted down together;
+see the comment in `app-shell.tsx` for the fuller version of this argument.
+
 **Page top-spacing convention:** pages start at `pt-4` and put `pr-14` on their
 header block, so the page title sits on the same row as the floating hamburger
 (button spans y=12–50px; a `text-xl` line at `pt-4` centres at ~30px against the
@@ -1185,6 +1231,217 @@ also the right moment to fix the known `no-useless-escape` backslash bug in
 `BAC2_ANSWER_RULES`, which needs an answer-quality re-test rather than a silent
 change.
 
+**Practice** (`features/practice`) — Flashcards & Quiz; see its own section below.
+
+### The practice page is two tabs, three levels, and empty on purpose
+
+`/practice` fills the `flashcards` nav item that sat as a disabled `href: null`
+placeholder. It is the Mock Exam page's shape — **two tabs over the subject
+catalog** — where the tabs are **Flashcard** and **Quiz**, and it borrows the
+Study page's tile grid for the subject chooser rather than inventing a third
+layout.
+
+**KHMER-ONLY, behind `PRACTICE_PAGE_LANG` in `features/practice/practice.ts`** —
+the same decision as `LESSONS_PAGE_LANG`, `EXAM_PAGE_LANG` and KruAI's
+`ANSWER_LANG`. Unlike the exam page there are **no bilingual carve-outs**: the
+content type itself is Khmer-only (`PracticeCard` in `types/index.ts`), so
+nothing underneath has an English column to preserve. The one piece of shared
+chrome that stays `lang`-driven is `FocusLayout`'s exit confirm, which belongs to
+the lesson flow too and must not read Khmer here and English there in one
+session.
+
+Tab labels are **"Flashcard" and "Quiz" in Latin script**. That is not
+untranslated copy — it is already what `translations.ts`'s own **km** column uses
+for those two words, the same call KruAI's Latin spelling makes.
+
+**THREE LEVELS, each its own route**, because these are three genuinely different
+screens and the back button should step through all of them:
+
+| path | screen | nav | KruAI |
+| --- | --- | --- | --- |
+| `/practice` | hub: two tabs + subject grid | shown | shown |
+| `/practice/:mode/:subjectId` | that subject's lesson list | shown | shown |
+| `/practice/:mode/:subjectId/:lessonRef` | the deck or the quiz | **hidden** | **shown** |
+
+`:mode` is `flashcards` \| `quiz` — the union is the URL vocabulary *and* the tab
+id, one spelling rather than two. `:lessonRef` is `{chapter}-{lesson}` (`3-1`),
+so the content key is `` `${subjectId}-${lessonRef}` `` → `biology-3-1`, the same
+prefix `sectionsFor()` already generates for section ids (`biology-3-1-1`).
+**Four segments for the runner, not three**, so it cannot collide with the
+lesson-list pattern — the ambiguity `pages/subject-path.tsx` documents for
+`/lessons/:lessonId` versus a bare `/lessons/:subjectId`.
+
+**The runner is a focus ROUTE, deliberately not the store's `focusMode` flag, and
+this is the load-bearing decision.** `hooks/use-focus-mode.ts` warns that
+`focusMode` is read by `useMentorBlocked()` as "a mock exam is being answered",
+and that a second screen setting it for another reason means the two questions
+have come apart. That is exactly this case: a practice runner wants the
+navigation hidden but **KruAI kept**. `isPracticeRunRoute()` in
+`utils/focus-routes.ts` answers it by pathname — counting segments rather than
+using `startsWith`, since the two shallower `/practice/` routes are places rather
+than tasks — so no flag is borrowed and `isAssessmentRoute()` is untouched. It
+also removes the failure `ExamRunner`'s cleanup effect exists to prevent: a
+browser-back out of a running deck changes the pathname, so the navigation
+returns on its own with nothing to unset.
+
+**A quiz here is PRACTICE, not a test**, and every difference from `ExamRunner`
+follows from that one call: answering is final and reveals the result and the
+explanation immediately, there is no submit-at-the-end, correct answers pay out
+as they are given, and there is no `confirmExit` because leaving discards
+nothing. It is the shape `SectionDetail` already uses for the questions inside a
+section, and it is why KruAI stays — a mentor mid-practice is the product
+working, exactly as it is mid-lesson.
+
+**The result never reaches `addExamResult`.** `examResults` captions Home's stat
+pill "from mock exams" and feeds `chat-prompt.ts` an average it states to KruAI
+as fact — the same reason past-paper and placement-test attempts are already kept
+out. When practice deserves a history it should be a separate persisted field.
+
+**What it DOES write is `tasks.flashcards` and `tasks.practice`**, through the
+same `completeTask()` Home's daily checklist and Roadmap's Daily Mission read.
+Those two rows previously had no way to be completed by doing anything — they
+were self-reported checkboxes. Finishing a deck or a quiz is now one real
+completion shared by all three screens, the way `tasks.lesson` already works.
+
+**`utils/rewards.ts` holds `QUIZ_XP` / `QUIZ_COINS`**, lifted out of
+`section-detail.tsx` the moment the practice quiz became a second caller — the
+same lift `shell/wordmark.tsx` and `shell/stat-bar.tsx` got. `lib/store.ts` warns
+that a *third* `addXp` coin override is the signal the ratio itself is wrong; two
+callers importing **one** constant is what keeps that count honest. A new import
+there is not a new override.
+
+**The lesson list is DERIVED from `chaptersFor()`** — the same function the Study
+path renders from — so `/practice/:mode/:subjectId` and `/subjects/:subjectId`
+can never disagree about what lessons a subject has. Today that is 7 real lessons
+for biology across 3 chapters and **one placeholder lesson for every other
+subject**, which is `chaptersFor()`'s fallback and the honest state rather than a
+bug. A row shows `lesson.title` **alone**, exactly as `subject-path-view.tsx`
+does: prefixing "មេរៀនទី N" would render "មេរៀនទី ១ · មេរៀនទី ១" on every lesson
+whose real name hasn't been supplied, because that placeholder title *is* its
+number.
+
+**`FLASHCARD_SUBJECTS` is physics/chemistry/biology/history — a closed list.**
+Flashcards earn their keep on recall-heavy material, not on subjects examined by
+working a problem or writing prose, so math, Khmer and the chosen language appear
+under **Quiz only**. A named constant beside `FOUNDATION_SUBJECTS`' precedent,
+and the render order comes from the catalog rather than from that array, so every
+subject list in the app stays in one order. Quiz uses `allSubjects()`, which
+drops the unchosen language — 7 cards, not 8.
+
+**`data/practice.ts` is EMPTY, and that is the normal state**, exactly as
+`PAST_PAPER_QUESTIONS` shipped. Counts are read from it rather than authored
+beside it (`lessonCountFor()`'s rule), so a row cannot claim a deck the app lacks
+and playability is derived from the same number. Adding one entry turns a row on
+with no other code change. **Both runners are therefore unreachable in the app as
+shipped** — add a temporary entry to exercise them. Note `PracticeCard` is the
+one new type, while the quiz reuses `SectionQuestion` **verbatim** rather than
+growing a twin.
+
+**Nothing empty is tappable, at either level.** A subject tile with no content
+and a lesson row with no content are both a dimmed `<div>` with a `ឆាប់ៗនេះ` chip
+— never a `<Link>` — following `subject-card.tsx`'s zero-lesson tile, the
+survey's `StudiedStep` and `sidebar-nav.tsx`'s `href: null` rows: a control that
+answers a tap with silence reads as broken. The mode badge is hidden on an empty
+tile too, the same pairing `subject-card.tsx` makes with its play button, so the
+tile carries no affordance at all.
+
+The subject tile shipped **tappable-when-empty** for one revision, borrowing the
+`PastPaperCard` departure on the grounds that the tap was "not silent" — it
+landed on a lesson list. That was overruled by the user and correctly: a screen
+whose rows are themselves all pending is silence with extra steps, and the app's
+two subject grids now behave identically rather than one being the exception.
+Don't restore it.
+
+**The consequence is the whole page today, and it is intended:** with
+`data/practice.ts` empty every tile on both tabs is dimmed, so nothing on
+`/practice` can be opened at all. That is the honest rendering of having no
+content, and it resolves by writing content rather than by re-enabling the link.
+`/practice/:mode/:subjectId` stays reachable by URL for development.
+
+**No emoji anywhere in this feature** — Lucide icons only, the newer
+section-content rule rather than the legacy lesson flow's emoji. Both runners use
+`utils/focus-styles.ts`'s ladder and `FocusLayout` with `showStats` on, since a
+lesson-like activity opts in and only the two assessments leave the counters off.
+The flashcard flip is the same `preserve-3d` + `backface-visibility` technique
+`lesson-detail.tsx` step 2 uses, and Continue is disabled until the card has been
+turned over — `SectionDetail`'s `quizDone` gate applied per card.
+
+`defaultMathLayout` (`utils/math-input.ts`) now has **two patterns**, because the
+subject sits in a different place in each: the first id segment on a lesson or
+section, its own third segment on a practice route.
+
+**Bottom nav is untouched.** It is a 5-tab bar and already full; practice is a
+drawer/sidebar destination, which is why its `NavItem` carries no `shortLabel`.
+
+### One subject's Quiz tab is a Mimo-style path instead of the plain list
+
+`/practice/quiz/physics` renders differently from every other `/practice/:mode/:subjectId`
+— a zigzag trail of square nodes over a dot-grid background, instead of
+`PracticeLessonList`'s rows. This is a DESIGN SAMPLE requested ahead of the real
+physics chapter/lesson/quiz content, which is still to be supplied — see the
+header of `features/practice/quiz-path.ts`.
+
+**`quizPathFor(subjectId)` decides which rendering a subject gets**, checked in
+`pages/practice-subject.tsx` and gated to Quiz mode only — Flashcard keeps the
+plain list on every subject, physics included. Physics is the only entry in
+`QUIZ_PATHS` today; that map is a `Partial<Record<SubjectId, …>>`, the same
+shape `SUBJECT_SESSIONS` uses, so a second subject is one entry rather than a
+hardcoded `if (subjectId === "physics")` spreading across callers.
+
+**The six nodes and their done/current/locked statuses are FIXED DEMO DATA**,
+authored by hand rather than derived from real content or `completedSessions` —
+the same explicitly-sanctioned move `features/progress`, `features/game` and
+`features/leaderboard`'s `demo-data.ts` already make to preview a screen before
+the real tracking behind it exists. **Every node is a non-interactive `<div>`,
+even "done" and "current" ones** — `quiz-path-node.tsx` explains why: there is
+nothing behind any of these sample ids yet, and a tappable node leading nowhere
+is exactly the broken-app pattern this codebase avoids everywhere else. When the
+real content lands, replace the file's contents with an authored structure keyed
+the way `SUBJECT_SESSIONS` is (chapter → lesson), derive `status` the way
+`sessionStatus()` does, and point each node at
+`/practice/quiz/physics/{chapter}-{lesson}` — the same runner route the plain
+list already links to — turning each node back into a real `<Link>`.
+
+**The visual language is deliberately NOT a recolour of `subject-path-view.tsx`'s
+Duolingo-style trail.** `quiz-path-node.tsx`'s badges are rounded SQUARES with a
+Check/Zap/Lock glyph, not `session-node.tsx`'s circular discs, and the connector
+between them (`ElbowConnector` in `quiz-path-view.tsx`) is two straight legs
+meeting one `strokeLinejoin="round"` corner rather than the lesson path's smooth
+cubic S-curve. The one thing kept IDENTICAL on purpose is the "lip" 3D press
+effect (`0 5px 0` box-shadow, colour mixed toward black) — see `session-node.tsx`
+for why that mix is the only one correct in both themes; it's what makes either
+shape read as a physical button rather than a flat icon. Per-node curriculum text
+also moved off the trail: with nothing authored yet there is no title to print
+under six identical squares, so the one title that matters — what's next — lives
+in the header pill above the trail instead.
+
+**The header is TWO tiers, reusing pieces from `subject-path-view.tsx` rather
+than a thinner invention — a plain single pill shipped first and read as
+noticeably less finished than the rest of the app, so it was replaced.**
+
+1. A subject summary card — `SubjectArt` + name + a progress bar over the WHOLE
+   path — is the identical treatment the lesson path's own header already uses.
+   `bg-surface` with the subject's tinted `--color-subj-*` border, never a solid
+   fill: it's a card holding text and a thin bar, not white text sitting on one.
+2. A solid-fill chapter/lesson banner directly below it, naming the CURRENT
+   node — again the same banner `subject-path-view.tsx` prints before each
+   lesson as the trail scrolls, carrying its own `0 4px 0 color-mix(...black)`
+   lip so the two screens read as one material. The difference is cardinality:
+   the lesson path prints one banner per lesson as you scroll past it, this path
+   prints exactly one, because per-node titles are off the trail itself (see
+   below) and this is the one place left to say what's current.
+3. The current node ALSO carries the lesson path's `ចាប់ផ្តើម` bubble —
+   `quiz-path-node.tsx` reuses the exact tail-pointing pill from
+   `session-node.tsx`'s `isNext` treatment, not a new one.
+
+**The dot grid takes its colour from the subject too**, via a pure CSS
+`radial-gradient(circle, var(--color-border) 1.5px, transparent 1.5px)` tile —
+no image — reusing the already-per-theme `--color-border` token so the dots stay
+subtle and correct in both themes with no new token. Only the connector strokes
+and the progress/banner fills take the raw `--subject-*` value; the summary
+card and its label stay on the tinted `--color-subj-*` scale, the same split
+`SUBJECT_STYLE` draws everywhere else.
+
 **Roadmap** (`features/roadmap`) — target grade/hours card, a "Pending Placement
 Tests" card (only rendered for pending tests that **have a date** — an undated
 one would render `Invalid Date`; flags "Overdue" once that date has passed), a "Daily Mission" quota card, and
@@ -1409,11 +1666,14 @@ reads worse than a blank one.
 
 ## Still not built
 
-Flashcards/Quiz (ការអនុវត្ត), Document Library,
-Streak-w/-Friends — these exist as disabled "Soon" items in the nav
-(`lib/nav-items.ts`) but have no route or feature folder. Flashcards currently
-only exist as step 3 of the lesson flow, which is why the nav item is a
-placeholder rather than a link to `/lessons`.
+Document Library and Streak-w/-Friends — these exist as disabled "Soon" items in
+the nav (`lib/nav-items.ts`) but have no route or feature folder.
+
+**Flashcards/Quiz has left this list.** It is `/practice` now, a real feature —
+see its section above. What is still missing there is CONTENT, not code:
+`data/practice.ts` is empty, so every lesson row is a `ឆាប់ៗនេះ` placeholder and
+neither runner is reachable in the app as shipped. That is the same state the
+past-papers tab is in, and it is by design.
 
 The drawer's Main section is Home / Mock Exam / Lessons / Flashcards-Quiz. An
 "Exam Papers" placeholder used to sit there and was deleted outright — its Khmer

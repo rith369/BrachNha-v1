@@ -45,10 +45,25 @@ export function applyInsert(
  * letters within reach, everything else starts on the digits.
  */
 export function defaultMathLayout(pathname: string | null): VirtualKeyboardName {
-  const match = pathname?.match(/^\/(?:lessons|sections)\/([^/?#]+)/);
-  if (!match) return "numeric";
-
-  const [subject] = decodeURIComponent(match[1]).split("-");
+  const subject = subjectFromPath(pathname);
   if (subject === "physics" || subject === "chemistry") return "greek";
   return "numeric";
+}
+
+/**
+ * The subject a route is about, or null.
+ *
+ * TWO PATTERNS, because the subject sits in a different place in each. On a
+ * lesson or section it is the first id segment (`biology-brain`,
+ * `biology-3-1-1`); on a practice route the mode comes first, so the subject is
+ * its own third segment (`/practice/quiz/physics/1-1`).
+ */
+function subjectFromPath(pathname: string | null): string | null {
+  const practice = pathname?.match(/^\/practice\/[^/?#]+\/([^/?#]+)/);
+  if (practice) return decodeURIComponent(practice[1]);
+
+  const lesson = pathname?.match(/^\/(?:lessons|sections)\/([^/?#]+)/);
+  if (lesson) return decodeURIComponent(lesson[1]).split("-")[0];
+
+  return null;
 }
