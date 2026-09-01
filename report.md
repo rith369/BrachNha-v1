@@ -19,7 +19,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 2 Sep 2026 — KruAI now knows about the written lesson sections
 
-*Not yet committed.*
+*Landed in commit `fb4d81e`.*
 
 **Why.** ៣.១.១ សេចក្ដីផ្ដើម has been written and a student can read it in the app — but
 KruAI could not see it. The mentor is given a list of everything the app contains, so it
@@ -59,7 +59,7 @@ look after a dev-server restart.
 
 ## 1 Sep 2026 — XP, streak and coins now show on every screen
 
-*Landed in commit `PENDING`.*
+*Landed in commit `f6b904d`.*
 
 **Why.** The small "⚡130 🔥3 🪙5" counter row only showed up inside lessons and
 on the subject path. You asked for it everywhere, since it's the core of the
@@ -89,7 +89,7 @@ Confirm a running mock exam still hides it.
 
 ## 1 Sep 2026 — A new look for physics' Quiz path (design sample)
 
-*Landed in commit `PENDING`.*
+*Landed in commit `f6b904d`.*
 
 **Why.** You asked to see the "path" style used for lessons re-done in the style
 of the Mimo app for the Quiz tab, using the subject's own colour — before
@@ -119,7 +119,7 @@ subject/tab combination still shows the plain list as before.
 
 ## 1 Sep 2026 — Flashcards & Quiz: the ការអនុវត្ត page is now real
 
-*Landed in commit `PENDING`.*
+*Landed in commit `f6b904d`.*
 
 **Why.** "Flashcards/Quiz" had been sitting in the side menu as a greyed-out
 "Soon" item since the app was built. Flashcards only existed as one step buried
@@ -184,7 +184,7 @@ removed.
 
 ## 28 Aug 2026 — A real database behind the app (Supabase)
 
-*Not yet committed. The two Supabase dashboard steps have now been done, and saving was confirmed working end to end on 28 Aug.*
+*Landed in commit `26e5e79`. The two Supabase dashboard steps have now been done, and saving was confirmed working end to end on 28 Aug.*
 
 **Why.** Everything a student had — their name, XP, streak, finished lessons, exam
 scores, every KruAI conversation — lived only in the browser they used. Clearing
