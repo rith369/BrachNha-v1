@@ -17,6 +17,46 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 2 Sep 2026 — KruAI now knows about the written lesson sections
+
+*Not yet committed.*
+
+**Why.** ៣.១.១ សេចក្ដីផ្ដើម has been written and a student can read it in the app — but
+KruAI could not see it. The mentor is given a list of everything the app contains, so it
+quotes the real curriculum instead of inventing one, and section content had never been
+added to that list. A student could finish the section, ask KruAI a question about it,
+and be told the app has no such lesson.
+
+**What changed.** Sections are now in the list the mentor reads.
+
+**It is a summary, not the whole lesson, and that is the important part.** One written
+section is about 7,000 characters. Khmer is expensive to send to an AI model — roughly
+one unit of cost per letter, far more than English — and the mentor's whole briefing is
+only a few thousand units today. Pasting one section in whole would have doubled the cost
+of **every question every student asks**, and the biology chapter alone is 43 sections.
+
+So each section contributes one line: its title, the names of the points it covers, and —
+in full — the common mistakes it corrects. The explanatory prose is left out. That is
+enough for KruAI to say "yes, that is section ៣.១.១, it covers these things, and here is
+the mistake students make", which is what the list is for. The teaching itself the model
+can already do once it knows the topic is on the syllabus.
+
+**A limit was added too.** The briefing now warns in the developer console if it grows past
+a set size, so the next person adding content sees the ceiling rather than discovering it
+as slow answers and a larger bill.
+
+**Nothing a student sees has changed** — same screens, same lesson, same answer style.
+
+**What to re-test.** Open KruAI and ask, in Khmer, about តម្រូវប្រសាទ or about the mistakes
+in ៣.១.១, and check the answer sounds like it knows the lesson. Then ask about a **physics**
+topic and confirm it still says plainly that the app has no physics lesson yet rather than
+inventing one — that is the thing this change could have broken.
+
+**Known limitation.** This was checked by measuring the briefing directly, which confirms
+the section is in it. Asking the live mentor was inconclusive: it answered with the right
+biology but kept to its exam-answer format instead of naming the section. Worth one more
+look after a dev-server restart.
+
 ## 1 Sep 2026 — XP, streak and coins now show on every screen
 
 *Landed in commit `PENDING`.*

@@ -248,6 +248,29 @@ instead of inventing a lesson. `src/data/bac2-format.ts` is the intended drop-in
 point for real MoEYS past papers — add entries to `BAC2_EXAMPLES` and flip
 `verified: true` once a teacher checks them; no code change needed.
 
+**`SECTION_CONTENT` is in the block too, but CONDENSED, and the condensing is the
+point.** `sectionLine()` emits title + every `items[].label` + the `mistakes`
+pairs in full + a question count. It deliberately drops every `body`, `intro` and
+`outro`. Measured on the first authored section: **~7,000 characters, 3,362 of
+them Khmer glyphs**, against a whole prompt of ~2.7–3.1k tokens — and Khmer
+tokenizes at roughly a token per glyph, so ONE section pasted whole would double
+the prompt and biology's 43 nodes would make it unusable. Labels are the
+curriculum's own names for things, which is what stops the model inventing its
+own; the prose it drops is what the model can already teach once anchored.
+Misconceptions are kept whole because they are two short strings and are the
+highest-value grounding in the file — "students think X, actually Y" is the shape
+of question a student actually brings.
+
+Section subjects are added to the `covered` set (`id.split("-")[0]`), or a
+subject whose only content is authored sections would still be announced as
+having none — i.e. the model would deny the lesson the student is reading.
+
+`PROMPT_BUDGET_CHARS` (24,000) warns on an oversized prompt. Deliberately
+measured in CHARACTERS, not an estimated token count: a Latin-calibrated
+estimate understates a Khmer prompt several times over. **If it fires, condense a
+source — don't raise the number.** The whole no-embeddings/no-RAG decision rests
+on the corpus staying small enough to send on every single request.
+
 **The chatbot is called KruAI** — one spelling in both languages, Latin script
 even in Khmer copy, because it's a brand name rather than a description. It used
 to be "AI Mentor" / "គ្រូ AI", which is where the name comes from (គ្រូ = kru =

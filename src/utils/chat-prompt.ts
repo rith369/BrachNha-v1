@@ -4,6 +4,7 @@
 import type { Lang } from "../types/index.js";
 import { LESSONS, FOUNDATION, FLASHCARDS, PRACTICE } from "../data/lessons.js";
 import { MOCK_QS } from "../data/questions.js";
+import { SECTION_CONTENT } from "../data/sections.js";
 import { BAC2_ANSWER_RULES, BAC2_EXAMPLES } from "../data/bac2-format.js";
 
 /**
@@ -74,6 +75,70 @@ function bi(pair: { en: string; km: string }, lang: Lang): string {
 }
 
 /**
+ * One line per authored SECTION — and deliberately NOT the section's text.
+ *
+ * A section is the unit real curriculum is written in, so it has to be in here
+ * or the mentor will deny that a lesson the student is literally reading
+ * exists. But it cannot go in whole. Measured on the first authored section:
+ * ~7,000 characters, 3,362 of them Khmer glyphs, and Khmer tokenizes at roughly
+ * a token per glyph. The entire prompt is ~2.7-3.1k tokens today, so ONE section
+ * pasted in full would double it and the 43 biology nodes would make it
+ * unusable.
+ *
+ * So this emits the SKELETON: title, the `label` of every item, and the
+ * misconceptions in full. Labels are the curriculum's own names for things,
+ * which is what stops the model inventing its own; `body` prose is the part the
+ * model can already teach once it knows the topic is on the syllabus.
+ *
+ * Misconceptions are the one thing kept whole. They are two short strings, and
+ * "students think X, actually Y" is both the highest-value grounding here and
+ * exactly the shape of question a student brings to a mentor.
+ *
+ * No `bi()` — SectionContent is Khmer-only by design (see types/index.ts), so
+ * there is no English column to render and nothing to choose between.
+ */
+function sectionLine(id: string, section: (typeof SECTION_CONTENT)[string]): string {
+  const labels = [section.intro, section.lesson, section.examples, section.notes]
+    .flatMap((block) => block.items.map((item) => item.label))
+    .filter(Boolean);
+
+  const wrongRight = section.mistakes
+    .map((m) => `students think "${m.wrong}" — actually "${m.right}"`)
+    .join("; ");
+
+  const bits = [`[section:${id}] ${section.title}`];
+  if (labels.length) bits.push(`Covers: ${labels.join("; ")}.`);
+  if (wrongRight) bits.push(`Common mistakes: ${wrongRight}.`);
+  if (section.quiz?.length) bits.push(`Has ${section.quiz.length} question(s).`);
+  return bits.join(" ");
+}
+
+/**
+ * Roughly where the system prompt stops being a few thousand tokens.
+ *
+ * Not a hard limit — the model would accept far more — but the whole
+ * no-embeddings/no-RAG decision rests on the corpus staying small enough to
+ * send on every request, and every added token is paid on every question the
+ * student asks. Khmer is the reason this is measured in CHARACTERS rather than
+ * a token estimate: it tokenizes at roughly a token per glyph, so a
+ * Latin-calibrated guess understates a Khmer prompt several times over.
+ *
+ * If this fires, the answer is to condense a content source (see sectionLine
+ * below), not to raise the number.
+ */
+const PROMPT_BUDGET_CHARS = 24_000;
+
+function warnIfOversized(prompt: string): void {
+  if (prompt.length > PROMPT_BUDGET_CHARS) {
+    console.warn(
+      `[chat-prompt] system prompt is ${prompt.length} chars, over the ` +
+        `${PROMPT_BUDGET_CHARS} budget. Every question pays this. Condense a ` +
+        `content source rather than raising the budget.`
+    );
+  }
+}
+
+/**
  * Flattens every piece of study content the app ships into a labelled text
  * block, so the mentor quotes THIS curriculum rather than inventing one.
  */
@@ -116,6 +181,10 @@ export function buildKnowledgeBlock(lang: Lang): string {
     );
   }
 
+  for (const [id, section] of Object.entries(SECTION_CONTENT)) {
+    parts.push(sectionLine(id, section));
+  }
+
   // The app only ships math and biology content today. Naming the gaps
   // explicitly is what stops the model claiming a physics lesson exists.
   const covered = new Set([
@@ -124,6 +193,11 @@ export function buildKnowledgeBlock(lang: Lang): string {
     ...Object.keys(FLASHCARDS),
     ...Object.keys(PRACTICE),
     ...MOCK_QS.map((q) => q.subj),
+    // Section ids are `{subject}-{chapter}-{lesson}-{section}`, so the subject
+    // is the first segment. Without this, a subject whose only content is
+    // authored sections would still be announced as having none — and the
+    // model would tell a student the lesson they are reading does not exist.
+    ...Object.keys(SECTION_CONTENT).map((id) => id.split("-")[0]),
   ]);
   const missing = BAC2_SUBJECTS.filter((s) => !covered.has(s));
 
@@ -220,7 +294,7 @@ export function buildSystemPrompt({
 }: {
   profile: ChatProfile;
 }): string {
-  return `You are KruAI, the study mentor inside the BrachNha app, a warm, patient tutor
+  const prompt = `You are KruAI, the study mentor inside the BrachNha app, a warm, patient tutor
 for Cambodian Grade 12 science-track students preparing for the Bac II exam
 (ប្រឡងសញ្ញាបត្រមធ្យមសិក្សាទុតិយភូមិ, MoEYS).
 
@@ -264,4 +338,7 @@ ${buildStudentBlock(profile)}
 
 LENGTH: this is a chat bubble on a phone. Aim for under 200 words unless the student asks
 for a full worked solution. End academic answers with the exam tip, and nothing after it.`;
+
+  warnIfOversized(prompt);
+  return prompt;
 }
