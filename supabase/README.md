@@ -38,9 +38,14 @@ exists`), so a partial run can be repeated rather than unpicked.
 ```bash
 npm install -D supabase
 npx supabase login
-npx supabase link --project-ref iqcnznrmdcntwoxbsdfy
+npx supabase link --project-ref <your-project-ref>
 npx supabase db push
 ```
+
+The project ref is the subdomain of your project URL — for
+`https://abcdefghijklm.supabase.co` it is `abcdefghijklm`. It is also on
+dashboard → Project Settings → General. Deliberately not hardcoded here: the
+ref names one specific project, and this repo is not tied to one.
 
 `db push` applies every migration not yet recorded in the project's migration
 history, so it stays correct as files are added. It is also what makes a second
