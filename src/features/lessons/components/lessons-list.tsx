@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { Flame } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
-import { useShallow } from "zustand/react/shallow";
 import { SubjectCard } from "./subject-card";
 import { UnderlineTabs } from "@/components/ui/underline-tabs";
 import {
@@ -22,23 +20,19 @@ import {
  *
  * KHMER-ONLY, on purpose. See LESSONS_PAGE_LANG in ../subjects for the why.
  *
- * Two deliberate departures from the reference design, both forced by the fact
- * that this is a bottom-nav tab inside existing app chrome rather than a
- * standalone screen:
+ * One deliberate departure from the reference design, forced by the fact that
+ * this is a bottom-nav tab inside existing app chrome rather than a standalone
+ * screen: no back arrow. You do not "go back" from a tab; BottomNav is how you
+ * leave.
  *
- *  - No back arrow. You do not "go back" from a tab; BottomNav is how you leave.
- *  - The streak chip is NOT top-right. TopBar's floating hamburger already owns
- *    `absolute top-3 right-4`. The header therefore follows the app's existing
- *    convention — title left, pr-14 on the header block to clear the hamburger —
- *    with the streak sitting inside that reserved space.
+ * The reference's own streak chip is gone from this header — it used to sit in
+ * the `pr-14` space reserved for TopBar's floating hamburger, but AppShell's
+ * global StatBar (see app-shell.tsx) now shows streak, plus level/XP/coins, on
+ * every ordinary screen including this one. Keeping a second streak number here
+ * would just be the same value shown twice a few pixels apart.
  */
 export function LessonsList() {
-  const { streak, userLanguage } = useBrachNhaStore(
-    useShallow((s) => ({
-      streak: s.streak,
-      userLanguage: s.userLanguage,
-    }))
-  );
+  const userLanguage = useBrachNhaStore((s) => s.userLanguage);
 
   // Component state, not store state: this is how the screen is being looked at
   // right now, not something a reload should inherit. Same call as the
@@ -50,14 +44,8 @@ export function LessonsList() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between gap-3 pr-14">
-        <div className="font-heading bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
-          វគ្គសិក្សា
-        </div>
-        <div className="flex shrink-0 items-center gap-1 rounded-full border border-purple/20 bg-purple/8 px-2.5 py-1">
-          <Flame className="size-3.5 text-pink" strokeWidth={2.5} />
-          <span className="text-xs font-extrabold text-purple">{streak}</span>
-        </div>
+      <div className="font-heading mb-4 bg-brand-tri bg-clip-text pr-14 text-xl font-extrabold text-transparent">
+        វគ្គសិក្សា
       </div>
 
       <UnderlineTabs tabs={SUBJECT_TABS} value={tab} onChange={setTab} />

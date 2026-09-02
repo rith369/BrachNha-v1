@@ -72,6 +72,9 @@ app's reward loop.
   Leaderboard, Profile, the subject path — not just inside a lesson.
 - It also gained a fourth pill: your Level, matching what Home's own header
   already showed, leading the row ahead of XP.
+- The Study page (វគ្គសិក្សា) had its own small streak number next to the title
+  — now that the global row already shows it, that one was removed so the same
+  number doesn't appear twice on that screen.
 - It stays OFF the screens where it was already deliberately hidden: while
   actually answering a mock exam or a placement test (so it can't turn a test
   into a scoreboard), and on the one-way roadmap screen right after signup.
