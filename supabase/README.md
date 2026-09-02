@@ -20,8 +20,9 @@ migration file instead — the filename is a timestamp, so they apply in order.
 
 ## Applying them
 
-**The tables do not exist yet.** Both files still have to be run once against
-the project. Two ways:
+**Run both files once against YOUR OWN project.** Each developer has their own
+Supabase project rather than sharing one, so this is done per project, not once
+for the repo — and it is already done on the projects currently in use. Two ways:
 
 ### A. Dashboard (no install)
 

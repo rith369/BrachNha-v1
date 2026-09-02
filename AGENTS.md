@@ -15,6 +15,7 @@ before you write code against any of them:
 | `typescript` 6      | `baseUrl` is deprecated. `erasableSyntaxOnly` bans enums and parameter properties.         |
 | `oxlint`            | Not ESLint. Config is `.oxlintrc.json`; there is no `eslint.config.mjs`.                   |
 | `@google/genai` 2   | Interactions API (`ai.interactions.create`), not `models.generateContent`.                 |
+| `@supabase/supabase-js` 2 | Keys are the NEW `sb_publishable_…` / `sb_secret_…` format, not `anon` / `service_role` JWTs — there is no `eyJ…` key to find. Reach the client through `await getSupabase()` in `src/lib/supabase.ts`, never a static import: the SDK is lazily loaded to keep it out of the entry chunk, and it returns `null` when unconfigured. |
 
 When in doubt, read the installed package's own types in `node_modules/<pkg>/`
 rather than recalling the API. Heed deprecation notices.

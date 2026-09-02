@@ -308,6 +308,28 @@ and a stale state it does not have today, on an app whose audience is on
 Cambodian mobile data. The store already solves the hard part; Supabase makes it
 durable.
 
+### Current state — it is set up, and there are TWO projects
+
+Since 2 Sep 2026 this is live rather than aspirational: both migrations applied,
+anonymous sign-ins on, `.env` filled, and a real row confirmed reaching
+`profiles`. `npm run db:check` passes all four steps. So do not read the setup
+instructions below as work still outstanding.
+
+**Each developer runs their OWN Supabase project against the same committed
+migrations** — the repo owner's and Hok Chheng's are separate databases with
+identical schemas, which is why no project ref or URL appears in any tracked
+file (`cc9a9c1` removed the last one). `.env` is the only place it belongs, and
+`supabase/migrations/*.sql` is the single source of truth applied to each.
+Never create or alter tables from the dashboard's Table Editor: the change works,
+and then nothing in the repo records it, no diff shows it, and the two projects
+drift apart silently.
+
+**When `PROMPT_BUDGET_CHARS` fires, this project is also the RAG store.** The
+mentor section explains why the whole corpus is sent on every request today and
+why that stops scaling once the curriculum is written. The answer is `pgvector`
+in the database that now exists — content stays in `src/data/*.ts` as the source
+of truth, with embeddings as a derived index — not a new vendor.
+
 **Files, and what each is for:**
 
 | file | role |
@@ -377,7 +399,11 @@ user into a permanent one and, with `mailer_autoconfirm` off, sends a
 confirmation link the student has to click before it applies. That is a product
 decision about whether BrachNha wants an email step at all — not a bug to fix.
 
-**Anonymous sign-ins are OFF by default** (Authentication → Sign In / Providers).
+**Anonymous sign-ins are OFF by default** (Authentication → Sign In / Providers)
+— that is the Supabase default, and it is ON in the projects in use; a NEW
+project starts with it off and syncs nothing until it is switched on and SAVED
+(the page is a form, so the toggle alone does not persist, and the settings
+endpoint below is the way to confirm rather than the toggle's colour).
 With them off, `signInAnonymously()` returns 422 and the hook takes the same path
 as "no network". Verified against the live project: the settings endpoint reports
 this at `external.anonymous_users`, NOT a flat `external_anonymous_users` — the
@@ -495,7 +521,8 @@ one-way onboarding lock all correctly stay clear of it for the reasons they
 already hide the rest of the chrome.
 
 **`subject-path-view.tsx`'s own inline `<StatBar />` was removed** the moment
-this landed — leaving it would have shown the counters twice on that one screen.
+this landed, and **`lessons-list.tsx`'s own streak-only chip went with it** —
+both would have shown a number the global bar already shows a few pixels away.
 `FocusLayout`'s `showStats` StatBar is a SEPARATE instance and was deliberately
 left alone: those routes have `hideChrome = true`, so the global one is absent
 there and the task screen's own copy is the only one rendering — no double-up,
@@ -2147,8 +2174,27 @@ fast-refresh only.
   (not 3000 — that was Next).
 - The Gemini key goes in `.env` or `.env.local` (both git-ignored). Restart the
   dev server after adding it; `loadEnv` runs once at config time.
+- **`.env` holds THREE values**, and the prefix rule cuts both ways:
+  `GEMINI_API_KEY` has no `VITE_` prefix so it can never reach the browser, while
+  `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are prefixed precisely
+  *because* they must — the publishable key is a public identifier and RLS is
+  what makes that safe. `.env.example` documents all three.
+- **`VITE_SUPABASE_ANON_KEY` holds a `sb_publishable_…` key, not an `eyJ…` JWT.**
+  The variable keeps the older "anon" name because `src/lib/supabase.ts` reads
+  it; the value is Supabase's newer publishable format. Don't go hunting the
+  dashboard for an "anon key" that isn't there. See AGENTS.md.
+- **Restart the dev server after editing `.env`.** A running Vite server keeps
+  the values it started with, and for a package installed since startup it
+  reports the import as unresolvable rather than merely stale — which reads like
+  a code error and isn't one.
 - Deploying: Vercel, config in `vercel.json`. `GEMINI_API_KEY` must be set in
   the Vercel project's Environment Variables — `.env` files are not uploaded.
+- **The two `VITE_SUPABASE_*` values must be in Vercel too, on Production AND
+  Preview, followed by a REDEPLOY.** Vite substitutes `VITE_*` at build time, so
+  an existing deployment keeps the empty strings baked into its bundle and
+  adding the variables changes nothing until a new build runs. Miss this and
+  production silently never syncs while localhost does — invisible from the UI,
+  because an absent Supabase is a supported state by design.
 
 ## Verification standard used throughout
 
