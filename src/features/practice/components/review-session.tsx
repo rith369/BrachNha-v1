@@ -5,7 +5,7 @@ import { useBrachNhaStore } from "@/lib/store";
 import { FocusLayout, FocusButton } from "@/components/shell/focus-layout";
 import { toKhmerDigits } from "@/utils/khmer-num";
 import type { ReviewGrade, ReviewResult } from "@/utils/spaced-repetition";
-import type { QueueCard } from "../review";
+import type { DeckProgress, QueueCard } from "../review";
 import { SwipeableFlashcard } from "./swipeable-flashcard";
 import { FlashcardSummary } from "./flashcard-summary";
 
@@ -48,8 +48,8 @@ function EmptyQueue({ onExit }: { onExit: () => void }) {
  *
  * ONE component for BOTH the per-lesson deck (flashcard-runner.tsx, after its
  * intro screen) and the Daily Review aggregate (pages/practice-review.tsx),
- * because the loop itself — flip, grade, advance, finish —
- * is identical either way; only where the cards came from and where "back"
+ * because the loop itself — flip, grade, advance, finish — is identical either
+ * way; only where the cards came from and where "back"
  * (exit, not step-back — see below) goes differ, and both are just props
  * here. Same lift-on-second-caller pattern as utils/rewards.ts and
  * shell/stat-bar.tsx.
@@ -78,18 +78,25 @@ function EmptyQueue({ onExit }: { onExit: () => void }) {
  * which card is ON SCREEN; it does NOT undo a grade already committed to
  * `cardReviews` — the same view-only semantics FocusLayout's own doc comment
  * describes ("let me re-read that," not "let me take that back"). A student
- * A student who wants to change a rating can simply rate the card again the
- * next time it comes round.
+ * who wants to change a rating can simply rate the card again the next time it
+ * comes round.
  */
 export function ReviewSession({
   queue,
   title,
+  progress,
   onExit,
 }: {
   queue: QueueCard[];
   /** Shown on the summary screen — the lesson name for a per-lesson session,
    *  or "ការពិនិត្យប្រចាំថ្ងៃ" for the aggregate. */
   title: string;
+  /** The WHOLE deck's progress, for the summary's ring — passed straight
+   *  through rather than derived here, because this component only ever sees
+   *  the session's own queue and a session is usually a subset of a deck.
+   *  The caller reads it live from the store, so it reflects the grades made
+   *  during this very session. */
+  progress?: DeckProgress;
   onExit: () => void;
 }) {
   const { gradeCard, completeTask, starredCards, toggleStarredCard } =
@@ -126,7 +133,14 @@ export function ReviewSession({
   // compiler depend on the safe `current` instead of `current.card.id`.)
   if (liveQueue.length === 0) return <EmptyQueue onExit={onExit} />;
   if (done) {
-    return <FlashcardSummary title={title} results={results} onExit={onExit} />;
+    return (
+      <FlashcardSummary
+        title={title}
+        results={results}
+        progress={progress}
+        onExit={onExit}
+      />
+    );
   }
 
   function rate(grade: ReviewGrade) {

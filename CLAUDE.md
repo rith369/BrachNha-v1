@@ -2078,6 +2078,76 @@ terminal screens could be one-line returns placed before `rate`. Neither `tsc`
 nor `oxlint` can see this, and it does not reproduce until the very last item of
 a list, so exercise the END of any such flow.
 
+### A progress ring on both flashcard screens, and a line that says well done
+
+Two additions asked for together, and they answer deliberately DIFFERENT
+questions — which is the part worth keeping straight.
+
+**`DeckProgressRing` measures the WHOLE DECK.** A mint arc for ចងចាំ, a pink arc
+for មិនទាន់ចងចាំ, bare `--color-chart-track` for everything not yet answered,
+and the remembered share as a percentage in the middle. It appears on the
+lesson's opening screen (where it REPLACED a decorative `Layers` icon — same
+position, same job as an anchor, except it now says something) and again under
+the summary. `deckProgress()` lives in `features/practice/review.ts` with the
+other pure queries, NOT beside the component: it is a query over `QueueCard[]`
+exactly like its neighbours, and a non-component export from a `.tsx` trips
+oxlint's `only-export-components` — the rule `utils/focus-styles.ts` exists for.
+
+Three things in the drawing that are decisions, not incidentals:
+
+- **Same SVG recipe as `features/progress/score-hero.tsx`** — `0 0 100 100`
+  viewBox, `-rotate-90` so the arc starts at twelve o'clock, `strokeDasharray`
+  against the circumference. The strokes are `var(--color-mint)` /
+  `var(--color-pink)` / `var(--color-chart-track)`, the per-theme scale rather
+  than `--brand-*`, because these are lines on a surface rather than fills under
+  white text. That is what makes it correct in dark with no `dark:` override.
+  The theming section lists hand-coded SVG donut tracks among the things a class
+  toggle cannot reach; this is a third one, tokenised for that reason.
+- **Butt caps, and a zero-length segment is not rendered at all.** Round caps
+  overhang by half the stroke width, which turns the junction between the two
+  arcs into an overlap and paints a visible dot where a segment has no cards.
+- **The percentage is of the WHOLE deck, not of the cards answered so far.** One
+  card right out of twenty is 5% of the lesson learned, not 100%, and the second
+  reading would congratulate a student for work they have not done.
+
+**The legend under the ring is OFF on the intro and ON in the summary.** The
+intro's three pile buttons sit directly beneath it carrying the same two
+numbers, and printing them twice a few pixels apart reads as a bug; the summary
+has no piles, so without the legend its two arc colours go unexplained.
+
+**`encouragementFor(remembered, total)` in `features/practice/encouragement.ts`
+is about THIS SESSION, not the deck** — that is the whole reason the two live
+apart. The summary's headline is the moment's feedback on the cards just
+answered, and a line drawn from deck totals would say the same thing to someone
+who just aced ten cards and someone who just failed them. It is DETERMINISTIC,
+banded at 100 / 75 / 40 / >0 / 0: random would say something different for the
+same result on a second look, which reads as the app not paying attention, and
+one fixed sentence congratulating everyone equally is worse than none, because
+a student who got two out of ten knows it isn't true. **The zero band never
+scolds** — same forward-only rule the leaderboard applies to the current user's
+own card.
+
+That headline REPLACED the old "បញ្ចប់ការពិនិត្យ!" rather than stacking under
+it; the Trophy and the "N កាត បានពិនិត្យ" pill already say the session ended.
+Anything keying off that string (an automated check, say) needs a new marker.
+
+**`progress` is an OPTIONAL prop threaded caller → `ReviewSession` →
+`FlashcardSummary`.** `ReviewSession` only ever sees its own queue, and a
+session is usually a subset of a deck, so it cannot derive deck-level progress
+itself — it forwards. `FlashcardRunner` passes `deckProgress(all)` and
+`practice-review.tsx` passes the whole catalog, each recomputed from the store
+every render, so by the time the summary renders it already reflects the grades
+just made. A caller with no meaningful denominator omits it and the ring simply
+is not drawn — absent rather than empty, like the starred list and the retention
+line before it.
+
+**NOTE: the intro now shows TWO percentages** — the ring's real remembered share
+and `mock-retention.ts`'s "ប្រូបាបចងចាំប្រហាក់ប្រហែល ~N%". The second is
+explicitly a mock (its own file exists so it can never be mistaken for the
+scheduler) and is now the weaker of the two. It was LEFT IN rather than removed
+because nobody asked for it to go; if the doubling reads as confusing, deleting
+the retention line is the intended resolution, not reworking the ring.
+
 ### A pile opens its LIST first, and a single question is reviewable on its own
 
 Tapping ចងចាំ / មិនទាន់ចងចាំ / សំខាន់ used to drop straight into the cards.

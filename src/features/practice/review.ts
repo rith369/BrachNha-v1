@@ -136,6 +136,37 @@ export function importantCards(
   return cards.filter((qc) => starredCards.includes(qc.card.id));
 }
 
+/**
+ * How much of a set of cards the student has actually learned. Derived, never
+ * stored — same rule `lessonCountFor()` follows: a stored progress figure
+ * drifts from the review state it claims to describe the first time a card is
+ * added, deleted or reset.
+ *
+ * `total` counts the WHOLE set, including cards never graded, because those are
+ * what the uncoloured part of the ring represents — and because the remembered
+ * share has to be of the whole lesson, not of the handful answered so far. One
+ * card right out of twenty is 5% of the lesson learned, not 100%.
+ *
+ * Lives here rather than beside the component that draws it because it is a
+ * pure query over QueueCards exactly like its neighbours above — and because a
+ * non-component export from a `.tsx` trips oxlint's `only-export-components`,
+ * the rule utils/focus-styles.ts and features/lessons/subject-styles.ts both
+ * exist to satisfy.
+ */
+export interface DeckProgress {
+  remembered: number;
+  notRemembered: number;
+  total: number;
+}
+
+export function deckProgress(cards: QueueCard[]): DeckProgress {
+  return {
+    remembered: rememberedCards(cards).length,
+    notRemembered: notRememberedCards(cards).length,
+    total: cards.length,
+  };
+}
+
 /** How many cards were graded today, across every deck — read straight off
  *  `lastReviewedAt`, never a separate counter that could drift from it. Feeds
  *  the Daily Review card's "reviewed" stat and the mock recommendations. */

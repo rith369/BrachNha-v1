@@ -19,6 +19,7 @@ import type { PracticeCard } from "@/types";
 import type { PracticeMode } from "../practice";
 import {
   cardsFor,
+  deckProgress,
   dueCardsFor,
   importantCards,
   notRememberedCards,
@@ -26,6 +27,7 @@ import {
   type QueueCard,
 } from "../review";
 import { averageMockRetention } from "../mock-retention";
+import { DeckProgressRing } from "./deck-progress-ring";
 import { ReviewSession } from "./review-session";
 import { FlashcardForm } from "./flashcard-form";
 
@@ -343,6 +345,9 @@ export function FlashcardRunner({
       <ReviewSession
         queue={session}
         title={title}
+        // Recomputed on every render from the store, so by the time the
+        // summary reads it, it already includes the grades just made.
+        progress={deckProgress(all)}
         onExit={pile ? () => setSession(null) : exit}
       />
     );
@@ -385,7 +390,18 @@ export function FlashcardRunner({
       }
     >
       <div className="text-center">
-        <Layers className="mx-auto mb-3 size-12 text-purple" strokeWidth={2} />
+        {/* THE RING REPLACES a decorative Layers icon that used to sit here.
+            Same position, same job as a visual anchor, except it answers "how
+            am I doing on this lesson" instead of just marking the screen as a
+            deck. The icon is still the fallback for a deck with no cards,
+            where a 0% ring would be measuring nothing. */}
+        {all.length > 0 ? (
+          <div className="mb-3 flex justify-center">
+            <DeckProgressRing progress={deckProgress(all)} legend={false} />
+          </div>
+        ) : (
+          <Layers className="mx-auto mb-3 size-12 text-purple" strokeWidth={2} />
+        )}
         <div className="font-heading mb-4 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
           {title}
         </div>

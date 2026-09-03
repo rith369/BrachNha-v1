@@ -1,7 +1,11 @@
 import { useNavigate } from "react-router";
 import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
-import { allCards, allDueCards } from "@/features/practice/review";
+import {
+  allCards,
+  allDueCards,
+  deckProgress,
+} from "@/features/practice/review";
 import { ReviewSession } from "@/features/practice/components/review-session";
 
 /**
@@ -35,12 +39,18 @@ export default function PracticeReviewPage() {
   );
 
   const due = allDueCards(studentCards, cardReviews);
-  const queue = due.length > 0 ? due : allCards(studentCards, cardReviews);
+  const everything = allCards(studentCards, cardReviews);
+  const queue = due.length > 0 ? due : everything;
 
   return (
     <ReviewSession
       queue={queue}
       title="ការពិនិត្យប្រចាំថ្ងៃ"
+      // The whole CATALOG is this screen's equivalent of a deck — it reviews
+      // across every subject, so its progress ring measures the same scope it
+      // draws its queue from. Recomputed each render, so grading during the
+      // session is already reflected by the time the summary shows it.
+      progress={deckProgress(everything)}
       onExit={() => navigate("/practice")}
     />
   );

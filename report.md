@@ -17,6 +17,49 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 3 Sep 2026 — A progress circle on flashcards, and a word of encouragement at the end
+
+*Landed in commit `PENDING`.*
+
+**Why.** Asked for directly: show progress when a lesson is opened and again
+after finishing flashcards, and say something encouraging once the student is
+done.
+
+**What changed.**
+
+- **A progress circle now sits at the top of a lesson's flashcard screen.** The
+  green part is how much of the lesson you remember, the pink part is what you
+  have marked as not remembered yet, and the plain grey part is cards you have
+  not answered at all. The number in the middle is how much of the whole lesson
+  you remember. It replaced the plain decorative icon that used to sit there.
+- **The same circle appears after finishing a review**, under a
+  "វឌ្ឍនភាពរបស់អ្នក" heading, so you can see the lesson move forward as a result
+  of the session you just did.
+- **The finish screen now opens with an encouraging line** instead of a plain
+  "review finished". What it says depends on how the session actually went —
+  from "អស្ចារ្យណាស់!" when everything was remembered, down to
+  "អ្នកបានព្យាយាមហើយ!" when none was. It never tells anyone off, and it always
+  points at what happens next.
+- The circle works in dark mode and down to the smallest phone screen.
+
+**Two things worth your opinion.**
+
+1. **The Khmer wording of the five encouragement lines is mine and deserves a
+   native read-through** — the same caution as the Biology card transcription.
+   They are all in one small file, so changing any of them is a one-line edit.
+2. **The lesson screen now shows two percentages**: the new circle (how much you
+   actually remember) and the older "ប្រូបាបចងចាំប្រហាក់ប្រហែល ~N%" line, which
+   is an estimate the app makes up rather than a real measurement. Two
+   percentages next to each other may be confusing. Say the word and the
+   estimate line goes.
+
+**What to re-test.** Practice → Flashcard → Biology → the first lesson. The
+circle should read ០% before you start. Review the cards, marking some ចងចាំ and
+some មិនទាន់ចងចាំ, and check the finish screen shows an encouraging line plus the
+circle. Go back into the lesson and confirm the circle at the top now matches.
+
+---
+
 ## 3 Sep 2026 — Tapping a pile now shows its questions first, and you can open just one
 
 *Landed in commit `09fafe1`.*
