@@ -1526,14 +1526,15 @@ and the render order comes from the catalog rather than from that array, so ever
 subject list in the app stays in one order. Quiz uses `allSubjects()`, which
 drops the unchosen language — 7 cards, not 8.
 
-**`data/practice.ts` is EMPTY, and that is the normal state**, exactly as
-`PAST_PAPER_QUESTIONS` shipped. Counts are read from it rather than authored
-beside it (`lessonCountFor()`'s rule), so a row cannot claim a deck the app lacks
-and playability is derived from the same number. Adding one entry turns a row on
-with no other code change. **Both runners are therefore unreachable in the app as
-shipped** — add a temporary entry to exercise them. Note `PracticeCard` is the
-one new type, while the quiz reuses `SectionQuestion` **verbatim** rather than
-growing a twin.
+**`data/practice.ts` was EMPTY, and that was the normal state**, exactly as
+`PAST_PAPER_QUESTIONS` shipped — until `"biology-1-1"` became the first real
+deck (see the spaced-repetition section below). Counts are read from it rather
+than authored beside it (`lessonCountFor()`'s rule), so a row cannot claim a
+deck the app lacks and playability is derived from the same number. Adding an
+entry turns a row on with no other code change — which is exactly what
+happened for Biology Lesson 1, and exactly what will happen for every deck
+after it. `PracticeCard` is the one content type here, while the quiz reuses
+`SectionQuestion` **verbatim** rather than growing a twin.
 
 **Nothing empty is tappable, at either level.** A subject tile with no content
 and a lesson row with no content are both a dimmed `<div>` with a `ឆាប់ៗនេះ` chip
@@ -1550,19 +1551,23 @@ whose rows are themselves all pending is silence with extra steps, and the app's
 two subject grids now behave identically rather than one being the exception.
 Don't restore it.
 
-**The consequence is the whole page today, and it is intended:** with
-`data/practice.ts` empty every tile on both tabs is dimmed, so nothing on
-`/practice` can be opened at all. That is the honest rendering of having no
-content, and it resolves by writing content rather than by re-enabling the link.
-`/practice/:mode/:subjectId` stays reachable by URL for development.
+**That consequence was the whole page for a while, and it was intended:** with
+`data/practice.ts` empty every tile on both tabs was dimmed, so nothing on
+`/practice` could be opened at all — the honest rendering of having no content,
+resolved by writing content rather than by re-enabling the link. Biology's
+Flashcard tile is the first to light up; every other subject on both tabs is
+still in that state until its own content lands.
+`/practice/:mode/:subjectId` stays reachable by URL for development regardless.
 
 **No emoji anywhere in this feature** — Lucide icons only, the newer
 section-content rule rather than the legacy lesson flow's emoji. Both runners use
 `utils/focus-styles.ts`'s ladder and `FocusLayout` with `showStats` on, since a
 lesson-like activity opts in and only the two assessments leave the counters off.
 The flashcard flip is the same `preserve-3d` + `backface-visibility` technique
-`lesson-detail.tsx` step 2 uses, and Continue is disabled until the card has been
-turned over — `SectionDetail`'s `quizDone` gate applied per card.
+`lesson-detail.tsx` step 2 uses — now living in `review-session.tsx` rather than
+`flashcard-runner.tsx` itself; see the spaced-repetition section below for why
+the flip-then-Continue gate this paragraph used to describe was replaced by a
+graded Again/Hard/Good/Easy flow instead of a plain "seen it, move on" Continue.
 
 `defaultMathLayout` (`utils/math-input.ts`) now has **two patterns**, because the
 subject sits in a different place in each: the first id segment on a lesson or
@@ -1570,6 +1575,612 @@ section, its own third segment on a practice route.
 
 **Bottom nav is untouched.** It is a 5-tab bar and already full; practice is a
 drawer/sidebar destination, which is why its `NavItem` carries no `shortLabel`.
+
+### Practice lesson rows are lip buttons now, and Biology chapter 1 has real names
+
+Two follow-up fixes landed right after spaced repetition did, both from a first
+look at Biology's actual content in the app.
+
+**`PracticeLessonList`'s tappable rows now use the SAME "lip" 3D-button
+technique `SessionNode` (the Study path's circular nodes) and
+`QuizPathNode` (the Mimo path's square nodes) already use** — a solid
+`style.fill` background under white text, a hard `0 4px 0
+color-mix(...black)` shadow with no blur, and `active:translate-y` +
+`active:shadow-[0_0_0_...]` so the row presses flush into its own shadow on
+tap. Same reasoning as those two: the lip colour is mixed TOWARD BLACK
+rather than the app's lighter `--color-subj-*` scale, because that scale is
+lighter than the fill in dark mode and would light the button from below —
+see session-node.tsx's own header for the fuller argument. This was a
+conscious choice between two options (restyle the existing list's rows vs.
+turn the list into a winding path like the Study page): the STRAIGHT LIST
+STAYS a straight list — only the row's material changed, not its layout —
+because Practice's lesson list is a reading-and-choosing screen by design
+(capped at `max-w-2xl`, the same as the exam tabs and the leaderboard),
+and a winding path is what the separate Study path screen is already for.
+
+**A row with NOTHING written stays exactly what it always was** — a flat,
+dimmed `<div>`, no lip, never a `<Link>`. Giving an empty row the lip
+treatment too would make it look pressable, which is the one thing it must
+not do; only content-backed rows get the 3D material.
+
+**Biology chapter 1 and its two lessons have their real names now**:
+ស៊ីមណូស្ពែម (Gymnosperm) and អង់ស្យូស្ពែម (Angiosperm) — the seed-plant
+split the chapter covers, chapter title "ស៊ីមណូស្ពែម និងអង់ស្យូស្ពែម".
+Set in `features/lessons/sessions.ts`'s `SUBJECT_SESSIONS.biology`, which
+is the single source both the Study path's banner and every Practice
+screen (lesson list, the flashcard runner's title, the review summary)
+read from — one edit, and all four screens picked it up with no other
+code change. Chapter 2 is still titleless, for the reason already recorded
+there (the scan it came from is too soft to transcribe safely).
+
+### Flashcards grew real spaced repetition, on top of the same feature
+
+The plain flip-through deck above is still the shape for Quiz and for any
+lesson before its own review history exists, but **Flashcard mode is now a
+real (simplified) spaced-repetition system** — due dates, a graded
+Again/Hard/Good/Easy review, and student-authored cards — layered onto the
+same `/practice` routes and `PracticeCard` content rather than a parallel
+feature. Biology Lesson 1 (`"biology-1-1"`) is the first deck with real
+content; everything below was built generically, against the whole catalog,
+not hardcoded to that one lesson.
+
+**The brief was explicit that this is a PROTOTYPE, not FSRS/SM-2.** Three
+things stayed deliberately out of scope and are documented as such at their
+own definitions rather than silently missing: a real memory-model scheduler,
+a real retention/ML prediction, and real AI-generated recommendations or
+cards. Each of those has a comment at its own file explaining exactly what
+would need to change to make it real.
+
+**`utils/spaced-repetition.ts` is the WHOLE swap boundary for a future FSRS
+integration.** One function, `schedule(state, grade, now) → state`, called
+by nothing except `gradeCard` in the store and read by nothing except
+`isDue`/`initialReviewState`/`daysUntilDue` in `features/practice/review.ts`
+and `flashcard-runner.tsx`. The interval table is deterministic on purpose
+(Again requeues the SAME session rather than simulating a real timer-based
+delay; Hard/Good/Easy graduate a new card to a short 1/3/7-day interval or
+scale an existing one ×1.2/×2/×2.5) — see the file's own header for the full
+reasoning. Replacing this with real FSRS later means rewriting the body of
+`schedule` and possibly widening `ReviewState`; no caller changes shape.
+
+**Due-ness PRIORITISES, it never GATES — this took two passes to land on.**
+"0 due, 0 new" is correct once every card has been graded (a card rated
+"Good" a minute ago is not supposed to come back immediately, that's the
+whole point of spaced repetition), but two different UI responses to it were
+tried:
+
+1. First pass: explain it. A flat, disabled "គ្មានកាតត្រូវពិនិត្យថ្ងៃនេះ"
+   (no cards to review today) read as an error, so `daysUntilDue` (in
+   `spaced-repetition.ts`) was added to show "អ្នកបានពិនិត្យអស់ហើយ!
+   ការពិនិត្យបន្ទាប់ក្នុងរយៈពេល N ថ្ងៃទៀត" (next review in N days) instead
+   — still disabled, just explained.
+2. **Overruled immediately: the button should never be disabled at all.**
+   A student who wants to restudy something they already know well should
+   always be able to, the same way nothing else in this app locks a lesson
+   behind a timer. `daysUntilDue`'s message stayed (still useful context,
+   reworded to "…ឬពិនិត្យម្តងទៀតឥឡូវក៏បាន" — "or review again now too," so
+   it reads as information rather than a restriction) but the GATE came off:
+   `startQueue = due.length > 0 ? due : all` in `flashcard-runner.tsx`, and
+   the same fallback in `practice-review.tsx` via the new `allCards()` in
+   `review.ts`. The button is only ever disabled when the deck itself is
+   empty (`all.length === 0`) — not when nothing happens to be scheduled.
+   Grading still updates the real due date either way; reviewing early just
+   means a card is judged again from wherever it already was.
+
+`ReviewSession`'s own empty-queue branch is now reachable only when a deck
+or the whole catalog TRULY has zero cards — both callers fall back before it
+ever sees "nothing due" — so its copy changed from "come back tomorrow" to
+"គ្មានកាតនៅឡើយទេ" (no cards yet), which is what that state actually means
+now.
+
+### The review CARD is Quizlet-style now — swipe, always-flippable, starrable
+
+The Show-Answer-then-four-buttons flow is gone. `SwipeableFlashcard`
+(`components/swipeable-flashcard.tsx`) is what `ReviewSession` renders
+instead: tap anywhere on the card to flip, drag it right for ចងចាំ (know
+it) or left for មិនទាន់ចងចាំ (don't know it yet), and a star in the corner
+to mark it important — modelled directly on a Quizlet screenshot the user
+supplied, with the explicit exception of Quizlet's pronunciation-audio
+speaker icon, which was asked to be left out.
+
+**Two student-facing options, not the scheduler's four.** This is a UI
+simplification, not a scheduler one: `rate()` in `review-session.tsx` still
+calls `gradeCard` with a real `ReviewGrade` from `utils/spaced-repetition.ts`
+— ចងចាំ maps to `"good"`, មិនទាន់ចងចាំ to `"again"` — so the scheduler (and
+its future FSRS replacement, which speaks the same four-grade vocabulary)
+never sees anything different. `"hard"`/`"easy"` are still real, valid
+`ReviewGrade` values; nothing currently produces them, which is why
+`FlashcardSummary`'s breakdown folds them into the two visible columns
+(`counts.again + counts.hard`, `counts.good + counts.easy`) rather than
+deleting them from the type.
+
+**Tap vs. drag is disambiguated by distance, via Pointer Events — one
+implementation for touch AND mouse.** Movement under `TAP_THRESHOLD` (8px)
+is a tap and flips the card; past `SWIPE_THRESHOLD` (110px) commits a
+rating; anything in between snaps back to centre. This is why a desktop
+student (`lg` and up gets a real laptop layout, not just a stretched phone
+— see the responsive-layout section) can rate a card by click-dragging it
+exactly like a touch swipe, with no separate mouse-only code path.
+
+**Two nested transforms, not one.** The outer wrapper carries the drag
+(`translateX` + a slight `rotate`, the same tilt Tinder/Quizlet both use);
+the INNER wrapper carries the existing flip (`rotateY` in a `perspective`
+container — the same technique `lesson-detail.tsx` step 2 uses). CSS
+transforms compose through the DOM, so a card can be mid-drag and mid-flip
+at once with no special-casing, which is what makes "they always can flip
+always" true regardless of drag state.
+
+**The star button caused a real bug worth remembering:** it originally sat
+INSIDE the flip container with its own `backface-visibility: hidden`,
+intending to "be on both faces." Instead, having no counter-rotation of its
+own, it inherited the container's `rotateY(180deg)` when flipped and ended
+up showing ITS OWN backface — invisible and unclickable — the moment the
+card flipped. The fix was moving it OUTSIDE the rotating layer entirely (a
+sibling of the flip container, not a child), so it is simply never subject
+to that rotation and stays visible and tappable in both flip states. Watch
+for this exact trap in any future ELEMENT THAT SHOULD SURVIVE A FLIP but
+isn't one of the two faces themselves.
+
+**`starredCards: string[]` is a new store field** — a flat id list, not
+part of `ReviewState`, because importance is the student's own bookmark and
+has nothing to do with where a card sits in its review cycle. Works for
+official and student cards alike since both share one id space. Same
+local-only reasoning as `cardReviews`/`studentCards`; nothing reads it back
+anywhere yet (no "show starred cards" filter was asked for) — marking and
+persisting is the whole feature today.
+
+**The fly-off animation is timed, not instant, and that timing is why the
+component is keyed on `card.id` by its caller.** Releasing past the swipe
+threshold starts a CSS transition sending the card off-screen, and only
+AFTER `FLYOFF_MS` (220ms, matched to the transition duration) does the
+component call `onSwipe` — calling it immediately would have let the parent
+swap in the next card synchronously, remounting `SwipeableFlashcard` under
+a new key mid-animation and cutting the fly-off short. Keying on `card.id`
+is also what resets the component's own drag/flip state for free between
+cards, with no effect required to do it by hand.
+
+**`rating-buttons.tsx` is deleted** — the four-button row it rendered has
+no caller left. Don't recreate it without a caller asking for four options
+again; the two-button fallback row now lives directly in
+`review-session.tsx`, styled as a ✕/✓ pair rather than a labelled row, to
+match the swipe gesture's own visual vocabulary (mint/pink) instead of
+inventing a third.
+
+**`PracticeCard` grew `id`, `source`, `createdAt`, `updatedAt`.** `id` is
+required because review state is keyed off it — an array index would
+silently point at the wrong card the moment content is reordered or a
+student's own card is deleted from the middle of their list. `source:
+"official" | "student"` is a discriminant on ONE type rather than two
+separate `OfficialFlashcard`/`StudentFlashcard` interfaces, which would
+carry an identical field list and be one more place for the two to drift.
+
+**`cardReviews` and `studentCards` are new store fields, LOCAL-ONLY.**
+Deliberately NOT added to `syncRelevantChange` in `use-supabase-sync.ts` or
+the push/pull mapping in `supabase-sync.ts` — that layer pushes a full
+snapshot of each table on every debounced change, which is justified there
+by small, capped data (20 conversations, a handful of exam results). A
+per-card table updated on every single grade is a different scale and access
+pattern, and deserves its own incremental sync path rather than being forced
+into the existing one. See "What a real backend would eventually need"
+below for the shape that table should take when it's built. Both fields are
+reset in `logout()` alongside the rest of a student's progress, and both
+need no `persist` version bump — see the store's own `merge()` for why a
+brand-new key with a default requires no migration.
+
+**Student cards attach to an official lesson's deck — there is no freeform
+"create your own deck" flow.** `studentCards` is keyed by the SAME
+`practiceKey()` string official decks use, so a student's own cards join
+the SAME review queue as the official ones for that lesson, tagged apart in
+the UI (their own "កាតរបស់អ្នក" section, with edit/delete) rather than a
+second review mechanism to keep in step. This also means student cards are
+only reachable inside a lesson that already has an official deck — matching
+`practice-run.tsx`'s redirect gate, which still checks the OFFICIAL deck
+only (`deckFor(key).length === 0`), the same rule
+`practiceLessonsFor()`'s `count` already enforces at the list level.
+
+**`features/practice/review.ts` is the pure query layer** — `cardsFor`,
+`dueCardsFor`, `allDeckKeys`, `allDueCards`, `reviewedTodayCount`. All take
+`studentCards`/`cardReviews` as plain arguments rather than reading the
+store directly (same shape as `pathProgress(chapters, completed)` in
+`features/lessons/sessions.ts`), so they stay callable from anywhere. A
+card with no review record is treated as fresh/"new"/due-now rather than
+requiring one to be seeded up front.
+
+**`ReviewSession` (`components/review-session.tsx`) is the ONE review loop**,
+shared by the per-lesson `FlashcardRunner` (after its intro screen) and the
+Daily Review aggregate at `/practice/review` — the loop itself (flip, grade,
+requeue-on-Again, advance, finish) does not care where the queue came from,
+only the title and exit route differ, and both are props. Same
+lift-on-second-caller pattern as `utils/rewards.ts` and `shell/stat-bar.tsx`.
+It owns three states: the graded queue with local same-session requeuing on
+"Again", an empty state ("nothing due — come back tomorrow", a legitimate
+state rather than an error), and `FlashcardSummary` on completion (shared
+too) — a breakdown of how many cards got each grade this session.
+
+**`FlashcardRunner` is now the INTRO screen**, not the review loop itself:
+due/new/total counts, this student's own cards for the lesson (add/edit/
+delete via `FlashcardForm`, an inline panel rather than a portalled dialog —
+same reasoning `ChatOverlay` avoiding `ui/sheet.tsx` gives), a mock
+retention line, and Start Review, which then renders `ReviewSession`. It
+now takes a **`deckKey` prop, not a `cards` array** — it needs to combine
+the official deck with this student's own cards and pair both with live
+review state itself, so `pages/practice-run.tsx` stays a thin route
+resolver rather than duplicating that assembly.
+
+**`/practice/review` — the Daily Review aggregate — pulls due cards from
+EVERY flashcard deck at once**, via `allDueCards()`. A static route,
+listed BEFORE the dynamic `practice/:mode/:subjectId` route in `app.tsx` so
+react-router resolves it first rather than treating "review" as a `:mode`
+value; `isFocusRoute` in `utils/focus-routes.ts` matches it by exact
+pathname rather than through `isPracticeRunRoute`'s segment-count scheme,
+since it has no `:subjectId`/`:lessonRef` to count. Not an assessment route
+— same non-measuring treatment the per-lesson runner already gets. Today
+this reduces to "whatever Biology has," since it's the only subject with a
+written deck; nothing here needs to change as more decks get content.
+
+**The hub briefly gained two summary cards and no longer has them —
+overruled by the user after seeing them.** `DailyReviewCard`
+(due/new/reviewed-today, a progress bar, Start Review) and
+`RecommendationsCard` (rule-based sentences, NOT AI, off the same numbers)
+shipped on `/practice` for one revision, both deleted along with
+`recommendations.ts` the moment that was overruled — the call was to keep
+the DUE-COUNT SCREEN PER LESSON (`FlashcardRunner`'s intro — see below) but
+drop the cross-subject summary sitting above the hub's tabs. Don't restore
+either file without being asked; `reviewedTodayCount` in `review.ts` is the
+one piece left with no caller today, kept because it's a small, correctly
+derived pure function that costs nothing to leave for whatever reads it
+next — everything else those two cards used (`allDueCards`, `allDeckKeys`)
+is still live, called by `/practice/review`'s aggregate runner, which is
+UNCHANGED and still reachable by URL even with no card on the hub driving
+traffic to it — same "stays reachable by URL for development" precedent the
+rest of this feature already sets for a screen with no authored entry point
+yet.
+
+**Retention is a MOCK, in its own file (`features/practice/
+mock-retention.ts`) specifically so it can never be mistaken for the real
+scheduler.** A small deterministic formula off `reviewCount`/`lapses` —
+not FSRS's own retrievability estimate, not scientifically calibrated to
+anything. Always labelled "ប្រហាក់ប្រហែល" (approximate) in the UI, and
+only shown once at least one card in view has actually been reviewed
+(`averageMockRetention` returns `null` otherwise, and the caller skips
+rendering rather than showing a meaningless 0%).
+
+**`FLASHCARD_XP`/`FLASHCARD_COINS` (in `utils/rewards.ts`, beside
+`QUIZ_XP`/`QUIZ_COINS`) are smaller than the quiz reward and paid for
+EVERY grade, including "Again".** A flashcard isn't right/wrong the way a
+quiz question is — it's a self-assessed recall rating, and pressing
+"Again" is genuine engagement, not a guess to be discouraged the way an
+incorrect quiz answer is. The existing `completeTask("flashcards")` flat
+daily bonus is unchanged and stacks on top per session.
+
+**Biology Lesson 1's deck is the first REAL content in `data/practice.ts`**
+— six cards transcribed from the textbook's own Q&A study page for
+ជំពូក ១ · មេរៀនទី ១ (Gymnosperms), matching the chapter/lesson numbers
+already authored in `features/lessons/sessions.ts`'s `SUBJECT_SESSIONS`.
+**Transcribed from a photographed page, not a digital source** — dense
+Khmer script is genuinely easy to misread character-by-character, so this
+is a best-effort pass pending a native read-through, not a guaranteed-
+correct transcript; the file's own comment says so and asks for a
+spot-check against the original. Fixing a misread word is a plain data
+edit in `data/practice.ts` — nothing else in the app needs to change.
+
+**That spot-check already caught one, and it's worth knowing the shape of
+it.** The recurring term across all six cards was first transcribed
+"ស៊ីមណ្ឌាស្នេម" — a plausible-looking string, not obvious nonsense on
+sight — and only came out as wrong once the user supplied the real term
+(ស៊ីមណូស្ពែម, the Khmer transliteration of "Gymnosperm") for the chapter
+title. The correction was made to the chapter/lesson TITLES in
+`sessions.ts` first; the actual card front/back text in `data/practice.ts`
+still had the old wrong spelling in all seven places until that was caught
+too and fixed with a straight find-and-replace. The lesson: a name
+correction supplied for one context (a title) can silently miss every
+OTHER place the same misread term appears — search the whole term across
+the codebase, not just the file the correction was mentioned for.
+
+**What a real backend would eventually need**, if/when this stops being
+local-only: a `card_reviews` table (`user_id`, `card_id`, the `ReviewState`
+fields, `updated_at`), RLS'd the same "own rows only" way every other table
+is, PLUS an incremental push path — writing just the one row that changed
+on each `gradeCard()` call, not a snapshot of the whole table the way
+`pushLocalState()` handles conversations and exam results today, since a
+review table's write volume (one row per card, every grade) doesn't fit
+that pattern. A `student_cards` table (`user_id`, `deck_key`, `front`,
+`back`, timestamps) would follow the same shape `daily_activity` already
+uses for per-user rows. Neither exists yet, on purpose — this file's own
+Supabase section explains why introducing a table is a deliberate, tracked
+step (a migration + hand-updated `database.ts`), not a silent one.
+
+### Drag-to-rate hardened: phone-only, a Back button, and a real bug worth remembering
+
+Four follow-ups landed once the swipe redesign got real hands-on use.
+
+**Drag now only activates below `lg` (1024px)** — `isDragViewport()` in
+`swipeable-flashcard.tsx`, checked once per gesture at `pointerdown` and
+cached in a ref so a resize mid-drag can't flip the rule out from under it.
+Dragging a card any real distance with a mouse reads as awkward in a way a
+thumb swipe doesn't, and the app already gets a genuinely wider desktop
+layout from `lg` up — so the intended desktop path is the Back/✕/✓ buttons
+below, not a mouse-drag fallback. Tap-to-flip is NOT gated by this; it works
+at every width, on every device, always.
+
+**The ✕/✓ pair moved into `FocusLayout`'s `footer` slot, with `onBack`
+beside it.** They used to sit inline in the body; moving them into `footer`
+is what let a real `onBack` — FocusLayout's own step-BACKWARDS-within-
+the-task affordance, the same one `SectionDetail` uses — sit next to them
+the way the shell already expects ("the row is items-stretch so the back
+button takes its height from the action button beside it"). Stepping back
+only changes which card is ON SCREEN; it does NOT undo a grade already
+committed to `cardReviews` — view-only, same as FocusLayout's own doc
+comment describes it ("let me re-read that," not "let me take that back").
+
+**A REAL BUG, worth reading in full because the fix looks small and the
+cause wasn't.** After a real drag-and-release on a phone-width viewport, no
+grade was ever recorded — the card just sat wherever the drag had left it,
+silently. `pointerdown` and every `pointermove` fired correctly the whole
+time (confirmed with on-page event logging: exact coordinates, every step);
+`pointerup` after any real movement simply never reached the component at
+all. Three plausible causes were tried and ruled out one at a time —
+`setPointerCapture` interfering, `perspective` and the drag `transform`
+sharing one element confusing hit-testing, a stale closure over
+`dragging`/`dragX` (which WAS also a real, separate bug — see below) — and
+none of them were the actual cause. **The real cause: `pointermove`/
+`pointerup` were bound directly to the card being dragged, and that card's
+own `transform` moves its hit-test box along with it. By release time on a
+real drag, the box the browser hit-tests against and the box the pointer is
+actually over have enough drift between them that the browser's hit test
+for `pointerup` misses the element outright** — a known category of bug
+with binding move/up to a transformed, dragged element itself rather than
+to `window`, not a quirk unique to this component. The fix: `pointermove`
+and `pointerup` are handled by a `useEffect` that adds `window`-level
+listeners (filtered to the current gesture by matching `e.pointerId`
+against the one captured at `pointerdown`), which fire reliably regardless
+of what the browser thinks is currently under the cursor. `pointerdown`
+alone stays a normal React prop on the card — it always fires at the card's
+ORIGINAL, untransformed position, before any drag transform has been
+applied, which is exactly the one part of the gesture that was never
+actually broken. **If a future change needs the dragged element's own
+move/up handlers back for some reason, re-verify a real release after a
+real drag on an actual mobile viewport — this class of bug does not show up
+in a static screenshot, only in an actual gesture, and effectively never
+reproduces from a stationary tap.**
+
+**A second, genuinely separate bug found while chasing the first: a
+same-position tap right after a drag-heavy sequence could silently commit a
+phantom rating instead of flipping.** A `pointermove` reaching the card
+BEFORE its own next `pointerdown` — the pointer simply gliding onto the
+card from wherever the previous tap or button click left it, which happens
+on essentially every real interaction since the pointer is never already
+resting exactly on the next element — computed its drag delta against
+`start.current`'s stale default rather than a fresh baseline, latching the
+drag-tracking refs to a large phantom value that a same-position release
+right after never cleared. The fix is `onPointerDown` unconditionally
+resetting `draggingRef`/`dragXRef` (and the mirrored `dragging`/`dragX`
+state) at the START of every gesture, not only at the end of a completed
+one — the state a NEW gesture begins from must never be inherited from
+however the PREVIOUS one happened to end.
+
+**`starredCards`/`toggleStarredCard`'s marking is now visible somewhere,
+closing the gap the first version's own comment flagged** ("nothing reads
+it back anywhere yet"). `FlashcardRunner`'s intro screen now has a
+"កាតសំខាន់" section listing every starred card for that lesson — official
+or student-authored, reading the SAME flat id list the review screen's star
+button writes to, so starring during a review and un-starring from the
+lesson intro are the same action from two places, never two trackers.
+Absent entirely, no empty state, when nothing is starred — an empty
+"important" section reads as a mistake, not a feature, the same rule the
+"your own cards" section already follows.
+
+**`reviewHistory: ReviewResult[]` is a new store field — the EVENT LOG
+behind `cardReviews`, deliberately separate from it.** `cardReviews` holds
+each card's CURRENT scheduling state, one row per card, overwritten on
+every grade; `reviewHistory` is one row per grade, EVER, appended (never
+overwritten) by the same `gradeCard()` call, capped at
+`MAX_REVIEW_HISTORY` (1000 — generous, months of real use) with the oldest
+entries dropped first, the same rule `conversations` already follows.
+Nothing reads it back yet; it exists so a future "how have you done on this
+card over time" or "which cards keep coming back" view has real data
+waiting rather than needing a second capture pass bolted on later. Local-
+only, for the same reason `cardReviews`/`studentCards`/`starredCards` are.
+
+**A THIRD swipe bug, and the React lesson in it is the reusable part: the
+review card is keyed on the QUEUE POSITION, not on `card.id`.** Reported as
+"the last swipe doesn't finish — it stays there unless I press the button,"
+and the repro is narrow enough to miss by hand: swipe មិនទាន់ចងចាំ (left →
+`"again"`) on the LAST card in the queue. `rate()` requeues an "again" card at
+the end of the same session, so when the card graded is the last one the very
+next presentation is THE SAME CARD — same `card.id`, next index. With a
+`card.id` key React sees no change, keeps the existing `SwipeableFlashcard`
+mounted, and that instance is still holding the `flyingOut` it set a moment
+ago: `opacity: 0`, translated 140% off-screen, and `onPointerDown` bailing on
+its own `if (flyingOut) return`. Measured before the fix: `opacity: "0"`,
+`x: -512`. The card was gone and every gesture landed on nothing, which is
+exactly why only the ✕/✓ buttons — which live in the PARENT — still worked.
+
+The id is not the identity that state belongs to. `SwipeableFlashcard`'s state
+is per-PRESENTATION (this drag, this fly-off), and the queue index is what
+counts presentations; a card can legitimately appear at two positions in one
+session. `key={`${index}-${current.card.id}`}` — the id kept only so the key
+reads as more than a bare number. **The general rule: when a component's state
+must reset on every ADVANCE, key it on the position, not on the payload's id —
+they differ precisely when the same payload can appear twice in a row, and that
+is the one case a manual test walks straight past.** Finishing by swipe was
+never broken and was re-verified alongside: a right-swipe on the last card
+still reaches `FlashcardSummary` and still ticks `tasks.flashcards`.
+
+### "Again" schedules for later, and the intro is three PILES, not three counts
+
+Two changes from the same piece of feedback, plus one crash the first of them
+exposed.
+
+**A card graded មិនទាន់ចងចាំ no longer comes back inside the same sitting.**
+`schedule()`'s "again" branch used to set `dueAt` to TODAY and `ReviewSession`
+pushed the card onto the end of its own queue, so it came round again before the
+session finished. Overruled: being shown a card seconds after admitting you
+don't know it teaches recognition, not recall. `AGAIN_INTERVAL_DAYS` (1) in
+`utils/spaced-repetition.ts` is that decision, named so it is one edit to
+revisit, and the requeue is gone from `rate()`.
+
+That makes `liveQueue` a genuinely frozen snapshot (`useState(queue)`, no
+setter), which is now load-bearing rather than leftover: grading writes to the
+store, the caller recomputes `cardsFor`/`dueCardsFor` on that same render, and a
+live `queue` prop would resize under the index mid-session.
+
+**The intro's due/new/total readout is now ចងចាំ / មិនទាន់ចងចាំ / សំខាន់, and
+each one is a BUTTON that opens a review of exactly the cards it counts.** The
+old three were numbers a student could look at and do nothing with. These are
+the other half of the change above: the card comes back later, and a pile is the
+"later" the student controls rather than waits for. `rememberedCards`,
+`notRememberedCards` and `importantCards` in `features/practice/review.ts` are
+the queries — the first two read `ReviewState.lastGrade`, which the scheduler
+already writes on every grade, so a pile's count and the cards its tap queues
+cannot become two different things. **A never-graded card is in NEITHER of the
+first two**, on purpose: lumping new cards into "not remembered" tells a student
+they failed something they have never been shown. Those are what the main Start
+button queues. The two-vs-four asymmetry is the usual one — "hard" folds in with
+"again", "easy" with "good".
+
+An EMPTY pile is a dimmed `<div>`, never a `<button>` — `subject-card.tsx`'s
+zero-lesson tile, the survey's `StudiedStep`, `sidebar-nav.tsx`'s `href: null`
+rows. `FlashcardRunner`'s `reviewing` boolean became a `QueueCard[] | null`
+because there are four ways in now and each opens a different set. The
+`កាតសំខាន់` list below is deliberately KEPT alongside the yellow pile: the
+button studies those cards, the list is the only place outside a review to see
+which they are and un-star one.
+
+**THE REACT COMPILER CRASH THIS EXPOSED — read this before adding an early
+return to any component in this repo.** Removing the requeue made
+`/practice/flashcards/biology/1-1` go blank on the last card with `TypeError:
+Cannot read properties of undefined (reading 'card')`, thrown from the RENDER
+path, in a component whose source has a perfectly ordinary `if (done) return
+<FlashcardSummary/>` guarding exactly that. The compiled output is the whole
+story:
+
+```js
+const done = index >= liveQueue.length;
+const current = liveQueue[index];
+let t2;
+if ($[2] !== completeTask || $[3] !== current.card.id || ...) {   // <-- throws
+  t2 = function rate(grade) { gradeCard(current.card.id, grade); ... };
+```
+
+`rate` touched `current` ONLY as `current.card.id`, so the compiler narrowed its
+memo dependency to that exact property path and emitted the check where the
+closure is built — ABOVE the `if (done)` return that was written to protect it.
+On the render after the final grade `current` is `undefined` and the dependency
+check throws before the guard can run. It had survived the previous version of
+the file only by luck: the requeue line `[...liveQueue, current]` used `current`
+as a whole value, so the dependency was the harmless `current` instead.
+
+**The rule: an early return that guards a possibly-undefined value must sit
+ABOVE every closure that reads INTO that value, not merely above the JSX.**
+Source order is what the compiler preserves; a guard below the closure protects
+nothing. This is why `EmptyQueue` was extracted into its own component — so both
+terminal screens could be one-line returns placed before `rate`. Neither `tsc`
+nor `oxlint` can see this, and it does not reproduce until the very last item of
+a list, so exercise the END of any such flow.
+
+### A pile opens its LIST first, and a single question is reviewable on its own
+
+Tapping ចងចាំ / មិនទាន់ចងចាំ / សំខាន់ used to drop straight into the cards.
+It now opens **`PileList`** — that pile's questions, each one tappable, with
+**ចាប់ផ្តើម** in the footer to run the whole pile. Two ways in, from one screen:
+work the pile in order, or go straight to the one card you meant.
+
+**This ABSORBED the separate `កាតសំខាន់` list that used to sit on the intro.**
+That list showed the starred cards but could not open them; the សំខាន់ pile now
+does both, and keeping both would have been two places showing one thing — the
+same call made when the hub's Daily Review card was dropped. Un-starring is
+still reachable without starting a review, which was that list's other job.
+
+**`pile` is separate state from `session`, not one screen enum**, because the
+two nest: a review started FROM a pile returns to that pile's list when it
+ends, not to the intro, which is only expressible if the pile outlives the
+session (`onExit={pile ? () => setSession(null) : exit}`). The main Start button
+leaves `pile` null and still exits the lesson exactly as before. Tapping one
+question is just `setSession([qc])` — a one-card queue, no special case anywhere
+downstream, which is the payoff of `ReviewSession` taking a queue rather than a
+deck key.
+
+**A row is a `<button>` and its star is a SIBLING, never nested** — a button
+inside a button is invalid, and the star has to stay independently tappable so
+a card can be starred from the list without opening it. Same split the "your own
+cards" rows already use for edit/delete. `PileList`'s empty state is reachable
+only by grading a card out of the pile you are standing in; an empty pile's tile
+on the intro is a dimmed `<div>` and cannot be tapped in the first place.
+
+**Testing note that cost a re-run: Playwright's `getByRole(name:)` is SUBSTRING
+matching by default.** `{ name: "ចងចាំ" }` also matches `មិនទាន់ចងចាំ`, and the
+✕ button comes first in the DOM, so a grading loop silently rated every card
+"again" and the piles came out 0/6 instead of 3/3. Pass `exact: true` whenever
+one Khmer label contains another — which these two do by construction.
+
+### The review card scrolls, and that made the gesture a THREE-way decision
+
+Four fixes from reading real cards on a phone.
+
+**The answer is `text-text`, not `text-mint`.** The back face is the longest
+body of reading on the screen and mint-on-mint tint was genuinely hard to read
+at length. The face keeps its mint border and `/8` background — that is enough
+to tell the two sides apart without colouring the prose itself.
+
+**Both faces are scroll containers.** The card is a fixed height so the deck
+doesn't jump between a one-line card and a long one, which means a long answer
+has to go somewhere; before this it simply overflowed, printing over the swipe
+hint below and past the card's own rounded edge. The inner block is
+`flex min-h-full flex-col justify-center`: centring on the SCROLL CONTAINER
+itself would push overflow above the scroll origin where it cannot be reached,
+while centring an inner block that is at least full height keeps a short answer
+centred and lets a long one start at the top and scroll. `overscroll-contain`
+stops a flick that reaches the end of the card carrying on into the page.
+
+**`SectionContent`-style bullets are in the DATA, not the renderer.** Biology
+1-1's question 2 answers "describe the four groups" with four groups, which read
+as one wall of text; each now starts `"• "` in `data/practice.ts`. The card
+renders `whitespace-pre-line`, so this is a plain content edit — nothing in the
+component knows about it.
+
+**The gesture now has THREE answers, not two, and this is the part to keep.**
+Tap-vs-drag by distance was enough while the card could not scroll. Once it
+could, a finger dragged up to read the rest of an answer was neither: it nudged
+the card sideways, and on release the "never crossed the drag threshold" branch
+FLIPPED the card out from under the reader. `gesture` (a ref, in
+`swipeable-flashcard.tsx`) is `"pending" | "drag" | "scroll"`; the first movement
+past `TAP_THRESHOLD` decides by AXIS — mostly-horizontal, on a viewport where
+dragging is allowed at all, is a rating; anything else is the browser's to
+scroll — and the decision is frozen for the rest of the gesture so a curving
+drag can't change its mind. `"scroll"` releases do nothing: not a rating, and
+pointedly not a flip.
+
+**Two touch-specific traps came with it, and neither shows up under a mouse.**
+
+1. **`pointercancel` is NOT a release.** Both were pointed at `handleUp`. The
+   moment the browser claims a touch as a native scroll it fires
+   `pointercancel`, often before the finger has travelled `TAP_THRESHOLD` — so
+   `handleUp` was still sitting in its "never moved, so it's a tap" branch and
+   flipped the card mid-scroll. `handleCancel` now drops the gesture and decides
+   nothing.
+2. **`touch-action: pan-y` has to be on the SCROLL CONTAINER, not just its
+   ancestor.** The wrapper carried `touch-pan-y` and the faces did not, and a
+   horizontal swipe on a scrollable card was cancelled by the browser after a
+   single `pointermove` — so a card long enough to scroll could not be rated by
+   swiping at all. The reason is that the browser resolves the permitted
+   behaviour from the hit element up to the scrolling ancestor that will handle
+   the pan; the face IS that scroll container, so its own `touch-action: auto`
+   was what the browser read, and the wrapper's `pan-y` above it never came into
+   it. Both faces now carry `touch-pan-y` themselves.
+
+Verified with real CDP touch events (`Input.dispatchTouchEvent`) rather than
+`page.mouse`, which is the only way any of this reproduces: tap flips; a drag up
+scrolls the answer and neither flips nor grades; a swipe right still grades and
+advances. **Re-verify with touch, not a mouse, after touching this file.**
+
+**Also gone: the "អ្នកបានពិនិត្យអស់ហើយ! កាលវិភាគបន្ទាប់…" line** on the intro,
+and `daysUntilDue` with it at that call site. It explained a wait that stopped
+existing the moment due-ness became a priority rather than a gate — every pile
+and the Start button are open whatever the schedule says, so a sentence about
+when the next review is scheduled was answering a question the screen no longer
+raises. `daysUntilDue` itself stays in `utils/spaced-repetition.ts`; it is a
+correct pure function and the obvious thing for a future "next review" surface
+to call.
 
 ### One subject's Quiz tab is a Mimo-style path instead of the plain list
 

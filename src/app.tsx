@@ -36,6 +36,7 @@ const routeModules = {
   practice: () => import("@/pages/practice"),
   practiceSubject: () => import("@/pages/practice-subject"),
   practiceRun: () => import("@/pages/practice-run"),
+  practiceReview: () => import("@/pages/practice-review"),
   profile: () => import("@/pages/profile"),
   progress: () => import("@/pages/progress"),
   roadmap: () => import("@/pages/roadmap"),
@@ -53,6 +54,7 @@ const PlacementTestRoute = lazy(routeModules.placementTest);
 const PracticePage = lazy(routeModules.practice);
 const PracticeSubjectPage = lazy(routeModules.practiceSubject);
 const PracticeRunPage = lazy(routeModules.practiceRun);
+const PracticeReviewPage = lazy(routeModules.practiceReview);
 const ProfilePage = lazy(routeModules.profile);
 const ProgressPage = lazy(routeModules.progress);
 const RoadmapPage = lazy(routeModules.roadmap);
@@ -171,6 +173,14 @@ export default function App() {
         {/* Four segments for the runner, not three, so it cannot collide with
             the lesson-list pattern above it — see pages/practice-run.tsx. */}
         <Route path="practice" element={<PracticePage />} />
+        {/* Static, listed before the dynamic :mode/:subjectId route below so
+            react-router's own more-specific-first matching resolves this
+            first rather than treating "review" as a :mode value. Two path
+            segments, so it cannot collide with that three-segment route on
+            segment count either — see isPracticeRunRoute's comment in
+            utils/focus-routes.ts for why segment count is what this feature
+            already disambiguates on. */}
+        <Route path="practice/review" element={<PracticeReviewPage />} />
         <Route
           path="practice/:mode/:subjectId"
           element={<PracticeSubjectPage />}

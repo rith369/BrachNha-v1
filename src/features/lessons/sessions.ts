@@ -130,10 +130,12 @@ function sectionsFor(
  * data/past-papers.ts. Adding an entry turns a real path on for that subject.
  *
  * Biology is the first real curriculum in the app, entered from the Grade 12
- * table of contents. Chapters 1 and 2 carry NO TITLE — the scan they came from
- * is too soft to transcribe Khmer safely, and a wrong glyph in a chapter title
- * is worse than an empty one. Their shape (two lessons each) is correct; only
- * the names are pending, and the banner shows "ជំពូក ១" alone until they arrive.
+ * table of contents. Chapter 1's name and its two lessons' names are real
+ * (ស៊ីមណូស្ពែម = Gymnosperm, អង់ស្យូស្ពែម = Angiosperm — the seed-plant split).
+ * Chapter 2 still carries NO TITLE — the scan it came from is too soft to
+ * transcribe Khmer safely, and a wrong glyph in a chapter title is worse than
+ * an empty one. Its shape (two lessons) is correct; only the names are
+ * pending, and its banner shows "ជំពូក ២" alone until they arrive.
  *
  * Every section is locked because no content is written behind any of them yet.
  * Note this REPLACES the derived fallback below, so biology-body and
@@ -144,10 +146,10 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
   biology: [
     {
       number: 1,
-      title: "",
+      title: "ស៊ីមណូស្ពែម និងអង់ស្យូស្ពែម",
       lessons: [
-        { number: 1, title: "មេរៀនទី ១", sessions: sectionsFor("biology", 1, 1) },
-        { number: 2, title: "មេរៀនទី ២", sessions: sectionsFor("biology", 1, 2) },
+        { number: 1, title: "ស៊ីមណូស្ពែម", sessions: sectionsFor("biology", 1, 1) },
+        { number: 2, title: "អង់ស្យូស្ពែម", sessions: sectionsFor("biology", 1, 2) },
       ],
     },
     {

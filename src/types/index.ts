@@ -188,6 +188,9 @@ export interface SectionContent {
   quiz?: SectionQuestion[];
 }
 
+/** Who authored a flashcard — see PracticeCard. */
+export type FlashcardSource = "official" | "student";
+
 /**
  * One flashcard in a lesson's practice deck.
  *
@@ -196,12 +199,30 @@ export interface SectionContent {
  * feature is Khmer-only (PRACTICE_PAGE_LANG in features/practice/practice.ts) and
  * keys its content by LESSON rather than by topic, so an English column here
  * would be fabrication dressed as data — the same call SectionContent made.
+ *
+ * `id` is REQUIRED and must be stable, because the spaced-repetition layer
+ * (utils/spaced-repetition.ts) keys per-card review state off it — an array
+ * index would silently point at the wrong card the moment content is reordered
+ * or a student's own card is deleted from the middle of their list. Official
+ * cards get an explicit id when authored (matching the app's everywhere-else
+ * convention of explicit ids over generated ones — session ids, lesson ids);
+ * student cards get one from the store's `newId()` on creation.
+ *
+ * `source` distinguishes an official (BrachNha-authored) card from a
+ * student-authored one. This is ONE type with a discriminant rather than two
+ * separate `OfficialFlashcard`/`StudentFlashcard` interfaces — both would carry
+ * the exact same front/back/id/timestamps fields, and a duplicate field list is
+ * one more place for the two to quietly drift apart.
  */
 export interface PracticeCard {
+  id: string;
   /** The prompt side — a term, a question, a formula to recall. */
   front: string;
   /** The answer side, revealed on flip. */
   back: string;
+  source: FlashcardSource;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type MockExamSubject = "math" | "biology" | "chemistry" | "physics";

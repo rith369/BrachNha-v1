@@ -17,6 +17,322 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 3 Sep 2026 — Tapping a pile now shows its questions first, and you can open just one
+
+*Landed in commit `PENDING`.*
+
+**Why.** Tapping ចងចាំ, មិនទាន់ចងចាំ or សំខាន់ went straight into the cards.
+You should be able to see what is in a pile first and then choose — including
+going straight to one particular question.
+
+**What changed.**
+
+- **Tapping any of the three buttons now opens a list of that pile's
+  questions.** Nothing starts until you choose.
+- **ចាប់ផ្តើម at the bottom runs the whole pile**, in order, as before.
+- **Tapping any single question reviews just that card.** When you finish it you
+  come back to the same list, so you can pick the next one — rather than being
+  dropped all the way out to the lesson list.
+- Each question keeps its star on the right, so you can mark or unmark a card as
+  important straight from the list without opening it.
+- **The separate កាតសំខាន់ list on the lesson's opening screen is gone**, because
+  the សំខាន់ button now does everything it did and more. Nothing was lost: the
+  same cards, the same stars, one tap further in.
+
+**What to re-test.** Practice → Flashcard → Biology → the first lesson. Review a
+few cards, marking some ចងចាំ and some មិនទាន់ចងចាំ, and star one or two. Back on
+the lesson screen, tap each of the three buttons: each should list its own
+questions. Tap one question and check you review only that card and land back on
+the list afterwards. Then use ចាប់ផ្តើម and check it runs the whole pile.
+
+---
+
+## 3 Sep 2026 — Flashcard answers are readable, scroll, and no longer flip while you read
+
+*Landed in commit `PENDING`.*
+
+**Why.** Reading real Biology cards on a phone turned up four problems: the
+answer text was green on green and hard to read, long answers ran off the bottom
+of the card, question 2's four groups were one solid block of text, and a line
+about when the next review is scheduled was left over from a rule that no longer
+applies.
+
+**What changed.**
+
+- **The answer is now black instead of green.** The card keeps its green tint
+  and border so you can still tell the answer side from the question side; only
+  the text colour changed.
+- **Long answers scroll inside the card.** Nothing runs off the edge any more.
+  Short answers still sit centred exactly as before. Scrolling with your finger
+  now scrolls the answer — it does not flip the card and does not count as
+  remembering or not remembering it. Swiping sideways still rates the card as
+  usual.
+- **Question 2's four groups are bullet points**, so the four plant groups read
+  as four separate items rather than one paragraph.
+- **Removed the "អ្នកបានពិនិត្យអស់ហើយ! កាលវិភាគបន្ទាប់…" line.** It described a
+  waiting period that no longer exists — every pile and the start button are
+  always open regardless of the schedule.
+
+**What to re-test.** Practice → Flashcard → Biology → the first lesson → start a
+review. Flip to question 2's answer: the text should be black, the four groups
+should have bullets, and you should be able to scroll down inside the card to
+read all four without the card flipping back or getting rated. Then swipe the
+same card sideways and check it still rates and moves on.
+
+---
+
+## 3 Sep 2026 — Cards you didn't remember come back later, and the three boxes are now buttons
+
+*Landed in commit `PENDING`.*
+
+**Why.** Two pieces of feedback. A card marked មិនទាន់ចងចាំ popped straight back
+up in the same sitting, when it should be saved for later. And the three boxes
+at the top of a lesson (ត្រូវពិនិត្យ / កាតថ្មី / សរុប) were just numbers — there
+was nothing you could do with them.
+
+**What changed.**
+
+- **មិនទាន់ចងចាំ now schedules the card for the next day instead of showing it
+  again immediately.** A review goes through each card once and finishes. Being
+  shown a card seconds after saying you don't know it tests whether you can
+  recognise the answer you just read, not whether you actually remember it.
+- **The three boxes are now three buttons: ចងចាំ, មិនទាន់ចងចាំ and សំខាន់.**
+  Each shows how many cards are in it and, when tapped, starts a review of
+  exactly those cards. So the cards you didn't remember are always one tap away
+  — you choose when to go back to them, rather than waiting for the app to
+  offer them. A pile with nothing in it is greyed out and not tappable.
+- A card you have never been shown counts as neither remembered nor
+  not-remembered; it is greyed out of both piles until you have answered it
+  once. The main button at the bottom is still what works through new cards.
+- **Found and fixed a crash while doing this**: finishing the very last card of
+  a review made the screen go blank. It was caused by an optimisation React
+  applies to this project automatically, reading a value a fraction of a second
+  after the last card had gone. Fixed, and written up so it doesn't recur.
+
+**What to re-test.** Practice → Flashcard → Biology → the first lesson. Mark
+some cards ចងចាំ and some មិនទាន់ចងចាំ, and check the review **finishes** after
+going through each card once — no card should come back. Then look at the three
+buttons at the top: the counts should match what you just did, and tapping
+មិនទាន់ចងចាំ should start a review of only those cards. Star a card or two
+during a review and check the សំខាន់ button counts them.
+
+---
+
+## 3 Sep 2026 — Fixed: swiping "មិនទាន់ចងចាំ" on the last card made it disappear
+
+*Landed in commit `PENDING`.*
+
+**Why.** Reported from real use: on the last card of a review, a swipe didn't
+finish the session — the card just stayed put and nothing happened until the
+✕ or ✓ button was pressed.
+
+**What changed.** One real bug, with a narrow trigger. Swiping **left**
+(មិនទាន់ចងចាំ) on the **last** card puts that card back at the end of the
+queue, so the next card shown is the same card again — which is correct and
+intended. But the app treated it as "still the same card, nothing to redraw,"
+so the card stayed in the state it was in mid-swipe: fully faded out and
+flicked off the side of the screen. It was still there, just invisible and
+untouchable, which is why only the two buttons underneath still worked. The
+card is now redrawn fresh on every advance, including that one.
+
+Everything else about the review flow is unchanged. Swiping right on the last
+card, which correctly ends the session and shows the summary, was tested again
+and was never affected.
+
+**What to re-test.** Open Practice → Flashcard → Biology → the first lesson,
+start a review, and get to the last card. Swipe it **left**: the same card
+should come straight back, fully visible, and still flip when you tap it.
+Then swipe every card **right** instead: the session should end on the summary
+screen, and the flashcards row on Home's daily checklist should be ticked.
+
+---
+
+## 3 Sep 2026 — Swipe restricted to phone, a Back button, and a real swipe bug fixed
+
+*Landed in commit `PENDING`.*
+
+**Why.** Four follow-ups from actually using the new swipe-card flow: the
+drag gesture felt awkward on a laptop, there was no way to step back to a
+card you'd already answered, and — the important one — a real drag on a
+phone-sized screen sometimes didn't register at all.
+
+**What changed.**
+
+- Dragging the card to rate it now only happens on phone/tablet. On a
+  laptop the card can still be flipped by clicking it, and you rate with
+  the ✕/✓ buttons — dragging a card any real distance with a mouse just
+  isn't comfortable the way a thumb swipe is.
+- A Back button (◀) now sits next to ✕/✓, so you can step back and re-read
+  a card you already answered. It only changes what's on screen — it
+  doesn't undo the rating you already gave.
+- **Found and fixed a real bug**: a genuine drag-and-release on a phone
+  screen could silently do nothing — the card would just sit there, no
+  rating recorded, no error shown. The cause was subtle (a browser
+  hit-testing quirk with dragging an element via its own event listeners,
+  not anything obviously wrong at a glance) and took real back-and-forth
+  testing to track down and fix properly, including a second, smaller bug
+  it surfaced along the way (a same-spot tap right after a drag could
+  silently register as the wrong rating). Both are fixed now and verified
+  with real drag/tap/release testing, not just visual screenshots.
+- Cards you've starred important now show up right on the lesson's own
+  screen when you open it, not just silently remembered with nothing to
+  show for it.
+- The app now keeps a running history of every card you've ever graded
+  (separate from just "what's the current schedule for this card"). Nothing
+  in the app shows this back to you yet — it's there so a future "how have
+  you done on this card over time" screen has real data to work from.
+
+**What to re-test.** On an actual phone (or a phone-width browser window),
+drag a card and release it — it should commit the rating every time, not
+just sometimes. On a laptop, confirm dragging does nothing but clicking ✕/✓
+still works. Star a card during review, then check it shows up on that
+lesson's opening screen.
+
+---
+
+## 3 Sep 2026 — Flashcards redesigned: swipe to rate, tap to flip, star to mark important
+
+*Landed in commit `PENDING`.*
+
+**Why.** You asked for a Quizlet-style card instead of the Show Answer +
+four-button flow: fewer options (just "I know it" / "I don't know it yet"),
+a swipe gesture, the card always flippable, and a way to flag a card as
+important.
+
+**What changed.**
+
+- The card can be flipped by tapping it, any time, with no button needed.
+- Swipe the card right for ចងចាំ (know it) or left for មិនទាន់ចងចាំ (don't
+  know it yet) — it tilts and fades a colour hint as you drag, then flies
+  off in that direction once you've dragged far enough. A ✕/✓ pair below
+  the card does the same two things by tap, for anyone who'd rather not
+  drag. Works with a mouse on desktop too, not just touch.
+- A star in the card's corner marks it important. It's yours to use however
+  you like for now — the app just remembers which cards you've starred.
+- The running tally above the card (a pink count and a green count) updates
+  live as you go, matching the reference screenshot.
+- The end-of-session summary now shows two totals — ចងចាំ / មិនទាន់ចងចាំ —
+  instead of the old four-way breakdown, since there are only two ratings
+  to give now.
+- Also caught and fixed while reviewing this: the actual flashcard question
+  and answer text still had the earlier mistranscribed plant name in it (a
+  name correction I'd only applied to the chapter title, not the card
+  content itself) — that's fixed throughout all six cards now.
+
+**What to re-test.** Open Biology Lesson 1's flashcards. Tap a card — it
+should flip. Drag it right past roughly a third of the screen — it should
+fly off and count toward the green tally. Drag left the same way for the
+pink one. Tap the star — it should fill in. Finish a session and check the
+summary shows two numbers, not four.
+
+---
+
+## 3 Sep 2026 — Flashcards can always be opened; nothing is locked behind a schedule
+
+*Landed in commit `PENDING`.*
+
+**Why.** After reviewing a lesson's cards, going back into that lesson showed
+"0 due, 0 new" with a disabled "no cards" button. That's the review system
+working correctly — a card you just rated isn't supposed to come back a
+minute later — but a disabled button with no explanation reads as broken,
+and you said plainly you didn't want students ever blocked from opening a
+deck.
+
+**What changed.** The Start button is now **never disabled** as long as a
+lesson has any cards at all. Tap it any time: if some cards are due, those
+come first; if none are, it opens the whole deck for you to go through again
+anyway. A small note above the button still tells you when the next
+*scheduled* review would have been ("ការពិនិត្យបន្ទាប់ក្នុងរយៈពេល ៣
+ថ្ងៃទៀត" — next scheduled in 3 days) — that's just context now, not a
+restriction. The same change applies to the Daily Review aggregate.
+
+**What to re-test.** Review all of a lesson's cards, then immediately go back
+in — the button should read "ពិនិត្យម្តងទៀត (N)" (review again) and be fully
+tappable, opening the whole deck.
+
+---
+
+## 3 Sep 2026 — Real chapter names, a 3D lesson button, and a simpler practice hub
+
+*Landed in commit `PENDING`.*
+
+**Why.** Three fixes from the first real look at Biology Lesson 1 in the
+app: the chapter/lesson names were still placeholders, the lesson row
+looked too flat next to the rest of the app's game-like style, and the
+due/reviewed summary card added to the practice hub wasn't wanted there.
+
+**What changed.**
+
+- Biology's first chapter and its two lessons now show their real names —
+  ស៊ីមណូស្ពែម (Gymnosperm) and អង់ស្យូស្ពែម (Angiosperm) — everywhere that
+  lesson's name appears: the Study path, the Flashcard lesson list, and
+  inside the review screens themselves.
+- The Flashcard lesson row is now a chunky, raised 3D button in the
+  subject's own colour — the same "lip" pressed-button look already used
+  for the Study path's round nodes and the physics Quiz path's square ones
+  — instead of a plain white card. A lesson with nothing written yet still
+  looks flat and dimmed, unchanged.
+- The practice hub (ការអនុវត្ត) is back to just the title, tabs, and subject
+  grid — the due/new/reviewed summary card and the recommendation sentences
+  above the tabs are gone. The due-count screen you get from tapping into a
+  specific lesson (before Start Review) is untouched and still shows those
+  numbers for that lesson.
+
+---
+
+## 3 Sep 2026 — Flashcards can now be scheduled for review, not just flipped through
+
+*Landed in commit `PENDING`.*
+
+**Why.** The Flashcard tab could only flip through a deck once, top to bottom,
+with no memory of what a student already knew well versus what they kept
+forgetting. You asked for real spaced repetition — the "show it again sooner
+if you forgot it, later if you knew it" system apps like Anki use — built for
+Biology Lesson 1 first, using the actual textbook Q&A content you sent over.
+
+**What changed.**
+
+- Opening Biology → Flashcard → មេរៀនទី ១ now shows how many cards are due
+  today and how many are brand new, with a Start Review button.
+- Reviewing a card now works Question → **Show Answer** → you rate yourself
+  **Again / Hard / Good / Easy**, then the next card. A card you say "Again"
+  to comes back later in the SAME session so you see it again before you
+  finish; "Good"/"Easy" push it further into the future.
+- At the end you get a summary: how many cards, and how many of each rating.
+- **You can now add your own flashcards** to a lesson — a "+ បន្ថែម" button
+  in that due-count screen — and edit or delete the ones you added. They join
+  the same review queue as the official cards, marked as yours.
+- The practice hub (ការអនុវត្ត) now has a **Daily Review** card up top showing
+  due/new/reviewed-today across every subject at once, with its own Start
+  Review that pulls from all of them together — today that's just Biology,
+  since it's the only subject with real flashcard content yet.
+- A small "recommendations" strip above that (e.g. "អ្នកមានកាត ៦ ត្រូវពិនិត្យ
+  ថ្ងៃនេះ") and a rough "estimated memory" percentage in the due-count screen.
+  **Both are simple rule-based/estimated numbers, not AI** — see the note
+  below.
+
+**The six flashcards themselves are real content**, transcribed from the
+photo of the textbook's Q&A page you sent (ជំពូក ១ · មេរៀនទី ១ — Gymnosperms).
+One honest caveat: dense, small Khmer text in a photo is genuinely easy to
+misread character-by-character, so please skim the six cards in the app
+against the original page — if anything looks off, it's a one-line fix in the
+content file, nothing else needs to change.
+
+**What's real and what's simplified, plainly:**
+
+| | |
+|---|---|
+| Real | Due dates, the Again/Hard/Good/Easy review itself, your own cards (add/edit/delete), the Daily Review counts, XP for reviewing |
+| Simplified | The scheduling math is a simple deterministic rule (not the same algorithm real flashcard apps like Anki use), built so a more sophisticated one can be dropped in later without changing any screen |
+| Mock, clearly labelled as such in the app | The "estimated memory" percentage and the recommendation sentences — both are small formulas over real numbers, not AI or machine learning |
+
+**What to re-test.** Open Biology's Flashcard lesson, review a few cards with
+different ratings, confirm the due count changes and XP goes up. Add a card of
+your own, confirm it shows up in the review queue, then edit and delete it.
+Check the Daily Review card on the practice hub reflects the same numbers.
+
+---
+
 ## 2 Sep 2026 — KruAI now knows about the written lesson sections
 
 *Landed in commit `fb4d81e`.*

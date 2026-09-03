@@ -20,6 +20,7 @@ export function isFocusRoute(pathname: string): boolean {
   return (
     pathname.startsWith("/lessons/") ||
     pathname.startsWith("/sections/") ||
+    pathname === "/practice/review" ||
     isPracticeRunRoute(pathname) ||
     isAssessmentRoute(pathname)
   );
@@ -43,6 +44,12 @@ export function isFocusRoute(pathname: string): boolean {
  * rather than measures, so KruAI stays reachable exactly as it does inside a
  * lesson. That gap is also why this is detected by pathname at all instead of by
  * the store's `focusMode` flag — see the note on useMentorBlocked().
+ *
+ * `/practice/review` — the Daily Review aggregate, pulling due cards from
+ * every deck at once rather than one lesson's — is a FOURTH task screen but
+ * does not fit this segment-count scheme (it has no :subjectId/:lessonRef to
+ * count), so isFocusRoute checks it with a plain exact match instead of
+ * routing it through this function. Same non-assessment treatment as here.
  */
 export function isPracticeRunRoute(pathname: string): boolean {
   if (!pathname.startsWith("/practice/")) return false;

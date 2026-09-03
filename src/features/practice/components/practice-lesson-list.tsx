@@ -51,6 +51,32 @@ function ChapterKicker({
   );
 }
 
+/** How tall the lip is, and therefore how far the row travels when pressed —
+ *  same constant SessionNode uses, so a lesson row and a path node press by
+ *  the same amount. */
+const LIP = 4;
+
+/**
+ * A lesson row, in TWO completely different shapes depending on whether
+ * there's a deck behind it — same split SessionNode makes on the Study path,
+ * not a coincidence: this is that same "lip" 3D button technique brought into
+ * a row instead of a disc, so the two screens read as one material.
+ *
+ * A ROW WITH CONTENT is a solid-fill lip button: `style.fill` under white
+ * text, a hard `0 Npx 0 color-mix(...black)` shadow (no blur, so it reads as
+ * an edge), and `active:translate-y` + `active:shadow-[0_0_0_...]` so it
+ * presses flush into its own shadow on tap. The lip colour is mixed TOWARD
+ * BLACK rather than using the app's lighter `--color-subj-*` scale — see
+ * session-node.tsx's own header for why that is the only mix correct in both
+ * themes (the lighter scale would light a dark-theme button from below).
+ *
+ * A ROW WITH NOTHING WRITTEN stays exactly what it always was: a flat,
+ * dimmed `<div>`, never a disabled `<Link>` — a control that answers a tap
+ * with silence reads as broken, the same rule subject-card.tsx's zero-lesson
+ * tile and sidebar-nav.tsx's `href: null` rows follow. Giving an empty row
+ * the lip treatment too would make it look pressable, which is the one thing
+ * it must not do.
+ */
 function LessonRow({
   lesson,
   subject,
@@ -64,62 +90,55 @@ function LessonRow({
   const Icon = mode === "flashcards" ? Layers : ListChecks;
   const unit = mode === "flashcards" ? "កាត" : "សំណួរ";
 
-  const body = (
-    <>
+  // A lesson with nothing written is a plain dimmed <div>, never a disabled
+  // <Link>. Same precedent as sidebar-nav.tsx's `href: null` rows, the survey's
+  // StudiedStep and subject-card.tsx's zero-lesson tile.
+  if (lesson.count === 0) {
+    return (
+      <div className="mb-3 flex items-center gap-3 rounded-2xl border border-purple/10 bg-surface p-3.5 opacity-60">
+        <div className="min-w-0 flex-1">
+          <div className="font-heading truncate text-sm font-extrabold text-text md:text-base">
+            {lesson.title}
+          </div>
+          <div className="mt-1">
+            <span className="inline-block rounded-full bg-purple/8 px-2 py-0.5 text-[10px] font-extrabold text-muted">
+              ឆាប់ៗនេះ
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const lip = `color-mix(in srgb, ${style.fill} 62%, black)`;
+
+  return (
+    <Link
+      to={`/practice/${mode}/${subject.id}/${lesson.ref}`}
+      className="mb-4 flex items-center gap-3 rounded-2xl p-3.5 text-white transition-[transform,box-shadow] duration-75 active:translate-y-[4px] active:shadow-[0_0_0_var(--lip)]"
+      style={
+        {
+          backgroundColor: style.fill,
+          boxShadow: `0 ${LIP}px 0 ${lip}`,
+          "--lip": lip,
+        } as React.CSSProperties
+      }
+    >
       <div className="min-w-0 flex-1">
         {/* The lesson's own title, alone — exactly what subject-path-view.tsx
             renders under a chapter banner, so the two screens name a lesson the
             same way. Prefixing "មេរៀនទី N" here would read "មេរៀនទី ១ · មេរៀនទី ១"
             on every lesson whose real name hasn't been supplied yet, since that
             placeholder title IS its number. */}
-        <div className="font-heading truncate text-sm font-extrabold text-text md:text-base">
+        <div className="font-heading truncate text-sm font-extrabold md:text-base">
           {lesson.title}
         </div>
-        <div className="mt-1">
-          {lesson.count > 0 ? (
-            <span
-              className={cn(
-                "flex items-center gap-1 text-[11px] font-bold md:text-xs",
-                style.text
-              )}
-            >
-              <Icon className="size-3 shrink-0" strokeWidth={2.5} />
-              {toKhmerDigits(lesson.count)} {unit}
-            </span>
-          ) : (
-            <span className="inline-block rounded-full bg-purple/8 px-2 py-0.5 text-[10px] font-extrabold text-muted">
-              ឆាប់ៗនេះ
-            </span>
-          )}
+        <div className="mt-1 flex items-center gap-1 text-[11px] font-bold opacity-90 md:text-xs">
+          <Icon className="size-3 shrink-0" strokeWidth={2.5} />
+          {toKhmerDigits(lesson.count)} {unit}
         </div>
       </div>
-      {lesson.count > 0 && (
-        <ChevronRight
-          className={cn("size-5 shrink-0", style.text)}
-          strokeWidth={2.5}
-        />
-      )}
-    </>
-  );
-
-  const shell =
-    "mb-2.5 flex items-center gap-3 rounded-2xl border border-purple/10 bg-surface p-3.5 shadow-panel";
-
-  // A lesson with nothing written is a plain dimmed <div>, never a disabled
-  // <Link>. Same precedent as sidebar-nav.tsx's `href: null` rows, the survey's
-  // StudiedStep and subject-card.tsx's zero-lesson tile: a control that answers
-  // a tap with silence reads as broken, so it must not look tappable. Every row
-  // is in this state today — see data/practice.ts.
-  if (lesson.count === 0) {
-    return <div className={cn(shell, "opacity-60")}>{body}</div>;
-  }
-
-  return (
-    <Link
-      to={`/practice/${mode}/${subject.id}/${lesson.ref}`}
-      className={cn(shell, "transition hover:brightness-[1.03]")}
-    >
-      {body}
+      <ChevronRight className="size-5 shrink-0" strokeWidth={2.5} />
     </Link>
   );
 }

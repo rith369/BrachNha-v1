@@ -53,13 +53,17 @@ export default function PracticeRunPage() {
       ?.lessons.find((l) => l.number === lessonNo)?.title ?? subject.name;
 
   if (parsed === "flashcards") {
-    const cards = deckFor(key);
-    if (cards.length === 0) {
+    // Gate on the OFFICIAL deck only, matching practiceLessonsFor()'s `count` —
+    // the same reason a lesson with nothing official written is a dimmed row,
+    // never a <Link>, on the list one level up. A student's own cards live
+    // alongside an official deck, not as a substitute for one; FlashcardRunner
+    // reads both once it's actually rendered.
+    if (deckFor(key).length === 0) {
       return <Navigate to={`/practice/flashcards/${subject.id}`} replace />;
     }
     return (
       <FlashcardRunner
-        cards={cards}
+        deckKey={key}
         subjectId={subject.id}
         mode="flashcards"
         title={title}

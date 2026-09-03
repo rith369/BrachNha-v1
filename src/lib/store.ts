@@ -8,8 +8,17 @@ import type {
   ChatMsg,
   Conversation,
   Commitment,
+  PracticeCard,
 } from "@/types";
 import { makeConversationTitle } from "@/utils/chat-history";
+import {
+  schedule,
+  initialReviewState,
+  type ReviewGrade,
+  type ReviewResult,
+  type ReviewState,
+} from "@/utils/spaced-repetition";
+import { FLASHCARD_XP, FLASHCARD_COINS } from "@/utils/rewards";
 
 export type {
   Lang,
@@ -25,6 +34,13 @@ export type {
 // chatty student slowly fills localStorage.
 const MAX_CHAT_MSGS = 40; // per conversation
 const MAX_CONVERSATIONS = 20; // oldest-updated dropped first
+
+// reviewHistory grows by one entry per grade, across every deck, for as long
+// as the student keeps studying — the fastest-growing persisted list in the
+// app by far. 1000 is generous (months of real daily use) while still
+// bounding localStorage; oldest entries drop first, same rule conversations
+// already follow.
+const MAX_REVIEW_HISTORY = 1000;
 
 function newId(): string {
   // randomUUID needs a secure context; localhost and https both qualify, but
@@ -91,6 +107,53 @@ interface BrachNhaState {
    * separate session id so it cannot drift from the lesson flow that sets it.
    */
   completedSessions: string[];
+  /**
+   * Per-card spaced-repetition state, keyed by `PracticeCard.id`. A card with
+   * no entry here has never been graded — features/practice/review.ts treats
+   * that as a fresh `initialReviewState()` rather than requiring one to exist
+   * up front, so this map only ever holds cards that have actually been seen.
+   *
+   * LOCAL-ONLY for this prototype — deliberately NOT added to
+   * `syncRelevantChange` in use-supabase-sync.ts or the push/pull mapping in
+   * supabase-sync.ts. That layer pushes a full snapshot of each table on every
+   * debounced change, which suits the small, capped data it handles today
+   * (conversations, exam results); a per-card review table updated on every
+   * single grade is a different access pattern and scale, and deserves its own
+   * incremental sync path rather than being forced into the existing one. See
+   * CLAUDE.md's Supabase section for what a real `card_reviews` table would
+   * need to look like when that lands.
+   */
+  cardReviews: Record<string, ReviewState>;
+  /**
+   * Student-authored flashcards, keyed by the SAME deck key official cards use
+   * (`"{subjectId}-{chapter}-{lesson}"`, see practiceKey in
+   * features/practice/practice.ts) — a student's own cards live alongside the
+   * official deck for that lesson rather than in a separate freeform deck
+   * system, so the review queue, due-dates and UI stay one mechanism instead of
+   * two. Same local-only reasoning as `cardReviews` above.
+   */
+  studentCards: Record<string, PracticeCard[]>;
+  /**
+   * Card ids the student has personally starred as important — a bookmark,
+   * not a review-schedule concept, which is why it's a flat id list rather
+   * than living inside `ReviewState`: a card's importance to the student has
+   * nothing to do with where it sits in the spaced-repetition cycle. Works
+   * for both official and student-authored cards since both share one id
+   * space. Same local-only reasoning as `cardReviews` above.
+   */
+  starredCards: string[];
+  /**
+   * Every graded review, oldest first, capped at MAX_REVIEW_HISTORY. This is
+   * DELIBERATELY SEPARATE from `cardReviews`: that map holds each card's
+   * CURRENT scheduling state (one row per card, overwritten on every grade —
+   * the interval, the next due date, the last grade), while this is the
+   * EVENT LOG behind it (one row per grade, ever, never overwritten). A card
+   * you've graded ten times has ONE entry in `cardReviews` and up to ten
+   * here. Nothing reads this back yet — it exists so a future "how have you
+   * done on this card over time" or "which cards keep coming back" view has
+   * real data to read rather than needing a second capture pass added later.
+   */
+  reviewHistory: ReviewResult[];
 
   // ── ui ──
   /** Device preference, not account data — deliberately NOT reset by logout().
@@ -133,6 +196,20 @@ interface BrachNhaState {
   addXp: (amount: number, coins?: number) => void;
   completeTask: (task: keyof Tasks) => void;
   completeSession: (lessonId: string) => void;
+  /** Grade one flashcard, advance its schedule (see utils/spaced-repetition.ts)
+   *  and award the flat per-card reward. Works for a card never graded before —
+   *  it starts from a fresh state rather than requiring one to exist. */
+  gradeCard: (cardId: string, grade: ReviewGrade) => void;
+  addStudentCard: (deckKey: string, front: string, back: string) => void;
+  updateStudentCard: (
+    deckKey: string,
+    cardId: string,
+    front: string,
+    back: string
+  ) => void;
+  /** Also drops any review-state record for that card — see the action body. */
+  deleteStudentCard: (deckKey: string, cardId: string) => void;
+  toggleStarredCard: (cardId: string) => void;
   addExamResult: (result: ExamResult) => void;
   resetDailyTasks: () => void;
   setTheme: (theme: Theme) => void;
@@ -219,6 +296,10 @@ const partializeState = (state: BrachNhaState) => ({
   tasks: state.tasks,
   examResults: state.examResults,
   completedSessions: state.completedSessions,
+  cardReviews: state.cardReviews,
+  studentCards: state.studentCards,
+  starredCards: state.starredCards,
+  reviewHistory: state.reviewHistory,
   theme: state.theme,
   conversations: state.conversations,
   activeConversationId: state.activeConversationId,
@@ -251,6 +332,10 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       tasks: emptyTasks,
       examResults: [],
       completedSessions: [],
+      cardReviews: {},
+      studentCards: {},
+      starredCards: [],
+      reviewHistory: [],
 
       theme: "light",
       chatOpen: false,
@@ -318,6 +403,83 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           state.completedSessions.includes(lessonId)
             ? state
             : { completedSessions: [...state.completedSessions, lessonId] }
+        ),
+
+      // A card with no prior record starts from a fresh ReviewState rather
+      // than requiring one to already exist — this is what lets a "new" card
+      // (never graded) be scheduled the first time it's shown.
+      gradeCard: (cardId, grade) =>
+        set((state) => {
+          const prev = state.cardReviews[cardId] ?? initialReviewState();
+          const reviewedAt = new Date().toISOString();
+          return {
+            cardReviews: {
+              ...state.cardReviews,
+              [cardId]: schedule(prev, grade),
+            },
+            // The event log — see reviewHistory's own doc comment for how
+            // this differs from cardReviews above. Oldest dropped first, the
+            // same rule conversations already follow.
+            reviewHistory: [
+              ...state.reviewHistory,
+              { cardId, grade, reviewedAt },
+            ].slice(-MAX_REVIEW_HISTORY),
+            ...award(state, FLASHCARD_XP, FLASHCARD_COINS),
+          };
+        }),
+
+      addStudentCard: (deckKey, front, back) =>
+        set((state) => {
+          const now = new Date().toISOString();
+          const card: PracticeCard = {
+            id: newId(),
+            front,
+            back,
+            source: "student",
+            createdAt: now,
+            updatedAt: now,
+          };
+          return {
+            studentCards: {
+              ...state.studentCards,
+              [deckKey]: [...(state.studentCards[deckKey] ?? []), card],
+            },
+          };
+        }),
+
+      updateStudentCard: (deckKey, cardId, front, back) =>
+        set((state) => ({
+          studentCards: {
+            ...state.studentCards,
+            [deckKey]: (state.studentCards[deckKey] ?? []).map((c) =>
+              c.id === cardId
+                ? { ...c, front, back, updatedAt: new Date().toISOString() }
+                : c
+            ),
+          },
+        })),
+
+      deleteStudentCard: (deckKey, cardId) =>
+        set((state) => {
+          // Drop the card's review-state record too, or a stale entry sits in
+          // cardReviews forever pointing at nothing.
+          const { [cardId]: _dropped, ...restReviews } = state.cardReviews;
+          return {
+            studentCards: {
+              ...state.studentCards,
+              [deckKey]: (state.studentCards[deckKey] ?? []).filter(
+                (c) => c.id !== cardId
+              ),
+            },
+            cardReviews: restReviews,
+          };
+        }),
+
+      toggleStarredCard: (cardId) =>
+        set((state) =>
+          state.starredCards.includes(cardId)
+            ? { starredCards: state.starredCards.filter((id) => id !== cardId) }
+            : { starredCards: [...state.starredCards, cardId] }
         ),
 
       resetDailyTasks: () => set({ tasks: emptyTasks }),
@@ -438,6 +600,10 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           tasks: emptyTasks,
           examResults: [],
           completedSessions: [],
+          cardReviews: {},
+          studentCards: {},
+          starredCards: [],
+          reviewHistory: [],
           conversations: [],
           activeConversationId: null,
         }),

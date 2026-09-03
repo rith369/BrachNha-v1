@@ -28,3 +28,21 @@
  */
 export const QUIZ_XP = 10;
 export const QUIZ_COINS = 5;
+
+/**
+ * Per-card reward for grading a flashcard in a spaced-repetition review — see
+ * `gradeCard` in lib/store.ts.
+ *
+ * Smaller than QUIZ_XP/QUIZ_COINS on purpose: a card review is lower-effort
+ * than committing to a multiple-choice answer, and a session grades several
+ * cards in a row, so the total adds up without a single card outearning a
+ * quiz question.
+ *
+ * Awarded for EVERY grade, including "Again" — unlike the quiz, a flashcard
+ * isn't right/wrong, it's a self-assessed recall rating, and pressing "Again"
+ * is genuine engagement (you tried to recall, then re-studied) rather than a
+ * guess to be discouraged. The `completeTask("flashcards")` flat bonus on
+ * finishing a whole session is unchanged and stacks on top of this.
+ */
+export const FLASHCARD_XP = 4;
+export const FLASHCARD_COINS = 1;
