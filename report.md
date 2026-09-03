@@ -19,7 +19,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Sep 2026 — Tapping a pile now shows its questions first, and you can open just one
 
-*Landed in commit `PENDING`.*
+*Landed in commit `09fafe1`.*
 
 **Why.** Tapping ចងចាំ, មិនទាន់ចងចាំ or សំខាន់ went straight into the cards.
 You should be able to see what is in a pile first and then choose — including
@@ -49,7 +49,7 @@ the list afterwards. Then use ចាប់ផ្តើម and check it runs the 
 
 ## 3 Sep 2026 — Flashcard answers are readable, scroll, and no longer flip while you read
 
-*Landed in commit `PENDING`.*
+*Landed in commit `09fafe1`.*
 
 **Why.** Reading real Biology cards on a phone turned up four problems: the
 answer text was green on green and hard to read, long answers ran off the bottom
@@ -83,7 +83,7 @@ same card sideways and check it still rates and moves on.
 
 ## 3 Sep 2026 — Cards you didn't remember come back later, and the three boxes are now buttons
 
-*Landed in commit `PENDING`.*
+*Landed in commit `09fafe1`.*
 
 **Why.** Two pieces of feedback. A card marked មិនទាន់ចងចាំ popped straight back
 up in the same sitting, when it should be saved for later. And the three boxes
@@ -120,7 +120,7 @@ during a review and check the សំខាន់ button counts them.
 
 ## 3 Sep 2026 — Fixed: swiping "មិនទាន់ចងចាំ" on the last card made it disappear
 
-*Landed in commit `PENDING`.*
+*Landed in commit `09fafe1`.*
 
 **Why.** Reported from real use: on the last card of a review, a swipe didn't
 finish the session — the card just stayed put and nothing happened until the
@@ -149,7 +149,7 @@ screen, and the flashcards row on Home's daily checklist should be ticked.
 
 ## 3 Sep 2026 — Swipe restricted to phone, a Back button, and a real swipe bug fixed
 
-*Landed in commit `PENDING`.*
+*Landed in commit `09fafe1`.*
 
 **Why.** Four follow-ups from actually using the new swipe-card flow: the
 drag gesture felt awkward on a laptop, there was no way to step back to a
@@ -192,7 +192,7 @@ lesson's opening screen.
 
 ## 3 Sep 2026 — Flashcards redesigned: swipe to rate, tap to flip, star to mark important
 
-*Landed in commit `PENDING`.*
+*Landed in commit `09fafe1`.*
 
 **Why.** You asked for a Quizlet-style card instead of the Show Answer +
 four-button flow: fewer options (just "I know it" / "I don't know it yet"),
@@ -229,7 +229,7 @@ summary shows two numbers, not four.
 
 ## 3 Sep 2026 — Flashcards can always be opened; nothing is locked behind a schedule
 
-*Landed in commit `PENDING`.*
+*Landed in commit `09fafe1`.*
 
 **Why.** After reviewing a lesson's cards, going back into that lesson showed
 "0 due, 0 new" with a disabled "no cards" button. That's the review system
@@ -254,7 +254,7 @@ tappable, opening the whole deck.
 
 ## 3 Sep 2026 — Real chapter names, a 3D lesson button, and a simpler practice hub
 
-*Landed in commit `PENDING`.*
+*Landed in commit `09fafe1`.*
 
 **Why.** Three fixes from the first real look at Biology Lesson 1 in the
 app: the chapter/lesson names were still placeholders, the lesson row
@@ -282,7 +282,7 @@ due/reviewed summary card added to the practice hub wasn't wanted there.
 
 ## 3 Sep 2026 — Flashcards can now be scheduled for review, not just flipped through
 
-*Landed in commit `PENDING`.*
+*Landed in commit `09fafe1`.*
 
 **Why.** The Flashcard tab could only flip through a deck once, top to bottom,
 with no memory of what a student already knew well versus what they kept
