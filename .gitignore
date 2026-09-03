@@ -21,6 +21,12 @@ dist-ssr
 # .claude/settings.json (shared, if you make one) stays tracked.
 .claude/settings.local.json
 
+# Scratch git worktrees Claude Code creates for isolated agent runs. Each one
+# is a full checkout of this repo (14MB and counting), and they outlive the run
+# that made them — so without this they sit in `git status` forever, one stray
+# `git add .` away from committing a copy of the repo into itself.
+.claude/worktrees/
+
 # Vercel
 .vercel
 
