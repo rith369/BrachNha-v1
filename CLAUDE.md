@@ -1513,10 +1513,17 @@ path renders from — so `/practice/:mode/:subjectId` and `/subjects/:subjectId`
 can never disagree about what lessons a subject has. Today that is 7 real lessons
 for biology across 3 chapters and **one placeholder lesson for every other
 subject**, which is `chaptersFor()`'s fallback and the honest state rather than a
-bug. A row shows `lesson.title` **alone**, exactly as `subject-path-view.tsx`
-does: prefixing "មេរៀនទី N" would render "មេរៀនទី ១ · មេរៀនទី ១" on every lesson
-whose real name hasn't been supplied, because that placeholder title *is* its
-number.
+bug. A row shows `lessonHeading(lesson.lessonNumber, lesson.title)` — "មេរៀនទី N"
+plus the real name, the same number+name pairing the chapter kicker already uses
+for "ជំពូក N", and the same helper `subject-path-view.tsx`'s own banner calls.
+This reverses an earlier version of this paragraph, which had the row show
+`lesson.title` alone and reasoned that prefixing the number would double up with
+a placeholder title of literally "មេរៀនទី N". That reasoning no longer applies:
+`PathLesson.title` for a not-yet-named lesson is now `""` (the same convention
+`Chapter.title` already used), so `lessonHeading` falls back to the number alone
+— never a name-shaped duplicate of the number it's next to. The user explicitly
+asked for number+name to never drop the number once a name is added, across both
+screens.
 
 **`FLASHCARD_SUBJECTS` is physics/chemistry/biology/history — a closed list.**
 Flashcards earn their keep on recall-heavy material, not on subjects examined by

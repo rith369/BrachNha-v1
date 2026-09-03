@@ -1,5 +1,6 @@
 import { LESSONS } from "@/data/lessons";
 import { hasSectionContent } from "@/data/sections";
+import { toKhmerDigits } from "@/utils/khmer-num";
 import type { SubjectId } from "./subjects";
 
 /**
@@ -57,6 +58,10 @@ export interface Session {
  */
 export interface PathLesson {
   number: number;
+  /** Lesson name WITHOUT the number — same convention as Chapter.title. Every
+   *  render site prefixes "មេរៀនទី N" itself via lessonHeading() below, so an
+   *  empty string here means the real name has not been supplied yet, and the
+   *  heading falls back to the number alone rather than a made-up title. */
   title: string;
   sessions: Session[];
   /**
@@ -76,16 +81,43 @@ export interface Chapter {
    *  then shows the number alone rather than a made-up title. */
   title: string;
   lessons: PathLesson[];
+  /**
+   * This subject's curriculum has no chapter grouping at all — its lessons are
+   * a flat list, not "an untitled chapter" (which is what an empty `title`
+   * alone means elsewhere, e.g. biology chapter 2). When true, both the Study
+   * path (subject-path-view.tsx) and the Practice lesson list
+   * (practice-lesson-list.tsx) skip the "ជំពូក N" kicker entirely rather than
+   * printing a bare chapter number nothing is grouping.
+   */
+  flat?: boolean;
 }
 
 /**
- * The three sections every lesson ends with.
+ * "មេរៀនទី N" plus the real name once one exists — the same number+name
+ * pairing the chapter banner already uses for "ជំពូក N". A name never
+ * replaces the number; a lesson with no name yet (title: "") reads as the
+ * number alone, exactly like a titleless chapter.
+ *
+ * Takes the two fields directly rather than a PathLesson, so both the Study
+ * path (PathLesson.number/.title) and the Practice lesson list
+ * (PracticeLesson.lessonNumber/.title, a differently-shaped projection of the
+ * same data) can call it without a type mismatch.
+ */
+export function lessonHeading(number: number, title: string): string {
+  const base = `មេរៀនទី ${toKhmerDigits(number)}`;
+  return title ? `${base} · ${title}` : base;
+}
+
+/**
+ * The three sections most lessons end with.
  *
  * Supplied as 3.1.4–3.1.6 for តម្រូវប្រសាទ, and they are structural rather than
  * topic-specific — every lesson collects mistakes, summarises, then tests — so
- * they are applied to all lessons rather than retyped per lesson. If a lesson
- * ever needs a different tail, give it explicit titles instead of calling
- * `sectionsFor`.
+ * they are applied by default rather than retyped per lesson. A lesson that
+ * needs a genuinely different tail passes `tail: false` to `sectionsFor` and
+ * spells its own out in full inside `titles` instead — see math lesson 1
+ * below, whose test folds កំហុស into itself rather than giving it a separate
+ * node.
  *
  * កំហុស is a plain locked node today. It describes a mistakes-collection
  * feature — a place a student's wrong answers accumulate — that does not exist
@@ -103,14 +135,19 @@ const PLACEHOLDER_SECTIONS = ["ផ្នែកទី ១", "ផ្នែកទ�
  * "3.1.4" on screen cannot drift from where the node actually sits — the same
  * reason lessonCountFor() counts LESSONS instead of being authored beside it.
  * Labels use Arabic digits to match the numbering printed in the textbook.
+ *
+ * `tail` defaults to LESSON_TAIL (the usual កំហុស/សេចក្តីសង្ខេប/តេស្ត three), but
+ * a lesson whose own titles already end the way it wants — its own summary,
+ * its own test — passes `tail: []` and puts the complete list in `titles`.
  */
 function sectionsFor(
   subjectId: SubjectId,
   chapter: number,
   lesson: number,
-  titles: readonly string[] = PLACEHOLDER_SECTIONS
+  titles: readonly string[] = PLACEHOLDER_SECTIONS,
+  tail: readonly string[] = LESSON_TAIL
 ): Session[] {
-  return [...titles, ...LESSON_TAIL].map((title, i) => {
+  return [...titles, ...tail].map((title, i) => {
     const id = `${subjectId}-${chapter}-${lesson}-${i + 1}`;
     return {
       id,
@@ -143,6 +180,45 @@ function sectionsFor(
  * /lessons/biology-body and /lessons/biology-brain.
  */
 export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
+  math: [
+    {
+      number: 1,
+      title: "",
+      // មូលដ្ឋានគ្រឹះ (foundation review) is a flat list of lessons, not a
+      // book with chapters — see Chapter.flat above.
+      flat: true,
+      lessons: [
+        {
+          number: 1,
+          title: "ប្រមាណវិធីបូក ដក គុណ ចែក",
+          // Nothing on this path is playable yet, so without this the page
+          // would open at the top with nothing to scroll to — same reason
+          // biology's ជំពូក ៣ · មេរៀនទី ១ carries it.
+          openHere: true,
+          // Own tail (`tail: []`), not LESSON_TAIL: this lesson's តេស្ដ folds
+          // កំហុស into itself — the ~20 exercises it will hold plus a
+          // per-student log of what they answer wrong there, so a wrong
+          // answer can be redrilled — rather than កំហុស getting biology's
+          // separate locked node. Content (all 6 sections) comes later; this
+          // just reserves their positions.
+          sessions: sectionsFor(
+            "math",
+            1,
+            1,
+            [
+              "វិន័យនៃសញ្ញា",
+              "ប្រភាគ និងការសម្រួលប្រភាគ",
+              "ទសភាគ និងការបម្លែង",
+              "លំដាប់ប្រតិបត្តិការ",
+              "មេរៀនសង្ខេប",
+              "តេស្ដ",
+            ],
+            []
+          ),
+        },
+      ],
+    },
+  ],
   biology: [
     {
       number: 1,
@@ -156,8 +232,8 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
       number: 2,
       title: "",
       lessons: [
-        { number: 1, title: "មេរៀនទី ១", sessions: sectionsFor("biology", 2, 1) },
-        { number: 2, title: "មេរៀនទី ២", sessions: sectionsFor("biology", 2, 2) },
+        { number: 1, title: "", sessions: sectionsFor("biology", 2, 1) },
+        { number: 2, title: "", sessions: sectionsFor("biology", 2, 2) },
       ],
     },
     {
@@ -238,7 +314,7 @@ export function chaptersFor(subjectId: SubjectId): Chapter[] {
       lessons: [
         {
           number: 1,
-          title: "មេរៀនទី ១",
+          title: "",
           sessions: [...real, ...locked],
         },
       ],

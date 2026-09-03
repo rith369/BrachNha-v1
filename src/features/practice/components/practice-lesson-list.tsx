@@ -4,6 +4,7 @@ import { cn } from "@/utils/cn";
 import { toKhmerDigits } from "@/utils/khmer-num";
 import { SUBJECT_STYLE } from "@/features/lessons/subject-styles";
 import { SubjectArt } from "@/features/lessons/components/subject-art";
+import { lessonHeading } from "@/features/lessons/sessions";
 import type { SubjectMeta } from "@/features/lessons/subjects";
 import { practiceLessonsFor, type PracticeLesson, type PracticeMode } from "../practice";
 
@@ -98,7 +99,7 @@ function LessonRow({
       <div className="mb-3 flex items-center gap-3 rounded-2xl border border-purple/10 bg-surface p-3.5 opacity-60">
         <div className="min-w-0 flex-1">
           <div className="font-heading truncate text-sm font-extrabold text-text md:text-base">
-            {lesson.title}
+            {lessonHeading(lesson.lessonNumber, lesson.title)}
           </div>
           <div className="mt-1">
             <span className="inline-block rounded-full bg-purple/8 px-2 py-0.5 text-[10px] font-extrabold text-muted">
@@ -125,13 +126,10 @@ function LessonRow({
       }
     >
       <div className="min-w-0 flex-1">
-        {/* The lesson's own title, alone — exactly what subject-path-view.tsx
-            renders under a chapter banner, so the two screens name a lesson the
-            same way. Prefixing "មេរៀនទី N" here would read "មេរៀនទី ១ · មេរៀនទី ១"
-            on every lesson whose real name hasn't been supplied yet, since that
-            placeholder title IS its number. */}
+        {/* "មេរៀនទី N" plus the real name — the same lessonHeading() the Study
+            path's own banner uses, so the two screens name a lesson identically. */}
         <div className="font-heading truncate text-sm font-extrabold md:text-base">
-          {lesson.title}
+          {lessonHeading(lesson.lessonNumber, lesson.title)}
         </div>
         <div className="mt-1 flex items-center gap-1 text-[11px] font-bold opacity-90 md:text-xs">
           <Icon className="size-3 shrink-0" strokeWidth={2.5} />
@@ -181,14 +179,15 @@ export function PracticeLessonList({
 
       {lessons.map((lesson, i) => (
         <div key={lesson.key}>
-          {(i === 0 ||
-            lessons[i - 1].chapterNumber !== lesson.chapterNumber) && (
-            <ChapterKicker
-              number={lesson.chapterNumber}
-              title={lesson.chapterTitle}
-              first={i === 0}
-            />
-          )}
+          {!lesson.chapterFlat &&
+            (i === 0 ||
+              lessons[i - 1].chapterNumber !== lesson.chapterNumber) && (
+              <ChapterKicker
+                number={lesson.chapterNumber}
+                title={lesson.chapterTitle}
+                first={i === 0}
+              />
+            )}
           <LessonRow lesson={lesson} subject={subject} mode={mode} />
         </div>
       ))}

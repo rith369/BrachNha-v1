@@ -1,7 +1,7 @@
 import { Navigate, useParams } from "react-router";
 import { deckFor, quizFor } from "@/data/practice";
 import { findSubject } from "@/features/lessons/subjects";
-import { chaptersFor } from "@/features/lessons/sessions";
+import { chaptersFor, lessonHeading } from "@/features/lessons/sessions";
 import { keyFromRef, parseMode } from "@/features/practice/practice";
 import { FlashcardRunner } from "@/features/practice/components/flashcard-runner";
 import { QuizRunner } from "@/features/practice/components/quiz-runner";
@@ -45,12 +45,16 @@ export default function PracticeRunPage() {
 
   // The lesson's own name for the completion screen, found in the same
   // chaptersFor() structure the list was built from — so the two cannot disagree
-  // about what this lesson is called.
+  // about what this lesson is called. lessonHeading() prefixes "មេរៀនទី N",
+  // matching how the Study path and the lesson list above both name a lesson;
+  // an unfound lesson falls back to the bare subject name instead.
   const [chapterNo, lessonNo] = lessonRef!.split("-").map(Number);
-  const title =
-    chaptersFor(subject.id)
-      .find((c) => c.number === chapterNo)
-      ?.lessons.find((l) => l.number === lessonNo)?.title ?? subject.name;
+  const foundLesson = chaptersFor(subject.id)
+    .find((c) => c.number === chapterNo)
+    ?.lessons.find((l) => l.number === lessonNo);
+  const title = foundLesson
+    ? lessonHeading(foundLesson.number, foundLesson.title)
+    : subject.name;
 
   if (parsed === "flashcards") {
     // Gate on the OFFICIAL deck only, matching practiceLessonsFor()'s `count` —

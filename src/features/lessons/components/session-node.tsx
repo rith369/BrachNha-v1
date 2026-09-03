@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { Check, Lock, Play } from "lucide-react";
+import { Check, Play } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { SUBJECT_STYLE } from "../subject-styles";
 import type { SubjectId } from "../subjects";
@@ -24,10 +24,17 @@ import type { Session, SessionStatus } from "../sessions";
  * dark mode, which would make the button look lit from below. Mixing toward
  * black is the only rule that stays correct in both themes.
  *
- * Three states, and the SHAPE changes with them, not just the colour. A locked
- * session is a <div>, never a disabled <Link>: same precedent as
- * sidebar-nav.tsx's `href: null` rows and the survey's StudiedStep, because a
- * control that answers a tap with silence reads as broken.
+ * LOCKED NODES LOOK IDENTICAL TO A PLAYABLE ONE — full colour, Play icon, the
+ * same lip — on the user's explicit request: a path of dashed grey circles with
+ * lock icons reads as "you can't have this," while a path that already looks
+ * finished reads as "this is coming," which is the impression wanted even
+ * before any section has content. This is a deliberate, requested exception to
+ * the app's general rule of never letting something look tappable when it
+ * isn't (see PracticeLessonList's empty rows, sidebar-nav.tsx's `href: null`
+ * rows, the survey's StudiedStep — all of which stay visibly dimmed on
+ * purpose). The one thing that still separates a locked node from a real one:
+ * it renders as a <div>, never a <Link> — content or not, a tap must not
+ * navigate somewhere empty.
  */
 
 /** How tall the lip is, and therefore how far the disc travels when pressed. */
@@ -48,10 +55,12 @@ export function SessionNode({
   const c = SUBJECT_STYLE[subjectId];
   const locked = status === "locked";
 
-  const Icon = status === "done" ? Check : locked ? Lock : Play;
+  const Icon = status === "done" ? Check : Play;
 
   // A finished node keeps its colour but steps back, so the path reads as a
   // trail of ground already covered rather than a row of equal buttons.
+  // Locked nodes deliberately do NOT branch here any more — see the header
+  // comment — so they get the same full-colour fill as a playable node.
   const fill =
     status === "done"
       ? `color-mix(in srgb, ${c.fill} 45%, var(--color-surface))`
@@ -63,25 +72,18 @@ export function SessionNode({
 
   const disc = (
     <span
-      className={cn(
-        "relative flex size-16 items-center justify-center rounded-full transition-[transform,box-shadow] duration-75 md:size-18",
-        locked
-          ? "border-2 border-dashed border-muted/40 bg-control text-muted"
-          : "text-white active:translate-y-[5px] active:shadow-[0_0_0_var(--lip)]"
-      )}
+      className="relative flex size-16 items-center justify-center rounded-full text-white transition-[transform,box-shadow] duration-75 active:translate-y-[5px] active:shadow-[0_0_0_var(--lip)] md:size-18"
       style={
-        locked
-          ? undefined
-          : ({
-              backgroundColor: fill,
-              boxShadow: `0 ${LIP}px 0 ${lip}`,
-              "--lip": lip,
-            } as React.CSSProperties)
+        {
+          backgroundColor: fill,
+          boxShadow: `0 ${LIP}px 0 ${lip}`,
+          "--lip": lip,
+        } as React.CSSProperties
       }
     >
       <Icon
-        className={cn("size-6 md:size-7", status !== "locked" && status !== "done" && "fill-current")}
-        strokeWidth={status === "done" ? 3.25 : locked ? 2.75 : 0}
+        className={cn("size-6 md:size-7", status !== "done" && "fill-current")}
+        strokeWidth={status === "done" ? 3.25 : 0}
       />
     </span>
   );
@@ -110,8 +112,8 @@ export function SessionNode({
 
       <span
         className={cn(
-          "mt-2 rounded-md px-1.5 py-0.5 text-[10px] font-extrabold md:text-xs",
-          locked ? "text-muted" : cn("bg-surface shadow-panel-sm", c.text)
+          "mt-2 rounded-md bg-surface px-1.5 py-0.5 text-[10px] font-extrabold shadow-panel-sm md:text-xs",
+          c.text
         )}
       >
         {session.label}
@@ -127,8 +129,7 @@ export function SessionNode({
           // overflow-wrap:anywhere, not a Tailwind break-* utility: Khmer has
           // no spaces, so a section name is one unbreakable run and would
           // otherwise render as a single line wider than the node's own box.
-          "mt-1 line-clamp-3 text-center text-[10px] leading-snug font-bold text-balance [overflow-wrap:anywhere] md:text-[11px]",
-          locked ? "text-muted" : "text-text"
+          "mt-1 line-clamp-3 text-center text-[10px] leading-snug font-bold text-balance text-text [overflow-wrap:anywhere] md:text-[11px]"
         )}
       >
         {session.title}
@@ -140,7 +141,11 @@ export function SessionNode({
 
   if (locked) {
     return (
-      <div className={cn(wrap, "opacity-55")} aria-disabled="true">
+      <div
+        className={wrap}
+        aria-disabled="true"
+        aria-label={`${session.label} ${session.title}`}
+      >
         {body}
       </div>
     );

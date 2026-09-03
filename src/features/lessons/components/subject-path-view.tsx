@@ -9,7 +9,13 @@ import { SessionNode } from "./session-node";
 import { SUBJECT_STYLE } from "../subject-styles";
 import type { SubjectMeta } from "../subjects";
 import type { PathLesson } from "../sessions";
-import { allSessions, chaptersFor, pathProgress, sessionStatus } from "../sessions";
+import {
+  allSessions,
+  chaptersFor,
+  lessonHeading,
+  pathProgress,
+  sessionStatus,
+} from "../sessions";
 
 /**
  * A subject's session path — what a student sees after tapping a subject card.
@@ -269,12 +275,14 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
                     }}
                   >
                     <div className="min-w-0">
-                      <div className="truncate text-[10px] font-bold opacity-80">
-                        ជំពូក {toKhmerDigits(chapter.number)}
-                        {chapter.title && ` · ${chapter.title}`}
-                      </div>
+                      {!chapter.flat && (
+                        <div className="truncate text-[10px] font-bold opacity-80">
+                          ជំពូក {toKhmerDigits(chapter.number)}
+                          {chapter.title && ` · ${chapter.title}`}
+                        </div>
+                      )}
                       <div className="font-heading truncate text-sm font-extrabold">
-                        {lesson.title}
+                        {lessonHeading(lesson.number, lesson.title)}
                       </div>
                     </div>
                     <span className="shrink-0 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-extrabold">

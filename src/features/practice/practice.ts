@@ -112,6 +112,10 @@ export interface PracticeLesson {
   /** Empty string when the chapter's real name hasn't been supplied — the
    *  banner then shows "ជំពូក ១" alone. See Chapter in lessons/sessions.ts. */
   chapterTitle: string;
+  /** True when the subject has no chapter grouping at all — see Chapter.flat
+   *  in lessons/sessions.ts. The list then skips the kicker entirely rather
+   *  than printing a bare chapter number nothing is grouping. */
+  chapterFlat: boolean;
   lessonNumber: number;
   title: string;
   /** Cards or questions written for this lesson in this mode. DERIVED. */
@@ -145,6 +149,7 @@ export function practiceLessonsFor(
         ref: lessonRef(chapter.number, lesson.number),
         chapterNumber: chapter.number,
         chapterTitle: chapter.title,
+        chapterFlat: chapter.flat ?? false,
         lessonNumber: lesson.number,
         title: lesson.title,
         count: content.length,
