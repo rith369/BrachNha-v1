@@ -19,7 +19,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Sep 2026 — A progress circle on flashcards, and a word of encouragement at the end
 
-*Landed in commit `PENDING`.*
+*Landed in commit `77596e5`.*
 
 **Why.** Asked for directly: show progress when a lesson is opened and again
 after finishing flashcards, and say something encouraging once the student is
