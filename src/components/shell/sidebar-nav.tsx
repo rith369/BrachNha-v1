@@ -78,8 +78,11 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-3">
+        {/* Always English. "Main" doesn't have a Khmer section-header word that
+            reads naturally here — a literal translation ("មេ") reads as
+            "mother/chief", not as a UI section label. */}
         <div className="px-3 pt-2 pb-1 text-[10px] font-extrabold tracking-widest text-muted uppercase">
-          {lang === "en" ? "Main" : "មេ"}
+          Main
         </div>
         <div className="flex flex-col gap-1">
           {mainNavItems.map((item) => (
@@ -89,8 +92,10 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
         <div className="my-2.5 h-px bg-purple/10" />
 
+        {/* Always English, same reason as "Main" above — "លក្ខណៈពិសេស" reads as
+            a product-spec term, not a section label a student recognises. */}
         <div className="px-3 pt-1 pb-1 text-[10px] font-extrabold tracking-widest text-muted uppercase">
-          {lang === "en" ? "Features" : "លក្ខណៈពិសេស"}
+          Features
         </div>
         <div className="flex flex-col gap-1">
           {featureNavItems.map((item) => (

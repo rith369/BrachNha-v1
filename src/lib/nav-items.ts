@@ -60,28 +60,28 @@ export const featureNavItems: NavItem[] = [
     icon: LineChart,
   },
   {
-    id: "game",
-    href: "/game",
-    label: { en: "Game", km: "ហ្គេម" },
-    icon: Gamepad2,
-  },
-  {
-    id: "roadmap",
-    href: "/roadmap",
-    label: { en: "Roadmap", km: "ផែនទី" },
-    icon: Map,
-  },
-  {
     id: "grade-prediction",
     href: "/grade-prediction",
     label: { en: "Grade Prediction", km: "ព្យាករណ៍និទ្ទេស" },
     icon: Gauge,
   },
   {
+    id: "game",
+    href: "/game",
+    label: { en: "Game", km: "ហ្គេម" },
+    icon: Gamepad2,
+  },
+  {
     id: "leaderboard",
     href: "/leaderboard",
     label: { en: "Leaderboard", km: "ចំណាត់ថ្នាក់" },
     icon: Trophy,
+  },
+  {
+    id: "roadmap",
+    href: "/roadmap",
+    label: { en: "Roadmap", km: "ផែនទី" },
+    icon: Map,
   },
   {
     id: "library",
@@ -109,5 +109,8 @@ export const bottomNavItems: NavItem[] = [
   mainNavItems[2], // Lessons
   mainNavItems[1], // Exams
   featureNavItems[0], // Progress
-  featureNavItems[1], // Game
+  // By id, not position: featureNavItems was reordered for the drawer/sidebar
+  // (Progress, Grade Prediction, Game, Leaderboard, Roadmap, ...), and a fixed
+  // index here would have silently swapped in Grade Prediction instead of Game.
+  featureNavItems.find((item) => item.id === "game")!,
 ];
