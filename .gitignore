@@ -46,3 +46,10 @@ shots-*/
 *.njsproj
 *.sln
 *.sw?
+
+# `vercel link` appends `.vercel` and `.env*` here. Both are already covered
+# above, and `.env*` additionally overrides the `!.env.example` negation — the
+# last matching pattern wins in git, so it would silently ignore the one env
+# file that is meant to be committed. Removed on purpose; if a future
+# `vercel link` puts them back, delete them again rather than dropping the
+# negation.

@@ -2898,6 +2898,17 @@ fast-refresh only.
   a code error and isn't one.
 - Deploying: Vercel, config in `vercel.json`. `GEMINI_API_KEY` must be set in
   the Vercel project's Environment Variables — `.env` files are not uploaded.
+- **Verify what Vercel actually has with `vercel env ls`** rather than trusting
+  that a dashboard edit was saved. The CLI is linked to `brach-nha-v1`; if a
+  fresh clone needs it, `vercel link --yes --project brach-nha-v1` — plain
+  `vercel link --yes` tries to CREATE a project from the folder name and fails,
+  because `Brachnha-v2` has capitals and Vercel project names must be lowercase.
+  `vercel logs <url>` reads production logs, but free-tier retention is about an
+  hour, so it only helps if you look soon after a failure.
+- **`vercel link` appends `.vercel` and `.env*` to `.gitignore`.** Both are
+  already covered, and `.env*` silently overrides the `!.env.example` negation
+  (last matching pattern wins), so delete them if they come back rather than
+  leaving them.
 - **The two `VITE_SUPABASE_*` values must be in Vercel too, on Production AND
   Preview, followed by a REDEPLOY.** Vite substitutes `VITE_*` at build time, so
   an existing deployment keeps the empty strings baked into its bundle and
