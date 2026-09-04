@@ -669,6 +669,27 @@ element juts past the viewport with no scrollable ancestor) from **soft** ones
 child does too, so Progress reports soft hits at phone widths and that is
 correct). Exit code follows hard failures only.
 
+**Run it with the Supabase variables BLANKED, or it fills the auth table with
+junk:**
+
+```bash
+VITE_SUPABASE_URL= VITE_SUPABASE_ANON_KEY= npm run dev   # then, elsewhere:
+node scripts/shots.mjs
+```
+
+The seed sets `userName`, which is exactly the condition `use-supabase-sync.ts`
+treats as "a student is logged in, push their state" — and each screenshot is a
+fresh browser context with no saved session, so every one of the ~102 page loads
+signs in anonymously and writes a new `auth.users` + `profiles` row. Measured on
+the live project: **212 users, of which 205 were screenshot runs** — 136 named
+"Panharith" (the seed on line 102), 51 "Sok", 18 "P". The seven real ones each
+had exactly one row, which is also the proof that the sync itself is correct.
+
+This is not a bug in the app — the app is doing what it promises — but it makes
+the Authentication board useless for seeing real students, and it grows by ~100
+every run. Blanking the two vars makes `isSupabaseConfigured` false, so the hook
+returns before it can sign in and the screenshots touch nothing.
+
 ### Focus mode — lessons and tests take over the screen
 
 Modelled on Duolingo: the moment a student is mid-task, **every** navigation

@@ -10,6 +10,7 @@ The database behind BrachNha. Everything a student does is still written to
 supabase/migrations/
   20260828000001_init_schema.sql   tables, indexes, triggers
   20260828000002_rls_policies.sql  row level security
+  20260904000001_hardening.sql     revoke RPC on handle_new_user, one FK index
 ```
 
 The SQL is the source of truth for the schema, checked into git like any other
@@ -20,19 +21,30 @@ migration file instead — the filename is a timestamp, so they apply in order.
 
 ## Applying them
 
-**Run both files once against YOUR OWN project.** Each developer has their own
-Supabase project rather than sharing one, so this is done per project, not once
-for the repo — and it is already done on the projects currently in use. Two ways:
+**Run every file once against YOUR OWN project, in filename order.** Each
+developer has their own Supabase project rather than sharing one, so this is
+done per project, not once for the repo. Two ways:
 
 ### A. Dashboard (no install)
 
 1. Supabase dashboard → **SQL Editor** → New query
 2. Paste the whole of `20260828000001_init_schema.sql`, run it
 3. Paste the whole of `20260828000002_rls_policies.sql`, run it
+4. Paste the whole of `20260904000001_hardening.sql`, run it
 
-Order matters: the second file adds policies to tables the first one creates.
-Both are written to be safely re-runnable (`if not exists`, `drop policy if
-exists`), so a partial run can be repeated rather than unpicked.
+Order matters: the second file adds policies to tables the first one creates,
+and the third revokes a grant on a function the first one defines. Every file is
+written to be safely re-runnable (`if not exists`, `drop policy if exists`, and
+a `revoke` that is a no-op when already revoked), so a partial run can be
+repeated rather than unpicked.
+
+The first two are applied on the projects currently in use; the third was added
+on 4 Sep 2026 and has to be run on each of them.
+
+**Applying them by pasting does not register them** in Supabase's own migration
+history — `list_migrations` comes back empty, and that is expected rather than a
+sign something failed. The files in git are the source of truth; the CLI route
+below is what would populate that history.
 
 ### B. Supabase CLI (recommended once there is more than one of these)
 
