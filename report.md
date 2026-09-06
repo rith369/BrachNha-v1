@@ -19,7 +19,8 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 7 Sep 2026 — Streak and Roadmap come off the menu, and one streak number everywhere
 
-*Not yet committed — fill in the code when it lands.*
+*Landed in commit `c557635` — the three Streak entries (6–7 Sep) all
+shipped together in that one commit.*
 
 **Why.** Two things, both reported: the menu was getting long — and both Streak
 and Roadmap are already reachable from the home page — and the streak on the home
@@ -60,7 +61,8 @@ of the phone screen are unchanged.
 
 ## 7 Sep 2026 — Streak with Friends is now a SHARED streak with one friend
 
-*Not yet committed — fill in the code when it lands.*
+*Landed in commit `c557635` — the three Streak entries (6–7 Sep) all
+shipped together in that one commit.*
 
 **Why.** The page built yesterday was a scoreboard: seven friends listed by whose
 own streak was longest. That was the wrong idea. What was wanted is the mechanic
@@ -125,7 +127,8 @@ same. Check Remind Dara turns to "Reminder sent" and cannot be pressed twice.
 
 ## 6 Sep 2026 — A Streak page, and "Streak" stops being translated
 
-*Not yet committed — fill in the code when it lands.*
+*Landed in commit `c557635` — the three Streak entries (6–7 Sep) all
+shipped together in that one commit.*
 
 **Why.** Two things asked for together: the mistranslated "ជួរជាមួយមិត្ត" in the
 menu, and a full Streak screen built to a supplied design brief.
