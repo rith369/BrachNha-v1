@@ -40,6 +40,8 @@ const routeModules = {
   profile: () => import("@/pages/profile"),
   progress: () => import("@/pages/progress"),
   roadmap: () => import("@/pages/roadmap"),
+  streak: () => import("@/pages/streak"),
+  streakFriends: () => import("@/pages/streak-friends"),
 };
 
 const GamePage = lazy(routeModules.game);
@@ -58,6 +60,8 @@ const PracticeReviewPage = lazy(routeModules.practiceReview);
 const ProfilePage = lazy(routeModules.profile);
 const ProgressPage = lazy(routeModules.progress);
 const RoadmapPage = lazy(routeModules.roadmap);
+const StreakPage = lazy(routeModules.streak);
+const StreakFriendsPage = lazy(routeModules.streakFriends);
 
 /**
  * Warms every split chunk once the browser is idle.
@@ -192,6 +196,8 @@ export default function App() {
         <Route path="profile" element={<ProfilePage />} />
         <Route path="progress" element={<ProgressPage />} />
         <Route path="roadmap" element={<RoadmapPage />} />
+        <Route path="streak" element={<StreakPage />} />
+        <Route path="streak/friends" element={<StreakFriendsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

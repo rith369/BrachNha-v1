@@ -65,6 +65,8 @@ const ROUTES = [
   { name: "grade-prediction", path: "/grade-prediction" },
   { name: "leaderboard", path: "/leaderboard" },
   { name: "roadmap", path: "/roadmap" },
+  { name: "streak", path: "/streak" },
+  { name: "streak-friends", path: "/streak/friends" },
   { name: "profile", path: "/profile" },
   // Tab B of /exam. Ordinary navigation is still on screen here — this is
   // NOT a focus route; only the running exam below is.
@@ -72,6 +74,16 @@ const ROUTES = [
     name: "exam-generated",
     path: "/exam",
     clicks: ['button:has-text("វិញ្ញាសារបង្កើតថ្មី")'],
+  },
+  // The streak page after its one interaction. Worth photographing separately
+  // because the celebration is the only state where the confetti layer exists,
+  // and a burst of absolutely-positioned particles is exactly the shape of
+  // thing that widens a page — the probe below is what proves it does not.
+  // Seeded lang is "en", so the English label is the right selector.
+  {
+    name: "streak-complete",
+    path: "/streak",
+    clicks: ["button:has-text(\"Complete Today's Goal\")"],
   },
 
   // ── focus mode: nav must be gone on all of these ──
@@ -94,8 +106,8 @@ const ROUTES = [
 ];
 
 // Without this every route renders LoginView. Shape mirrors partializeState in
-// src/lib/store.ts; version 2 matches the store's current schema so `migrate`
-// leaves the theme alone.
+// src/lib/store.ts; the `version` below matches the store's current schema so
+// `migrate` leaves the theme and the streak alone.
 const seeded = (theme) => ({
   state: {
     lang: "en",
@@ -121,7 +133,7 @@ const seeded = (theme) => ({
     xp: 120,
     level: 2,
     coins: 30,
-    streak: 3,
+    streak: 12,
     tasks: { lesson: false, practice: false, flashcards: false, challenge: false },
     examResults: [],
     completedSessions: [],
@@ -129,7 +141,7 @@ const seeded = (theme) => ({
     conversations: [],
     activeConversationId: null,
   },
-  version: 2,
+  version: 3,
 });
 
 /**

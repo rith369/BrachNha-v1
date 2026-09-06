@@ -17,6 +17,158 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 7 Sep 2026 — Streak and Roadmap come off the menu, and one streak number everywhere
+
+*Not yet committed — fill in the code when it lands.*
+
+**Why.** Two things, both reported: the menu was getting long — and both Streak
+and Roadmap are already reachable from the home page — and the streak on the home
+page said **3** while the Streak pages said **12**.
+
+**What changed.**
+
+- **The numbers now agree.** There was one real number in the app (used by the
+  home page's Streak pill and the small counter at the top of every screen) and
+  a separate made-up 12 on the two Streak pages. There is now **one** number,
+  12, and everything reads it — home, the top counter, Streak, and Streak with
+  Friends. It is still a placeholder until the app really counts days, but it is
+  a single placeholder instead of two.
+- **Your browser gets updated automatically.** If you had already opened the app,
+  your saved copy said 3. It becomes 12 next time you load the page. Nothing else
+  about your saved data is touched — your XP, theme and progress are left alone.
+  This is safe because nothing in the app has ever added to that number, so a
+  saved 3 was never something you earned.
+- **"Streak" and "Roadmap" are both gone from the menu.** Neither page is gone —
+  only the menu row. Both were already on the home page, so the menu row was a
+  second way into a screen you are already looking at a summary of:
+  - **Streak** → tap the **flame pill** on the home page (the one with your day
+    count on it).
+  - **Roadmap** → tap the **Quest Map** button in the purple box at the top of
+    the home page. The roadmap is also still where you land straight after the
+    survey, exactly as before.
+- **"Streak with Friends" stays in the menu**, because nothing on the home page
+  tells you it is there.
+- The menu now fits on one screen without scrolling, and Profile is visible at
+  the bottom again.
+
+**What to re-test.** Open the home page: the flame pill and the small counter at
+the top should both read 12. Tap the flame pill — it should open the Streak page,
+which should also read 12. Tap Quest Map — it should open the Roadmap. Open
+Streak with Friends from the menu; it should read 12 too. Check the menu no
+longer has "Streak" or "Roadmap" rows, and that the five buttons along the bottom
+of the phone screen are unchanged.
+
+## 7 Sep 2026 — Streak with Friends is now a SHARED streak with one friend
+
+*Not yet committed — fill in the code when it lands.*
+
+**Why.** The page built yesterday was a scoreboard: seven friends listed by whose
+own streak was longest. That was the wrong idea. What was wanted is the mechanic
+social apps use — **you and one friend hold ONE streak between you, and it only
+continues on days you BOTH finish your daily goal.** The scoreboard was replaced
+completely. The Remind button was kept, by request.
+
+**The rule, because everything else follows from it.**
+
+- You finish ✅ + Dara finishes ✅ → the shared streak grows 🔥
+- You finish ✅ + Dara does not ❌ → **nothing happens.** The streak does not
+  grow, and it is at risk.
+
+Finishing your own goal is not half a day's credit. It is no credit until your
+friend finishes too. The page says this in four separate places on purpose.
+
+**What the page shows.**
+
+- **A header built around two people**, not one — your avatar, a flame, Dara's
+  avatar, joined by a line so the flame belongs to both of you. Underneath: 12,
+  "Day Streak", "Study together. Keep the streak alive." Each avatar has a ring
+  that is green once that person is done and amber while they are not.
+- **Today's Goal lists both of you** with a clear Completed / Not completed yet
+  on each, plus "Waiting for Dara..." and what happens if she does not finish.
+- **Remind Dara** — the button you liked, kept and renamed. It turns into
+  "Reminder sent".
+- **The week shows shared results.** A filled flame means both of you finished
+  that day, an amber outline means only one did, a cross means neither. Two small
+  dots under each day say which of you it was. There is a key underneath.
+- **Shared milestones** — 3 First Spark, 7 One Week, 14 Two Weeks, 30 Study
+  Partners, 60 Dedicated Duo, 100 Learning Legends — with 12 / 14 days and
+  "2 days until your next milestone".
+
+**Trying it out.** Both of you start the day unfinished. Press **Complete Today's
+Goal** and you go green — but the number stays at 12 and the page says "You're
+done! Now waiting for Dara." That is the whole point made visible. Then press the
+faint dashed **Simulate friend completion** button, which stands in for Dara
+finishing on her own phone: she goes green, the streak jumps 12 → 13, confetti
+fires, and it says "You and Dara kept the streak alive!"
+
+**One deliberate change from the brief.** The brief said today should start with
+you already ✅ and Dara ⏳ — but it also asked for a "Complete Today's Goal"
+button that completes you, which would then have nothing to do. So the day starts
+with both of you unfinished. Every message the brief asked for still appears,
+just in order, and both buttons actually work.
+
+**The dashed button is marked "Prototype only" on purpose.** It stands in for
+another person. Making it look like a normal button would let someone press it
+and think they had really made Dara do something.
+
+**What is still fake.** All of it. The app has no idea who your friends are,
+cannot read another student's numbers, and sends no notifications — so the
+reminder goes nowhere and is forgotten on reload. There is also a genuinely hard
+question nobody has answered yet: two people in different timezones have two
+different "todays", and a shared streak needs one.
+
+**What to re-test.** Menu → Streak with Friends, in both languages and both themes.
+Press Complete Today's Goal and confirm the number **stays at 12**. Then Simulate
+friend completion and confirm it becomes 13 with the celebration. Try it the
+other way round too — simulate Dara first, then yourself — it should behave the
+same. Check Remind Dara turns to "Reminder sent" and cannot be pressed twice.
+
+## 6 Sep 2026 — A Streak page, and "Streak" stops being translated
+
+*Not yet committed — fill in the code when it lands.*
+
+**Why.** Two things asked for together: the mistranslated "ជួរជាមួយមិត្ត" in the
+menu, and a full Streak screen built to a supplied design brief.
+
+**What changed.**
+
+- **"Streak" is no longer translated anywhere.** The menu item that read
+  ជួរជាមួយមិត្ត now reads "Streak ជាមួយមិត្តភក្តិ", and the new page keeps the
+  word in English in the Khmer version too. It is a product name, like KruAI and
+  like Flashcard/Quiz, not a word to find a Khmer equivalent for. Where the
+  *meaning* needs saying, the Khmer copy still says ថ្ងៃជាប់ៗគ្នា.
+- **There is a new Streak page**, in the menu under Roadmap. Top to bottom: a big
+  flame with the day count, this week's seven days, today's goal with a button,
+  how far off the next milestone is, and the six milestones themselves
+  (3 / 7 / 14 / 30 / 60 / 100 days).
+- **Pressing "Complete Today's Goal" plays the reward.** Confetti, the flame
+  pops, the number goes from 12 to 13, today's circle fills in, the goal card
+  flips to "Streak maintained!", and the milestone bar moves to 13 / 14.
+- **The page says what a streak actually is** — "a day only counts when you
+  finish your daily goal; opening the app is not enough." That is the difference
+  between this and the social-app streaks it takes its feel from.
+- Works in Khmer and English, light and dark, and down to the smallest phone.
+
+**Two things worth your opinion.**
+
+1. **The number at the top of the page does not match the little flame in the
+   corner.** The page says 12 because the brief asked for 12; the counter at the
+   top of every screen shows your real streak, which is 3 on a fresh account. It
+   is the same "fake data for now" approach Progress, Game, Grade Prediction and
+   the Leaderboard already use — but this is the first screen where the fake
+   number sits right next to the real one, so it is noticeable. Say the word and
+   the page will show your real streak instead; the trade is that the demo then
+   opens on 3 days with almost every milestone locked, which is a much less
+   impressive screen to show someone.
+2. **"Streak with Friends" is still greyed out, on purpose.** This page is your own
+   streak only. Comparing it with friends needs the app to know who your friends
+   are, which it currently does not.
+
+**What to re-test.** Menu → Streak. Check the page in both languages and both
+themes. Press "Complete Today's Goal" once and watch the celebration — the
+button should then be dead and read "Goal complete". Reload the page and note
+that it resets to 12; nothing is saved, which is expected for a prototype.
+
 ## 3 Sep 2026 — A progress circle on flashcards, and a word of encouragement at the end
 
 *Landed in commit `77596e5`.*

@@ -69,12 +69,14 @@ list, and the variable file is the smaller of the two here.
 The app ships light **and** dark, **light by default**. `theme: "dark" | "light"`
 lives on the store (persisted, and deliberately **not** cleared by `logout()` —
 it's a device preference, not account data). Dark was briefly the default and
-that value is still in older payloads, so `persist` is at `version: 2` with a
-`migrate` that resets v1 `theme` to light — the stored "dark" there is the old
-default rather than anyone's choice, and without the reset flipping the default
-would change nothing for anyone who had already opened the app. This is the
-first migration that actually fires; see the `merge` comment for why v0 data
-could never use one.
+that value is still in older payloads, so `persist`'s `migrate` resets v1
+`theme` to light — the stored "dark" there is the old default rather than
+anyone's choice, and without the reset flipping the default would change nothing
+for anyone who had already opened the app. This was the first migration that
+actually fires; see the `merge` comment for why v0 data could never use one.
+(`version` is now **3** — the v2 → v3 step lifts the seeded `streak` for the
+same "the stored value is the old default" reason; see the Streak section.
+`index.html`'s pre-paint guard is `>= 2` and still holds.)
 
 `AppShell` toggles a `dark` class on `<html>` in an effect next to the existing
 `lang` one, and `index.html` carries a blocking inline script that applies the
@@ -442,6 +444,16 @@ reason. When it goes live it wants a view or a `security definer` function
 exposing rank and display name only — **not** a "profiles are readable by
 everyone" policy, which hands out email, age and location with it.
 
+**`/streak/friends` is now a SECOND screen waiting on that same function**, and
+it needs two things more. A **friendship model** — a one-sided "following" turns
+a SHARED streak into a stranger's progress bar you cannot influence, so it wants
+an invite/accept pair, which nothing in the schema has. And a **pair-owned
+streak row**, because the number belongs to neither student individually: it is
+a property of the relationship, and storing it on one side means two rows that
+can disagree. Build the read path once for both screens rather than twice — the
+friends board needs display name, avatar seed and today's goal-met flag, which
+is a superset of what the leaderboard asks for.
+
 ### Content stays in `src/data/`
 
 Lessons, sections, subjects, past papers are NOT in the database. Most subjects
@@ -599,6 +611,17 @@ second group. Keep using it rather than introducing a second number.
 (the list) and `Sidebar` (the `hidden lg:flex` column). `Drawer` renders the
 *same* `SidebarNav` inside its Sheet, so the two navs are one component and
 cannot drift — add a route to `lib/nav-items.ts` and it appears in both.
+
+**A ROUTE DOES NOT HAVE TO BE IN THAT LIST, and two deliberately are not.**
+`/roadmap` and `/streak` were both removed from `featureNavItems` at the user's
+request: the list had grown past a phone screen, and each already has a doorway
+on Home that shows the very thing the page is about — the "Quest Map" chip in
+`motivation-hero.tsx` and the Flame stat pill in `stat-pills.tsx`. A nav row
+there is a second entrance to a screen the student is looking at the summary of.
+Before adding a row for a new route, check whether Home already points at it.
+The comment block where those two used to sit spells this out; don't quietly
+re-add them.
+
 `BottomNav` and `TopBar` carry `lg:hidden` on their own roots rather than on the
 9 pages that render them. `FabChat` and page `pb-20`/`pb-36` both exist to clear
 the bottom nav, so both get `lg:` overrides — without them desktop has ~80px of
@@ -661,7 +684,7 @@ only, and DOM order is unchanged — e.g. Home still has the grade card between
 the installed Chrome through `playwright-core` — no browser download — seeds a
 logged-in profile into `localStorage` (that seed mirrors `partializeState`, so any
 new field that gates what a page renders has to be added to it or the screenshots
-quietly become of some other screen), then walks 11 routes × 9 widths (plus 3 click-driven states)
+quietly become of some other screen), then walks 17 routes × 9 widths (plus 4 click-driven states)
 (320/375/390/430/768/1024/1280/1440/1920), writes a PNG each and asserts nothing
 overflows. It separates **hard** failures (the page scrolls sideways, or an
 element juts past the viewport with no scrollable ancestor) from **soft** ones
@@ -2364,6 +2387,14 @@ hard-clamped to 2–6/day regardless of budget; lessons/practice have a floor, n
 ceiling. Marking a mission row done calls the same `completeTask(key)` as Home's
 daily checklist, so the two views share one real completion state.
 
+**`/roadmap` HAS NO NAV ROW — reached from Home's "Quest Map" chip**
+(`features/home/components/motivation-hero.tsx`), and from the survey, which
+drops a fresh student straight onto it. Removed at the user's request for the
+same reason `/streak` was: Home already carries the doorway, and the drawer had
+grown past a phone screen. Note the onboarding lock made a nav row nearly
+pointless here anyway — `ShellLayout` hides all chrome on `/roadmap` until the
+pledge has been seen, so the student who most needs a way back never had one.
+
 **Nothing books a placement test any more**, so `pendingPlacementTests` is only
 ever non-empty for an account that scheduled one before that was removed. The
 pending card, `schedulePlacementTest`/`resolvePlacementTest`,
@@ -2393,6 +2424,14 @@ the rule-based model in `use-grade-prediction.ts`. Fake/demo data on purpose.
 one 30-student `demo-data.ts` and the pure ranking layer in
 `utils/leaderboard.ts`. Fake/demo data on purpose, with one exception noted
 below. Its own section follows.
+
+**Streak** (`features/streak`) — TWO routes measuring TWO DIFFERENT THINGS.
+`/streak` is the student's own solo streak (`demo-data.ts` + the milestone maths
+in `utils/streak.ts`); `/streak/friends` is a SHARED streak with one friend,
+which only advances on days BOTH of them finish (`friend-streak-demo-data.ts` +
+`utils/streak-friends.ts`). Both take the COUNT itself from the store rather
+than authoring one; the surrounding state is demo data. Their own sections
+follow.
 
 **Profile** (`features/profile`) — stats summary (reuses Home's `StatPills`
 as-is), grade/language card, and a Logout button that shows a Cancel/confirm
@@ -2486,6 +2525,272 @@ DiceBear `adventurer` style and default params as the existing six). The rule in
 the Game section still holds: a new `avatarSeed` needs a matching SVG on disk,
 there is no live-generation fallback.
 
+### Streak — one number, and the one demo screen that visibly contradicts the app
+
+`/streak` fills the gamification gap the app's own `streak` field had never been
+given a screen for. Built to a supplied brief: hero count, weekly tracker,
+today's goal with a simulated "complete" button, milestone progress, milestone
+grid, in that order — which is the brief's stated visual hierarchy and also the
+order a student reads the answer to "why is my streak 12".
+
+**IT IS A PROTOTYPE, and the brief said so** — hardcoded numbers, one simulated
+interaction, no backend, no real streak derivation. Same explicitly-sanctioned
+move `features/progress`, `features/game`, `features/grade-prediction` and
+`features/leaderboard` already make.
+
+**THE COUNT COMES FROM THE STORE, AND THIS WAS A REAL BUG ONCE.** The page first
+shipped with its own `DEMO_STREAK = 12` while `lib/store.ts` seeded `streak: 3`,
+so Home's stat pill and the global `StatBar` — which renders on every ordinary
+screen, about forty pixels above this page's own hero — said 3 next to a hero
+saying 12. One fact, two hardcoded numbers, guaranteed to disagree. The user
+caught it.
+
+`DEMO_SEED_STREAK` in `lib/store.ts` is now the single source, the store field
+is seeded from it, and **every surface reads the field**: Home's `StatPills`,
+`StatBar`, both `/streak` screens and the mentor prompt. `demo-data.ts` no
+longer exports a count at all and carries a note not to reintroduce one. Nothing
+increments the field yet, which is exactly why it can be one seeded number — the
+day a daily activity log exists, the constant is deleted and the field is
+derived, and no consumer moves.
+
+**That change needed a persist migration, and the reasoning is the same one the
+theme reset used.** Overwriting a persisted value is normally wrong — but
+NOTHING HAS EVER INCREMENTED `streak`, so every stored `3` is the old default
+rather than days a student earned, and leaving it would have kept the pill
+saying 3 in browsers that had already opened the app. `version` is 3, and the
+v2 → v3 step is guarded on `state.streak === 3` so a value set any other way is
+left alone. **Once streaks are really computed this migration must not be
+extended** — at that point a stored number is the student's own. `index.html`'s
+pre-paint script needs no change: its guard is `saved.version >= 2`, still true.
+
+The one remaining disagreement is transient and deliberate: the celebration's
++1 is local and unwritten, so for a few seconds the page shows 13 while the bar
+shows 12. That is a demo action the student just took, not the resting state
+drifting.
+
+**The brief contradicted itself once, and the resolution is recorded in
+`demo-data.ts`.** It asked for the goal card to read "3 / 3 tasks completed ·
+Streak maintained! · ring at 100%" AND for today to be un-ticked on the weekly
+tracker, for the button to complete it, and for that to take the streak 12 → 13.
+Those cannot all be true of a day that is already finished. 3/3 is plainly the
+AFTER state, so the card opens at 2/3 and lands on 3/3 on the tap. One task
+outstanding rather than three also makes a single "Complete Today's Goal" button
+honest — it finishes what is left instead of silently clearing a whole day.
+
+**The three daily tasks are the store's REAL `Tasks` keys** — lesson / practice
+/ flashcards, the same three Home's checklist and Roadmap's Daily Mission
+already share one completion state for. Keeping the ids identical is what makes
+the eventual swap a rename rather than a redesign. Nothing here calls
+`completeTask()`, and that is not only the brief: that action awards real XP and
+coins, so wiring the button to it would pay a student for pressing a demo.
+
+**Bilingual, NOT Khmer-only** — deliberately breaking with the newer
+`LESSONS_PAGE_LANG` / `EXAM_PAGE_LANG` / `PRACTICE_PAGE_LANG` convention. That
+rule exists for screens whose CONTENT is Khmer curriculum, where an English
+column would be fabrication dressed as data. Nothing here is curriculum; it is
+gamification chrome like Home, Progress, Profile and the Leaderboard, and all
+four of those follow the store's `lang`. Copy lives in `features/streak/copy.ts`
+rather than `data/translations.ts`, the same way the exam and leaderboard own
+theirs.
+
+**"Streak" is never translated**, in either the page copy or the nav item — a
+product term, on the user's explicit instruction (the previous
+`ជួរជាមួយមិត្ត` reading of it did not make sense). Same call already made for
+KruAI, and for "Flashcard"/"Quiz" in `translations.ts`'s own km column. The
+Khmer copy still spells the MEANING out as ថ្ងៃជាប់ៗគ្នា where it matters, so
+nothing has to be guessed from the loanword. Digits stay Latin throughout,
+matching `StatBar`'s own streak pill rather than the Khmer-numeral convention
+the curriculum pages use.
+
+**`--brand-flame-from/to` is a THIRD brand-scale pair, and it exists for a
+contrast reason.** Fire wants `--brand-yellow`, which is 2.1:1 with white and
+fails outright. `#ea580c → #e91e8c` is 4.2:1 and 4.6:1, so the ramp carries the
+white flame glyph (3:1 for a non-text graphic) and survives `bg-clip-text` as
+the huge count (3:1 for large text, measured 4.1:1 light / 4.3:1 dark). **It is
+NOT for normal-size white text** — the page's CTA stays on `bg-brand` for
+exactly that, since a 16px bold label needs 4.5:1. `--shadow-flame` is the one
+shadow kept COLOURED on dark, because a black shadow under a glowing object is
+the wrong physics.
+
+**Three animations, all transform/opacity, all in the reduced-motion block.**
+`streakBreathe` is the only loop and drives exactly ONE element — the Roadmap's
+mistake was putting a pulse on a dozen nodes at once. `streakPop` and
+`streakConfetti` are one-shots fired by the tap. The confetti's fourteen
+particles are a FIXED TABLE at module scope, not `Math.random()`: a random burst
+re-rolls on every render, so one re-render mid-flight would teleport every
+particle onto a new path. Nothing travels more than 96px from centre, which is
+what keeps the burst inside the card at the 320px floor — `scripts/shots.mjs`
+treats a sideways-scrolling page as a hard failure, and there is now a
+`streak-complete` route in it that photographs exactly that state.
+
+**`completed` is one boolean and everything is derived from it** — the count,
+the week's last cell, the goal ring, the milestone bar and the grid — so they
+cannot disagree about whether today is done. `celebrating` is separate and
+short-lived because it drives only the one-shots; folding the two together would
+either leave the confetti on screen forever or revert the streak when it
+cleared.
+
+**`useCountUp` reads `from` off the last value PAINTED, not the previous
+target.** Those differ whenever the target moves again mid-tween, and taking the
+previous target makes the number jump backwards before setting off again. The
+ref is only written inside the effect and the frame callback, never during
+render, which is what keeps it safe under the React Compiler.
+
+**Milestone states are told apart by more than colour** — a tick, a filled
+flame, a padlock — because the grid is the one place on the page where the state
+IS the information. Every card is a `<div>`: there is nothing behind a milestone
+to open, and a control that answers a tap with silence reads as broken
+(`sidebar-nav.tsx`'s `href: null` rows, the survey's `StudiedStep`,
+`subject-card.tsx`'s zero-lesson tile).
+
+`milestoneProgress()` returns `null` once every rung is passed and the caller
+renders nothing, rather than a bar pinned at 100% under "0 days until your next
+milestone" — the same absent-rather-than-empty rule the starred list and the
+retention line already follow.
+
+**`/streak` HAS NO NAV ROW, AND THAT IS ON PURPOSE — DON'T ADD ONE BACK.** It
+briefly had one and it was removed at the user's request, along with
+`/roadmap`'s, for the same reason: the drawer had grown past a phone screen, and
+this page already has a natural doorway in **Home's Flame stat pill**, which
+shows that very number and links to it. A nav row would be a second entrance to
+a screen the student is looking at the summary of. `StatPills` is the only place
+that link exists, and it is the only one of its four pills that links anywhere —
+the other three have no page to open, and a control that answers a tap with
+silence reads as broken. The pills render as a `<Link>` or a `<div>` from one
+shared class string so the linked one cannot drift visually from its neighbours.
+`StatPills` is reused as-is on Profile, so the doorway is on both screens.
+
+**`/streak/friends` DOES keep its nav row**, because nothing on Home hints that
+it exists. Its icon is `Users`, not `Flame` — that was already true when the two
+sat near each other, and it still distinguishes the social half.
+
+`bottomNavItems` survived both removals unchanged: it takes Progress by
+`featureNavItems[0]`, still index 0, and Game by id — which is exactly why that
+lookup is by id rather than position. See its own comment.
+
+### Streak with Friends — a SHARED streak, and the rule is the whole feature
+
+`/streak/friends` fills the `friends` nav item that had sat as a disabled "Soon"
+placeholder since the beginning — the same way `/practice` filled `flashcards`.
+
+**IT SHIPPED ONCE AS SOMETHING ELSE AND WAS REPLACED WHOLESALE.** The first
+version ranked seven friends by their individual streaks — a small leaderboard.
+The user asked for the TikTok/Snapchat mechanic instead: one friend, one streak
+held jointly, which **advances only on days BOTH people finish their daily
+goal**. Those are opposite products. A leaderboard of separate streaks says
+"beat your friends"; this says "carry each other", and one person doing the work
+earns the pair nothing. `utils/streak-friends.ts`, the demo data and every
+component under it were rewritten rather than adapted; `friend-row.tsx`,
+`friends-summary.tsx`, `friends-view.tsx` and `friends-demo-data.ts` are
+deleted. **Don't reintroduce ranking here** — that is what `/leaderboard` is.
+
+**`sharedStreakToday(base, today)` is where the product rule actually lives**,
+and it is one line: `today.kept ? base + 1 : base`, where `kept` means both.
+Everything visible derives from it, so the count, the header rings, the week's
+last cell, the goal rows, the milestone bar and the grid cannot disagree about
+whether today counted.
+
+**`SharedDayStatus` is `kept | atRisk | broken`, and `atRisk` is only honest for
+TODAY.** The day is not over, so one person outstanding is a warning. On a PAST
+day the same combination means the streak actually broke. The demo week
+deliberately contains no such day, so the distinction never has to be drawn on
+screen — but a real implementation has to make it, and splitting that value in
+two is the first thing the type should grow.
+
+**`waitingOnFriend` and `waitingOnYou` are separate booleans, not one "who are
+we waiting for" enum**, because both can be true at once and an enum would force
+that case to pick a side.
+
+**FOUR STATUS BRANCHES, NOT THREE** (`sharedStatusLine` in `copy.ts`). "Neither
+of us has started" and "I'm done, they aren't" are different situations and only
+one is the friend's fault; always naming the friend would tell a student who has
+not opened a lesson today that Dara is the problem. The brief's own two lines are
+branches 2 and 4 verbatim. Nothing scolds in any state — the same forward-only
+rule the leaderboard applies to the current user.
+
+**The brief contradicted itself, same as the solo page's did.** Its data section
+says today starts "Panha ✅ / Dara ⏳"; its interaction section then asks for a
+"Complete Today's Goal" button that changes Panha to completed — which cannot do
+anything if Panha is already done, and a button dead on arrival is the pattern
+this codebase avoids everywhere. **Today opens with BOTH outstanding**, which
+makes both prototype controls live, walks the whole loop, and still shows every
+line of the brief's copy, just sequenced. The at-risk framing is true from first
+paint either way, because the streak is at risk while anyone is outstanding.
+
+**THREE CONTROLS AT THREE DELIBERATE WEIGHTS:**
+
+| control | weight | why |
+| --- | --- | --- |
+| Complete Today's Goal | `bg-brand`, the app's real CTA | the only one a shipped version keeps |
+| Remind Dara | outlined secondary | the nudge mechanic kept from the deleted version at the user's request — it turns waiting into something the student can act on |
+| Simulate friend completion | **dashed, muted, labelled "Prototype only"** | it stands in for another human being |
+
+That third one is the one to not tidy. Dressing it as an ordinary button would be
+the single genuinely dishonest thing on the page — a student could press it and
+believe they had made Dara do something. Each control unmounts rather than
+sitting disabled once it has nothing left to do.
+
+**`finishDay(you, friend)` takes BOTH next values** rather than each control
+flipping its own flag, so the celebration fires on the transition into "both
+done" whichever button got there second. The two can legitimately be pressed in
+either order, and an `onComplete` that only knew its own half would miss
+friend-first. Both orders are covered by the verification standard below.
+
+**The header layout IS the argument.** The solo page centres one flame with the
+count under it; here the flame sits BETWEEN two avatars on a gradient rail that
+passes under both, so the number reads as a pair's before it reads as a number.
+The rail is a `z-0` bar behind the row rather than a border, because a border
+would stop at each edge instead of connecting them. Each avatar carries its own
+ring — mint once that person is done, amber while not — which is why the header
+needs no separate "who is outstanding" row. The badge slot under each face is
+always rendered even for the friend who has no badge, or the two columns differ
+in height and the flame drifts off the rail.
+
+**The week is SHARED outcomes plus a two-dot strip**, not two rows of ticks. The
+brief sketched a table with a column each and then said it need not look like
+one. Each day is one indicator carrying the day's verdict — filled flame for
+both, outlined amber flame for one, cross for neither — with 4px dots underneath
+saying which of the pair finished, left-you right-friend, matching the header's
+avatar order. The dots read as texture at a glance, which is the intent; the full
+sentence is on each cell's `aria-label`, since neither a glyph nor two dots says
+anything out loud. **`broken` is muted, not red** — a day nobody managed is
+already a loss, and the destructive colour would turn a quiet week into a
+telling-off.
+
+**Every state is icon + words, never colour alone.** The whole page is one
+distinction repeated in four places, and it has to survive not being able to tell
+mint from amber.
+
+**`SHARED_MILESTONES` is a SECOND ladder, not the solo one relabelled.** Same
+thresholds, different names — the solo rungs describe one student becoming
+something ("Beginner", "Monthly Master"), these describe a pair ("Study
+Partners", "Dedicated Duo"). Sharing one array and swapping labels was rejected:
+the two ladders are free to diverge the moment either page's rewards are tuned.
+It costs one file because `rankMilestones()` and `milestoneProgress()` take the
+array as an argument, and `MilestoneCard` / `MilestoneProgress` render whatever
+they are handed — that argument existed for exactly this.
+
+**A CHILD PATH OF `/streak`, not a top-level `/friends`,** because it is the same
+idea seen a different way. No collision risk — the two differ by a static
+segment, unlike the `/lessons/:lessonId` versus bare `/lessons/:subjectId`
+ambiguity `pages/subject-path.tsx` documents. It is the one page in the pair that
+carries a **back link**, because it is reached from another page and its nav item
+is buried in the drawer; `/streak` is a destination and has nothing to go back
+from. A `<Link to="/streak">` rather than `navigate(-1)`: history could have come
+from anywhere, and this always means "up to my own streak".
+
+**The count is the store's `streak`, not a third copy.** The two pages measure
+different things and are not required by logic to agree, but starting level is
+what makes the shared rule legible — the student sees the same number Home's
+pill and the StatBar show, and learns that HERE it moves only when Dara moves
+too. See the solo section for the bug that authoring a second number caused.
+
+**Reminders are local state and forget on reload, deliberately.** A real one is a
+notification: the app sends none, and sending the first needs a consent story
+nobody has designed. `friend-streak-demo-data.ts` carries the rest of what a real
+version needs, including the one that is genuinely hard — two people in two
+timezones have two "todays" and the pair needs one.
+
 ## Performance — the four rules, and why each one exists
 
 The app was slow, and the reported symptom was **navigation**, not first load.
@@ -2573,8 +2878,14 @@ reads worse than a blank one.
 
 ## Still not built
 
-Document Library and Streak-w/-Friends — these exist as disabled "Soon" items in
-the nav (`lib/nav-items.ts`) but have no route or feature folder.
+Document Library — the last disabled "Soon" item in the nav
+(`lib/nav-items.ts`), with no route or feature folder.
+
+**Streak-w/-Friends has left this list.** It is `/streak/friends` now, a real
+screen — see its section above. What is missing there is a BACKEND, not code:
+there is no friendship model, cross-user reads are the same blocker the
+leaderboard is waiting on, and a reminder has nowhere to go. Same state the
+past-papers tab and the practice decks were in, and by design.
 
 **Flashcards/Quiz has left this list.** It is `/practice` now, a real feature —
 see its section above. What is still missing there is CONTENT, not code:
@@ -2750,16 +3061,25 @@ surface under the wrong tab on the same screen. XP *is* awarded for both. When
 past papers deserve a history of their own it should be a separate persisted
 field, not a widening of this one.
 
-**Progress, Game, Grade Prediction and Leaderboard intentionally use fake, fixed
-demo data** (`features/*/demo-data.ts`), not live store data. An explicit user
-decision to avoid edge-case bugs (e.g. a brand-new user with zero exams breaking
-a chart). The files have comments noting what real data would need to exist
-(per-subject score tracking, a daily activity log) before switching over. The
-leaderboard's list is the longest of those: cross-student ranking, an XP ledger
-with timestamps, a daily activity log, and **active** study minutes with idle
-time excluded — counting "app is open" would make leaving a phone unlocked a
-winning strategy, which is exactly what that screen is built to argue against.
-Its one live read is the student's own name.
+**Progress, Game, Grade Prediction, Leaderboard and Streak intentionally use
+fake, fixed demo data** (`features/*/demo-data.ts`), not live store data. An
+explicit user decision to avoid edge-case bugs (e.g. a brand-new user with zero
+exams breaking a chart). The files have comments noting what real data would
+need to exist (per-subject score tracking, a daily activity log) before
+switching over. The leaderboard's list is the longest of those: cross-student
+ranking, an XP ledger with timestamps, a daily activity log, and **active**
+study minutes with idle time excluded — counting "app is open" would make
+leaving a phone unlocked a winning strategy, which is exactly what that screen
+is built to argue against. Its one live read is the student's own name.
+
+**Streak is the exception to the pattern, and it had to be.** The other four
+measure something the chrome does not show, so their invented numbers sit beside
+nothing that could contradict them. A streak page restates a number the global
+`StatBar` renders on every screen, so its demo count was VISIBLY WRONG — the bar
+said 3, the page said 12 — until the count moved into the store. Both `/streak`
+screens now read `streak` from there and only their surrounding state is
+authored. **A new demo screen that displays XP, level, coins or streak has this
+same problem** and should read the store rather than invent one.
 
 **The Study Activity heatmap's dates are the exception to "fixed demo data"** —
 they're derived, not fixed, same pattern as `daysUntilExam()`. The COUNTS in

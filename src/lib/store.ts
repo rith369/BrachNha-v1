@@ -275,6 +275,20 @@ const emptyUserData: UserData = {
   studied: false,
 };
 
+/**
+ * The seeded streak, and the SINGLE source for every streak shown anywhere.
+ *
+ * Exported so features/streak can build its screens on the same number instead
+ * of authoring a second one. It used to have a private copy called
+ * DEMO_STREAK, which is exactly how Home's stat pill came to say 3 while the
+ * Streak page said 12 — two hardcoded numbers for one fact.
+ *
+ * It stops being a constant the day a daily activity log exists; at that point
+ * this is deleted and the field is derived. Nothing else has to move, because
+ * everything already reads the field rather than this.
+ */
+export const DEMO_SEED_STREAK = 12;
+
 // Named rather than inline so `migrate` can borrow its return type — the two
 // have to agree on exactly which keys reach localStorage.
 const partializeState = (state: BrachNhaState) => ({
@@ -328,7 +342,16 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       xp: 0,
       level: 1,
       coins: 0,
-      streak: 3,
+      /**
+       * NOTHING COMPUTES THIS YET — it is seeded and only ever read, by Home's
+       * StatPills, the global StatBar, the two /streak screens and the mentor
+       * prompt. Until a daily activity log exists (see the Streak feature's own
+       * demo-data.ts for the timezone and missed-day questions that are still
+       * undesigned), it is one hardcoded number, and it has to be THE one:
+       * every surface that shows a streak reads this, so they cannot disagree.
+       * It was 3 while the pages that display it prominently did not exist.
+       */
+      streak: DEMO_SEED_STREAK,
       tasks: emptyTasks,
       examResults: [],
       completedSessions: [],
@@ -596,7 +619,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           xp: 0,
           level: 1,
           coins: 0,
-          streak: 3,
+          streak: DEMO_SEED_STREAK,
           tasks: emptyTasks,
           examResults: [],
           completedSessions: [],
@@ -613,21 +636,39 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       partialize: partializeState,
 
       // v1 stamped writes so a future schema change COULD use `migrate`; v2 is
-      // the first one that actually does. Note neither helps with the v0 data
+      // the first one that actually did. Note neither helps with the v0 data
       // already in students' browsers — see the `merge` note below.
-      version: 2,
+      version: 3,
 
-      // v1 → v2: dark shipped as the default for a few hours and got written
-      // into everyone's localStorage before the default flipped to light. That
-      // stored "dark" is the old default rather than a choice anyone made, so
-      // it's cleared — otherwise flipping the default changes nothing for the
-      // people who already opened the app. A deliberate pick made from the
-      // drawer after this lands is stamped v2 and is left alone.
       migrate: (persisted, version) => {
-        const state = persisted as Partial<PersistedState>;
+        let state = persisted as Partial<PersistedState>;
+
+        // v1 → v2: dark shipped as the default for a few hours and got written
+        // into everyone's localStorage before the default flipped to light.
+        // That stored "dark" is the old default rather than a choice anyone
+        // made, so it's cleared — otherwise flipping the default changes
+        // nothing for the people who already opened the app. A deliberate pick
+        // made from the drawer after this lands is stamped v2 and is left
+        // alone.
         if (version < 2) {
-          return { ...state, theme: "light" as const };
+          state = { ...state, theme: "light" as const };
         }
+
+        // v2 → v3: the seeded streak went 3 → 12 so that every surface showing
+        // a streak agrees (Home's stat pill, the global StatBar, both /streak
+        // screens). Overwriting a persisted value normally would be wrong — but
+        // NOTHING HAS EVER INCREMENTED THIS FIELD, so every stored 3 is the old
+        // default rather than days a student actually earned, and leaving it
+        // would mean the pill kept saying 3 next to a page saying 12. Same
+        // reasoning as the theme reset above.
+        //
+        // Guarded on the exact old default so a value set any other way is left
+        // alone — and once streaks are really computed, this migration must not
+        // be extended: at that point a stored number is a student's own.
+        if (version < 3 && state.streak === 3) {
+          state = { ...state, streak: DEMO_SEED_STREAK };
+        }
+
         return state;
       },
 

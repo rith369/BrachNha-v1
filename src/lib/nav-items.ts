@@ -4,12 +4,11 @@ import {
   BookOpen,
   ClipboardList,
   Layers,
-  Map,
   Gamepad2,
   Trophy,
   Library,
-  Flame,
   User,
+  Users,
   LineChart,
   Gauge,
 } from "lucide-react";
@@ -77,12 +76,25 @@ export const featureNavItems: NavItem[] = [
     label: { en: "Leaderboard", km: "ចំណាត់ថ្នាក់" },
     icon: Trophy,
   },
-  {
-    id: "roadmap",
-    href: "/roadmap",
-    label: { en: "Roadmap", km: "ផែនទី" },
-    icon: Map,
-  },
+  // ── TWO ROUTES ARE DELIBERATELY ABSENT FROM THIS LIST. DON'T ADD THEM BACK.
+  //
+  // The list was getting long, and both already have a doorway on Home that
+  // shows the very thing the page is about — a nav row would be a second
+  // entrance to a screen the student is looking at the summary of:
+  //
+  //   /roadmap  ← the "Quest Map" chip in features/home/components/
+  //               motivation-hero.tsx. It is also where a student lands
+  //               straight out of the survey, and ShellLayout's onboarding lock
+  //               (app.tsx) hides all chrome there until the pledge is seen —
+  //               so for the one student who most needs it, a nav row was never
+  //               visible in the first place.
+  //   /streak   ← the Flame stat pill in features/home/components/
+  //               stat-pills.tsx, which renders that exact count.
+  //
+  // "Streak with Friends" below keeps its row because nothing on Home hints
+  // that it exists. Neither removal touches `bottomNavItems`: it takes Progress
+  // by `featureNavItems[0]`, still index 0, and Game by id — which is precisely
+  // the reason that lookup is by id rather than position.
   {
     id: "library",
     href: null,
@@ -91,9 +103,18 @@ export const featureNavItems: NavItem[] = [
   },
   {
     id: "friends",
-    href: null,
-    label: { en: "Streak w/ Friends", km: "ជួរជាមួយមិត្ត" },
-    icon: Flame,
+    // Was `null` — a disabled "Soon" placeholder — until the friends board
+    // landed. Nested under /streak because it is the same number seen a
+    // different way; see pages/streak-friends.tsx.
+    href: "/streak/friends",
+    // Users, not Flame: this sits two rows under the Streak page above, and two
+    // identical flames in one list stop the icon carrying any signal. The
+    // social half is what distinguishes this item, so that is what the icon
+    // says.
+    // "with", never "w/" — the abbreviation saves four characters and reads as
+    // a typo in a menu a student sees every day.
+    label: { en: "Streak with Friends", km: "Streak ជាមួយមិត្តភក្តិ" },
+    icon: Users,
   },
   {
     id: "profile",

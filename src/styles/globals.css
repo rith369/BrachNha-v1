@@ -26,6 +26,22 @@
   --brand-mint: #10b981;
   --brand-yellow: #f59e0b;
 
+  /* ── The streak flame ramp — brand-scale semantics, so IDENTICAL in both
+     themes. It carries the white flame glyph on the streak hero and is clipped
+     into the huge streak count, and both roles need it to hold up against
+     white and against the page.
+
+     The obvious pick for fire, --brand-yellow (#f59e0b), is 2.1:1 with white
+     and fails outright. These two are 4.2:1 (#ea580c) and 4.6:1 (#e91e8c), so
+     every point along the ramp clears the 3:1 minimum for a non-text graphic
+     and for large text, in both themes — the clipped count measures 4.1:1 on
+     the light page and 4.3:1 on the dark one.
+
+     It is NOT for normal-size white text: the page's own CTA stays on bg-brand
+     for exactly that reason. */
+  --brand-flame-from: #ea580c;
+  --brand-flame-to: #e91e8c;
+
   /* ── Accent roles — text, icons, borders, tints, chart series ──
      Lifted in .dark so they stay readable ON a dark surface. Because they are
      lifted, every existing low-alpha tint (bg-purple/8, border-purple/10, …)
@@ -109,6 +125,10 @@
   --shadow-cta-lg: 0 6px 20px rgba(139, 43, 226, 0.45);
   --shadow-drawer: 8px 0 40px rgba(139, 43, 226, 0.15);
   --shadow-mint-cta: 0 4px 14px rgba(16, 185, 129, 0.3);
+  /* Warm halo under the streak flame disc. STATIC, never animated — a moving
+     box-shadow is a paint property and repaints every frame; the disc animates
+     `transform` instead. See the fabPulse note further down. */
+  --shadow-flame: 0 10px 30px rgba(234, 88, 12, 0.35);
   /* Glow on the Roadmap's SVG path connector. */
   --path-glow: rgba(139, 43, 226, 0.75);
 
@@ -193,6 +213,12 @@
   --shadow-cta-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
   --shadow-drawer: 8px 0 40px rgba(0, 0, 0, 0.6);
   --shadow-mint-cta: 0 4px 14px rgba(0, 0, 0, 0.5);
+  /* The one shadow kept COLOURED on dark. Every other one becomes a real black
+     shadow here because a coloured halo reads as an artefact — but the flame
+     disc is the page's single focal point and a black shadow under a glowing
+     object is the wrong physics. Lifted to 0.45 since a 0.35 orange wash
+     disappears against #100e18. */
+  --shadow-flame: 0 10px 34px rgba(234, 88, 12, 0.45);
   /* Brighter than the light-mode glow: a 75% #8b2be2 halo disappears against
      #100e18, and the path connector is the Roadmap's main visual thread. */
   --path-glow: rgba(180, 124, 245, 0.55);
@@ -242,6 +268,7 @@
   --shadow-cta-lg: var(--shadow-cta-lg);
   --shadow-drawer: var(--shadow-drawer);
   --shadow-mint-cta: var(--shadow-mint-cta);
+  --shadow-flame: var(--shadow-flame);
 
   /* Khmer is listed as a fallback, not applied conditionally: the Latin fonts
      have no Khmer glyphs, so the browser reaches for Noto per glyph. Mixed
@@ -294,6 +321,18 @@
     var(--brand-pink),
     var(--brand-purple),
     var(--brand-blue)
+  );
+}
+
+/* The streak flame ramp, as a fill and as a bg-clip-text source. Declared as a
+   utility for the same reason the two above are: it appears on the flame disc,
+   the streak count and the milestone bar, and three hand-written copies of one
+   gradient is how they end up different. */
+@utility bg-flame {
+  background-image: linear-gradient(
+    135deg,
+    var(--brand-flame-from),
+    var(--brand-flame-to)
   );
 }
 
@@ -398,15 +437,75 @@ h1, h2, h3, h4, .font-heading {
   animation: startBob 1.6s ease-in-out infinite;
 }
 
+/* ── Streak page ──
+   All three are TRANSFORM AND OPACITY ONLY, for the reason spelled out in the
+   fabPulse note above: nothing else can run on the compositor, and this page
+   is a scrolling column with a burst of ~14 particles going off in the middle
+   of it.
+
+   streakBreathe is the only loop here and it drives exactly ONE element, the
+   flame disc — the Roadmap's mistake was putting a loop on a dozen nodes at
+   once. The other two are one-shots fired by the "Complete Today's Goal" tap;
+   their elements unmount when it finishes. */
+@keyframes streakBreathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+.animate-streak-breathe {
+  animation: streakBreathe 3.2s ease-in-out infinite;
+}
+
+/* The flame and the count on completion. Overshoot then settle — the back-out
+   curve is what makes it read as a reward rather than a resize. */
+@keyframes streakPop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.28); }
+  62% { transform: scale(0.94); }
+  100% { transform: scale(1); }
+}
+.animate-streak-pop {
+  animation: streakPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Confetti. Direction and spin come from --dx / --dy / --rot set per particle
+   in celebration-animation.tsx, so ONE keyframe serves the whole burst; the
+   variables are static for the life of each element, so they interpolate as
+   plain constants inside the transform. `both` holds the 0% state through the
+   stagger delay, without which every particle would flash at full opacity in
+   its start position before its turn came. */
+@keyframes streakConfetti {
+  0% { opacity: 0; transform: translate3d(0, 0, 0) scale(0.4) rotate(0deg); }
+  12% { opacity: 1; }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--dx), var(--dy), 0) scale(1) rotate(var(--rot));
+  }
+}
+.animate-streak-confetti {
+  animation: streakConfetti 1.1s cubic-bezier(0.18, 0.8, 0.32, 1) both;
+}
+
 /* Both loops above run forever. Someone who has asked their device for less
    motion should get the finished state, not an endless animation — and on a
-   low-end phone that is a real amount of work saved as well. */
+   low-end phone that is a real amount of work saved as well.
+
+   The streak one-shots are turned off here too. The celebration still HAPPENS
+   with reduced motion — the count changes, today's cell fills, the goal card
+   flips to "Streak maintained!" — it just arrives instead of flying in. The
+   confetti has no still frame worth keeping, so it simply never shows. */
 @media (prefers-reduced-motion: reduce) {
   .animate-fab-pulse,
   .animate-fab-pulse::after,
   .animate-shimmer,
-  .animate-start-bob {
+  .animate-start-bob,
+  .animate-streak-breathe,
+  .animate-streak-pop {
     animation: none;
+  }
+
+  .animate-streak-confetti {
+    animation: none;
+    display: none;
   }
 }
 
