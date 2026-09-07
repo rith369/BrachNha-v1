@@ -190,6 +190,27 @@ export const FOUNDATION: Record<string, Lesson> = {
   },
 };
 
+/**
+ * Resolve a lesson id, or null if nothing is behind it.
+ *
+ * The lookup used to live inside lesson-detail.tsx as `LESSONS[cat][topic]`
+ * with no guard at all, so `/lessons/anything` threw a TypeError during render
+ * and — with no error boundary in the app at the time — blanked the whole
+ * screen. Every sibling route already resolved-then-redirected instead
+ * (pages/section-detail.tsx is the pattern); this is what lets this one do the
+ * same.
+ *
+ * Returns null rather than throwing because the caller's job is to redirect,
+ * not to catch. A bad id here is only ever a typed URL or a stale link.
+ */
+export function lessonDataFor(lessonId: string): Lesson | null {
+  if (lessonId === "math-foundation") return FOUNDATION.math;
+  if (lessonId === "biology-foundation") return FOUNDATION.biology;
+  const [cat, topic] = lessonId.split("-");
+  if (!cat || !topic) return null;
+  return LESSONS[cat]?.[topic] ?? null;
+}
+
 export const FLASHCARDS: Record<string, Flashcard[]> = {
   math: [
     {

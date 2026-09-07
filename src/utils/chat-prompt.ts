@@ -63,8 +63,33 @@ function clean(value: string, max = 60): string {
   return value.replace(/[\p{Cc}\p{Cf}]/gu, " ").trim().slice(0, max);
 }
 
-function cleanList(values: string[], max = 12): string[] {
-  return values.slice(0, max).map((v) => clean(v, 30)).filter(Boolean);
+function cleanList(values: unknown): string[] {
+  if (!Array.isArray(values)) return [];
+  return values
+    .slice(0, 12)
+    .map((v) => (typeof v === "string" ? clean(v, 30) : ""))
+    .filter(Boolean);
+}
+
+/**
+ * A profile number, or null if it is not one.
+ *
+ * ChatProfile TYPES these as numbers, and for the app's own client they are.
+ * But /api/chat is a public unauthenticated endpoint, the handler builds the
+ * profile by spreading the parsed request body over its defaults, and
+ * `JSON.parse` produces whatever was sent — so the type is a description of the
+ * intended caller, not a guarantee about the value. Every one of these is
+ * interpolated straight into the system prompt, so an unchecked string field
+ * here is arbitrary text inside the model's instructions, and an unbounded one
+ * is arbitrary text of any LENGTH: past the 2000-char cap on messages, past the
+ * 12-message history limit, and past PROMPT_BUDGET_CHARS, which only warns.
+ *
+ * Clamped as well as type-checked, because a finite number can still be
+ * absurd, and "level 1e308" in a prompt is noise the model has to reconcile.
+ */
+function cleanNumber(value: unknown, min: number, max: number): number | null {
+  if (typeof value !== "number" || !Number.isFinite(value)) return null;
+  return Math.min(max, Math.max(min, Math.round(value)));
 }
 
 /** Renders a bilingual content pair. English is always included (the Khmer
@@ -213,12 +238,19 @@ is not listed above.`;
 
 /** A short brief on who the model is talking to. */
 export function buildStudentBlock(profile: ChatProfile): string {
+  // EVERY field below goes through clean/cleanList/cleanNumber before it is
+  // interpolated. Six of them did not — language, level, xp, streak,
+  // avgExamPct and examCount were written straight in on the strength of their
+  // declared types, which say nothing about what a public endpoint actually
+  // receives. See cleanNumber for the full argument.
   const name = clean(profile.name) || "the student";
   const lines: string[] = [`Name: ${name}.`];
 
-  if (profile.grade) lines.push(`Target grade: ${clean(profile.grade, 2)}.`);
-  if (Number.isFinite(profile.daysToExam) && profile.daysToExam > 0) {
-    const days = Math.round(profile.daysToExam);
+  const grade = clean(profile.grade, 2);
+  if (grade) lines.push(`Target grade: ${grade}.`);
+
+  const days = cleanNumber(profile.daysToExam, 0, 40_000);
+  if (days !== null && days > 0) {
     const months = Math.max(1, Math.round(days / 30.44));
     lines.push(
       `Time until the Bac II exam: ${days} days (about ${months} month(s)).`
@@ -229,17 +261,25 @@ export function buildStudentBlock(profile: ChatProfile): string {
   const strong = cleanList(profile.strengths);
   if (weak.length) lines.push(`Weak subjects (prioritise these): ${weak.join(", ")}.`);
   if (strong.length) lines.push(`Subjects they enjoy: ${strong.join(", ")}.`);
-  if (profile.language) {
+
+  // Only the two real values. A whitelist rather than clean(), because this is
+  // a closed set and anything else is not a shortened language name, it is
+  // someone else's text.
+  if (profile.language === "english" || profile.language === "french") {
     lines.push(`Foreign-language subject taken: ${profile.language}.`);
   }
 
-  lines.push(
-    `Progress: level ${profile.level}, ${profile.xp} XP, ${profile.streak}-day streak.`
-  );
-  if (profile.avgExamPct !== null && profile.examCount > 0) {
-    lines.push(
-      `Mock exams sat: ${profile.examCount}, averaging ${profile.avgExamPct}%.`
-    );
+  const level = cleanNumber(profile.level, 1, 999);
+  const xp = cleanNumber(profile.xp, 0, 10_000_000);
+  const streak = cleanNumber(profile.streak, 0, 20_000);
+  if (level !== null && xp !== null && streak !== null) {
+    lines.push(`Progress: level ${level}, ${xp} XP, ${streak}-day streak.`);
+  }
+
+  const avgPct = cleanNumber(profile.avgExamPct, 0, 100);
+  const examCount = cleanNumber(profile.examCount, 0, 100_000);
+  if (avgPct !== null && examCount !== null && examCount > 0) {
+    lines.push(`Mock exams sat: ${examCount}, averaging ${avgPct}%.`);
   } else {
     lines.push("They have not sat a mock exam in the app yet.");
   }

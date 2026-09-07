@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from "react";
 import { Outlet, Route, Routes, useLocation } from "react-router";
 import { AppShell } from "@/components/shell/app-shell";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { useFocusMode, useMentorBlocked } from "@/hooks/use-focus-mode";
 import { useBrachNhaStore } from "@/lib/store";
 import HomePage from "@/pages/home";
@@ -162,44 +163,55 @@ export default function App() {
   usePrefetchRoutes();
 
   return (
-    <Routes>
-      <Route element={<ShellLayout />}>
-        <Route index element={<HomePage />} />
-        <Route path="game" element={<GamePage />} />
-        <Route path="exam" element={<ExamPage />} />
-        <Route path="grade-prediction" element={<GradePredictionPage />} />
-        <Route path="leaderboard" element={<LeaderboardPage />} />
-        <Route path="lessons" element={<LessonsPage />} />
-        <Route path="lessons/:lessonId" element={<LessonDetailPage />} />
-        <Route path="sections/:sectionId" element={<SectionDetailPage />} />
-        <Route path="subjects/:subjectId" element={<SubjectPathPage />} />
-        <Route path="placement-test/:subject" element={<PlacementTestRoute />} />
-        {/* Four segments for the runner, not three, so it cannot collide with
-            the lesson-list pattern above it — see pages/practice-run.tsx. */}
-        <Route path="practice" element={<PracticePage />} />
-        {/* Static, listed before the dynamic :mode/:subjectId route below so
-            react-router's own more-specific-first matching resolves this
-            first rather than treating "review" as a :mode value. Two path
-            segments, so it cannot collide with that three-segment route on
-            segment count either — see isPracticeRunRoute's comment in
-            utils/focus-routes.ts for why segment count is what this feature
-            already disambiguates on. */}
-        <Route path="practice/review" element={<PracticeReviewPage />} />
-        <Route
-          path="practice/:mode/:subjectId"
-          element={<PracticeSubjectPage />}
-        />
-        <Route
-          path="practice/:mode/:subjectId/:lessonRef"
-          element={<PracticeRunPage />}
-        />
-        <Route path="profile" element={<ProfilePage />} />
-        <Route path="progress" element={<ProgressPage />} />
-        <Route path="roadmap" element={<RoadmapPage />} />
-        <Route path="streak" element={<StreakPage />} />
-        <Route path="streak/friends" element={<StreakFriendsPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Route>
-    </Routes>
+    // OUTSIDE <Routes>, so a throw during a route's render is caught rather
+    // than taking the whole tree with it. Deliberately not per-route: the
+    // fallback's job is to get a stuck student moving again, and a boundary
+    // inside the shell would keep rendering navigation that may itself be what
+    // threw. See components/error-boundary.tsx for why reloading alone is not
+    // a sufficient escape in an app with a persisted store.
+    <ErrorBoundary>
+      <Routes>
+        <Route element={<ShellLayout />}>
+          <Route index element={<HomePage />} />
+          <Route path="game" element={<GamePage />} />
+          <Route path="exam" element={<ExamPage />} />
+          <Route path="grade-prediction" element={<GradePredictionPage />} />
+          <Route path="leaderboard" element={<LeaderboardPage />} />
+          <Route path="lessons" element={<LessonsPage />} />
+          <Route path="lessons/:lessonId" element={<LessonDetailPage />} />
+          <Route path="sections/:sectionId" element={<SectionDetailPage />} />
+          <Route path="subjects/:subjectId" element={<SubjectPathPage />} />
+          <Route
+            path="placement-test/:subject"
+            element={<PlacementTestRoute />}
+          />
+          {/* Four segments for the runner, not three, so it cannot collide with
+              the lesson-list pattern above it — see pages/practice-run.tsx. */}
+          <Route path="practice" element={<PracticePage />} />
+          {/* Static, listed before the dynamic :mode/:subjectId route below so
+              react-router's own more-specific-first matching resolves this
+              first rather than treating "review" as a :mode value. Two path
+              segments, so it cannot collide with that three-segment route on
+              segment count either — see isPracticeRunRoute's comment in
+              utils/focus-routes.ts for why segment count is what this feature
+              already disambiguates on. */}
+          <Route path="practice/review" element={<PracticeReviewPage />} />
+          <Route
+            path="practice/:mode/:subjectId"
+            element={<PracticeSubjectPage />}
+          />
+          <Route
+            path="practice/:mode/:subjectId/:lessonRef"
+            element={<PracticeRunPage />}
+          />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="progress" element={<ProgressPage />} />
+          <Route path="roadmap" element={<RoadmapPage />} />
+          <Route path="streak" element={<StreakPage />} />
+          <Route path="streak/friends" element={<StreakFriendsPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
+      </Routes>
+    </ErrorBoundary>
   );
 }

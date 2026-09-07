@@ -1,6 +1,7 @@
 import { deckFor } from "@/data/practice";
 import { chaptersFor } from "@/features/lessons/sessions";
 import type { PracticeCard } from "@/types";
+import { todayKey } from "@/utils/day";
 import {
   initialReviewState,
   isDue,
@@ -174,8 +175,12 @@ export function reviewedTodayCount(
   cardReviews: Record<string, ReviewState>,
   now: Date = new Date()
 ): number {
-  const today = now.toISOString().slice(0, 10);
+  // `lastReviewedAt` is a full ISO INSTANT, so slicing it gives the UTC date.
+  // Parse it back and re-derive the LOCAL day, matching every other day
+  // boundary in the app — see utils/day.ts. Slicing both sides looked
+  // self-consistent and was: consistently seven hours out for the audience.
+  const today = todayKey(now);
   return Object.values(cardReviews).filter(
-    (s) => s.lastReviewedAt?.slice(0, 10) === today
+    (s) => s.lastReviewedAt !== null && todayKey(new Date(s.lastReviewedAt)) === today
   ).length;
 }

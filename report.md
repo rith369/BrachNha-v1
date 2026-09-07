@@ -17,6 +17,65 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 7 Sep 2026 — A code review before login: six real bugs fixed, and the app made safer to break
+
+*Landed in commit `TBD`.*
+
+**Why.** Ahead of building a real login, we reviewed the whole app for problems
+that would be much harder to fix once students have accounts. The review found
+six things that were already wrong, several traps waiting for the login work, and
+a way for a stranger to run up the AI bill.
+
+**What changed — the six bugs.**
+
+1. **Daily tasks were not daily.** The code that clears the checklist at the end
+   of the day existed but was never actually run. So once a student finished a
+   lesson, that box stayed ticked forever, the 20 XP for it could only ever be
+   earned once in their whole life, and every following day was recorded as
+   though all three tasks had been done. The checklist now resets on the first
+   day change, whether the app is reopened or just left running overnight. **This
+   is the big one — please re-test the daily checklist on Home and the Daily
+   Mission on the Roadmap.**
+2. **A wrong lesson link crashed the entire app to a blank screen.** Opening a
+   lesson address that does not exist now returns to the Study page, the same way
+   a wrong section address already did.
+3. **Nothing caught crashes.** Any unexpected error blanked the whole app, and
+   because the app remembers its state, reloading landed straight back on the
+   blank screen with no way out on a phone. There is now a proper error screen
+   with a Reload button and, if that does not help, a confirm-first "clear saved
+   data" escape. It does not touch the account backup.
+4. **Flashcard review dates were computed in the wrong timezone.** For anyone
+   studying between midnight and 7am — a realistic before-school slot — every
+   review interval came out a day short, and a card marked "មិនទាន់ចងចាំ" at 5am
+   came back at 7am the same morning instead of the next day.
+5. **Long chat conversations could show the wrong text in a bubble.** Only past
+   40 messages in one conversation, where the oldest starts dropping off.
+6. **A crash waiting to happen on the last question of a practice quiz.** Not
+   yet visible, but one small edit away from breaking. Fixed now.
+
+**What changed — getting ready for login.** The app now listens for sign-in and
+sign-out events instead of guessing from whether a name is filled in; logging out
+now genuinely ends the session rather than relying on that guess, and it works
+with no internet; and links that arrive by email (confirmation, password reset)
+will now be recognised instead of silently doing nothing.
+
+**What changed — the AI chat.** The chat address is public, so anyone who finds
+it could previously send an enormous request or slip extra instructions into it
+and spend the Gemini budget. Requests are now size-limited and every piece of
+student information is checked before it goes into the AI's instructions.
+
+**Not done, on purpose.** The review found one larger problem left for the login
+work itself: today the app assumes one student uses one device. When two devices
+share one account, the second one to save will overwrite the first's chat history
+and progress. That needs a merge design, and it should be decided before the
+login screen is built rather than after.
+
+**Housekeeping.** Verification created three test accounts on the database named
+`SignoutProbe` and `SignoutProbe2`. They can be deleted from the Authentication
+board whenever convenient.
+
+---
+
 ## 7 Sep 2026 — Streak and Roadmap come off the menu, and one streak number everywhere
 
 *Landed in commit `c557635` — the three Streak entries (6–7 Sep) all

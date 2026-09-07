@@ -135,6 +135,10 @@ const seeded = (theme) => ({
     coins: 30,
     streak: 12,
     tasks: { lesson: false, practice: false, flashcards: false, challenge: false },
+    // The day `tasks` describes. "" means nothing has been completed yet, so
+    // AppShell's rollover stamps today and leaves the (already empty) checklist
+    // alone — no screenshot shows a reset that just happened.
+    tasksDate: "",
     examResults: [],
     completedSessions: [],
     theme,

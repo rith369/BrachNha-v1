@@ -39,6 +39,15 @@ export function checkRateLimit(
 
   // Drop keys whose hits have all aged out. Without this the map grows forever
   // on a long-lived instance, since every distinct IP would leave an entry.
+  //
+  // KNOWN COST, deliberately not optimised: this sweeps the whole map on EVERY
+  // request rather than amortising, so it is O(tracked keys x hits per key) in
+  // front of each call. At this app's traffic that is a handful of keys and
+  // invisible. It stops being invisible near MAX_TRACKED_KEYS, which is the
+  // point at which this in-memory limiter is the wrong tool anyway — it is
+  // per-instance, so a serverless deployment already has as many independent
+  // counters as it has warm instances. The fix at that scale is a shared store
+  // (Redis / Upstash), not a faster sweep here.
   for (const [k, times] of hits) {
     const live = times.filter((t) => t > cutoff);
     if (live.length) hits.set(k, live);

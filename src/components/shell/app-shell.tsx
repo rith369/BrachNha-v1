@@ -51,6 +51,7 @@ export function AppShell({
   const surveyed = useBrachNhaStore((s) => s.surveyed);
   const lang = useBrachNhaStore((s) => s.lang);
   const theme = useBrachNhaStore((s) => s.theme);
+  const rolloverDailyTasks = useBrachNhaStore((s) => s.rolloverDailyTasks);
 
   // Signs the student in (anonymously) and keeps the store backed up to
   // Supabase. Renders nothing and returns nothing — it is mounted here rather
@@ -59,6 +60,24 @@ export function AppShell({
   // unreachable it is a no-op and the app stays entirely local, which is the
   // supported state, not a degraded one.
   useSupabaseSync();
+
+  // `tasks` is TODAY's checklist, and something has to be the thing that says
+  // so. Mounted here rather than on Home because the daily rows are read from
+  // three screens (Home's checklist, Roadmap's Daily Mission, the streak
+  // pages) and a student can land on any of them first.
+  //
+  // On mount AND on every visibilitychange: a phone left open overnight never
+  // remounts, so waking the tab is the only moment it gets to notice the date
+  // changed. The action is a no-op when the day has not moved, so this costs
+  // one string compare per wake and publishes no store update.
+  useEffect(() => {
+    rolloverDailyTasks();
+    const onVisible = () => {
+      if (document.visibilityState === "visible") rolloverDailyTasks();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [rolloverDailyTasks]);
 
   // Hiding the FAB is not enough on its own. `chatOpen` is global and survives
   // navigation, so a student could open the mentor on the exam INTRO screen and

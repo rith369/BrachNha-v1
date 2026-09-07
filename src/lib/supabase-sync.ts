@@ -3,6 +3,11 @@ import { useBrachNhaStore } from "@/lib/store";
 import type { ExamResult } from "@/lib/store";
 import type { Commitment, Conversation, PendingPlacementTest } from "@/types";
 import type { InsertOf, Tables } from "@/types/database";
+// The local-calendar day key. This used to be a private helper here, carrying
+// the comment explaining why UTC is wrong for a Phnom Penh student; two other
+// files then re-derived the same thing in UTC and got it wrong. One helper now
+// — see utils/day.ts.
+import { todayKey as today } from "@/utils/day";
 
 /**
  * Maps the Zustand store onto the Supabase schema, in both directions.
@@ -351,10 +356,17 @@ async function pushConversations(userId: string, conversations: Conversation[]) 
  * Reads the account back out of Supabase and into the store.
  *
  * Only ever called for an empty store — see the "which copy wins" note above.
- * If the profile row is missing (a project where the migrations have not been
- * applied, or an account created before the trigger existed) this returns false
- * and the caller pushes instead, which is the right recovery: the local copy
- * becomes the server copy rather than the student being handed a blank account.
+ *
+ * Returns false when there is nothing to adopt: no profile row at all (a project
+ * whose migrations were never applied, or an account created before the trigger
+ * existed) or a row with no display_name. The caller does NOT then push, and
+ * must not: this path runs only when the store is EMPTY, so a push would upload
+ * a blank account over whatever the server does hold. What happens instead is
+ * nothing — the student stays on the Login screen, types a name, and the
+ * ordinary push path takes it from there against the session they already have.
+ *
+ * (An earlier version of this comment claimed the caller pushes. It never did,
+ * and it was right not to.)
  */
 export async function pullRemoteState(userId: string): Promise<boolean> {
   const db = await getSupabase();
@@ -454,6 +466,11 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
           challenge: todayRow.data.task_challenge,
         }
       : { lesson: false, practice: false, flashcards: false, challenge: false },
+    // The row that came back IS today's — the query filters on today() — so
+    // stamp it as such. Without this the pulled checklist arrives with an empty
+    // tasksDate and AppShell's rollover immediately wipes it, which looks like
+    // the pull silently failing.
+    tasksDate: today(),
   });
 
   for (const c of restored) lastPushedSignature.set(c.id, signatureOf(c));
@@ -468,15 +485,6 @@ export function resetSyncCache() {
 }
 
 // ── helpers ─────────────────────────────────────────────────────────────────
-
-/** Local calendar date as YYYY-MM-DD. Deliberately NOT toISOString().slice(0,10),
- *  which is UTC: for a student in Phnom Penh (UTC+7) that rolls the day over at
- *  7am, so a morning lesson would be filed under yesterday. */
-function today(): string {
-  const d = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
 
 /** PostgREST's `in` filter takes a bare comma-separated list, so any value
  *  containing a comma, quote or paren has to be quoted and escaped or it is

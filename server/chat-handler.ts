@@ -51,13 +51,40 @@ const RATE_LIMIT = 30;
 const RATE_WINDOW_MS = 60_000;
 
 /**
- * A hosting platform sets x-forwarded-for and its leftmost entry is the real
- * client, which is what makes this worth keying on — unlike anything the client
- * sends in the body, which an attacker can simply randomise. In local dev there
- * is no proxy and every request keys to "local", which is fine: the limit is
- * there to protect a public deployment, not your own machine.
+ * Largest request body we will read. The whole history the client can legally
+ * send is 40 messages that the composer itself caps well under this, so 64KB is
+ * far above any real question and far below anything worth allocating for.
+ *
+ * It matters because `req.json()` parses the ENTIRE body before any of the
+ * limits below apply: MAX_HISTORY and MAX_MESSAGE_CHARS bound what reaches the
+ * MODEL, not what reaches memory. A megabyte of JSON was fully parsed and
+ * array-allocated first, on a public endpoint, before being thrown away.
+ */
+const MAX_BODY_BYTES = 64 * 1024;
+
+/** Messages accepted before the request is rejected outright, as opposed to
+ *  MAX_HISTORY, which is how many of them are forwarded. The client's own cap
+ *  is 40; this leaves room and still refuses an array built to be expensive. */
+const MAX_MESSAGES = 100;
+
+/**
+ * The rate-limit key.
+ *
+ * Header order is the point. `x-vercel-forwarded-for` is set by the platform
+ * and cannot be spoofed by the caller, so it is tried FIRST; plain
+ * `x-forwarded-for` is a header anyone can put on a request, and a limiter
+ * keyed on it hands out a fresh bucket to anybody who varies it — which is the
+ * one thing this must not do, since it is the only gate on the endpoint.
+ *
+ * The fallbacks are kept for other hosts, in descending order of
+ * trustworthiness. In local dev there is no proxy and every request keys to
+ * "local", which is fine: the limit is there to protect a public deployment,
+ * not your own machine.
  */
 function clientIp(req: Request): string {
+  const vercel = req.headers.get("x-vercel-forwarded-for")?.trim();
+  if (vercel) return vercel.split(",")[0].trim();
+
   const forwarded = req.headers.get("x-forwarded-for");
   if (forwarded) {
     const first = forwarded.split(",")[0].trim();
@@ -120,9 +147,28 @@ function textResponse(
 }
 
 export async function handleChat(req: Request): Promise<Response> {
+  // Declared size first, before a byte is read. Cheap, and it turns the obvious
+  // way to make this endpoint expensive into a 413 that costs one header read.
+  const declared = Number(req.headers.get("content-length"));
+  if (Number.isFinite(declared) && declared > MAX_BODY_BYTES) {
+    return textResponse("Request too large.", 413);
+  }
+
+  // Then the actual bytes, because content-length is the caller's claim about
+  // the caller's own body and a chunked request carries none at all.
+  let raw: string;
+  try {
+    raw = await req.text();
+  } catch {
+    return textResponse("Invalid request body.", 400);
+  }
+  if (raw.length > MAX_BODY_BYTES) {
+    return textResponse("Request too large.", 413);
+  }
+
   let body: ChatRequestBody;
   try {
-    body = (await req.json()) as ChatRequestBody;
+    body = JSON.parse(raw) as ChatRequestBody;
   } catch {
     return textResponse("Invalid request body.", 400);
   }
@@ -132,6 +178,13 @@ export async function handleChat(req: Request): Promise<Response> {
 
   if (!messages.length) {
     return textResponse("No message.", 400);
+  }
+  // Rejected rather than sliced. MAX_HISTORY below already bounds what is
+  // FORWARDED, so a huge array costs nothing upstream — but accepting it says
+  // this endpoint will do unbounded work on request, and the app's own client
+  // never sends more than 40.
+  if (messages.length > MAX_MESSAGES) {
+    return textResponse("Too many messages.", 400);
   }
 
   // Checked before the API-key lookup and before any upstream call, so a flood

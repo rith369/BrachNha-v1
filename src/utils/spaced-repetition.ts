@@ -17,6 +17,8 @@
  * `cardReviews`; this file has no idea a store exists.
  */
 
+import { addDaysKey, todayKey } from "@/utils/day";
+
 export type ReviewGrade = "again" | "hard" | "good" | "easy";
 
 /**
@@ -67,15 +69,14 @@ export interface ReviewResult {
  */
 const AGAIN_INTERVAL_DAYS = 1;
 
-function toDateKey(d: Date): string {
-  return d.toISOString().slice(0, 10);
-}
-
-function addDays(base: Date, days: number): string {
-  const d = new Date(base);
-  d.setDate(d.getDate() + days);
-  return toDateKey(d);
-}
+// LOCAL calendar dates, from the app's one day helper — never
+// toISOString().slice(0, 10). Both of these used to be UTC-derived (and
+// `addDays` did its arithmetic locally and then formatted in UTC, which is
+// worse than either alone), so for a student in Phnom Penh studying between
+// midnight and 07:00 every interval landed a day short and an "again" card came
+// due again the same morning. See utils/day.ts for the full account.
+const toDateKey = todayKey;
+const addDays = addDaysKey;
 
 /** A card with no review record yet: "new" and due immediately, so it shows up
  *  in today's queue the first time it's ever seen. */

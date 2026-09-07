@@ -370,7 +370,13 @@ export function ChatOverlay() {
           if (m.role === "bot" && !m.text) return null;
           return (
             <div
-              key={i}
+              // `m.id`, not the index. A conversation is capped with
+              // `slice(-40)`, which drops from the FRONT, so past 40 messages
+              // every index shifts and an index key has React reuse one
+              // bubble's DOM node for a different message. Messages persisted
+              // before ids existed have none and keep the index — correct for
+              // history that has already settled and cannot move again.
+              key={m.id ?? i}
               className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div

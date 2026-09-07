@@ -415,7 +415,10 @@ flat name is simply absent from the payload, so reading it always says
 ### Two places the schema deliberately does more than mirror the store
 
 **`daily_activity` has a date.** The store's `tasks` is only ever today —
-`resetDailyTasks()` wipes it and nothing survives. One row per student per day
+`resetDailyTasks()` wipes it and nothing survives. (That was an ASPIRATION until
+the pre-login review: the function had no caller, so `tasks` accumulated forever
+and every day's row inherited stale flags. `tasksDate` + `rolloverDailyTasks()`
+are what make the sentence true — see that section below.) One row per student per day
 is the "daily activity log" that `features/progress/demo-data.ts` and
 `utils/leaderboard.ts` both name as the missing piece before the heatmap and the
 study-time board can stop being demo data. Its `questions_answered` /
@@ -472,6 +475,11 @@ thing. Two invariants worth re-checking after any change to the store:
 
 Both were verified mechanically when this landed — 21/21 fields, 74/74 columns
 across 8 tables — and both are the kind of thing that rots quietly.
+
+`tasksDate` is listed in `syncRelevantChange` although it has NO column of its
+own — `daily_activity` keys on `activity_date`, which the push derives itself.
+It is there so the two lists stay the same length and the next person auditing
+them finds a one-to-one, rather than a gap they have to reason about.
 
 `@supabase/ssr` is in `package.json` and is unused: it is for frameworks with a
 server-rendered request cycle, which this app does not have. Safe to remove.
@@ -3016,7 +3024,8 @@ normally. `partialize` is a named function purely so `merge` can borrow its type
 **Survey persists across reloads**, same as Login — `surveyed` and `userData`
 are in `lib/store.ts`'s `partialize` (`lang`, `userName`/`userEmail`/`userAge`/
 `userLocation`, `userLanguage`, `surveyed`, `userData`, `pendingPlacementTests`,
-`commitment`, `pledgeSeen`, `xp`, `level`, `streak`, `tasks`, `examResults`,
+`commitment`, `pledgeSeen`, `xp`, `level`, `streak`, `tasks`, `tasksDate`,
+`examResults`,
 `conversations`, `activeConversationId`; `chatOpen`/`drawerOpen`/`pledgeOpen` deliberately
 excluded as UI state). This reverses the original app's behavior; it was
 explicitly changed once Logout existed. The only way back to a blank
@@ -3125,6 +3134,213 @@ some networks (browser `err_name_not_resolved` even though server-side curl
 worked), breaking the avatars outright. There is no live-generation fallback
 anymore, so adding a new `avatarSeed` means downloading a matching SVG into
 `public/avatars/` too.
+
+## The pre-login review — six live bugs, and what it deliberately left
+
+A whole-codebase review run before real login is built, on the reasoning that
+these are cheaper to fix now than once accounts exist. Two things it CHECKED and
+found clean, worth recording so nobody re-audits them: all 23 multi-field store
+selectors use `useShallow` (zero violations of the infinite-loop pattern below),
+and there is no render-phase `setState`, no effect loop and no unguarded storage
+access anywhere in `src/`.
+
+### `tasks` is TODAY's checklist, and nothing was making that true
+
+**`resetDailyTasks` had NO CALLER.** Not one, anywhere in the repo — only its own
+definition and three comments (in the SQL migration, in `supabase-sync.ts`, and
+in this file) asserting that it ran. `completeTask` is a one-way latch
+(`if (state.tasks[task]) return state`) and `tasks` is persisted, so:
+
+- Home's daily checklist and Roadmap's Daily Mission were permanently ticked
+  after a student's first lesson, forever.
+- The 20 XP per task was a ONCE-IN-A-LIFETIME award, not a daily one — which
+  quietly removes the daily loop the whole gamification design rests on.
+- `daily_activity` wrote those stale flags onto every future day's row, poisoning
+  the very activity log `features/progress/demo-data.ts` names as the thing that
+  has to exist before the heatmap can stop being demo data.
+
+**`tasksDate` is the fix and the whole mechanism.** A persisted `YYYY-MM-DD`
+stamp beside `tasks`; `rolloverDailyTasks()` clears when it is not today;
+`completeTask` stamps it and also rolls over itself, so finishing a task on a new
+day cannot add to yesterday's row. `AppShell` calls the rollover on mount AND on
+`visibilitychange` — a phone left open overnight never remounts, so waking the
+tab is the only moment it gets to notice. The action returns the state object
+unchanged when there is nothing to do, so a quiet wake publishes no store update
+and schedules no push. `pullRemoteState` sets `tasksDate` too: the row it read
+IS today's, and without the stamp the rollover would wipe the checklist it just
+pulled and look like the pull failing.
+
+A brand-new key with a default needs no `version` bump — see `merge()`.
+
+### One day helper, because two definitions of "today" had already diverged
+
+`utils/day.ts` (`todayKey`, `addDaysKey`) is now the ONLY way a calendar day is
+computed. It existed as a private helper in `supabase-sync.ts` carrying the
+comment explaining why UTC is wrong for a Phnom Penh student — and two other
+files then re-derived the same thing in UTC anyway.
+
+**`utils/spaced-repetition.ts` was the one that mattered.** `toDateKey` was
+`toISOString().slice(0, 10)` (UTC) while `addDays` did its arithmetic in LOCAL
+time and then formatted in UTC — worse than either alone. In UTC+7, for anyone
+studying between midnight and 07:00: every interval landed a day short, and a
+card graded "again" at 05:00 got `dueAt` = today and came due again at 07:00 the
+SAME MORNING, which is exactly what `AGAIN_INTERVAL_DAYS` was written to prevent.
+Verified with a real browser at `Asia/Phnom_Penh` 05:00: `dueAt` is now the next
+day. `features/practice/review.ts`'s `reviewedTodayCount` was sliced the same way
+on both sides — self-consistent, and consistently seven hours out; it now parses
+`lastReviewedAt` (a full ISO INSTANT) back and re-derives the LOCAL day.
+
+**The rule: never `toISOString().slice(0, 10)` for a date key.** A full ISO
+timestamp for an instant is fine and untouched.
+
+No migration for existing `cardReviews`: the shift is at most a day, and due-ness
+prioritises rather than gates.
+
+### `/lessons/:lessonId` was the one route that did not guard its param
+
+`getLessonData` did `LESSONS[cat][topic]` bare, so any unknown id threw during
+render. Every sibling already resolved-then-redirected
+(`pages/section-detail.tsx` is the pattern). The lookup is now
+`lessonDataFor(lessonId): Lesson | null` in `data/lessons.ts`, the PAGE resolves
+and `<Navigate>`s, and `LessonDetail` takes the resolved lesson as a PROP — so by
+the time it mounts the lesson is known to exist.
+
+### There was no error boundary at all
+
+Which is what turned the above into a blank app rather than a bad route. And
+reloading does not fix it: the store is PERSISTED, so a throw caused by stored
+state reproduces on every reload, and a phone has no devtools to clear storage
+from. `components/error-boundary.tsx` wraps `<Routes>` in `app.tsx` and offers
+two escapes — Reload, and a two-tap-confirmed **clear saved data** that removes
+`localStorage["brachnha"]` and deliberately LEAVES `localStorage["brachnha-auth"]`
+alone, so the account survives and the sync layer's empty-store-plus-session path
+can pull it straight back. Bilingual rather than Khmer-only: it has to be
+readable at the one moment the app cannot tell you which language was chosen.
+
+Outside `<Routes>`, not per-route: a boundary inside the shell would keep
+rendering the navigation that may itself be what threw.
+
+### Two smaller ones
+
+**`ChatMsg` grew an optional `id`, and the overlay keys on it.** The list is not
+append-only — `addChatMsg` caps with `slice(-40)`, which drops from the FRONT, so
+past 40 messages every index shifts and an index key had React reuse a bubble's
+DOM node for a different message. Optional because messages already in
+localStorage predate it and ones restored from Supabase have none (the table
+stores `seq`/`role`/`content`, and this is not worth a migration); those keep the
+index fallback, which is correct for history that cannot move again.
+
+**`quiz-runner.tsx` had the documented React Compiler crash latent in it.**
+`questions[index]` is undefined once `finish()` sets `index = total`, `done` was
+handled by a JSX ternary rather than an early return, and `answerQuestion` read
+`question.correct`. It was not throwing — the compiler was taking the whole-object
+dependency because the JSX reads several properties — but it was one refactor from
+the narrowed path. `QuizSummary` was extracted so `if (done) return` can sit ABOVE
+the closure. Same shape as `EmptyQueue` in `review-session.tsx`, same reason.
+
+### What the review deliberately did NOT do
+
+**The push is destructive and the pull fires once, into an empty store.** Today
+anonymous auth guarantees one device is one account, so this is invisible. The
+moment two devices share a uid, a device that already has local data has
+`userName !== ""` and therefore takes the PUSH path, never the pull — and that
+push deletes every server conversation not in its local list, prunes
+`pending_placement_tests`, overwrites `xp`/`level`/`coins`/`streak` with its own
+values, and overwrites today's `daily_activity` row. There is no `updated_at`
+comparison and no merge anywhere, so the last device to become visible wins and
+the other's work is gone.
+
+Alongside it: `cardReviews`/`studentCards`/`starredCards`/`reviewHistory` never
+leave the device, so roaming loses every student-authored card and the whole
+review schedule; `handle_new_user` is `after insert` only so `profiles.email`
+never follows `auth.users.email`; `profiles.email` has no unique constraint; and
+`profiles` has no DELETE policy, so a client can never clean up the losing side of
+an account merge.
+
+**Decide the merge strategy before writing the login screen, not after.**
+
+## Auth: three seams added for the login that is coming
+
+None of these change behaviour today. Each removes a trap that would otherwise be
+found the hard way during the login work.
+
+**`onAuthStateChange` is now subscribed.** There was no listener anywhere, and the
+identity effect only ever re-runs on `hasName` — so a token refresh failing, a
+session expiring, a sign-out in another tab, and a session arriving from a link
+were all invisible. It handles `SIGNED_OUT` (drop the caches) and `SIGNED_IN`
+(push, if a name exists). **Anything it does that touches the client is deferred
+to a fresh task**: Supabase runs the callback while holding its own auth lock and
+calling back in from inside it can deadlock.
+
+**Pushes are serialized and coalesced through `runPush`, at module scope.** Three
+things can start one — the identity effect, the debounced subscription, the auth
+listener — and the only guard used to be a `flushing` boolean local to one of
+them. That matters because `pushConversations` clears a conversation's messages
+and re-inserts them: two pushes interleaving there can land a delete after the
+other's insert and drop a reply. Coalesced rather than queued, because a push
+always writes the current full snapshot; the `do/while` is what guarantees the
+last request still sees the latest store.
+
+**`signOutAccount()` makes sign-out explicit.** It was INFERRED — the identity
+effect noticed `userName` had gone empty while it was already running and
+concluded logout must have caused it, which holds only while a session and a name
+are the same fact. `profile-view.tsx` calls it directly now; the inference stays
+as a backstop. **`scope: "local"`**, deliberately: an anonymous account has no
+other sessions to revoke, and a local sign-out needs no network, so it still works
+offline — a global sign-out that failed offline would leave the session in
+storage, and the next reload would read "credentials but no study data" as a fresh
+install and PULL BACK the account the student just left. Not awaited at the call
+site, so the student is not watching a spinner on bad mobile data; it never
+throws. Verified end to end: session cleared, no failed requests, and the logout
+still stuck after a reload.
+
+**`detectSessionInUrl` is now `true`.** It was off on the reasoning that nothing
+redirects into this app. True, and it is also the switch that silently breaks
+every flow that does: email confirmation, magic links, password reset and OAuth
+all deliver the session in the URL, and with it off the link lands and does
+nothing, with no error to search for. That includes `updateUser({ email })`, the
+anonymous-to-permanent upgrade this whole design aims at.
+
+**`pullRemoteState`'s docstring was wrong** and is corrected. It claimed a `false`
+return meant the caller pushes instead. The caller ignores the value — and must,
+since that path only runs on an EMPTY store, so a push would upload a blank
+account over a real one. The recovery is that the student stays on Login, types a
+name, and the ordinary push path takes over.
+
+## The chat endpoint is public — what now bounds it
+
+`/api/chat` is unauthenticated by design and has no CORS restriction, so the
+per-IP limiter is the only gate. Three holes were closed.
+
+**Six profile fields reached the system prompt uncleaned** — `language`, `level`,
+`xp`, `streak`, `avgExamPct`, `examCount`. `ChatProfile` types five of them as
+numbers, but the handler builds the profile by spreading the PARSED REQUEST BODY
+over its defaults, so the type describes the intended caller rather than the
+value. `{"profile":{"xp":"<50KB of instructions>"}}` landed verbatim inside the
+model's instructions — past the 2000-char message cap, past `MAX_HISTORY`, and
+past `PROMPT_BUDGET_CHARS`, which only warns and never truncates. `cleanNumber`
+now type-checks AND clamps each one, `language` is a two-value whitelist rather
+than a `clean()`, and `cleanList` takes `unknown`. Verified against the real
+module through `ssrLoadModule`: hostile fields are dropped entirely and an honest
+profile still renders in full.
+
+**Nothing bounded the request body.** `req.json()` parsed all of it before any
+limit applied — `MAX_HISTORY` and `MAX_MESSAGE_CHARS` bound what reaches the
+MODEL, not what reaches memory. Now `MAX_BODY_BYTES` (64KB) is checked against
+`content-length` first and then against the bytes actually read (a chunked request
+carries no length), and `MAX_MESSAGES` (100) rejects rather than slices. The Vite
+dev bridge stops accumulating at the same cap but keeps DRAINING the socket —
+abandoning a half-read body is how a dev server ends up with a hung connection.
+Measured: 413 with a length, 400 chunked.
+
+**The rate limiter keyed on `x-forwarded-for`,** which any caller can set — a
+limiter keyed on a client-supplied header hands a fresh bucket to anyone who
+varies it. `x-vercel-forwarded-for` is set by the platform and is tried FIRST now,
+with the old chain as the fallback for other hosts.
+
+The limiter's whole-map sweep on every request is left alone with a comment: it
+is per-instance anyway, so at the scale where the sweep costs anything the answer
+is a shared store, not a faster sweep.
 
 ## Bugs found and fixed during the build (know these patterns)
 

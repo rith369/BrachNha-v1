@@ -55,10 +55,23 @@ export function getSupabase(): Promise<SupabaseClient<Database> | null> {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
-        // No OAuth or magic-link redirects reach this app, so there is never a
-        // session in the URL to find. Leaving it on makes the client parse
-        // location on every load for a case that cannot happen.
-        detectSessionInUrl: false,
+        // ON, although nothing redirects into this app YET.
+        //
+        // This was off, reasoning that anonymous sign-in never puts a session
+        // in the URL so parsing location was wasted work. True, and it is also
+        // the switch that silently breaks every flow that DOES arrive that way:
+        // email confirmation, magic links, password reset and OAuth all hand
+        // the session over in the URL, and with this off the link lands on the
+        // app and simply does nothing, with no error anywhere to explain it.
+        //
+        // That includes the one upgrade this whole design is aimed at —
+        // updateUser({ email }) converting the anonymous user into a permanent
+        // one needs its confirmation link to come back through here.
+        //
+        // The cost of having it on today is one check of location on load for a
+        // case that cannot yet happen. The cost of having it off on the day it
+        // can is a debugging session with no symptom to search for.
+        detectSessionInUrl: true,
         // Its own key, deliberately separate from the store's "brachnha" key.
         // The session is credentials with an expiry; the store is study data.
         // Clearing one must never be able to take the other with it.

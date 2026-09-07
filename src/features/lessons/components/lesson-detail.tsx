@@ -11,7 +11,7 @@ import {
   focusLabel,
   focusOption,
 } from "@/utils/focus-styles";
-import { LESSONS, FOUNDATION, FLASHCARDS, PRACTICE } from "@/data/lessons";
+import { FLASHCARDS, PRACTICE } from "@/data/lessons";
 import type { Lesson } from "@/types";
 
 // Three.js + react-three-fiber + drei together are a meaningfully large
@@ -25,13 +25,6 @@ const BrainModelViewer = lazy(() =>
 
 const TOTAL_STEPS = 6;
 
-function getLessonData(lessonId: string): Lesson {
-  if (lessonId === "math-foundation") return FOUNDATION.math;
-  if (lessonId === "biology-foundation") return FOUNDATION.biology;
-  const [cat, topic] = lessonId.split("-");
-  return LESSONS[cat][topic];
-}
-
 function getCategoryAndTopic(lessonId: string) {
   const cat = lessonId.split("-")[0];
   const topic = lessonId.includes("foundation")
@@ -40,7 +33,20 @@ function getCategoryAndTopic(lessonId: string) {
   return { cat, topic };
 }
 
-export function LessonDetail({ lessonId }: { lessonId: string }) {
+/**
+ * `lesson` is resolved by the ROUTE (pages/lesson-detail.tsx) and passed in,
+ * rather than looked up here from the id. This component used to do the lookup
+ * itself with no guard, which meant an unknown id threw during render; the page
+ * now redirects instead, and by the time this mounts the lesson is known to
+ * exist. Same split pages/section-detail.tsx already uses for a section.
+ */
+export function LessonDetail({
+  lessonId,
+  lesson,
+}: {
+  lessonId: string;
+  lesson: Lesson;
+}) {
   const navigate = useNavigate();
   const { lang, completeTask, completeSession } = useBrachNhaStore(
     useShallow((s) => ({
@@ -55,7 +61,7 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
   const [flipped, setFlipped] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
 
-  const ld = getLessonData(lessonId);
+  const ld = lesson;
   const { cat, topic } = getCategoryAndTopic(lessonId);
   const cards = (FLASHCARDS[cat] || []).filter((c) => c.topic === topic);
   const question = (PRACTICE[cat] || [])[0];

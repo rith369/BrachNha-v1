@@ -19,6 +19,7 @@ import {
   type ReviewState,
 } from "@/utils/spaced-repetition";
 import { FLASHCARD_XP, FLASHCARD_COINS } from "@/utils/rewards";
+import { todayKey } from "@/utils/day";
 
 export type {
   Lang,
@@ -100,6 +101,22 @@ interface BrachNhaState {
   coins: number;
   streak: number;
   tasks: Tasks;
+  /**
+   * The local calendar day (`YYYY-MM-DD`) `tasks` describes.
+   *
+   * `tasks` is meant to be TODAY's checklist and nothing else — Home's daily
+   * checklist, Roadmap's Daily Mission and daily_activity's one-row-per-day all
+   * assume it. It was never true: `resetDailyTasks` existed but had no caller
+   * anywhere in the repo, and `completeTask` is a one-way latch, so a student's
+   * first finished lesson left `tasks.lesson` ticked forever, its 20 XP was a
+   * once-in-a-lifetime award rather than a daily one, and every future day's
+   * activity row inherited the stale flags.
+   *
+   * This is the stamp that makes the reset possible: `rolloverDailyTasks()`
+   * compares it to `todayKey()` and clears when they differ. Empty string means
+   * "no tasks have been completed yet", which needs no reset.
+   */
+  tasksDate: string;
   examResults: ExamResult[];
   /**
    * Lesson ids the student has finished, which is what turns a session node on
@@ -212,6 +229,9 @@ interface BrachNhaState {
   toggleStarredCard: (cardId: string) => void;
   addExamResult: (result: ExamResult) => void;
   resetDailyTasks: () => void;
+  /** Clears `tasks` if `tasksDate` is not today. Idempotent and cheap, so the
+   *  caller can run it on mount and on every tab-visible without a guard. */
+  rolloverDailyTasks: () => void;
   setTheme: (theme: Theme) => void;
   setChatOpen: (open: boolean) => void;
   setDrawerOpen: (open: boolean) => void;
@@ -308,6 +328,7 @@ const partializeState = (state: BrachNhaState) => ({
   coins: state.coins,
   streak: state.streak,
   tasks: state.tasks,
+  tasksDate: state.tasksDate,
   examResults: state.examResults,
   completedSessions: state.completedSessions,
   cardReviews: state.cardReviews,
@@ -353,6 +374,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
        */
       streak: DEMO_SEED_STREAK,
       tasks: emptyTasks,
+      tasksDate: "",
       examResults: [],
       completedSessions: [],
       cardReviews: {},
@@ -412,9 +434,16 @@ export const useBrachNhaStore = create<BrachNhaState>()(
 
       completeTask: (task) =>
         set((state) => {
-          if (state.tasks[task]) return state; // already done, no-op
+          // Roll the day over first, so finishing a task on a new day clears
+          // yesterday's ticks rather than adding to them. Without this, a
+          // student whose tab has been open since yesterday would find the
+          // task already "done" and earn nothing for real work.
+          const today = todayKey();
+          const rolled = state.tasksDate === today ? state.tasks : emptyTasks;
+          if (rolled[task]) return state; // already done today, no-op
           return {
-            tasks: { ...state.tasks, [task]: true },
+            tasks: { ...rolled, [task]: true },
+            tasksDate: today,
             ...award(state, 20),
           };
         }),
@@ -505,7 +534,23 @@ export const useBrachNhaStore = create<BrachNhaState>()(
             : { starredCards: [...state.starredCards, cardId] }
         ),
 
-      resetDailyTasks: () => set({ tasks: emptyTasks }),
+      resetDailyTasks: () =>
+        set({ tasks: emptyTasks, tasksDate: todayKey() }),
+
+      // The caller is AppShell, on mount and on every visibilitychange — a
+      // phone left open overnight has to roll over too, and "hidden → visible"
+      // is the only reliable moment a backgrounded tab gets to notice.
+      // Returns the state object unchanged when there is nothing to do, so
+      // zustand publishes no update and the sync layer schedules no push.
+      rolloverDailyTasks: () =>
+        set((state) => {
+          const today = todayKey();
+          if (state.tasksDate === today) return state;
+          // No tasks completed yet: stamp the day and leave the (already
+          // empty) checklist alone, so a fresh install does not look like a
+          // rollover that just happened.
+          return { tasks: emptyTasks, tasksDate: today };
+        }),
 
       addExamResult: (result) =>
         set((state) => ({ examResults: [...state.examResults, result] })),
@@ -521,9 +566,14 @@ export const useBrachNhaStore = create<BrachNhaState>()(
 
       // Creates the conversation lazily on the first message, so "New chat"
       // never leaves an empty row in the history list.
-      addChatMsg: (msg) =>
+      addChatMsg: (rawMsg) =>
         set((state) => {
           const now = new Date().toISOString();
+          // Stamped here rather than at the call site so every message gets one
+          // from the single place messages are created — the overlay's key
+          // depends on it, and a caller that forgot would silently fall back to
+          // the index key this exists to replace.
+          const msg: ChatMsg = { ...rawMsg, id: rawMsg.id ?? newId() };
           const active = state.conversations.find(
             (c) => c.id === state.activeConversationId
           );
@@ -621,6 +671,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           coins: 0,
           streak: DEMO_SEED_STREAK,
           tasks: emptyTasks,
+          tasksDate: "",
           examResults: [],
           completedSessions: [],
           cardReviews: {},

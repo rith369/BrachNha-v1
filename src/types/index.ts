@@ -50,6 +50,21 @@ export interface Commitment {
 export interface ChatMsg {
   role: "user" | "bot";
   text: string;
+  /**
+   * A stable React key for the bubble. OPTIONAL because messages already sitting
+   * in a student's localStorage predate it and messages restored from Supabase
+   * have none either — the chat_messages table stores `seq`, `role` and
+   * `content`, and this is not worth a migration to add.
+   *
+   * It exists because the list is NOT append-only: addChatMsg caps a
+   * conversation with `slice(-40)`, which drops from the FRONT, so past 40
+   * messages every remaining message's index shifts by one. The overlay used to
+   * key on that index, which had React reuse each bubble's DOM node for a
+   * different message — wrong text against an in-flight KaTeX render. Rendering
+   * falls back to the index when this is absent, which is correct for history
+   * that is already painted and will not move again.
+   */
+  id?: string;
 }
 
 // One saved conversation with KruAI. Conversations are created lazily —

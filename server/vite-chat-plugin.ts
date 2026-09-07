@@ -23,15 +23,34 @@ const ROUTE = "/api/chat";
 /** The shape server/chat-handler.ts exports, as seen through ssrLoadModule. */
 type ChatModule = { handleChat: (req: Request) => Promise<Response> };
 
+/** Mirrors MAX_BODY_BYTES in chat-handler.ts. Duplicated rather than imported
+ *  because this file is loaded by the Vite config, outside the graph that
+ *  ssrLoadModule builds — importing the handler here is exactly what the plugin
+ *  is written to avoid.
+ *
+ *  Past the cap the accumulated body is dropped and the handler sees an empty
+ *  one. Its own content-length check answers 413 for an ordinary client; a
+ *  chunked request carries no length, so that lands on the parse failure and
+ *  answers 400 instead. Either way nothing large is held, which is the point —
+ *  this bound is about the dev server's memory, not its status codes. */
+const MAX_BODY_BYTES = 64 * 1024;
+
 /** Node's IncomingMessage -> the web Request that handleChat() expects. */
 async function toWebRequest(
   req: Connect.IncomingMessage,
   origin: string
 ): Promise<Request> {
   const chunks: Buffer[] = [];
+  let total = 0;
   for await (const chunk of req) {
-    chunks.push(chunk as Buffer);
+    const buf = chunk as Buffer;
+    total += buf.length;
+    // Stop ACCUMULATING, but keep draining the socket: abandoning a half-read
+    // request body mid-stream is how a dev server ends up with a hung
+    // connection instead of a clean error.
+    if (total <= MAX_BODY_BYTES) chunks.push(buf);
   }
+  if (total > MAX_BODY_BYTES) chunks.length = 0;
 
   const headers = new Headers();
   for (const [key, value] of Object.entries(req.headers)) {

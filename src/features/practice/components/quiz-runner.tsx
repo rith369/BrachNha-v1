@@ -68,13 +68,45 @@ export function QuizRunner({
 
   const total = questions.length;
   const done = index >= total;
-  const question = questions[index];
   const answer = answers[index] ?? null;
   const score = questions.filter((q, i) => answers[i] === q.correct).length;
 
   function exit() {
     navigate(`/practice/${mode}/${subjectId}`);
   }
+
+  function finish() {
+    // The SAME `tasks.practice` field Home's daily checklist and Roadmap's Daily
+    // Mission read, so a finished quiz is one real completion rather than a
+    // second tracker beside the self-reported one.
+    completeTask("practice");
+    setIndex(total);
+  }
+
+  /**
+   * THIS EARLY RETURN MUST STAY ABOVE `answerQuestion` — it is not stylistic.
+   *
+   * `questions[index]` is undefined once `finish()` sets `index = total`, and
+   * `answerQuestion` reads INTO it (`question.correct`). The React Compiler
+   * narrows a closure's memo dependency to the exact property path it reads and
+   * emits that check where the closure is BUILT, which is above any guard that
+   * comes later in source order — so a guard expressed only as a JSX ternary
+   * (which is what this used to be) protects nothing, and the dependency check
+   * throws on the render after the final answer.
+   *
+   * That is the crash documented in review-session.tsx, which is why the
+   * terminal screen is a separate component here: it makes the guard a one-line
+   * return that can sit above the closure. Neither tsc nor oxlint can see this,
+   * and it only reproduces on the LAST question — so exercise the end of the
+   * flow after touching this file.
+   */
+  if (done) {
+    return (
+      <QuizSummary score={score} total={total} title={title} onExit={exit} />
+    );
+  }
+
+  const question = questions[index];
 
   /**
    * Reward figures and the reasoning behind them live in utils/rewards.ts,
@@ -92,17 +124,7 @@ export function QuizRunner({
     if (option === question.correct) addXp(QUIZ_XP, QUIZ_COINS);
   }
 
-  function finish() {
-    // The SAME `tasks.practice` field Home's daily checklist and Roadmap's Daily
-    // Mission read, so a finished quiz is one real completion rather than a
-    // second tracker beside the self-reported one.
-    completeTask("practice");
-    setIndex(total);
-  }
-
-  const footer = done ? (
-    <FocusButton onClick={exit}>← ត្រឡប់</FocusButton>
-  ) : (
+  const footer = (
     // Disabled until answered rather than absent: a button that appears out of
     // nowhere shifts the layout under the student's thumb.
     <FocusButton
@@ -115,95 +137,122 @@ export function QuizRunner({
 
   return (
     <FocusLayout
-      progressPct={(Math.min(index, total) / total) * 100}
+      progressPct={(index / total) * 100}
       onExit={exit}
-      // Absent on the first question (the X is the only way out) and on the
-      // completion screen, where the quiz is already banked.
-      onBack={index > 0 && !done ? () => setIndex(index - 1) : undefined}
+      // Absent on the first question — the X is the only way out there.
+      onBack={index > 0 ? () => setIndex(index - 1) : undefined}
       showStats
-      meta={`${toKhmerDigits(Math.min(index + 1, total))} / ${toKhmerDigits(total)}`}
+      meta={`${toKhmerDigits(index + 1)} / ${toKhmerDigits(total)}`}
       footer={footer}
     >
-      {done ? (
-        <div className="text-center">
-          <Trophy
-            className="mx-auto mb-3 size-14 text-yellow md:mb-5 md:size-20"
-            strokeWidth={2}
-          />
-          <div className="font-heading mb-2.5 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent md:text-3xl">
-            បញ្ចប់ Quiz!
-          </div>
-          <div className="mx-auto mb-3 w-fit rounded-2xl bg-brand px-6 py-3 text-center text-white">
-            <div className="text-lg font-extrabold">
-              {toKhmerDigits(score)} / {toKhmerDigits(total)}
-            </div>
-            <div className="text-xs font-bold opacity-90">ចម្លើយត្រឹមត្រូវ</div>
-          </div>
-          <div className="text-xs font-bold text-muted">{title}</div>
+      <div>
+        <div className="mb-3 flex items-center gap-1.5 text-xs font-extrabold text-muted md:mb-4 md:text-sm">
+          <ListChecks className="size-4 shrink-0" strokeWidth={2.5} />
+          Quiz
         </div>
-      ) : (
-        <div>
-          <div className="mb-3 flex items-center gap-1.5 text-xs font-extrabold text-muted md:mb-4 md:text-sm">
-            <ListChecks className="size-4 shrink-0" strokeWidth={2.5} />
-            Quiz
+
+        <div className={focusCard}>
+          {question.scenario && (
+            <p className={`mb-3 whitespace-pre-line text-muted ${focusBody}`}>
+              {question.scenario}
+            </p>
+          )}
+          <div className={`mb-4 md:mb-6 ${focusPrompt}`}>{question.q}</div>
+
+          <div className="flex flex-col gap-2 md:gap-3">
+            {question.options.map((opt) => {
+              // `correct` is compared by string equality, so an option's
+              // ក./ខ./គ./ឃ. prefix has to be carried in the data's `correct`
+              // too — see SectionQuestion in types/index.ts.
+              const state = !answer
+                ? "neutral"
+                : opt === question.correct
+                  ? "correct"
+                  : opt === answer
+                    ? "wrong"
+                    : "neutral";
+              return (
+                <button
+                  key={opt}
+                  disabled={!!answer}
+                  onClick={() => answerQuestion(opt)}
+                  className={
+                    focusOption +
+                    " " +
+                    (state === "correct"
+                      ? "border-mint/40 bg-mint/10 text-mint"
+                      : state === "wrong"
+                        ? "border-pink/40 bg-pink/10 text-pink"
+                        : "border-purple/10 bg-surface text-text hover:bg-purple/5")
+                  }
+                >
+                  {opt}
+                </button>
+              );
+            })}
           </div>
 
-          <div className={focusCard}>
-            {question.scenario && (
-              <p className={`mb-3 whitespace-pre-line text-muted ${focusBody}`}>
-                {question.scenario}
-              </p>
-            )}
-            <div className={`mb-4 md:mb-6 ${focusPrompt}`}>{question.q}</div>
-
-            <div className="flex flex-col gap-2 md:gap-3">
-              {question.options.map((opt) => {
-                // `correct` is compared by string equality, so an option's
-                // ក./ខ./គ./ឃ. prefix has to be carried in the data's `correct`
-                // too — see SectionQuestion in types/index.ts.
-                const state = !answer
-                  ? "neutral"
-                  : opt === question.correct
-                    ? "correct"
-                    : opt === answer
-                      ? "wrong"
-                      : "neutral";
-                return (
-                  <button
-                    key={opt}
-                    disabled={!!answer}
-                    onClick={() => answerQuestion(opt)}
-                    className={
-                      focusOption +
-                      " " +
-                      (state === "correct"
-                        ? "border-mint/40 bg-mint/10 text-mint"
-                        : state === "wrong"
-                          ? "border-pink/40 bg-pink/10 text-pink"
-                          : "border-purple/10 bg-surface text-text hover:bg-purple/5")
-                    }
-                  >
-                    {opt}
-                  </button>
-                );
-              })}
-            </div>
-
-            {answer && (
-              <Callout
-                tone={answer === question.correct ? "mint" : "pink"}
-                icon={answer === question.correct ? CircleCheck : CircleX}
-                label={
-                  answer === question.correct ? "ត្រឹមត្រូវ!" : "មិនត្រឹមត្រូវ"
-                }
-                className="mt-3 md:mt-4"
-              >
-                <p className={focusBody}>{question.explanation}</p>
-              </Callout>
-            )}
-          </div>
+          {answer && (
+            <Callout
+              tone={answer === question.correct ? "mint" : "pink"}
+              icon={answer === question.correct ? CircleCheck : CircleX}
+              label={
+                answer === question.correct ? "ត្រឹមត្រូវ!" : "មិនត្រឹមត្រូវ"
+              }
+              className="mt-3 md:mt-4"
+            >
+              <p className={focusBody}>{question.explanation}</p>
+            </Callout>
+          )}
         </div>
-      )}
+      </div>
+    </FocusLayout>
+  );
+}
+
+/**
+ * The completion screen, extracted so QuizRunner's `if (done) return` can be a
+ * one-line guard placed above the closures that read into `questions[index]`.
+ * See the comment on that return — this component exists for that reason, not
+ * because the markup needed reusing.
+ */
+function QuizSummary({
+  score,
+  total,
+  title,
+  onExit,
+}: {
+  score: number;
+  total: number;
+  title: string;
+  onExit: () => void;
+}) {
+  return (
+    <FocusLayout
+      progressPct={100}
+      onExit={onExit}
+      // No onBack: the quiz is already banked, and stepping back into it would
+      // put answered questions back on screen with nothing left to do.
+      showStats
+      meta={`${toKhmerDigits(total)} / ${toKhmerDigits(total)}`}
+      footer={<FocusButton onClick={onExit}>← ត្រឡប់</FocusButton>}
+    >
+      <div className="text-center">
+        <Trophy
+          className="mx-auto mb-3 size-14 text-yellow md:mb-5 md:size-20"
+          strokeWidth={2}
+        />
+        <div className="font-heading mb-2.5 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent md:text-3xl">
+          បញ្ចប់ Quiz!
+        </div>
+        <div className="mx-auto mb-3 w-fit rounded-2xl bg-brand px-6 py-3 text-center text-white">
+          <div className="text-lg font-extrabold">
+            {toKhmerDigits(score)} / {toKhmerDigits(total)}
+          </div>
+          <div className="text-xs font-bold opacity-90">ចម្លើយត្រឹមត្រូវ</div>
+        </div>
+        <div className="text-xs font-bold text-muted">{title}</div>
+      </div>
     </FocusLayout>
   );
 }

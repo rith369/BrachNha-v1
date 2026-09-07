@@ -6,6 +6,7 @@ import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { useT } from "@/data/translations";
 import type { TranslationKey } from "@/data/translations";
+import { signOutAccount } from "@/hooks/use-supabase-sync";
 
 export function ProfileView() {
   const { lang, userName, userLanguage, userData, logout } = useBrachNhaStore(
@@ -19,6 +20,23 @@ export function ProfileView() {
   );
   const t = useT(lang);
   const [confirming, setConfirming] = useState(false);
+
+  /**
+   * Ends the Supabase session as well as clearing the store. The two used to be
+   * coupled by inference — the sync hook watched for `userName` going empty and
+   * concluded a logout had happened — which works only while a session and a
+   * name mean the same thing, and stops working the day this app has a real
+   * login. See signOutAccount in hooks/use-supabase-sync.ts.
+   *
+   * Not awaited: the store clear is what the student can see, and making them
+   * watch a spinner on Cambodian mobile data before their own logout takes
+   * effect would be the wrong trade. signOutAccount never throws and signs out
+   * LOCALLY, so it needs no network to succeed.
+   */
+  function confirmLogout() {
+    void signOutAccount();
+    logout();
+  }
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-36 lg:pb-10">
@@ -73,7 +91,7 @@ export function ProfileView() {
               {lang === "en" ? "Cancel" : "បោះបង់"}
             </button>
             <button
-              onClick={logout}
+              onClick={confirmLogout}
               className="flex-1 rounded-2xl bg-pink px-6 py-3 text-sm font-extrabold text-white"
             >
               {lang === "en" ? "Yes, reset" : "យល់ព្រម"}
