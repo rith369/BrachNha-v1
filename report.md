@@ -19,7 +19,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 7 Sep 2026 — A code review before login: six real bugs fixed, and the app made safer to break
 
-*Landed in commit `TBD`.*
+*Landed in commit `a85670c`.*
 
 **Why.** Ahead of building a real login, we reviewed the whole app for problems
 that would be much harder to fix once students have accounts. The review found
