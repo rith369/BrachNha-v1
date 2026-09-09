@@ -7,8 +7,14 @@ import { StatBar } from "./stat-bar";
 import { LoginView } from "@/features/login/components/login-view";
 import { SurveyView } from "@/features/survey/components/survey-view";
 import { CommitmentOverlay } from "@/features/commitment/components/commitment-overlay";
+import { EntryView } from "@/features/auth/components/entry-view";
+import { AuthSplash } from "@/features/auth/components/auth-splash";
+import { AuthPromptOverlay } from "@/features/auth/components/auth-prompt-overlay";
+import { AccountConflictView } from "@/features/auth/components/account-conflict-view";
 import { useBrachNhaStore } from "@/lib/store";
 import { useSupabaseSync } from "@/hooks/use-supabase-sync";
+import { useAuthSession } from "@/hooks/use-auth-session";
+import { useAuth } from "@/hooks/use-auth";
 
 // The mentor pulls in KaTeX and its web fonts for typesetting replies. It is
 // only mounted when chatOpen is true, but a static import would still ship all
@@ -52,13 +58,22 @@ export function AppShell({
   const lang = useBrachNhaStore((s) => s.lang);
   const theme = useBrachNhaStore((s) => s.theme);
   const rolloverDailyTasks = useBrachNhaStore((s) => s.rolloverDailyTasks);
+  const guestMode = useBrachNhaStore((s) => s.guestMode);
+  const authPrompt = useBrachNhaStore((s) => s.authPrompt);
+  const accountConflict = useBrachNhaStore((s) => s.accountConflict);
 
-  // Signs the student in (anonymously) and keeps the store backed up to
-  // Supabase. Renders nothing and returns nothing — it is mounted here rather
-  // than in a page because it has to outlive every navigation, the same reason
-  // the chat conversation lives in the store. If Supabase is unconfigured or
-  // unreachable it is a no-op and the app stays entirely local, which is the
-  // supported state, not a degraded one.
+  // Resolves who is signed in. The ONLY onAuthStateChange subscriber in the
+  // app, and mounted before the sync hook because the sync hook reads the
+  // identity it publishes.
+  useAuthSession();
+  const { status, isAuthenticated, hasFullAccess } = useAuth();
+
+  // Keeps a signed-in student's store backed up to Supabase. Renders nothing
+  // and returns nothing — mounted here rather than in a page because it has to
+  // outlive every navigation, the same reason the chat conversation lives in
+  // the store. A guest, an unconfigured project or an unreachable one all make
+  // it a no-op, and the app stays entirely local: the supported state, not a
+  // degraded one.
   useSupabaseSync();
 
   // `tasks` is TODAY's checklist, and something has to be the thing that says
@@ -113,10 +128,38 @@ export function AppShell({
     // narrow cap so the content actually fills a laptop. The 1600px ceiling
     // keeps an ultra-wide monitor from stretching cards to absurd widths, and
     // mx-auto centres what's left beyond it.
-    <div className="mx-auto flex h-dvh w-full max-w-lg flex-col overflow-hidden bg-bg md:max-w-3xl lg:max-w-[1600px] lg:flex-row">
-      {!userName ? (
+    <div className="relative mx-auto flex h-dvh w-full max-w-lg flex-col overflow-hidden bg-bg md:max-w-3xl lg:max-w-[1600px] lg:flex-row">
+      {/* ── The gate ───────────────────────────────────────────────────────
+          A ternary chain, in strict priority order. Kept as JSX rather than
+          early returns so nothing above it closes over a possibly-null
+          `authUser` — see the React Compiler note in hooks/use-auth.ts.
+
+          `hasFullAccess` is true when Supabase is unconfigured, which is what
+          skips this whole chain for `npm run preview`, a fresh fork and
+          scripts/shots.mjs: with no project there is no account to have, and
+          the app behaves exactly as it did before auth existed.
+
+          Note the last two conditions apply to AUTHENTICATED students only.
+          A guest falls straight through to the app with no name and no survey,
+          which is the point — and because their `surveyed` was never faked,
+          signing in later walks them through it properly. */}
+      {status === "loading" && !hasFullAccess && !guestMode && !userName ? (
+        <AuthSplash />
+      ) : accountConflict ? (
+        <AccountConflictView />
+      ) : /* `status === "ready"` is load-bearing here, not belt-and-braces.
+             A returning student HAS a name and a session, but the session takes
+             a dynamic import to resolve — so during that window they are
+             "not authenticated and not a guest", and without this they would be
+             thrown onto the entry screen and asked to sign in to the account
+             they are already signed in to. Falling through to the app instead
+             is the whole point of not gating first paint on auth: the only
+             thing that arrives late is whether the locked features unlock. */
+      status === "ready" && !isAuthenticated && !guestMode && !hasFullAccess ? (
+        <EntryView />
+      ) : hasFullAccess && !userName ? (
         <LoginView />
-      ) : !surveyed ? (
+      ) : hasFullAccess && !surveyed ? (
         <SurveyView />
       ) : (
         <>
@@ -177,7 +220,7 @@ export function AppShell({
               {/* !hideMentor here too, not just on the FAB: the effect above
                   closes an open chat, but this makes the overlay unrenderable
                   during an assessment rather than relying on that to have run. */}
-              {chatOpen && !hideMentor && (
+              {chatOpen && !hideMentor && hasFullAccess && (
                 <Suspense fallback={null}>
                   <ChatOverlay />
                 </Suspense>
@@ -185,6 +228,16 @@ export function AppShell({
               {pledgeOpen && <CommitmentOverlay />}
             </div>
           </div>
+          {/* A level ABOVE the relative wrapper, unlike CommitmentOverlay.
+              This one is a translucent scrim rather than an opaque panel, so
+              rendering it inside that wrapper left the StatBar row undimmed
+              along the top edge — visibly a modal sitting "inside" the page.
+              Anchors to the shell root, which carries `relative` for this.
+
+              Rendered conditionally rather than self-hiding, so the component
+              never sees a null feature and needs no internal guard — which
+              keeps the React Compiler's early-return hazard out of it. */}
+          {authPrompt && <AuthPromptOverlay />}
         </>
       )}
     </div>

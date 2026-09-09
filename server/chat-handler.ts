@@ -7,6 +7,7 @@ import { GoogleGenAI } from "@google/genai";
 import type { Lang, ChatMsg } from "../src/types/index.js";
 import { buildSystemPrompt, type ChatProfile } from "../src/utils/chat-prompt.js";
 import { checkRateLimit } from "./rate-limit.js";
+import { isVerificationConfigured, verifyRequestUser } from "./verify-user.js";
 
 /**
  * KruAI endpoint. Started life as a Netlify function, then a Next.js route
@@ -41,13 +42,23 @@ const MAX_HISTORY = 12;
 const MAX_MESSAGE_CHARS = 2000;
 
 /**
- * Per-IP burst cap. This endpoint is public and unauthenticated, so without it
- * anyone who finds the URL can spend the Gemini budget by scripting it. Set
- * well above human use on purpose: a whole classroom often shares one school
- * router's IP, and a limit tuned to "one student" would lock the class out.
- * A script doing thousands a minute still gets stopped.
+ * TWO caps, because there are now two things to defend against.
+ *
+ * The endpoint used to be public and unauthenticated, so one per-IP number had
+ * to do both jobs — and it was deliberately set high (30/min) because a whole
+ * classroom shares one school router's IP and a limit tuned to "one student"
+ * would lock the class out. That compromise is over: a verified user id is a
+ * real per-student key, so the two jobs split.
+ *
+ *   IP   — anti-flood only, in front of the signature check so junk costs
+ *          nothing. High enough that a full classroom never notices it.
+ *   USER — the real quota, and the one a student can actually hit.
+ *
+ * Note both are per serverless instance (see rate-limit.ts), so they are a
+ * guardrail rather than an exact global budget.
  */
-const RATE_LIMIT = 30;
+const IP_RATE_LIMIT = 240;
+const USER_RATE_LIMIT = 20;
 const RATE_WINDOW_MS = 60_000;
 
 /**
@@ -131,6 +142,24 @@ function busyMessage(lang: Lang): string {
     : "⏳ Too many questions at once. Please wait a moment and ask again.";
 }
 
+/**
+ * The 401 body.
+ *
+ * It has to read as a sentence, not as a status: chat-overlay.tsx renders any
+ * non-ok response body verbatim as a KruAI bubble, so "Unauthorized" would
+ * arrive on screen as the mentor's answer to the student's question.
+ *
+ * Deliberately says nothing about WHY. Expired, unsigned, anonymous and absent
+ * are one message to the caller — the distinction is in the server log, where
+ * it helps us, rather than in the response, where it only helps someone
+ * probing the endpoint.
+ */
+function signInMessage(lang: Lang): string {
+  return lang === "km"
+    ? "🔒 សូមចូលគណនីដោយប្រើ Google ដើម្បីសួរសំណួរជាមួយ KruAI។"
+    : "🔒 Please sign in with Google to ask KruAI a question.";
+}
+
 function textResponse(
   body: string,
   status: number,
@@ -187,14 +216,61 @@ export async function handleChat(req: Request): Promise<Response> {
     return textResponse("Too many messages.", 400);
   }
 
-  // Checked before the API-key lookup and before any upstream call, so a flood
-  // costs us nothing. Reuses busyMessage() so a student sees the same wording
-  // whether the limit was ours or Google's — one situation, one message.
-  const rate = checkRateLimit(clientIp(req), RATE_LIMIT, RATE_WINDOW_MS);
-  if (!rate.ok) {
+  // Anti-flood, before the signature check and before any upstream call, so
+  // junk costs us nothing. Reuses busyMessage() so a student sees the same
+  // wording whether the limit was ours or Google's — one situation, one message.
+  const ipRate = checkRateLimit(clientIp(req), IP_RATE_LIMIT, RATE_WINDOW_MS);
+  if (!ipRate.ok) {
     return textResponse(busyMessage(lang), 429, {
-      "Retry-After": String(rate.retryAfterSec),
+      "Retry-After": String(ipRate.retryAfterSec),
     });
+  }
+
+  // ── who is asking ─────────────────────────────────────────────────────────
+  //
+  // Hiding the button in the UI is not a gate; this is. Without it a guest can
+  // spend the Gemini budget with one curl, which is the whole reason the client
+  // sends a bearer token at all.
+  if (!isVerificationConfigured()) {
+    // Unconfigured is a DEVELOPMENT convenience only. In production it would
+    // mean a missing Vercel variable had quietly reopened the endpoint to
+    // everyone, so it fails closed instead — loudly, and in a way that shows up
+    // the first time anyone tries the mentor rather than on a bill.
+    if (process.env.NODE_ENV === "production") {
+      console.error(
+        "[api/chat] refusing to run: no SUPABASE_URL / VITE_SUPABASE_URL, so " +
+          "no request can be authenticated. Set it in the Vercel project and redeploy."
+      );
+      return textResponse(
+        lang === "km"
+          ? "🔒 KruAI មិនអាចប្រើបានបណ្តោះអាសន្ន។ សូមព្យាយាមម្ដងទៀតនៅពេលបន្តិចទៀត។"
+          : "🔒 KruAI is temporarily unavailable. Please try again shortly.",
+        503
+      );
+    }
+    console.warn(
+      "[api/chat] no SUPABASE_URL — skipping token verification. " +
+        "This is allowed in dev only; production fails closed."
+    );
+  } else {
+    const auth = await verifyRequestUser(req);
+    if (!auth.ok) {
+      console.warn(`[api/chat] rejected request: ${auth.reason}`);
+      return textResponse(signInMessage(lang), 401);
+    }
+
+    // The real quota, keyed on the student rather than on their school's
+    // router. Prefixed so a user id can never collide with an IP key.
+    const userRate = checkRateLimit(
+      `u:${auth.userId}`,
+      USER_RATE_LIMIT,
+      RATE_WINDOW_MS
+    );
+    if (!userRate.ok) {
+      return textResponse(busyMessage(lang), 429, {
+        "Retry-After": String(userRate.retryAfterSec),
+      });
+    }
   }
 
   // Without a key the chat degrades to a friendly notice instead of a 500, so

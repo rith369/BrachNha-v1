@@ -3,6 +3,7 @@ import { useLocation } from "react-router";
 import { Bot } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { useFocusMode, useHasBottomNav } from "@/hooks/use-focus-mode";
+import { useRequireAuth } from "@/hooks/use-auth";
 import { cn } from "@/utils/cn";
 
 /**
@@ -39,6 +40,7 @@ function findControlUnder(el: HTMLElement): boolean {
 
 export function FabChat() {
   const setChatOpen = useBrachNhaStore((s) => s.setChatOpen);
+  const requireAuth = useRequireAuth();
   const { pathname } = useLocation();
   // Only ever true here for a LESSON: the shell doesn't render the FAB at all on
   // the two assessments, which are the other focus screens.
@@ -84,7 +86,14 @@ export function FabChat() {
   return (
     <button
       ref={btnRef}
-      onClick={() => setChatOpen(true)}
+      // The FAB stays VISIBLE for a guest and raises the login prompt instead
+      // of opening. Hiding it would leave nothing on screen to say the mentor
+      // exists; this way the lock is the advertisement. The real gate is the
+      // bearer token the endpoint demands — see server/chat-handler.ts.
+      onClick={() => {
+        if (!requireAuth("chat")) return;
+        setChatOpen(true);
+      }}
       aria-label="KruAI"
       className={cn(
         "animate-fab-pulse absolute right-4 z-40 flex size-13 items-center justify-center rounded-full bg-linear-to-br from-[var(--brand-pink)] to-[var(--brand-purple)] shadow-cta-lg transition-opacity duration-150 lg:right-6",

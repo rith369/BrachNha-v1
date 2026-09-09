@@ -49,9 +49,23 @@ export function LoginView() {
   );
   const t = useT(lang);
 
-  const [name, setName] = useState("");
+  // Prefilled from the Google account when there is one.
+  //
+  // PRIMITIVE selectors, not the AuthUser object. Reading `authUser` and then
+  // `user.name` inside a handler is the React Compiler hazard documented in
+  // hooks/use-auth.ts — the compiler narrows the memo dependency to the
+  // property path and checks it where the closure is built, above any guard.
+  // Selecting the strings sidesteps the question entirely, and they are stable
+  // by value so the selector's reference check is happy.
+  const googleName = useBrachNhaStore((s) => s.authUser?.name ?? "");
+  const googleEmail = useBrachNhaStore((s) => s.authUser?.email ?? "");
+
+  // Initial values only — the student can still edit both. useState's initial
+  // argument is read on the first render, which is the one where the session is
+  // already resolved: AppShell does not render this branch until it is.
+  const [name, setName] = useState(googleName);
   const [language, setLanguage] = useState<"" | "english" | "french">("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(googleEmail);
   const [age, setAge] = useState("");
   const [province, setProvince] = useState("");
   const [customLocation, setCustomLocation] = useState("");
@@ -95,6 +109,14 @@ export function LoginView() {
         <div className="text-xs font-bold text-muted">
           {t.createAccountSubtitle}
         </div>
+        {/* Signed in already — this screen is now about the details Google does
+            not know, chiefly the study language, which decides whether English
+            or French appears as a subject throughout the app. */}
+        {googleEmail && (
+          <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-purple/8 px-3 py-1 text-xs font-extrabold text-purple">
+            {t.signedInAs} {googleEmail}
+          </div>
+        )}
       </div>
 
       <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">

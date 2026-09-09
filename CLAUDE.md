@@ -313,9 +313,13 @@ durable.
 ### Current state — it is set up, and there are TWO projects
 
 Since 2 Sep 2026 this is live rather than aspirational: both migrations applied,
-anonymous sign-ins on, `.env` filled, and a real row confirmed reaching
-`profiles`. `npm run db:check` passes all four steps. So do not read the setup
-instructions below as work still outstanding.
+`.env` filled, and a real row confirmed reaching `profiles`. `npm run db:check`
+passes all four steps. So do not read the setup instructions below as work still
+outstanding.
+
+**Identity is Google sign-in now, not anonymous** — see the auth section near the
+end of this file. Nothing calls `signInAnonymously()` any more, so a guest
+creates no `auth.users` row and syncs nothing at all.
 
 **Each developer runs their OWN Supabase project against the same committed
 migrations** — the repo owner's and Hok Chheng's are separate databases with
@@ -375,42 +379,48 @@ device. The costs are not symmetrical, so the tie does not go to the middle.
 `crypto.randomUUID` is unavailable. A uuid column would reject those and every
 id already sitting in a student's localStorage.
 
-### Identity is ANONYMOUS, and that is what keeps the login screen intact
+### Identity is GOOGLE, and anonymous sign-in is gone
 
-`signInAnonymously()` mints a real `auth.users` row with no email and no
-password, so `auth.uid()` exists and RLS works, while the student still just
-types a name and picks a language. BrachNha's "login" has never been an
-authentication step and turning it into one would be a product change nobody
-asked for.
+**This section used to say the opposite.** Until real login landed, sign-in was
+`signInAnonymously()` for anybody with a name in the store: a real `auth.users`
+row with no email and no password, so `auth.uid()` existed and RLS worked while
+the student only typed a name. That is all removed — `signInAnonymouslyOnce` and
+its StrictMode `signInInFlight` guard are deleted, and `use-supabase-sync.ts`
+never creates a session. See the auth section near the end of this file for what
+replaced it.
 
-**This means the sync is a BACKUP, not multi-device sync.** An anonymous session
-lives in one browser's localStorage; a second device gets a different anonymous
-user and an empty account. Real roaming needs
-`supabase.auth.updateUser({ email })` to convert that same user into a permanent
-one — which keeps the uid and therefore every row already written against it.
-Nothing in the schema or `supabase-sync.ts` changes when that happens;
-`use-supabase-sync.ts` is the only file that would.
+Three consequences worth having in mind here:
 
-**An anonymous user has no email, and that surprises people.** The
-Authentication → Users board shows the row with a blank Email column, because
-`auth.users.email` is genuinely empty — that is what anonymous means. The
-address a student types on the login screen is optional profile data, and it
-goes to `profiles.email`, visible in Table Editor → profiles. Putting it on the
-auth user instead means `updateUser({ email })`, which converts the anonymous
-user into a permanent one and, with `mailer_autoconfirm` off, sends a
-confirmation link the student has to click before it applies. That is a product
-decision about whether BrachNha wants an email step at all — not a bug to fix.
+- **A GUEST SYNCS NOTHING.** No session, so no rows, which is the honest meaning
+  of having no account. Their work lives in `localStorage`, which is where the
+  live copy has always been anyway.
+- **The 205 junk users cannot happen again.** `scripts/shots.mjs` created about
+  a hundred anonymous accounts per run because the seeded `userName` was all the
+  old hook needed. Nothing signs in without a student pressing a button now.
+  Run it with the Supabase vars blanked anyway — that is still the documented
+  command, and it is what makes the screenshots skip the entry screen.
+- **Anonymous sign-ins can be turned OFF in the dashboard** (Authentication →
+  Sign In / Providers). Nothing calls it. It is still ON in the projects in use,
+  and leaving it on is harmless but pointless.
 
-**Anonymous sign-ins are OFF by default** (Authentication → Sign In / Providers)
-— that is the Supabase default, and it is ON in the projects in use; a NEW
-project starts with it off and syncs nothing until it is switched on and SAVED
-(the page is a form, so the toggle alone does not persist, and the settings
-endpoint below is the way to confirm rather than the toggle's colour).
-With them off, `signInAnonymously()` returns 422 and the hook takes the same path
-as "no network". Verified against the live project: the settings endpoint reports
-this at `external.anonymous_users`, NOT a flat `external_anonymous_users` — the
-flat name is simply absent from the payload, so reading it always says
-"disabled". `scripts/supabase-check.mjs` carries a comment saying so.
+**Roaming is real now, and so is the risk that comes with it.** Two devices
+signing into one Google account get the same uid and therefore the same rows.
+That is the feature — and it is also what made `pushLocalState` dangerous, since
+it writes a full destructive snapshot. `syncedUserId` and `AccountConflictView`
+are the answer; see "Signing in cannot destroy work" below.
+
+**A Google user's email is on the auth user AND in `profiles.email`.** The
+trigger `handle_new_user` copies `new.email` into the profile row on insert, and
+`login-view.tsx` prefills the same address into `userEmail` so the ordinary push
+keeps it there. `profiles.email` still has no unique constraint, which matters
+more now than it did: two Google accounts are two uids with no linking.
+
+**Verified against the live project:** the settings endpoint reports the
+anonymous toggle at `external.anonymous_users`, NOT a flat
+`external_anonymous_users` — the flat name is simply absent from the payload, so
+reading it always says "disabled". `scripts/supabase-check.mjs` carries a
+comment saying so. Google shows up at `external.google` the same way, which is
+how "is Google actually enabled" is checked without trusting a toggle's colour.
 
 ### Two places the schema deliberately does more than mirror the store
 
@@ -708,18 +718,23 @@ VITE_SUPABASE_URL= VITE_SUPABASE_ANON_KEY= npm run dev   # then, elsewhere:
 node scripts/shots.mjs
 ```
 
-The seed sets `userName`, which is exactly the condition `use-supabase-sync.ts`
-treats as "a student is logged in, push their state" — and each screenshot is a
-fresh browser context with no saved session, so every one of the ~102 page loads
-signs in anonymously and writes a new `auth.users` + `profiles` row. Measured on
-the live project: **212 users, of which 205 were screenshot runs** — 136 named
-"Panharith" (the seed on line 102), 51 "Sok", 18 "P". The seven real ones each
-had exactly one row, which is also the proof that the sync itself is correct.
+**The cause is gone; the command is still right.** The seed set `userName`,
+which was exactly the condition the old `use-supabase-sync.ts` treated as "a
+student is logged in, sign them in and push" — and each screenshot is a fresh
+browser context with no saved session, so every one of the ~102 page loads
+created a new `auth.users` + `profiles` row. Measured on the live project:
+**212 users, of which 205 were screenshot runs** — 136 named "Panharith" (the
+seed on line 102), 51 "Sok", 18 "P". The seven real ones each had exactly one
+row, which is also the proof that the sync itself was correct.
 
-This is not a bug in the app — the app is doing what it promises — but it makes
-the Authentication board useless for seeing real students, and it grows by ~100
-every run. Blanking the two vars makes `isSupabaseConfigured` false, so the hook
-returns before it can sign in and the screenshots touch nothing.
+Anonymous sign-in is REMOVED, so no run can create a user any more — nothing
+signs in without a student pressing a button. **Keep blanking the two vars
+anyway**, for a different and now more important reason: with Supabase
+configured, the seeded profile is not an authenticated session, so the gate
+would render the ENTRY SCREEN for all 17 routes and every screenshot would be of
+the same page. Blanking them makes `isSupabaseConfigured` false, which gives the
+harness full access exactly as before. The 205 existing rows are still there and
+still worth deleting one day.
 
 ### Focus mode — lessons and tests take over the screen
 
@@ -3240,107 +3255,260 @@ the closure. Same shape as `EmptyQueue` in `review-session.tsx`, same reason.
 
 ### What the review deliberately did NOT do
 
-**The push is destructive and the pull fires once, into an empty store.** Today
-anonymous auth guarantees one device is one account, so this is invisible. The
-moment two devices share a uid, a device that already has local data has
-`userName !== ""` and therefore takes the PUSH path, never the pull — and that
-push deletes every server conversation not in its local list, prunes
-`pending_placement_tests`, overwrites `xp`/`level`/`coins`/`streak` with its own
-values, and overwrites today's `daily_activity` row. There is no `updated_at`
-comparison and no merge anywhere, so the last device to become visible wins and
-the other's work is gone.
+**The destructive-push warning below has since been ACTED ON.** It said: decide
+the merge strategy before writing the login screen, not after. That is what
+`syncedUserId` and `AccountConflictView` are — see "Signing in cannot destroy
+work" in the auth section. The original wording is kept because the failure it
+describes is still exactly one wrong edit away:
 
-Alongside it: `cardReviews`/`studentCards`/`starredCards`/`reviewHistory` never
-leave the device, so roaming loses every student-authored card and the whole
-review schedule; `handle_new_user` is `after insert` only so `profiles.email`
-never follows `auth.users.email`; `profiles.email` has no unique constraint; and
-`profiles` has no DELETE policy, so a client can never clean up the losing side of
-an account merge.
+> The push is destructive and the pull fires once, into an empty store. While
+> anonymous auth guaranteed one device was one account this was invisible. The
+> moment two devices share a uid, a device that already has local data has
+> `userName !== ""` and therefore takes the PUSH path, never the pull — and that
+> push deletes every server conversation not in its local list, prunes
+> `pending_placement_tests`, overwrites `xp`/`level`/`coins`/`streak` with its
+> own values, and overwrites today's `daily_activity` row. There is no
+> `updated_at` comparison and no merge anywhere, so the last device to become
+> visible wins and the other's work is gone.
 
-**Decide the merge strategy before writing the login screen, not after.**
+The push itself is unchanged — still a full destructive snapshot. What changed is
+that it can no longer run against an account this device has not claimed.
 
-## Auth: three seams added for the login that is coming
+**Still true, and still not addressed:**
+`cardReviews`/`studentCards`/`starredCards`/`reviewHistory` never leave the
+device, so roaming loses every student-authored card and the whole review
+schedule — which now matters, because roaming is real. `profiles.email` has no
+unique constraint, and `profiles` has no DELETE policy, so a client can never
+clean up the losing side of an account merge. (`handle_new_user` being `after
+insert` only no longer bites: a Google user arrives WITH an email, so the trigger
+captures it, and `login-view.tsx` prefills the same address into `userEmail` so
+the ordinary push keeps it current.)
 
-None of these change behaviour today. Each removes a trap that would otherwise be
-found the hard way during the login work.
+## Auth: Google sign-in, guest mode, and what each one may touch
 
-**`onAuthStateChange` is now subscribed.** There was no listener anywhere, and the
-identity effect only ever re-runs on `hasName` — so a token refresh failing, a
-session expiring, a sign-out in another tab, and a session arriving from a link
-were all invisible. It handles `SIGNED_OUT` (drop the caches) and `SIGNED_IN`
-(push, if a name exists). **Anything it does that touches the client is deferred
-to a fresh task**: Supabase runs the callback while holding its own auth lock and
-calling back in from inside it can deadlock.
+Real login landed. The section this replaces described three seams "for the
+login that is coming"; all three were used, and the design they anticipated is
+now built. The anonymous-identity section above records what was removed.
 
-**Pushes are serialized and coalesced through `runPush`, at module scope.** Three
-things can start one — the identity effect, the debounced subscription, the auth
-listener — and the only guard used to be a `flushing` boolean local to one of
-them. That matters because `pushConversations` clears a conversation's messages
-and re-inserts them: two pushes interleaving there can land a delete after the
-other's insert and drop a reply. Coalesced rather than queued, because a push
-always writes the current full snapshot; the `do/while` is what guarantees the
-last request still sees the latest store.
+### The state model — three states, one source of truth
 
-**`signOutAccount()` makes sign-out explicit.** It was INFERRED — the identity
-effect noticed `userName` had gone empty while it was already running and
-concluded logout must have caused it, which holds only while a session and a name
-are the same fact. `profile-view.tsx` calls it directly now; the inference stays
-as a backstop. **`scope: "local"`**, deliberately: an anonymous account has no
-other sessions to revoke, and a local sign-out needs no network, so it still works
-offline — a global sign-out that failed offline would leave the session in
-storage, and the next reload would read "credentials but no study data" as a fresh
-install and PULL BACK the account the student just left. Not awaited at the call
-site, so the student is not watching a spinner on bad mobile data; it never
-throws. Verified end to end: session cleared, no failed requests, and the logout
-still stuck after a reload.
+**THE SUPABASE SESSION IS THE ONLY PROOF OF AUTHENTICATION.** Everything else is
+routing.
 
-**`detectSessionInUrl` is now `true`.** It was off on the reasoning that nothing
-redirects into this app. True, and it is also the switch that silently breaks
-every flow that does: email confirmation, magic links, password reset and OAuth
-all deliver the session in the URL, and with it off the link lands and does
-nothing, with no error to search for. That includes `updateUser({ email })`, the
-anonymous-to-permanent upgrade this whole design aims at.
+| | `authStatus` | `authUser` | `guestMode` |
+| --- | --- | --- | --- |
+| Loading | `"loading"` | `null` | — |
+| Authenticated | `"ready"` | the flattened session | `false` |
+| Guest | `"ready"` | `null` | `true` |
+| Not chosen yet | `"ready"` | `null` | `false` |
 
-**`pullRemoteState`'s docstring was wrong** and is corrected. It claimed a `false`
-return meant the caller pushes instead. The caller ignores the value — and must,
-since that path only runs on an EMPTY store, so a push would upload a blank
-account over a real one. The recovery is that the student stays on Login, types a
-name, and the ordinary push path takes over.
+`authStatus`, `authUser`, `authPrompt` and `accountConflict` are **excluded from
+`partializeState`**, exactly like `chatOpen` — re-derived from Supabase on every
+load. Only `guestMode` and `syncedUserId` persist, and `guestMode` **grants
+nothing**: it routes past the entry screen and that is all. `hooks/use-auth.ts`
+is where every question about identity is answered.
 
-## The chat endpoint is public — what now bounds it
+**A GUEST HAS NO `userName`, deliberately.** `continueAsGuest()` sets one flag
+and nothing else. A placeholder like "Guest" in the store would reach
+`profiles.display_name`, the leaderboard and the pledge signature — and survive a
+later Google sign-in, leaving the student permanently named "Guest".
+`useDisplayName()` supplies the fallback at render time instead.
 
-`/api/chat` is unauthenticated by design and has no CORS restriction, so the
-per-IP limiter is the only gate. Three holes were closed.
+**No persist `version` bump.** `guestMode` and `syncedUserId` are new keys with
+defaults, which `merge()` already handles (see its comment). That also settles
+what happens to existing installs: they arrive with `guestMode: false`, land on
+the entry screen, and keep every byte of local data whichever button they press.
 
-**Six profile fields reached the system prompt uncleaned** — `language`, `level`,
-`xp`, `streak`, `avgExamPct`, `examCount`. `ChatProfile` types five of them as
-numbers, but the handler builds the profile by spreading the PARSED REQUEST BODY
-over its defaults, so the type describes the intended caller rather than the
-value. `{"profile":{"xp":"<50KB of instructions>"}}` landed verbatim inside the
-model's instructions — past the 2000-char message cap, past `MAX_HISTORY`, and
-past `PROMPT_BUDGET_CHARS`, which only warns and never truncates. `cleanNumber`
-now type-checks AND clamps each one, `language` is a two-value whitelist rather
-than a `clean()`, and `cleanList` takes `unknown`. Verified against the real
-module through `ssrLoadModule`: hostile fields are dropped entirely and an honest
-profile still renders in full.
+### The gate, in `app-shell.tsx`
 
-**Nothing bounded the request body.** `req.json()` parsed all of it before any
-limit applied — `MAX_HISTORY` and `MAX_MESSAGE_CHARS` bound what reaches the
-MODEL, not what reaches memory. Now `MAX_BODY_BYTES` (64KB) is checked against
-`content-length` first and then against the bytes actually read (a chunked request
-carries no length), and `MAX_MESSAGES` (100) rejects rather than slices. The Vite
-dev bridge stops accumulating at the same cap but keeps DRAINING the socket —
-abandoning a half-read body is how a dev server ends up with a hung connection.
-Measured: 413 with a length, 400 chunked.
+A ternary chain, in priority order, kept as JSX rather than early returns so
+nothing above it closes over a possibly-null `authUser`:
 
-**The rate limiter keyed on `x-forwarded-for`,** which any caller can set — a
-limiter keyed on a client-supplied header hands a fresh bucket to anyone who
-varies it. `x-vercel-forwarded-for` is set by the platform and is tried FIRST now,
-with the old chain as the fallback for other hosts.
+```
+loading, and they'd be on the entry screen anyway -> <AuthSplash/>
+conflict pending                                  -> <AccountConflictView/>
+ready, not authenticated, not guest               -> <EntryView/>
+authenticated, no name                            -> <LoginView/>   (prefilled)
+authenticated, not surveyed                       -> <SurveyView/>
+                                                  -> the app
+```
 
-The limiter's whole-map sweep on every request is left alone with a comment: it
-is per-instance anyway, so at the scale where the sweep costs anything the answer
-is a shared store, not a faster sweep.
+Three things there are load-bearing and easy to undo:
+
+- **`hasFullAccess` is true when Supabase is UNCONFIGURED**, which skips the
+  whole chain. With no project there is no account to have, no server to protect
+  and no AI credits to spend — the same degradation the mentor already does for
+  a missing `GEMINI_API_KEY`. It is also what keeps `npm run preview`, a fresh
+  fork and `scripts/shots.mjs` working with **no change to the screenshot seed**:
+  the documented blanked-env command was already the right one.
+- **`status === "ready"` on the EntryView branch.** A returning student has a
+  name and a session, but the session takes a dynamic import to resolve — so for
+  that window they are "not authenticated and not a guest", and without this they
+  would be thrown onto the entry screen and asked to sign in to the account they
+  are already signed in to.
+- **The splash renders only when the student would see the entry screen anyway.**
+  Gating the whole tree on "loading" would put an import — and, for an expired
+  token, a network round trip — in front of first paint for every returning
+  student. See the top of `lib/supabase.ts` for why that is not affordable.
+
+`userName`/`surveyed` now gate **authenticated students only**. A guest falls
+straight through to Home, and because their `surveyed` was never faked, signing
+in later walks them through the survey properly.
+
+### What is locked, and where the gate actually is
+
+Roadmap and KruAI. Everything else — lessons, practice, flashcards, mock exams,
+progress, streak — stays open to guests. Locking another feature is one
+`requireAuth(...)` call.
+
+**The roadmap guard is on the ROUTE, not the links.** There are four ways in
+(Home's Quest Map chip, grade-prediction's recommended action, and two
+programmatic `navigate("/roadmap")` calls in the survey and placement-test
+flows), and a click handler covers neither the last two nor a typed URL. Home's
+chip *also* calls `requireAuth` so the modal opens in place rather than on a
+locked page, but that is polish on top of the real gate in `pages/roadmap.tsx`.
+
+**`ShellLayout`'s `roadmapLock` gained `hasFullAccess`, and it is not
+decoration.** A guest never signs a pledge, so without it that condition is true
+for every guest reaching `/roadmap` — and it strips the sidebar, the hamburger
+and the FAB while the route renders no `BottomNav` either. They would land on the
+locked panel with no navigation at all and no way out but the browser's back
+button. There is a screenshot test for exactly this.
+
+**KruAI is gated three times over**: `FabChat` raises the prompt instead of
+opening (the FAB stays VISIBLE — the lock is what advertises the feature),
+`AppShell` refuses to render `ChatOverlay` without access, and the endpoint
+demands a bearer token. Only the third is a real gate; the first two are UX.
+
+### The endpoint verifies the caller now
+
+`/api/chat` was public and unauthenticated. It now rejects anything without a
+valid, non-anonymous Supabase access token — hiding a button is not a gate, and
+a guest with one `curl` could spend the Gemini budget.
+
+**`server/verify-user.ts` verifies LOCALLY, with no network per request.** The
+obvious route — `GET /auth/v1/user` with the bearer token — was rejected on three
+counts: it puts a Supabase round trip in front of a stream whose selling point is
+~2.7s to first character; every student's check would egress from the same
+handful of Vercel IPs into Supabase's own per-IP auth limits; and caching it
+correctly means capping the cache at the token's own `exp` anyway.
+
+This project signs with **ES256 asymmetric keys** (verified against its live
+JWKS endpoint), which `node:crypto` reads natively from a JWK — so this is ~200
+lines and **zero dependencies**. JWKS is fetched once per instance, re-fetched on
+an unknown `kid` but no more often than `JWKS_REFETCH_MIN_MS`, or a stream of
+junk tokens with invented kids becomes a fetch amplifier. An HS256 branch exists
+for a legacy project still on the shared secret. **Relative imports only** — the
+Vercel function bundler reads the root tsconfig, which has no `paths`.
+
+**THE TRADE, and do not reuse this without revisiting it:** a locally verified
+token cannot be revoked early, so a student signed out on another device keeps a
+working token until it expires (an hour). Correct for a rate-limit gate on a chat
+endpoint. NOT correct for anything destructive.
+
+**Unconfigured fails CLOSED in production.** No `SUPABASE_URL` means no request
+can be authenticated, which in production means a missing Vercel variable has
+quietly reopened the endpoint — so it returns 503 and logs loudly. In dev it
+warns and continues, or "the mentor works locally" would mean nothing about
+production.
+
+**The rate limits were re-set, and the old number was the whole point.**
+`chat-handler.ts` recorded that 30/min per IP was chosen *because a classroom
+shares one school router*. Keeping that as a pre-filter would have changed
+nothing — it stays the binding constraint. The IP number is now a pure anti-flood
+figure (240/min) and the real cap (20/min) is on the verified user id, which is a
+real per-student key for the first time.
+
+**The 401 body is a sentence, not a status.** `chat-overlay.tsx` renders any
+non-ok body verbatim as a KruAI bubble, so "Unauthorized" would arrive on screen
+as the mentor's answer. It also says nothing about *why* — expired, unsigned,
+anonymous and absent are one message to the caller and four distinct reasons in
+the server log.
+
+### Signing in cannot destroy work
+
+`pushLocalState` writes a **full destructive snapshot**: it deletes server
+conversations absent from the local list and overwrites xp/level/coins/streak.
+That was harmless while anonymous auth guaranteed one device was one account.
+Google makes it a two-tap operation — guest on a school computer, do a lesson,
+sign in, and the phone's account is gone.
+
+So the pull/push decision keys on **`syncedUserId`** (the account this DEVICE
+last synced with), not on whether the store happens to be empty:
+
+| session uid | local store | action |
+| --- | --- | --- |
+| `=== syncedUserId` | any | push, as before |
+| new uid | empty | pull (a reinstall, or a second device) |
+| new uid | has work, remote profile blank | push (first sign-in — upload it) |
+| new uid | has work, remote has a real profile | **`AccountConflictView`** |
+
+**There is no merge, and the conflict screen is not one.** Merging two divergent
+XP totals, streaks and review schedules is a real design problem nobody has
+solved here. Asking turns silent loss into a choice, and the screen says plainly
+that the other side will be replaced. `fetchRemoteSnapshot()` reads four columns
+with no side effects precisely so neither side is touched before the student
+answers; `flush()` checks `accountConflict` for the same reason.
+
+`profiles` still has no DELETE policy, so the losing side can never be cleaned
+up. Two Google accounts are still two uids with no linking.
+
+### The OAuth callback, and the trap in the lazy import
+
+`hasAuthTraces()` in `lib/auth.ts` decides whether to download the SDK at all, so
+a student who has never signed in never pays the ~40KB. **Getting it wrong in the
+other direction swallows every sign-in**, and the mechanism is not obvious: the
+SDK's own `_initialize()` is the only thing that parses an OAuth callback out of
+the URL, and it runs when the client is CONSTRUCTED. On the redirect back from
+Google there is no stored session yet — the SDK is what writes it. "No stored
+session, skip the import" would have bounced every student straight back to the
+entry screen with nothing in the console.
+
+Three independent tells, any one of which forces the slow path: a localStorage
+key **starting with** the auth key (a prefix scan — PKCE parks code verifiers
+under suffixed keys); OAuth parameters in the URL, **including the error ones**
+(without them a declined consent screen lands back saying nothing); and our own
+sentinel written before the redirect, which is the version-proof one because it
+does not depend on the SDK's internal key layout.
+
+**`flowType: "pkce"` is stated rather than inherited.** The supabase-js default
+is the implicit flow, which returns the session in the URL FRAGMENT — a refresh
+token in session history, reachable through a `Referer`. Changing it changes the
+shape of the callback, which is why the detection covers both `code=` and
+`access_token=`.
+
+### React Compiler: `requireAuth` reads the store imperatively
+
+`useRequireAuth()` returns a closure, and that closure must call
+`useBrachNhaStore.getState()` rather than closing over a selector value. Reading
+`authUser.id` would make the compiler narrow its memo dependency to that property
+path and emit the check where the closure is BUILT — in the hook body, with no
+guard above it — and `authUser` is legitimately null for every guest. It would
+throw on the home screen for exactly the people the hook exists to serve. Neither
+`tsc` nor `oxlint` can see it. Same reason `AuthPromptOverlay` is mounted as
+`{authPrompt && <AuthPromptOverlay/>}`: the component never sees null, so there
+is no guard to misplace.
+
+### What the dashboard needs
+
+Google is configured **outside this repo** and nothing in the code can check it
+for you:
+
+1. Google Cloud Console → OAuth 2.0 Client ID (Web application), redirect URI
+   `https://<project-ref>.supabase.co/auth/v1/callback`, consent screen
+   configured.
+2. Supabase → Authentication → Providers → **Google → enable**, paste the client
+   id and secret.
+3. Supabase → Authentication → URL Configuration → Site URL and Redirect URLs.
+   **A Vercel preview gets a fresh hostname every deploy**, so that list needs a
+   wildcard or OAuth fails on every preview — the kind of thing diagnosed as
+   "OAuth is broken" a week later.
+4. Vercel → `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` on Production AND
+   Preview, then **redeploy**. Without them the endpoint returns 503 by design.
+
+No database migration was needed. RLS already keys on `auth.uid()`, which works
+identically for a Google user, and the avatar comes from the session rather than
+a column.
 
 ## Bugs found and fixed during the build (know these patterns)
 
@@ -3474,4 +3642,26 @@ npm run db:check     # env → reachability → anonymous sign-ins → all 8 tab
 
 and check `dist/assets/` still contains a separate Supabase chunk, for the same
 reason `math-field-panel-*.js` is checked — a static import undoes the lazy
-boundary silently and only the bundle output shows it.
+boundary silently and only the bundle output shows it. The chunk is named after
+the package's own dist folder (`dist-*.js`, ~54KB gzip); confirm it holds
+`GoTrueClient` and that the entry chunk's only "supabase" hit is the inlined env
+values.
+
+**For anything touching auth, none of the above proves the thing that matters.**
+Typecheck and lint cannot see a swallowed OAuth callback, a guest reaching the
+mentor, or a React Compiler crash that only fires for a null `authUser`. Exercise
+these against a running dev server:
+
+```bash
+# The gate. A guest must never reach the endpoint, and an unauthenticated
+# caller must be refused even with a valid-looking token.
+curl -i -X POST localhost:5173/api/chat -H 'Content-Type: application/json' \
+  -d '{"messages":[{"role":"user","text":"hi"}],"lang":"en"}'      # expect 401
+```
+
+Then in a browser: a fresh profile shows the entry screen and downloads NO
+Supabase chunk; "Continue as Guest" lands on Home and survives a reload; the chat
+FAB raises the prompt and fires no `/api/chat` request; a typed `/roadmap` shows
+the locked panel **with the navigation still on screen**; and loading with
+`?code=x` in the URL DOES pull the SDK (that last one is the callback-swallowing
+trap — see the auth section).

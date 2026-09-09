@@ -1,5 +1,56 @@
 export type Lang = "en" | "km";
 
+// ── auth ────────────────────────────────────────────────────────────────────
+//
+// These live here rather than beside the code that uses them because both
+// lib/store.ts and lib/auth.ts need them, and lib/auth.ts already reaches
+// lib/supabase-sync.ts, which writes back into the store. Importing the types
+// from a leaf module keeps that a type-only relationship instead of a runtime
+// import cycle.
+
+/** "loading" until the session is resolved, or ruled out without importing the
+ *  SDK at all (see hasAuthTraces in lib/auth.ts). NOTHING may read "loading" as
+ *  "signed out" — that is what flashes the entry screen at a signed-in student. */
+export type AuthStatus = "loading" | "ready";
+
+/** The identity, flattened out of a Supabase session. Non-null only for a real,
+ *  non-anonymous account. Never persisted. */
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  avatarUrl: string;
+}
+
+/** Which locked feature raised the login prompt. A union rather than a free
+ *  string so the modal's copy table has to cover every case that can reach it —
+ *  adding a feature here is a type error until its wording exists. */
+export type AuthFeature = "roadmap" | "chat";
+
+/** One side of the sign-in conflict: enough to tell the two apart on screen
+ *  without pulling either one down first. */
+export interface AccountSnapshot {
+  name: string;
+  level: number;
+  xp: number;
+  streak: number;
+}
+
+/**
+ * Raised when a sign-in finds study data on the DEVICE and a real account on
+ * the SERVER, and they are not the same account this device last synced with.
+ *
+ * Neither side is written until the student picks one. Without this the push
+ * path runs unconditionally and a guest signing in on a school computer
+ * silently overwrites the account on their phone — see `syncedUserId` in
+ * lib/store.ts for why the two cannot simply be merged.
+ */
+export interface AccountConflict {
+  userId: string;
+  local: AccountSnapshot;
+  remote: AccountSnapshot;
+}
+
 // No `months` here on purpose: the time left is derived from the fixed exam
 // date (utils/exam-date.ts), not asked for and stored. A stored answer goes
 // stale the day after it is given.

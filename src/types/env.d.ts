@@ -18,6 +18,10 @@
 interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL?: string;
   readonly VITE_SUPABASE_ANON_KEY?: string;
+  /** Accepted alias for VITE_SUPABASE_ANON_KEY. Same value, and the name the
+   *  Supabase dashboard actually uses for it — see the comment in
+   *  src/lib/supabase.ts. Set one or the other, not both. */
+  readonly VITE_SUPABASE_PUBLISHABLE_KEY?: string;
 }
 
 interface ImportMeta {

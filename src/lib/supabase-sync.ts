@@ -1,7 +1,12 @@
 import { getSupabase } from "@/lib/supabase";
 import { useBrachNhaStore } from "@/lib/store";
 import type { ExamResult } from "@/lib/store";
-import type { Commitment, Conversation, PendingPlacementTest } from "@/types";
+import type {
+  AccountSnapshot,
+  Commitment,
+  Conversation,
+  PendingPlacementTest,
+} from "@/types";
 import type { InsertOf, Tables } from "@/types/database";
 // The local-calendar day key. This used to be a private helper here, carrying
 // the comment explaining why UTC is wrong for a Phnom Penh student; two other
@@ -482,6 +487,43 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
  *  bookkeeping and skip writing their first conversation. */
 export function resetSyncCache() {
   lastPushedSignature.clear();
+}
+
+/**
+ * Just enough of an account to tell it apart from what is on this device.
+ *
+ * Four columns, no joins, no side effects — this runs on the sign-in path where
+ * NEITHER side may be written until the student has chosen, so it must not be
+ * tempting to reach for pullRemoteState() instead. Returns null when there is
+ * no row or the row has never been filled in, which is what a brand-new Google
+ * account looks like: handle_new_user() inserts a profile with an empty
+ * display_name the moment the auth.users row appears, so "a row exists" is not
+ * the same question as "this account has been used".
+ */
+export async function fetchRemoteSnapshot(
+  userId: string
+): Promise<AccountSnapshot | null> {
+  const db = await getSupabase();
+  if (!db) return null;
+
+  const { data, error } = await db
+    .from("profiles")
+    .select("display_name, level, xp, streak")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (error) {
+    console.warn(`[sync] snapshot: ${error.message}`);
+    return null;
+  }
+  if (!data?.display_name) return null;
+
+  return {
+    name: data.display_name,
+    level: data.level,
+    xp: data.xp,
+    streak: data.streak,
+  };
 }
 
 // ── helpers ─────────────────────────────────────────────────────────────────

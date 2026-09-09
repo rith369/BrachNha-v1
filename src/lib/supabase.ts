@@ -35,7 +35,16 @@ import type { Database } from "@/types/database";
  */
 
 const url = import.meta.env.VITE_SUPABASE_URL;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+// Two accepted names for one value. The repo has always used
+// VITE_SUPABASE_ANON_KEY, and the value in it is Supabase's newer
+// `sb_publishable_…` format rather than the legacy `anon` JWT — so the variable
+// name says "anon" while the dashboard calls it publishable, which sends people
+// hunting for an `eyJ…` key that does not exist. Reading both means either name
+// works and nobody has to be told which one this repo picked.
+const anonKey =
+  import.meta.env.VITE_SUPABASE_ANON_KEY ??
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 /** True when both env values are present. Read this rather than awaiting the
  *  client where the intent is "is the project wired up" — it answers
@@ -55,23 +64,23 @@ export function getSupabase(): Promise<SupabaseClient<Database> | null> {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
-        // ON, although nothing redirects into this app YET.
+        // Load-bearing since Google sign-in landed: OAuth hands the session
+        // over in the URL, and with this off the redirect from Google arrives
+        // and simply does nothing, with no error anywhere to explain it.
         //
-        // This was off, reasoning that anonymous sign-in never puts a session
-        // in the URL so parsing location was wasted work. True, and it is also
-        // the switch that silently breaks every flow that DOES arrive that way:
-        // email confirmation, magic links, password reset and OAuth all hand
-        // the session over in the URL, and with this off the link lands on the
-        // app and simply does nothing, with no error anywhere to explain it.
-        //
-        // That includes the one upgrade this whole design is aimed at —
-        // updateUser({ email }) converting the anonymous user into a permanent
-        // one needs its confirmation link to come back through here.
-        //
-        // The cost of having it on today is one check of location on load for a
-        // case that cannot yet happen. The cost of having it off on the day it
-        // can is a debugging session with no symptom to search for.
+        // NOTE the interaction with the lazy import above — the SDK's own
+        // _initialize() is what reads the URL, and it runs on construction. So
+        // the callback is only parsed if something awaits getSupabase() on that
+        // load. hasAuthTraces() in lib/auth.ts is what guarantees it does.
         detectSessionInUrl: true,
+        // PKCE, stated rather than inherited. The supabase-js default is the
+        // implicit flow, which returns the session in the URL FRAGMENT — so a
+        // refresh token ends up in session history and can leak through a
+        // Referer header. PKCE returns a short-lived `?code=` instead.
+        //
+        // Changing this changes the shape of the callback URL, which is exactly
+        // why hasAuthTraces() looks for both `code=` and `access_token=`.
+        flowType: "pkce",
         // Its own key, deliberately separate from the store's "brachnha" key.
         // The session is credentials with an expiry; the store is study data.
         // Clearing one must never be able to take the other with it.

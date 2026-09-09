@@ -110,6 +110,18 @@ export function chatApi(): Plugin {
       if (env.GEMINI_API_KEY && !process.env.GEMINI_API_KEY) {
         process.env.GEMINI_API_KEY = env.GEMINI_API_KEY;
       }
+      // verify-user.ts needs the project URL to fetch the JWKS it checks
+      // bearer tokens against. On Vercel every project variable is already in
+      // process.env regardless of prefix; in dev nothing puts it there, and
+      // without it the handler skips verification with a warning — which would
+      // make "the mentor works locally" mean nothing about production.
+      for (const key of [
+        "SUPABASE_URL",
+        "VITE_SUPABASE_URL",
+        "SUPABASE_JWT_SECRET",
+      ]) {
+        if (env[key] && !process.env[key]) process.env[key] = env[key];
+      }
     },
 
     configureServer(server: ViteDevServer) {

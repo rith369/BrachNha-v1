@@ -75,7 +75,8 @@ function cleanList(values: unknown): string[] {
  * A profile number, or null if it is not one.
  *
  * ChatProfile TYPES these as numbers, and for the app's own client they are.
- * But /api/chat is a public unauthenticated endpoint, the handler builds the
+ * But /api/chat now authenticates the CALLER, not the payload — a signed-in
+ * student can still send whatever body they like. The handler builds the
  * profile by spreading the parsed request body over its defaults, and
  * `JSON.parse` produces whatever was sent — so the type is a description of the
  * intended caller, not a guarantee about the value. Every one of these is
