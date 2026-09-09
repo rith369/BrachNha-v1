@@ -19,7 +19,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 8 Sep 2026 — Real login: sign in with Google, or carry on as a guest
 
-*Landed in commit `PENDING`.*
+*Landed in commit `58320ec`.*
 
 **Why.** Until now BrachNha had no login at all. The opening screen asked for a
 name and saved it on the phone, and that was it — there was no account, nothing
