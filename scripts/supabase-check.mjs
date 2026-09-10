@@ -9,7 +9,7 @@
  *
  *   1. Are the env values there and shaped like a Supabase URL and key?
  *   2. Is the project reachable, and does it accept the key?
- *   3. Are anonymous sign-ins enabled? (off by default — the app's auth needs it)
+ *   3. Is Google sign-in enabled? (off by default — it is how students get in)
  *   4. Do the tables from supabase/migrations exist?
  *
  * Dev tooling, so it lives outside src/ and never bundles — same placement and
@@ -118,17 +118,38 @@ async function main() {
   }
 
   step("3. Auth configuration");
-  // NESTED under `external`, not a flat external_anonymous_users field — the
-  // flat name is what the docs' prose implies and it is simply absent from the
-  // payload, so reading it gives `undefined` and this check reports "disabled"
-  // on a correctly configured project. Verified against a live project.
-  const anonEnabled = Boolean(settings.external?.anonymous_users);
-  if (anonEnabled) {
-    ok("anonymous sign-ins enabled");
+  // NESTED under `external`, not a flat external_google / external_anonymous_users
+  // field — the flat names are what the docs' prose implies and they are simply
+  // absent from the payload, so reading one gives `undefined` and this check
+  // reports "disabled" on a correctly configured project. Verified live.
+  //
+  // GOOGLE is the check now. This used to require ANONYMOUS sign-ins, and that
+  // was right at the time: signInAnonymously() was the only way the app could
+  // get an auth.uid(), so with it off nothing synced at all. Real login replaced
+  // it — nothing calls signInAnonymously any more — and leaving the old check
+  // here would fail a correctly configured project the moment someone turned
+  // that toggle off, which is now the recommended thing to do.
+  const googleEnabled = Boolean(settings.external?.google);
+  if (googleEnabled) {
+    ok("Google sign-in enabled");
   } else {
-    bad("anonymous sign-ins DISABLED — the app cannot create accounts");
+    bad("Google sign-in DISABLED — students cannot create an account");
     console.log(
-      "    Dashboard → Authentication → Sign In / Providers → Anonymous sign-ins"
+      "    Dashboard → Authentication → Sign In / Providers → Google"
+    );
+    console.log(
+      "    Needs a client id + secret from Google Cloud Console; see supabase/README.md"
+    );
+  }
+
+  // A warning, not a failure, and deliberately the opposite polarity to before.
+  // Nothing in the app calls it, so it is an unused door: the publishable key
+  // ships in the browser bundle by design, and anyone holding it can mint
+  // auth.users rows straight from the API. That is where ~205 junk accounts
+  // came from.
+  if (settings.external?.anonymous_users) {
+    warn(
+      "anonymous sign-ins are ON but nothing uses them — safe to turn off"
     );
   }
   if (settings.disable_signup) warn("signups are disabled project-wide");
@@ -159,8 +180,8 @@ async function main() {
     console.log("\n  Apply them: see supabase/README.md\n");
     process.exit(1);
   }
-  if (!anonEnabled) {
-    bad("schema is in place, but anonymous sign-ins are still off");
+  if (!googleEnabled) {
+    bad("schema is in place, but Google sign-in is still off");
     process.exit(1);
   }
   ok("all checks passed\n");

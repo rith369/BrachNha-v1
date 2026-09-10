@@ -64,15 +64,39 @@ ref names one specific project, and this repo is not tied to one.
 history, so it stays correct as files are added. It is also what makes a second
 environment (a staging project, a teammate's local Postgres) reproducible.
 
-## Then: enable anonymous sign-ins
+## Then: enable Google sign-in
 
-Dashboard → **Authentication → Sign In / Providers → Anonymous sign-ins → on**.
+**This section used to say "enable anonymous sign-ins".** It was correct then
+and is wrong now: `signInAnonymously()` was the only way the app could obtain an
+`auth.uid()`, so with it off nothing synced. Real login replaced it. Nothing
+calls it any more, and **you should turn that toggle OFF** — the publishable key
+ships in the browser by design, so while anonymous sign-ins are on, anyone
+holding it can create `auth.users` rows straight from the API. That is where
+this project's ~205 junk accounts came from.
 
-It is off by default, and without it nothing syncs. BrachNha's login screen asks
-for a name and a language and has never been an authentication step; turning it
-into one would be a product change. `signInAnonymously()` mints a real
-`auth.users` row with no email and no password, so `auth.uid()` exists and every
-policy below works, while the student sees no difference at all.
+Google is configured in two places, and neither is in this repo:
+
+**1. Google Cloud Console** — APIs & Services → Credentials → **OAuth 2.0
+Client ID**, type *Web application*. Under **Authorized redirect URIs** add:
+
+```
+https://<your-project-ref>.supabase.co/auth/v1/callback
+```
+
+Configure the consent screen (External), and add the three non-sensitive scopes
+`openid`, `.../auth/userinfo.email`, `.../auth/userinfo.profile` under **Data
+Access** — the app reads nothing else. While the app's publishing status is
+*Testing*, only accounts listed under **Audience → Test users** can sign in.
+
+**2. Supabase** — Authentication → **Sign In / Providers → Google → on**, paste
+the client id and secret, and press **Save**. The page is a form; the toggle
+alone does not persist.
+
+Then Authentication → **URL Configuration**: set the Site URL, and list every
+origin students arrive from under Redirect URLs (`http://localhost:5173/**` for
+dev, plus your deployed domain). **Avoid a bare `https://*.vercel.app/**`** — it
+would let Supabase hand an auth code to any Vercel subdomain, which anyone can
+deploy. Scope the wildcard to your own project's hostnames.
 
 ## Checking it worked
 
@@ -81,8 +105,9 @@ npm run db:check
 ```
 
 Reports, in order: env values present → project reachable and key accepted →
-anonymous sign-ins on → all eight tables reachable. It stops at the first
-failure so the output names a cause rather than a symptom.
+Google sign-in on → all eight tables reachable. It stops at the first failure so
+the output names a cause rather than a symptom, and warns (without failing) if
+anonymous sign-ins are still on.
 
 ## The tables
 
