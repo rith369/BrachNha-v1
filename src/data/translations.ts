@@ -201,6 +201,7 @@ export const T = {
     signingIn: "Signing in...",
     signInFailed: "Sign-in could not start. Please check your connection and try again.",
     guest: "Guest",
+    privacyPolicy: "Privacy policy",
 
     loginRequired: "Login required",
     loginRequiredRoadmap:
@@ -416,6 +417,7 @@ export const T = {
     signingIn: "កំពុងចូល...",
     signInFailed: "មិនអាចចាប់ផ្តើមការចូលបានទេ។ សូមពិនិត្យអ៊ីនធឺណិត រួចព្យាយាមម្ដងទៀត។",
     guest: "ភ្ញៀវ",
+    privacyPolicy: "គោលការណ៍ឯកជនភាព",
 
     loginRequired: "ត្រូវការចូលគណនី",
     loginRequiredRoadmap:

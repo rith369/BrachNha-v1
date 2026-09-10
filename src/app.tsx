@@ -39,6 +39,7 @@ const routeModules = {
   practiceSubject: () => import("@/pages/practice-subject"),
   practiceRun: () => import("@/pages/practice-run"),
   practiceReview: () => import("@/pages/practice-review"),
+  privacy: () => import("@/pages/privacy"),
   profile: () => import("@/pages/profile"),
   progress: () => import("@/pages/progress"),
   roadmap: () => import("@/pages/roadmap"),
@@ -59,6 +60,7 @@ const PracticePage = lazy(routeModules.practice);
 const PracticeSubjectPage = lazy(routeModules.practiceSubject);
 const PracticeRunPage = lazy(routeModules.practiceRun);
 const PracticeReviewPage = lazy(routeModules.practiceReview);
+const PrivacyPage = lazy(routeModules.privacy);
 const ProfilePage = lazy(routeModules.profile);
 const ProgressPage = lazy(routeModules.progress);
 const RoadmapPage = lazy(routeModules.roadmap);
@@ -180,6 +182,22 @@ export default function App() {
     // a sufficient escape in an app with a persisted store.
     <ErrorBoundary>
       <Routes>
+        {/* OUTSIDE ShellLayout, and that is the whole point of it being here.
+            Every route below passes through AppShell's auth gate, which would
+            render the entry screen instead of the policy — breaking the two
+            readers who matter most: Google, which checks this URL resolves
+            before it will publish the OAuth app, and a student deciding whether
+            to sign up at all. A privacy policy you have to log in to read is
+            not a privacy policy. It brings its own page frame for the same
+            reason: there is no shell around it. */}
+        <Route
+          path="privacy"
+          element={
+            <Suspense fallback={null}>
+              <PrivacyPage />
+            </Suspense>
+          }
+        />
         <Route element={<ShellLayout />}>
           <Route index element={<HomePage />} />
           <Route path="game" element={<GamePage />} />

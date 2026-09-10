@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
 import { useT } from "@/data/translations";
@@ -78,6 +79,19 @@ export function EntryView() {
             {t.guestNote}
           </p>
         </div>
+
+        {/* Below the card rather than inside it: this is a doorway out of the
+            decision, not part of it. It has to be here at all because this is
+            the one screen where someone is deciding whether to hand over their
+            Google account — and because Google requires the policy to be
+            reachable before it will publish the OAuth app. /privacy is routed
+            OUTSIDE the shell so it opens without signing in; see app.tsx. */}
+        <Link
+          to="/privacy"
+          className="mt-5 block text-center text-xs font-bold text-muted underline underline-offset-2 hover:text-purple"
+        >
+          {t.privacyPolicy}
+        </Link>
       </div>
     </div>
   );
