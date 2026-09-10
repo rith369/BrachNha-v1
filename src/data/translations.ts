@@ -13,6 +13,12 @@ export const T = {
       "A few details so your AI coach and study plan fit you.",
     enterName: "Full name",
     namePlaceholder: "Type your name...",
+    // UNUSED since Google sign-in landed, and kept only so the km pair stays
+    // balanced. Do NOT wire an email input back onto the login form: the
+    // address comes from the session now, and an editable copy would let an
+    // unverified value overwrite the verified one in profiles.email. See
+    // submit() in features/login/components/login-view.tsx. A parent's or
+    // school contact address would be a different key with a different label.
     emailOptional: "Email (optional)",
     age: "Age",
     whereFrom: "Where are you from?",

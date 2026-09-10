@@ -60,12 +60,13 @@ export function LoginView() {
   const googleName = useBrachNhaStore((s) => s.authUser?.name ?? "");
   const googleEmail = useBrachNhaStore((s) => s.authUser?.email ?? "");
 
-  // Initial values only — the student can still edit both. useState's initial
-  // argument is read on the first render, which is the one where the session is
-  // already resolved: AppShell does not render this branch until it is.
+  // Name is an initial value only — the student can still edit it. Google hands
+  // over a full legal name and a student may well want "Panha" rather than "Keo
+  // Panharith". useState's initial argument is read on the first render, which
+  // is the one where the session is already resolved: AppShell does not render
+  // this branch until it is.
   const [name, setName] = useState(googleName);
   const [language, setLanguage] = useState<"" | "english" | "french">("");
-  const [email, setEmail] = useState(googleEmail);
   const [age, setAge] = useState("");
   const [province, setProvince] = useState("");
   const [customLocation, setCustomLocation] = useState("");
@@ -80,7 +81,20 @@ export function LoginView() {
     completeLogin({
       name: trimmed,
       language,
-      email: email.trim() || undefined,
+      // Taken from the SESSION, never from an input.
+      //
+      // There used to be an editable "email (optional)" field here, prefilled
+      // from Google — which put the same address on screen twice (the chip
+      // below says it too) and, worse, let a student type a different one. Its
+      // only consumer is `profiles.email` via supabase-sync.ts, so an edited
+      // value would silently overwrite the verified address with an unverified
+      // one on every push, and `profiles.email` has no unique constraint to
+      // catch it. Everyone who reaches this screen is signed in, so there was
+      // never a case where the input was the only source.
+      //
+      // A parent's or school contact address, if that is ever wanted, is a
+      // different field with a different label — not this one.
+      email: googleEmail || undefined,
       age: age.trim() || undefined,
       location: location || undefined,
     });
@@ -156,18 +170,8 @@ export function LoginView() {
           </div>
         </div>
 
-        <div className="mb-3">
-          <label className="mb-1.5 block text-xs font-extrabold text-muted">
-            {t.emailOptional}
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            className={inputClasses}
-          />
-        </div>
+        {/* No email field. The signed-in address is shown as a chip above and
+            written straight from the session — see submit(). */}
 
         <div className="mb-3">
           <label className="mb-1.5 block text-xs font-extrabold text-muted">
