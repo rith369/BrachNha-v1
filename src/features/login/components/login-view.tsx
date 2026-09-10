@@ -49,9 +49,24 @@ export function LoginView() {
   );
   const t = useT(lang);
 
-  const [name, setName] = useState("");
+  // Prefilled from the Google account when there is one.
+  //
+  // PRIMITIVE selectors, not the AuthUser object. Reading `authUser` and then
+  // `user.name` inside a handler is the React Compiler hazard documented in
+  // hooks/use-auth.ts — the compiler narrows the memo dependency to the
+  // property path and checks it where the closure is built, above any guard.
+  // Selecting the strings sidesteps the question entirely, and they are stable
+  // by value so the selector's reference check is happy.
+  const googleName = useBrachNhaStore((s) => s.authUser?.name ?? "");
+  const googleEmail = useBrachNhaStore((s) => s.authUser?.email ?? "");
+
+  // Name is an initial value only — the student can still edit it. Google hands
+  // over a full legal name and a student may well want "Panha" rather than "Keo
+  // Panharith". useState's initial argument is read on the first render, which
+  // is the one where the session is already resolved: AppShell does not render
+  // this branch until it is.
+  const [name, setName] = useState(googleName);
   const [language, setLanguage] = useState<"" | "english" | "french">("");
-  const [email, setEmail] = useState("");
   const [age, setAge] = useState("");
   const [province, setProvince] = useState("");
   const [customLocation, setCustomLocation] = useState("");
@@ -66,7 +81,20 @@ export function LoginView() {
     completeLogin({
       name: trimmed,
       language,
-      email: email.trim() || undefined,
+      // Taken from the SESSION, never from an input.
+      //
+      // There used to be an editable "email (optional)" field here, prefilled
+      // from Google — which put the same address on screen twice (the chip
+      // below says it too) and, worse, let a student type a different one. Its
+      // only consumer is `profiles.email` via supabase-sync.ts, so an edited
+      // value would silently overwrite the verified address with an unverified
+      // one on every push, and `profiles.email` has no unique constraint to
+      // catch it. Everyone who reaches this screen is signed in, so there was
+      // never a case where the input was the only source.
+      //
+      // A parent's or school contact address, if that is ever wanted, is a
+      // different field with a different label — not this one.
+      email: googleEmail || undefined,
       age: age.trim() || undefined,
       location: location || undefined,
     });
@@ -95,6 +123,14 @@ export function LoginView() {
         <div className="text-xs font-bold text-muted">
           {t.createAccountSubtitle}
         </div>
+        {/* Signed in already — this screen is now about the details Google does
+            not know, chiefly the study language, which decides whether English
+            or French appears as a subject throughout the app. */}
+        {googleEmail && (
+          <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-purple/8 px-3 py-1 text-xs font-extrabold text-purple">
+            {t.signedInAs} {googleEmail}
+          </div>
+        )}
       </div>
 
       <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
@@ -134,18 +170,8 @@ export function LoginView() {
           </div>
         </div>
 
-        <div className="mb-3">
-          <label className="mb-1.5 block text-xs font-extrabold text-muted">
-            {t.emailOptional}
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            className={inputClasses}
-          />
-        </div>
+        {/* No email field. The signed-in address is shown as a chip above and
+            written straight from the session — see submit(). */}
 
         <div className="mb-3">
           <label className="mb-1.5 block text-xs font-extrabold text-muted">

@@ -17,6 +17,83 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 8 Sep 2026 — Real login: sign in with Google, or carry on as a guest
+
+*Landed in commit `58320ec`.*
+
+**Why.** Until now BrachNha had no login at all. The opening screen asked for a
+name and saved it on the phone, and that was it — there was no account, nothing
+followed a student to a second device, and the AI mentor was open to anyone on
+the internet who found the address. This adds a real account, and a way in for
+students who are not ready to make one.
+
+**What a student sees now.**
+
+Opening the app for the first time gives two choices:
+
+- **Continue with Google** — a real account. Their progress is backed up, and
+  they get the AI study roadmap and KruAI.
+- **Continue as Guest** — straight into the app, no account, no questions. They
+  can study lessons, do practice, flashcards and mock exams, and see their
+  progress. Everything is saved on that phone only.
+
+A guest who taps the roadmap or the chat button gets a short "Login required"
+panel explaining why, with a Google button and a "Maybe later". Nothing is
+hidden from them — they can see the features exist, which is rather the point.
+
+**Two things are account-only, and both for the same reason.** The AI roadmap is
+built from a student's own survey answers, and KruAI is a personal tutor that
+remembers their questions. Neither means anything without somewhere to save it.
+KruAI has a second reason: every question costs real money on the AI service, and
+we do not want that spent by people just passing through.
+
+**Signing in later keeps your work.** A guest who has been studying and then
+signs in with Google carries everything up into their new account. The one case
+where that is not automatic is when the Google account ALREADY has progress saved
+from another phone — then the app stops and asks which to keep, showing the level
+and XP on each side, and nothing is overwritten until the student chooses. This
+was the single most dangerous part of adding login and it is worth knowing it is
+handled.
+
+**What to re-test.**
+
+1. Open the app in a fresh browser — you should get the two-choice screen.
+2. "Continue as Guest" → you land on Home, NOT the survey. Reload the page: you
+   should still be a guest, still on Home.
+3. As a guest, tap the chat button and the "Quest Map" chip on Home — both should
+   show the "Login required" panel rather than opening.
+4. As a guest, type `/roadmap` into the address bar — you should get a "Sign in to
+   unlock" panel **with the menu and buttons still there**, not a dead end.
+5. Sign in with Google → you are asked for your name (pre-filled from Google) and
+   which language you study, then the survey, then the roadmap.
+6. Reload after signing in — you should stay signed in.
+7. Profile → Logout returns you to the two-choice screen.
+
+**Two new things on the Profile page.** A **study language** switcher, so English
+or French can be changed after signing up — before this it could only be set once,
+on the first screen, and a guest never saw that screen at all. And for guests, a
+"Guest mode" card with a Google button, so there is a way to make an account
+without having to bump into a locked feature first.
+
+**Before Google login will work, two settings pages need filling in** — this is
+configuration outside the code, so the app cannot do it for us:
+
+- **Google Cloud Console** — create an OAuth client and allow BrachNha's Supabase
+  address to receive the sign-in.
+- **Supabase** — turn Google on and paste in the two values Google gives you, then
+  list the addresses students will be arriving from (localhost for testing, and
+  the live site).
+
+Until that is done, "Continue with Google" will show a polite failure message and
+"Continue as Guest" will work normally. There is a step-by-step list in CLAUDE.md.
+
+**Also fixed along the way.** The app used to quietly create a throwaway account
+for every student in the background, which is where the ~200 junk rows on the
+Supabase users page came from. That is gone — nothing creates an account now
+unless a student presses the button.
+
+---
+
 ## 7 Sep 2026 — A code review before login: six real bugs fixed, and the app made safer to break
 
 *Landed in commit `a85670c`.*

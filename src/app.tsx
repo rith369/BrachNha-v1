@@ -3,6 +3,7 @@ import { Outlet, Route, Routes, useLocation } from "react-router";
 import { AppShell } from "@/components/shell/app-shell";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { useFocusMode, useMentorBlocked } from "@/hooks/use-focus-mode";
+import { useAuth } from "@/hooks/use-auth";
 import { useBrachNhaStore } from "@/lib/store";
 import HomePage from "@/pages/home";
 import NotFoundPage from "@/pages/not-found";
@@ -122,7 +123,15 @@ function ShellLayout() {
   // the only way off it, because a hamburger tap there means the student never
   // reaches the pledge at all. Once they've seen it — signed or skipped — the
   // roadmap is an ordinary page again.
-  const roadmapLock = pathname === "/roadmap" && !commitment && !pledgeSeen;
+  //
+  // `hasFullAccess` is load-bearing and not obvious. A guest never signs a
+  // pledge, so without it this condition is true for EVERY guest who reaches
+  // /roadmap — and it strips the sidebar, the hamburger and the FAB, while the
+  // route itself renders no BottomNav. They would land on the locked panel with
+  // no navigation of any kind and no way out but the browser's back button.
+  const { hasFullAccess } = useAuth();
+  const roadmapLock =
+    pathname === "/roadmap" && hasFullAccess && !commitment && !pledgeSeen;
 
   // Lessons and tests hide the same NAVIGATION, for a different reason: mid-task
   // the screen should be the exercise and nothing else. Both cases drop TopBar

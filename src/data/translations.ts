@@ -13,6 +13,12 @@ export const T = {
       "A few details so your AI coach and study plan fit you.",
     enterName: "Full name",
     namePlaceholder: "Type your name...",
+    // UNUSED since Google sign-in landed, and kept only so the km pair stays
+    // balanced. Do NOT wire an email input back onto the login form: the
+    // address comes from the session now, and an editable copy would let an
+    // unverified value overwrite the verified one in profiles.email. See
+    // submit() in features/login/components/login-view.tsx. A parent's or
+    // school contact address would be a different key with a different label.
     emailOptional: "Email (optional)",
     age: "Age",
     whereFrom: "Where are you from?",
@@ -181,6 +187,46 @@ export const T = {
     titleAchiever: "Achiever",
     titleExpert: "Expert",
     titleMaster: "Master",
+
+    // ── auth ──
+    // Bilingual, not Khmer-only: this is chrome, like Home and Profile, rather
+    // than curriculum content — so it follows the store's `lang` the way the
+    // rest of the shell does. "Google" is never translated, it is a brand name.
+    entryTitle: "Welcome, Hero!",
+    entryTagline: "Your quest to conquer Bac II starts here.",
+    continueWithGoogle: "Continue with Google",
+    continueAsGuest: "Continue as Guest",
+    guestNote: "Look around first. You can sign in any time to save your progress.",
+    googleNote: "Saves your progress and unlocks your AI coach.",
+    signingIn: "Signing in...",
+    signInFailed: "Sign-in could not start. Please check your connection and try again.",
+    guest: "Guest",
+
+    loginRequired: "Login required",
+    loginRequiredRoadmap:
+      "Your AI study roadmap is built from your own answers, so it needs an account to save them to.",
+    loginRequiredChat:
+      "KruAI is your personal tutor, so it needs an account to remember your questions.",
+    maybeLater: "Maybe later",
+    signInToUnlock: "Sign in to unlock",
+
+    accountConflictTitle: "Two sets of progress",
+    accountConflictBody:
+      "You have saved progress on this account, and different progress on this device. Which should we keep?",
+    accountConflictWarning: "The other one will be replaced.",
+    useMyAccount: "Use my saved account",
+    useThisDevice: "Keep this device's work",
+    onThisDevice: "On this device",
+    savedToAccount: "Saved to your account",
+    restoringAccount: "Restoring your account...",
+
+    studyLanguage: "Study language",
+    signedInAs: "Signed in as",
+    guestModeLabel: "Guest mode",
+    guestModeNote: "Your progress is saved on this device only.",
+    exitGuestMode: "Exit guest mode",
+    exitGuestConfirm:
+      "This clears everything saved on this device — XP, streak, lessons and exam history. Continue?",
   },
   km: {
     appName: "BrachNha",
@@ -359,6 +405,43 @@ export const T = {
     titleAchiever: "អ្នកសម្រេចបាន",
     titleExpert: "អ្នកជំនាញ",
     titleMaster: "មេជំនាញ",
+
+    // ── auth ──
+    entryTitle: "សូមស្វាគមន៍វីរបុរស!",
+    entryTagline: "ដំណើរយកឈ្នះ Bac II របស់អ្នកចាប់ផ្តើមនៅទីនេះ។",
+    continueWithGoogle: "បន្តជាមួយ Google",
+    continueAsGuest: "បន្តជាភ្ញៀវ",
+    guestNote: "មើលសិនក៏បាន។ អ្នកអាចចូលគណនីពេលណាក៏បាន ដើម្បីរក្សាទុកវឌ្ឍនភាព។",
+    googleNote: "រក្សាទុកវឌ្ឍនភាព និងបើកប្រើ KruAI របស់អ្នក។",
+    signingIn: "កំពុងចូល...",
+    signInFailed: "មិនអាចចាប់ផ្តើមការចូលបានទេ។ សូមពិនិត្យអ៊ីនធឺណិត រួចព្យាយាមម្ដងទៀត។",
+    guest: "ភ្ញៀវ",
+
+    loginRequired: "ត្រូវការចូលគណនី",
+    loginRequiredRoadmap:
+      "ផែនការសិក្សារបស់អ្នកបង្កើតឡើងតាមចម្លើយផ្ទាល់ខ្លួន ដូច្នេះត្រូវមានគណនីដើម្បីរក្សាទុក។",
+    loginRequiredChat:
+      "KruAI ជាគ្រូផ្ទាល់ខ្លួនរបស់អ្នក ដូច្នេះត្រូវមានគណនីដើម្បីចងចាំសំណួររបស់អ្នក។",
+    maybeLater: "ទុកសិន",
+    signInToUnlock: "ចូលគណនីដើម្បីបើកប្រើ",
+
+    accountConflictTitle: "វឌ្ឍនភាពពីរកន្លែង",
+    accountConflictBody:
+      "អ្នកមានវឌ្ឍនភាពក្នុងគណនីនេះ ហើយមានវឌ្ឍនភាពផ្សេងក្នុងឧបករណ៍នេះ។ តើត្រូវរក្សាមួយណា?",
+    accountConflictWarning: "មួយទៀតនឹងត្រូវជំនួស។",
+    useMyAccount: "ប្រើគណនីដែលរក្សាទុក",
+    useThisDevice: "រក្សាទុកការងារក្នុងឧបករណ៍នេះ",
+    onThisDevice: "ក្នុងឧបករណ៍នេះ",
+    savedToAccount: "រក្សាទុកក្នុងគណនី",
+    restoringAccount: "កំពុងស្ដារគណនីរបស់អ្នក...",
+
+    studyLanguage: "ភាសាសិក្សា",
+    signedInAs: "ចូលគណនីជា",
+    guestModeLabel: "របៀបភ្ញៀវ",
+    guestModeNote: "វឌ្ឍនភាពរបស់អ្នករក្សាទុកតែក្នុងឧបករណ៍នេះប៉ុណ្ណោះ។",
+    exitGuestMode: "ចាកចេញពីរបៀបភ្ញៀវ",
+    exitGuestConfirm:
+      "សកម្មភាពនេះនឹងលុបទាំងអស់ក្នុងឧបករណ៍នេះ — XP ជួរ មេរៀន និងប្រវត្តិប្រឡង។ បន្ត?",
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 

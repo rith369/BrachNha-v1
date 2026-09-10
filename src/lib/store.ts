@@ -9,6 +9,10 @@ import type {
   Conversation,
   Commitment,
   PracticeCard,
+  AuthStatus,
+  AuthUser,
+  AuthFeature,
+  AccountConflict,
 } from "@/types";
 import { makeConversationTitle } from "@/utils/chat-history";
 import {
@@ -29,6 +33,10 @@ export type {
   ChatMsg,
   Conversation,
   Commitment,
+  AuthStatus,
+  AuthUser,
+  AuthFeature,
+  AccountConflict,
 };
 
 // Conversations are persisted, so both dimensions are capped — otherwise a
@@ -69,6 +77,51 @@ export interface LoginData {
 }
 
 interface BrachNhaState {
+  // ── auth ──
+  //
+  // THE SESSION IS THE ONLY PROOF OF AUTHENTICATION. `authUser` below is a
+  // flattened copy of it, and it is deliberately NOT persisted — it is
+  // re-derived from Supabase on every load by hooks/use-auth-session.ts,
+  // because a value someone can edit in devtools is not evidence of anything.
+  //
+  /** "loading" until the session has been resolved (or ruled out without even
+   *  importing the SDK — see hasAuthTraces in lib/auth.ts). Nothing may treat
+   *  "loading" as "signed out": that is what would flash the entry screen at a
+   *  student who is in fact signed in. */
+  authStatus: AuthStatus;
+  /** Non-null ONLY for a real, non-anonymous session. Not persisted. */
+  authUser: AuthUser | null;
+  /**
+   * The student chose "Continue as Guest". Persisted, and it GRANTS NOTHING —
+   * it only routes them past the entry screen on the next load. Every check
+   * that unlocks a feature reads `authUser`, never this.
+   *
+   * Deliberately does NOT set a userName: writing a placeholder like "Guest"
+   * into the store would push it to profiles.display_name, surface it on the
+   * leaderboard and pre-fill it into the pledge signature, and then survive a
+   * later Google sign-in — leaving the student permanently named "Guest".
+   * useDisplayName() supplies the fallback at render time instead.
+   */
+  guestMode: boolean;
+  /** Which feature raised the "login required" prompt, or null. A string rather
+   *  than a boolean so the modal can say what it was that needed an account. */
+  authPrompt: AuthFeature | null;
+  /**
+   * The last account this DEVICE successfully synced with, or null.
+   *
+   * This is what makes signing in safe. `pushLocalState` writes a full
+   * destructive snapshot — it deletes server conversations absent from the
+   * local list and overwrites xp/level/coins/streak — so pushing into an
+   * account this device has never seen would wipe whatever the student built up
+   * on another one. Comparing the session's uid against this distinguishes
+   * "my own account, back again" from "an account I am adopting", and the
+   * second case asks before writing anything. See hooks/use-supabase-sync.ts.
+   */
+  syncedUserId: string | null;
+  /** Set when a sign-in finds data on BOTH sides and the student has to choose.
+   *  Nothing is written to either side until they do. */
+  accountConflict: AccountConflict | null;
+
   // ── onboarding / profile ──
   lang: Lang;
   userName: string;
@@ -203,7 +256,25 @@ interface BrachNhaState {
   activeConversationId: string | null;
 
   // ── actions ──
+  /** Called only by hooks/use-auth-session.ts, from the one onAuthStateChange
+   *  subscription. A no-op when nothing actually changed — see the body: this
+   *  fires on every token refresh and every tab focus, and `persist` writes the
+   *  whole store to localStorage on every set(). */
+  setAuthSession: (status: AuthStatus, user: AuthUser | null) => void;
+  /** "Continue as Guest". Sets the flag and NOTHING else — deliberately no
+   *  placeholder userName; see the field's own comment. */
+  continueAsGuest: () => void;
+  openAuthPrompt: (feature: AuthFeature) => void;
+  closeAuthPrompt: () => void;
+  setSyncedUserId: (userId: string | null) => void;
+  setAccountConflict: (conflict: AccountConflict | null) => void;
   setLang: (lang: Lang) => void;
+  /** The English/French track, changeable after signup. It decides which
+   *  language subject appears across Study, Practice, the exam tabs and grade
+   *  prediction, and used to be settable only on the login form — which a guest
+   *  never sees, leaving them on the allSubjects() English fallback with no way
+   *  out. Profile owns the control. */
+  setStudyLanguage: (language: "english" | "french") => void;
   completeLogin: (data: LoginData) => void;
   completeSurvey: (data: UserData) => void;
   schedulePlacementTest: (subject: string, scheduledDate: string) => void;
@@ -312,6 +383,21 @@ export const DEMO_SEED_STREAK = 12;
 // Named rather than inline so `migrate` can borrow its return type — the two
 // have to agree on exactly which keys reach localStorage.
 const partializeState = (state: BrachNhaState) => ({
+  // Persisted, but NOT synced — the two exceptions to the one-to-one with
+  // syncRelevantChange in hooks/use-supabase-sync.ts, noted here so the next
+  // person auditing the two lists does not "fix" them:
+  //
+  //   guestMode    — a choice about this device, not study data. Pushing it
+  //                  would be pushing it for an account that by definition has
+  //                  no session to push with.
+  //   syncedUserId — bookkeeping ABOUT the sync, so syncing it is circular.
+  //
+  // authStatus/authUser/authPrompt/accountConflict are excluded outright, like
+  // the UI flags below: the session is re-derived from Supabase on every load,
+  // and a persisted copy of "who is signed in" would be exactly the thing an
+  // attacker edits.
+  guestMode: state.guestMode,
+  syncedUserId: state.syncedUserId,
   lang: state.lang,
   userName: state.userName,
   userEmail: state.userEmail,
@@ -348,6 +434,17 @@ type PersistedState = ReturnType<typeof partializeState>;
 export const useBrachNhaStore = create<BrachNhaState>()(
   persist(
     (set) => ({
+      // "loading" is the honest opening value even when Supabase is
+      // unconfigured — use-auth-session.ts settles it on mount either way, and
+      // the gate in AppShell only ever renders a splash for a student who would
+      // be looking at the entry screen anyway.
+      authStatus: "loading",
+      authUser: null,
+      guestMode: false,
+      authPrompt: null,
+      syncedUserId: null,
+      accountConflict: null,
+
       lang: "en",
       userName: "",
       userEmail: "",
@@ -390,7 +487,40 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       conversations: [],
       activeConversationId: null,
 
+      /**
+       * Returns the state object UNCHANGED when the resolved identity has not
+       * moved, which matters more than it looks: `persist` serialises the whole
+       * store — up to 20 conversations of 40 messages — on every set(), and
+       * this is called from an auth listener that fires on every hourly token
+       * refresh and every tab focus. Comparing the id rather than the object is
+       * the point; the listener builds a fresh AuthUser each time.
+       *
+       * Signing IN also clears `guestMode`. Without that a guest who signs in
+       * keeps the flag, which would skip the survey and leave every locked
+       * feature still locked for someone who now has an account.
+       */
+      setAuthSession: (status, user) =>
+        set((state) => {
+          const sameUser = (state.authUser?.id ?? null) === (user?.id ?? null);
+          if (state.authStatus === status && sameUser) return state;
+          return {
+            authStatus: status,
+            authUser: user,
+            guestMode: user ? false : state.guestMode,
+            // A prompt on screen is asking them to do exactly this; leaving it
+            // up over the app they just unlocked would be its own bug.
+            authPrompt: user ? null : state.authPrompt,
+          };
+        }),
+
+      continueAsGuest: () => set({ guestMode: true, authPrompt: null }),
+      openAuthPrompt: (feature) => set({ authPrompt: feature }),
+      closeAuthPrompt: () => set({ authPrompt: null }),
+      setSyncedUserId: (userId) => set({ syncedUserId: userId }),
+      setAccountConflict: (conflict) => set({ accountConflict: conflict }),
+
       setLang: (lang) => set({ lang }),
+      setStudyLanguage: (language) => set({ userLanguage: language }),
       completeLogin: (data) =>
         set({
           userName: data.name,
@@ -656,6 +786,17 @@ export const useBrachNhaStore = create<BrachNhaState>()(
 
       logout: () =>
         set({
+          // Cleared in the SAME set() as the study data, not left to the auth
+          // listener a moment later. profile-view.tsx fires signOutAccount()
+          // without awaiting it, so for a beat `userName` is empty while
+          // `authUser` is still set — and the gate would read that as "signed
+          // in but no profile" and flash LoginView on the way out.
+          authStatus: "ready",
+          authUser: null,
+          guestMode: false,
+          authPrompt: null,
+          syncedUserId: null,
+          accountConflict: null,
           userName: "",
           userEmail: "",
           userAge: "",

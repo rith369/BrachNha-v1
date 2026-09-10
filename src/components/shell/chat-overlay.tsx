@@ -18,6 +18,7 @@ import { useT } from "@/data/translations";
 import { relativeDay } from "@/utils/chat-history";
 import { applyInsert, defaultMathLayout } from "@/utils/math-input";
 import { daysUntilExam } from "@/utils/exam-date";
+import { getAccessToken } from "@/lib/auth";
 import { cn } from "@/utils/cn";
 import { MathText } from "./math-text";
 import type { ChatProfile } from "@/utils/chat-prompt";
@@ -224,9 +225,22 @@ export function ChatOverlay() {
     addChatMsg({ role: "bot", text: "" });
 
     try {
+      // Read at send time, never held in state: getSession() refreshes an
+      // expired token on the spot, and the store is persisted — a token parked
+      // in it would be written to localStorage on every unrelated update.
+      //
+      // A null token is not short-circuited here. The endpoint answers 401 with
+      // a readable sentence, which the branch below renders, so the student
+      // gets the same explanation whether their session was missing or merely
+      // stale. The server is the gate; this is just how the key gets to it.
+      const token = await getAccessToken();
+
       const res = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ messages: history, lang, profile }),
       });
 

@@ -2,17 +2,17 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { Sparkles, Map, ClipboardList, LineChart, Gamepad2 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
-import { useShallow } from "zustand/react/shallow";
 import { QUOTES } from "@/data/questions";
 import { daysUntilExam } from "@/utils/exam-date";
+import { useRequireAuth, useDisplayName } from "@/hooks/use-auth";
 
 export function MotivationHero() {
-  const { lang, userName } = useBrachNhaStore(
-    useShallow((s) => ({
-      lang: s.lang,
-      userName: s.userName,
-    }))
-  );
+  const lang = useBrachNhaStore((s) => s.lang);
+  // Not `userName` directly: a guest deliberately has none, so the greeting
+  // would read "Good Day, !". useDisplayName supplies the Google name or a
+  // localized "Guest" instead — see hooks/use-auth.ts.
+  const userName = useDisplayName();
+  const requireAuth = useRequireAuth();
 
   // A real count to the exam date, not months × 30.
   const daysLeft = daysUntilExam();
@@ -43,8 +43,15 @@ export function MotivationHero() {
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
+        {/* Stays a <Link> — it IS a link for anyone signed in, and keeping the
+            href means middle-click and "open in new tab" still work. The guard
+            only cancels the navigation for a guest so the prompt opens here
+            instead of on a locked page. pages/roadmap.tsx is the real gate. */}
         <Link
           to="/roadmap"
+          onClick={(e) => {
+            if (!requireAuth("roadmap")) e.preventDefault();
+          }}
           className="flex items-center gap-1.5 rounded-full bg-pink/15 px-3.5 py-1.5 text-xs font-extrabold text-pink transition-transform active:scale-[0.98]"
         >
           <Map className="size-3.5" strokeWidth={2.5} />
