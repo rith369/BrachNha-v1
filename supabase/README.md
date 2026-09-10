@@ -98,6 +98,56 @@ dev, plus your deployed domain). **Avoid a bare `https://*.vercel.app/**`** — 
 would let Supabase hand an auth code to any Vercel subdomain, which anyone can
 deploy. Scope the wildcard to your own project's hostnames.
 
+### Three traps in the Google console, in the order they bite
+
+All three cost real time the first time through, and none of them says what it
+actually wants.
+
+**1. "Publish app" is greyed out, and the reason is on another page.** The
+Audience page says only *"complete your configuration on the Branding page"*.
+Publishing an External app needs three Branding fields that are optional while
+in Testing: **Application home page**, **Application privacy policy link**, and
+**Authorized domains**. The same missing configuration also shows on Audience as
+a permanent *"OAuth configuration is incomplete"* banner that survives a reload,
+which reads like a bug and is not one.
+
+**2. Every domain you name has to be registered, and the full hostname is what
+it wants.** Authorized domains must cover the redirect URI's domain AND
+whatever the home page and privacy policy links use — usually two entries:
+
+```
+<your-project-ref>.supabase.co
+your-app-domain.example.com
+```
+
+A shared hosting suffix like `vercel.app` is **rejected**: register the full
+hostname (`your-app.vercel.app`). Google's own error names the exact string it
+expects — read it rather than guessing.
+
+**3. DO NOT UPLOAD A LOGO.** With only the three non-sensitive scopes above and
+no logo, publishing is **instant and needs no review**. Uploading a logo is a
+brand claim, and it triggers a verification that takes days to weeks — to change
+one icon on one screen. The consent screen shows your app's NAME either way. Add
+it later, once you are live and not waiting on anything.
+
+### Testing vs In production
+
+|  | Testing | In production |
+| --- | --- | --- |
+| Who can sign in | only emails added under Audience → Test users | anyone with a Google account |
+| Cap | 100 | none |
+| Anyone else | hard "Access blocked" error | signs in normally |
+| Review | none | none, for non-sensitive scopes |
+
+**Testing is the state that produces errors**, so it is not the cautious choice
+— a student whose address you have not typed in by hand simply cannot get in,
+and the message blames Google verification rather than your test-user list.
+Publishing is reversible: the same page has a "Back to testing" button.
+
+The app needs `/privacy` to be reachable WITHOUT signing in for any of this,
+which is why that route sits outside `ShellLayout` — see the comment in
+`src/app.tsx`.
+
 ## Checking it worked
 
 ```bash
