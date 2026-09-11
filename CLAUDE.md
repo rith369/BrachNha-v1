@@ -2985,19 +2985,50 @@ the moment practice quizzes exist.
 
 **The calendar** (`features/profile/components/study-calendar.tsx`, maths in
 `utils/study-calendar.ts`) — a month grid, Sunday first to match
-`buildHeatmapWeeks`, with current and best streak above it and ‹ › paging back to
-the first logged month (never past the current one). Four things that look like
-choices anyone would make and are not:
+`buildHeatmapWeeks`, with current and best streak above it.
 
-- **TWO marks, because the rule has two kinds of day.** A goal day is a SOLID
-  `bg-brand` circle — those are the days the streak counts, so the solid runs on
-  the grid ARE the streak. A studied-but-no-goal day is a faint `bg-purple/10`
-  tint: real work shown, not a streak day. Filling those solid too would draw an
-  unbroken run beside a streak that says it broke. A legend names both, and the
-  nudge under the grid counts today's goal ("1 / 3") while it is open.
-- **Goal days are `bg-brand` under a white number, not the flame ramp.**
-  `bg-brand` is the scale cleared for white text in both themes; the flame ramp
-  is reserved for large text and glyphs and a 12px digit on it misses 4.5:1.
+**‹ › page through a fixed window, not just months with data.** They first
+stopped at the earliest logged month and at the current one — which on a new
+install meant two faded arrows that did nothing, and the user asked why they
+could not go back or forward. Now: BACK as far as the log can hold
+(`MAX_ACTIVITY_DAYS`), since before that no day can ever have been recorded;
+FORWARD to the exam month, read from `BAC2_EXAM_DATE` so the next cohort's
+one-line edit moves it too, and never short of the current month so the
+calendar still reaches today after the exam. The **Bac II exam day** carries a
+pink graduation cap above a pink number (per-theme `--color-pink`: a mark, not a
+fill under white text), is announced in its `aria-label`, and is named in the
+legend and under the title on its month. Other **future months** show the `daysUntilExam()` countdown
+under the title instead of a "goal done on 0 days" that is true and useless. A
+**Today** button appears in the header whenever another month is shown, and is
+absent — not disabled — on this one. It is a "schedule" in the only sense the
+app can honestly offer one: the fixed date everything is counting toward.
+
+Five things that look like choices anyone would make and are not:
+
+- **FLAMES, NOT CIRCLES — the user's design call, so the days look like a
+  streak.** A goal day is a BIG FLAME with its number inside: those are the days
+  the streak counts, so a run of flames on the grid IS the streak. A
+  studied-but-no-goal day is a smaller faint `bg-purple/20` flame: real work
+  shown, not a streak day — full-size flames there would draw an unbroken run
+  beside a streak that says it broke. Today is an UNDERLINE (white over a flame,
+  purple otherwise), the exam a cap; nothing in a day cell is round. A legend
+  names the marks, and the nudge under the grid counts today's goal ("1 / 3")
+  while it is open. The browser check fails if any day cell grows a
+  `rounded-full` or `ring-` again.
+- **The flame is a CSS MASK of Lucide's own Flame path**, so it matches the
+  streak glyph in `StatBar`, the pills and the Streak page — a mask because the
+  fill is a gradient, and an SVG gradient needs a page-unique id per flame. Its
+  viewBox is CROPPED to the flame (`4 2 16 21`): Lucide's 24×24 square is mostly
+  margin, and uncropped the flame filled two thirds of its cell and a two-digit
+  number spilled out. Cells are `h-11 w-9` — the flame's own 16:21 — and every
+  number shares one baseline where the flame's round body is (13/21 down),
+  flame or not. The small flame is inset in PERCENT so its body stays on the
+  number at both cell sizes.
+- **The fill is orange at the tip and `--brand-flame-to` pink from halfway
+  down, not the full flame ramp.** The white number sits in the lower half, and
+  that pink is 4.6:1 with white — clearing 4.5:1 for small text — while the
+  orange end is 4.2:1 and would not. That is the same reason globals.css keeps
+  the full ramp for large text and glyphs.
 - **Days are `<div>`s with an `aria-label`, never buttons.** There is nothing
   behind a day to open.
 - **The Khmer month names are HAND-WRITTEN (`KM_MONTHS`), not `Intl`.** Desktop
@@ -3006,9 +3037,11 @@ choices anyone would make and are not:
   `km-KH` in English without a warning; Android ships trimmed locale data too.
   The streak screens hand-write their Khmer weekday initials for the same reason,
   and the calendar reuses them (`weekdayLabel`) plus `daysLabel` from
-  `features/streak/copy.ts`. **`commitment-banner.tsx`'s `formatSignedDate`
-  still uses `km-KH` and so prints its date in English in Khmer mode** — the
-  same bug, pre-existing, not fixed here.
+  `features/streak/copy.ts`. **Two pre-existing places still use `km-KH` and so
+  print English in Khmer mode:** `commitment-banner.tsx`'s `formatSignedDate`,
+  and `utils/exam-date.ts`'s `formatExamDate` (shown on the roadmap). Same bug,
+  not fixed here — the calendar's exam label deliberately does not call
+  `formatExamDate` for that reason.
 
 **The identity row** (`profile-identity.tsx`) shows `authUser.avatarUrl`, which
 arrived with every Google session and was used nowhere, with

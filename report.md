@@ -17,6 +17,36 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 11 Sep 2026 — The study calendar shows flames, goes back and forward, and marks the Bac II exam
+
+*Not yet committed.*
+
+**Why.** You asked for the days to look like a streak instead of circles. And the
+‹ › arrows looked faded and did nothing when tapped, because they only moved to
+months that already had study recorded — and recording only started today.
+
+**What changed.**
+
+- **No more circles.** A day you finished the daily goal shows a **big flame**
+  with the date inside it, so a run of flames is your streak. A day you studied
+  but didn't finish shows a smaller, faint flame. Today is underlined.
+- **‹ goes back** through about the last 13 months (as far back as the app keeps
+  study history). Months before recording began are simply empty.
+- **› goes forward** up to **August 2027**, the Bac II exam month. The exam day,
+  **10 August**, has a pink graduation cap on it and is named under the month
+  title and in the key below the calendar.
+- **Future months** show how many days are left until Bac II.
+- A **Today** button appears whenever you're looking at another month, to jump
+  straight back.
+
+**What to re-test.** On Profile, finish today's goal: today turns into a big
+flame. Tap › until August 2027: the 10th has a pink graduation cap and says "Bac II
+exam date". Tap Today to come back. Tap ‹ a few times: it keeps going back, then
+stops about a year ago. Check it on a small phone too — the flames should sit
+side by side without overlapping.
+
+---
+
 ## 11 Sep 2026 — Profile: a study calendar, a real streak, and your Google photo
 
 *Landed in commit `c437337`.*
