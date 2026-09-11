@@ -19,7 +19,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 11 Sep 2026 — The study calendar shows flames, goes back and forward, and marks the Bac II exam
 
-*Not yet committed.*
+*Landed in commit `04d0d90`.*
 
 **Why.** You asked for the days to look like a streak instead of circles. And the
 ‹ › arrows looked faded and did nothing when tapped, because they only moved to
