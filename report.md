@@ -19,7 +19,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 11 Sep 2026 — Profile: a study calendar, a real streak, and your Google photo
 
-*Not yet committed.*
+*Landed in commit `c437337`.*
 
 **Why.** You asked for something on the Profile page like a schedule — a calendar
 showing which days you studied. The app had never recorded *which days* anyone
@@ -71,7 +71,7 @@ in with Google: your study days are still there.
 
 ## 11 Sep 2026 — Welcome picture, a simpler logout question, and a hint for guests
 
-*Not yet committed.*
+*Landed in commit `c437337`.*
 
 **What changed.**
 
@@ -94,7 +94,7 @@ question. As a guest, Exit guest mode shows the warning and the Google hint.
 
 ## 11 Sep 2026 — Flashcards can be swiped on a laptop too
 
-*Not yet committed.*
+*Landed in commit `c437337`.*
 
 **Why.** You asked for flashcards to be movable left/right on every device, the way
 they are on a phone. Until now, on a laptop or any screen 1024px or wider, dragging
@@ -119,7 +119,7 @@ answer up and down doesn't flip or rate the card.
 
 ## 11 Sep 2026 — "New Exam" is now a card list too, and it still works
 
-*Not yet committed.*
+*Landed in commit `c437337`.*
 
 **Why.** You asked for *វិញ្ញាសារបង្កើតថ្មី* (New Exam) to look the same as
 *វិញ្ញាសារឆ្នាំចាស់* (Past Papers) — a card per subject — but without the exam-year
@@ -153,7 +153,7 @@ like *វិញ្ញាសារឆ្នាំចាស់* minus the year row
 
 ## 11 Sep 2026 — The whole past-paper card is tappable now, not just the button
 
-*Not yet committed.*
+*Landed in commit `c437337`.*
 
 **Why.** On the Mock Exam page's *វិញ្ញាសារឆ្នាំចាស់* tab, only the small *តេស្ត*
 button on each card opened anything — tapping the picture or the subject name did
