@@ -19,20 +19,6 @@ const TAP_THRESHOLD = 8;
 const FLYOFF_MS = 220;
 
 /**
- * DRAG-TO-RATE IS PHONE/TABLET ONLY, below the app's own `lg` breakpoint
- * (1024px — the same number every other `lg:` in this codebase means). A
- * mouse-drag technically works (Pointer Events don't care which device fired
- * them), but dragging a card any real distance with a mouse is awkward in a
- * way a thumb swipe isn't, and the app already has a wider desktop layout
- * with room for real buttons — see review-session.tsx's Back/rating buttons,
- * which are the intended desktop path. Tap-to-flip is NOT gated by this: it
- * stays available at every width, on every device.
- */
-function isDragViewport(): boolean {
-  return typeof window !== "undefined" && window.innerWidth < 1024;
-}
-
-/**
  * One flashcard, Quizlet-style: tap anywhere to flip, drag left/right to rate
  * — right for ចងចាំ (know it), left for មិនទាន់ចងចាំ (don't know it yet) —
  * and a star to mark it important. Replaces the old Show-Answer-then-four-
@@ -113,10 +99,6 @@ export function SwipeableFlashcard({
   // and the card is animating on its own, ignoring further input.
   const [flyingOut, setFlyingOut] = useState<"know" | "dontKnow" | null>(null);
   const start = useRef({ x: 0, y: 0 });
-  // Cached once per gesture, at pointerdown, rather than re-read on every
-  // move — a resize mid-drag (real, if rare, on a foldable or a resized
-  // browser window) can't flip the rule out from under an in-progress drag.
-  const dragAllowed = useRef(true);
   // Refs, not just the state above — the window-level handlers below read
   // these for the actual grading decision so they always see the LATEST
   // value the instant it's written, with no dependency on a render having
@@ -137,14 +119,13 @@ export function SwipeableFlashcard({
   // then frozen for the rest of the gesture so a drag that curves doesn't
   // change its mind halfway.
   //   "pending" — hasn't moved enough to be anything yet; releasing = a tap
-  //   "drag"    — horizontal, on a viewport where dragging is allowed: rates
-  //   "scroll"  — vertical, or any movement where dragging isn't allowed:
-  //               the browser scrolls the face, and release does nothing
+  //   "drag"    — mostly horizontal: rates
+  //   "scroll"  — mostly vertical: the browser scrolls the face, and release
+  //               does nothing
   const gesture = useRef<"pending" | "drag" | "scroll">("pending");
 
   function onPointerDown(e: React.PointerEvent) {
     if (flyingOut) return;
-    dragAllowed.current = isDragViewport();
     start.current = { x: e.clientX, y: e.clientY };
     activePointerId.current = e.pointerId;
     // Reset here, not only at the end of a completed gesture — belt and
@@ -167,11 +148,10 @@ export function SwipeableFlashcard({
 
       if (gesture.current === "pending") {
         if (Math.max(Math.abs(dx), Math.abs(dy)) < TAP_THRESHOLD) return;
-        // Mostly-horizontal, and only where dragging is allowed at all, is a
-        // rating. Everything else — vertical, or any real movement on a
-        // desktop viewport — is left to the browser, which scrolls the face.
-        gesture.current =
-          dragAllowed.current && Math.abs(dx) >= Math.abs(dy) ? "drag" : "scroll";
+        // Mostly-horizontal is a rating, at every width and with a mouse as
+        // much as a finger — Pointer Events don't care which fired them.
+        // Mostly-vertical is left to the browser, which scrolls the face.
+        gesture.current = Math.abs(dx) >= Math.abs(dy) ? "drag" : "scroll";
       }
       if (gesture.current !== "drag") return;
 
@@ -193,7 +173,7 @@ export function SwipeableFlashcard({
       }
 
       if (gesture.current === "scroll") {
-        // The reader scrolled the face (or mouse-dragged on desktop). Not a
+        // The reader scrolled the face (or mouse-dragged it vertically). Not a
         // rating, and pointedly NOT a flip either.
         return;
       }
@@ -261,7 +241,7 @@ export function SwipeableFlashcard({
     <div>
       <div
         onPointerDown={onPointerDown}
-        className="relative touch-pan-y select-none"
+        className="relative cursor-grab touch-pan-y select-none active:cursor-grabbing"
         style={{
           transform: flyTransform ?? `translateX(${dragX}px) rotate(${rotate}deg)`,
           opacity: flyingOut ? 0 : 1,
@@ -371,14 +351,7 @@ export function SwipeableFlashcard({
       </div>
 
       <div className="mt-3 text-center text-xs font-bold text-muted">
-        <span className="lg:hidden">
-          ចុចដើម្បីត្រឡប់ • អូសស្តាំ = ចងចាំ • អូសឆ្វេង = មិនទាន់ចងចាំ
-        </span>
-        {/* Above `lg` the drag is disabled (see isDragViewport) in favour of
-            the Back/✕/✓ buttons review-session.tsx renders there — a mouse
-            has to click those anyway, so the hint just says what's still
-            true at that width. */}
-        <span className="hidden lg:inline">ចុចដើម្បីត្រឡប់</span>
+        ចុចដើម្បីត្រឡប់ • អូសស្តាំ = ចងចាំ • អូសឆ្វេង = មិនទាន់ចងចាំ
       </div>
     </div>
   );

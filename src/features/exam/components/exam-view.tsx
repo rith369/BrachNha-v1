@@ -2,16 +2,23 @@ import { useState } from "react";
 import { useBrachNhaStore, type ExamResult } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { UnderlineTabs } from "@/components/ui/underline-tabs";
-import { MOCK_QS } from "@/data/questions";
-import { EXAM_TABS, type ExamTab, type PastPaper } from "../papers";
+import { EXAM_TABS, type ExamPaper, type ExamTab } from "../papers";
 import { ExamRunner, type ExamScore } from "./exam-runner";
 import { ExamResults } from "./exam-results";
-import { GeneratedExamPanel } from "./generated-exam-panel";
+import { GeneratedPapersPanel } from "./generated-papers-panel";
 import { PastPapersPanel } from "./past-papers-panel";
 
-/** Which kind of attempt is in flight. The distinction outlives the run, because
- *  it also decides what Retake restarts. */
-type Run = { kind: "generated" } | { kind: "past"; paper: PastPaper };
+/**
+ * Which kind of attempt is in flight. The distinction outlives the run, because
+ * it also decides what Retake restarts AND whether handleSubmit writes into
+ * examResults. Both kinds now carry a `paper` — Tab B stopped being one fixed
+ * mixed-subject test the moment it became a per-subject card list, so a
+ * "generated" run needs to know WHICH subject's paper it's running exactly like
+ * a "past" run already does. See generatedPapers() in ../papers.
+ */
+type Run =
+  | { kind: "generated"; paper: ExamPaper }
+  | { kind: "past"; paper: ExamPaper };
 
 /**
  * The /exam screen: two tabs over one exam catalog, plus the runner and results
@@ -52,11 +59,11 @@ export function ExamView() {
     addXp(score.score * 20);
 
     // But a PAST-PAPER attempt deliberately does NOT go into examResults. That
-    // array captions Home's stat pill "from mock exams", feeds chat-prompt.ts's
-    // "average mock-exam percentage" to KruAI as a fact about the student, and
-    // is rendered UNFILTERED by Tab B's Previous Results list — so a past-paper
-    // attempt would show up under the wrong tab on this very screen. Same rule
-    // that already keeps placement-test attempts out.
+    // array captions Home's stat pill "from mock exams" and feeds
+    // chat-prompt.ts's "average mock-exam percentage" to KruAI as a fact about
+    // the student — a real MoEYS past paper is the opposite end of that
+    // spectrum from a generated practice paper, not another mock exam. Same
+    // rule that already keeps placement-test attempts out.
     //
     // When past papers get a history of their own it should be a SEPARATE
     // persisted field, not a widening of this one.
@@ -74,8 +81,8 @@ export function ExamView() {
     return (
       <div className="min-h-0 flex-1">
         <ExamRunner
-          questions={run.kind === "past" ? run.paper.questions : MOCK_QS}
-          kicker={run.kind === "past" ? run.paper.subject.name : undefined}
+          questions={run.paper.questions}
+          kicker={run.paper.subject.name}
           onExit={() => setRun(null)}
           onSubmit={handleSubmit}
         />
@@ -108,8 +115,8 @@ export function ExamView() {
                 onStartPaper={(paper) => setRun({ kind: "past", paper })}
               />
             ) : (
-              <GeneratedExamPanel
-                onStart={() => setRun({ kind: "generated" })}
+              <GeneratedPapersPanel
+                onStartPaper={(paper) => setRun({ kind: "generated", paper })}
               />
             )}
           </>

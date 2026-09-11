@@ -13,6 +13,7 @@ import type {
   AuthUser,
   AuthFeature,
   AccountConflict,
+  ActivityLog,
 } from "@/types";
 import { makeConversationTitle } from "@/utils/chat-history";
 import {
@@ -22,8 +23,9 @@ import {
   type ReviewResult,
   type ReviewState,
 } from "@/utils/spaced-repetition";
-import { FLASHCARD_XP, FLASHCARD_COINS } from "@/utils/rewards";
-import { todayKey } from "@/utils/day";
+import { FLASHCARD_XP, FLASHCARD_COINS, TASK_XP } from "@/utils/rewards";
+import { addDaysKey, parseDayKey, todayKey } from "@/utils/day";
+import { currentStreak, isGoalComplete } from "@/utils/streak";
 
 export type {
   Lang,
@@ -50,6 +52,11 @@ const MAX_CONVERSATIONS = 20; // oldest-updated dropped first
 // bounding localStorage; oldest entries drop first, same rule conversations
 // already follow.
 const MAX_REVIEW_HISTORY = 1000;
+
+// activityLog gains at most one key per day studied, so this is roughly a
+// year and a month of history — longer than a Bac II cohort uses the app, and
+// the same window the sync layer pulls back on a fresh device.
+export const MAX_ACTIVITY_DAYS = 400;
 
 function newId(): string {
   // randomUUID needs a secure context; localhost and https both qualify, but
@@ -152,7 +159,21 @@ interface BrachNhaState {
    * Nothing spends them yet.
    */
   coins: number;
+  /**
+   * DERIVED from `activityLog` by currentStreak() in utils/streak.ts, and
+   * stored only so every reader — Home's StatPills, the global StatBar, both
+   * /streak screens, the mentor prompt, profiles.streak — keeps reading one
+   * plain field. Counts GOAL-COMPLETE days only. Recomputed wherever it can
+   * change: `completeTask()` (the goal just completed) and
+   * `rolloverDailyTasks()` (a day passed without it). Nothing may set it any
+   * other way — and earning XP alone deliberately does not touch it.
+   */
   streak: number;
+  /** The one record of WHEN a student studied: per local day, the XP earned and
+   *  whether the daily goal was met. See DayActivity in types/index.ts. XP is
+   *  written by `award()`, the goal by `completeTask()`; capped at
+   *  MAX_ACTIVITY_DAYS; synced through daily_activity. */
+  activityLog: ActivityLog;
   tasks: Tasks;
   /**
    * The local calendar day (`YYYY-MM-DD`) `tasks` describes.
@@ -276,6 +297,8 @@ interface BrachNhaState {
    *  out. Profile owns the control. */
   setStudyLanguage: (language: "english" | "french") => void;
   completeLogin: (data: LoginData) => void;
+  /** Profile's name edit. Ignores a blank name — see the action body. */
+  setUserName: (name: string) => void;
   completeSurvey: (data: UserData) => void;
   schedulePlacementTest: (subject: string, scheduledDate: string) => void;
   resolvePlacementTest: (subject: string, isWeak: boolean) => void;
@@ -300,8 +323,9 @@ interface BrachNhaState {
   toggleStarredCard: (cardId: string) => void;
   addExamResult: (result: ExamResult) => void;
   resetDailyTasks: () => void;
-  /** Clears `tasks` if `tasksDate` is not today. Idempotent and cheap, so the
-   *  caller can run it on mount and on every tab-visible without a guard. */
+  /** Clears `tasks` and re-derives `streak` if `tasksDate` is not today.
+   *  Idempotent and cheap, so the caller can run it on mount and on every
+   *  tab-visible without a guard. */
   rolloverDailyTasks: () => void;
   setTheme: (theme: Theme) => void;
   setChatOpen: (open: boolean) => void;
@@ -336,11 +360,48 @@ interface BrachNhaState {
  * the exception stays visible at the call site instead of hiding in a table
  * here — if a third or fourth caller ever needs one, that is the signal the
  * ratio itself is wrong and should be re-set, not worked around again.
+ *
+ * It is ALSO the single place a day becomes a studied day. Every lesson, quiz
+ * answer, flashcard and daily task already routes its reward through here, so
+ * logging the XP against today in the same breath is what makes "studied" and
+ * "earned something" one fact rather than two trackers that can drift.
+ *
+ * It does NOT touch the streak. A streak day is a GOAL-complete day, not a
+ * studied one (the user's rule), so only completeTask() can make one.
  */
 const COINS_PER_XP = 0.25;
 
+/** Drops anything older than MAX_ACTIVITY_DAYS. Day keys compare
+ *  chronologically as plain strings. */
+function trimLog(log: ActivityLog, today: string): ActivityLog {
+  const cutoff = addDaysKey(parseDayKey(today), -MAX_ACTIVITY_DAYS);
+  return Object.fromEntries(
+    Object.entries(log).filter(([day]) => day > cutoff)
+  );
+}
+
+/** Today's XP grows by `amount`. A zero grant leaves the log untouched rather
+ *  than writing an empty entry, which would claim a studied day that wasn't.
+ *  (`prev?.xp` also reads a plain number — the first, XP-only shape of this
+ *  log — as 0 instead of throwing; it only ever reached development browsers.) */
+function logXp(log: ActivityLog, today: string, amount: number): ActivityLog {
+  if (amount <= 0) return log;
+  const prev = log[today];
+  return trimLog(
+    { ...log, [today]: { xp: (prev?.xp ?? 0) + amount, goal: prev?.goal === true } },
+    today
+  );
+}
+
+/** Marks today's goal done. Idempotent. */
+function logGoal(log: ActivityLog, today: string): ActivityLog {
+  const prev = log[today];
+  if (prev?.goal === true) return log;
+  return trimLog({ ...log, [today]: { xp: prev?.xp ?? 0, goal: true } }, today);
+}
+
 function award(
-  state: { xp: number; level: number; coins: number },
+  state: { xp: number; level: number; coins: number; activityLog: ActivityLog },
   amount: number,
   coins?: number
 ) {
@@ -349,6 +410,7 @@ function award(
     xp,
     level: xp >= state.level * 100 ? state.level + 1 : state.level,
     coins: state.coins + (coins ?? Math.floor(amount * COINS_PER_XP)),
+    activityLog: logXp(state.activityLog, todayKey(), amount),
   };
 }
 
@@ -365,20 +427,6 @@ const emptyUserData: UserData = {
   grade: "",
   studied: false,
 };
-
-/**
- * The seeded streak, and the SINGLE source for every streak shown anywhere.
- *
- * Exported so features/streak can build its screens on the same number instead
- * of authoring a second one. It used to have a private copy called
- * DEMO_STREAK, which is exactly how Home's stat pill came to say 3 while the
- * Streak page said 12 — two hardcoded numbers for one fact.
- *
- * It stops being a constant the day a daily activity log exists; at that point
- * this is deleted and the field is derived. Nothing else has to move, because
- * everything already reads the field rather than this.
- */
-export const DEMO_SEED_STREAK = 12;
 
 // Named rather than inline so `migrate` can borrow its return type — the two
 // have to agree on exactly which keys reach localStorage.
@@ -413,6 +461,7 @@ const partializeState = (state: BrachNhaState) => ({
   level: state.level,
   coins: state.coins,
   streak: state.streak,
+  activityLog: state.activityLog,
   tasks: state.tasks,
   tasksDate: state.tasksDate,
   examResults: state.examResults,
@@ -460,16 +509,10 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       xp: 0,
       level: 1,
       coins: 0,
-      /**
-       * NOTHING COMPUTES THIS YET — it is seeded and only ever read, by Home's
-       * StatPills, the global StatBar, the two /streak screens and the mentor
-       * prompt. Until a daily activity log exists (see the Streak feature's own
-       * demo-data.ts for the timezone and missed-day questions that are still
-       * undesigned), it is one hardcoded number, and it has to be THE one:
-       * every surface that shows a streak reads this, so they cannot disagree.
-       * It was 3 while the pages that display it prominently did not exist.
-       */
-      streak: DEMO_SEED_STREAK,
+      // Derived from activityLog — see the field's doc comment. It used to be
+      // a seeded 12 (DEMO_SEED_STREAK) that nothing ever incremented.
+      streak: 0,
+      activityLog: {},
       tasks: emptyTasks,
       tasksDate: "",
       examResults: [],
@@ -530,6 +573,17 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           userLocation: data.location ?? "",
         }),
 
+      // Blank is refused HERE, not only in the form: an empty userName is
+      // exactly what AppShell's gate reads as "signed in, no profile yet", so
+      // writing one would throw the student back onto the signup form.
+      setUserName: (name) =>
+        set((state) => {
+          const trimmed = name.trim();
+          return trimmed && trimmed !== state.userName
+            ? { userName: trimmed }
+            : state;
+        }),
+
       completeSurvey: (data) =>
         set({ userData: data, surveyed: true }),
 
@@ -571,10 +625,19 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           const today = todayKey();
           const rolled = state.tasksDate === today ? state.tasks : emptyTasks;
           if (rolled[task]) return state; // already done today, no-op
+          const tasks = { ...rolled, [task]: true };
+          const rewarded = award(state, TASK_XP);
+          // THE ONLY PLACE A STREAK DAY IS MADE. The goal is complete the moment
+          // the last of its three tasks lands, whichever order they came in.
+          const activityLog = isGoalComplete(tasks)
+            ? logGoal(rewarded.activityLog, today)
+            : rewarded.activityLog;
           return {
-            tasks: { ...rolled, [task]: true },
+            tasks,
             tasksDate: today,
-            ...award(state, 20),
+            ...rewarded,
+            activityLog,
+            streak: currentStreak(activityLog, today),
           };
         }),
 
@@ -679,7 +742,15 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           // No tasks completed yet: stamp the day and leave the (already
           // empty) checklist alone, so a fresh install does not look like a
           // rollover that just happened.
-          return { tasks: emptyTasks, tasksDate: today };
+          return {
+            tasks: emptyTasks,
+            tasksDate: today,
+            // A new day is the one moment a streak can BREAK with no task being
+            // completed, so completeTask() alone would never notice. A run that
+            // ended yesterday still counts today (see currentStreak); one that
+            // ended the day before does not.
+            streak: currentStreak(state.activityLog, today),
+          };
         }),
 
       addExamResult: (result) =>
@@ -810,7 +881,8 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           xp: 0,
           level: 1,
           coins: 0,
-          streak: DEMO_SEED_STREAK,
+          streak: 0,
+          activityLog: {},
           tasks: emptyTasks,
           tasksDate: "",
           examResults: [],
@@ -830,7 +902,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       // v1 stamped writes so a future schema change COULD use `migrate`; v2 is
       // the first one that actually did. Note neither helps with the v0 data
       // already in students' browsers — see the `merge` note below.
-      version: 3,
+      version: 4,
 
       migrate: (persisted, version) => {
         let state = persisted as Partial<PersistedState>;
@@ -846,19 +918,17 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           state = { ...state, theme: "light" as const };
         }
 
-        // v2 → v3: the seeded streak went 3 → 12 so that every surface showing
-        // a streak agrees (Home's stat pill, the global StatBar, both /streak
-        // screens). Overwriting a persisted value normally would be wrong — but
-        // NOTHING HAS EVER INCREMENTED THIS FIELD, so every stored 3 is the old
-        // default rather than days a student actually earned, and leaving it
-        // would mean the pill kept saying 3 next to a page saying 12. Same
-        // reasoning as the theme reset above.
+        // v3 → v4 (and it supersedes the old v2 → v3 step, which lifted the
+        // seed 3 → 12): the streak stops being a seed and starts being derived
+        // from activityLog. Overwriting a persisted value is normally wrong —
+        // but NOTHING EVER INCREMENTED THIS FIELD, so every stored streak, 3 or
+        // 12, is a default rather than days a student earned. There is no
+        // history to derive a real one from, so it is 0 until they study.
         //
-        // Guarded on the exact old default so a value set any other way is left
-        // alone — and once streaks are really computed, this migration must not
-        // be extended: at that point a stored number is a student's own.
-        if (version < 3 && state.streak === 3) {
-          state = { ...state, streak: DEMO_SEED_STREAK };
+        // THIS IS THE LAST STREAK MIGRATION. From v4 on the stored number is
+        // derived from the student's own log; a future step must never touch it.
+        if (version < 4) {
+          state = { ...state, streak: 0, activityLog: {} };
         }
 
         return state;

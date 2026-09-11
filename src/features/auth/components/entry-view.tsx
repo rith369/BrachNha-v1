@@ -49,10 +49,20 @@ export function EntryView() {
           the middle of a phone and do not drift to the top of a laptop. */}
       <div className="flex flex-1 flex-col justify-center">
         <div className="mb-8 text-center">
-          <div className="mb-3 text-6xl">⚔️</div>
-          {/* t.welcome carries its own ⚔️ and the illustration above is the
-              same sword, so this uses a plain heading — the same pairing
-              login-view.tsx makes with t.createAccount. */}
+          {/* width/height reserve the box before the file lands, so the
+              heading below does not jump on first paint — same reason
+              wordmark.tsx sets them. Decorative, so alt is empty: the heading
+              underneath already says what this screen is. */}
+          <img
+            src="/illustrations/entry.svg"
+            alt=""
+            width={220}
+            height={160}
+            className="mx-auto mb-4 w-full max-w-[220px]"
+          />
+          {/* t.welcome carries a ⚔️ of its own, which would sit oddly under
+              this illustration, so this uses a plain heading — the same
+              pairing login-view.tsx makes with t.createAccount. */}
           <div className="mb-2 font-heading text-xl font-extrabold">
             {t.entryTitle}
           </div>

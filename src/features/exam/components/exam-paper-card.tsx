@@ -2,11 +2,16 @@ import { PenLine } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { SUBJECT_STYLE } from "@/features/lessons/subject-styles";
 import { SubjectArt } from "@/features/lessons/components/subject-art";
-import type { PastPaper } from "../papers";
+import type { ExamPaper } from "../papers";
 
 /**
- * One past-paper row: a wide illustration banner, the paper's name, its blurb,
- * and the តេស្ត action.
+ * One exam-paper row: a wide illustration banner, the paper's name, its blurb,
+ * and the តេស្ត action. Shared by BOTH tabs — real past-year papers (which carry
+ * a `year` the card never reads) and the newly-generated per-subject papers —
+ * lifted the moment the second caller needed the identical look, same reason
+ * `shell/wordmark.tsx` and `shell/stat-bar.tsx` exist. `paper` is typed as the
+ * base `ExamPaper`, not `PastPaper`, precisely so it doesn't demand a field this
+ * component has never rendered.
  *
  * THE BANNER'S CROP RATIO IS HELD CONSTANT, not its height. This card triples
  * in width from 288px on a 320px phone to the 672px content cap, so a fixed
@@ -26,30 +31,39 @@ import type { PastPaper } from "../papers";
  * in a CSS multi-column; this list is ordinary block flow.
  *
  * The shell is the app's NEUTRAL surface. Subject colour appears only in the art
- * gradient and — for a paper that actually has questions — the action fill.
+ * gradient and — for a paper that actually has questions — the action pill.
  *
- * THE តេស្ត BUTTON STAYS TAPPABLE ON AN EMPTY PAPER, and that is a deliberate
- * departure from this app's usual rule (sidebar-nav.tsx's `href: null` rows, the
- * survey's StudiedStep, subject-card.tsx's zero-lesson tile all render a
- * non-tappable div because a control that answers a tap with silence reads as
- * broken). It was chosen for this screen: the tap is NOT silent, it explains
- * itself, and the ឆាប់ៗនេះ chip means a student learns the state without having
- * to tap at all — the same principle as StudiedStep's note being rendered
- * unconditionally rather than on press. Don't "fix" it back to a dimmed div.
+ * THE WHOLE CARD IS THE TAP TARGET, not just the តេស្ត pill — the user asked for
+ * this explicitly after the first version only wired the small button up.
+ * `onTest` sits on the outer `<button>`; the visible តេស្ត chip is a plain `<span>`
+ * rather than a second nested button, since a `<button>` inside a `<button>` is
+ * invalid and the whole card already carries the one real action. Same
+ * "the row IS the link" shape `PracticeLessonList`'s lesson rows already use with
+ * `<Link>` — here it's `<button>` because the action is a callback (open the
+ * runner, or show the notice), not a route.
  *
- * The button's two looks are the honest signal: a pending paper gets the neutral
- * outline pill from the reference design, a paper with real questions gets the
- * subject fill under white text. Every paper is pending today, so the screen
- * matches the reference now and gains the distinction for free when content
- * lands. The fill is an inline style because --subject-* is deliberately not
- * mapped into @theme — see subject-styles.ts.
+ * THE CARD STAYS TAPPABLE ON AN EMPTY PAPER, and that is a deliberate departure
+ * from this app's usual rule (sidebar-nav.tsx's `href: null` rows, the survey's
+ * StudiedStep, subject-card.tsx's zero-lesson tile all render a non-tappable div
+ * because a control that answers a tap with silence reads as broken). It was
+ * chosen for this screen: the tap is NOT silent, it explains itself, and the
+ * ឆាប់ៗនេះ chip means a student learns the state without having to tap at all —
+ * the same principle as StudiedStep's note being rendered unconditionally rather
+ * than on press. Don't "fix" it back to a dimmed div.
+ *
+ * The pill's two looks are still the honest signal: a pending paper gets the
+ * neutral outline pill from the reference design, a paper with real questions
+ * gets the subject fill under white text. Every paper is pending today, so the
+ * screen matches the reference now and gains the distinction for free when
+ * content lands. The fill is an inline style because --subject-* is deliberately
+ * not mapped into @theme — see subject-styles.ts.
  */
-export function PastPaperCard({
+export function ExamPaperCard({
   paper,
   notice,
   onTest,
 }: {
-  paper: PastPaper;
+  paper: ExamPaper;
   /** Show the coming-soon line under this card. Owned by the panel so only one
    *  card can ever show it. */
   notice: boolean;
@@ -59,13 +73,16 @@ export function PastPaperCard({
   const style = SUBJECT_STYLE[paper.subject.id];
 
   return (
-    <div className="mb-3 overflow-hidden rounded-2xl border border-purple/10 bg-surface shadow-panel">
+    <button
+      onClick={onTest}
+      className="mb-3 block w-full overflow-hidden rounded-2xl border border-purple/10 bg-surface text-left shadow-panel transition hover:brightness-[1.03] active:brightness-95"
+    >
       <SubjectArt subject={paper.subject} className="aspect-[11/4] max-h-44 rounded-none" />
 
       <div className="p-3.5">
         <div className="flex items-center justify-between gap-3">
           {/* min-w-0 + truncate: without them a long Khmer paper name pushes the
-              action button off the card at 320px. */}
+              action pill off the card at 320px. */}
           <div className="min-w-0 flex-1">
             <div className="font-heading truncate text-sm font-extrabold text-text md:text-base">
               {paper.title}
@@ -75,19 +92,18 @@ export function PastPaperCard({
             </div>
           </div>
 
-          <button
-            onClick={onTest}
+          <span
             className={cn(
-              "flex shrink-0 items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-extrabold transition",
+              "flex shrink-0 items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-extrabold",
               ready
                 ? "text-white shadow-panel-sm"
-                : "border border-purple/15 bg-purple/8 text-purple hover:bg-purple/12"
+                : "border border-purple/15 bg-purple/8 text-purple"
             )}
             style={ready ? { backgroundColor: style.fill } : undefined}
           >
             <PenLine className="size-3.5 shrink-0" strokeWidth={2.5} />
             តេស្ត
-          </button>
+          </span>
         </div>
 
         {!ready && (
@@ -105,6 +121,6 @@ export function PastPaperCard({
           </div>
         )}
       </div>
-    </div>
+    </button>
   );
 }

@@ -1,18 +1,93 @@
 /**
- * Streak milestone maths — pure, and deliberately ignorant of where the numbers
- * come from.
+ * Streak maths — pure, and deliberately ignorant of where the numbers come from.
  *
  * Same split as utils/leaderboard.ts and utils/gradePrediction.ts: this file
- * owns the derivation and declares the shape it needs, while the ladder itself
- * lives in features/streak/milestones.ts and the (currently fake) streak value
- * in features/streak/demo-data.ts. utils/ never imports from features/, so the
- * arrow only ever points this way.
+ * owns the derivation and declares the shape it needs, while the milestone
+ * ladder lives in features/streak/milestones.ts. utils/ never imports from
+ * features/, so the arrow only ever points this way.
  *
- * NOTHING HERE IS DEMO DATA. When real per-day tracking lands, the streak
- * number handed in stops being hardcoded and every function below keeps
- * working unchanged — which is the point of taking it as an argument rather
- * than reading the store.
+ * Two halves. The milestone functions take a streak NUMBER and never cared
+ * where it came from — which is why they needed no change when the number
+ * stopped being a hardcoded seed. `currentStreak` / `bestStreak` are where that
+ * number now comes FROM: the store's `activityLog`, one entry per day studied.
+ *
+ * THE RULE: A DAY COUNTS ONLY WHEN THE DAILY GOAL IS COMPLETE — the user's
+ * decision, and what the Streak page has always told students ("just opening
+ * the app doesn't count"). Studying without finishing the goal still fills the
+ * day in on the Profile calendar, more faintly, but it does not extend a streak.
  */
+
+import type { ActivityLog, Tasks } from "@/types";
+import { addDaysKey, parseDayKey } from "@/utils/day";
+
+/**
+ * The daily goal: the three tasks the Streak page's goal card and Roadmap's
+ * Daily Mission already name. `challenge` is an extra row on Home's checklist,
+ * not part of the goal.
+ */
+export const DAILY_GOAL_TASKS = ["lesson", "practice", "flashcards"] as const;
+
+export function isGoalComplete(tasks: Tasks): boolean {
+  return DAILY_GOAL_TASKS.every((key) => tasks[key]);
+}
+
+/** How many of today's goal tasks are done — the "1 / 3" in the calendar. */
+export function goalTasksDone(tasks: Tasks): number {
+  return DAILY_GOAL_TASKS.filter((key) => tasks[key]).length;
+}
+
+// Optional chaining is load-bearing, not tidiness: an absent day is undefined,
+// and a device that ran the first, XP-only version of this log holds plain
+// numbers, whose `.goal` is simply undefined — false, rather than a crash.
+function goalMet(log: ActivityLog, day: string): boolean {
+  return log[day]?.goal === true;
+}
+
+function previousDay(day: string): string {
+  return addDaysKey(parseDayKey(day), -1);
+}
+
+/**
+ * The streak as it stands on `today`: the run of consecutive goal-complete days
+ * ending today — or ending YESTERDAY when today's goal is not done yet.
+ *
+ * That second clause is the whole design. A streak is not broken until the day
+ * is over: a student who finished the goal every day this week and opens the
+ * app at 7am has an unbroken streak waiting for today's work, and only a full
+ * day without the goal takes it to 0. Counting strictly from today would show 0
+ * every morning and break every streak at midnight.
+ *
+ * `today` is an argument rather than a todayKey() call so the rule is testable
+ * against a fixed date, and so the store computes it once per update.
+ */
+export function currentStreak(log: ActivityLog, today: string): number {
+  let day = goalMet(log, today) ? today : previousDay(today);
+  let count = 0;
+  while (goalMet(log, day)) {
+    count += 1;
+    day = previousDay(day);
+  }
+  return count;
+}
+
+/** The longest run anywhere in the log. Always >= currentStreak, since the
+ *  current run is one of the runs it considers. */
+export function bestStreak(log: ActivityLog): number {
+  // YYYY-MM-DD sorts chronologically as a plain string.
+  const days = Object.keys(log)
+    .filter((d) => goalMet(log, d))
+    .sort();
+
+  let best = 0;
+  let run = 0;
+  let prev: string | null = null;
+  for (const day of days) {
+    run = prev !== null && previousDay(day) === prev ? run + 1 : 1;
+    best = Math.max(best, run);
+    prev = day;
+  }
+  return best;
+}
 
 export interface StreakMilestone {
   /** Consecutive days needed to reach it. */

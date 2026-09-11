@@ -3,7 +3,7 @@ import { useBrachNhaStore } from "@/lib/store";
 import { PAST_PAPER_YEARS } from "@/data/past-papers";
 import { toKhmerDigits } from "@/utils/khmer-num";
 import { cn } from "@/utils/cn";
-import { PastPaperCard } from "./past-paper-card";
+import { ExamPaperCard } from "./exam-paper-card";
 import { papersForYear, type PastPaper } from "../papers";
 
 /**
@@ -80,7 +80,7 @@ export function PastPapersPanel({
 
       <div>
         {papers.map((p) => (
-          <PastPaperCard
+          <ExamPaperCard
             key={p.key}
             paper={p}
             notice={notice === p.key}

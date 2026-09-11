@@ -73,6 +73,20 @@ export interface Tasks {
   challenge: boolean;
 }
 
+/** One local calendar day of study — the device's twin of a daily_activity row. */
+export interface DayActivity {
+  /** XP earned that day. > 0 means the student studied. */
+  xp: number;
+  /** All three daily-goal tasks (utils/streak.ts's DAILY_GOAL_TASKS) were done
+   *  that day. ONLY these days count toward the streak. */
+  goal: boolean;
+}
+
+/** Keyed `YYYY-MM-DD` by utils/day.ts's todayKey(). The streak, the "+N today"
+ *  label and the Profile calendar are all derived from this and nothing else.
+ *  An absent day was not studied at all. */
+export type ActivityLog = Record<string, DayActivity>;
+
 export interface PendingPlacementTest {
   subject: string;
   scheduledDate: string;

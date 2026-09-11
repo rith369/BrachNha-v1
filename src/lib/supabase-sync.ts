@@ -1,8 +1,9 @@
 import { getSupabase } from "@/lib/supabase";
-import { useBrachNhaStore } from "@/lib/store";
+import { MAX_ACTIVITY_DAYS, useBrachNhaStore } from "@/lib/store";
 import type { ExamResult } from "@/lib/store";
 import type {
   AccountSnapshot,
+  ActivityLog,
   Commitment,
   Conversation,
   PendingPlacementTest,
@@ -12,7 +13,12 @@ import type { InsertOf, Tables } from "@/types/database";
 // the comment explaining why UTC is wrong for a Phnom Penh student; two other
 // files then re-derived the same thing in UTC and got it wrong. One helper now
 // — see utils/day.ts.
-import { todayKey as today } from "@/utils/day";
+import { addDaysKey, todayKey as today } from "@/utils/day";
+import { TASK_XP } from "@/utils/rewards";
+import { currentStreak } from "@/utils/streak";
+
+/** How many past days of the study log each push re-sends. See the push. */
+const ACTIVITY_PUSH_DAYS = 14;
 
 /**
  * Maps the Zustand store onto the Supabase schema, in both directions.
@@ -217,23 +223,73 @@ export async function pushLocalState(userId: string, s: StoreState) {
   }
 
   // ── today's tasks ──
-  // The store's `tasks` is only ever today (resetDailyTasks wipes it), so it
+  // The store's `tasks` is only ever today (rolloverDailyTasks wipes it), so it
   // lands on today's row. Yesterday's row is left exactly as it was, which is
-  // the whole point of giving the table a date — it is the activity log the
-  // Progress heatmap needs and the store cannot keep.
+  // the whole point of giving the table a date — it is the server-side copy of
+  // the store's activityLog, one row per day studied.
+  const todayDate = today();
   await attempt("daily_activity", () =>
     db.from("daily_activity").upsert(
       {
         user_id: userId,
-        activity_date: today(),
+        activity_date: todayDate,
         task_lesson: s.tasks.lesson,
         task_practice: s.tasks.practice,
         task_flashcards: s.tasks.flashcards,
         task_challenge: s.tasks.challenge,
+        xp_earned: s.activityLog[todayDate]?.xp ?? 0,
       },
       { onConflict: "user_id,activity_date" }
     )
   );
+
+  // ── the study log: recent days ──
+  // Today's row above carries the checklist; these carry WHEN the student
+  // studied, for every earlier day in the last ACTIVITY_PUSH_DAYS the log knows.
+  // A window rather than today alone because pushes are debounced and the
+  // network comes and goes: a day studied entirely offline would otherwise never
+  // reach the server, and the calendar pulled onto a new phone would show a gap
+  // the student knows they filled.
+  //
+  // TWO batches, and they cannot be merged. postgrest-js sends the union of the
+  // rows' keys as the column list and fills a missing key with NULL, so one row
+  // without task flags in a batch that has them would write NULL into a NOT NULL
+  // column and fail the whole request. Each batch sets only its own columns —
+  // an upsert touches nothing else — so a day's other fields stay as written.
+  const windowStart = addDaysKey(new Date(), -ACTIVITY_PUSH_DAYS);
+  const recentDays = Object.entries(s.activityLog).filter(
+    ([day]) => day >= windowStart && day < todayDate
+  );
+
+  const xpRows = recentDays
+    .filter(([, d]) => d.xp > 0)
+    .map(([day, d]) => ({ user_id: userId, activity_date: day, xp_earned: d.xp }));
+  if (xpRows.length) {
+    await attempt("daily_activity: recent xp", () =>
+      db
+        .from("daily_activity")
+        .upsert(xpRows, { onConflict: "user_id,activity_date" })
+    );
+  }
+
+  // A goal day had all three goal tasks done by definition, so writing them
+  // true is exact — and it is what the pull reads the goal back from.
+  const goalRows = recentDays
+    .filter(([, d]) => d.goal)
+    .map(([day]) => ({
+      user_id: userId,
+      activity_date: day,
+      task_lesson: true,
+      task_practice: true,
+      task_flashcards: true,
+    }));
+  if (goalRows.length) {
+    await attempt("daily_activity: recent goals", () =>
+      db
+        .from("daily_activity")
+        .upsert(goalRows, { onConflict: "user_id,activity_date" })
+    );
+  }
 
   // ── exam results ──
   // kind is 'mock' for everything in this array by definition: exam-view.tsx
@@ -389,7 +445,7 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
   }
   if (!profile || !profile.display_name) return false;
 
-  const [pending, commitments, exams, sessions, conversations] =
+  const [pending, commitments, exams, sessions, conversations, activity] =
     await Promise.all([
       db
         .from("pending_placement_tests")
@@ -413,14 +469,40 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
         .select("*, chat_messages(seq, role, content)")
         .eq("user_id", userId)
         .order("updated_at", { ascending: false }),
+      // The whole study history, not just today: this is what brings the
+      // Profile calendar and the streak back after a logout or on a new phone.
+      // Same window the store keeps, so nothing pulled is trimmed straight off.
+      db
+        .from("daily_activity")
+        .select(
+          "activity_date, xp_earned, task_lesson, task_practice, task_flashcards, task_challenge"
+        )
+        .eq("user_id", userId)
+        .gt("activity_date", addDaysKey(new Date(), -MAX_ACTIVITY_DAYS)),
     ]);
 
-  const todayRow = await db
-    .from("daily_activity")
-    .select("*")
-    .eq("user_id", userId)
-    .eq("activity_date", today())
-    .maybeSingle();
+  const todayDate = today();
+  const activityRows = activity.data ?? [];
+  const todayRow = activityRows.find((r) => r.activity_date === todayDate);
+
+  // The goal comes from the task flags — the same three DAILY_GOAL_TASKS the
+  // store checks. XP comes from xp_earned, except on rows written before that
+  // column was filled in, which carry only flags: each ticked task paid exactly
+  // TASK_XP, so that is rebuilt — a true lower bound for the day, not a guess.
+  // A row with nothing was never a studied day (the push writes today's row even
+  // when every flag is false) and is left out: absent means not studied.
+  const activityLog: ActivityLog = {};
+  for (const r of activityRows) {
+    const ticked = [
+      r.task_lesson,
+      r.task_practice,
+      r.task_flashcards,
+      r.task_challenge,
+    ].filter(Boolean).length;
+    const xp = r.xp_earned > 0 ? r.xp_earned : ticked * TASK_XP;
+    const goal = r.task_lesson && r.task_practice && r.task_flashcards;
+    if (xp > 0 || goal) activityLog[r.activity_date] = { xp, goal };
+  }
 
   type MessageRow = Pick<Tables<"chat_messages">, "seq" | "role" | "content">;
   type ConversationWithMessages = Tables<"conversations"> & {
@@ -463,19 +545,23 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
     // overlay would render an empty thread it cannot explain.
     activeConversationId:
       activeId && restored.some((c) => c.id === activeId) ? activeId : null,
-    tasks: todayRow.data
+    tasks: todayRow
       ? {
-          lesson: todayRow.data.task_lesson,
-          practice: todayRow.data.task_practice,
-          flashcards: todayRow.data.task_flashcards,
-          challenge: todayRow.data.task_challenge,
+          lesson: todayRow.task_lesson,
+          practice: todayRow.task_practice,
+          flashcards: todayRow.task_flashcards,
+          challenge: todayRow.task_challenge,
         }
       : { lesson: false, practice: false, flashcards: false, challenge: false },
-    // The row that came back IS today's — the query filters on today() — so
-    // stamp it as such. Without this the pulled checklist arrives with an empty
-    // tasksDate and AppShell's rollover immediately wipes it, which looks like
-    // the pull silently failing.
-    tasksDate: today(),
+    // The row matched IS today's, so stamp it as such. Without this the pulled
+    // checklist arrives with an empty tasksDate and AppShell's rollover
+    // immediately wipes it, which looks like the pull silently failing.
+    tasksDate: todayDate,
+    activityLog,
+    // Re-derived, deliberately overriding the `streak` storeFromProfile() just
+    // spread in: profiles.streak is only the last value some device pushed,
+    // while the rows are the history it was computed from.
+    streak: currentStreak(activityLog, todayDate),
   });
 
   for (const c of restored) lastPushedSignature.set(c.id, signatureOf(c));

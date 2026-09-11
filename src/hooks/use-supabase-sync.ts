@@ -123,6 +123,7 @@ function syncRelevantChange(a: StoreState, b: StoreState): boolean {
     a.level !== b.level ||
     a.coins !== b.coins ||
     a.streak !== b.streak ||
+    a.activityLog !== b.activityLog ||
     a.tasks !== b.tasks ||
     // No column of its own — daily_activity keys on activity_date, which the
     // push derives itself. Listed anyway to keep the one-to-one with

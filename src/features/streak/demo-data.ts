@@ -7,35 +7,37 @@
 // numbers, simulated interactions, no backend and no real
 // streak calculation.
 //
-// ── THE STREAK NUMBER ITSELF IS NOT IN HERE ──
-// It is the store's own `streak` field, seeded from
-// DEMO_SEED_STREAK in lib/store.ts, and StreakView reads it
-// straight off the store. That is deliberate and it is the fix
-// for a real bug: this file used to export its own DEMO_STREAK
-// of 12 while the store seeded 3, so Home's stat pill and the
-// global StatBar said 3 a few pixels above a hero saying 12.
-// One fact, two hardcoded numbers, guaranteed to disagree.
+// ── THE STREAK NUMBER ITSELF IS NOT IN HERE — AND IT IS REAL ──
+// It is the store's own `streak` field, which StreakView reads
+// straight off the store. It is DERIVED now, from the store's
+// `activityLog` by currentStreak() in utils/streak.ts; it used
+// to be a seeded DEMO_SEED_STREAK of 12 that nothing
+// incremented. Before that, this file exported its own
+// DEMO_STREAK of 12 while the store seeded 3, so Home's pill
+// said 3 a few pixels above a hero saying 12 — one fact, two
+// hardcoded numbers, guaranteed to disagree.
 //
-// So DO NOT reintroduce a streak constant here. Everything
-// below is the surrounding demo state — which days are ticked,
-// which tasks are outstanding — and none of it is the count.
+// So DO NOT reintroduce a streak constant here.
 //
-// What real data would have to exist to switch this over:
-//   • a daily activity log — one row per student per day, with
-//     whether the daily goal was met. The `daily_activity`
-//     table in supabase/migrations already has the shape and
-//     the date column for exactly this; nothing writes the
-//     goal-met flag yet.
-//   • a real streak derivation over that log, including the
-//     timezone question (a "day" for a student in Phnom Penh
-//     is not a UTC day) and what a missed day does — reset to
-//     zero, or a freeze/grace day. Neither is designed yet,
-//     which is the other reason this is not wired up.
-//   • today's goal read from the store's real `tasks`, which
-//     Home's daily checklist and Roadmap's Daily Mission
-//     already share. DEMO_DAILY_TASKS below is deliberately
-//     keyed the same way so that swap is a rename, not a
-//     redesign.
+// The questions this comment used to list as undesigned are
+// settled: a day counts ONLY WHEN THE DAILY GOAL IS COMPLETE
+// (lesson + practice + flashcards — DAILY_GOAL_TASKS in
+// utils/streak.ts), which is exactly what STREAK_COPY's rule
+// line already told students; a day is the student's LOCAL day
+// (utils/day.ts); a missed day resets to zero (no freeze or
+// grace day); and the log syncs through daily_activity.
+//
+// ⚠ STILL DEMO — ON THE USER'S DECISION, 11 SEP 2026. Asked
+// directly, they chose to keep this page's simulated pieces:
+//   • DEMO_DAILY_TASKS and the "Complete Today's Goal" button
+//     (+1 and confetti, local, gone on reload).
+//   • DEMO_WEEK / TODAY_ID — the weekly tracker's ticks.
+// Both now sit beside a REAL count and disagree with Profile's
+// study calendar, which reads the real activityLog. When they
+// are made real: the week is the last seven day keys, ticked
+// iff activityLog[day]?.goal; the goal card reads the store's
+// `tasks` (keyed identically, so that swap is a rename); and the
+// button cannot stay a simulation beside a real streak.
 // ============================================================
 
 /** How far the simulated "Complete Today's Goal" tap moves the store's count. */

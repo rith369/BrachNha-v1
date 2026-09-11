@@ -17,6 +17,163 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 11 Sep 2026 — Profile: a study calendar, a real streak, and your Google photo
+
+*Not yet committed.*
+
+**Why.** You asked for something on the Profile page like a schedule — a calendar
+showing which days you studied. The app had never recorded *which days* anyone
+studied, so the streak number was a fake 12 that every account started with, and
+the little "▲ +20 today" and "Best!" labels were typed in by hand.
+
+**What changed.**
+
+- **A study calendar on Profile.** One month at a time, today circled, arrows to
+  look at earlier months, and your current and best streak above it. Days you
+  finished the daily goal are filled in solid; days you studied but didn't finish
+  it are shown lighter. Under it: how far you are with today's goal ("1 / 3").
+- **The streak is real now, and it only counts finished daily goals.** A day
+  counts when you complete all three daily tasks — a lesson, practice and
+  flashcards. Studying without finishing all three shows on the calendar but does
+  not count, and a day like that ends the streak. The top bar, Home, Profile and
+  the Streak page all show the same number.
+- **"+N today" and "Best!" are true.** They show what you actually earned today and
+  whether today's streak is your record.
+- **Your study days are saved to your account**, so the calendar comes back after
+  logging out and in again, or on a new phone.
+- **Your Google photo** now shows next to your name (your first letter if the
+  photo can't load), and a small pencil lets you fix your name.
+
+**Heads-up: everyone's streak will show 0 at first — including yours.** The old 12
+was never earned; it was just the starting number. Finish the daily goal once and
+it becomes 1.
+
+**Not changed on purpose.** Target grade and weak subjects still can't be edited —
+they build the roadmap, and you asked not to change the roadmap yet.
+
+**Practice can only be ticked by hand for now.** There are no practice quizzes
+written yet, so the only way to complete the "practice" part of the goal is to
+tick it on Home's checklist. Lessons and flashcards complete for real. This also
+means three taps on Home can count as a streak day until quizzes exist.
+
+**Kept as a demo, on purpose.** On the Streak page, the goal card, its "Complete
+Today's Goal" button and the row of 7 weekday ticks are still made-up demo data,
+so they won't match the new calendar. (Its explanation text — a day only counts
+when you finish your daily goal — is now true.)
+
+**What to re-test.** On Profile: today is circled and it says "Finish today's goal
+(0 / 3)". Finish a lesson: today turns light, it says 1 / 3, and the streak does
+**not** change. Do practice and flashcards too: today turns solid and the streak
+goes up by one. Check the Khmer version shows Khmer month names. Log out and back
+in with Google: your study days are still there.
+
+---
+
+## 11 Sep 2026 — Welcome picture, a simpler logout question, and a hint for guests
+
+*Not yet committed.*
+
+**What changed.**
+
+- **The first screen** (Continue with Google / Continue as Guest) shows an
+  illustration of a student instead of the ⚔️ emoji, in the app's purple, readable
+  in both light and dark mode.
+- **Logging out** now just asks "Are you sure you want to log out?" with
+  **Yes, log out**, instead of a long warning that sounded like your data would be
+  deleted. Signing back in restores your progress — everything except flashcard
+  review progress (remembered / not remembered, starred, your own cards), which is
+  still saved only on the phone.
+- **Guests** still get the full warning, because for them it's true — a guest has
+  no account, so exiting really does delete everything. Under it there's now a
+  hint: *"Want to keep your progress? Tap Continue with Google above instead."*
+
+**What to re-test.** As a signed-in student, Profile → Logout shows the short
+question. As a guest, Exit guest mode shows the warning and the Google hint.
+
+---
+
+## 11 Sep 2026 — Flashcards can be swiped on a laptop too
+
+*Not yet committed.*
+
+**Why.** You asked for flashcards to be movable left/right on every device, the way
+they are on a phone. Until now, on a laptop or any screen 1024px or wider, dragging
+the card did nothing and you had to click ✕ or ✓.
+
+**What changed.**
+
+- On a laptop, you can now click and drag a flashcard right for *ចងចាំ* or left for
+  *មិនទាន់ចងចាំ*, exactly like swiping on a phone.
+- The mouse pointer turns into a "grab" hand over the card, so it's clear it can be
+  moved.
+- The hint under the card now shows the swipe instructions on every screen size.
+- The ✕ / ✓ buttons are still there on every device — dragging is an extra way to
+  answer, not a replacement.
+
+**What to re-test.** On a laptop: drag a card right, then left — each should fly off
+and count. A short drag should snap back without counting. A plain click should
+still flip the card. On a phone, check swiping still works and that scrolling a long
+answer up and down doesn't flip or rate the card.
+
+---
+
+## 11 Sep 2026 — "New Exam" is now a card list too, and it still works
+
+*Not yet committed.*
+
+**Why.** You asked for *វិញ្ញាសារបង្កើតថ្មី* (New Exam) to look the same as
+*វិញ្ញាសារឆ្នាំចាស់* (Past Papers) — a card per subject — but without the exam-year
+row, since a newly-generated paper isn't tied to a past year.
+
+**What changed.**
+
+- *វិញ្ញាសារបង្កើតថ្មី* is now a plain list of subject cards, styled identically to
+  the Past Papers tab, with no *ជ្រើសរើសសម័យប្រឡង* / year-chip section above it.
+- **Math and Biology already work** — tapping either one opens a real exam (the
+  same questions the old single "Start Exam" button always ran). Every other
+  subject shows *ឆាប់ៗនេះ* ("coming soon") until it gets its own questions, same
+  as the Past Papers tab.
+- **The old "Start Exam" screen is still in the app's code, just not shown
+  anymore** — you asked to keep it rather than delete it, in case it's wanted
+  back later.
+
+**One thing worth knowing:** the old screen also showed a short "Previous
+Results" list under the Start button. That list doesn't have a home on the new
+card layout — *វិញ្ញាសារឆ្នាំចាស់* never had one either, so this keeps the two tabs
+matching. Your scores still count everywhere else (XP, Home's "from mock exams"
+number); they're just not listed on this screen anymore. Say the word if you'd
+like that list back somewhere.
+
+**What to re-test.** Open Mock Exam → *វិញ្ញាសារបង្កើតថ្មី*. It should look exactly
+like *វិញ្ញាសារឆ្នាំចាស់* minus the year row. Tap the math card — it should open a
+5-question exam and finish normally with a score and XP. Tap any other subject
+— it should show the "being prepared" note, not open anything.
+
+---
+
+## 11 Sep 2026 — The whole past-paper card is tappable now, not just the button
+
+*Not yet committed.*
+
+**Why.** On the Mock Exam page's *វិញ្ញាសារឆ្នាំចាស់* tab, only the small *តេស្ត*
+button on each card opened anything — tapping the picture or the subject name did
+nothing. Fixed at your request: the whole card now responds.
+
+**What changed.**
+
+- Tapping anywhere on a past-paper card — the picture, the title, the blurb, or
+  the *តេស្ត* button itself — does the same thing.
+- **Nothing about WHAT happens changed.** Every past paper is still empty until
+  real content is added, so tapping any of them still shows *"មាតិកាវិញ្ញាសារនេះកំពុងរៀបចំ។
+  សូមរង់ចាំបន្តិច។"* (this exam's content is being prepared). Once a paper has
+  real questions, tapping anywhere on its card will open it.
+
+**What to re-test.** Open Mock Exam → *វិញ្ញាសារឆ្នាំចាស់* and tap a card's picture
+or its title (not the button) — the "being prepared" note should appear, exactly
+as tapping the button already did.
+
+---
+
 ## 8 Sep 2026 — Real login: sign in with Google, or carry on as a guest
 
 *Landed in commit `58320ec`.*
