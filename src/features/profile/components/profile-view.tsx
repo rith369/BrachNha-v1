@@ -3,9 +3,11 @@ import { LogOut } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { StatPills } from "@/features/home/components/stat-pills";
 import { GoogleButton } from "@/features/auth/components/google-button";
+import { ProfileIdentity } from "./profile-identity";
+import { StudyCalendar } from "./study-calendar";
 import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
-import { useAuth, useDisplayName } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { useT } from "@/data/translations";
 import type { TranslationKey } from "@/data/translations";
 import { signOutAccount } from "@/lib/auth";
@@ -22,8 +24,7 @@ export function ProfileView() {
       }))
     );
   const t = useT(lang);
-  const { user, isGuest } = useAuth();
-  const userName = useDisplayName();
+  const { isGuest } = useAuth();
   const [confirming, setConfirming] = useState(false);
 
   // What the app is ACTUALLY doing, not what was stored. A guest never sets
@@ -51,18 +52,25 @@ export function ProfileView() {
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-36 lg:pb-10">
-      <div className="mb-5 pr-14">
+      {/* The title alone carries pr-14 — it shares a row with the floating
+          hamburger. The identity row sits below that button, so it gets the
+          full width for a long name. */}
+      <div className="mb-4 pr-14">
         <div className="font-heading bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
           {t.yourProfile} 🎓
         </div>
-        <div className="text-xs font-bold text-muted">{userName}</div>
-        {user?.email && (
-          <div className="text-xs font-bold text-muted">{user.email}</div>
-        )}
+      </div>
+
+      <div className="mb-5">
+        <ProfileIdentity />
       </div>
 
       <div className="mb-4">
         <StatPills />
+      </div>
+
+      <div className="mb-4">
+        <StudyCalendar />
       </div>
 
       <Card className="mb-4">
@@ -132,15 +140,30 @@ export function ProfileView() {
       ) : (
         <div className="rounded-2xl border border-pink/30 bg-pink/5 p-4 text-center">
           <div className="mb-3 text-sm font-bold">
-            {/* A guest has no account to sign out OF, so the warning has to say
-                what actually happens: everything is on this device and this
-                clears it, with no backup to restore from. */}
+            {/* The two branches are deliberately unequal. A signed-in student
+                gets a plain question: signing back in restores their progress,
+                and the old list of everything being cleared from the device
+                read as a threat of losing it. (All but the flashcard review
+                data, which never leaves the device — see CLAUDE.md. That gap
+                is fixed by syncing it, not by warning about it here.) A guest
+                keeps the full warning, because for them it is not a threat:
+                there is no backup, and this is the last screen that can say so. */}
             {isGuest
               ? t.exitGuestConfirm
               : lang === "en"
-                ? "This signs you out and clears this device — name, survey, XP, streak, and exam history. Your account backup is not deleted. Continue?"
-                : "សកម្មភាពនេះនឹងចេញពីគណនី ហើយលុបទិន្នន័យក្នុងឧបករណ៍នេះ — ឈ្មោះ សំណួរ XP ជួរ និងប្រវត្តិប្រឡង។ ព័ត៌មានក្នុងគណនីមិនត្រូវលុបទេ។ បន្ត?"}
+                ? "Are you sure you want to log out?"
+                : "តើអ្នកប្រាកដថាចង់ចាកចេញមែនទេ?"}
           </div>
+          {/* A guest who wants an account can mistake "exit" for the way to
+              get one — and it is the one button that destroys the progress
+              signing in would have carried over. The Google button sits in
+              the guest card directly above, so this points at it rather than
+              rendering a second one inside a box already holding two. */}
+          {isGuest && (
+            <div className="mb-3 text-xs font-bold text-purple">
+              {t.exitGuestKeepHint}
+            </div>
+          )}
           <div className="flex gap-2.5">
             <button
               onClick={() => setConfirming(false)}
@@ -152,7 +175,11 @@ export function ProfileView() {
               onClick={confirmLogout}
               className="flex-1 rounded-2xl bg-pink px-6 py-3 text-sm font-extrabold text-white"
             >
-              {lang === "en" ? "Yes, reset" : "យល់ព្រម"}
+              {lang === "en"
+                ? isGuest
+                  ? "Yes, reset"
+                  : "Yes, log out"
+                : "យល់ព្រម"}
             </button>
           </div>
         </div>

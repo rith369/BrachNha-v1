@@ -228,6 +228,20 @@ export const T = {
     exitGuestMode: "Exit guest mode",
     exitGuestConfirm:
       "This clears everything saved on this device — XP, streak, lessons and exam history. Continue?",
+    exitGuestKeepHint:
+      "Want to keep your progress? Tap “Continue with Google” above instead.",
+    studyCalendar: "Study calendar",
+    calendarCurrentStreak: "Current streak",
+    calendarBestStreak: "Best streak",
+    calendarGoalDone: "Daily goal done",
+    calendarStudied: "Studied",
+    calendarNotStudied: "Not studied",
+    calendarToday: "Today",
+    previousMonth: "Previous month",
+    nextMonth: "Next month",
+    editName: "Edit name",
+    saveName: "Save",
+    cancelEdit: "Cancel",
   },
   km: {
     appName: "BrachNha",
@@ -444,6 +458,22 @@ export const T = {
     exitGuestMode: "ចាកចេញពីរបៀបភ្ញៀវ",
     exitGuestConfirm:
       "សកម្មភាពនេះនឹងលុបទាំងអស់ក្នុងឧបករណ៍នេះ — XP ជួរ មេរៀន និងប្រវត្តិប្រឡង។ បន្ត?",
+    exitGuestKeepHint:
+      "ចង់រក្សាវឌ្ឍនភាពរបស់អ្នកទុកទេ? សូមចុច «បន្តជាមួយ Google» នៅខាងលើជំនួសវិញ។",
+    // "Streak" stays in Latin script, as in features/streak/copy.ts — a product
+    // term the user asked never to translate.
+    studyCalendar: "ប្រតិទិនសិក្សា",
+    calendarCurrentStreak: "Streak បច្ចុប្បន្ន",
+    calendarBestStreak: "Streak ល្អបំផុត",
+    calendarGoalDone: "បញ្ចប់គោលដៅប្រចាំថ្ងៃ",
+    calendarStudied: "បានរៀន",
+    calendarNotStudied: "មិនបានរៀន",
+    calendarToday: "ថ្ងៃនេះ",
+    previousMonth: "ខែមុន",
+    nextMonth: "ខែបន្ទាប់",
+    editName: "កែឈ្មោះ",
+    saveName: "រក្សាទុក",
+    cancelEdit: "បោះបង់",
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 

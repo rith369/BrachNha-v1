@@ -74,9 +74,10 @@ that value is still in older payloads, so `persist`'s `migrate` resets v1
 anyone's choice, and without the reset flipping the default would change nothing
 for anyone who had already opened the app. This was the first migration that
 actually fires; see the `merge` comment for why v0 data could never use one.
-(`version` is now **3** — the v2 → v3 step lifts the seeded `streak` for the
-same "the stored value is the old default" reason; see the Streak section.
-`index.html`'s pre-paint guard is `>= 2` and still holds.)
+(`version` is now **4** — the v3 → v4 step zeroes the old seeded `streak` for
+the same "the stored value is the old default" reason, now that the streak is
+derived; see the Streak section. `index.html`'s pre-paint guard is `>= 2` and
+still holds.)
 
 `AppShell` toggles a `dark` class on `<html>` in an effect next to the existing
 `lang` one, and `index.html` carries a blocking inline script that applies the
@@ -431,11 +432,15 @@ and every day's row inherited stale flags. `tasksDate` + `rolloverDailyTasks()`
 are what make the sentence true — see that section below.) One row per student per day
 is the "daily activity log" that `features/progress/demo-data.ts` and
 `utils/leaderboard.ts` both name as the missing piece before the heatmap and the
-study-time board can stop being demo data. Its `questions_answered` /
-`xp_earned` / `study_minutes` columns are written by nothing yet and are there
-so the row has somewhere to put them; an empty column costs nothing, a migration
-on a live table costs a deploy. When `study_minutes` is finally populated it
-must mean ACTIVE minutes — see the leaderboard section for why.
+study-time board can stop being demo data. **It is the server copy of the
+store's `activityLog` now** — `xp_earned` carries a day's XP and the three goal
+task flags carry whether the daily goal was met — which is what the Profile study
+calendar and the real streak are built on (see that section). The push sends
+today's row plus the previous 14 days, and the pull reads the last 400 back. `questions_answered` / `study_minutes` are still written by
+nothing and are there so the row has somewhere to put them; an empty column
+costs nothing, a migration on a live table costs a deploy. When `study_minutes`
+is finally populated it must mean ACTIVE minutes — see the leaderboard section
+for why.
 
 **`exam_results` has a `kind`.** The store's `examResults` holds generated mock
 exams ONLY, and three things depend on that: Home's "from mock exams" stat pill,
@@ -490,6 +495,10 @@ across 8 tables — and both are the kind of thing that rots quietly.
 own — `daily_activity` keys on `activity_date`, which the push derives itself.
 It is there so the two lists stay the same length and the next person auditing
 them finds a one-to-one, rather than a gap they have to reason about.
+
+`activityLog` is in both lists too, and it has no column on `profiles` either:
+it maps onto `daily_activity`, one row per key — `xp` to `xp_earned`, `goal` to
+the lesson/practice/flashcards flags.
 
 `@supabase/ssr` is in `package.json` and is unused: it is for frameworks with a
 server-rendered request cycle, which this app does not have. Safe to remove.
@@ -1408,8 +1417,10 @@ refill-over-time rules and a paywall story nobody has designed.
 
 `/exam` was a single "start the 10-question mock exam" card plus the last three
 results. It is now **វិញ្ញាសារឆ្នាំចាស់** (real MoEYS past papers, browsed by exam
-session then by subject) and **វិញ្ញាសារបង្កើតថ្មី** (that original flow, unchanged),
-built on the same pieces as the Study page so the two screens cannot drift.
+session then by subject) and **វិញ្ញាសារបង្កើតថ្មី** (newly-generated papers, one
+card per subject, no session to choose), both rendered by the SAME
+`ExamPaperCard` so the two tabs cannot visually drift — the user explicitly
+asked for Tab B to match Tab A's style, minus the year selector.
 
 **KHMER-ONLY, behind `EXAM_PAGE_LANG` in `features/exam/papers.ts`** — the same
 decision as `LESSONS_PAGE_LANG` and KruAI's `ANSWER_LANG`. It governs the exam
@@ -1437,15 +1448,68 @@ timer, and a "១៨០ នាទី" label on an untimed paper is the scrapped
 placement-scheduling failure again). `data/past-papers.ts` imports nothing from
 `features/`; the typed `paperKey()` lives in `features/exam/papers.ts`.
 
-**The `តេស្ត` button stays tappable on an empty paper** — a deliberate departure
-from this app's dim-and-don't-tap precedent (`sidebar-nav.tsx`'s `href: null`
-rows, the survey's `StudiedStep`, `subject-card.tsx`'s zero-lesson tile). It was
-chosen: the tap is not silent, it explains itself, and the `ឆាប់ៗនេះ` chip means
-the state is legible **without** tapping — the same principle as `studiedNote`
-being rendered unconditionally. The button's two looks carry the real signal:
-neutral outline pill while pending, subject fill under white text once the paper
-has questions. Every paper is pending today, so the screen matches the reference
-design now and gains the distinction for free later.
+**Tab B went through the exact same card-list redesign, minus the year
+selector — and the OLD flow was kept, not deleted.** `GeneratedPapersPanel` is
+`PastPapersPanel` with the `ជ្រើសរើសសម័យប្រឡង` heading and the year-chip row
+removed and nothing else changed: same `ExamPaperCard`, same tap-anywhere
+behaviour, same empty-shows-a-notice rule. `generatedPapers()` (in
+`features/exam/papers.ts`) derives one paper per subject the same way
+`papersForYear()` does, sharing its `paperTitle()`/`paperBlurb()` helpers so
+the two tabs' wording is literally identical. `components/generated-exam-panel.tsx`
+(the old single mixed-subject intro-card-plus-history screen) is **left in the
+codebase, unreferenced by `ExamView`, at the user's explicit request** — don't
+delete it as dead code; that is the point of keeping it.
+
+**One real behaviour change worth flagging: Tab B lost its inline "Previous
+Results" list**, which only `generated-exam-panel.tsx` ever rendered. It has no
+home in the card layout and `PastPapersPanel` never had one either — dropping
+it is what "same style as Tab A" means literally — but the data isn't gone: a
+generated-paper attempt still writes `examResults` exactly as before (Home's
+stat pill and `chat-prompt.ts`'s average both still see it), it's just not
+listed on `/exam` itself any more. If a recent-attempts list is wanted back, it
+would need its own home — e.g. on the results screen, or a new section under
+the card list — rather than reviving the retired panel.
+
+**`data/generated-exams.ts`'s `GENERATED_EXAM_QUESTIONS` is DERIVED FROM
+`MOCK_QS`, not empty** — grouped by `subj`, so math and biology start live
+(5 questions each, same content the retired flow always ran) and every other
+subject starts `ឆាប់ៗនេះ` exactly like a real past paper does. This is what
+"keep the old exam, don't show it [that way]" means for the CONTENT and not
+only the component: retiring the old mixed-subject screen must not also mean a
+student can no longer take any exam here at all. `MOCK_QS` itself is still very
+much alive — `utils/chat-prompt.ts` and `utils/placement.ts` both read it
+independently of any exam UI, old or new.
+
+**`ExamPaperCard` (renamed from `PastPaperCard`) and its base `ExamPaper` type
+are the shared surface.** `PastPaper extends ExamPaper { year: number }`, a
+field the card has never rendered — `generatedPapers()` returns plain
+`ExamPaper[]` rather than inventing a fake year. `Run` in `ExamView` changed to
+match: `{ kind: "generated"; paper: ExamPaper } | { kind: "past"; paper:
+ExamPaper }`, since Tab B stopped being one fixed test and needs to know WHICH
+subject's paper is running exactly like Tab A already did. `handleSubmit`'s
+`examResults`-write rule is unchanged (`kind === "generated"` writes, `"past"`
+doesn't) — only what a "generated" run now points at changed.
+
+**THE WHOLE CARD IS THE TAP TARGET, not just the `តេស្ត` pill.** It shipped with
+only the small pill wired up and the user asked for the whole card to work — the
+outer `<button>` now carries `onTest`, and the visible `តេស្ត` chip is a plain
+`<span>` rather than a second nested button (a `<button>` inside a `<button>` is
+invalid, and the card already has exactly one action). Same "the row IS the
+control" shape `PracticeLessonList`'s lesson rows already use with `<Link>` —
+`<button>` here because the action is a callback (open the runner, or show the
+notice) rather than a route.
+
+**The card stays tappable on an empty paper** — a deliberate departure from this
+app's dim-and-don't-tap precedent (`sidebar-nav.tsx`'s `href: null` rows, the
+survey's `StudiedStep`, `subject-card.tsx`'s zero-lesson tile). It was chosen:
+the tap is not silent, it explains itself, and the `ឆាប់ៗនេះ` chip means the
+state is legible **without** tapping — the same principle as `studiedNote` being
+rendered unconditionally. The pill's two looks carry the real signal: neutral
+outline while pending, subject fill under white text once the paper has
+questions. Every PAST paper is pending today, so Tab A matches the reference
+design exactly and gains the distinction for free later; Tab B's math and
+biology cards already show the filled look, since `GENERATED_EXAM_QUESTIONS`
+isn't empty — see below.
 
 **The banner holds its CROP RATIO, not its height** (`aspect-[11/4] max-h-44`).
 The card triples in width from 288px to the 672px content cap, so a fixed height
@@ -1495,6 +1559,13 @@ History paper — which the catalog has cards for.
 also the right moment to fix the known `no-useless-escape` backslash bug in
 `BAC2_ANSWER_RULES`, which needs an answer-quality re-test rather than a silent
 change.
+
+`scripts/shots.mjs`'s `focus-exam` route now clicks Tab B's math card
+specifically (`button:has-text("វិញ្ញាសារគណិតវិទ្យា")`) rather than a fixed "start"
+button that no longer exists — math is the one subject on either tab
+guaranteed to have content, via the `MOCK_QS` derivation above. If math's
+`GENERATED_EXAM_QUESTIONS` entry is ever removed, that route needs a different
+subject with real content or it stops reaching the runner at all.
 
 **Practice** (`features/practice`) — Flashcards & Quiz; see its own section below.
 
@@ -1963,18 +2034,21 @@ uses for per-user rows. Neither exists yet, on purpose — this file's own
 Supabase section explains why introducing a table is a deliberate, tracked
 step (a migration + hand-updated `database.ts`), not a silent one.
 
-### Drag-to-rate hardened: phone-only, a Back button, and a real bug worth remembering
+### Drag-to-rate hardened: a Back button, and a real bug worth remembering
 
 Four follow-ups landed once the swipe redesign got real hands-on use.
 
-**Drag now only activates below `lg` (1024px)** — `isDragViewport()` in
-`swipeable-flashcard.tsx`, checked once per gesture at `pointerdown` and
-cached in a ref so a resize mid-drag can't flip the rule out from under it.
-Dragging a card any real distance with a mouse reads as awkward in a way a
-thumb swipe doesn't, and the app already gets a genuinely wider desktop
-layout from `lg` up — so the intended desktop path is the Back/✕/✓ buttons
-below, not a mouse-drag fallback. Tap-to-flip is NOT gated by this; it works
-at every width, on every device, always.
+**Drag works at EVERY width, mouse included — this reverses an earlier call.**
+Drag used to activate only below `lg` (1024px), via an `isDragViewport()`
+check in `swipeable-flashcard.tsx`, on the reasoning that a mouse-drag is
+awkward and the ✕/✓ buttons were the intended desktop path. The user asked
+for laptops to swipe like phones, so the gate and the function are deleted;
+the gesture's axis alone decides drag vs scroll now. The card carries
+`cursor-grab` so a mouse user can see it moves, and the hint under it no
+longer has a desktop-only variant. The ✕/✓ buttons stay at every width — a
+drag is an extra way in, not a replacement. A vertical mouse-drag resolves to
+`"scroll"`, which does nothing on release (a mouse scrolls the face with the
+wheel), so it neither rates nor flips.
 
 **The ✕/✓ pair moved into `FocusLayout`'s `footer` slot, with `onBack`
 beside it.** They used to sit inline in the body; moving them into `footer`
@@ -2456,10 +2530,12 @@ which only advances on days BOTH of them finish (`friend-streak-demo-data.ts` +
 than authoring one; the surrounding state is demo data. Their own sections
 follow.
 
-**Profile** (`features/profile`) — stats summary (reuses Home's `StatPills`
-as-is), grade/language card, and a Logout button that shows a Cancel/confirm
-step before calling the store's `logout()` (resets name, survey, XP, level,
-streak, tasks and exam history, sending the user back to Login).
+**Profile** (`features/profile`) — identity row (Google photo, editable name),
+stats summary (reuses Home's `StatPills` as-is), a real **study calendar**,
+grade/language card, and a Logout button that shows a Cancel/confirm step
+before calling the store's `logout()` (resets name, survey, XP, level, streak,
+the study log, tasks and exam history, sending the user back to the entry
+screen). The calendar and identity row have their own section below.
 
 **KruAI chat** (`components/shell/chat-overlay.tsx` + `server/chat-handler.ts`)
 — real Gemini wiring, done. See the endpoint section above.
@@ -2568,23 +2644,39 @@ screen, about forty pixels above this page's own hero — said 3 next to a hero
 saying 12. One fact, two hardcoded numbers, guaranteed to disagree. The user
 caught it.
 
-`DEMO_SEED_STREAK` in `lib/store.ts` is now the single source, the store field
-is seeded from it, and **every surface reads the field**: Home's `StatPills`,
-`StatBar`, both `/streak` screens and the mentor prompt. `demo-data.ts` no
-longer exports a count at all and carries a note not to reintroduce one. Nothing
-increments the field yet, which is exactly why it can be one seeded number — the
-day a daily activity log exists, the constant is deleted and the field is
-derived, and no consumer moves.
+The store's `streak` field is the single source, and **every surface reads the
+field**: Home's `StatPills`, `StatBar`, both `/streak` screens and the mentor
+prompt. `demo-data.ts` exports no count and carries a note not to reintroduce
+one.
 
-**That change needed a persist migration, and the reasoning is the same one the
-theme reset used.** Overwriting a persisted value is normally wrong — but
-NOTHING HAS EVER INCREMENTED `streak`, so every stored `3` is the old default
-rather than days a student earned, and leaving it would have kept the pill
-saying 3 in browsers that had already opened the app. `version` is 3, and the
-v2 → v3 step is guarded on `state.streak === 3` so a value set any other way is
-left alone. **Once streaks are really computed this migration must not be
-extended** — at that point a stored number is the student's own. `index.html`'s
-pre-paint script needs no change: its guard is `saved.version >= 2`, still true.
+**THE COUNT IS REAL NOW.** It was a seeded `DEMO_SEED_STREAK` of 12 that nothing
+incremented, and this section used to promise that "the day a daily activity log
+exists, the constant is deleted and the field is derived, and no consumer
+moves". That happened, exactly so: the store's `activityLog` is the log,
+`currentStreak()` derives the field, the constant is gone, and not one consumer
+changed. See "Profile's study calendar" below for the rule and the mechanics.
+
+**The migration chain ends at v4.** The v2 → v3 step once lifted the seed 3 → 12
+(every stored 3 was the old default, never earned). The v3 → v4 step replaces
+it: every stored streak, 3 or 12, is a seed, there is no history to derive a
+real one from, so it becomes 0 until the student studies. **From v4 on the
+stored number is derived from the student's own log, and a future step must
+never touch it.** `index.html`'s pre-paint guard is `saved.version >= 2`, still
+true.
+
+**The rule is the one this page always stated: a day counts only when the daily
+goal is complete.** `STREAK_COPY`'s rule line was written for the prototype and
+was briefly FALSE once the count became real, because the first version counted
+any day with XP. The user settled it — the goal, not XP — so the copy needed no
+change; the code came to it.
+
+**⚠ Still demo, on the user's explicit decision (11 Sep 2026):** the goal card
+(`DEMO_DAILY_TASKS`), its "Complete Today's Goal" button (+1 and confetti, local,
+gone on reload) and the weekly tracker's ticks (`DEMO_WEEK`, `TODAY_ID = "sun"`).
+Offered the choice of making the card real, they chose to keep it a demo. So
+this page now shows a REAL count beside simulated surroundings, and its week
+disagrees with Profile's calendar. `demo-data.ts`'s header records what making
+each real involves; don't do it unasked.
 
 The one remaining disagreement is transient and deliberate: the celebration's
 +1 is local and unwritten, so for a few seconds the page shows 13 while the bar
@@ -2814,6 +2906,162 @@ nobody has designed. `friend-streak-demo-data.ts` carries the rest of what a rea
 version needs, including the one that is genuinely hard — two people in two
 timezones have two "todays" and the pair needs one.
 
+### Profile's study calendar — and where the streak comes from now
+
+Asked for as "a schedule" on Profile, clarified as **a calendar showing which
+days the student studied**. The app had no per-day history at all, so the
+calendar needed a real log first — and once that existed, the streak and the two
+string-literal labels under the stat pills ("▲ +20 today", "Best!") could be
+made TRUE rather than deleted.
+
+**THE RULE — A DAY COUNTS ONLY WHEN THE DAILY GOAL IS COMPLETE.** The user's
+decision, and what the Streak page had always told students. The goal is the
+three tasks the Streak page's goal card and Roadmap's Daily Mission name —
+lesson, practice, flashcards — as `DAILY_GOAL_TASKS` in `utils/streak.ts`.
+`challenge` is an extra row on Home's list, not part of the goal. **Studying
+without finishing the goal does NOT extend a streak, and a day like that BREAKS
+a run.** (The first version of this counted any day with XP; it was replaced
+before it shipped.)
+
+**`activityLog: Record<string, DayActivity>`** (`types/index.ts`) — local day
+key → `{ xp, goal }`, the device's twin of a `daily_activity` row. An absent day
+was not studied at all. Two writers, one field each:
+
+- **`award()` writes `xp`** — every lesson, quiz answer, flashcard grade and
+  daily task already routes its reward through it, so "studied" and "earned
+  something" are one fact and no screen can grow a second tracker. It does NOT
+  touch the streak.
+- **`completeTask()` writes `goal`** — when the last of the three goal tasks
+  lands, in whichever order. **It is the only place a streak day is made.**
+
+Capped at `MAX_ACTIVITY_DAYS` (400). Cleared by `logout()`. Readers use
+`log[day]?.goal` / `?.xp` — the optional chaining also turns a stale plain number
+(the unreleased XP-only shape, which only reached development browsers) into
+"nothing" rather than a crash.
+
+**The streak maths, in `utils/streak.ts`:** `currentStreak(log, today)` counts
+the run of goal days ending today — **or ending YESTERDAY when today's goal is
+not done yet**. A streak is not broken until the day is over; counting strictly
+from today would show 0 every morning. `bestStreak(log)` is the longest run
+anywhere. Both take `today` as an argument, never call `todayKey()` themselves,
+so the rule is testable against a fixed date.
+
+**Where `streak` is recomputed:** `completeTask()` (the goal just completed) and
+`rolloverDailyTasks()` on a day change (the one moment a streak can break with no
+task completed). Nothing else may set it. It stays a stored field only so every
+existing reader kept reading one plain number.
+
+**Sync** rides the existing `daily_activity` table — no migration. The push
+writes today's row (task flags + `xp_earned`), then two batches for the previous
+14 days, because a day studied entirely offline would otherwise never reach the
+server: one of `xp_earned`, one setting the three goal flags true on goal days
+(exact — a goal day had all three by definition). **They must stay two batches.**
+postgrest-js sends the union of the rows' keys as `columns=` and fills a missing
+key with NULL, so one row without flags in a batch that has them writes NULL into
+a NOT NULL column and fails the request. Each batch sets only its own columns, so
+a day's other fields are untouched.
+
+The pull reads 400 days back and rebuilds the log: `goal` from the three flags,
+`xp` from `xp_earned` — except rows written before that column was filled, which
+carry only flags, where it is rebuilt as `TASK_XP` (20, `utils/rewards.ts`) per
+ticked task. That is exactly what each tick paid, so it is a true lower bound, not
+a guess. The pulled `streak` is RE-DERIVED from the rebuilt log, not taken from
+`profiles.streak`, which is only the last value some device pushed. Consequence
+worth knowing: study history now comes back after a logout, which it did not
+before.
+
+**Two devices used on different days** each show only their own days until a
+fresh pull (the pull runs only into an empty store), and the last push wins
+`profiles.streak`. Same local-wins rule as the rest of sync.
+
+**⚠ TODAY THE GOAL CAN ONLY BE FINISHED BY TICKING "PRACTICE" BY HAND.**
+`PRACTICE_QUIZZES` in `data/practice.ts` is empty, so `quiz-runner.tsx` — the
+only real completion of the practice task — is unreachable. Lessons and
+flashcards complete for real; practice only through Home's checklist or
+Roadmap's mission rows, which tick on tap. That is why those rows were NOT made
+completion-only: doing so would make the goal, and therefore every streak,
+impossible. It also means three taps on Home can count as a streak day. Revisit
+the moment practice quizzes exist.
+
+**The calendar** (`features/profile/components/study-calendar.tsx`, maths in
+`utils/study-calendar.ts`) — a month grid, Sunday first to match
+`buildHeatmapWeeks`, with current and best streak above it.
+
+**‹ › page through a fixed window, not just months with data.** They first
+stopped at the earliest logged month and at the current one — which on a new
+install meant two faded arrows that did nothing, and the user asked why they
+could not go back or forward. Now: BACK as far as the log can hold
+(`MAX_ACTIVITY_DAYS`), since before that no day can ever have been recorded;
+FORWARD to the exam month, read from `BAC2_EXAM_DATE` so the next cohort's
+one-line edit moves it too, and never short of the current month so the
+calendar still reaches today after the exam. The **Bac II exam day** carries a
+pink graduation cap above a pink number (per-theme `--color-pink`: a mark, not a
+fill under white text), is announced in its `aria-label`, and is named in the
+legend and under the title on its month. Other **future months** show the `daysUntilExam()` countdown
+under the title instead of a "goal done on 0 days" that is true and useless. A
+**Today** button appears in the header whenever another month is shown, and is
+absent — not disabled — on this one. It is a "schedule" in the only sense the
+app can honestly offer one: the fixed date everything is counting toward.
+
+Five things that look like choices anyone would make and are not:
+
+- **FLAMES, NOT CIRCLES — the user's design call, so the days look like a
+  streak.** A goal day is a BIG FLAME with its number inside: those are the days
+  the streak counts, so a run of flames on the grid IS the streak. A
+  studied-but-no-goal day is a smaller faint `bg-purple/20` flame: real work
+  shown, not a streak day — full-size flames there would draw an unbroken run
+  beside a streak that says it broke. Today is an UNDERLINE (white over a flame,
+  purple otherwise), the exam a cap; nothing in a day cell is round. A legend
+  names the marks, and the nudge under the grid counts today's goal ("1 / 3")
+  while it is open. The browser check fails if any day cell grows a
+  `rounded-full` or `ring-` again.
+- **The flame is a CSS MASK of Lucide's own Flame path**, so it matches the
+  streak glyph in `StatBar`, the pills and the Streak page — a mask because the
+  fill is a gradient, and an SVG gradient needs a page-unique id per flame. Its
+  viewBox is CROPPED to the flame (`4 2 16 21`): Lucide's 24×24 square is mostly
+  margin, and uncropped the flame filled two thirds of its cell and a two-digit
+  number spilled out. Cells are `h-11 w-9` — the flame's own 16:21 — and every
+  number shares one baseline where the flame's round body is (13/21 down),
+  flame or not. The small flame is inset in PERCENT so its body stays on the
+  number at both cell sizes.
+- **The fill is orange at the tip and `--brand-flame-to` pink from halfway
+  down, not the full flame ramp.** The white number sits in the lower half, and
+  that pink is 4.6:1 with white — clearing 4.5:1 for small text — while the
+  orange end is 4.2:1 and would not. That is the same reason globals.css keeps
+  the full ramp for large text and glyphs.
+- **Days are `<div>`s with an `aria-label`, never buttons.** There is nothing
+  behind a day to open.
+- **The Khmer month names are HAND-WRITTEN (`KM_MONTHS`), not `Intl`.** Desktop
+  Chrome was measured with NO Khmer locale data —
+  `Intl.DateTimeFormat.supportedLocalesOf(["km"])` is empty — and formats
+  `km-KH` in English without a warning; Android ships trimmed locale data too.
+  The streak screens hand-write their Khmer weekday initials for the same reason,
+  and the calendar reuses them (`weekdayLabel`) plus `daysLabel` from
+  `features/streak/copy.ts`. **Two pre-existing places still use `km-KH` and so
+  print English in Khmer mode:** `commitment-banner.tsx`'s `formatSignedDate`,
+  and `utils/exam-date.ts`'s `formatExamDate` (shown on the roadmap). Same bug,
+  not fixed here — the calendar's exam label deliberately does not call
+  `formatExamDate` for that reason.
+
+**The identity row** (`profile-identity.tsx`) shows `authUser.avatarUrl`, which
+arrived with every Google session and was used nowhere, with
+`referrerPolicy="no-referrer"` (Google's avatar host turns down some hotlinked
+requests that carry a Referer) and an `onError` fallback to the first letter on
+a `bg-brand` circle. The pencil edits the name via `setUserName`, which **refuses
+a blank name in the store itself**: an empty `userName` is what the gate reads as
+"signed in, no profile yet", so writing one would throw the student back onto
+the signup form. **Guests get no pencil** — their "Guest" is a render-time
+fallback, and a stored name would skip `LoginView` on sign-in, which is where
+the Google name is prefilled.
+
+**Deliberately NOT editable here: target grade and weak subjects.** Both were in
+the plan and cut at review — they drive the roadmap (`GRADE_HOURS` → the daily
+mission, `weaknesses` → the phases) and the user does not want the roadmap
+changing yet. When they come back: edit in place on Profile rather than a "Redo
+survey" button (the survey restarts all four steps blank, takes over the screen
+and has no cancel), and move `GRADES` / `FIXED_SUBJECTS` out of `survey-view.tsx`
+into a `.ts` so both screens share one list.
+
 ## Performance — the four rules, and why each one exists
 
 The app was slow, and the reported symptom was **navigation**, not first load.
@@ -3039,8 +3287,8 @@ normally. `partialize` is a named function purely so `merge` can borrow its type
 **Survey persists across reloads**, same as Login — `surveyed` and `userData`
 are in `lib/store.ts`'s `partialize` (`lang`, `userName`/`userEmail`/`userAge`/
 `userLocation`, `userLanguage`, `surveyed`, `userData`, `pendingPlacementTests`,
-`commitment`, `pledgeSeen`, `xp`, `level`, `streak`, `tasks`, `tasksDate`,
-`examResults`,
+`commitment`, `pledgeSeen`, `xp`, `level`, `streak`, `activityLog`, `tasks`,
+`tasksDate`, `examResults`,
 `conversations`, `activeConversationId`; `chatOpen`/`drawerOpen`/`pledgeOpen` deliberately
 excluded as UI state). This reverses the original app's behavior; it was
 explicitly changed once Logout existed. The only way back to a blank

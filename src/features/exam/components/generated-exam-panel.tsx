@@ -3,15 +3,19 @@ import { MOCK_QS } from "@/data/questions";
 import { scoreColor } from "../score-styles";
 
 /**
- * Tab B: the app's own generated practice exam.
- *
- * Behaviour is unchanged from the single-screen /exam this replaced — same
- * MOCK_QS set, same last-three history, same XP. Only its copy moved to Khmer
- * (EXAM_PAGE_LANG in ../papers) and it now sits behind a tab.
+ * RETIRED FROM THE UI, KEPT IN THE CODEBASE — at the user's explicit request.
+ * `ExamView` no longer imports this; Tab B renders `GeneratedPapersPanel`
+ * instead, which offers one card per subject rather than one fixed mixed test.
+ * This file's behaviour is otherwise exactly what shipped before that change —
+ * the single MOCK_QS set, the last-three history, the same XP — left intact in
+ * case the old flow is wanted back. Don't delete it as "unused code"; that is
+ * the whole point of keeping it. `MOCK_QS` itself is very much still alive —
+ * `utils/chat-prompt.ts` and `utils/placement.ts` both read it independently of
+ * this component.
  *
  * examResults is read UNFILTERED here, which is one of the reasons a past-paper
- * attempt must never be written into it: those attempts would surface in this
- * list, under the wrong tab, on the same screen. See ExamView.handleSubmit.
+ * (or generated-paper) attempt must never be written into it: those attempts
+ * would surface in this list. See ExamView.handleSubmit.
  */
 export function GeneratedExamPanel({ onStart }: { onStart: () => void }) {
   const examResults = useBrachNhaStore((s) => s.examResults);

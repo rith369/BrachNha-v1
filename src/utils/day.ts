@@ -41,3 +41,12 @@ export function addDaysKey(base: Date, days: number): string {
   d.setDate(d.getDate() + days);
   return todayKey(d);
 }
+
+/** A `todayKey` string back to LOCAL midnight of that day — its inverse, so
+ *  walking a run of days is `addDaysKey(parseDayKey(k), ±1)` with no UTC step
+ *  anywhere. `new Date("2026-09-11")` would NOT do: a bare ISO date parses as
+ *  UTC midnight, which is the previous evening in Phnom Penh. */
+export function parseDayKey(key: string): Date {
+  const [y, m, d] = key.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}

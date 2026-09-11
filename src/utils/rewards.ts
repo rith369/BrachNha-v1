@@ -46,3 +46,14 @@ export const QUIZ_COINS = 5;
  */
 export const FLASHCARD_XP = 4;
 export const FLASHCARD_COINS = 1;
+
+/**
+ * The flat bonus for each daily task — lesson, practice, flashcards, challenge —
+ * paid once per task per day by `completeTask` in lib/store.ts.
+ *
+ * It was a bare `20` inside the store until it gained a second reader:
+ * lib/supabase-sync.ts rebuilds a day's XP from how many tasks were ticked, for
+ * daily_activity rows written before xp_earned was filled in. Two copies of the
+ * number would be two numbers waiting to disagree — the reason this file exists.
+ */
+export const TASK_XP = 20;

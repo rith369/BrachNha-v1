@@ -87,27 +87,56 @@ const ROUTES = [
   },
 
   // ── focus mode: nav must be gone on all of these ──
-  // Scoped to `button:has-text`, NOT a bare `text=`: both screens show their
-  // title and their CTA with the same words, and a bare text selector picks the
+  // Scoped to `button:has-text`, NOT a bare `text=`: on the lesson intro the
+  // title and the CTA share the same words, and a bare text selector picks the
   // heading (a div), so the click silently does nothing and the shot is of the
-  // intro screen. Still true now that the exam CTA is Khmer: the generated-exam
-  // card renders the same words as a heading div AND as the button.
+  // intro screen.
   {
     name: "focus-lesson-content",
     path: "/lessons/math-limits",
     clicks: ['button:has-text("Start Learning")'],
   },
+  // Tab B's math card specifically: GENERATED_EXAM_QUESTIONS derives from the
+  // old MOCK_QS test, so math (and biology) are the only two subjects with
+  // guaranteed content to click into — see data/generated-exams.ts. Every
+  // exam-paper card IS a single <button> now (see exam-paper-card.tsx), so
+  // there's no button-vs-heading trap here the way there was in lessons above.
   {
     name: "focus-exam",
     path: "/exam",
-    clicks: ['button:has-text("វិញ្ញាសារបង្កើតថ្មី")', 'button:has-text("ចាប់ផ្តើមប្រឡង")'],
+    clicks: [
+      'button:has-text("វិញ្ញាសារបង្កើតថ្មី")',
+      'button:has-text("វិញ្ញាសារគណិតវិទ្យា")',
+    ],
   },
   { name: "focus-placement", path: "/placement-test/math" },
 ];
 
+// A local-calendar day key `offset` days from today — the same rule as
+// src/utils/day.ts's todayKey(), and never toISOString(), which is UTC.
+function dayKey(offset) {
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+// A study history, so Profile's calendar photographs filled in rather than
+// empty. A 12-day run of GOAL days ending yesterday, plus three older days —
+// two where the student studied without finishing the goal, so the faint
+// "studied" mark is photographed too. Today shows its "not yet" ring and the
+// nudge, the everyday state. The seeded `streak` below is what this log
+// derives to; AppShell's rollover recomputes it on load anyway (tasksDate "").
+const seededActivity = Object.fromEntries([
+  ...Array.from({ length: 12 }, (_, i) => [dayKey(-(i + 1)), { xp: 80 + i * 5, goal: true }]),
+  [dayKey(-20), { xp: 24, goal: false }],
+  [dayKey(-21), { xp: 40, goal: false }],
+  [dayKey(-25), { xp: 90, goal: true }],
+]);
+
 // Without this every route renders LoginView. Shape mirrors partializeState in
 // src/lib/store.ts; the `version` below matches the store's current schema so
-// `migrate` leaves the theme and the streak alone.
+// `migrate` leaves the theme, the streak and the activity log alone.
 const seeded = (theme) => ({
   state: {
     lang: "en",
@@ -134,6 +163,7 @@ const seeded = (theme) => ({
     level: 2,
     coins: 30,
     streak: 12,
+    activityLog: seededActivity,
     tasks: { lesson: false, practice: false, flashcards: false, challenge: false },
     // The day `tasks` describes. "" means nothing has been completed yet, so
     // AppShell's rollover stamps today and leaves the (already empty) checklist
@@ -145,7 +175,7 @@ const seeded = (theme) => ({
     conversations: [],
     activeConversationId: null,
   },
-  version: 3,
+  version: 4,
 });
 
 /**

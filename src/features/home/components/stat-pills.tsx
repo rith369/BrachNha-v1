@@ -3,6 +3,8 @@ import { Link } from "react-router";
 import { Card } from "@/components/ui/card";
 import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
+import { todayKey } from "@/utils/day";
+import { bestStreak } from "@/utils/streak";
 
 /**
  * The four headline numbers on Home (and reused as-is on Profile).
@@ -20,33 +22,58 @@ import { useShallow } from "zustand/react/shallow";
  * string, so the linked one cannot drift visually from its three neighbours.
  */
 export function StatPills() {
-  const { lang, xp, level, streak, examResults } = useBrachNhaStore(
-    useShallow((s) => ({
-      lang: s.lang,
-      xp: s.xp,
-      level: s.level,
-      streak: s.streak,
-      examResults: s.examResults,
-    }))
-  );
+  const { lang, xp, level, streak, examResults, activityLog } =
+    useBrachNhaStore(
+      useShallow((s) => ({
+        lang: s.lang,
+        xp: s.xp,
+        level: s.level,
+        streak: s.streak,
+        examResults: s.examResults,
+        activityLog: s.activityLog,
+      }))
+    );
 
   const toNextLevel = Math.max(level * 100 - xp, 0);
   const questionsAnswered = examResults.reduce((sum, r) => sum + r.total, 0);
+
+  // Both notes were string literals — "▲ +20 today" and "Best!" — which every
+  // student saw whatever they had done. They read the activity log now, the
+  // same record the streak itself is derived from, so the three cannot disagree.
+  const xpToday = activityLog[todayKey()]?.xp ?? 0;
+  const best = bestStreak(activityLog);
+  const atBest = best > 0 && streak === best;
+  const streakNote =
+    best === 0
+      ? lang === "en"
+        ? "Start today"
+        : "ចាប់ផ្តើមថ្ងៃនេះ"
+      : atBest
+        ? lang === "en"
+          ? "Best!"
+          : "ល្អបំផុត!"
+        : lang === "en"
+          ? `Best ${best}`
+          : `ល្អបំផុត ${best}`;
 
   const pills = [
     {
       icon: Zap,
       value: xp,
       label: lang === "en" ? "XP Points" : "ពិន្ទុ XP",
-      note: lang === "en" ? "▲ +20 today" : "▲ +20 ថ្ងៃនេះ",
+      // The arrow claims a gain, so it appears only when there was one.
+      note:
+        (xpToday > 0 ? "▲ " : "") +
+        (lang === "en" ? `+${xpToday} today` : `+${xpToday} ថ្ងៃនេះ`),
       color: "text-pink",
     },
     {
       icon: Flame,
       value: streak,
       label: lang === "en" ? "Streak" : "ជួរ",
-      note: lang === "en" ? "Best!" : "ល្អបំផុត!",
-      noteIcon: Trophy,
+      note: streakNote,
+      // The trophy marks a record, so it only appears when this IS one.
+      noteIcon: atBest ? Trophy : undefined,
       color: "text-yellow",
       href: "/streak",
     },
