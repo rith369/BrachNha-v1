@@ -19,7 +19,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 12 Sep 2026 — Jump to any lesson from the top of a path, and the two Study tabs stop overlapping
 
-*Not yet committed.*
+*Landed in commit `d02df08`.*
 
 **Why.** A subject path is long — biology is 43 stops — so reaching a lesson in
 the middle meant scrolling past everything before it. And on the Study page, the
@@ -50,7 +50,7 @@ light and dark, phone and laptop.
 
 ## 11 Sep 2026 — Screens with sample numbers now say so
 
-*Not yet committed.*
+*Landed in commit `d02df08`.*
 
 **Why.** Some screens still show made-up numbers, the same for every student,
 while the bar at the top of the screen shows your real XP and streak. On
