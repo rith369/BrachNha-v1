@@ -22,8 +22,32 @@ export function isFocusRoute(pathname: string): boolean {
     pathname.startsWith("/sections/") ||
     pathname === "/practice/review" ||
     isPracticeRunRoute(pathname) ||
+    // A game match arrives here through isAssessmentRoute below, the same way the
+    // placement test does — it is measured, not merely a task.
     isAssessmentRoute(pathname)
   );
+}
+
+/**
+ * A game match in progress.
+ *
+ * `/game` itself is a PLACE — it is where a student chooses a subject to play —
+ * so it keeps its navigation, and only `/game/:subjectId` is a task. That is the
+ * same trailing-slash rule isFocusRoute() applies to "/lessons/", and it needs
+ * no segment counting because there is no static `/game/*` path to disambiguate
+ * from (unlike the two-pattern ambiguity pages/subject-path.tsx documents).
+ *
+ * DETECTED BY PATHNAME RATHER THAN BY THE STORE'S `focusMode` FLAG, which is the
+ * load-bearing choice here and the same one isPracticeRunRoute() made.
+ * hooks/use-focus-mode.ts warns that `focusMode` is read by useMentorBlocked()
+ * as "a mock exam is being answered", and exam-runner.tsx adds that it is a
+ * boolean rather than a counter, so exactly one runner may ever set it. Keying
+ * off the pathname also means a browser-back out of a running match restores the
+ * navigation on its own, with nothing to unset — the failure ExamRunner's
+ * cleanup effect exists to prevent simply cannot happen here.
+ */
+export function isGameRunRoute(pathname: string): boolean {
+  return pathname.startsWith("/game/");
 }
 
 /**
@@ -75,9 +99,16 @@ export function isPracticeRunRoute(pathname: string): boolean {
  *
  * The mock exam is absent for the same reason it's absent above: it isn't
  * identifiable by URL. use-focus-mode.ts ORs the store flag in.
+ *
+ * A GAME MATCH COUNTS, which is why this is no longer the placement test alone.
+ * A timed duel against a scored opponent is a competition, not a lesson — "a
+ * mentor on tap measures the mentor" applies exactly, and unlike a lesson or a
+ * practice quiz there is nothing being taught mid-match to ask about. Note this
+ * widens the rule by PATHNAME, so the warning about borrowing the store's
+ * focusMode flag for a second meaning stays satisfied.
  */
 export function isAssessmentRoute(pathname: string): boolean {
-  return pathname.startsWith("/placement-test/");
+  return pathname.startsWith("/placement-test/") || isGameRunRoute(pathname);
 }
 
 /**

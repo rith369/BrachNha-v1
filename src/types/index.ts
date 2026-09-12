@@ -25,7 +25,7 @@ export interface AuthUser {
 /** Which locked feature raised the login prompt. A union rather than a free
  *  string so the modal's copy table has to cover every case that can reach it —
  *  adding a feature here is a type error until its wording exists. */
-export type AuthFeature = "roadmap" | "chat";
+export type AuthFeature = "roadmap" | "chat" | "game";
 
 /** One side of the sign-in conflict: enough to tell the two apart on screen
  *  without pulling either one down first. */
@@ -320,6 +320,18 @@ export interface ExamQuestion {
   q: { en: string; km: string };
   correct: string;
   options: string[];
+  /**
+   * How hard this question is, used by the Game feature when a creator picks a
+   * difficulty for their competition.
+   *
+   * OPTIONAL, and left unset on every question that exists today. None of the
+   * authored questions carry a difficulty, and assigning one to each of them
+   * would be inventing a judgement nobody made — the same reason a chapter with
+   * no supplied title carries "" rather than a made-up one. An untagged question
+   * passes every filter, so tagging content later starts the filter working with
+   * no code change, exactly as adding a GAME_QUESTIONS entry turns a subject on.
+   */
+  difficulty?: GameDifficulty;
 }
 
 /** A question in the generated mock exam, where the subject is always known. */
@@ -335,4 +347,111 @@ export interface Bac2Example {
   question: { en: string; km: string };
   answer: { en: string; km: string };
   verified: boolean;
+}
+
+/**
+ * How hard a competition is, chosen by whoever created it.
+ *
+ * "mix" is a real option rather than the absence of one: it says the creator
+ * deliberately wanted a spread, which is different from not having decided.
+ */
+export type GameDifficulty = "easy" | "medium" | "hard" | "mix";
+
+/**
+ * A challenge one student posts for others to take.
+ *
+ * THE QUESTIONS ARE FROZEN ONTO THE ROW, not an index or a seed into the
+ * subject's pool. It costs a little more storage and buys the one property the
+ * whole feature rests on: a joiner answers EXACTLY what the creator answered,
+ * for as long as the competition exists. A reference into the pool would break
+ * the moment data/game-questions.ts is edited — and since content is explicitly
+ * arriving later, that edit is not hypothetical. It also means a result stays
+ * meaningful after the source questions are reworded or removed.
+ *
+ * `creatorName` IS DENORMALISED ON PURPOSE AND MUST STAY THAT WAY. The result
+ * screen has to name who you were up against, and the obvious way to get that —
+ * letting everyone read `profiles` — would publish email, age and location with
+ * it. supabase/migrations/20260828000002_rls_policies.sql forbids exactly that
+ * policy. Carrying the name here is what lets a competition be world-readable
+ * while `profiles` stays owner-only. Do not "tidy" this into a join.
+ *
+ * The cost of that choice, stated so it is not mistaken for a bug: a student who
+ * renames themselves does not rename their old competitions.
+ */
+export interface Competition {
+  /** Client-minted, like conversations.id — see newId() in lib/store.ts. */
+  id: string;
+  creatorId: string;
+  creatorName: string;
+  /** A SubjectId, held as a plain string: lib/ never imports from features/,
+   *  the same reason PendingPlacementTest.subject is one. */
+  subject: string;
+  difficulty: GameDifficulty;
+  /** The whole-quiz budget the creator chose. */
+  minutes: number;
+  questions: ExamQuestion[];
+  creatorScore: number;
+  /** How long the creator took. Milliseconds, and the tie-break: equal scores
+   *  rank on speed. */
+  creatorMs: number;
+  total: number;
+  /** A full ISO INSTANT, never a date key — see utils/day.ts. */
+  createdAt: string;
+  /**
+   * When this reached the server, or ABSENT if it never has.
+   *
+   * Absent is the honest default and the reason this is optional rather than a
+   * boolean: every competition created before the tables existed is already
+   * sitting in students' browsers without the field, and `undefined` reads
+   * correctly as "not shared" with no migration.
+   *
+   * It exists because the local copy is written first and unconditionally, so a
+   * publish can fail — offline, signed out, tables missing — and leave a
+   * competition nobody else can see. Without this the hub called those rows
+   * "open for joiners", which was simply false. features/game/share-pending.ts
+   * retries them; MyCompetitions labels them until it succeeds.
+   */
+  sharedAt?: string;
+}
+
+/**
+ * One student's run at someone else's competition.
+ *
+ * IT CARRIES THE COMPARISON, not just this student's half. `opponentName`,
+ * `opponentScore`, `opponentMs`, `subject` and `total` are copied from the
+ * competition at the moment it was played, so the row is a complete record of a
+ * result on its own.
+ *
+ * That is what lets the history list render without the competition it refers
+ * to — which matters as soon as competitions live on the server: a joiner
+ * fetches one, plays it, and has no reason to keep it. The alternative is a
+ * second read per history row, and a history that goes blank offline. Same
+ * reasoning as freezing the questions onto the competition, and the same cost:
+ * if the creator renames themselves, an old attempt keeps the old name.
+ */
+export interface CompetitionAttempt {
+  id: string;
+  competitionId: string;
+  userId: string;
+  userName: string;
+  score: number;
+  ms: number;
+  /** The creator's half of the comparison, frozen at play time. */
+  opponentName: string;
+  /**
+   * The creator's account id, used to pick their avatar (utils/avatar-seed.ts)
+   * so they look the same here as they did in the browse list.
+   *
+   * OPTIONAL because attempts already in a student's browser predate it, and
+   * those fall back to hashing the name — the same no-migration reasoning as
+   * Competition.sharedAt. Local-only: the server's competition_attempts row
+   * identifies the competition by competition_id, which carries the creator.
+   */
+  opponentId?: string;
+  opponentScore: number;
+  opponentMs: number;
+  /** A SubjectId, as a plain string — see Competition.subject. */
+  subject: string;
+  total: number;
+  playedAt: string;
 }

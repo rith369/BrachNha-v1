@@ -109,6 +109,19 @@ const ROUTES = [
       'button:has-text("វិញ្ញាសារគណិតវិទ្យា")',
     ],
   },
+  // The competition create form, and then the run itself. /game/create is a
+  // real route, so the form needs no click chain; the run needs one click.
+  // Requires the Supabase vars to be BLANKED, or hasFullAccess is false and both
+  // photograph the locked panel instead — which is the documented command anyway.
+  { name: "focus-game-create", path: "/game/create" },
+  {
+    name: "focus-game-run",
+    path: "/game/create",
+    // The seed sets lang "en", and the Game feature is bilingual, so this
+    // selector is the ENGLISH label. A Khmer one silently never matches and the
+    // shot quietly becomes the create form again.
+    clicks: ['button:has-text("Start playing")'],
+  },
   { name: "focus-placement", path: "/placement-test/math" },
 ];
 
@@ -170,6 +183,49 @@ const seeded = (theme) => ({
     // alone — no screenshot shows a reset that just happened.
     tasksDate: "",
     examResults: [],
+    // One posted competition and one played attempt, so /game photographs the
+    // cards a real student sees rather than the hero alone. Both are hidden when
+    // empty (see pages/game.tsx), which is exactly why the seed has to carry
+    // them: the seed mirrors partializeState, and a new field that GATES what a
+    // page renders has to be added here or the screenshots quietly become of a
+    // different screen.
+    competitions: [
+      {
+        id: "seed-comp-1",
+        creatorId: "seed-user",
+        creatorName: "Panharith",
+        subject: "math",
+        difficulty: "mix",
+        minutes: 5,
+        // Five stand-ins so the row reports a believable length; only the
+        // COUNT is rendered on /game, never the question text.
+        questions: [1, 2, 3, 4, 5].map(() => ({
+          q: { en: "", km: "" },
+          correct: "",
+          options: [],
+        })),
+        creatorScore: 4,
+        creatorMs: 96_000,
+        total: 5,
+        createdAt: new Date().toISOString(),
+      },
+    ],
+    competitionAttempts: [
+      {
+        id: "seed-att-1",
+        competitionId: "seed-comp-2",
+        userId: "seed-user",
+        userName: "Panharith",
+        score: 4,
+        ms: 88_000,
+        opponentName: "Sokha",
+        opponentScore: 3,
+        opponentMs: 91_000,
+        subject: "biology",
+        total: 5,
+        playedAt: new Date().toISOString(),
+      },
+    ],
     completedSessions: [],
     theme,
     conversations: [],

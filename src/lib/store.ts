@@ -14,6 +14,8 @@ import type {
   AuthFeature,
   AccountConflict,
   ActivityLog,
+  Competition,
+  CompetitionAttempt,
 } from "@/types";
 import { makeConversationTitle } from "@/utils/chat-history";
 import {
@@ -45,6 +47,10 @@ export type {
 // chatty student slowly fills localStorage.
 const MAX_CHAT_MSGS = 40; // per conversation
 const MAX_CONVERSATIONS = 20; // oldest-updated dropped first
+// Competitions a student has posted, and their runs at other people’s. Both
+// persisted, so both need a bound like conversations and reviewHistory. 50 is
+// months of real use; oldest drop first.
+const MAX_COMPETITIONS = 50;
 
 // reviewHistory grows by one entry per grade, across every deck, for as long
 // as the student keeps studying — the fastest-growing persisted list in the
@@ -193,6 +199,26 @@ interface BrachNhaState {
   tasksDate: string;
   examResults: ExamResult[];
   /**
+   * Competitions this student CREATED.
+   *
+   * LOCAL-ONLY IN THIS STORE, and deliberately absent from `syncRelevantChange`
+   * in hooks/use-supabase-sync.ts — not because it does not reach the server,
+   * but because it does NOT go through the snapshot push. lib/competitions.ts
+   * writes each competition once, at the moment it is posted.
+   *
+   * That distinction is the point. `pushLocalState` writes a DESTRUCTIVE
+   * snapshot of this student's own tables, and a competition is not exclusively
+   * theirs — other students' attempts hang off it. Pushed that way, clearing a
+   * browser would delete challenges other people were part-way through. An
+   * earlier draft of this comment told stage B to add both fields to that list;
+   * that would have been the bug, and this is the correction.
+   */
+  competitions: Competition[];
+  /** This student's own runs at other people's competitions. Written straight to
+   *  the server by lib/competitions.ts for the same reason, and kept here so the
+   *  history list renders offline. */
+  competitionAttempts: CompetitionAttempt[];
+  /**
    * Lesson ids the student has finished, which is what turns a session node on
    * the subject path from "next" into "done". Holds lesson ids rather than a
    * separate session id so it cannot drift from the lesson flow that sets it.
@@ -322,6 +348,34 @@ interface BrachNhaState {
   deleteStudentCard: (deckKey: string, cardId: string) => void;
   toggleStarredCard: (cardId: string) => void;
   addExamResult: (result: ExamResult) => void;
+  /**
+   * Posts a competition this student created, and pays for their own run.
+   *
+   * MINTS THE id AND createdAt ITSELF, so no component has to call newId() or
+   * Date.now() — both are impure, and a call in a component body is the purity
+   * violation oxlint's react(purity) rule and the React Compiler both object
+   * to. Same shape as addChatMsg, which mints conversation ids here too.
+   */
+  addCompetition: (
+    competition: Omit<Competition, "id" | "createdAt">,
+    xp: number
+  ) => void;
+  /**
+   * Stamps a competition as having reached the server.
+   *
+   * Separate from addCompetition because the two happen at different moments:
+   * the row is saved immediately, and publishing it is a network round trip that
+   * may only succeed on a later visit. Returns the state unchanged when there is
+   * nothing to do, so a no-op publishes no store update — the same shape
+   * rolloverDailyTasks uses.
+   */
+  markCompetitionShared: (id: string) => void;
+  /** Records this student’s run at someone else’s competition. Mints its own
+   *  id and playedAt, for the reason above. */
+  addCompetitionAttempt: (
+    attempt: Omit<CompetitionAttempt, "id" | "playedAt">,
+    xp: number
+  ) => void;
   resetDailyTasks: () => void;
   /** Clears `tasks` and re-derives `streak` if `tasksDate` is not today.
    *  Idempotent and cheap, so the caller can run it on mount and on every
@@ -465,6 +519,8 @@ const partializeState = (state: BrachNhaState) => ({
   tasks: state.tasks,
   tasksDate: state.tasksDate,
   examResults: state.examResults,
+  competitions: state.competitions,
+  competitionAttempts: state.competitionAttempts,
   completedSessions: state.completedSessions,
   cardReviews: state.cardReviews,
   studentCards: state.studentCards,
@@ -516,6 +572,8 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       tasks: emptyTasks,
       tasksDate: "",
       examResults: [],
+      competitions: [],
+      competitionAttempts: [],
       completedSessions: [],
       cardReviews: {},
       studentCards: {},
@@ -756,6 +814,34 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       addExamResult: (result) =>
         set((state) => ({ examResults: [...state.examResults, result] })),
 
+      addCompetition: (competition, xp) =>
+        set((state) => ({
+          competitions: [
+            ...state.competitions,
+            { ...competition, id: newId(), createdAt: new Date().toISOString() },
+          ].slice(-MAX_COMPETITIONS),
+          ...award(state, xp),
+        })),
+
+      markCompetitionShared: (id) =>
+        set((state) => {
+          const i = state.competitions.findIndex((c) => c.id === id);
+          if (i === -1 || state.competitions[i].sharedAt) return state;
+          const next = [...state.competitions];
+          next[i] = { ...next[i], sharedAt: new Date().toISOString() };
+          return { competitions: next };
+        }),
+
+      addCompetitionAttempt: (attempt, xp) =>
+        set((state) => ({
+          competitionAttempts: [
+            ...state.competitionAttempts,
+            { ...attempt, id: newId(), playedAt: new Date().toISOString() },
+          ].slice(-MAX_COMPETITIONS),
+          ...award(state, xp),
+        })),
+
+
       setTheme: (theme) => set({ theme }),
       setChatOpen: (open) => set({ chatOpen: open }),
       setDrawerOpen: (open) => set({ drawerOpen: open }),
@@ -886,6 +972,8 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           tasks: emptyTasks,
           tasksDate: "",
           examResults: [],
+          competitions: [],
+          competitionAttempts: [],
           completedSessions: [],
           cardReviews: {},
           studentCards: {},

@@ -33,6 +33,10 @@ const TABLES = [
   "completed_sessions",
   "conversations",
   "chat_messages",
+  // The Game feature (20260913000001). competitions is the first table in the
+  // schema any signed-in student can read, not just its owner.
+  "competitions",
+  "competition_attempts",
 ];
 
 const ok = (m) => console.log(`  \x1b[32m✓\x1b[0m ${m}`);

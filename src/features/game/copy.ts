@@ -1,0 +1,220 @@
+import { addDaysKey, todayKey } from "@/utils/day";
+import { toKhmerDigits } from "@/utils/khmer-num";
+import type { Lang } from "@/types";
+
+/**
+ * The Game feature owns its copy, the way features/streak and features/exam own
+ * theirs, rather than growing data/translations.ts by thirty keys that only one
+ * screen reads.
+ *
+ * BILINGUAL, following the store's `lang` — NOT Khmer-only.
+ *
+ * An earlier pass made this feature Khmer-only behind a GAME_PAGE_LANG constant,
+ * reasoning that it is a subject-first screen like Study, Exam and Practice. The
+ * user overruled that: they want the page in English AND Khmer, like Home,
+ * Progress, Profile and the Leaderboard. It is the right call — the chrome here
+ * is gamification labels over numbers, not curriculum, so an English column is
+ * ordinary translation rather than the fabrication the Khmer-only rule exists to
+ * prevent.
+ *
+ * THE QUESTIONS THEMSELVES ARE NOT TRANSLATED, on the user's explicit
+ * instruction: competition content renders exactly as supplied. ExamQuestion
+ * still carries an {en, km} pair because it is shared with MOCK_QS and the
+ * placement test; game content may simply carry the same string in both, which
+ * is what "no need to translate" means in practice — nobody is asked for a
+ * second version.
+ */
+export const GAME_COPY = {
+  en: {
+    title: "Game 🎮",
+    subtitle: "Play against other students · Bac II Mode",
+    createCta: "🎮 Create Game Now!",
+    liveGame: "Live Game",
+    you: "You",
+    waiting: "Waiting for a joiner",
+    myStats: "My Game Stats 🏅",
+    wins: "Wins 🏆",
+    losses: "Losses 💀",
+    draws: "Draws 🤝",
+    winRate: "Win Rate",
+    winsShort: "Wins",
+    drawShort: "Draw",
+    lossesShort: "Losses",
+    myCompetitions: "My Competitions ⏳",
+    recentGames: "Recent Games 📜",
+    seeAll: "See all →",
+    openForJoiners: "Open for joiners",
+    notShared: "Not shared yet",
+    minutes: "min",
+    questions: "questions",
+    // Create flow
+    create: "Create a competition",
+    createBlurb:
+      "You play first, then friends join and play against your score.",
+    subject: "Subject",
+    difficulty: "Difficulty",
+    duration: "Time limit",
+    startPlaying: "Start playing",
+    comingSoon: "Coming soon",
+    noQuestions: "No subject has questions yet.",
+    // Run
+    saving: "Saving…",
+    // Posted
+    posted: "Competition created!",
+    yourScore: "Your score",
+    postedBlurb:
+      "Waiting for a friend to join. You will see the result once someone plays.",
+    postedOffline:
+      "Saved on this device, but it could not be shared yet — check your connection and your sign-in. Other students cannot see it until it is.",
+    done: "Done",
+    // Result
+    win: "You win!",
+    loss: "You lost",
+    draw: "Draw",
+    tieBreak: "Same score · decided on speed",
+    seconds: "s",
+    // Locked
+    back: "← Back",
+    // Browse list — the app's first network-backed section
+    challengeSomeone: "Challenge Someone 👊",
+    loadingCompetitions: "Looking for competitions…",
+    loadingCompetition: "Opening the competition…",
+    competitionsFailed: "Could not load competitions.",
+    competitionsEmpty: "Nobody has posted one yet. Be the first!",
+    competitionsSignIn: "Sign in to see competitions from other students.",
+    competitionGone: "This competition is no longer available.",
+    competitionFailed: "Could not open this competition. Check your connection.",
+    retry: "Try again",
+    play: "🎮 Play",
+    scoreToBeat: "Score to beat",
+    // One attempt per competition — see attemptFor() in game.ts.
+    played: "Played",
+    alreadyPlayed: "You have already played this competition.",
+    seeResult: "See result",
+    /** Shown when competitions exist but this student has played them all —
+     *  distinct from competitionsEmpty, which means none exist at all. */
+    allPlayed: "You have played every competition. Create one of your own!",
+  },
+  km: {
+    title: "ហ្គេម 🎮",
+    subtitle: "ប្រកួតជាមួយសិស្សដទៃ · របៀប Bac II",
+    createCta: "🎮 បង្កើតការប្រកួតឥឡូវនេះ!",
+    liveGame: "ការប្រកួតផ្ទាល់",
+    you: "អ្នក",
+    waiting: "រង់ចាំអ្នកចូលរួម",
+    myStats: "កំណត់ត្រារបស់អ្នក 🏅",
+    wins: "ឈ្នះ 🏆",
+    losses: "ចាញ់ 💀",
+    draws: "ស្មើ 🤝",
+    winRate: "អត្រាឈ្នះ",
+    winsShort: "ឈ្នះ",
+    drawShort: "ស្មើ",
+    lossesShort: "ចាញ់",
+    myCompetitions: "ការប្រកួតរបស់អ្នក ⏳",
+    recentGames: "ការប្រកួតថ្មីៗ 📜",
+    seeAll: "មើលទាំងអស់ →",
+    openForJoiners: "បើកចំហរង់ចាំ",
+    notShared: "មិនទាន់ចែករំលែក",
+    minutes: "នាទី",
+    questions: "សំណួរ",
+    create: "បង្កើតការប្រកួត",
+    createBlurb:
+      "អ្នកលេងមុនគេ បន្ទាប់មកមិត្តភក្តិចូលរួមប្រកួតនឹងពិន្ទុរបស់អ្នក។",
+    subject: "មុខវិជ្ជា",
+    difficulty: "កម្រិត",
+    duration: "រយៈពេល",
+    startPlaying: "ចាប់ផ្តើមលេង",
+    comingSoon: "ឆាប់ៗនេះ",
+    noQuestions: "មិនទាន់មានសំណួរសម្រាប់មុខវិជ្ជាណាមួយនៅឡើយទេ។",
+    saving: "កំពុងរក្សាទុក…",
+    posted: "បានបង្កើតការប្រកួត!",
+    yourScore: "ពិន្ទុរបស់អ្នក",
+    postedBlurb:
+      "រង់ចាំមិត្តភក្តិចូលរួម។ នៅពេលមានគេលេង អ្នកនឹងឃើញលទ្ធផល។",
+    postedOffline:
+      "រក្សាទុកក្នុងឧបករណ៍នេះ ប៉ុន្តែមិនទាន់បានចែករំលែកទេ។ សូមពិនិត្យអ៊ីនធឺណិត និងគណនីរបស់អ្នក។",
+    done: "រួចរាល់",
+    win: "អ្នកឈ្នះ!",
+    loss: "អ្នកចាញ់",
+    draw: "ស្មើគ្នា",
+    tieBreak: "ពិន្ទុស្មើគ្នា · សម្រេចដោយល្បឿន",
+    seconds: "វិនាទី",
+    back: "← ត្រឡប់",
+    challengeSomeone: "ប្រកួតជាមួយគេ 👊",
+    loadingCompetitions: "កំពុងរកការប្រកួត…",
+    loadingCompetition: "កំពុងបើកការប្រកួត…",
+    competitionsFailed: "មិនអាចទាញយកការប្រកួតបានទេ។",
+    competitionsEmpty: "មិនទាន់មាននរណាបង្កើតទេ។ អ្នកជាមនុស្សដំបូង!",
+    competitionsSignIn: "ចូលគណនីដើម្បីមើលការប្រកួតរបស់សិស្សដទៃ។",
+    competitionGone: "ការប្រកួតនេះលែងមានទៀតហើយ។",
+    competitionFailed: "មិនអាចបើកការប្រកួតនេះបានទេ។ សូមពិនិត្យអ៊ីនធឺណិត។",
+    retry: "ព្យាយាមម្តងទៀត",
+    play: "🎮 លេង",
+    scoreToBeat: "ពិន្ទុត្រូវយកឈ្នះ",
+    played: "លេងរួច",
+    alreadyPlayed: "អ្នកបានលេងការប្រកួតនេះរួចហើយ។",
+    seeResult: "មើលលទ្ធផល",
+    allPlayed: "អ្នកបានលេងការប្រកួតទាំងអស់ហើយ។ បង្កើតមួយរបស់អ្នកទៅ!",
+  },
+} as const;
+
+/**
+ * The one-word outcome shown on a chip — shared by the browse list and the
+ * history card. Separate from copy.win/loss/draw, which are full sentences for
+ * the result SCREEN ("You win!"); a chip needs one word.
+ */
+export const OUTCOME_LABEL = {
+  win: { en: "Won", km: "ឈ្នះ" },
+  loss: { en: "Lost", km: "ចាញ់" },
+  draw: { en: "Draw", km: "ស្មើ" },
+} as const;
+
+export function gameCopy(lang: Lang) {
+  return GAME_COPY[lang];
+}
+
+/** Digits follow the language: Khmer numerals in Khmer, Latin in English —
+ *  matching how the rest of the bilingual chrome reads. */
+export function num(value: number | string, lang: Lang): string {
+  return lang === "km" ? toKhmerDigits(value) : String(value);
+}
+
+/**
+ * "Today" / "Yesterday" / "N days ago".
+ *
+ * HAND-WRITTEN RATHER THAN `Intl`, and that is not a style choice. Desktop
+ * Chrome ships with no Khmer locale data — `Intl.DateTimeFormat` formats
+ * `km-KH` in English without any warning — and Android ships trimmed data too.
+ * The streak screens hand-write their Khmer weekday names for exactly this
+ * reason, and two places in the app (commitment-banner.tsx's formatSignedDate
+ * and utils/exam-date.ts's formatExamDate) still carry the bug.
+ *
+ * The day is re-derived through utils/day.ts, which computes a LOCAL calendar
+ * day. Never `toISOString().slice(0, 10)` — that is UTC, and for a Phnom Penh
+ * student studying before 07:00 it names the wrong day. The stored value is an
+ * instant, which is correct; only the comparison has to be local.
+ */
+export function relativeDay(iso: string, lang: Lang): string {
+  const day = localDayOf(iso);
+  const now = new Date();
+  if (day === todayKey(now)) return lang === "en" ? "Today" : "ថ្ងៃនេះ";
+  if (day === addDaysKey(now, -1))
+    return lang === "en" ? "Yesterday" : "ម្សិលមិញ";
+
+  // Walk back rather than subtracting timestamps: a span containing a clock
+  // change is not a whole number of 24-hour periods, and addDaysKey already
+  // knows how to step a calendar day.
+  for (let n = 2; n <= 30; n++) {
+    if (day === addDaysKey(now, -n)) {
+      return lang === "en" ? `${n} days ago` : `${toKhmerDigits(n)} ថ្ងៃមុន`;
+    }
+  }
+  return lang === "en" ? "A while ago" : "យូរមកហើយ";
+}
+
+function localDayOf(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}

@@ -57,3 +57,23 @@ export const FLASHCARD_COINS = 1;
  * number would be two numbers waiting to disagree — the reason this file exists.
  */
 export const TASK_XP = 20;
+
+/**
+ * XP for one correct answer in a Game competition.
+ *
+ * DELIBERATELY THE SAME RATE AS A QUIZ ANSWER, and defined as that constant
+ * rather than as a second `10`, so the two cannot drift apart. A competition
+ * question is the same act as a practice question — commit to an answer, be
+ * right or wrong — and paying more for it would make the fastest way to earn XP
+ * a race rather than a lesson.
+ *
+ * It is named rather than used inline because it is the obvious place a future
+ * tuning goes ("a competition is worth more"), and a named constant makes that
+ * one edit instead of a hunt through two pages.
+ *
+ * NO COIN OVERRIDE. Callers pass this to the store's competition actions, which
+ * route through `award()` with no coin argument, so the default COINS_PER_XP
+ * ratio applies. lib/store.ts warns that a THIRD hand-set coin figure is the
+ * signal the ratio itself is wrong; this deliberately does not become one.
+ */
+export const GAME_XP_PER_CORRECT = QUIZ_XP;

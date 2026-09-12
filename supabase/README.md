@@ -21,9 +21,12 @@ migration file instead — the filename is a timestamp, so they apply in order.
 
 ## Applying them
 
-**Run every file once against YOUR OWN project, in filename order.** Each
-developer has their own Supabase project rather than sharing one, so this is
-done per project, not once for the repo. Two ways:
+**Run every file once, in filename order.** There are two projects, one per
+developer, but only one is still being worked on — as of Sep 2026 the repo owner
+is the only person building the app, so a new migration is applied once rather
+than twice. The other project is untouched and needs nothing. If a second person
+picks the app up again, every migration added since has to be applied to their
+project too. Two ways:
 
 ### A. Dashboard (no install)
 
@@ -31,15 +34,19 @@ done per project, not once for the repo. Two ways:
 2. Paste the whole of `20260828000001_init_schema.sql`, run it
 3. Paste the whole of `20260828000002_rls_policies.sql`, run it
 4. Paste the whole of `20260904000001_hardening.sql`, run it
+5. Paste the whole of `20260913000001_competitions.sql`, run it
 
 Order matters: the second file adds policies to tables the first one creates,
-and the third revokes a grant on a function the first one defines. Every file is
+the third revokes a grant on a function the first one defines, and the fourth
+creates its own tables and their policies together — enabling RLS without a
+policy denies everything, so those cannot be split. Every file is
 written to be safely re-runnable (`if not exists`, `drop policy if exists`, and
 a `revoke` that is a no-op when already revoked), so a partial run can be
 repeated rather than unpicked.
 
-The first two are applied on the projects currently in use; the third was added
-on 4 Sep 2026 and has to be run on each of them.
+The first three are applied. The fourth was added on 13 Sep 2026 for the Game
+feature and is the one to run next; `npm run db:check` reports
+`2 of 10 tables missing` until it is.
 
 **Applying them by pasting does not register them** in Supabase's own migration
 history — `list_migrations` comes back empty, and that is expected rather than a
@@ -155,7 +162,7 @@ npm run db:check
 ```
 
 Reports, in order: env values present → project reachable and key accepted →
-Google sign-in on → all eight tables reachable. It stops at the first failure so
+Google sign-in on → all ten tables reachable. It stops at the first failure so
 the output names a cause rather than a symptom, and warns (without failing) if
 anonymous sign-ins are still on.
 

@@ -23,11 +23,14 @@ import { GoogleButton } from "./google-button";
  * hamburger, no bottom nav and no way out at all.
  */
 
-const REASON: Record<AuthFeature, "loginRequiredRoadmap" | "loginRequiredChat"> =
-  {
-    roadmap: "loginRequiredRoadmap",
-    chat: "loginRequiredChat",
-  };
+const REASON: Record<
+  AuthFeature,
+  "loginRequiredRoadmap" | "loginRequiredChat" | "loginRequiredGame"
+> = {
+  roadmap: "loginRequiredRoadmap",
+  chat: "loginRequiredChat",
+  game: "loginRequiredGame",
+};
 
 export function LockedFeature({
   feature,

@@ -208,6 +208,8 @@ export const T = {
       "Your AI study roadmap is built from your own answers, so it needs an account to save them to.",
     loginRequiredChat:
       "KruAI is your personal tutor, so it needs an account to remember your questions.",
+    loginRequiredGame:
+      "A competition is played against other students, so it needs an account for them to find you.",
     maybeLater: "Maybe later",
     signInToUnlock: "Sign in to unlock",
 
@@ -439,6 +441,8 @@ export const T = {
       "ផែនការសិក្សារបស់អ្នកបង្កើតឡើងតាមចម្លើយផ្ទាល់ខ្លួន ដូច្នេះត្រូវមានគណនីដើម្បីរក្សាទុក។",
     loginRequiredChat:
       "KruAI ជាគ្រូផ្ទាល់ខ្លួនរបស់អ្នក ដូច្នេះត្រូវមានគណនីដើម្បីចងចាំសំណួររបស់អ្នក។",
+    loginRequiredGame:
+      "ការប្រកួតគឺលេងជាមួយសិស្សដទៃ ដូច្នេះត្រូវមានគណនីដើម្បីឱ្យគេឃើញអ្នក។",
     maybeLater: "ទុកសិន",
     signInToUnlock: "ចូលគណនីដើម្បីបើកប្រើ",
 

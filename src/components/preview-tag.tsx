@@ -5,8 +5,11 @@ import { cn } from "@/utils/cn";
 
 /**
  * "Preview · sample data" — the mark on every screen that still runs on fixed
- * demo numbers: Progress, Grade Prediction (the page and Home's card), Game,
- * the Leaderboard and Streak with Friends.
+ * demo numbers: Progress, Grade Prediction (the page and Home’s card), the
+ * Leaderboard and Streak with Friends — plus Game, which carries it for two
+ * reasons at once: its hero card is decoration the user asked to keep, and a
+ * posted competition cannot reach another student until the backend lands. Every
+ * other section on that page is real.
  *
  * It exists because those numbers sit directly under the REAL global StatBar.
  * Progress's top row says 1,240 XP and a 12-day streak, the Leaderboard's "You"

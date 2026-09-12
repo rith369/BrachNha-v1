@@ -322,14 +322,22 @@ outstanding.
 end of this file. Nothing calls `signInAnonymously()` any more, so a guest
 creates no `auth.users` row and syncs nothing at all.
 
-**Each developer runs their OWN Supabase project against the same committed
-migrations** — the repo owner's and Hok Chheng's are separate databases with
-identical schemas, which is why no project ref or URL appears in any tracked
-file (`cc9a9c1` removed the last one). `.env` is the only place it belongs, and
-`supabase/migrations/*.sql` is the single source of truth applied to each.
-Never create or alter tables from the dashboard's Table Editor: the change works,
-and then nothing in the repo records it, no diff shows it, and the two projects
-drift apart silently.
+**ONE ACTIVE Supabase project — but the migrations are still the source of
+truth.** The schema was built for two, one per developer, because neither wanted
+a teammate's test data in their dashboard. As of Sep 2026 only the repo owner is
+still working on the app; Hok Chheng's project still exists and nothing needs
+doing to it, it simply stops receiving migrations. So a new migration is applied
+ONCE, not twice. That is also why no project ref or URL appears in any tracked
+file (`cc9a9c1` removed the last one) — `.env` is the only place it belongs, and
+that stays right whether there is one project or five.
+
+**The rule that outlives the headcount:** `supabase/migrations/*.sql` is applied
+by hand, and never, ever replaced by an edit in the dashboard's Table Editor. A
+change made there works, and then nothing in the repo records it, no diff shows
+it, and the schema and the code drift apart silently. With one active project
+that is merely invisible; the moment a second person starts working on the app
+again, **every migration since has to be applied to their project too** and the
+whole per-project discipline is back.
 
 **When `PROMPT_BUDGET_CHARS` fires, this project is also the RAG store.** The
 mentor section explains why the whole corpus is sent on every request today and
@@ -2510,8 +2518,8 @@ survey.
 trend line + bar chart, subject breakdown w/ sparklines, focus areas, activity
 heatmap, AI insights. Uses fake/demo data on purpose (see below).
 
-**Game** (`features/game`) — live game card, stats, opponent list, game
-history. Also fake/demo data on purpose.
+**Game** (`features/game`) — asynchronous competitions between real students.
+See its own section below.
 
 **Grade Prediction** (`features/grade-prediction`) — `/grade-prediction` route
 plus a Home widget, both fed by one source: `demo-data.ts`. Nine components plus
@@ -2539,6 +2547,427 @@ screen). The calendar and identity row have their own section below.
 
 **KruAI chat** (`components/shell/chat-overlay.tsx` + `server/chat-handler.ts`)
 — real Gemini wiring, done. See the endpoint section above.
+
+### The Game page is asynchronous competitions between real students
+
+`/game` was the last screen running entirely on invented numbers — a fabricated
+live match with two named students, HP bars, a frozen `01:24` timer, and a "Join
+Game Now!" button with no handler. It is now a real feature, built to a design
+the user specified:
+
+1. A student **creates** a competition — subject, difficulty, and how many
+   minutes to finish in — and takes the quiz immediately.
+2. They see their score and **no win or loss**, because there is nobody to
+   compare against yet.
+3. The competition is **public**; other students see it and tap Play.
+4. A joiner takes the **same questions** and sees the result at once, because the
+   creator's score already exists. **Nothing is real-time.**
+5. Many may join, and **each is measured against the creator only** — not against
+   each other. That is what keeps a competition playable after the first person
+   takes it, and it is the user's own framing.
+
+**A BOT DUEL WAS BUILT FIRST AND REPLACED.** The opponent was a simulated bot
+that actually played against you. The user asked for real students instead, so
+`bot.ts`, `bot-chip.tsx`, `planBotTurns` and the `?bot=` param are all deleted.
+**Nothing a student ANSWERS is ever scored against a simulated opponent** — a run
+is compared only to a real person's recorded run. Don't reintroduce a bot as a
+"fallback opponent" for an empty app. (The hero card's decorative scoreline is a
+separate thing, requested deliberately — see the hub section.)
+
+**IT IS CROSS-USER NOW.** Built in two passes — stage A on one device, stage B
+the server — and both are in. A competition is written locally AND published to
+`public.competitions`; the hub's Challenge Someone card lists other students'
+competitions; `/game/play/:competitionId` fetches one and records an attempt.
+
+**THE MIGRATION IS APPLIED BY HAND.** `20260913000001_competitions.sql` is run in
+the Supabase dashboard's SQL editor — once, on the one project that now exists
+(see the Supabase section). Until it is, `npm run db:check` reports `2 of 10
+tables missing` and the browse list shows its failed state while everything else
+on the page keeps working. That degradation is deliberate, not a fallback bolted
+on afterwards.
+
+`PreviewTag` still stays, for the one reason left: the hero card is decoration by
+request. Everything else on the page is real.
+
+#### Two denormalisations, both load-bearing, neither a shortcut
+
+**`Competition.questions` is the FROZEN question set**, not an index or a seed
+into `data/game-questions.ts`. A joiner must answer exactly what the creator
+answered, for as long as the competition exists — and since content is
+explicitly arriving later, an edit to that file is not hypothetical. A reference
+would silently re-point an old competition at different questions.
+
+**`Competition.creatorName` is the creator's display name, copied onto the row.**
+This is the security decision in the whole feature. The result screen has to name
+who you were up against; the obvious way to get that is a policy letting everyone
+read `profiles` — and that table holds **email, age and location**.
+`supabase/migrations/20260828000002_rls_policies.sql` already forbids exactly
+that policy, having hit the same temptation for the leaderboard. Carrying the
+name on the competition is what lets the row be world-readable while `profiles`
+stays owner-only. **Do not "tidy" this into a join.**
+
+`CompetitionAttempt` carries the same idea one step further: it stores BOTH
+halves of the comparison (`opponentName`/`opponentScore`/`opponentMs`, plus
+`subject` and `total`), so the history list renders without the competition it
+refers to. Once competitions live on the server a joiner has no reason to keep
+one, and the alternative is a second read per history row and a history that
+goes blank offline.
+
+The cost of both, stated so it is not mistaken for a bug: **a student who renames
+themselves does not rename their old rows.**
+
+#### One clock for the whole quiz, and speed breaks ties
+
+`MATCH_MINUTES` is the budget the creator picks from, and it covers the whole
+run. A per-question countdown was built first and removed: with a total budget as
+well, two clocks on one screen can contradict each other. One budget is also what
+makes two runs comparable — both students had the same time, so the only
+difference is what they did with it.
+
+**Running out does NOT discard the attempt.** It submits whatever was answered.
+The unanswered questions already cost the points; throwing the run away on top
+punishes a slow reader twice. Elapsed time is capped at the deadline so a
+backgrounded tab, where the interval stops firing, cannot report a run longer
+than the budget it was given.
+
+**`outcomeOf()` takes two runs, not two scores, because SPEED BREAKS TIES.** With
+five questions a draw is the likeliest outcome of all, and "you both got 4" is a
+flat thing to show someone who just raced. The result screen shows both times
+under both scores always, and names the tie-break only when it actually decided
+the match — so the first time it settles one it does not read as the app picking
+a winner at random.
+
+#### The routes, and why both are static-prefixed
+
+| route | screen | nav | KruAI |
+| --- | --- | --- | --- |
+| `/game` | hub: hero, your competitions, your record | shown | shown |
+| `/game/create` | form → run → posted | hidden | blocked |
+| `/game/play/:competitionId` | a joiner's run → result | hidden | blocked |
+
+`isGameRunRoute()` is `startsWith("/game/")`, so `/game` stays a PLACE with its
+navigation and only the two task routes hide it — the same trailing-slash rule
+`/lessons/` follows. Both task routes are **static-prefixed**, so the
+`/lessons/:lessonId` versus bare `/lessons/:subjectId` ambiguity
+`pages/subject-path.tsx` documents cannot arise here at all.
+
+It is added to **`isAssessmentRoute()`** as well, which used to be the placement
+test alone: a timed competition against a scored opponent measures rather than
+teaches, so "a mentor on tap measures the mentor" applies exactly. Detection is
+by pathname and never by the store's `focusMode` flag — `use-focus-mode.ts` warns
+that borrowing that flag for a second meaning is how the two questions come
+apart, and the pathname version also means a browser-back mid-run restores the
+navigation with nothing to unset.
+
+**`/game/create` holds three phases in one route** (form → run → posted) because
+the middle two cannot be linked to: a competition does not exist until its
+creator has played it. The joiner's side IS linkable and is its own route.
+
+**The create route is GATED, not just its button.** A guest has no id to post
+under. The gate renders inside `FocusLayout` rather than `LockedFeature` — this
+is a focus route, so the navigation is already hidden, and `LockedFeature`'s
+panel expects the nav to still be around it (see its own note). Dropping it in
+here would strand a guest with no way out, the trap `ShellLayout`'s `roadmapLock`
+had to grow `hasFullAccess` to avoid.
+
+#### The hub keeps the ORIGINAL page, and its hero card is deliberately fake
+
+The rebuild first replaced the hero with an honest "you vs an empty slot" panel —
+no opponent, no scores, no bars — and reorganised the page around it. **The user
+overruled that and asked for the original page back**, and both halves of that
+are recorded here because they look like regressions and are not.
+
+**The layout is the original**: the gradient hero, `My Game Stats 🏅` with its
+four-stat strip and three-segment bar, and two cards side by side below. The
+sections below the hero are `My Competitions ⏳` and `Recent Games 📜`.
+`Challenge Someone 👊` is NOT one of them: that card listed invented classmates
+with ranks, an Online dot and a Play button that did nothing, and a real roster
+needs cross-user reads. When stage B lands, the public list takes that slot and
+its name back.
+
+**The hero card is decoration, by request.** The opponent, both scores, the HP
+split, the subject, the question progress and the clock all come from
+`features/game/demo-data.ts`. Two things on it are real: the LEFT fighter is the
+signed-in student (display name, and their Google photo when they have one), and
+the button, which reads Create Game Now and routes to `/game/create`.
+
+That is a deliberate product decision rather than an oversight, and it is why
+`PreviewTag` stays on this page. **The rule this codebase actually holds to is
+not "no sample data" — it is that sample data must be LABELLED**, which is what
+that pill is for and what `preview-tag.tsx` says in its own header. Every other
+section on the page is real and derived from the store.
+
+Don't quietly make the fake numbers real by wiring them to a competition: the
+card would then be claiming a live match, which is the one thing this feature
+cannot do. If it should stop being decorative, it becomes a "you vs your latest
+joiner" panel — a separate decision to take with the user, not a tidy-up.
+
+**Every card below the hero is absent until it has something to say**, and the
+conditions live in `pages/game.tsx` rather than inside each card so the
+responsive grid does not keep an empty cell. A first-time `/game` is the hero
+alone.
+
+**`gameStats()` derives every number from the attempts.** The original card
+carried seven hand-authored ones that disagreed: `winRate: 75` beside bar
+segments describing a 69% win share. Two traps it now avoids: `winRate` is 0 when
+nothing has been played (the alternative renders `NaN%`), and the three bar
+segments are **two rounds plus a remainder** — three independent `Math.round`s
+sum to 101 and overflow the track.
+
+#### Bilingual, not Khmer-only — and this also reversed
+
+An earlier pass put the feature behind a `GAME_PAGE_LANG = "km"` constant,
+reasoning that it is a subject-first screen like Study, Exam and Practice. **The
+user overruled that too**: the page follows the store's `lang`, like Home,
+Progress, Profile and the Leaderboard. That is the better fit — the chrome here
+is gamification labels over numbers, not curriculum, so an English column is
+ordinary translation rather than the fabrication the Khmer-only rule exists to
+prevent. The constant is gone; copy lives in `features/game/copy.ts`, the way
+the streak and exam features own theirs.
+
+**THE QUESTIONS THEMSELVES ARE NOT TRANSLATED**, on the user's explicit
+instruction: competition content renders exactly as supplied. `ExamQuestion`
+still carries an `{en, km}` pair because it is shared with `MOCK_QS` and the
+placement test, so game content may simply carry the same string in both — which
+is what "no need to translate" means in practice: nobody is asked for a second
+version.
+
+**The known consequence, so it is not mistaken for a bug:** `SubjectMeta.name` is
+a bare Khmer literal, so subject names render in Khmer inside the English page.
+That was the whole argument for Khmer-only, and it was weighed and set aside.
+Giving subjects an English name is a change to the shared catalog and affects
+Study, Exam and Practice too — don't make it here.
+
+`copy.ts`'s `relativeDay()` is hand-written rather than `Intl`: desktop Chrome
+formats `km-KH` in English with no warning.
+
+#### Content, and the difficulty that does nothing yet
+
+`data/game-questions.ts`'s `GAME_QUESTIONS` is **empty, and that is the normal
+state** — the `PAST_PAPER_QUESTIONS` discipline. `gameQuestionsFor()` falls back
+to `GENERATED_EXAM_QUESTIONS`, so math and biology are playable today from the
+5+5 real questions `MOCK_QS` already holds; every other subject is a dimmed,
+unselectable tile on the create form. That fallback is one `??` clause to delete.
+
+`ExamQuestion.difficulty` is **optional and set on nothing today**, so every
+difficulty filter is currently a no-op and a competition is a shuffled slice of
+the subject's pool. That is the accepted prototype behaviour — the user said as
+much, that a few similar exercises are fine for now — not a bug, and tagging
+content later starts the filter working with no code change. `pickQuestions()`
+falls back to the unfiltered pool when a difficulty matches nothing, because an
+empty set would post a competition nobody can play.
+
+#### The store
+
+`competitions` and `competitionAttempts` are persisted, capped at
+`MAX_COMPETITIONS` (50, oldest dropped first), and cleared by `logout()`. No
+persist `version` bump — new keys with defaults are handled by `merge()`.
+
+**Both actions mint their own `id` and timestamp.** `newId()` and `Date.now()`
+are impure, and calling either from a component body is what oxlint's
+`react(purity)` rule and the React Compiler both object to — it was caught by
+lint on the first pass. Same shape as `addChatMsg`.
+
+**They are deliberately ABSENT from `syncRelevantChange`, and they stay absent
+now that the server exists.** They reach it through `lib/competitions.ts`, which
+writes each row once, rather than through the snapshot push — see that file's
+section below for why routing them through `pushLocalState` would delete other
+students' challenges. An earlier draft of this paragraph said stage B must add
+both to that list; that would have been the bug.
+
+Results never touch `examResults` — that array captions Home's "from mock exams"
+pill and feeds `chat-prompt.ts` an average it states to KruAI as fact, the same
+reason practice, past-paper and placement attempts are all kept out.
+
+`GAME_XP_PER_CORRECT` in `utils/rewards.ts` is defined **as `QUIZ_XP`** rather
+than as a second `10`, so the two cannot drift. No coin override: the actions
+route through `award()` with no coin argument, so the default ratio applies and
+this does not become the third hand-set coin figure `lib/store.ts` warns about.
+
+#### The React Compiler guard, in a component that owns a timer
+
+`competition-run.tsx` cannot use the usual `if (done) return <Summary/>` at the
+very top, because a hook cannot be skipped and it owns the clock. The order is
+therefore **every hook first, then the terminal guard, then the closures that
+read into `questions[index]`** — which satisfies both rules at once. The header
+there explains it in full. Per-question state lives in the keyed child, so
+nothing in the parent needs a per-question effect.
+
+`scripts/shots.mjs` gained `focus-game-create` and `focus-game-run`, and its seed
+gained `competitions`/`competitionAttempts` — without them `/game` photographs
+the hero alone, since every other card is hidden when empty.
+
+#### The server layer — the app's first cross-user data
+
+`20260913000001_competitions.sql` adds `competitions` and `competition_attempts`,
+and with them **the first policy in this schema whose `using` clause is not an
+ownership test**:
+
+```sql
+create policy "competitions: read all"
+  on public.competitions for select to authenticated using (true);
+```
+
+**Why that is safe is a property of the ROW, not of the policy.** A competition
+carries a subject, a difficulty, a time budget, a frozen question set, the
+creator's score and their display name. No email, no age, no location.
+`creator_name` is denormalised precisely so this feature never needs a policy on
+`profiles` — which `20260828000002_rls_policies.sql` explicitly forbids, having
+hit the same temptation for the leaderboard. **Do not replace it with a join.**
+
+`competition_attempts` is deliberately NARROWER than the competition it hangs
+off: readable if it is yours, or if you created the competition. That is the
+product rule in SQL — every joiner competes against the creator, so a joiner sees
+only their own result and the creator sees everyone. Joiners never see each other.
+
+**Neither table has an UPDATE policy, and that is not an omission.** A
+competition is a fixed challenge and an attempt is a result; both being editable
+after the fact would silently rewrite outcomes already shown to other people.
+Insert-once, delete-if-you-must. `unique (competition_id, user_id)` is what stops
+a student re-rolling a bad run until they beat the creator — the client reports
+that duplicate as "already played", not as a failure.
+
+**`competitions.id` is `text`, not `uuid`**, for the same reason
+`conversations.id` is: it is minted client-side by `newId()`, which falls back to
+a `c<base36>` string where `crypto.randomUUID` is missing.
+
+#### `lib/competitions.ts` — deliberately NOT part of the sync layer
+
+Two differences, and both matter:
+
+- **`supabase-sync.ts` pushes a DESTRUCTIVE SNAPSHOT** of one student's own
+  tables. A competition is not exclusively owned by the device that posted it —
+  other students' attempts hang off it — so a snapshot push would delete
+  challenges other people were part-way through the moment a browser was
+  cleared. Competitions are therefore written ONCE, when they happen, and never
+  re-pushed.
+- **That layer swallows every error by design.** This one reads other people's
+  rows and writes things a student is waiting on, so every function returns a
+  `Result<T>` with a reason rather than throwing or logging.
+
+**So `competitions`/`competitionAttempts` stay OUT of `syncRelevantChange`.** An
+earlier draft of the store's own comment told stage B to add them; that would
+have been the bug, and both comments now say so. The one-to-one between
+`partializeState` and that list has two documented exceptions for this feature.
+
+The store mints each row's `id` and timestamp, and the page **reads the row back**
+(`getState().competitions.at(-1)`) before publishing, so the server gets the same
+id the device has. Minting a second one at the call site would give the two
+copies different identities and a joiner's attempt would point at neither.
+
+**The local write always happens first and unconditionally.** Publishing can fail
+— offline, unconfigured, a signed-out session — and when it does the student
+keeps their own record of the run and `PostedView` says the competition was not
+shared, rather than claiming it is waiting for joiners nobody can see.
+
+#### `Competition.sharedAt` and the retry — a real bug, found on a real account
+
+The first version assumed every locally-saved competition had also reached the
+server, so `MyCompetitions` labelled all of them **"open for joiners"**. The user
+had created one before the tables existed; it sat on one device, unjoinable, with
+the hub insisting it was open. The label was simply false.
+
+**`sharedAt` is OPTIONAL rather than a boolean**, and that is what makes it work
+with no migration: every competition already in a student's browser lacks the
+field, and `undefined` reads correctly as "never shared".
+
+`features/game/share-pending.ts` retries them, mounted by the hub — the page that
+lists those rows and makes the claim. Three decisions in it:
+
+- **A duplicate counts as SUCCESS.** `competitions.id` is the primary key, so a
+  unique violation means the row is already up there — which is exactly what a
+  publish that landed just before the app closed looks like. Treating it as a
+  failure would retry forever and never clear the label.
+- **`unconfigured`/`unauthenticated` stop the whole pass**, rather than failing
+  each row in turn: neither is fixed by trying the next competition, and a guest
+  browsing the hub should cost nothing.
+- **The in-flight guard is MODULE-LEVEL, not a ref.** This creates a remote row,
+  and StrictMode gives each of its two effect passes its own ref — the exact trap
+  that once produced two anonymous users per page load. Module scope is what
+  makes "once per browser" mean once.
+
+It runs on arrival rather than on a timer: that is when a student is looking at
+the list, and a background loop would spend a phone's battery on a table nobody
+is reading.
+
+#### One attempt per competition, enforced in THREE places
+
+Replaying until you beat the creator would make every score meaningless, so
+`unique (competition_id, user_id)` sits on the table. That alone was not enough,
+and the gap is worth remembering: the database refused the second ROW while the
+app happily ran the quiz again and `addCompetitionAttempt` paid XP and added a
+local history row each time. **The score stayed fair and the rewards did not.**
+
+So the rule is now stated at all three levels, and each covers a case the others
+cannot:
+
+- **The database** — the only one that is authoritative, and the only one a
+  hand-crafted request cannot get around.
+- **The browse list** DROPS a competition once it has been played, rather than
+  showing it with a result chip. It briefly did the latter and the user asked for
+  the removal: a browse list is what you CAN play, the result already lives in
+  Recent Games, and a list that only grows is one a student stops reading.
+  `fetchMyAttemptIds()` is what makes that hold across devices — the local
+  attempts only know this phone.
+- **`/game/play/:id`** shows the stored result rather than the questions, and
+  `finish()` carries a final guard for the race where someone reaches it anyway.
+
+`fetchMyAttempt()` is what makes it hold ACROSS DEVICES: the local store only
+knows this phone, so without asking the server a student could play on a laptop
+and again here and be paid twice. It deliberately does NOT block the screen — a
+failed check leaves it null and the local guard still applies, because being
+offline should not mean being unable to play.
+
+#### Avatars are DERIVED, and that is a privacy decision
+
+Every row in the browse list and the history shipped with a hardcoded
+`seed="sreyroth"`, so two different students were visually identical — which
+defeats the point of a face. `utils/avatar-seed.ts` replaces it: an FNV-1a hash
+of the account id picks one of the 30 avatars already in `public/avatars/`.
+
+**THE REAL PHOTO WAS CONSIDERED AND REJECTED.** Only the CURRENT student’s Google
+photo is available to the app. Showing anyone else’s means copying their photo
+URL onto the world-readable competition row the way `creator_name` already is —
+publishing every student’s face to everyone in the app. For a school app that is
+a real step, it needs a migration, and old rows would need a cartoon fallback
+anyway. A face here exists to tell two classmates apart, which a consistent
+cartoon does just as well. A student’s own photo still shows on Profile and the
+hero card, where only they see it.
+
+Two properties the hash must keep, both in the file’s own header: it is
+**deterministic and arithmetic** (the same student must look the same on every
+OTHER student’s screen, not just their own), and **the list order is part of the
+output** — adding a 31st avatar reshuffles everyone, which is free today and
+would not be once a classroom recognises each other.
+
+`CompetitionAttempt.opponentId` exists for this and nothing else, so a past
+opponent keeps the face they had in the list. Optional, falling back to the
+name, so older attempts still render — the same no-migration reasoning as
+`sharedAt`.
+
+#### The first UI that awaits the network
+
+`open-competitions.tsx` is the exception to `lib/supabase.ts`'s rule that nothing
+in the UI may depend on the client being present. It honours the spirit of that
+rule instead of breaking it: **nothing blocks first paint.** The hub renders
+instantly from the store and this one card fills in underneath, with its waiting
+states as quiet inline lines inside a card that already occupies its space — no
+full-page spinner, and no layout that jumps when the answer lands.
+
+No skeleton rows, on purpose: a list of grey bars pretending to be content is a
+bigger lie than one muted sentence. A guest is offered sign-in rather than an
+empty list — they are not missing data, they are missing an account. And the
+whole section **renders `null` when Supabase is unconfigured**, so a fresh clone
+and the blanked-env screenshot harness see nothing at all rather than an error
+about a state that is supported by design.
+
+**Both async components derive their display state during render and only ever
+call `setState` from an async callback**, never synchronously in an effect body —
+oxlint's `react(set-state-in-effect)` caught the first version of both. "Guest"
+is derived from the session rather than pushed into state, and the opening
+"loading" comes from the initial value. Each effect also waits for
+`authStatus !== "loading"`: RLS gives an unauthenticated caller nothing, so
+firing early would show a failure and then fetch again a moment later.
 
 ### Leaderboard — THREE boards, not one board with three columns
 
@@ -3333,7 +3762,7 @@ surface under the wrong tab on the same screen. XP *is* awarded for both. When
 past papers deserve a history of their own it should be a separate persisted
 field, not a widening of this one.
 
-**Progress, Game, Grade Prediction, Leaderboard and Streak intentionally use
+**Progress, Grade Prediction, Leaderboard and Streak intentionally use
 fake, fixed demo data** (`features/*/demo-data.ts`), not live store data. An
 explicit user decision to avoid edge-case bugs (e.g. a brand-new user with zero
 exams breaking a chart). The files have comments noting what real data would
@@ -3356,8 +3785,11 @@ same problem** and should read the store rather than invent one.
 
 **Every screen still on demo data carries `PreviewTag`** —
 `components/preview-tag.tsx`, a dashed "Preview · sample data" pill — on its own
-line under the title on Progress, Grade Prediction, Game, the Leaderboard and
-Streak with Friends. Added
+line under the title on Progress, Grade Prediction, the Leaderboard and Streak
+with Friends — and on Game, which carries it for two reasons at once: its hero
+card is decoration by the user’s own request, and until competitions reach a
+server nobody else can see or join what a student posts. Every other section on
+that page is real. The tag comes off when both are true. Added
 11 Sep 2026: Progress's top row says 1,240 XP and a 12🔥 streak and the
 Leaderboard's "You" row 2,430 XP, a few pixels under the bar's real numbers, and
 the user could not tell which were real. Labelling was chosen over making those
@@ -3409,9 +3841,10 @@ the same `tasks` store fields** (lesson/practice/flashcards). Completing a
 mission row on Roadmap shows that item as done on Home, and vice versa — by
 design, one real completion, not a duplicate tracker.
 
-**Game avatars** (`live-game-card.tsx`, `opponent-list.tsx`,
-`game-history.tsx`) render through `components/ui/avatar.tsx`, a plain `<img>`
-pointed at `/avatars/{seed}.svg` — DiceBear-style pictures downloaded once and
+**Game avatars**: the Game feature's own invented roster is gone — see its
+section. `components/ui/avatar.tsx` is still how every avatar in the app renders
+(`features/game/components/new-match-card.tsx` among them): a plain `<img>`
+pointed at `/avatars/{seed}.svg`, DiceBear-style pictures downloaded once and
 bundled in `public/avatars/`, keyed off the `avatarSeed` strings in
 `features/game/demo-data.ts`. This replaced a version that called DiceBear's
 live API on every render; that was dropped after the API proved unreachable on
@@ -3907,8 +4340,13 @@ dev server — with and without a key — since neither typecheck nor lint cover
 For anything touching Supabase, additionally:
 
 ```bash
-npm run db:check     # env → reachability → anonymous sign-ins → all 8 tables
+npm run db:check     # env → reachability → Google sign-in → all 10 tables
 ```
+
+**The Game feature needs its migration applied before db:check passes** —
+20260913000001_competitions.sql, by hand, in EACH developer’s own project. Until
+then the check reports 2 of 10 tables missing and /game’s browse list shows its
+failed state while the rest of the page keeps working.
 
 and check `dist/assets/` still contains a separate Supabase chunk, for the same
 reason `math-field-panel-*.js` is checked — a static import undoes the lazy

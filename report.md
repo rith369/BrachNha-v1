@@ -17,6 +17,157 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 13 Sep 2026 — Competitions are shared now: other students can see and join yours
+
+*Not yet committed.*
+
+**Why.** Until now a competition only existed on the phone that created it — which is why
+it vanished when you signed into a different account. This is the step that puts it on the
+server so other students can find it.
+
+**⚠ You must do one thing before this works.** The database needs two new tables, and they
+have to be added by hand — **once, on your project**:
+
+1. Supabase dashboard → **SQL Editor** → New query
+2. Open `supabase/migrations/20260913000001_competitions.sql` and paste the whole file in
+3. Run it
+4. Back in the terminal, `npm run db:check` should say **all ten tables**
+
+Until you do, the Game page still works — the new "Challenge Someone" section just says it
+could not load. Nothing else on the page is affected.
+
+**What changed.**
+
+- **Posting a competition now shares it.** When you finish your own run it is saved to the
+  server, and the screen tells you if that did not work (no connection, not signed in)
+  instead of pretending it is waiting for players.
+- **A new "Challenge Someone 👊" section** on the Game page lists competitions other
+  students have posted — who made it, the subject, the difficulty, the time limit, and the
+  score you have to beat. Tap **Play** to take it.
+- **You see the result the moment you finish**, because the creator's score is already
+  there. Nothing is live; nobody has to be online at the same time.
+- **You can only play a competition once.** That is on purpose — otherwise you could keep
+  retrying until you beat the score.
+- **You never see your own competitions in that list**, and other players' attempts are
+  private: you see your own result, and the person who created a competition sees everyone
+  who took theirs. Players do not see each other.
+
+**What other students can see about you.** Only what a challenge needs: your display name,
+the subject, the questions and your score. Your email, age and location are **not** shared
+— the competition carries your name directly so the app never needs permission to read
+your profile.
+
+**What to re-test** (this is the part I could not fully test alone — it needs two
+accounts):
+
+1. Run the SQL above, then `npm run db:check`.
+2. Sign in on localhost and create a competition.
+3. On another browser or device, sign in with a **different** Google account, open Game,
+   and check the competition appears under Challenge Someone.
+4. Play it and confirm you see win/loss against the first account's score.
+5. Try playing the same one twice — the second time should not be possible.
+6. Turn off your wifi and open Game — the section should say it could not load, and the
+   rest of the page should still work.
+
+**A competition made before the tables existed.** You had created one on your account
+before the database was set up, so it only ever lived on your phone — it showed under *My
+Competitions* but no other account could see it. That was expected, but the row still said
+*"open for joiners"*, which was untrue, and it would have happened to any student who
+created a competition with no connection.
+
+Fixed two ways: a competition that has not reached the server now says **"not shared yet"**
+instead, and **the app retries uploading it every time you open the Game page**. Your old
+one should upload itself the next time you visit that page while signed in — watch the
+label change from "not shared yet" to "open for joiners".
+
+**A competition you have played disappears from the list.** Challenge Someone now only
+shows competitions you can still play — once you finish one it drops off, and the result is
+in Recent Games where it belongs. If you have played everything available, the list says so
+rather than looking broken.
+
+**You can only play a competition once, and now the app says so.** The database already
+refused to record a second attempt — so nobody could improve their score by retrying — but
+the app still let you play the questions again, and quietly gave you XP for it each time.
+That is fixed: a competition you have already played shows your score instead of a Play
+button, opening it again shows your result rather than the quiz, and no extra XP is given.
+It also checks the server, so playing on your phone and then your laptop does not count
+twice.
+
+**Everyone had the same picture.** In the Challenge Someone list every competition showed
+the same cartoon face, so two different students looked identical. Each person now gets
+their own picture, chosen automatically from their account and always the same one — so a
+classmate looks the same to you every time, and in your match history too.
+
+**A note on why it is a cartoon and not their real photo.** Showing someone’s actual Google
+picture would mean storing it on the competition where every student in the app can see it.
+For a school app that is a bigger decision than it looks, and the picture only needs to
+tell two classmates apart — which the cartoon does. Your own real photo still shows on your
+Profile and on the card at the top of the Game page, where only you see it. Say the word if
+you would rather use real photos and I will do it properly.
+
+**Still deliberately fake.** The big card at the top of the page is still decoration, as
+you asked, which is why the *Preview · sample data* label stays.
+
+---
+
+## 12 Sep 2026 — The Game page is real: create a competition and post your score
+
+*Not yet committed.*
+
+**Why.** The Game page was entirely made up. It showed a match between two students who do
+not exist, and none of its buttons did anything. You asked for real competitions between
+real students: one student creates a challenge, plays it, and others join later and see
+whether they beat that score.
+
+**What changed.**
+
+- **The page looks exactly as it did.** Same big card, same *My Game Stats 🏅*, same layout.
+  The only change on the card is the button, now **Create Game Now**, and the left-hand
+  player is you — your name and your Google photo.
+- **Tapping it creates a real competition.** Choose a subject, a difficulty and how many
+  minutes, and you play the quiz straight away.
+- **You do not see a win or a loss at the end** — by design. There is nobody to compare
+  against yet. You see your score and a note that the competition is posted and waiting.
+- **One clock for the whole quiz**, the length you chose. If it runs out, whatever you
+  already answered still counts.
+- **If two people score the same, the faster one wins.** Both times are shown, and the
+  screen says when speed decided it.
+- **The stats, your competitions and your match history are now real.** They come from what
+  you actually play, and they do not appear until you have played something — a card full
+  of zeros looks like a bug.
+- **English and Khmer**, following the app's language setting. Question text is shown
+  exactly as supplied and is never translated.
+- **Math and Biology work now** (5 questions each, the questions the app already had).
+  Every other subject shows *coming soon* until you supply its questions.
+- **Creating needs an account.** Guests can look at the page but are asked to sign in
+  before creating, the same way Roadmap and KruAI already ask.
+
+**Two things that look like leftovers and are deliberate.**
+
+The big card's scores, health bars, subject and timer are still made up — you asked to keep
+that card as it was. That is the reason the page still carries the *Preview · sample data*
+label; everything below that card is real.
+
+Subject names still read in Khmer even when the app is in English. The subject list is
+shared with Study, Exam and Practice and only has Khmer names; changing that affects those
+pages too, so it was left alone.
+
+**The important limitation.** *Other students cannot see or join your competition yet, and
+that is also why it disappeared when you signed into a different account.* Competitions are
+saved on your own device under your own account. The part that shares them between students
+is a database change that has not been made yet — it is the next step.
+
+**What to re-test.** Create a competition and play it to the last question. Try letting the
+clock run out. Check the page in both languages. Check that the navigation disappears while
+playing and comes back with the browser's back button. As a guest, check that Create asks
+you to sign in.
+
+**Still to come.** The database step that makes competitions public, so other students can
+find and join them — and so they survive signing in on another device. That one needs
+testing with two accounts.
+
+---
+
 ## 12 Sep 2026 — Jump to any lesson from the top of a path, and the two Study tabs stop overlapping
 
 *Landed in commit `d02df08`.*

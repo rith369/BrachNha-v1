@@ -27,6 +27,8 @@ import NotFoundPage from "@/pages/not-found";
  */
 const routeModules = {
   game: () => import("@/pages/game"),
+  gameCreate: () => import("@/pages/game-create"),
+  gamePlay: () => import("@/pages/game-play"),
   exam: () => import("@/pages/exam"),
   gradePrediction: () => import("@/pages/grade-prediction"),
   leaderboard: () => import("@/pages/leaderboard"),
@@ -48,6 +50,8 @@ const routeModules = {
 };
 
 const GamePage = lazy(routeModules.game);
+const GameCreatePage = lazy(routeModules.gameCreate);
+const GamePlayPage = lazy(routeModules.gamePlay);
 const ExamPage = lazy(routeModules.exam);
 const GradePredictionPage = lazy(routeModules.gradePrediction);
 const LeaderboardPage = lazy(routeModules.leaderboard);
@@ -201,6 +205,11 @@ export default function App() {
         <Route element={<ShellLayout />}>
           <Route index element={<HomePage />} />
           <Route path="game" element={<GamePage />} />
+          {/* Both task routes are STATIC-PREFIXED, so there is no
+              /game/:something pattern to collide with — the ambiguity
+              pages/subject-path.tsx documents for /lessons cannot arise here. */}
+          <Route path="game/create" element={<GameCreatePage />} />
+          <Route path="game/play/:competitionId" element={<GamePlayPage />} />
           <Route path="exam" element={<ExamPage />} />
           <Route path="grade-prediction" element={<GradePredictionPage />} />
           <Route path="leaderboard" element={<LeaderboardPage />} />

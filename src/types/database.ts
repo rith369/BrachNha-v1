@@ -23,6 +23,18 @@
  * only because chat_messages declares a relationship back to conversations.
  */
 
+/** What postgrest gives back for a jsonb column. Only competitions.questions
+ *  uses it; the concrete shape is asserted once, at the boundary in
+ *  lib/competitions.ts, rather than pretended to here — this file mirrors the
+ *  SQL, and the SQL says jsonb. */
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
+
 type ProfileFk<Name extends string> = {
   foreignKeyName: Name;
   columns: ["user_id"];
@@ -215,6 +227,91 @@ export type Database = {
           Database["public"]["Tables"]["completed_sessions"]["Insert"]
         >;
         Relationships: [ProfileFk<"completed_sessions_user_id_fkey">];
+      };
+
+      // ── competitions (the Game feature) ────────────────────────────────
+      // The first cross-user tables in the schema: a competition is readable by
+      // every signed-in student. See 20260913000001_competitions.sql for why
+      // that is safe and why `creator_name` is denormalised rather than joined.
+      competitions: {
+        Row: {
+          id: string;
+          creator_id: string;
+          creator_name: string;
+          subject: string;
+          difficulty: string;
+          minutes: number;
+          /** The frozen question set. `Json` rather than ExamQuestion[] because
+           *  this file mirrors the SQL, and the column is jsonb — the shape is
+           *  asserted once, at the boundary in lib/competitions.ts. */
+          questions: Json;
+          creator_score: number;
+          creator_ms: number;
+          total: number;
+          created_at: string;
+        };
+        Insert: {
+          id: string;
+          creator_id: string;
+          creator_name?: string;
+          subject: string;
+          difficulty?: string;
+          minutes: number;
+          questions?: Json;
+          creator_score: number;
+          creator_ms: number;
+          total: number;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["competitions"]["Insert"]>;
+        // NOT ProfileFk: that generic hardcodes columns: ["user_id"], and this
+        // table's owner column is creator_id.
+        Relationships: [
+          {
+            foreignKeyName: "competitions_creator_id_fkey";
+            columns: ["creator_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+
+      competition_attempts: {
+        Row: {
+          id: string;
+          competition_id: string;
+          user_id: string;
+          user_name: string;
+          score: number;
+          ms: number;
+          played_at: string;
+        };
+        Insert: {
+          id?: string;
+          competition_id: string;
+          user_id: string;
+          user_name?: string;
+          score: number;
+          ms: number;
+          played_at?: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["competition_attempts"]["Insert"]
+        >;
+        // Two relationships: one to the competition, one to the student. The
+        // first is what lets a creator embed attempts on their own competition
+        // in a single select.
+        Relationships: [
+          ProfileFk<"competition_attempts_user_id_fkey">,
+          {
+            foreignKeyName: "competition_attempts_competition_id_fkey";
+            columns: ["competition_id"];
+            isOneToOne: false;
+            referencedRelation: "competitions";
+            referencedColumns: ["id"];
+          },
+        ];
       };
 
       conversations: {

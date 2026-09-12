@@ -29,11 +29,14 @@ import { GoogleButton } from "./google-button";
 /** A record rather than a switch, so adding a value to AuthFeature is a type
  *  error until its wording exists. A locked feature with no explanation is
  *  worse than one that is simply unavailable. */
-const REASON: Record<AuthFeature, "loginRequiredRoadmap" | "loginRequiredChat"> =
-  {
-    roadmap: "loginRequiredRoadmap",
-    chat: "loginRequiredChat",
-  };
+const REASON: Record<
+  AuthFeature,
+  "loginRequiredRoadmap" | "loginRequiredChat" | "loginRequiredGame"
+> = {
+  roadmap: "loginRequiredRoadmap",
+  chat: "loginRequiredChat",
+  game: "loginRequiredGame",
+};
 
 export function AuthPromptOverlay() {
   const { lang, authPrompt, closeAuthPrompt } = useBrachNhaStore(
