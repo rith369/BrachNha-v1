@@ -3,13 +3,36 @@ import { BookOpen, Clock, Play } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { SUBJECT_STYLE } from "../subject-styles";
 import { SubjectArt } from "./subject-art";
+import { PATH_TAB, SUBJECT_SESSIONS } from "../sessions";
 import {
   MINUTES_PER_LESSON,
-  firstLessonId,
   lessonCountFor,
   type SubjectId,
   type SubjectMeta,
+  type SubjectTab,
 } from "../subjects";
+
+/**
+ * How many lessons this tab has for a subject. 0 means the card is closed.
+ *
+ * An authored path counts only on the tab PATH_TAB assigns it to — that is the
+ * whole point: math's foundation path opens from មូលដ្ឋានគ្រឹះ and is closed
+ * under មុខវិជ្ជា. A foundation path counts its own lessons. A Bac II path
+ * keeps counting LESSONS, exactly as the card always has.
+ *
+ * A subject with no authored path gets one derived from LESSONS, which is Bac
+ * II topic content, so it can only open from មុខវិជ្ជា.
+ */
+function lessonsOnTab(id: SubjectId, tab: SubjectTab): number {
+  const path = SUBJECT_SESSIONS[id];
+  if (path) {
+    if (PATH_TAB[id] !== tab) return 0;
+    return tab === "foundation"
+      ? path.flatMap((c) => c.lessons).length
+      : lessonCountFor(id);
+  }
+  return tab === "all" ? lessonCountFor(id) : 0;
+}
 
 function Meta({ count, id }: { count: number; id: SubjectId }) {
   const tone = SUBJECT_STYLE[id].text;
@@ -36,10 +59,15 @@ function Meta({ count, id }: { count: number; id: SubjectId }) {
  * that answers a tap with silence reads as broken, so it must not look tappable.
  * Most subjects are in this state today.
  */
-export function SubjectCard({ subject }: { subject: SubjectMeta }) {
+export function SubjectCard({
+  subject,
+  tab,
+}: {
+  subject: SubjectMeta;
+  tab: SubjectTab;
+}) {
   const c = SUBJECT_STYLE[subject.id];
-  const count = lessonCountFor(subject.id);
-  const href = firstLessonId(subject.id);
+  const count = lessonsOnTab(subject.id, tab);
 
   const body = (
     <>
@@ -47,7 +75,7 @@ export function SubjectCard({ subject }: { subject: SubjectMeta }) {
         <div className="font-heading min-w-0 text-sm font-extrabold text-text md:text-base">
           {subject.name}
         </div>
-        {href && (
+        {count > 0 && (
           // The ONE place the supplied hex is used as-is: a solid fill with a
           // white glyph on it, which is the role that palette was picked for.
           // Inline style rather than a class because --subject-* is deliberately
@@ -86,7 +114,7 @@ export function SubjectCard({ subject }: { subject: SubjectMeta }) {
     c.card
   );
 
-  if (!href) {
+  if (count === 0) {
     return <div className={cn(shell, "opacity-60")}>{body}</div>;
   }
 

@@ -17,6 +17,72 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 12 Sep 2026 — Jump to any lesson from the top of a path, and the two Study tabs stop overlapping
+
+*Not yet committed.*
+
+**Why.** A subject path is long — biology is 43 stops — so reaching a lesson in
+the middle meant scrolling past everything before it. And on the Study page, the
+two tabs (**មូលដ្ឋានគ្រឹះ** and **មុខវិជ្ជា**) both opened the same thing for a
+subject, so foundation maths appeared under មុខវិជ្ជា as though it were Bac II
+maths.
+
+**What changed.**
+
+- **Tap the subject card at the top of a path to open a list of its chapters and
+  lessons**, then tap any lesson to jump straight to it. Tap the card again to
+  close the list. This works on the Study path and on the Physics quiz path.
+- **Each lesson in that list shows its own progress** (for example "0/6") and a
+  tick once it is finished.
+- **The two Study tabs are now separate.** Maths opens from **មូលដ្ឋានគ្រឹះ**
+  only and leads to the foundation path (ប្រមាណវិធីបូក ដក គុណ ចែក). Under
+  **មុខវិជ្ជា** maths reads **ឆាប់ៗនេះ**, because no Bac II maths is written yet.
+  Biology is unchanged and still opens from មុខវិជ្ជា.
+- Home's Grade Prediction card no longer carries the "Preview · sample data"
+  tag — see the entry below.
+
+**What to re-test.** On a subject path, open the list, jump to a lesson near the
+bottom, and check the page scrolls to it. Check the Study page tabs: maths open
+under មូលដ្ឋានគ្រឹះ, "ឆាប់ៗនេះ" under មុខវិជ្ជា, and biology still open. Both
+light and dark, phone and laptop.
+
+---
+
+## 11 Sep 2026 — Screens with sample numbers now say so
+
+*Not yet committed.*
+
+**Why.** Some screens still show made-up numbers, the same for every student,
+while the bar at the top of the screen shows your real XP and streak. On
+Progress, the top row said **1,240 XP and a 12-day streak** right under a bar
+saying **0**. The Leaderboard's "You" card said 2,430 XP. There was no way to
+tell which numbers to believe.
+
+**What's real and what isn't.** Everything on Home's four stat boxes (XP,
+streak, level, questions) and the coins in the top bar is real and saved to your
+account. So are Profile's calendar, the Roadmap, your mock exam results and your
+flashcard progress. The screens below are still sample data.
+
+**What changed.** A small dashed tag, **"Preview · sample data"**
+(Khmer: **"មើលជាមុន · ទិន្នន័យគំរូ"**), now sits under the title of:
+
+- Progress
+- Grade Prediction
+- Game
+- Leaderboard
+- Streak with Friends
+
+No numbers changed. The Streak page has no tag, because its big number is real.
+Home has no tag either: its Grade Prediction card is a link into the Grade
+Prediction screen, which carries the tag itself, so you are told before you
+read any number there.
+
+**What to re-test.** Open each screen above and check the tag is under the title,
+in English and Khmer, light and dark. A Khmer-speaking teammate should check the
+Khmer wording reads naturally.
+
+---
+
 ## 11 Sep 2026 — The study calendar shows flames, goes back and forward, and marks the Bac II exam
 
 *Landed in commit `04d0d90`.*

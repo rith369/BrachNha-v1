@@ -1,6 +1,7 @@
 import { ArrowLeft, Users } from "lucide-react";
 import { Link } from "react-router";
 import { BottomNav } from "@/components/shell/bottom-nav";
+import { PreviewTag } from "@/components/preview-tag";
 import { FriendStreakView } from "@/features/streak/components/friend-streak-view";
 import { useStreakCopy } from "@/features/streak/copy";
 import { useBrachNhaStore } from "@/lib/store";
@@ -35,7 +36,7 @@ export default function StreakFriendsPage() {
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-20 md:px-6 lg:px-8 lg:pb-8">
         <div className="mx-auto w-full max-w-2xl">
           {/* pr-14 keeps the row clear of TopBar's floating hamburger. */}
-          <div className="mb-4 flex items-center gap-2 pr-14">
+          <div className="mb-2 flex items-center gap-2 pr-14">
             <Link
               to="/streak"
               aria-label={c.title}
@@ -52,6 +53,7 @@ export default function StreakFriendsPage() {
               {c.friendsTitle}
             </h1>
           </div>
+          <PreviewTag className="mb-4" />
 
           <FriendStreakView />
         </div>

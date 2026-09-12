@@ -1,6 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
-import { ArrowLeft } from "lucide-react";
+import {
+  ArrowLeft,
+  BookOpen,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+} from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
 import { toKhmerDigits } from "@/utils/khmer-num";
@@ -8,7 +15,7 @@ import { SubjectArt } from "./subject-art";
 import { SessionNode } from "./session-node";
 import { SUBJECT_STYLE } from "../subject-styles";
 import type { SubjectMeta } from "../subjects";
-import type { PathLesson } from "../sessions";
+import type { Chapter, PathLesson } from "../sessions";
 import {
   allSessions,
   chaptersFor,
@@ -129,6 +136,127 @@ function Mascot() {
   );
 }
 
+/**
+ * The chapter/lesson quick-jump list — what tapping the header progress card
+ * opens.
+ *
+ * A long path (biology is 43 nodes) means reaching a SPECIFIC lesson normally
+ * means scrolling past everything before it. This is a flat table of contents
+ * over the exact same chapters/lessons the winding path renders, so a tap can
+ * go straight there instead. It does not navigate anywhere on its own —
+ * SubjectPathView switches back to the path view and scrolls to the picked
+ * lesson's banner, the same element a student would otherwise have scrolled to
+ * by hand.
+ *
+ * Locked lessons are listed too, deliberately unlike this app's usual
+ * dim-and-don't-tap rule (subject-card.tsx's zero-lesson tile, the survey's
+ * StudiedStep): this only jumps to an on-page location already reachable by
+ * scrolling, it grants no new access, so hiding a locked lesson here would
+ * just make it harder to find the very thing a student is trying to browse to.
+ * Same reasoning SessionNode's own header gives for why a locked NODE isn't
+ * dimmed either — and for the same reason, a locked row here is NOT visually
+ * demoted to a second-class look; only a genuinely FINISHED lesson steps back
+ * (see `allDone` below), matching the one distinction SessionNode itself draws.
+ *
+ * Rows are `c.card` — the app's ordinary soft tint-and-border card, the same
+ * token subject-card.tsx and this screen's own header use — rather than the
+ * path's heavy solid "lip" fill. Seven of those stacked read as one loud wall
+ * of identical buttons with no room to breathe; this is a table of contents to
+ * scan, not a row of path buttons to press, so it gets the reading-list
+ * treatment: an icon avatar carries the colour, the fraction gets its own
+ * line instead of being squeezed into a pill, and every row gets real padding.
+ */
+function ChapterJumpList({
+  chapters,
+  completedSessions,
+  subject,
+  onPick,
+}: {
+  chapters: Chapter[];
+  completedSessions: string[];
+  subject: SubjectMeta;
+  onPick: (lesson: PathLesson) => void;
+}) {
+  const c = SUBJECT_STYLE[subject.id];
+  return (
+    <div className="mx-auto flex w-full max-w-2xl flex-col">
+      {chapters.map((chapter) => (
+        <div key={chapter.number}>
+          {!chapter.flat && (
+            <div
+              className={cn(
+                "mt-6 mb-2.5 flex items-baseline gap-1.5 truncate text-[11px] font-extrabold first:mt-0 md:text-xs",
+                c.text
+              )}
+            >
+              <span>ជំពូក {toKhmerDigits(chapter.number)}</span>
+              {chapter.title && (
+                <span className="truncate text-muted">
+                  · {chapter.title}
+                </span>
+              )}
+            </div>
+          )}
+          <div className="flex flex-col gap-2.5">
+            {chapter.lessons.map((lesson) => {
+              const total = lesson.sessions.length;
+              const done = lesson.sessions.filter(
+                (x) => x.href && completedSessions.includes(x.id)
+              ).length;
+              // Only a fully finished lesson steps back — the same one
+              // distinction SessionNode draws for its own "done" discs, and
+              // deliberately the ONLY one, so a locked lesson keeps reading as
+              // "coming, not forbidden" here too.
+              const allDone = total > 0 && done === total;
+
+              return (
+                <button
+                  key={lesson.number}
+                  type="button"
+                  onClick={() => onPick(lesson)}
+                  className={cn(
+                    "flex w-full items-center gap-3.5 rounded-2xl border px-4 py-3.5 text-left shadow-panel-sm transition hover:brightness-[1.03] active:scale-[0.985] md:gap-4 md:px-5 md:py-4",
+                    c.card
+                  )}
+                >
+                  <span
+                    className="flex size-10 shrink-0 items-center justify-center rounded-xl text-white md:size-11"
+                    style={{
+                      backgroundColor: allDone
+                        ? `color-mix(in srgb, ${c.fill} 45%, var(--color-surface))`
+                        : c.fill,
+                    }}
+                  >
+                    {allDone ? (
+                      <Check className="size-5" strokeWidth={3} />
+                    ) : (
+                      <BookOpen className="size-4.5" strokeWidth={2.25} />
+                    )}
+                  </span>
+
+                  <span className="min-w-0 flex-1">
+                    <span className="font-heading block truncate text-sm font-extrabold text-text md:text-base">
+                      {lessonHeading(lesson.number, lesson.title)}
+                    </span>
+                    <span className={cn("mt-0.5 block text-xs font-bold", c.text)}>
+                      {done}/{total} សម្រេច
+                    </span>
+                  </span>
+
+                  <ChevronRight
+                    className={cn("size-5 shrink-0", c.text)}
+                    strokeWidth={2.5}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
   const completedSessions = useBrachNhaStore((s) => s.completedSessions);
   const c = SUBJECT_STYLE[subject.id];
@@ -175,11 +303,21 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
     null;
 
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const landingRef = useRef<HTMLDivElement>(null);
+  // Keyed by PathLesson object identity rather than a composed string: for an
+  // authored subject chaptersFor() returns the exact SUBJECT_SESSIONS array
+  // (stable references across renders), and within any single render this map
+  // is only ever read using lesson objects drawn from that SAME `chapters`, so
+  // identity is a safe key and sidesteps needing "which chapter is this lesson
+  // in" just to look a node back up.
+  const lessonNodeRefs = useRef(new Map<PathLesson, HTMLDivElement>());
 
+  // Two ways to land on a specific lesson's banner: on mount/subject-change,
+  // automatically (below); or on demand, via the jump list (mode/onJumpPick
+  // below). Both scroll the SAME map of nodes, just with different timing and
+  // animation — see each site for why.
   useEffect(() => {
     const scroller = scrollerRef.current;
-    const target = landingRef.current;
+    const target = landingLesson && lessonNodeRefs.current.get(landingLesson);
     if (!scroller || !target) return;
     // Instant, never smooth: an animated scroll on first paint reads as the page
     // glitching rather than as a deliberate position. Measured from bounding
@@ -189,7 +327,63 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
       target.getBoundingClientRect().top -
       scroller.getBoundingClientRect().top -
       8;
-  }, [subject.id]);
+  }, [subject.id, landingLesson]);
+
+  // "path" is the winding trail (the normal screen); "jump" swaps the SAME
+  // scroller's content for a flat chapter/lesson table of contents — see
+  // ChapterJumpList's header comment for why a long path needs this.
+  //
+  // Reset SYNCHRONOUSLY DURING RENDER when the subject changes, not in an
+  // effect — React's own documented pattern for "adjust state when a prop
+  // changes" (react.dev, useState: "Storing information from previous
+  // renders"). An effect would show one subject's jump list under another
+  // subject's header for a frame before catching up; this can't, because
+  // React re-renders with the reset value before the browser ever paints.
+  const [mode, setMode] = useState<"path" | "jump">("path");
+  const [renderedSubjectId, setRenderedSubjectId] = useState(subject.id);
+  if (renderedSubjectId !== subject.id) {
+    setRenderedSubjectId(subject.id);
+    setMode("path");
+  }
+
+  function toggleMode() {
+    const next = mode === "path" ? "jump" : "path";
+    // Reset to the top of the list rather than inheriting the path's current
+    // scroll offset, which would land the list somewhere arbitrary.
+    if (next === "jump" && scrollerRef.current) scrollerRef.current.scrollTop = 0;
+    setMode(next);
+  }
+
+  // A jump-list pick sets mode back to "path" AND a target in the same event,
+  // so React batches them into one re-render: the winding path mounts (its
+  // node refs populate during that commit), and only THEN does this effect
+  // run and find a populated lessonNodeRefs to scroll against.
+  //
+  // jumpTarget is deliberately never reset to null afterward: its only job is
+  // to be a dependency this effect can react to, and picking the exact same
+  // lesson twice in a row (the only case that would miss a re-fire) is
+  // already sitting at that scroll position, so there is nothing to redo.
+  const [jumpTarget, setJumpTarget] = useState<PathLesson | null>(null);
+  function handleJumpPick(lesson: PathLesson) {
+    setMode("path");
+    setJumpTarget(lesson);
+  }
+  useEffect(() => {
+    if (!jumpTarget) return;
+    const scroller = scrollerRef.current;
+    const target = lessonNodeRefs.current.get(jumpTarget);
+    if (!scroller || !target) return;
+    // Smooth here, unlike the landing effect above: this is a deliberate tap,
+    // not first paint, so an animated scroll reads as a response rather than
+    // a glitch.
+    scroller.scrollBy({
+      top:
+        target.getBoundingClientRect().top -
+        scroller.getBoundingClientRect().top -
+        8,
+      behavior: "smooth",
+    });
+  }, [jumpTarget]);
 
   return (
     <div className="flex h-full flex-col">
@@ -204,9 +398,17 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
           <ArrowLeft className="size-4.5" strokeWidth={2.5} />
         </Link>
 
-        <div
+        {/* A BUTTON, not a static card: tapping it opens ChapterJumpList below,
+            a flat table of contents over the same chapters/lessons the winding
+            path renders — so reaching a specific lesson does not mean scrolling
+            past everything before it. The chevron is the only visual hint it's
+            expandable; tap again (or pick a lesson) to close it. */}
+        <button
+          type="button"
+          onClick={toggleMode}
+          aria-expanded={mode === "jump"}
           className={cn(
-            "mx-auto flex w-full max-w-md items-center gap-3 rounded-2xl border p-3 shadow-panel",
+            "mx-auto flex w-full max-w-md items-center gap-3 rounded-2xl border p-3 text-left shadow-panel transition hover:brightness-[1.03]",
             c.card
           )}
         >
@@ -230,7 +432,12 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
               </span>
             </div>
           </div>
-        </div>
+          {mode === "jump" ? (
+            <ChevronUp className={cn("size-4 shrink-0", c.text)} strokeWidth={3} />
+          ) : (
+            <ChevronDown className={cn("size-4 shrink-0", c.text)} strokeWidth={3} />
+          )}
+        </button>
       </div>
 
       {/* One scroller per screen, as every page in this app owns exactly one —
@@ -239,9 +446,17 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
         ref={scrollerRef}
         className="min-h-0 flex-1 overflow-y-auto px-4 pb-28 lg:pb-10"
       >
-        {/* max-w-md, not max-w-2xl: the winding offsets are percentages, so a
+        {mode === "jump" ? (
+          <ChapterJumpList
+            chapters={chapters}
+            completedSessions={completedSessions}
+            subject={subject}
+            onPick={handleJumpPick}
+          />
+        ) : (
+        /* max-w-md, not max-w-2xl: the winding offsets are percentages, so a
             wide column would fling the nodes far apart and break the trail into
-            disconnected islands. This is a path, not a reading column. */}
+            disconnected islands. This is a path, not a reading column. */
         <div className="mx-auto w-full max-w-md">
           {chapters.flatMap((chapter) =>
             chapter.lessons.map((lesson) => {
@@ -257,7 +472,10 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
               return (
                 <div
                   key={`${chapter.number}.${lesson.number}`}
-                  ref={lesson === landingLesson ? landingRef : undefined}
+                  ref={(el) => {
+                    if (el) lessonNodeRefs.current.set(lesson, el);
+                    else lessonNodeRefs.current.delete(lesson);
+                  }}
                 >
                   {/* A filled banner rather than a hairline divider, which is
                       what gives the path its "unit" feel. It carries the same
@@ -329,6 +547,7 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
           )}
           <Mascot />
         </div>
+        )}
       </div>
     </div>
   );

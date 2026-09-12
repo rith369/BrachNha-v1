@@ -148,12 +148,6 @@ export function lessonCountFor(subjectId: string): number {
   return Object.keys(LESSONS[subjectId] ?? {}).length;
 }
 
-/** The id of a subject's first lesson, or null when it has no content yet. */
-export function firstLessonId(subjectId: string): string | null {
-  const topic = Object.keys(LESSONS[subjectId] ?? {})[0];
-  return topic ? `${subjectId}-${topic}` : null;
-}
-
 /**
  * The two tabs. Foundation is derived from FOUNDATION_SUBJECTS (already exactly
  * math/physics/chemistry, and shared with the survey and placement flow) rather

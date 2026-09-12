@@ -6,14 +6,16 @@ import { FocusAreas } from "@/features/progress/components/focus-areas";
 import { ActivityHeatmap } from "@/features/progress/components/activity-heatmap";
 import { AiInsights } from "@/features/progress/components/ai-insights";
 import { BottomNav } from "@/components/shell/bottom-nav";
+import { PreviewTag } from "@/components/preview-tag";
 
 export default function ProgressPage() {
   return (
     <div className="flex h-full flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-20 lg:pb-8 md:px-6 lg:px-8">
-        <div className="font-heading mb-4 bg-brand-tri bg-clip-text pr-14 text-xl font-extrabold text-transparent">
+        <div className="font-heading mb-2 bg-brand-tri bg-clip-text pr-14 text-xl font-extrabold text-transparent">
           📈 Progress
         </div>
+        <PreviewTag className="mb-4" />
         {/* One column on a phone, two from md (tablet) and no further. Columns
             land at ~352px on a tablet and ~470–620px on a laptop, all
             comfortably inside the range these cards already handle — a 320px

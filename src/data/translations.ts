@@ -242,6 +242,7 @@ export const T = {
     editName: "Edit name",
     saveName: "Save",
     cancelEdit: "Cancel",
+    previewTag: "Preview · sample data",
   },
   km: {
     appName: "BrachNha",
@@ -474,6 +475,7 @@ export const T = {
     editName: "កែឈ្មោះ",
     saveName: "រក្សាទុក",
     cancelEdit: "បោះបង់",
+    previewTag: "មើលជាមុន · ទិន្នន័យគំរូ",
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 

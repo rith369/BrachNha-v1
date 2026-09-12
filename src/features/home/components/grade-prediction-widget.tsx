@@ -36,6 +36,11 @@ export function GradePredictionWidget() {
         </div>
       </div>
       <ChevronRight className="size-4 shrink-0 text-muted" strokeWidth={2.5} />
+      {/* NO PreviewTag here, deliberately. This card is a doorway rather than
+          the data itself, and the page it opens carries the tag at the top of
+          its own screen — a student who taps through meets it before reading
+          any number. A second pill hanging off a small card on Home read as
+          clutter on the one screen that should stay clean. */}
     </Link>
   );
 }

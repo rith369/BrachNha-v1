@@ -1,7 +1,7 @@
 import { LESSONS } from "@/data/lessons";
 import { hasSectionContent } from "@/data/sections";
 import { toKhmerDigits } from "@/utils/khmer-num";
-import type { SubjectId } from "./subjects";
+import type { SubjectId, SubjectTab } from "./subjects";
 
 /**
  * A subject's learning path, in the shape the real textbooks use:
@@ -267,6 +267,29 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
       ],
     },
   ],
+};
+
+/**
+ * Which Study-page tab each authored path above belongs to: មូលដ្ឋានគ្រឹះ
+ * ("foundation") or មុខវិជ្ជា ("all").
+ *
+ * The two tabs are two different curricula, not two filters over one list —
+ * មូលដ្ឋានគ្រឹះ is foundation review, មុខវិជ្ជា is the Bac II curriculum.
+ * Math's path (ប្រមាណវិធីបូក ដក គុណ ចែក) is foundation review; biology's is the
+ * Grade 12 textbook. A path opens from its own tab and is closed on the other.
+ * Before this map existed both tabs opened every path, so math's foundation
+ * review appeared under មុខវិជ្ជា as if it were Bac II math.
+ *
+ * An authored path missing from here opens on NEITHER tab — add it here in the
+ * same edit that adds it to SUBJECT_SESSIONS.
+ *
+ * Both tabs route to /subjects/{id}, which only works because no subject has a
+ * path on both tabs yet. When Bac II math arrives beside the foundation path,
+ * the two need separate data and separate routes: one id cannot open two paths.
+ */
+export const PATH_TAB: Partial<Record<SubjectId, SubjectTab>> = {
+  math: "foundation",
+  biology: "all",
 };
 
 /** How many locked placeholders to show after the real content runs out, so the

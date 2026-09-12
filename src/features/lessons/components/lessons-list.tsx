@@ -62,7 +62,7 @@ export function LessonsList() {
       */}
       <div className="columns-2 gap-3 md:columns-3 lg:columns-4">
         {subjects.map((s) => (
-          <SubjectCard key={s.id} subject={s} />
+          <SubjectCard key={s.id} subject={s} tab={tab} />
         ))}
       </div>
     </div>

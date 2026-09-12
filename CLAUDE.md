@@ -3345,13 +3345,35 @@ leaving a phone unlocked a winning strategy, which is exactly what that screen
 is built to argue against. Its one live read is the student's own name.
 
 **Streak is the exception to the pattern, and it had to be.** The other four
-measure something the chrome does not show, so their invented numbers sit beside
-nothing that could contradict them. A streak page restates a number the global
+were built when their invented numbers sat beside nothing that could contradict
+them — which stopped being true for Progress and the Leaderboard once `StatBar`
+went global (see `PreviewTag` below). A streak page restates a number the global
 `StatBar` renders on every screen, so its demo count was VISIBLY WRONG — the bar
 said 3, the page said 12 — until the count moved into the store. Both `/streak`
 screens now read `streak` from there and only their surrounding state is
 authored. **A new demo screen that displays XP, level, coins or streak has this
 same problem** and should read the store rather than invent one.
+
+**Every screen still on demo data carries `PreviewTag`** —
+`components/preview-tag.tsx`, a dashed "Preview · sample data" pill — on its own
+line under the title on Progress, Grade Prediction, Game, the Leaderboard and
+Streak with Friends. Added
+11 Sep 2026: Progress's top row says 1,240 XP and a 12🔥 streak and the
+Leaderboard's "You" row 2,430 XP, a few pixels under the bar's real numbers, and
+the user could not tell which were real. Labelling was chosen over making those
+numbers real, for now. **The tags ARE the list of what is still fake** — a new
+demo screen gets one, and a screen that switches to real data loses it. `/streak`
+is deliberately untagged: its count is real, and its demo goal card is the
+user's recorded call (see the Streak section). The label is `text-text`, not
+`text-muted`, because light-theme muted is ~3.8:1 on white — under AA at 10px.
+
+**TAG THE SCREEN, NOT THE DOORWAY TO IT.** Home's grade card carried one
+pinned to its top edge for a day and it was removed at the user's request: it
+is a link into `/grade-prediction`, which already shows the tag above its own
+title, so anyone tapping through is told before they read a number. A second
+pill hanging off a small card read as clutter on the screen that should stay
+the calmest. Home's own chips and pills (`StatPills`, `MotivationHero`) link
+to tagged pages the same way and stay untagged for the same reason.
 
 **The Study Activity heatmap's dates are the exception to "fixed demo data"** —
 they're derived, not fixed, same pattern as `daysUntilExam()`. The COUNTS in

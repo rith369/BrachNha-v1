@@ -3,6 +3,7 @@ import { GameStatsCard } from "@/features/game/components/game-stats-card";
 import { OpponentList } from "@/features/game/components/opponent-list";
 import { GameHistory } from "@/features/game/components/game-history";
 import { BottomNav } from "@/components/shell/bottom-nav";
+import { PreviewTag } from "@/components/preview-tag";
 
 export default function GamePage() {
   return (
@@ -11,9 +12,10 @@ export default function GamePage() {
         <div className="mb-0.5 font-heading pr-14 text-xl font-extrabold">
           Game 🎮
         </div>
-        <div className="mb-4 pr-14 text-xs font-bold text-muted">
+        <div className="mb-2 pr-14 text-xs font-bold text-muted">
           Play against other students · Bac II Mode
         </div>
+        <PreviewTag className="mb-4" />
         {/* See pages/progress.tsx for why two columns at lg needs no changes
             inside the cards themselves. */}
         <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
