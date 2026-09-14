@@ -26,7 +26,9 @@ import { Wordmark } from "@/components/shell/wordmark";
  * from it rather than from a template:
  *   collected fields   → partializeState in lib/store.ts
  *   what reaches the DB → profileRow / pushLocalState in lib/supabase-sync.ts
- *   what reaches Gemini → ChatProfile in utils/chat-prompt.ts
+ *   what reaches Gemini → ChatProfile AND ScreenRef in utils/chat-prompt.ts
+ *                         (the profile, plus WHICH SCREEN was open — see
+ *                          screenRefFor in utils/chat-screen.ts)
  *   guest behaviour     → useSupabaseSync bails without a session
  *   no AI retention     → `store: false` in server/chat-handler.ts
  * If any of those change, this page is part of the change.
@@ -183,10 +185,12 @@ export default function PrivacyPage() {
             </li>
             <li>
               <strong>Google Gemini</strong> — the AI behind KruAI. When you ask
-              a question we send that question, the recent conversation, and a
-              short summary of your profile (name, target grade, subjects you
-              find weak, level and streak) so the answer fits you. We ask Google
-              <strong> not to keep </strong> these conversations.
+              a question we send that question, the recent conversation, a short
+              summary of your profile (name, target grade, subjects you find
+              weak, level and streak), and <strong>which lesson page you had
+              open</strong>, so KruAI can answer from the lesson you are
+              actually reading. We ask Google <strong>not to keep</strong> these
+              conversations.
             </li>
           </ul>
           <p>

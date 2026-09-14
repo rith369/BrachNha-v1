@@ -18,6 +18,7 @@ import { useT } from "@/data/translations";
 import { relativeDay } from "@/utils/chat-history";
 import { applyInsert, defaultMathLayout } from "@/utils/math-input";
 import { daysUntilExam } from "@/utils/exam-date";
+import { screenRefFor } from "@/utils/chat-screen";
 import { getAccessToken } from "@/lib/auth";
 import { cn } from "@/utils/cn";
 import { MathText } from "./math-text";
@@ -241,7 +242,18 @@ export function ChatOverlay() {
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ messages: history, lang, profile }),
+        // `screen` is read HERE, at send time, not when the overlay mounted.
+        // ChatOverlay is global and survives navigation — that is what `chatOpen`
+        // being a store field buys — so a student can open the mentor on a
+        // section, navigate behind it and then ask. Where they are now is the
+        // answer. The endpoint uses it to quote the app's own text back; see
+        // pinnedContextFor in utils/chat-prompt.ts.
+        body: JSON.stringify({
+          messages: history,
+          lang,
+          profile,
+          screen: screenRefFor(pathname),
+        }),
       });
 
       if (!res.ok || !res.body) {

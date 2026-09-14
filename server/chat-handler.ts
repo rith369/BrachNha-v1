@@ -5,7 +5,12 @@ import { GoogleGenAI } from "@google/genai";
 // `paths` — so an aliased import here fails the deploy build. Relative paths
 // work in both. See the same note in src/utils/chat-prompt.ts.
 import type { Lang, ChatMsg } from "../src/types/index.js";
-import { buildSystemPrompt, type ChatProfile } from "../src/utils/chat-prompt.js";
+import {
+  buildSystemPrompt,
+  pinnedContextFor,
+  type ChatProfile,
+} from "../src/utils/chat-prompt.js";
+import type { ScreenRef } from "../src/utils/chat-screen.js";
 import { checkRateLimit } from "./rate-limit.js";
 import { isVerificationConfigured, verifyRequestUser } from "./verify-user.js";
 
@@ -114,6 +119,61 @@ interface ChatRequestBody {
   messages?: ChatMsg[];
   lang?: Lang;
   profile?: ChatProfile;
+  /** `unknown`, not `ScreenRef`: this is whatever JSON.parse produced. See
+   *  cleanScreen — the declared type of a request body is a description of the
+   *  intended caller, never a guarantee about the value. */
+  screen?: unknown;
+}
+
+/**
+ * Longest id we will even look up. Content ids are `biology-3-1-1` shaped, so
+ * this is generous by an order of magnitude.
+ *
+ * Checked BEFORE the lookup, the same instinct as MAX_BODY_BYTES checking
+ * content-length before reading the body: bound the cheap thing first, so a
+ * 60KB string never becomes a hash probe.
+ */
+const MAX_ID_CHARS = 64;
+
+function screenId(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.length > MAX_ID_CHARS) return undefined;
+  return trimmed;
+}
+
+/**
+ * The screen the student had open, or {}.
+ *
+ * DELIBERATELY NOT clean()/cleanList()/cleanNumber(), and the distinction is
+ * the whole security argument for this feature:
+ *
+ *   clean() makes a string safe to DISPLAY. It does not make it TRUE.
+ *
+ * Every ChatProfile field goes through it because every one is interpolated
+ * straight into the model's instructions. Nothing here ever is. A screen ref is
+ * used exactly once, as a lookup key into the app's own content, and then
+ * discarded — what reaches the prompt is the object the lookup found. So the
+ * client may SELECT from the corpus and can never SUPPLY content to it.
+ *
+ * This function therefore only bounds SHAPE and COST. Membership is checked by
+ * pinnedContextFor(), next to the data it is checking against, so the invariant
+ * holds even for a caller that skipped this step — see its `Object.hasOwn` note
+ * for the prototype-inheritance trap that makes the guard non-obvious.
+ *
+ * An unrecognised id is dropped SILENTLY, with no error anywhere: a student on
+ * a stale client, or on a route whose content was renamed, is an ordinary
+ * thing. There is nothing to tell them and nothing for them to do.
+ */
+function cleanScreen(value: unknown): ScreenRef {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const raw = value as Record<string, unknown>;
+  return {
+    sectionId: screenId(raw.sectionId),
+    lessonId: screenId(raw.lessonId),
+    subjectId: screenId(raw.subjectId),
+    practiceKey: screenId(raw.practiceKey),
+  };
 }
 
 /**
@@ -322,6 +382,16 @@ export async function handleChat(req: Request): Promise<Response> {
     ...(body.profile ?? {}),
   };
 
+  // The cheapest grounding the app has, and the most precise: a student reading
+  // a section and asking "why does this happen?" has named the exact 7,000
+  // characters of curriculum the question is about. No model, no round trip.
+  //
+  // `screen` is validated for shape here and for MEMBERSHIP inside
+  // pinnedContextFor, which is what makes the text safe — it comes from the
+  // app's own content, never from the request.
+  const screen = cleanScreen(body.screen);
+  const context = pinnedContextFor(screen);
+
   try {
     const ai = new GoogleGenAI({ apiKey });
     const stream = await ai.interactions.create({
@@ -333,7 +403,11 @@ export async function handleChat(req: Request): Promise<Response> {
       // No `lang` here on purpose: the mentor always answers in Khmer (see
       // ANSWER_LANG in utils/chat-prompt.ts). `lang` still drives this route's
       // own error messages, which follow the app's UI language.
-      system_instruction: buildSystemPrompt({ profile }),
+      system_instruction: buildSystemPrompt({
+        profile,
+        context,
+        focusSubject: screen.subjectId,
+      }),
       generation_config: {
         // Measured on this prompt: "minimal" gives ~2.7s to first character vs
         // ~11.2s on "low" — a big deal on a phone, and accuracy held up on

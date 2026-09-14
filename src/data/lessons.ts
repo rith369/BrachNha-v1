@@ -208,7 +208,21 @@ export function lessonDataFor(lessonId: string): Lesson | null {
   if (lessonId === "biology-foundation") return FOUNDATION.biology;
   const [cat, topic] = lessonId.split("-");
   if (!cat || !topic) return null;
-  return LESSONS[cat]?.[topic] ?? null;
+  // Object.hasOwn on BOTH levels, not `LESSONS[cat]?.[topic] ?? null`.
+  //
+  // LESSONS is a plain object literal, so it inherits from Object.prototype:
+  // `LESSONS["constructor"]` is the Object constructor and
+  // `Object["toString"]` is a function. The optional chain finds a truthy
+  // value, `?? null` never fires, and `/lessons/constructor-toString` returned
+  // a FUNCTION typed as a Lesson — past the page's `if (!lesson) <Navigate>`
+  // guard and into a render that reads `lesson.title.en` and throws.
+  //
+  // Reachable from a typed URL, and the id also reaches utils/chat-prompt.ts
+  // now, which is what surfaced it. Same trap, and same guard, as
+  // pinnedContextFor's lookups into SECTION_CONTENT.
+  if (!Object.hasOwn(LESSONS, cat)) return null;
+  const topics = LESSONS[cat];
+  return Object.hasOwn(topics, topic) ? topics[topic] : null;
 }
 
 export const FLASHCARDS: Record<string, Flashcard[]> = {
