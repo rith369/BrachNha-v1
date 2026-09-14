@@ -245,6 +245,10 @@ export type Database = {
            *  this file mirrors the SQL, and the column is jsonb — the shape is
            *  asserted once, at the boundary in lib/competitions.ts. */
           questions: Json;
+          /** Which option the creator picked per question, same jsonb treatment
+           *  as `questions` above. Defaults to `[]` on rows written before
+           *  20260914000001, which the client reads as "not recorded". */
+          creator_answers: Json;
           creator_score: number;
           creator_ms: number;
           total: number;
@@ -258,6 +262,7 @@ export type Database = {
           difficulty?: string;
           minutes: number;
           questions?: Json;
+          creator_answers?: Json;
           creator_score: number;
           creator_ms: number;
           total: number;
@@ -285,6 +290,8 @@ export type Database = {
           user_name: string;
           score: number;
           ms: number;
+          /** This joiner's picks per question — see competitions.creator_answers. */
+          answers: Json;
           played_at: string;
         };
         Insert: {
@@ -294,6 +301,7 @@ export type Database = {
           user_name?: string;
           score: number;
           ms: number;
+          answers?: Json;
           played_at?: string;
         };
         Update: Partial<

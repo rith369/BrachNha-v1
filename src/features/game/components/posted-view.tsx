@@ -24,6 +24,7 @@ export function PostedView({
   total,
   shared,
   onExit,
+  onNext,
 }: {
   score: number;
   total: number;
@@ -32,6 +33,9 @@ export function PostedView({
    *  "waiting for a friend to join" — nobody can join it. */
   shared: boolean;
   onExit: () => void;
+  /** Go on to the review — photograph the working, then see the answers. Same
+   *  optional shape as ResultView's, and for the same reason. */
+  onNext?: () => void;
 }) {
   const lang = useBrachNhaStore((s) => s.lang);
   const t = gameCopy(lang);
@@ -40,7 +44,11 @@ export function PostedView({
     <FocusLayout
       progressPct={100}
       onExit={onExit}
-      footer={<FocusButton onClick={onExit}>{t.done}</FocusButton>}
+      footer={
+        <FocusButton onClick={onNext ?? onExit}>
+          {onNext ? t.seeAnswers : t.done}
+        </FocusButton>
+      }
     >
       <div className="text-center">
         <Hourglass

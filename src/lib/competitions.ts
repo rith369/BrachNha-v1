@@ -54,6 +54,21 @@ function fail(reason: FailReason): Result<never> {
   return { ok: false, reason };
 }
 
+/**
+ * A stored answer list, narrowed at the boundary.
+ *
+ * An EMPTY array is the honest reading of both "this row predates answer
+ * recording" (the column's default) and "nothing was answered", and the review
+ * screen tells those apart by comparing the length against the question count
+ * rather than by asking this to distinguish them. Anything that is not a string
+ * becomes null — a null already means "no answer given", so a malformed entry
+ * degrades into the case the screen already draws.
+ */
+function toAnswers(value: unknown): (string | null)[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((v) => (typeof v === "string" ? v : null));
+}
+
 /** A competition as it arrives from the server, plus whether it is the reader's
  *  own — the browse list hides those, and the UI labels them either way. */
 export interface RemoteCompetition extends Competition {
@@ -69,6 +84,7 @@ function toCompetition(
     difficulty: string;
     minutes: number;
     questions: unknown;
+    creator_answers?: unknown;
     creator_score: number;
     creator_ms: number;
     total: number;
@@ -94,6 +110,7 @@ function toCompetition(
     questions: Array.isArray(row.questions)
       ? (row.questions as unknown as ExamQuestion[])
       : [],
+    creatorAnswers: toAnswers(row.creator_answers),
     creatorScore: row.creator_score,
     creatorMs: row.creator_ms,
     total: row.total,
@@ -130,6 +147,9 @@ export async function publishCompetition(
     minutes: competition.minutes,
     // The frozen set, stored whole — see the type's own comment.
     questions: competition.questions as unknown as never,
+    // Written in the SAME insert as the score, which is what lets the table stay
+    // insert-only: there is no second write to permit later.
+    creator_answers: (competition.creatorAnswers ?? []) as unknown as never,
     creator_score: competition.creatorScore,
     creator_ms: competition.creatorMs,
     total: competition.total,
@@ -207,6 +227,9 @@ export async function publishAttempt(
     user_name: attempt.userName,
     score: attempt.score,
     ms: attempt.ms,
+    // Same insert as the score, for the same reason publishCompetition writes
+    // creator_answers inline: the table has no UPDATE policy and should not.
+    answers: (attempt.answers ?? []) as unknown as never,
     played_at: attempt.playedAt,
   });
 
@@ -277,9 +300,15 @@ export async function fetchMyAttemptIds(
 /** One joiner's run, as the creator sees it on their own competition. */
 export interface JoinerAttempt {
   competitionId: string;
+  /** The joiner's account id. Needed for two things the creator's review does:
+   *  picking their avatar (utils/avatar-seed.ts) and building the path to the
+   *  photo of their working, which is named after them. */
+  userId: string;
   userName: string;
   score: number;
   ms: number;
+  /** What they picked per question, for the creator's side of the comparison. */
+  answers: (string | null)[];
   playedAt: string;
 }
 
@@ -300,7 +329,7 @@ export async function fetchAttemptsFor(
 
   const { data, error } = await db
     .from("competition_attempts")
-    .select("competition_id, user_name, score, ms, played_at")
+    .select("competition_id, user_id, user_name, score, ms, answers, played_at")
     .in("competition_id", competitionIds)
     // Best first, then fastest — the same ordering outcomeOf() decides by.
     .order("score", { ascending: false })
@@ -311,9 +340,11 @@ export async function fetchAttemptsFor(
     ok: true,
     data: (data ?? []).map((r) => ({
       competitionId: r.competition_id,
+      userId: r.user_id,
       userName: r.user_name,
       score: r.score,
       ms: r.ms,
+      answers: toAnswers(r.answers),
       playedAt: r.played_at,
     })),
   };

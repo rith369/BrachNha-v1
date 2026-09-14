@@ -87,6 +87,11 @@ export const GAME_COPY = {
     retry: "Try again",
     play: "🎮 Play",
     scoreToBeat: "Score to beat",
+    // Two clocks on the run screen: the budget for the whole competition, and a
+    // stopwatch on the question in front of you. The labels are what tell them
+    // apart — see clockLabel().
+    timeLeft: "Time left",
+    thisQuestion: "This question",
     // One attempt per competition — see attemptFor() in game.ts.
     played: "Played",
     alreadyPlayed: "You have already played this competition.",
@@ -94,6 +99,46 @@ export const GAME_COPY = {
     /** Shown when competitions exist but this student has played them all —
      *  distinct from competitionsEmpty, which means none exist at all. */
     allPlayed: "You have played every competition. Create one of your own!",
+    // ── The review: what each side answered, and the working they showed ──
+    //
+    // THE QUESTIONS AND OPTIONS ARE STILL NEVER TRANSLATED. These are the labels
+    // AROUND the content — the same split the rest of this table already makes.
+    reviewTitle: "Answers 📝",
+    seeAnswers: "See the answers",
+    questionLabel: "Question",
+    correctAnswer: "Correct answer",
+    noAnswer: "No answer",
+    answersUnavailable:
+      "This match was played before answers were recorded, so there is nothing to compare.",
+    reviewMissing: "That competition is not on this device.",
+    // The photo of the working done on paper
+    yourWorking: "Your working ✍️",
+    theirWorking: "Their working ✍️",
+    photoPrompt:
+      "Photograph the working you wrote on paper. The answers come next.",
+    photoWhy: "Take it before you look — that is what makes the swap worth something.",
+    takePhoto: "📷 Take a photo",
+    retakePhoto: "Retake",
+    uploadingPhoto: "Uploading…",
+    photoFailed: "Could not upload. Check your connection and try again.",
+    skipPhoto: "Skip for now",
+    // Taking it back. A student uploads a picture of their own handwriting, so
+    // being able to withdraw it is part of having agreed to share it at all.
+    deletePhoto: "Delete",
+    deleteConfirm: "Delete this photo?",
+    deleteWarns:
+      "It is removed for everyone, and their working is hidden again until you add one.",
+    deletingPhoto: "Deleting…",
+    deleteFailed: "Could not delete. Check your connection and try again.",
+    cancel: "Cancel",
+    photoLocked: "Add your own working to see theirs.",
+    noPhotoYet: "Nothing here yet.",
+    loadingPhoto: "Opening…",
+    // The creator's side: everyone who took their competition
+    joiners: "Who has played 👥",
+    noJoinersYet: "Nobody has joined yet.",
+    loadingJoiners: "Looking for joiners…",
+    joinersFailed: "Could not load who has played.",
   },
   km: {
     title: "ហ្គេម 🎮",
@@ -151,10 +196,44 @@ export const GAME_COPY = {
     retry: "ព្យាយាមម្តងទៀត",
     play: "🎮 លេង",
     scoreToBeat: "ពិន្ទុត្រូវយកឈ្នះ",
+    timeLeft: "នៅសល់",
+    thisQuestion: "សំណួរនេះ",
     played: "លេងរួច",
     alreadyPlayed: "អ្នកបានលេងការប្រកួតនេះរួចហើយ។",
     seeResult: "មើលលទ្ធផល",
     allPlayed: "អ្នកបានលេងការប្រកួតទាំងអស់ហើយ។ បង្កើតមួយរបស់អ្នកទៅ!",
+    reviewTitle: "ចម្លើយ 📝",
+    seeAnswers: "មើលចម្លើយ",
+    questionLabel: "សំណួរទី",
+    correctAnswer: "ចម្លើយត្រឹមត្រូវ",
+    noAnswer: "គ្មានចម្លើយ",
+    answersUnavailable:
+      "ការប្រកួតនេះបានលេងរួចមុនពេលប្រព័ន្ធកត់ត្រាចម្លើយ ដូច្នេះគ្មានអ្វីប្រៀបធៀបទេ។",
+    reviewMissing: "រកមិនឃើញការប្រកួតនេះនៅលើឧបករណ៍នេះទេ។",
+    yourWorking: "សន្លឹកចម្លើយរបស់អ្នក ✍️",
+    theirWorking: "សន្លឹកចម្លើយរបស់គេ ✍️",
+    photoPrompt:
+      "ថតរូបការគណនាដែលអ្នកបានសរសេរលើក្រដាស។ បន្ទាប់មកអ្នកនឹងឃើញចម្លើយ។",
+    photoWhy: "ថតមុនពេលមើលចម្លើយ ទើបការផ្លាស់ប្តូរគំនិតមានតម្លៃ។",
+    takePhoto: "📷 ថតរូប",
+    retakePhoto: "ថតម្តងទៀត",
+    uploadingPhoto: "កំពុងផ្ទុកឡើង…",
+    photoFailed: "មិនអាចផ្ទុកឡើងបានទេ។ សូមពិនិត្យអ៊ីនធឺណិត រួចព្យាយាមម្តងទៀត។",
+    skipPhoto: "រំលងសិន",
+    deletePhoto: "លុប",
+    deleteConfirm: "លុបរូបនេះមែនទេ?",
+    deleteWarns:
+      "វានឹងត្រូវលុបចោលសម្រាប់អ្នកទាំងអស់គ្នា ហើយសន្លឹករបស់គេនឹងត្រូវលាក់វិញ រហូតដល់អ្នកដាក់រូបថ្មី។",
+    deletingPhoto: "កំពុងលុប…",
+    deleteFailed: "មិនអាចលុបបានទេ។ សូមពិនិត្យអ៊ីនធឺណិត រួចព្យាយាមម្តងទៀត។",
+    cancel: "បោះបង់",
+    photoLocked: "ដាក់សន្លឹកចម្លើយរបស់អ្នកជាមុនសិន ទើបមើលរបស់គេបាន។",
+    noPhotoYet: "មិនទាន់មានទេ។",
+    loadingPhoto: "កំពុងបើក…",
+    joiners: "អ្នកដែលបានលេង 👥",
+    noJoinersYet: "មិនទាន់មាននរណាចូលរួមទេ។",
+    loadingJoiners: "កំពុងរកអ្នកចូលរួម…",
+    joinersFailed: "មិនអាចទាញយកអ្នកចូលរួមបានទេ។",
   },
 } as const;
 
@@ -177,6 +256,27 @@ export function gameCopy(lang: Lang) {
  *  matching how the rest of the bilingual chrome reads. */
 export function num(value: number | string, lang: Lang): string {
   return lang === "km" ? toKhmerDigits(value) : String(value);
+}
+
+/**
+ * `m:ss` from milliseconds.
+ *
+ * Shared by the run's COUNTDOWN (time left in the whole competition) and each
+ * question's STOPWATCH (time spent on this one). Two clocks sit on that screen
+ * at once, so they must at least be shaped identically — a countdown reading
+ * `1:05` beside a stopwatch reading `65s` would make the pair harder to read
+ * than either alone. Their LABELS are what tell them apart.
+ *
+ * It lives here rather than in competition-run.tsx because a non-component
+ * export from a `.tsx` trips oxlint's `only-export-components` — the rule
+ * `utils/focus-styles.ts` exists for.
+ */
+export function clockLabel(ms: number, lang: Lang): string {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  return `${num(Math.floor(s / 60), lang)}:${num(
+    String(s % 60).padStart(2, "0"),
+    lang
+  )}`;
 }
 
 /**

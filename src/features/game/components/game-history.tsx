@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { useBrachNhaStore } from "@/lib/store";
 import { Avatar } from "@/components/ui/avatar";
 import { findSubject } from "@/features/lessons/subjects";
@@ -52,9 +53,18 @@ export function GameHistory() {
           const subject = findSubject(a.subject);
 
           return (
-            <div
+            // THE WHOLE ROW IS THE CONTROL, the same shape ExamPaperCard and
+            // PracticeLessonList already use — a <Link>, not a button, because
+            // the review is a real destination with its own URL.
+            //
+            // Every row here is safe to make tappable: an attempt only exists
+            // because this student played it, so there is always something
+            // behind it. That is what keeps this clear of the dim-and-don't-tap
+            // rule that governs the app's empty tiles.
+            <Link
               key={a.id}
-              className="flex items-center gap-3 rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel-sm"
+              to={`/game/review/${a.competitionId}`}
+              className="flex items-center gap-3 rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel-sm transition hover:bg-purple/5"
             >
               <span
                 className={`shrink-0 rounded-full px-2 py-1 text-[9px] font-extrabold ${OUTCOME_STYLE[outcome]}`}
@@ -85,7 +95,7 @@ export function GameHistory() {
                   {relativeDay(a.playedAt, lang)}
                 </div>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>

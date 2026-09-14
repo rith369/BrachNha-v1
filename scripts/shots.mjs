@@ -122,7 +122,26 @@ const ROUTES = [
     // shot quietly becomes the create form again.
     clicks: ['button:has-text("Start playing")'],
   },
+  // The review a finished competition leaves behind: both sides' picks, and the
+  // slots for the photographed working. The seeded ATTEMPT is used rather than
+  // the seeded competition because it is the richer of the two — it has an
+  // opponent to compare against. With the Supabase vars blanked the photo
+  // sections render nothing at all (by design, see work-photo.tsx), so this is a
+  // layout check on the answer list.
+  { name: "focus-game-review", path: "/game/review/seed-comp-2" },
   { name: "focus-placement", path: "/placement-test/math" },
+];
+
+// Five questions shared by the seeded competition and the seeded attempt, so
+// /game/review has real prompts and options to lay out. The text is deliberately
+// plain arithmetic rather than anything from src/data — the harness must not
+// depend on authored content it does not own.
+const SEED_QUESTIONS = [
+  { q: { en: "Solve 3x - 4 = 2", km: "ដោះស្រាយ 3x - 4 = 2" }, correct: "x = 2", options: ["x = 1", "x = 2", "x = 3", "x = 6"] },
+  { q: { en: "What is 4 x 3?", km: "4 x 3 ស្មើប៉ុន្មាន?" }, correct: "12", options: ["7", "10", "12", "14"] },
+  { q: { en: "What is the value of sin(0)?", km: "sin(0) មានតម្លៃប៉ុន្មាន?" }, correct: "0", options: ["0", "1", "-1", "8"] },
+  { q: { en: "A line through the origin with slope 3", km: "បន្ទាត់កាត់គល់ មានជម្រាល 3" }, correct: "y = 3x", options: ["y = 3x", "y = x + 3", "y = 3", "x = 3y"] },
+  { q: { en: "How many sides does a square have?", km: "ការ៉េមានប៉ុន្មានជ្រុង?" }, correct: "4", options: ["3", "4", "5", "6"] },
 ];
 
 // A local-calendar day key `offset` days from today — the same rule as
@@ -197,13 +216,12 @@ const seeded = (theme) => ({
         subject: "math",
         difficulty: "mix",
         minutes: 5,
-        // Five stand-ins so the row reports a believable length; only the
-        // COUNT is rendered on /game, never the question text.
-        questions: [1, 2, 3, 4, 5].map(() => ({
-          q: { en: "", km: "" },
-          correct: "",
-          options: [],
-        })),
+        // REAL-LOOKING QUESTIONS, not empty stand-ins. /game renders only the
+        // COUNT, but /game/review renders the prompts and every option — so the
+        // blanks that were fine here until the review existed would photograph
+        // five empty cards and prove nothing about how the screen wraps.
+        questions: SEED_QUESTIONS,
+        creatorAnswers: ["x = 2", "12", "0", "y = 3x", "4"],
         creatorScore: 4,
         creatorMs: 96_000,
         total: 5,
@@ -218,6 +236,12 @@ const seeded = (theme) => ({
         userName: "Panharith",
         score: 4,
         ms: 88_000,
+        // The review's three frozen fields — see types/index.ts. Without them
+        // /game/review says the match predates answer recording, which is a
+        // true sentence and a useless screenshot.
+        questions: SEED_QUESTIONS,
+        answers: ["x = 2", "12", "8", "y = 3x", "4"],
+        opponentAnswers: ["x = 2", "10", "0", "y = 3x", null],
         opponentName: "Sokha",
         opponentScore: 3,
         opponentMs: 91_000,

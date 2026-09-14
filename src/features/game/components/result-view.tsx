@@ -70,6 +70,7 @@ export function ResultView({
   opponentName,
   note,
   onExit,
+  onNext,
 }: {
   mine: Run;
   theirs: Run;
@@ -79,6 +80,15 @@ export function ResultView({
    *  screen is reached again rather than earned — see pages/game-play.tsx. */
   note?: string;
   onExit: () => void;
+  /**
+   * Go on to the review — photograph your working, then compare answers.
+   *
+   * OPTIONAL so this stays a terminal screen where there is nothing to go on to,
+   * rather than growing a button that leads nowhere. When it is passed, the
+   * verdict stops being the end of the flow and becomes the middle of it: the
+   * score is settled here, and what each side actually picked is settled next.
+   */
+  onNext?: () => void;
 }) {
   const lang = useBrachNhaStore((s) => s.lang);
   const t = gameCopy(lang);
@@ -95,7 +105,11 @@ export function ResultView({
     <FocusLayout
       progressPct={100}
       onExit={onExit}
-      footer={<FocusButton onClick={onExit}>{t.done}</FocusButton>}
+      footer={
+        <FocusButton onClick={onNext ?? onExit}>
+          {onNext ? t.seeAnswers : t.done}
+        </FocusButton>
+      }
     >
       <div className="text-center">
         {outcome === "draw" ? (

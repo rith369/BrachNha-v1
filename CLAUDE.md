@@ -239,40 +239,168 @@ call, so a flood costs nothing. In dev there's no proxy and everything keys to
 `"local"`, which is fine — it exists to protect a deployment.
 
 Chat answer quality is **prompt engineering, not fine-tuning** —
-`gemini-3-flash-preview` can't be fine-tuned, and the whole content corpus (~28
-items) fits in a ~2.7–3.1k-token system prompt, so no embeddings/RAG.
-`src/utils/chat-prompt.ts` composes: persona + honesty guardrails +
-`src/data/bac2-format.ts`'s `BAC2_ANSWER_RULES` (the Given → Method → numbered
-Steps → Answer → Exam tip skeleton) + `BAC2_EXAMPLES` (few-shot worked answers)
-+ every lesson/flashcard/practice/mock question flattened as grounding + the
-student's real profile. `buildKnowledgeBlock` also emits the list of subjects
-with NO app content (physics/chemistry/history/khmer today) so the model says so
-instead of inventing a lesson. `src/data/bac2-format.ts` is the intended drop-in
-point for real MoEYS past papers — add entries to `BAC2_EXAMPLES` and flip
-`verified: true` once a teacher checks them; no code change needed.
+`gemini-3-flash-preview` can't be fine-tuned, and the whole content corpus still
+fits in one system prompt, so no embeddings/RAG **yet** (see the staging note at
+the end of this section). `src/utils/chat-prompt.ts` composes: persona + honesty
+guardrails + `src/data/bac2-format.ts`'s `BAC2_ANSWER_RULES` (the Given → Method
+→ numbered Steps → Answer → Exam tip skeleton) + `BAC2_EXAMPLES` (few-shot
+worked answers) + the CATALOG + the CONTEXT + the student's real profile.
+`src/data/bac2-format.ts` is the intended drop-in point for real MoEYS past
+papers — add entries to `BAC2_EXAMPLES` and flip `verified: true` once a teacher
+checks them; no code change needed.
 
-**`SECTION_CONTENT` is in the block too, but CONDENSED, and the condensing is the
-point.** `sectionLine()` emits title + every `items[].label` + the `mistakes`
-pairs in full + a question count. It deliberately drops every `body`, `intro` and
-`outro`. Measured on the first authored section: **~7,000 characters, 3,362 of
-them Khmer glyphs**, against a whole prompt of ~2.7–3.1k tokens — and Khmer
-tokenizes at roughly a token per glyph, so ONE section pasted whole would double
-the prompt and biology's 43 nodes would make it unusable. Labels are the
-curriculum's own names for things, which is what stops the model inventing its
-own; the prose it drops is what the model can already teach once anchored.
-Misconceptions are kept whole because they are two short strings and are the
-highest-value grounding in the file — "students think X, actually Y" is the shape
-of question a student actually brings.
+### The corpus goes in TWICE, at two levels of detail
+
+This is the shape of `chat-prompt.ts` and the thing not to collapse back into
+one block. It used to be one: every lesson, flashcard and practice question
+pasted in full, with each authored SECTION condensed to a skeleton of labels.
+**The result was a mentor that knew a section's table of contents and had never
+seen a word of it** — `sectionLine()` drops every `body`, `intro` and `outro`,
+which on the first authored section is ~7,000 characters of Khmer prose.
+
+- **`buildCatalogBlock(lang, focusSubject?)` — what EXISTS.** Always sent, and
+  complete in the sense that matters: every item is named, and the
+  `covered`/`missing` computation runs over the WHOLE corpus. This is what backs
+  "never invent a BrachNha lesson", so **it may never be derived from a search
+  result** — if it were, the mentor would deny the existence of any lesson a
+  given turn happened not to surface. `focusSubject` decides ORDER only, never
+  membership.
+- **`buildContextBlock(chunks)` — the full PROSE of a few items**, sent because
+  we know they are relevant.
+
+**Today the only source of context is the screen the student has open**, and
+that is a signal with perfect precision, zero latency and no model in the loop.
+`utils/chat-screen.ts`'s `screenRefFor(pathname)` is sent by `chat-overlay.tsx`
+(read at SEND time, not mount — the overlay is global and survives navigation),
+and `pinnedContextFor()` turns it into `RetrievedChunk[]`. Measured: on
+`/sections/biology-3-1-1` the whole section arrives as 5 chunks.
+
+**THE INVARIANT — the client may SELECT from the corpus, never SUPPLY content to
+it.** Every id in a `ScreenRef` is used once as a lookup key and then discarded;
+what reaches the prompt is the object the lookup found. Three guards, and each
+covers a case the others cannot:
+
+- `cleanScreen()` in `chat-handler.ts` bounds SHAPE and COST only (64-char cap
+  before the lookup). It deliberately does NOT use `clean()`: that makes a
+  string safe to *display*, and nothing here is ever interpolated.
+- `Object.hasOwn`, never `in` and never a truthiness test — these are plain
+  object literals, so `"constructor" in SECTION_CONTENT` is true and
+  `SECTION_CONTENT["toString"]` is a function.
+- `isLookupKey()`, which is **not redundant with the above**: a single-element
+  ARRAY stringifies to its element, so `Object.hasOwn(SECTION_CONTENT,
+  ["biology-3-1-1"])` is TRUE and the next line calls `.split()` on an array.
+  Measured, not theorised.
+
+An unrecognised id is dropped silently — a stale client or a renamed route is
+ordinary, and there is nothing to tell the student.
+
+**`RetrievedChunk.pinned` exists for the layer that is not built yet.** True
+means "the student has this screen open", which is certain; false is reserved
+for anything less certain that adds to the same array later. Pinned chunks sort
+first and are dropped last, because **a guess must never evict a fact**.
+
+**A section's QUIZ is deliberately excluded from its chunks.** Its `correct`
+field is the answer to a question on the screen the student is standing on. The
+catalog still counts the questions, so the mentor knows the quiz exists — it is
+just not handed the answer key. The old skeleton did this by accident;
+`sectionChunks()` now does it on purpose.
+
+**`buildContextBlock` carries a sentence that is load-bearing:** *their absence
+proves nothing*. Once the model sees an "excerpts" block it starts inferring
+that anything NOT quoted does not exist, and would tell students the app lacks a
+lesson whenever grounding missed it. The catalog is the inventory; the excerpts
+are a sample.
+
+**`bi()` leads with KHMER now, and the English is the fallback.** It used to
+emit `en [KH: km]` for every field — 5,999 Latin characters in a 12,595-char
+block, for a mentor forbidden to reply in English (`ANSWER_LANG`). The English
+is not dropped outright because some Khmer entries in `data/lessons.ts` really
+are abbreviated; WHICH ones was measured rather than guessed — across the 57
+pairs the Khmer runs at a median **0.71× the English length**, and Khmer is
+denser per character, so that is a complete rendering. Only the 15 pairs below
+`KM_STUB_RATIO` (0.6) keep both. If that column is ever completed, `bi()`
+collapses to `pair.km`.
 
 Section subjects are added to the `covered` set (`id.split("-")[0]`), or a
 subject whose only content is authored sections would still be announced as
 having none — i.e. the model would deny the lesson the student is reading.
 
-`PROMPT_BUDGET_CHARS` (24,000) warns on an oversized prompt. Deliberately
-measured in CHARACTERS, not an estimated token count: a Latin-calibrated
-estimate understates a Khmer prompt several times over. **If it fires, condense a
-source — don't raise the number.** The whole no-embeddings/no-RAG decision rests
-on the corpus staying small enough to send on every single request.
+### THREE budgets, and they differ in KIND
+
+Getting these confused is how the prompt breaks silently.
+
+| constant | bounds | on exceeding |
+| --- | --- | --- |
+| `PROMPT_BUDGET_CHARS` (24,000) | AUTHORED content | **warns** — a human condenses a source |
+| `CATALOG_BUDGET_CHARS` (11,000) | assembled catalog | **degrades** entries to their title |
+| `CONTEXT_BUDGET_CHARS` (9,000) | assembled context | **drops whole chunks** from the tail |
+
+The last two degrade silently because the CODE chose that content — warning
+about it would be the code complaining about its own decision. Only the first
+has anyone to tell. **If `PROMPT_BUDGET_CHARS` fires, something has been added
+that neither of the other two governs.**
+
+All three are in CHARACTERS, not an estimated token count: Khmer tokenizes at
+roughly a token per glyph, so a Latin-calibrated estimate understates a Khmer
+prompt several times over.
+
+`CONTEXT_BUDGET_CHARS` drops **whole chunks, never a slice**. A cut at an
+arbitrary character index in Khmer lands inside an orthographic cluster (base
+consonant + U+17D2 coeng + subscript + vowel) and renders as a broken glyph;
+and half a worked example is worse than none.
+
+### Measured, 13 Sep 2026 — and how to re-measure
+
+| | before | after |
+| --- | --- | --- |
+| prompt on Home | 19,525 | **16,221** |
+| prompt on `/sections/biology-3-1-1` | 19,525 (no prose) | **20,169** (5 chunks, full prose) |
+| catalog block | 12,595 (5,999 Latin) | **9,291** (2,648 Latin) |
+
+Re-measure by loading the real module — plain `node` cannot, because
+`data/*.ts` uses `.js` specifiers that only resolve under a bundler, which is
+the same reason `server/vite-chat-plugin.ts` exists:
+
+```js
+const { createServer } = await import("vite");
+const s = await createServer({ server: { middlewareMode: true }, appType: "custom", configFile: false });
+const m = await s.ssrLoadModule("/src/utils/chat-prompt.ts");
+// ... buildSystemPrompt({ profile, context, focusSubject }).length
+await s.close();   // without this the process never exits
+```
+
+### When RAG earns its place — and what was decided
+
+The staging was deliberate: at ~29 catalog items there is nothing for retrieval
+to SELECT, since a top-6 over 29 chunks is a top-6 over a list you could send
+whole. The screen the student is on beats any search until they routinely ask
+about content that is not in front of them.
+
+**Trigger: roughly 15 authored sections / 150 chunks.** Stage 1 already
+established every interface stage 2 needs — `RetrievedChunk`,
+`buildContextBlock`, `CONTEXT_BUDGET_CHARS`, the `context = []` default and the
+select-never-supply invariant — so stage 2 changes exactly one thing: *where the
+non-pinned chunks come from*.
+
+**The index store is a COMMITTED FILE bundled into the function, not pgvector**
+(the user's call, and it reverses what the Supabase section used to assert). At
+256 dims, 1,200 chunks is ~1.6MB of base64 in a `server/mentor-index.ts` module;
+search is an exact dot product over a `Float32Array`, sub-millisecond, so the
+only added latency is the query embedding (~120ms against the measured 2.7s to
+first character). pgvector would add 40–280ms more and make mentor *quality*
+silently depend on a service this whole codebase is written to tolerate the
+absence of. Revisit past ~5,000 chunks, or the moment retrievable content stops
+living in `src/data/`.
+
+**Run the Khmer spike BEFORE building any of it.** `gemini-embedding-001` lists
+Khmer among 100+ languages, but Khmer is low-resource and unsegmented — the same
+property that forces these budgets to count characters. If embeddings cannot
+separate Khmer curriculum topics, stage 2 is wasted work discovered *after*
+building it; pin harder instead (the current section plus its neighbours in the
+same lesson). Chunk on AUTHORED boundaries (`SectionBlock`, `Misconception`,
+`PracticeCard`) and never on a length — Khmer has no whitespace to window on,
+and the dictionary segmenter you would otherwise need is exactly the dependency
+this repo declines.
 
 **The chatbot is called KruAI** — one spelling in both languages, Latin script
 even in Khmer copy, because it's a brand name rather than a description. It used
@@ -339,11 +467,20 @@ that is merely invisible; the moment a second person starts working on the app
 again, **every migration since has to be applied to their project too** and the
 whole per-project discipline is back.
 
-**When `PROMPT_BUDGET_CHARS` fires, this project is also the RAG store.** The
-mentor section explains why the whole corpus is sent on every request today and
-why that stops scaling once the curriculum is written. The answer is `pgvector`
-in the database that now exists — content stays in `src/data/*.ts` as the source
-of truth, with embeddings as a derived index — not a new vendor.
+**THIS PROJECT IS NOT THE RAG STORE, and this paragraph used to say it was.**
+It asserted `pgvector` here as the settled answer, with no reasoning attached,
+and it was read as decided. The decision went the other way (13 Sep 2026, the
+user's call): when the mentor outgrows one prompt, the embedding index is a
+**committed file bundled into the serverless function**, not a table here. The
+full argument is in the mentor section — the short version is that an absent or
+unreachable Supabase is a SUPPORTED state everywhere in this app, so putting
+mentor *quality* behind it creates a degradation that is invisible from the UI
+by construction, and that the corpus is static, small, and already in git.
+
+What survives unchanged is the half that was never in doubt: **content stays in
+`src/data/*.ts` as the source of truth, with embeddings as a DERIVED index, and
+no new vendor.** Revisit this only past ~5,000 chunks, or the moment
+retrievable content stops living in `src/data/`.
 
 **Files, and what each is for:**
 
@@ -2516,7 +2653,87 @@ survey.
 
 **Progress dashboard** (`features/progress`) — score hero (SVG donut), Recharts
 trend line + bar chart, subject breakdown w/ sparklines, focus areas, activity
-heatmap, AI insights. Uses fake/demo data on purpose (see below).
+heatmap, AI insights. The NUMBERS are fake/demo data on purpose (see below); the
+SUBJECTS they hang off are not — see the section directly below.
+
+### Progress: the numbers are invented, the SUBJECTS are not
+
+This page shipped with its own hand-written subject list and it had drifted from
+the app in five separate ways at once, which is worth listing because each is a
+different failure and only the first was visible:
+
+- **A "Geo" bar for a subject the app has never had.** No entry in `SUBJECTS`, no
+  colour token, no translation key, no lessons, no exam papers. It existed in
+  this one file.
+- **History, Khmer and the language subject were missing** from both cards.
+- **The two cards disagreed**: five subjects in the chart, four in the list.
+- **Two spellings of the same four** — `Chem`/`Chemistry`, `Phys`/`Physics` —
+  because each card authored its own labels.
+- **The five shared brand accents instead of the per-subject palette**, so math
+  was purple here and blue everywhere else. That is precisely what
+  `features/lessons/subject-styles.ts` exists to prevent.
+
+**`features/progress/subjects.ts` is the fix, and the shape is the point.**
+`progressSubjects(userLanguage)` maps `allSubjects()` — the same call the
+Study, Exam and Practice pages make — over `demo-data.ts`'s `subjectStats`,
+picking up the list, its order, the student's chosen language subject, the
+catalog's Lucide icon, an English name and the per-subject colour. Only the
+numbers come from the demo file, and `PreviewTag` is what says so.
+
+**The name is ALWAYS ENGLISH — not `T[lang]`, although an earlier version of
+this file made it follow the store's language.** That was reverted: every other
+label on this page ("Overall Readiness", "Questions Answered", the "📈 Progress"
+title) is a hardcoded English string, so making only the subject names switch to
+Khmer would have traded one inconsistency for another — Khmer names sitting
+inside otherwise-English cards. If the whole dashboard is localized later,
+revisit this alongside that work rather than in isolation.
+
+**`subjectStats` is `Record<SubjectId, SubjectStats>`, not an array**, which is
+what makes the geography row unrepresentable rather than merely deleted: a
+subject outside the catalog cannot be given a score, and a NEW subject fails to
+compile until it has one. The bar chart and the breakdown list read the same
+record, so a subject's question count cannot differ between two cards a few
+pixels apart the way it could when each authored its own.
+
+**`totalQuestions` is SUMMED, never authored.** The hero's old hand-written 342
+was the sum of the five subjects this file used to list, geography included — so
+deleting that subject would have left a total no row on the page adds up to.
+Same rule as `lessonCountFor()` on the Study page. **English and French carry
+identical stats** so that sum does not depend on which language the student
+picked; they are one "your language subject" row written twice.
+
+**`trendPct` is one signed number** and the arrow, sign and colour are derived
+from it. It replaced `trend: "▲ +6%"` sitting beside a `trendUp` boolean — two
+hand-written values describing one fact, free to disagree.
+
+**The colour is the per-theme `--color-subj-*` scale, never the raw
+`--subject-*` hex.** Everything coloured here is a score in coloured text, a
+progress fill, a sparkline bar or an SVG bar on a card — never white text on a
+fill, which is the only role the raw value is correct for. That is also why it
+needs no `dark:` anything.
+
+**THE BARS STILL GO UP — a horizontal layout was tried first and reverted at
+the user's request** to keep the "bars going up" look the original page had.
+Seven upright bars give each label ~36px at the 320px floor and neither
+"Chemistry" nor "Chemistry" abbreviated three different ways fits there, so
+`XAxis dataKey` is `shortLabel` (`SHORT_LABEL` in `progress/subjects.ts` — Math,
+Phys, Chem, Bio, Hist, Khmer, Eng, Fr), ONE consistent map rather than the old
+chart's own hand-picked codes that had already drifted from the list below it.
+The full name is a tap/hover away: `<Tooltip content={<ChartTooltip/>}>` in
+`subject-bar-chart.tsx` is a custom content component (not
+`contentStyle`/`labelStyle`/`itemStyle`, which only style Recharts' own default
+panel) so it can read `payload[0].payload` — the whole `ProgressSubject` row
+`Bar` was given — and print the full `name` instead of the axis's short one.
+`interval={0}` on the `XAxis` keeps Recharts from thinning ticks on its own,
+which it otherwise does at this width even with room for all of them.
+
+**`focusAreas` and `aiInsights` were deliberately left alone.** Their subjects
+(Chemistry, Physics, Math) are real, and their topics are demo prose rather than
+a subject list — there is nothing for them to drift from yet.
+
+**Still demo, and still tagged:** the hero's XP / streak / study-time row is
+sample data, which is the recorded decision `PreviewTag` exists for. Making
+those real is a separate call, not part of this.
 
 **Game** (`features/game`) — asynchronous competitions between real students.
 See its own section below.
@@ -2616,13 +2833,34 @@ goes blank offline.
 The cost of both, stated so it is not mistaken for a bug: **a student who renames
 themselves does not rename their old rows.**
 
-#### One clock for the whole quiz, and speed breaks ties
+#### One budget for the run, plus a per-question STOPWATCH
 
-`MATCH_MINUTES` is the budget the creator picks from, and it covers the whole
-run. A per-question countdown was built first and removed: with a total budget as
-well, two clocks on one screen can contradict each other. One budget is also what
-makes two runs comparable — both students had the same time, so the only
-difference is what they did with it.
+`MATCH_MINUTES` (10/20/30) is the budget the creator picks, and it covers the
+whole run. One budget is what makes two runs comparable — both students had the
+same time, so the only difference is what they did with it.
+
+**A per-question COUNTDOWN was built first and removed, and the reason is the
+part to keep:** there is no honest number for how long one question should take.
+It varies by subject, by question and by student, so any limit would be invented
+— and it could contradict the total budget that IS real.
+
+**What replaced it counts UP.** Each question shows how long the student has
+spent on it, with no limit and no consequence: information, not pressure. It
+tells them what they took without pretending to know what they should have.
+
+Two mechanics behind it:
+
+- **The stopwatch takes the parent’s tick as a prop.** `CompetitionRun` already
+  runs one interval for the countdown, so `GameQuestion` reads that `now` rather
+  than starting a second timer beside it.
+- **It restarts for free.** The child is keyed on the queue position, so a new
+  question is a new mount and its lazy `startedAt` is simply the new mount time.
+  It freezes on commit so the number stops at what the student took rather than
+  creeping through the confirm delay.
+
+`clockLabel()` lives in `copy.ts` and formats both, so a countdown reading `1:05`
+never sits beside a stopwatch reading `65s`. **Their labels are what tell them
+apart** — Time left / This question.
 
 **Running out does NOT discard the attempt.** It submits whatever was answered.
 The unanswered questions already cost the points; throwing the run away on top
@@ -2644,17 +2882,31 @@ a winner at random.
 | `/game` | hub: hero, your competitions, your record | shown | shown |
 | `/game/create` | form → run → posted | hidden | blocked |
 | `/game/play/:competitionId` | a joiner's run → result | hidden | blocked |
+| `/game/review/:competitionId` | both sides' answers + the working photos | hidden | **shown** |
 
-`isGameRunRoute()` is `startsWith("/game/")`, so `/game` stays a PLACE with its
-navigation and only the two task routes hide it — the same trailing-slash rule
+`isGameRunRoute()` is `startsWith("/game/")` MINUS the review, so `/game` stays a
+PLACE with its navigation and only the task routes hide it — the same trailing-slash rule
 `/lessons/` follows. Both task routes are **static-prefixed**, so the
 `/lessons/:lessonId` versus bare `/lessons/:subjectId` ambiguity
 `pages/subject-path.tsx` documents cannot arise here at all.
 
-It is added to **`isAssessmentRoute()`** as well, which used to be the placement
-test alone: a timed competition against a scored opponent measures rather than
-teaches, so "a mentor on tap measures the mentor" applies exactly. Detection is
-by pathname and never by the store's `focusMode` flag — `use-focus-mode.ts` warns
+**THE REVIEW IS A FOCUS ROUTE BUT NOT AN ASSESSMENT, and that gap is why
+`isGameReviewRoute()` exists.** By the time anyone is on it the score is recorded
+and the database refuses a second attempt, so there is nothing left to measure —
+and "why is that the right answer?" is precisely the case KruAI is kept reachable
+inside a lesson for. It is named directly in `isFocusRoute()` rather than
+arriving through `isAssessmentRoute()`, and subtracted from `isGameRunRoute()`.
+
+The seam that leaves is worth knowing: both runs NAVIGATE to the review when they
+finish, so the mentor reappears the instant the URL changes rather than the
+instant the run ends. That is the right boundary — it is the same moment the
+result stops being in progress — but the review is the first screen in the flow
+where the FAB comes back.
+
+The two RUN routes are added to **`isAssessmentRoute()`**, which used to be the
+placement test alone: a timed competition against a scored opponent measures
+rather than teaches, so "a mentor on tap measures the mentor" applies exactly.
+Detection is by pathname and never by the store's `focusMode` flag — `use-focus-mode.ts` warns
 that borrowing that flag for a second meaning is how the two questions come
 apart, and the pathname version also means a browser-back mid-run restores the
 navigation with nothing to unset.
@@ -2917,6 +3169,156 @@ knows this phone, so without asking the server a student could play on a laptop
 and again here and be paid twice. It deliberately does NOT block the screen — a
 failed check leaves it null and the local guard still applies, because being
 offline should not mean being unable to play.
+
+#### The review: what each side answered, and a photo of the working
+
+A competition used to record that you got 3 out of 5 and stop. That is a score,
+not a lesson — it does not say which three, and there is nothing in it a student
+can act on. The flow now continues past the verdict, and the user specified the
+order: **quiz → result → photograph your working → the app's answers → your
+opponent's working.**
+
+**`/game/review/:competitionId` is that whole tail, and ONE ROUTE SERVES BOTH
+SIDES.** That works because it is keyed on the COMPETITION rather than on a row:
+a student is either its creator or holds an attempt at it, and never both — you
+cannot join your own. So the same URL is a joiner's review of the creator and a
+creator's review of everyone who took their challenge, with no second route and
+no two id spaces to keep straight. Both runs `navigate(..., { replace: true })`
+into it, so a back tap lands on `/game` rather than on a spent quiz.
+
+**IT IS ALSO THE DURABLE ARTEFACT.** Recent Games rows and My Competitions rows
+are `<Link>`s to it now. That reverses `my-competitions.tsx`'s own header, which
+said no row may ever link because the only thing behind a competition is playing
+it and playing your own is a race against yourself. True until the review
+existed; what a row leads to now is specifically the creator's, never the quiz.
+
+##### The photo's position in the flow IS the design
+
+AFTER the result, because this is the one screen in the feature where something
+can genuinely fail — a camera, a permission, a phone on mobile data — and a
+failed upload must never cost a student the score they just earned.
+
+BEFORE the answers, and this half is load-bearing rather than a preference: once
+the correct answers are on screen, a photograph of "my working" is a photograph
+of working that could be corrected first. Asking while the student still knows
+only their score is what makes the picture worth swapping.
+
+**SKIP STILL EXISTS, and it buys exactly one thing.** A hard lock would mean a
+broken camera permanently hides a review already earned, so Skip reaches the
+answers. It does NOT reach the classmate's photo — that stays behind the
+reciprocity gate (`WorkPhoto`'s `locked`), which is the honest shape of an
+exchange: showing yours opens theirs, and nothing else is held hostage to it.
+
+That gate is deliberately in the UI and NOT in SQL. It is a nudge toward the
+exchange, not a security boundary, and in the database it would mean a student
+whose upload failed on a dead connection silently loses access to a classmate's
+working once the connection comes back.
+
+##### The answers are DENORMALISED onto the attempt, like everything else here
+
+`Competition.creatorAnswers` and `CompetitionAttempt.answers` hold the option
+TEXT per question — matching how `correct` is compared everywhere else in this
+app, where an index would be a second representation free to drift — with `null`
+for a question the clock ran out on, and ALWAYS padded to the full length so the
+two sides pair positionally.
+
+The attempt ALSO freezes `questions` and `opponentAnswers`. That is this type's
+existing rule taken one step further rather than a new one: it already copies the
+opponent's name and score precisely so the history list need not re-read a
+competition the joiner has no reason to keep. A review that had to fetch would go
+blank on a bad connection, in an app where no other screen does. The cost is
+~8KB per attempt, against a list already capped at `MAX_COMPETITIONS`.
+
+**Every new field is OPTIONAL**, so rows already in students' browsers still
+open — the screen says the match predates answer recording rather than drawing a
+grid where every question looks unanswered. Same reasoning as `sharedAt` and
+`opponentId`, and the server columns default to `[]` for the same reason.
+
+**Both are written in the SAME INSERT as the score**, which is what lets the two
+tables keep the insert-only shape `20260913000001` argues for: there is no second
+write to permit, so neither grows the UPDATE policy that would let a recorded
+result be rewritten after someone has been shown it.
+
+##### The bucket, and why no column records a path
+
+`competition-work` is the FIRST STORAGE BUCKET in this project and the first file
+BrachNha has ever stored that a student made. It is private, read through
+short-lived signed URLs rather than a public bucket's permanent ones.
+
+**THE PATH IS THE IDENTITY: `{competitionId}/{userId}.jpg`**, and nothing
+anywhere records it. Every storage policy reads the owner straight back out of
+that filename — not `storage.objects.owner`, whose name and type have moved
+across Supabase versions. Two things follow, and both are the point: no table
+needs a write after its insert, and a file named after anyone else is refused by
+the database rather than by a convention the client could quietly break.
+
+The read policy mirrors the product rule `competition_attempts` already encodes:
+your own always; every joiner's if you created the competition; and if you
+JOINED one, the creator's **and nobody else's** — that last `exists` clause is
+what stops a joiner reaching a second joiner's photo by guessing their uid.
+
+**UPDATE and DELETE are allowed on an object although neither score table permits
+either**, and the distinction is real: a score is a result and must not be
+editable once it has been shown, but a photo is an artefact. The first attempt at
+photographing a page of working very often has a thumb across it, and a picture
+of your own handwriting that you can publish and cannot withdraw is not something
+you meaningfully agreed to share. `MyWorkPhoto` is the pair of buttons for those
+two policies — Retake and Delete, on your own photo only, which is all the policy
+would permit anyway.
+
+**Deleting RE-CLOSES the reciprocity gate**, and that is the rule being
+consistent rather than theatre: showing yours is what opens theirs, so
+withdrawing yours has to withdraw the view it bought. Otherwise the promise made
+to the student on the other side is the weaker "show yours once". The confirm
+says so before it happens rather than letting it be discovered after.
+
+**`WorkPhoto` needs its `hidden` prop for exactly this.** A signed URL fetched a
+moment ago still resolves for its whole lifetime, so without an explicit override
+the panel would go on showing a photo the student has just taken back — the one
+moment where trusting a cached answer is a broken promise rather than a stale
+pixel.
+
+**`useWorkPhoto` is the single owner of that state**, held by the page and read
+by both the step before the answers and the panel after them. They are two
+renderings of one fact; a copy in each is how "have I uploaded?" ends up answered
+differently a few pixels apart. Its `upload` returns a BOOLEAN rather than the
+caller watching `phase`, because a caller that reads the phase after awaiting
+reads the value captured by the render it started from — always the one from
+before the upload ran.
+
+**Uploads are compressed client-side first** (`utils/image-compress.ts`): a phone
+photographs at 3–5MB, and the audience pays for that twice — once to upload, once
+for every classmate who opens it. 1400px on the long edge at JPEG 0.72 is
+200–350KB and stays legible; below ~1000px a pencilled fraction starts to mush.
+No image library was added, for the reason `scripts/webp.mjs` records. The
+bucket's 2MB `file_size_limit` is a hard stop for a caller that skips the
+compressor, not the real control. **EXIF orientation is the trap** —
+`createImageBitmap`'s `imageOrientation: "from-image"` is what stops portrait
+photos uploading sideways, and Safari honours it only from 16; older versions
+ignore the option rather than throwing, so a photo lands rotated rather than not
+at all.
+
+##### Where it degrades, and what is deliberately absent
+
+`WorkPhoto` renders NOTHING when Supabase is unconfigured, and the review skips
+the photo step entirely when there is no project or no account — both are
+supported states (a fork with no `.env`, the blanked-env screenshot harness), so
+asking for a photo there would be an error message about the app working as
+designed.
+
+**A student can delete their own photo, and that shipped with the feature rather
+than after it** — see Retake and Delete above. It was very nearly left as a
+policy with no button, which would have meant asking a student to upload a
+picture of their own handwriting with no way to take it back.
+
+**What is still absent is REPORTING someone else's**, and that is a real gap
+rather than one deferred quietly. The storage policies bound who can see a photo
+to the two students in a competition, so the blast radius of anything unpleasant
+is one classmate — but there is nothing in the app for that classmate to do about
+it except close the screen. A report path needs somewhere for a report to GO,
+which this app has no notion of yet: no teacher role, no moderation queue, no
+admin. That is the design problem to solve before a real classroom uses this, not
+another button.
 
 #### Avatars are DERIVED, and that is a privacy decision
 
@@ -3773,6 +4175,14 @@ study minutes with idle time excluded — counting "app is open" would make
 leaving a phone unlocked a winning strategy, which is exactly what that screen
 is built to argue against. Its one live read is the student's own name.
 
+**"Demo data" means demo NUMBERS. It never licensed inventing a CURRICULUM.**
+Progress had a geography bar for a subject the app does not teach, which no
+amount of "the numbers are fake anyway" excuses — a student reads it as a claim
+about what BrachNha covers. Its subject list is derived from the catalog now (see
+the Progress section above); a demo screen that names subjects, lessons or exams
+must take that list from `allSubjects()`, `chaptersFor()` or the equivalent, and
+invent only the figures hung off it.
+
 **Streak is the exception to the pattern, and it had to be.** The other four
 were built when their invented numbers sat beside nothing that could contradict
 them — which stopped being true for Progress and the Leaderboard once `StatBar`
@@ -4343,10 +4753,21 @@ For anything touching Supabase, additionally:
 npm run db:check     # env → reachability → Google sign-in → all 10 tables
 ```
 
-**The Game feature needs its migration applied before db:check passes** —
-20260913000001_competitions.sql, by hand, in EACH developer’s own project. Until
-then the check reports 2 of 10 tables missing and /game’s browse list shows its
-failed state while the rest of the page keeps working.
+**The Game feature needs BOTH its migrations applied before db:check passes** —
+`20260913000001_competitions.sql` and
+`20260914000001_competition_answers_and_work.sql`, by hand, in the SQL editor.
+Without the first, the check reports 2 of 10 tables missing and /game's browse
+list shows its failed state while the rest of the page keeps working. Without the
+second it names the two missing COLUMNS, and a new competition saves locally but
+cannot be SHARED — the insert names `creator_answers` and is refused, so the hub
+labels the row "Not shared yet", which is true, and `share-pending.ts` retries it
+once the migration lands.
+
+`db:check` deliberately has NO storage-bucket check. The publishable key cannot
+tell a real bucket from an invented one — `POST /storage/v1/object/list` answers
+`200 []` for both, measured — and a silent false pass is worse than no check at
+all. The two columns come from the same migration as the bucket and already
+answer whether it ran.
 
 and check `dist/assets/` still contains a separate Supabase chunk, for the same
 reason `math-field-panel-*.js` is checked — a static import undoes the lazy

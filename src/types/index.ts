@@ -390,6 +390,21 @@ export interface Competition {
   /** The whole-quiz budget the creator chose. */
   minutes: number;
   questions: ExamQuestion[];
+  /**
+   * WHICH OPTION THE CREATOR PICKED for each question, positionally matched to
+   * `questions`, with null where the clock ran out before they answered.
+   *
+   * The option TEXT rather than its index, matching how `correct` is compared
+   * everywhere else in this app — an index would be a second representation of
+   * the same answer, free to drift the day a pool is reordered.
+   *
+   * OPTIONAL because every competition posted before the review screen existed
+   * is already sitting in students' browsers without it, and on the server the
+   * column defaults to `[]`. Both read as "this match predates answer recording",
+   * which the review screen says out loud rather than drawing a grid where every
+   * question looks unanswered. Same no-migration reasoning as `sharedAt`.
+   */
+  creatorAnswers?: (string | null)[];
   creatorScore: number;
   /** How long the creator took. Milliseconds, and the tie-break: equal scores
    *  rank on speed. */
@@ -412,6 +427,17 @@ export interface Competition {
    * retries them; MyCompetitions labels them until it succeeds.
    */
   sharedAt?: string;
+  /**
+   * When this student's photo of their own working reached the bucket, or ABSENT
+   * if they have not taken one.
+   *
+   * A LOCAL MARKER WITH NO COLUMN BEHIND IT, and that is the point: the file's
+   * path is `{competitionId}/{userId}.jpg`, so the server needs nothing recorded
+   * to find it and both tables stay insert-only. This exists purely so the review
+   * screen knows whether to ask for a photo without a network round trip on a
+   * screen that otherwise works offline. See lib/competition-photos.ts.
+   */
+  photoAt?: string;
 }
 
 /**
@@ -454,4 +480,29 @@ export interface CompetitionAttempt {
   subject: string;
   total: number;
   playedAt: string;
+  /**
+   * THE REVIEW'S THREE FIELDS. Everything the "what did each of us answer"
+   * screen needs, frozen here at play time so it renders with no network at all.
+   *
+   * That is this type's existing rule taken one step further, not a new one: the
+   * attempt already copies the opponent's score and name precisely so the history
+   * list does not have to re-read a competition the joiner has no reason to keep.
+   * A review that had to fetch would be a screen that goes blank on a bad
+   * connection, in an app where every other screen does not.
+   *
+   * The cost is honest and bounded: roughly 8KB per attempt, against a store that
+   * keeps at most MAX_COMPETITIONS of them.
+   *
+   * All three are OPTIONAL so attempts already in a student's browser still open
+   * — the screen says the match predates answer recording rather than drawing an
+   * empty grid. Same reasoning as `opponentId` and `Competition.sharedAt`.
+   */
+  questions?: ExamQuestion[];
+  /** This student's own picks, positionally matched to `questions`. */
+  answers?: (string | null)[];
+  /** The creator's picks, copied off the competition at play time. */
+  opponentAnswers?: (string | null)[];
+  /** When this student's photo of their working reached the bucket — a local
+   *  marker with no column behind it, exactly like Competition.photoAt. */
+  photoAt?: string;
 }

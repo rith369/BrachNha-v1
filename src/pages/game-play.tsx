@@ -130,6 +130,12 @@ export default function GamePlayPage() {
     navigate("/game");
   }
 
+  // REPLACED into history, not pushed: the run is spent and the database refuses
+  // a second attempt, so a back tap from the review must not land on the quiz.
+  function review() {
+    navigate(`/game/review/${competitionId}`, { replace: true });
+  }
+
   function finish(run: RunResult) {
     if (!competition) return;
     // ONE ATTEMPT PER COMPETITION, enforced here as well as in the database.
@@ -154,6 +160,13 @@ export default function GamePlayPage() {
       opponentMs: competition.creatorMs,
       subject: competition.subject,
       total: competition.total,
+      // THE REVIEW'S THREE FIELDS, frozen here for the same reason the opponent's
+      // score already is: a joiner has no reason to keep the competition on their
+      // device, so a review that had to re-read it would go blank offline. See
+      // CompetitionAttempt's own note.
+      questions: competition.questions,
+      answers: run.answers,
+      opponentAnswers: competition.creatorAnswers,
     };
     addCompetitionAttempt(attempt, run.score * GAME_XP_PER_CORRECT);
 
@@ -215,6 +228,11 @@ export default function GamePlayPage() {
         opponentName={competition.creatorName}
         note={t.alreadyPlayed}
         onExit={exit}
+        // Offered even here. The attempt may have been recorded on ANOTHER
+        // device, in which case the review says so — which is the honest answer,
+        // and better than hiding the way to the answers from someone who has
+        // earned them.
+        onNext={review}
       />
     );
   }
@@ -227,6 +245,7 @@ export default function GamePlayPage() {
         total={competition.total}
         opponentName={competition.creatorName}
         onExit={exit}
+        onNext={review}
       />
     );
   }

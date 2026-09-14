@@ -11,6 +11,10 @@ supabase/migrations/
   20260828000001_init_schema.sql   tables, indexes, triggers
   20260828000002_rls_policies.sql  row level security
   20260904000001_hardening.sql     revoke RPC on handle_new_user, one FK index
+  20260913000001_competitions.sql  the Game feature: the first cross-user tables
+  20260914000001_competition_answers_and_work.sql
+                                   what each side answered, and the first
+                                   storage bucket in the project
 ```
 
 The SQL is the source of truth for the schema, checked into git like any other
@@ -35,18 +39,30 @@ project too. Two ways:
 3. Paste the whole of `20260828000002_rls_policies.sql`, run it
 4. Paste the whole of `20260904000001_hardening.sql`, run it
 5. Paste the whole of `20260913000001_competitions.sql`, run it
+6. Paste the whole of `20260914000001_competition_answers_and_work.sql`, run it
 
 Order matters: the second file adds policies to tables the first one creates,
-the third revokes a grant on a function the first one defines, and the fourth
-creates its own tables and their policies together — enabling RLS without a
+the third revokes a grant on a function the first one defines, the fourth
+creates its own tables and their policies together, and the fifth adds columns
+and storage policies that name the fourth's tables — enabling RLS without a
 policy denies everything, so those cannot be split. Every file is
 written to be safely re-runnable (`if not exists`, `drop policy if exists`, and
 a `revoke` that is a no-op when already revoked), so a partial run can be
 repeated rather than unpicked.
 
-The first three are applied. The fourth was added on 13 Sep 2026 for the Game
-feature and is the one to run next; `npm run db:check` reports
-`2 of 10 tables missing` until it is.
+The first four are applied. **The fifth was added on 14 Sep 2026 and is the one
+to run next.** `npm run db:check` names the two columns it adds until it is.
+
+Until it runs, the Game page keeps working but **a new competition cannot be
+shared**: the insert names `creator_answers`, so it is refused, the row stays on
+the device and the hub labels it "Not shared yet" - which is true, and is why
+that label exists. Applying the migration fixes it for every competition posted
+after it; `features/game/share-pending.ts` retries the ones stranded before.
+
+There is no bucket check in `db:check`, deliberately - the publishable key
+cannot tell an existing bucket from an invented one. See the comment in
+`scripts/supabase-check.mjs`; the column checks come from the same migration and
+already answer whether it ran.
 
 **Applying them by pasting does not register them** in Supabase's own migration
 history — `list_migrations` comes back empty, and that is expected rather than a
@@ -178,6 +194,14 @@ anonymous sign-ins are still on.
 | `completed_sessions` | finished lesson ids | `completedSessions` |
 | `conversations` | KruAI chat threads | `conversations` |
 | `chat_messages` | the messages in them, ordered by `seq` | `conversations[].msgs` |
+| `competitions` | a posted challenge: frozen questions, the creator's score and picks | `competitions` |
+| `competition_attempts` | one row per student per competition: their score and picks | `competitionAttempts` |
+
+There is also one **storage bucket**, `competition-work` (private), holding the
+photograph each student takes of the working they did on paper. Objects are
+named `{competition_id}/{user_id}.jpg`, and every policy on them reads the owner
+straight back out of that filename - so no table stores a path and neither of
+the two above needs a write after its insert.
 
 Curriculum content — lessons, sections, subjects, past papers — is **not** here.
 It lives in `src/data/*.ts` and stays there while the curriculum shape is still
@@ -188,7 +212,17 @@ migration. Revisit when content settles.
 
 Every table denies everything by default and then allows exactly one thing: you
 may read and write rows where `user_id` (or `id`, on `profiles`) equals your own
-`auth.uid()`. There is no shared or public data in this schema.
+`auth.uid()`.
+
+**The two competition tables are the exception, and they are the only one.** A
+competition is readable by every signed-in student, because a challenge nobody
+else can see is not a challenge. That is safe as a property of the ROW rather
+than of the policy: it carries a subject, a question set, a score and a display
+NAME, and no email, age or location. `creator_name` is denormalised for exactly
+that reason. An attempt is narrower still - readable by the student who made it,
+or by whoever created the competition - which is the product rule in SQL: every
+joiner competes against the creator, and joiners never see each other. The
+storage policies on `competition-work` mirror the same three cases.
 
 **The leaderboard is the one screen this deliberately does not serve.** It needs
 to rank students against each other, which means reading across users, and it is

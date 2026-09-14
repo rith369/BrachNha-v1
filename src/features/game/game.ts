@@ -28,7 +28,22 @@ export const MATCH_QUESTIONS = 10;
  * phone, and it stops a competition being posted with a budget nobody would
  * take (nine seconds, or four hours).
  */
-export const MATCH_MINUTES = [3, 5, 10] as const;
+/**
+ * The time budgets a creator may choose from, in minutes.
+ *
+ * THIS IS THE WHOLE RUN, never one question. A per-question limit was built
+ * first and removed at the user's request, for a reason worth keeping: there is
+ * no honest number for "how long should one question take" — it varies by
+ * subject, by question, and by student — so any limit would be invented. What
+ * replaced it is a per-question STOPWATCH that counts up (see game-question.tsx),
+ * which tells a student how long they spent without pretending to know how long
+ * they should have.
+ *
+ * Widened from 3/5/10 on the user's instruction. Competitions already posted
+ * with the old values keep working — `minutes` is just a number on the row, so
+ * there is nothing to migrate.
+ */
+export const MATCH_MINUTES = [10, 20, 30] as const;
 
 /** The difficulty chips on the create screen, in order. Bilingual — the
  *  feature follows the store’s lang; see features/game/copy.ts. */

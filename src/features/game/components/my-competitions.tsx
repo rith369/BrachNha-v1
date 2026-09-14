@@ -1,4 +1,5 @@
 import { Hourglass } from "lucide-react";
+import { Link } from "react-router";
 import { useBrachNhaStore } from "@/lib/store";
 import { findSubject } from "@/features/lessons/subjects";
 import { SUBJECT_STYLE } from "@/features/lessons/subject-styles";
@@ -47,9 +48,17 @@ export function MyCompetitions() {
           const difficulty = DIFFICULTIES.find((d) => d.id === c.difficulty);
 
           return (
-            <div
+            // A ROW IS A LINK TO ITS REVIEW NOW, which is the exception this
+            // component's header reserved: it says no row may link, on the
+            // grounds that the only thing behind a competition is playing it and
+            // playing your own is a race against yourself. That was true until
+            // the review existed. It now leads somewhere that is specifically
+            // the CREATOR's — their own answers, and the working of everyone who
+            // took their challenge — and never to the quiz.
+            <Link
               key={c.id}
-              className="flex items-center gap-3 rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel-sm"
+              to={`/game/review/${c.id}`}
+              className="flex items-center gap-3 rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel-sm transition hover:bg-purple/5"
             >
               <span
                 className={cn(
@@ -98,7 +107,7 @@ export function MyCompetitions() {
                   {c.sharedAt ? t.openForJoiners : t.notShared}
                 </div>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>

@@ -17,6 +17,268 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 14 Sep 2026 — Compare answers after a competition, and swap a photo of your working
+
+*Not yet committed.* **Needs a database step — see the bottom of this entry.**
+
+**Why.** A competition told you that you got 3 out of 5 and stopped there. That is
+a score, not a lesson: it never said *which* three, and there was nothing in it a
+student could learn from. Your idea was that the two students should also swap a
+photo of the working they did on paper — the multiple choice gives the score, the
+photo shows the method, and the method is the half that actually teaches.
+
+**The new flow, in the order you asked for it.**
+
+1. Take the quiz, as before.
+2. See your result, as before — win or loss for a joiner, just your score for
+   the person who created it.
+3. **Photograph the working you wrote on paper.**
+4. **See the answers** — every question, the correct option, which one you
+   picked, and which one your opponent picked.
+5. **See their photo** of their own working.
+
+**Recent Games and My Competitions are tappable now.** Both were just lists to
+look at; each row now opens that competition's answers page, so you can go back
+to any past match and read through it again. The photos are there too.
+
+**Two decisions inside this worth knowing, because they are not accidents.**
+
+*The photo comes after your result, not before.* Photographing can fail — a
+camera, a permission, a weak signal — and losing your score because a photo
+would not upload would be a bad trade. By the time it asks, the score is
+already yours.
+
+*The photo comes before the answers.* Once the correct answers are on screen, a
+photo of "my working" is a photo of working you could have fixed first. Asking
+while you still only know your score is what keeps the picture honest.
+
+**You can skip the photo, and skipping costs one thing.** If your camera will not
+cooperate you can still reach the answers. What you do not get is your
+classmate's photo — showing yours is what opens theirs. That is the exchange,
+and it is the only thing held back.
+
+**You can retake or delete your own photo.** On the answers screen, your own
+working has two buttons under it: **Retake** if the first one came out blurry,
+and **Delete** to remove it entirely. Deleting asks once before it happens, and
+tells you what it will do — the photo is gone for everyone, and your classmate's
+working goes back behind "add your own to see theirs", because showing yours is
+what opened it.
+
+You can only ever touch your own photo. That is enforced by the database, not
+just hidden in the app: there is no arrangement of taps that reaches somebody
+else's.
+
+**A few smaller things.**
+
+- Photos are shrunk on your phone before uploading — a 4MB camera photo becomes
+  about 300KB — because students pay for that data twice, once to send and once
+  for each classmate who opens it. Tapping a photo opens it full size so you can
+  zoom in on the handwriting.
+- Photos are private. Only the two students in a competition can see each
+  other's, and joiners never see each other's at all — the same rule the scores
+  already follow.
+- **There is still no way to REPORT someone else's photo**, and you should know
+  that before this reaches a real classroom. Only one classmate can see any given
+  photo, so nothing can spread — but if they see something they shouldn't, the
+  app gives them nothing to do about it. Fixing that needs somewhere for a report
+  to go (a teacher account, or someone checking them), which the app does not
+  have yet. Worth deciding before a class uses this, not after.
+- **KruAI is now available on the answers screen.** It stays blocked during the
+  quiz itself, but once the score is final, "why is that the right answer?" is
+  exactly the sort of question it should be there for.
+- The questions and options themselves are still never translated — only the
+  labels around them follow your English/Khmer setting, as before.
+- Competitions played before this update still open; they show a short note
+  saying answers were not recorded for that match, because they were not.
+
+**The database step, and what happens if it is skipped.** This needs
+`20260914000001_competition_answers_and_work.sql` run once in the Supabase SQL
+editor (instructions in `supabase/README.md`). Until it is run, the Game page
+keeps working but **a newly created competition cannot be shared with anyone** —
+it saves on your own device and the hub labels it "Not shared yet", which is
+true. Running the migration fixes it from then on, and the app retries the ones
+that were stranded. `npm run db:check` will tell you which state you are in.
+
+**What to re-test.** Create a competition and walk the whole flow: result →
+photo → answers. Then sign in as a second student, play that competition, and
+check you see the first student's photo and their picks beside yours. Tap a row
+in Recent Games and confirm it reopens the same screen. Try Skip once and check
+you reach the answers but the other photo stays covered.
+
+---
+
+## 14 Sep 2026 — The subject chart on Progress goes back to bars going up
+
+*Not yet committed.*
+
+**Why.** Yesterday's fix (below) made the "Questions Answered" chart on Progress
+correct — the real 7 subjects instead of an invented "Geography" — but changed
+its shape from bars standing up to bars lying on their side, because 7 real
+subject names didn't fit under an upright bar at phone width. You asked whether
+the upright look could come back.
+
+**What changed.** The bars stand up again. Each one is labelled with a short
+code (Math, Phys, Chem, Bio, Hist, Khmer, Eng) instead of the full name, and
+tapping or hovering a bar shows the full name and its question count. This is
+one consistent set of short codes, unlike the old chart, which had drifted to
+using different abbreviations than the list underneath it.
+
+**Also fixed while touching this:** the subject names on this page had started
+following your language setting (English/Khmer) in the previous update, which
+would have shown Khmer subject names inside a page where every other label
+("Overall Readiness", "Questions Answered", and so on) is always in English.
+That's reverted — the names stay English here, matching the rest of the page,
+until the whole dashboard is translated together.
+
+**What to re-test.** Open Progress and check the "Questions Answered" chart:
+7 upright bars with short labels underneath, and tapping/hovering a bar shows
+its full subject name.
+
+---
+
+## 14 Sep 2026 — KruAI can read the lesson you have open
+
+*Not yet committed.*
+
+**Why.** You asked whether RAG — giving the AI a searchable library to look things up in —
+could make KruAI more accurate. Measuring the question first changed the answer, and the
+finding was worth more than the feature: **KruAI had never actually been shown the lesson
+text.** It was sent a table of contents — the section's title, the names of its bullet
+points, and the common-mistakes pairs — and every paragraph of real Khmer teaching was
+left out to save room. So it was answering about our lessons from general knowledge.
+
+**What it looked like in practice.** We asked KruAI to explain the swing example from the
+Biology section, twice — once as it was, once with the fix.
+
+- **Before:** it confidently described *seeing a swing coming toward you and stepping out
+  of the way.* Fluent, plausible, and not what the textbook says at all.
+- **After:** it described the textbook's actual example — eyes looking forward, hands
+  gripping the rope, body braced to keep balance — and explained it using the lesson's own
+  four cooperating body systems.
+
+Nothing about the model changed. It simply got shown the page the student was reading.
+
+**What changed.**
+
+- **KruAI now receives the full text of the lesson, section or flashcard deck you have
+  open**, quoted exactly, and is told to prefer it over its own recollection. It reads
+  this at the moment you press send, so if you open KruAI on one page and browse to
+  another before asking, it uses where you are *now*.
+- **The content library it always received was slimmed down** to make room. About half of
+  it was English text — a leftover from before KruAI was set to always reply in Khmer.
+  The Khmer is now sent on its own, except for the handful of entries where our Khmer
+  version is genuinely shorter than the English and would lose detail.
+- **Net effect on length: it got shorter, not longer.** The information sent on an
+  ordinary screen dropped by about 17%, and even with a full lesson attached it stays
+  comfortably inside the limit.
+
+**Two things it deliberately does NOT do.**
+
+- **It is never given the answers to the quiz on the screen in front of you.** It knows
+  the quiz exists and will happily teach the topic; it is not handed the answer key.
+- **It will not claim the app is missing something just because it wasn't quoted.** The
+  full list of what BrachNha contains is still sent every time, so "we don't have a
+  physics lesson yet" stays true and "we have this lesson" stays true.
+
+**A bug found and fixed along the way.** Certain malformed lesson addresses — the kind you
+would only reach by mistyping a web address — made the lesson page crash to the error
+screen instead of politely redirecting. That is fixed.
+
+**What to re-test.** Open a Biology section, ask KruAI something answerable only from that
+page's text, and check the answer uses the lesson's own wording. Then ask the same thing
+from the Home screen and check it still answers sensibly rather than claiming the lesson
+does not exist. Ask about physics — it should still say plainly that there is no physics
+lesson in the app yet.
+
+**Still to come.** The searchable library itself is designed but not built, deliberately:
+with one section written there is nothing to search through that we can't simply send in
+full. It becomes worth building at roughly fifteen written sections. One thing needs
+checking before then — whether the search technology handles Khmer well enough, since
+Khmer is a harder language for these tools than English. That is a half-hour test, and
+it is worth knowing the answer before committing to the work rather than after.
+
+---
+
+## 13 Sep 2026 — The Progress dashboard shows the real subjects now
+
+*Not yet committed.*
+
+**Why.** You spotted that the Progress page listed subjects the app does not teach — there
+was a **Geography** bar in the "Questions Answered" chart, and Geography is not one of the
+seven subjects anywhere else in BrachNha. It had other mismatches alongside it.
+
+**What was wrong.**
+
+- **Geography appeared in the chart.** It has no lessons, no exam papers and no colour of
+  its own — it only ever existed in this one page's sample numbers.
+- **History, Khmer and the language subject (English/French) were missing** from both the
+  chart and the "Subject Breakdown" list.
+- **The two cards disagreed with each other.** The chart showed five subjects, the list
+  below it showed four.
+- **The names did not match the rest of the app** — the chart said "Chem", "Phys", "Bio"
+  while the list said "Chemistry", "Physics", "Biology".
+- **The colours were the wrong ones.** Every other screen gives each subject its own
+  colour; this page was using the app's general pink/purple/blue set, so Maths was purple
+  here and blue everywhere else.
+- The list used **emoji** for subjects (🧮 ⚗️ 🔭 🌿) rather than the icons the rest of the
+  app moved to.
+- The **"Questions" total at the top (342) included Geography's share.**
+
+**What changed.** The Progress page now takes its subject list from the same place the
+Study, Mock Exam and Practice pages do. So:
+
+- **All seven real subjects appear** — Maths, Physics, Chemistry, Biology, History, Khmer,
+  and whichever language you chose at sign-up. Geography is gone.
+- **Only your chosen language shows.** A student who picked English sees English, not French.
+- **Every subject is in its own colour**, the same colour it has on the Study page.
+- **The names are the app's own names, and they follow the app's language** — they switch to
+  Khmer when the app is in Khmer.
+- **The subject icons replace the emoji.**
+- **The "Questions" total is now added up from the subjects on the page** (432), so it can
+  never again be a number the rows do not add to.
+- **The "Questions Answered" chart now runs left-to-right** (bars across, subjects down the
+  side) instead of bottom-to-top. Seven upright bars left no room for the names — some would
+  simply have gone unlabelled — and sideways gives each name a full row in both languages.
+
+**Still sample data, on purpose.** The numbers on this page are still invented, which is
+what the small **"Preview · sample data"** label above the title says. What is fixed is that
+they are now attached to subjects that actually exist. The XP, streak and study-time figures
+in the top row are also still sample numbers — that was a separate decision you took earlier
+and it has not changed here.
+
+---
+
+## 13 Sep 2026 — Longer time limits, and a stopwatch on each question
+
+*Not yet committed.*
+
+**Why.** The time choices were too short, and you wanted it clear that the time you pick
+covers the WHOLE competition rather than each question.
+
+**What changed.**
+
+- **The time limit is now 10, 20 or 30 minutes** (was 3, 5 or 10). 20 is the default.
+- **That time is for the whole competition**, exactly as before — it is not per question.
+  The clock at the top now says **"Time left"** so that is unmistakable.
+- **Each question now has its own stopwatch** that starts when the question appears and
+  counts UP, shown as **"This question 0:42"**. There is no limit on it and nothing happens
+  when it rises — it is just so you can see how long you spent on that question.
+- It resets for each new question and stops the moment you answer.
+
+**Why a stopwatch rather than a per-question limit:** there is no fair number for how long
+one question should take — it depends on the subject, the question and the student. A limit
+would be a guess. Counting up tells you what you took without pretending to know what you
+should have.
+
+**Competitions already posted with the old 3, 5 or 10 minutes still work** exactly as they
+are — nothing needed changing for them.
+
+**What to re-test.** Create a competition and check the three time choices are 10/20/30.
+Start it and watch both clocks: the top one counts down from the time you chose, the one on
+the card counts up and restarts on each question. Check it in Khmer too.
+
+---
+
 ## 13 Sep 2026 — Competitions are shared now: other students can see and join yours
 
 *Not yet committed.*

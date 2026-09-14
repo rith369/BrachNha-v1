@@ -376,6 +376,27 @@ interface BrachNhaState {
     attempt: Omit<CompetitionAttempt, "id" | "playedAt">,
     xp: number
   ) => void;
+  /**
+   * Records whether this student has a photo of their working for a competition.
+   *
+   * TWO-WAY, unlike markCompetitionShared, because a photo can be taken back —
+   * see deleteWorkPhoto. That is the whole reason this is a setter with a
+   * boolean rather than a one-way stamp: sharing is a fact about the past and
+   * cannot un-happen, but a photograph of your own handwriting is something you
+   * are allowed to withdraw.
+   *
+   * KEYED ON THE COMPETITION, NOT ON A ROW, and it writes to whichever of the
+   * two lists holds it — which is never both: you cannot join a competition you
+   * created, so exactly one of `competitions` and `competitionAttempts` can
+   * match an id. That is what makes one action correct for both sides rather
+   * than two to choose between at every call site.
+   *
+   * It records nothing the server does not already know — the file's path is
+   * derived from ids (see lib/competition-photos.ts) — and exists only so the
+   * review screen can decide whether to ask for a photo without a network round
+   * trip. Returns the state unchanged when there is nothing to do.
+   */
+  setWorkPhoto: (competitionId: string, taken: boolean) => void;
   resetDailyTasks: () => void;
   /** Clears `tasks` and re-derives `streak` if `tasksDate` is not today.
    *  Idempotent and cheap, so the caller can run it on mount and on every
@@ -840,6 +861,31 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           ].slice(-MAX_COMPETITIONS),
           ...award(state, xp),
         })),
+
+      setWorkPhoto: (competitionId, taken) =>
+        set((state) => {
+          // undefined rather than a falsy string, so a row with no photo is
+          // shaped exactly like one written before this field existed — there is
+          // one "no photo" state, not two.
+          const at = taken ? new Date().toISOString() : undefined;
+
+          const ci = state.competitions.findIndex((c) => c.id === competitionId);
+          if (ci !== -1) {
+            if (Boolean(state.competitions[ci].photoAt) === taken) return state;
+            const next = [...state.competitions];
+            next[ci] = { ...next[ci], photoAt: at };
+            return { competitions: next };
+          }
+
+          const ai = state.competitionAttempts.findIndex(
+            (a) => a.competitionId === competitionId
+          );
+          if (ai === -1) return state;
+          if (Boolean(state.competitionAttempts[ai].photoAt) === taken) return state;
+          const next = [...state.competitionAttempts];
+          next[ai] = { ...next[ai], photoAt: at };
+          return { competitionAttempts: next };
+        }),
 
 
       setTheme: (theme) => set({ theme }),

@@ -10,7 +10,7 @@
  *   1. Are the env values there and shaped like a Supabase URL and key?
  *   2. Is the project reachable, and does it accept the key?
  *   3. Is Google sign-in enabled? (off by default — it is how students get in)
- *   4. Do the tables from supabase/migrations exist?
+ *   4. Do the tables from supabase/migrations exist, with their columns?
  *
  * Dev tooling, so it lives outside src/ and never bundles — same placement and
  * reasoning as shots.mjs and webp.mjs. No dependencies: Node 22's global fetch
@@ -38,6 +38,45 @@ const TABLES = [
   "competitions",
   "competition_attempts",
 ];
+
+/**
+ * Columns added by a LATER migration than the one that created their table.
+ *
+ * A table check alone cannot see these: `competitions` has existed since
+ * 20260913000001, so "the table is there" stays true while the review screen is
+ * quietly broken because 20260914000001 was never applied. PostgREST answers a
+ * select for a column that does not exist with a 400 naming it, which is exactly
+ * the probe needed.
+ */
+const COLUMNS = [
+  ["competitions", "creator_answers"],
+  ["competition_attempts", "answers"],
+];
+
+/*
+ * NO STORAGE CHECK HERE, AND IT WAS TRIED. 20260914000001 also creates the
+ * `competition-work` bucket, so a probe for it looks like the obvious companion
+ * to the column checks above. The publishable key cannot see a bucket's
+ * existence, and both candidate endpoints were measured AGAINST A PROJECT WHERE
+ * THE BUCKET REALLY EXISTS, side by side with an invented name:
+ *
+ *   POST /storage/v1/object/list/<bucket>   real -> 200 []
+ *                                        invented -> 200 []
+ *   GET  /storage/v1/bucket/<bucket>        real -> 400 NoSuchBucket
+ *                                        invented -> 400 NoSuchBucket
+ *
+ * Byte-identical in both directions, so neither can tell the two apart: the
+ * first is a silent false PASS and the second a permanent false FAIL. That
+ * comparison is the one worth insisting on - an earlier version of this note
+ * drew the same conclusion from a run where the bucket did NOT yet exist, where
+ * "both say not found" was equally consistent with a working probe.
+ *
+ * The columns above come from the same migration as the bucket, and the
+ * dashboard's SQL editor runs a file as ONE TRANSACTION - so a failure creating
+ * the bucket or its policies would have rolled the columns back too. Their
+ * presence is already the answer, and one honest signal beats two where one
+ * lies.
+ */
 
 const ok = (m) => console.log(`  \x1b[32m✓\x1b[0m ${m}`);
 const bad = (m) => console.log(`  \x1b[31m✗\x1b[0m ${m}`);
@@ -178,9 +217,25 @@ async function main() {
     }
   }
 
+  // Columns from a later migration than their own table's. See COLUMNS.
+  if (!missing) {
+    for (const [table, column] of COLUMNS) {
+      const res = await fetch(
+        `${url}/rest/v1/${table}?select=${column}&limit=0`,
+        { headers }
+      );
+      if (res.status === 400) {
+        bad(`${table}.${column} - column not found`);
+        missing++;
+      } else {
+        ok(`${table}.${column}`);
+      }
+    }
+  }
+
   console.log();
   if (missing) {
-    bad(`${missing} of ${TABLES.length} tables missing — migrations not applied yet`);
+    bad(`${missing} thing(s) missing — migrations not applied yet`);
     console.log("\n  Apply them: see supabase/README.md\n");
     process.exit(1);
   }

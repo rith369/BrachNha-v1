@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Timer } from "lucide-react";
 import { FocusLayout } from "@/components/shell/focus-layout";
 import { useBrachNhaStore } from "@/lib/store";
-import { gameCopy, num } from "../copy";
+import { clockLabel, gameCopy, num } from "../copy";
 import { cn } from "@/utils/cn";
 import { GameQuestion } from "./game-question";
 import type { ExamQuestion } from "@/types";
@@ -12,14 +12,16 @@ export interface RunResult {
   score: number;
   total: number;
   ms: number;
-}
-
-function clock(ms: number, lang: "en" | "km"): string {
-  const s = Math.max(0, Math.ceil(ms / 1000));
-  return `${num(Math.floor(s / 60), lang)}:${num(
-    String(s % 60).padStart(2, "0"),
-    lang
-  )}`;
+  /**
+   * Which option was picked for each question, positionally matched to
+   * `questions` and ALWAYS of length `total`.
+   *
+   * The padding matters: a run that the clock ends leaves the tail unanswered,
+   * and reporting a short array would make the review screen's positional
+   * pairing silently wrong for the joiner's half against the creator's. Null is
+   * the explicit "never answered this one".
+   */
+  answers: (string | null)[];
 }
 
 /**
@@ -73,6 +75,10 @@ export function CompetitionRun({
   const [now, setNow] = useState(() => Date.now());
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
+  // Appended one per answered question, so its length is always `index` and it
+  // is naturally short when the clock ends the run — padded to `total` at the
+  // moment it is reported.
+  const [picks, setPicks] = useState<string[]>([]);
   // Fires onFinish exactly once. The two endings — answering the last question
   // and the clock expiring — can land on the same render, and without this the
   // run would be reported twice and scored twice.
@@ -91,16 +97,26 @@ export function CompetitionRun({
   useEffect(() => {
     if (reported.current || (!done && !expired)) return;
     reported.current = true;
-    // Capped at the deadline so a backgrounded tab, which stops firing the
-    // interval, cannot report a run longer than the budget it was given.
-    onFinish({ score, total, ms: Math.min(Date.now(), deadline) - startedAt });
-  }, [done, expired, score, total, deadline, startedAt, onFinish]);
+    onFinish({
+      score,
+      total,
+      // Capped at the deadline so a backgrounded tab, which stops firing the
+      // interval, cannot report a run longer than the budget it was given.
+      ms: Math.min(Date.now(), deadline) - startedAt,
+      // Padded to the full length here rather than at every reader: a run the
+      // clock ended has fewer picks than questions, and the review screen pairs
+      // the two sides BY POSITION.
+      answers: Array.from({ length: total }, (_, i) => picks[i] ?? null),
+    });
+  }, [done, expired, score, total, deadline, startedAt, picks, onFinish]);
 
   // Stable across renders so the child's own effect does not re-fire on every
   // clock tick — which would restart its confirm delay ~4 times a second and the
-  // run would never advance.
-  const handleAnswer = useCallback((correct: boolean) => {
+  // run would never advance. Every update is a functional one, so it needs no
+  // dependency on the values it changes.
+  const handleAnswer = useCallback((correct: boolean, picked: string) => {
     if (correct) setScore((s) => s + 1);
+    setPicks((p) => [...p, picked]);
     setIndex((i) => i + 1);
   }, []);
 
@@ -142,7 +158,8 @@ export function CompetitionRun({
               low ? "text-pink" : "text-muted"
             )}
           >
-            {clock(remaining, lang)}
+            <span className="font-bold">{t.timeLeft} </span>
+            {clockLabel(remaining, lang)}
           </span>
         </div>
 
@@ -174,6 +191,10 @@ export function CompetitionRun({
           key={index}
           question={questions[index]}
           onAnswer={handleAnswer}
+          // The parent already ticks for the countdown, so the per-question
+          // stopwatch reads that same value rather than starting a second
+          // interval beside it.
+          now={now}
         />
       </div>
     </FocusLayout>

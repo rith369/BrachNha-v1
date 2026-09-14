@@ -27,8 +27,8 @@ interface Draft {
 }
 
 /** How the posting went, so the screen can say whether other students can
- *  actually see it. */
-type Posted = RunResult & { shared: boolean };
+ *  actually see it — plus the id the review is reached by. */
+type Posted = RunResult & { shared: boolean; competitionId: string | null };
 
 /**
  * `/game/create` — post a competition and take it yourself.
@@ -83,6 +83,11 @@ export default function GameCreatePage() {
       difficulty: draft.difficulty,
       minutes: draft.minutes,
       questions: draft.questions,
+      // What the creator picked, question by question. Saved in the same write
+      // as the score so the two can never describe different runs — and, on the
+      // server, in the same INSERT, which is what lets the table stay
+      // insert-only. See 20260914000001.
+      creatorAnswers: result.answers,
       creatorScore: result.score,
       creatorMs: result.ms,
       total: result.total,
@@ -95,7 +100,8 @@ export default function GameCreatePage() {
     // id the device has. Minting a second one here would give the two copies
     // different identities, and a joiner's attempt would point at neither.
     const saved = useBrachNhaStore.getState().competitions.at(-1);
-    if (!saved) return setPosted({ ...result, shared: false });
+    if (!saved)
+      return setPosted({ ...result, shared: false, competitionId: null });
 
     const res = await publishCompetition(saved);
     // A duplicate means the row is already up there — the primary key is the
@@ -104,7 +110,7 @@ export default function GameCreatePage() {
     // labelled "not shared" forever.
     const shared = res.ok || res.reason === "duplicate";
     if (shared) markCompetitionShared(saved.id);
-    setPosted({ ...result, shared });
+    setPosted({ ...result, shared, competitionId: saved.id });
   }
 
   // THE GATE IS ON THE ROUTE, not only on the hub's Create button — a click
@@ -149,6 +155,18 @@ export default function GameCreatePage() {
         total={posted.total}
         shared={posted.shared}
         onExit={exit}
+        // The review is REPLACED into history rather than pushed: this route's
+        // three phases cannot be returned to — the competition is posted and the
+        // run is spent — so a back tap from the review belongs on /game, not on
+        // a form that would start a second one.
+        onNext={
+          posted.competitionId
+            ? () =>
+                navigate(`/game/review/${posted.competitionId}`, {
+                  replace: true,
+                })
+            : undefined
+        }
       />
     );
   }

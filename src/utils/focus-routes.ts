@@ -22,6 +22,9 @@ export function isFocusRoute(pathname: string): boolean {
     pathname.startsWith("/sections/") ||
     pathname === "/practice/review" ||
     isPracticeRunRoute(pathname) ||
+    // The game review is a focus screen but NOT an assessment, so it has to be
+    // named here rather than arriving through isAssessmentRoute below.
+    isGameReviewRoute(pathname) ||
     // A game match arrives here through isAssessmentRoute below, the same way the
     // placement test does — it is measured, not merely a task.
     isAssessmentRoute(pathname)
@@ -47,7 +50,32 @@ export function isFocusRoute(pathname: string): boolean {
  * cleanup effect exists to prevent simply cannot happen here.
  */
 export function isGameRunRoute(pathname: string): boolean {
-  return pathname.startsWith("/game/");
+  return pathname.startsWith("/game/") && !isGameReviewRoute(pathname);
+}
+
+/**
+ * The screen a finished competition leaves behind: what each side answered, and
+ * the photograph of the working they did on paper.
+ *
+ * CARVED OUT OF isGameRunRoute FOR ONE REASON — the mentor. It is still a focus
+ * screen (isFocusRoute names it directly), because it is full-screen and has its
+ * own way out; what it is NOT is an assessment. By the time anyone is here the
+ * score is recorded and the database refuses a second attempt, so there is
+ * nothing left to measure and "why is that the right answer?" is exactly the
+ * lesson case KruAI is kept available inside a lesson for.
+ *
+ * A STATIC PREFIX, like the two run routes, so `/game/review/:id` cannot collide
+ * with them and the whole family stays free of the `/lessons/:lessonId` versus
+ * bare `/lessons/:subjectId` ambiguity pages/subject-path.tsx documents.
+ *
+ * NOTE THE ONE SEAM THIS LEAVES: the run routes navigate HERE when they finish,
+ * so the mentor becomes available at the moment the URL changes rather than the
+ * moment the run ends. That is the correct boundary — it is the same instant the
+ * result stops being in progress — but it does mean the review is the first
+ * screen in the flow where the FAB reappears.
+ */
+export function isGameReviewRoute(pathname: string): boolean {
+  return pathname.startsWith("/game/review/");
 }
 
 /**

@@ -29,6 +29,7 @@ const routeModules = {
   game: () => import("@/pages/game"),
   gameCreate: () => import("@/pages/game-create"),
   gamePlay: () => import("@/pages/game-play"),
+  gameReview: () => import("@/pages/game-review"),
   exam: () => import("@/pages/exam"),
   gradePrediction: () => import("@/pages/grade-prediction"),
   leaderboard: () => import("@/pages/leaderboard"),
@@ -52,6 +53,7 @@ const routeModules = {
 const GamePage = lazy(routeModules.game);
 const GameCreatePage = lazy(routeModules.gameCreate);
 const GamePlayPage = lazy(routeModules.gamePlay);
+const GameReviewPage = lazy(routeModules.gameReview);
 const ExamPage = lazy(routeModules.exam);
 const GradePredictionPage = lazy(routeModules.gradePrediction);
 const LeaderboardPage = lazy(routeModules.leaderboard);
@@ -210,6 +212,15 @@ export default function App() {
               pages/subject-path.tsx documents for /lessons cannot arise here. */}
           <Route path="game/create" element={<GameCreatePage />} />
           <Route path="game/play/:competitionId" element={<GamePlayPage />} />
+          {/* The tail of BOTH runs, and the durable artefact they leave
+              behind — see pages/game-review.tsx for why one route keyed on
+              the competition serves the creator and every joiner. Unlike
+              the two above it is not an assessment route, so KruAI is
+              reachable here. */}
+          <Route
+            path="game/review/:competitionId"
+            element={<GameReviewPage />}
+          />
           <Route path="exam" element={<ExamPage />} />
           <Route path="grade-prediction" element={<GradePredictionPage />} />
           <Route path="leaderboard" element={<LeaderboardPage />} />
