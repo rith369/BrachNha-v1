@@ -10,19 +10,25 @@
 // swap this file's contents for live selectors off useBrachNhaStore
 // — every component below only reads from here, so that's a
 // one-file change.
+//
+// FAKE NUMBERS, REAL SUBJECTS. The numbers may be invented; the
+// list of subjects they are attached to may not. This file used to
+// carry its own subject list — five hand-written rows including a
+// "Geo" that the app has never had a lesson, an exam paper or a
+// colour token for, alongside two spellings of the other four
+// ("Chem"/"Chemistry") and the shared brand accents rather than the
+// per-subject palette every other screen keys off. `subjectStats`
+// below is now keyed by SubjectId, so a subject that is not in the
+// catalog cannot be given a score, and ../subjects.ts supplies the
+// name, icon and colour from that same catalog.
 // ============================================================
+
+import type { SubjectId } from "@/features/lessons/subjects";
 
 export const overallReadiness = {
   pct: 83,
   change: "▲ +8% vs last month",
 };
-
-export const miniMetrics = [
-  { label: "Questions", value: "342", color: "text-pink" },
-  { label: "Study Time", value: "28h", color: "text-blue" },
-  { label: "Day Streak", value: "12🔥", color: "text-mint" },
-  { label: "XP Earned", value: "1,240", color: "text-yellow" },
-];
 
 export interface DailyActivity {
   day: string;
@@ -52,71 +58,113 @@ export const weeklyActivityChangePct: Record<"xp" | "hours", number> = {
   hours: 15,
 };
 
-export const questionsPerSubject = [
-  { subject: "Math", value: 98, color: "var(--color-purple)" },
-  { subject: "Chem", value: 72, color: "var(--color-blue)" },
-  { subject: "Phys", value: 85, color: "var(--color-pink)" },
-  { subject: "Bio", value: 54, color: "var(--color-mint)" },
-  { subject: "Geo", value: 33, color: "var(--color-yellow)" },
-];
-
-export interface SubjectBreakdown {
-  emoji: string;
-  name: string;
+export interface SubjectStats {
   sessions: number;
   questions: number;
   score: number;
-  trend: string;
-  trendUp: boolean;
-  color: string;
-  sparkline: number[]; // 7 relative heights, 0-100
+  /**
+   * Signed percentage change, ONE field rather than the old
+   * `trend: "▲ +6%"` string beside a `trendUp` boolean — two hand-written
+   * values describing one fact, free to disagree. The arrow and the colour
+   * are derived from the sign at render time.
+   */
+  trendPct: number;
+  /** 7 relative heights, 0-100. */
+  sparkline: number[];
 }
 
-export const subjectBreakdown: SubjectBreakdown[] = [
-  {
-    emoji: "🧮",
-    name: "Mathematics",
+/**
+ * Keyed by SubjectId, so every row belongs to a subject the app actually
+ * teaches and a missing row fails to compile rather than rendering blank.
+ * The bar chart and the breakdown list both read this, which is what stops a
+ * subject's question count differing between the two cards the way Math's
+ * once could.
+ *
+ * ENGLISH AND FRENCH CARRY IDENTICAL NUMBERS on purpose. Only one of them is
+ * ever on screen (the student picks at Login), so they are one "your language
+ * subject" row shown twice — and keeping them equal is what lets the
+ * Questions total below be computed without knowing which was chosen.
+ */
+export const subjectStats: Record<SubjectId, SubjectStats> = {
+  math: {
     sessions: 24,
     questions: 98,
     score: 78,
-    trend: "▲ +6%",
-    trendUp: true,
-    color: "var(--color-purple)",
+    trendPct: 6,
     sparkline: [40, 55, 50, 65, 70, 75, 78],
   },
-  {
-    emoji: "⚗️",
-    name: "Chemistry",
-    sessions: 18,
-    questions: 72,
-    score: 65,
-    trend: "▼ -2%",
-    trendUp: false,
-    color: "var(--color-blue)",
-    sparkline: [70, 68, 72, 66, 60, 63, 65],
-  },
-  {
-    emoji: "🔭",
-    name: "Physics",
+  physics: {
     sessions: 22,
     questions: 85,
     score: 91,
-    trend: "▲ +11%",
-    trendUp: true,
-    color: "var(--color-pink)",
+    trendPct: 11,
     sparkline: [55, 65, 72, 78, 84, 88, 91],
   },
-  {
-    emoji: "🌿",
-    name: "Biology",
+  chemistry: {
+    sessions: 18,
+    questions: 72,
+    score: 65,
+    trendPct: -2,
+    sparkline: [70, 68, 72, 66, 60, 63, 65],
+  },
+  biology: {
     sessions: 12,
     questions: 54,
     score: 54,
-    trend: "▲ +3%",
-    trendUp: true,
-    color: "var(--color-mint)",
+    trendPct: 3,
     sparkline: [48, 50, 45, 52, 50, 53, 54],
   },
+  history: {
+    sessions: 9,
+    questions: 41,
+    score: 72,
+    trendPct: 4,
+    sparkline: [60, 62, 66, 64, 70, 71, 72],
+  },
+  khmer: {
+    sessions: 11,
+    questions: 46,
+    score: 80,
+    trendPct: 2,
+    sparkline: [72, 74, 73, 76, 78, 79, 80],
+  },
+  english: {
+    sessions: 8,
+    questions: 36,
+    score: 69,
+    trendPct: -3,
+    sparkline: [75, 73, 74, 70, 68, 70, 69],
+  },
+  french: {
+    sessions: 8,
+    questions: 36,
+    score: 69,
+    trendPct: -3,
+    sparkline: [75, 73, 74, 70, 68, 70, 69],
+  },
+};
+
+/**
+ * The hero's "Questions" figure, SUMMED from the rows above rather than
+ * authored beside them — the same rule lessonCountFor() follows on the Study
+ * page. The old hand-written 342 was the sum of the five subjects this file
+ * used to list, geography included, so removing that subject would have left
+ * a total no row on the page adds up to.
+ *
+ * French is skipped rather than filtered by the student's choice because the
+ * two language rows are deliberately identical; see subjectStats.
+ */
+export const totalQuestions = (
+  Object.entries(subjectStats) as [SubjectId, SubjectStats][]
+)
+  .filter(([id]) => id !== "french")
+  .reduce((sum, [, s]) => sum + s.questions, 0);
+
+export const miniMetrics = [
+  { label: "Questions", value: String(totalQuestions), color: "text-pink" },
+  { label: "Study Time", value: "28h", color: "text-blue" },
+  { label: "Day Streak", value: "12🔥", color: "text-mint" },
+  { label: "XP Earned", value: "1,240", color: "text-yellow" },
 ];
 
 export const focusAreas = [
