@@ -19,7 +19,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 14 Sep 2026 — Compare answers after a competition, and swap a photo of your working
 
-*Not yet committed.* **Needs a database step — see the bottom of this entry.**
+*Landed in commit `14a35ad`.* **Needed a database step — already applied to the live project on 14 Sep; see the bottom of this entry if you ever set up a second one.**
 
 **Why.** A competition told you that you got 3 out of 5 and stopped there. That is
 a score, not a lesson: it never said *which* three, and there was nothing in it a
@@ -109,7 +109,7 @@ you reach the answers but the other photo stays covered.
 
 ## 14 Sep 2026 — The subject chart on Progress goes back to bars going up
 
-*Not yet committed.*
+*Landed in commit `9cb5ceb`.*
 
 **Why.** Yesterday's fix (below) made the "Questions Answered" chart on Progress
 correct — the real 7 subjects instead of an invented "Geography" — but changed
@@ -138,7 +138,7 @@ its full subject name.
 
 ## 14 Sep 2026 — KruAI can read the lesson you have open
 
-*Not yet committed.*
+*Landed in commit `2d3e0e9`.*
 
 **Why.** You asked whether RAG — giving the AI a searchable library to look things up in —
 could make KruAI more accurate. Measuring the question first changed the answer, and the
@@ -201,7 +201,7 @@ it is worth knowing the answer before committing to the work rather than after.
 
 ## 13 Sep 2026 — The Progress dashboard shows the real subjects now
 
-*Not yet committed.*
+*Landed in commit `9cb5ceb`.*
 
 **Why.** You spotted that the Progress page listed subjects the app does not teach — there
 was a **Geography** bar in the "Questions Answered" chart, and Geography is not one of the
@@ -250,7 +250,7 @@ and it has not changed here.
 
 ## 13 Sep 2026 — Longer time limits, and a stopwatch on each question
 
-*Not yet committed.*
+*Landed in commit `14a35ad`.*
 
 **Why.** The time choices were too short, and you wanted it clear that the time you pick
 covers the WHOLE competition rather than each question.
@@ -281,7 +281,7 @@ the card counts up and restarts on each question. Check it in Khmer too.
 
 ## 13 Sep 2026 — Competitions are shared now: other students can see and join yours
 
-*Not yet committed.*
+*Landed in commit `43532f8`.*
 
 **Why.** Until now a competition only existed on the phone that created it — which is why
 it vanished when you signed into a different account. This is the step that puts it on the
@@ -374,7 +374,7 @@ you asked, which is why the *Preview · sample data* label stays.
 
 ## 12 Sep 2026 — The Game page is real: create a competition and post your score
 
-*Not yet committed.*
+*Landed in commit `43532f8`.*
 
 **Why.** The Game page was entirely made up. It showed a match between two students who do
 not exist, and none of its buttons did anything. You asked for real competitions between
