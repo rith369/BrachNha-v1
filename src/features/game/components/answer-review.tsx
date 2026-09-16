@@ -35,6 +35,7 @@ export function AnswerReview({
   mine,
   theirs,
   theirsLabel,
+  renderExtra,
 }: {
   questions: ExamQuestion[];
   /** This student's picks, positionally matched to `questions`. */
@@ -43,6 +44,17 @@ export function AnswerReview({
    *  against — a creator whose competition nobody has joined yet. */
   theirs?: (string | null)[];
   theirsLabel?: string;
+  /**
+   * Something to render at the foot of each question's card — the photos of
+   * working attached to that question.
+   *
+   * A slot rather than photo props, because this component compares ANSWERS and
+   * should not learn what storage, uploads or a reciprocity gate are. It takes
+   * only the index: reading `questions[index]` stays this component's job, which
+   * keeps the caller's closure free of the property read the React Compiler would
+   * narrow its memo dependency onto.
+   */
+  renderExtra?: (index: number) => React.ReactNode;
 }) {
   const lang = useBrachNhaStore((s) => s.lang);
   const t = gameCopy(lang);
@@ -118,6 +130,14 @@ export function AnswerReview({
                     {theirsLabel}: {t.noAnswer}
                   </span>
                 )}
+              </div>
+            )}
+
+            {/* The working for THIS question, under the answer it explains —
+                which is the whole point of photographing per question. */}
+            {renderExtra && (
+              <div className="mt-3 border-t border-purple/10 pt-3">
+                {renderExtra(i)}
               </div>
             )}
           </div>

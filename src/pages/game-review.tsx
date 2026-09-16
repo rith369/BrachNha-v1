@@ -8,10 +8,9 @@ import { findSubject } from "@/features/lessons/subjects";
 import { attemptFor, OUTCOME_STYLE, outcomeOf } from "@/features/game/game";
 import { OUTCOME_LABEL, gameCopy, num } from "@/features/game/copy";
 import { AnswerReview } from "@/features/game/components/answer-review";
-import { WorkPhoto } from "@/features/game/components/work-photo";
-import { MyWorkPhoto } from "@/features/game/components/my-work-photo";
+import { QuestionPhotos } from "@/features/game/components/question-photos";
 import { WorkPhotoStep } from "@/features/game/components/work-photo-step";
-import { useWorkPhoto } from "@/features/game/use-work-photo";
+import { useMyWorkPhotos, usePhotoList } from "@/features/game/use-work-photos";
 import { avatarSeedFor } from "@/utils/avatar-seed";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { fetchAttemptsFor, type JoinerAttempt } from "@/lib/competitions";
@@ -66,13 +65,12 @@ export default function GameReviewPage() {
   const attempt = attemptFor(attempts, competitionId);
   const mineIsCreator = Boolean(created);
 
-  // ONE OWNER FOR THE PHOTO. Both the step before the answers and the panel
-  // after them read this, because they are two renderings of one fact — see
-  // use-work-photo.ts. `available` is false where a photo could not work at all
-  // (no project, no account), which are supported states rather than errors: a
-  // fork with no .env, the blanked-env screenshot harness. Asking for a photo
-  // there would be an error message about the app working as designed.
-  const photo = useWorkPhoto(
+  // ONE OWNER FOR THIS STUDENT'S PHOTOS. The step before the answers and the
+  // strip under each answer read this, because they are two renderings of one
+  // fact — see use-work-photos.ts. `available` is false where photos could not
+  // work at all (no project, no account), which are supported states rather than
+  // errors: a fork with no .env, the blanked-env screenshot harness.
+  const mine = useMyWorkPhotos(
     competitionId,
     authUserId,
     Boolean(created?.photoAt ?? attempt?.photoAt)
@@ -85,6 +83,33 @@ export default function GameReviewPage() {
     mineIsCreator && isSupabaseConfigured ? "loading" : []
   );
   const [pickedJoiner, setPickedJoiner] = useState<string | null>(null);
+
+  // Whose picks and photos sit beside this student's. A joiner always faces the
+  // creator; a creator faces whichever joiner they have selected, and nobody
+  // until they do.
+  //
+  // DERIVED UP HERE, above the early returns, because the opponent's photo list
+  // is a HOOK and a hook cannot live below a return. Every read goes through `?.`
+  // on purpose, so nothing here narrows onto a property of a row that may not
+  // exist.
+  const selected =
+    joiners !== "loading" && joiners !== "failed"
+      ? joiners.find((j) => j.userId === pickedJoiner)
+      : undefined;
+  const opponentId = mineIsCreator ? selected?.userId : attempt?.opponentId;
+  const opponentName = mineIsCreator ? selected?.userName : attempt?.opponentName;
+  const opponentAnswers = mineIsCreator
+    ? selected?.answers
+    : attempt?.opponentAnswers;
+
+  // RECIPROCITY: their photos are not even FETCHED until you have shown yours.
+  // Gating the render alone would still download a classmate's working to a
+  // student who was never meant to see it.
+  const theirs = usePhotoList(
+    competitionId,
+    opponentId ?? "",
+    Boolean(opponentId) && mine.uploaded
+  );
 
   // WHO HAS TAKEN MY COMPETITION — the creator's half of the exchange, and the
   // one thing on this screen that cannot come from the device. The read policy
@@ -129,37 +154,30 @@ export default function GameReviewPage() {
   const myAnswers = created?.creatorAnswers ?? attempt?.answers ?? [];
   const subject = findSubject(created?.subject ?? attempt?.subject ?? "");
 
-  // THE PHOTO COMES BEFORE THE ANSWERS, and this is the gate that enforces it.
-  // See WorkPhotoStep for why that order is the whole point, and why Skip still
-  // exists.
-  if (!revealed && photo.available) {
+  // THE PHOTOS COME BEFORE THE ANSWERS, and this is the gate that enforces it.
+  // See WorkPhotoStep for why that order is the whole point, and why moving on
+  // with none is still allowed.
+  if (!revealed && mine.available) {
     return (
-      <FocusLayout progressPct={66} onExit={exit}>
-        <WorkPhotoStep
-          photo={photo}
-          onDone={() => setRevealed(true)}
-          onSkip={() => setRevealed(true)}
-        />
+      <FocusLayout
+        progressPct={66}
+        onExit={exit}
+        // NOT held while a photo uploads. The upload state lives in this page's
+        // hook rather than in the step, so moving on does not unmount it: a photo
+        // still in flight simply finishes and appears under its answer.
+        footer={
+          <FocusButton onClick={() => setRevealed(true)}>{t.seeAnswers}</FocusButton>
+        }
+      >
+        <WorkPhotoStep questions={questions} mine={mine} />
       </FocusLayout>
     );
   }
 
-  // Whose picks sit beside this student's. A joiner always faces the creator; a
-  // creator faces whichever joiner they have selected, and nobody until they do.
-  const selected =
-    joiners !== "loading" && joiners !== "failed"
-      ? joiners.find((j) => j.userId === pickedJoiner)
-      : undefined;
-
-  const opponentId = mineIsCreator ? selected?.userId : attempt?.opponentId;
-  const opponentName = mineIsCreator ? selected?.userName : attempt?.opponentName;
-  const opponentAnswers = mineIsCreator
-    ? selected?.answers
-    : attempt?.opponentAnswers;
-
   // The questions are frozen onto the row, so an empty list means the match
   // predates answer recording rather than anything having gone wrong.
   const recorded = questions.length > 0 && myAnswers.length > 0;
+  const gateShut = Boolean(opponentId) && mine.available && !mine.uploaded;
 
   return (
     <FocusLayout
@@ -179,18 +197,6 @@ export default function GameReviewPage() {
 
         {attempt && <Scoreline attempt={attempt} lang={lang} />}
 
-        {/* YOUR working first, then theirs. The order is the exchange: what you
-            put in, then what it opened. Yours carries Retake and Delete; theirs
-            carries neither, and cannot — the storage policy only ever lets a
-            student touch a file named after themselves. */}
-        {photo.available && (
-          <MyWorkPhoto
-            competitionId={competitionId}
-            userId={authUserId}
-            photo={photo}
-          />
-        )}
-
         {mineIsCreator && (
           <JoinerPicker
             joiners={joiners}
@@ -201,15 +207,13 @@ export default function GameReviewPage() {
           />
         )}
 
-        {opponentId && (
-          <WorkPhoto
-            competitionId={competitionId}
-            userId={opponentId}
-            title={opponentName ? `${opponentName} ✍️` : t.theirWorking}
-            // RECIPROCITY: you see theirs once you have shown yours. Skipping
-            // reaches the answers and stops there — see WorkPhotoStep.
-            locked={!photo.uploaded}
-          />
+        {/* THE GATE IS SAID ONCE, up here, not under every question. Five copies
+            of "add your own working to see theirs" is a wall of the same
+            sentence; one, above the answers, is a rule. */}
+        {gateShut && (
+          <p className="rounded-2xl border border-purple/10 bg-purple/8 px-3 py-2.5 text-center text-xs font-bold text-purple">
+            {t.photoLocked}
+          </p>
         )}
 
         {recorded ? (
@@ -218,6 +222,27 @@ export default function GameReviewPage() {
             mine={myAnswers}
             theirs={opponentAnswers}
             theirsLabel={opponentName}
+            // Each question's working, under the answer it explains. Absent
+            // entirely where photos cannot work (no project, no account).
+            renderExtra={
+              mine.available
+                ? (i) => (
+                    <QuestionPhotos
+                      question={i}
+                      mine={mine}
+                      opponent={
+                        opponentId
+                          ? {
+                              name: opponentName ?? t.theirWorking,
+                              list: theirs,
+                              locked: !mine.uploaded,
+                            }
+                          : undefined
+                      }
+                    />
+                  )
+                : undefined
+            }
           />
         ) : (
           <p className="text-center text-sm font-bold text-muted">

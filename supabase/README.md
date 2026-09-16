@@ -15,6 +15,12 @@ supabase/migrations/
   20260914000001_competition_answers_and_work.sql
                                    what each side answered, and the first
                                    storage bucket in the project
+  20260916000002_competition_work_per_question.sql
+                                   photos of working per question, several
+                                   per question; storage policies only
+  20260916000003_competition_work_count_fix.sql
+                                   fixes 000002: its photo count recursed
+                                   into its own policy and refused uploads
 ```
 
 The SQL is the source of truth for the schema, checked into git like any other
@@ -40,6 +46,9 @@ project too. Two ways:
 4. Paste the whole of `20260904000001_hardening.sql`, run it
 5. Paste the whole of `20260913000001_competitions.sql`, run it
 6. Paste the whole of `20260914000001_competition_answers_and_work.sql`, run it
+7. Paste the whole of `20260916000001_content_activity.sql`, run it
+8. Paste the whole of `20260916000002_competition_work_per_question.sql`, run it
+9. Paste the whole of `20260916000003_competition_work_count_fix.sql`, run it
 
 Order matters: the second file adds policies to tables the first one creates,
 the third revokes a grant on a function the first one defines, the fourth
@@ -198,8 +207,9 @@ anonymous sign-ins are still on.
 | `competition_attempts` | one row per student per competition: their score and picks | `competitionAttempts` |
 
 There is also one **storage bucket**, `competition-work` (private), holding the
-photograph each student takes of the working they did on paper. Objects are
-named `{competition_id}/{user_id}.jpg`, and every policy on them reads the owner
+photographs each student takes of the working they did on paper — per question,
+up to six each. Objects are named
+`{competition_id}/{user_id}/{question}-{photo_id}.jpg`, and every policy on them reads the owner
 straight back out of that filename - so no table stores a path and neither of
 the two above needs a write after its insert.
 
@@ -240,3 +250,15 @@ appear in a `VITE_`-prefixed variable, or anywhere in `src/`.
 
 Same rule, opposite direction, as `GEMINI_API_KEY`: unprefixed on purpose so it
 stays server-side. See CLAUDE.md.
+
+## `20260916000002` and `20260916000003` — the migrations `db:check` cannot see
+
+They change storage POLICIES only (photos became per question), and the
+publishable key cannot read policies, so `npm run db:check` passes whether or not
+they have run. **Run both** — `000002` on its own refuses EVERY upload with
+"infinite recursion detected in policy for relation objects", because its
+six-photo count read `storage.objects` from inside a policy on that same table;
+`000003` moves the count into a function. The symptom of it missing is specific: **every photo upload fails with
+"Could not upload"**, because the older insert policy looks for the owner in the
+filename and the new path puts it in a folder. If uploads fail on a project where
+everything else works, this is the first thing to check.

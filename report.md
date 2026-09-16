@@ -17,6 +17,71 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 16 Sep 2026 — Photos of your working go with each question now, and each can have several pages
+
+*Not yet committed.* **Needs a database step — see the end of this entry.**
+
+**Why.** After a competition you could take ONE photo of your working. But one
+photo of your whole paper does not tell your classmate which working goes with
+which question, and a single answer often runs to two or three sheets. The useful
+conversation is "you got question 3 and I didn't — show me YOUR question 3", and
+one photo could not do that.
+
+**What changed.**
+
+- **The photo screen lists every question**, each with its own **Add photo**
+  button. Photograph the questions you wrote working for; skip the ones you did in
+  your head. It is one screen, not a separate screen per question.
+- **Several photos per question** — up to 6. You can pick several pages from your
+  gallery at once, or take new ones with the camera.
+- **On the answers screen, each question shows the answer, then your photos for
+  that question, then your classmate's photos for that question.** You can still
+  add or delete your own photos there.
+- **To delete a photo, tap its × and then tap "Delete?"** — two taps, so a stray
+  tap cannot remove a page.
+
+**Unchanged on purpose:**
+
+- You still photograph your working **before** seeing the answers, so the photo is
+  of what you actually wrote, not something you fixed afterwards.
+- You can still move on without any photos and see the answers.
+- You see your classmate's photos once you have added **at least one photo, on any
+  question**. It is deliberately not per question: otherwise, if you skipped
+  question 3 because you couldn't do it, you would be locked out of your friend's
+  question 3 — exactly the one you want to see. If you delete your last photo,
+  their photos are hidden again, and the app tells you before you confirm.
+
+**Also new: the database now limits how much can be uploaded** — at most six
+photos per question, only for questions that competition actually has. Before,
+each photo had a size limit but nothing limited how many.
+
+**The database step — TWO files.** Run
+`20260916000002_competition_work_per_question.sql` and then
+`20260916000003_competition_work_count_fix.sql` in the Supabase SQL editor (steps
+in `supabase/README.md`). **The first one on its own blocks every photo upload**
+— it had a mistake in how it counted photos, found on the very first real try,
+and the second file fixes it. Until both have run, every upload fails with "Could
+not upload". Note that `npm run db:check` cannot
+tell whether this one has been run — it only changes access rules, which that
+check cannot see — so a failing upload is the sign.
+
+Any photo taken with the old one-photo version is not shown any more (it belonged
+to no question). That should only be test photos.
+
+**What we could and could not check.** The whole flow was tested in a browser
+against a stand-in for the storage server: picking three pages at once, photos
+showing under the right questions, deleting, the six-photo limit, and a student
+who added no photos never even downloading their classmate's. The real database
+rules themselves were not tested from here — that needs the migration run and two
+real accounts.
+
+**What to re-test.** After running the migration: play a competition, add two
+photos to question 1 and one to question 3, see the answers, and check they sit
+under the right questions. Then sign in as the other student and check you see
+those photos under the same questions — but only after adding one of your own.
+
+---
+
 ## 16 Sep 2026 — Study time reads in minutes on the weekly chart
 
 *Landed in commit `85c8d57`.* **No database step needed.**

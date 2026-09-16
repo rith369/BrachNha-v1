@@ -3374,27 +3374,56 @@ said no row may ever link because the only thing behind a competition is playing
 it and playing your own is a race against yourself. True until the review
 existed; what a row leads to now is specifically the creator's, never the quiz.
 
-##### The photo's position in the flow IS the design
+##### Photos are PER QUESTION, several per question — and the step is ONE screen
 
-AFTER the result, because this is the one screen in the feature where something
-can genuinely fail — a camera, a permission, a phone on mobile data — and a
-failed upload must never cost a student the score they just earned.
+**It began as one photo per student per competition, and that was the wrong
+unit.** A photo of "my whole paper" does not tell a classmate which working goes
+with which question, and one answer often runs to several pages. The user caught
+it: the exchange is only useful at the level a student actually asks about —
+"you got question 3 and I didn't, show me YOUR question 3". So a photo belongs to
+a question now, up to `MAX_PHOTOS_PER_QUESTION` (6) each, and on the review every
+question card shows its answer and then both sides' working for that question.
 
-BEFORE the answers, and this half is load-bearing rather than a preference: once
-the correct answers are on screen, a photograph of "my working" is a photograph
-of working that could be corrected first. Asking while the student still knows
-only their score is what makes the picture worth swapping.
+**THE STEP IS ONE SCREEN LISTING EVERY QUESTION, not a camera screen per
+question.** Per-question photos invite the obvious build — five screens before a
+student sees a single answer, including the questions they did in their head.
+That forced march was designed out: each question has its own Add photo, a
+student photographs the ones that had working and moves on when they choose.
 
-**SKIP STILL EXISTS, and it buys exactly one thing.** A hard lock would mean a
-broken camera permanently hides a review already earned, so Skip reaches the
-answers. It does NOT reach the classmate's photo — that stays behind the
-reciprocity gate (`WorkPhoto`'s `locked`), which is the honest shape of an
-exchange: showing yours opens theirs, and nothing else is held hostage to it.
+**The picker is `multiple` with NO `capture`, and the pair is deliberate.**
+`capture` forces a phone straight into its camera for a single shot — right for
+one photo, wrong the moment an answer is three sheets a student already
+photographed in their camera app. Without it phones offer camera AND gallery.
+Uploads run SEQUENTIALLY, not in parallel: each file is decoded to a full-size
+bitmap before it is shrunk, and four at once is exactly what kills the tab on the
+cheap handsets this audience has.
 
-That gate is deliberately in the UI and NOT in SQL. It is a nudge toward the
-exchange, not a security boundary, and in the database it would mean a student
-whose upload failed on a dead connection silently loses access to a classmate's
-working once the connection comes back.
+**Photos stay BEFORE the answers**, for the reason that was always load-bearing:
+once the correct answers are on screen, a photo of "my working" is working that
+could be corrected first. AFTER the result, because a failed upload must never
+cost a student their score. **Known seam, not closed:** the review route is not an
+assessment, so KruAI is reachable on the photo step, and a student could ask it
+before photographing. The photo is a social artefact rather than a graded one, and
+gating the mentor by a state INSIDE a route would mean borrowing the store's
+`focusMode` flag, which `use-focus-mode.ts` warns against.
+
+**"See the answers" is never held while a photo uploads.** The upload state lives
+in the PAGE's `useMyWorkPhotos`, not in the step, so revealing the answers does
+not unmount it — a photo in flight finishes and appears under its answer.
+
+**Moving on with no photos buys exactly one thing.** A broken camera must not
+permanently hide a review already earned, so the answers are always reachable.
+The other side's working is not: the reciprocity gate opens on ANY photo, on any
+question. **Deliberately not per question** — that would hide your friend's Q3
+working precisely when you skipped Q3 because you could not do it, which is the
+case the exchange exists for. The screen says so before the student moves on, and
+the review says it ONCE above the answers rather than under every question.
+
+**The gate stops the FETCH, not only the render.** `usePhotoList` for the
+opponent is disabled until you have shown working, so a student who skipped never
+downloads a classmate's photos at all — verified by watching the requests, not the
+screen. It remains a UI rule and NOT SQL: in the database it would mean a student
+whose upload failed on a dead connection loses access once it comes back.
 
 ##### The answers are DENORMALISED onto the attempt, like everything else here
 
@@ -3427,46 +3456,85 @@ result be rewritten after someone has been shown it.
 BrachNha has ever stored that a student made. It is private, read through
 short-lived signed URLs rather than a public bucket's permanent ones.
 
-**THE PATH IS THE IDENTITY: `{competitionId}/{userId}.jpg`**, and nothing
-anywhere records it. Every storage policy reads the owner straight back out of
-that filename — not `storage.objects.owner`, whose name and type have moved
-across Supabase versions. Two things follow, and both are the point: no table
-needs a write after its insert, and a file named after anyone else is refused by
-the database rather than by a convention the client could quietly break.
+**THE PATH IS STILL THE IDENTITY:
+`{competitionId}/{userId}/{questionIndex}-{photoId}.jpg`**, and nothing anywhere
+records a photo. A reader LISTS the student's folder and reads each photo's
+question back out of its filename; `PHOTO_NAME` in `lib/competition-photos.ts` is
+the only parser and mirrors the policy's regex exactly. Two things follow: no table
+needs a write after its insert, and a file under anyone else's folder is refused by
+the database rather than by a convention the client could break.
+
+`photoId` is a base-36 timestamp THEN random characters, so ids sort by when they
+were taken and "page 1" lists before "page 2" — the folder is listed by name.
+
+**TWO ROUND TRIPS PER STUDENT, NOT ONE PER PHOTO:** one `list`, then one batched
+`createSignedUrls`. Signed links are matched back to photos by PATH, never by
+position, because the batch response is not promised to be in request order.
+
+`20260916000002` rewrote every policy, because the owner moved from the filename
+to the second folder segment. Each ownership test is
+`coalesce(folder[2], filename-without-.jpg)`, which is the new owner for the new
+shape and the old owner for a file at the old single-photo path — so any such test
+upload stays readable and deletable, though nothing in the app shows it any more.
+**The database now also enforces what it did not:** at most six photos per
+question, a question index the competition actually has (pulled with
+`regexp_match`, because Postgres does not promise to evaluate the shape check
+before a cast), and one strict filename shape. The first version bounded each
+file's size and never how many there were.
+
+**THE COUNT LIVES IN A FUNCTION, AND THE FIRST VERSION OF IT REFUSED EVERY
+UPLOAD.** `20260916000002` counted with a subquery on `storage.objects` from
+inside a policy on `storage.objects`. Postgres expands a table's row security
+while rewriting a query and refuses to meet the same table again inside it —
+*"infinite recursion detected in policy for relation objects"* — and it raises
+that at REWRITE time, so the policy was created without complaint and then failed
+on every insert. Nothing in the app could show it: the screen said "Could not
+upload" and the user found it on the first real try. `20260916000003` moves the
+count into `public.my_competition_work_count()`, a `SECURITY DEFINER` function —
+a function body is planned separately, so there is nothing to recurse into.
+**It takes no user id and reads `auth.uid()` itself**, so called directly over
+the REST API it can only ever count the CALLER's own photos; a version taking any
+folder would leak who has played and uploaded, the exact thing
+`listWorkPhotos` is built never to reveal. **The rule to keep: a policy on a
+table must never query that same table** — the classic Supabase `profiles` trap,
+and it applies to `storage.objects` exactly as to any table of ours.
+
+`lib/competition-photos.ts` now prints the storage service's real error message
+to the console **in development only** (`devReport`). That exists because of this
+bug — a policy mistake is invisible from the UI by construction, and the Result
+contract reduces every error to a reason.
 
 The read policy mirrors the product rule `competition_attempts` already encodes:
-your own always; every joiner's if you created the competition; and if you
-JOINED one, the creator's **and nobody else's** — that last `exists` clause is
-what stops a joiner reaching a second joiner's photo by guessing their uid.
+your own always; every joiner's if you created the competition; and if you JOINED
+one, the creator's **and nobody else's**.
 
-**UPDATE and DELETE are allowed on an object although neither score table permits
-either**, and the distinction is real: a score is a result and must not be
-editable once it has been shown, but a photo is an artefact. The first attempt at
-photographing a page of working very often has a thumb across it, and a picture
-of your own handwriting that you can publish and cannot withdraw is not something
-you meaningfully agreed to share. `MyWorkPhoto` is the pair of buttons for those
-two policies — Retake and Delete, on your own photo only, which is all the policy
-would permit anyway.
+**DELETE is allowed on your own photos; UPDATE is not, any more.** The
+single-photo version needed UPDATE so a blurry shot could be overwritten in place.
+Every photo has its own id now, so a retake is a delete plus a new file, and a
+policy that is not needed is surface that is not there. Deleting takes two taps
+on the thumbnail's × (it turns into a red "Delete?"), and deleting your LAST photo
+re-closes the reciprocity gate — the confirm says so at that moment only, because
+removing one of several pages changes nothing for the other side.
 
-**Deleting RE-CLOSES the reciprocity gate**, and that is the rule being
-consistent rather than theatre: showing yours is what opens theirs, so
-withdrawing yours has to withdraw the view it bought. Otherwise the promise made
-to the student on the other side is the weaker "show yours once". The confirm
-says so before it happens rather than letting it be discovered after.
+**`useMyWorkPhotos` is the single owner**, held by the page and read by the step
+and by every question card. It keeps what the server LISTED apart from what this
+visit ADDED and REMOVED, and merges them during render: a new photo shows at once
+from the file the phone is still holding (an object URL, revoked on unmount), a
+deleted one disappears at once, and nothing re-lists the folder per tap on mobile
+data. Its `add` returns how many landed rather than the caller watching state,
+because a caller that reads state after awaiting reads the render it started from.
+Until a list has actually arrived — slow OR failed — the gate trusts the store's
+`photoAt`, so a moment offline does not shut it on a student who showed working.
 
-**`WorkPhoto` needs its `hidden` prop for exactly this.** A signed URL fetched a
-moment ago still resolves for its whole lifetime, so without an explicit override
-the panel would go on showing a photo the student has just taken back — the one
-moment where trusting a cached answer is a broken promise rather than a stale
-pixel.
+`usePhotoList` keys its result on WHOSE folder it holds, so switching the creator's
+selected joiner cannot show one joiner's photos under another's name while the new
+list loads. That "stale key reads as loading" is derived during render, not reset
+in an effect — oxlint's `react(set-state-in-effect)`.
 
-**`useWorkPhoto` is the single owner of that state**, held by the page and read
-by both the step before the answers and the panel after them. They are two
-renderings of one fact; a copy in each is how "have I uploaded?" ends up answered
-differently a few pixels apart. Its `upload` returns a BOOLEAN rather than the
-caller watching `phase`, because a caller that reads the phase after awaiting
-reads the value captured by the render it started from — always the one from
-before the upload ran.
+`AnswerReview` takes a `renderExtra(index)` slot rather than photo props: it
+compares ANSWERS and should not learn what storage or a gate is. It passes only the
+index, so the caller's closure never reads into `questions[i]` — the property path
+the React Compiler would narrow a memo dependency onto.
 
 **Uploads are compressed client-side first** (`utils/image-compress.ts`): a phone
 photographs at 3–5MB, and the audience pays for that twice — once to upload, once
@@ -3480,20 +3548,28 @@ photos uploading sideways, and Safari honours it only from 16; older versions
 ignore the option rather than throwing, so a photo lands rotated rather than not
 at all.
 
+**Verified against an IN-MEMORY FAKE of the storage API**, intercepted in the
+browser with Playwright's `route`, because no automated browser can hold a real
+session and the policy migration is applied by hand. That runs the real list →
+sign → upload → delete code with only the server faked: three pages picked at once
+land on one question with policy-shaped paths, the opponent's photos appear under
+the right questions with ONE batched signing call, a skipped student's browser
+never requests the opponent's folder, and eight picked pages send exactly six.
+**It does not prove the SQL.** The policies were not exercised against a real
+project from here; that needs the migration applied and two real accounts.
+
 ##### Where it degrades, and what is deliberately absent
 
-`WorkPhoto` renders NOTHING when Supabase is unconfigured, and the review skips
-the photo step entirely when there is no project or no account — both are
-supported states (a fork with no `.env`, the blanked-env screenshot harness), so
-asking for a photo there would be an error message about the app working as
-designed.
+The photo UI renders NOTHING when Supabase is unconfigured or there is no
+account, and the photo step is skipped entirely — both are supported states (a
+fork with no `.env`, the blanked-env screenshot harness).
 
-**A student can delete their own photo, and that shipped with the feature rather
-than after it** — see Retake and Delete above. It was very nearly left as a
-policy with no button, which would have meant asking a student to upload a
-picture of their own handwriting with no way to take it back.
+**`db:check` cannot see `20260916000002`.** It adds no table or column, only
+policies, and the publishable key cannot read policies. The symptom of it being
+missing is every upload failing with "Could not upload" — the old insert policy
+wants the owner in the filename, which the new path no longer has.
 
-**What is still absent is REPORTING someone else's**, and that is a real gap
+**What is still absent is REPORTING someone else's photo**, and that is a real gap
 rather than one deferred quietly. The storage policies bound who can see a photo
 to the two students in a competition, so the blast radius of anything unpleasant
 is one classmate — but there is nothing in the app for that classmate to do about
@@ -5100,7 +5176,10 @@ new device pulls no per-subject history.
 
 **The Game feature needs BOTH its migrations applied before db:check passes** —
 `20260913000001_competitions.sql` and
-`20260914000001_competition_answers_and_work.sql`, by hand, in the SQL editor.
+`20260914000001_competition_answers_and_work.sql` — plus
+`20260916000002_competition_work_per_question.sql` AND its fix
+`20260916000003_competition_work_count_fix.sql` for photos, which db:check
+cannot detect (policies only) — by hand, in the SQL editor.
 Without the first, the check reports 2 of 10 tables missing and /game's browse
 list shows its failed state while the rest of the page keeps working. Without the
 second it names the two missing COLUMNS, and a new competition saves locally but

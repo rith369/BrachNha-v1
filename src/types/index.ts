@@ -486,14 +486,15 @@ export interface Competition {
    */
   sharedAt?: string;
   /**
-   * When this student's photo of their own working reached the bucket, or ABSENT
-   * if they have not taken one.
+   * Set while this student has AT LEAST ONE photo of their working on this
+   * competition, on any question; ABSENT once they have none.
    *
-   * A LOCAL MARKER WITH NO COLUMN BEHIND IT, and that is the point: the file's
-   * path is `{competitionId}/{userId}.jpg`, so the server needs nothing recorded
-   * to find it and both tables stay insert-only. This exists purely so the review
-   * screen knows whether to ask for a photo without a network round trip on a
-   * screen that otherwise works offline. See lib/competition-photos.ts.
+   * A LOCAL MARKER WITH NO COLUMN BEHIND IT, and that is the point: photos live at
+   * `{competitionId}/{userId}/{question}-{photoId}.jpg` and are found by listing
+   * that folder, so the server needs nothing recorded and both tables stay
+   * insert-only. This exists so the review screen can skip the photo step, and
+   * open the reciprocity gate, before the list has arrived — or when it cannot
+   * arrive at all. See lib/competition-photos.ts.
    */
   photoAt?: string;
 }
@@ -560,7 +561,7 @@ export interface CompetitionAttempt {
   answers?: (string | null)[];
   /** The creator's picks, copied off the competition at play time. */
   opponentAnswers?: (string | null)[];
-  /** When this student's photo of their working reached the bucket — a local
-   *  marker with no column behind it, exactly like Competition.photoAt. */
+  /** Set while this student has at least one photo of their working here — a
+   *  local marker with no column behind it, exactly like Competition.photoAt. */
   photoAt?: string;
 }
