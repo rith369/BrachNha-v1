@@ -17,6 +17,41 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 16 Sep 2026 — Study time reads in minutes on the weekly chart
+
+*Landed in commit `85c8d57`.* **No database step needed.**
+
+**Why.** You finished a biology deck, looked at the Progress page and saw nothing.
+Nothing was broken — the time was being counted correctly the whole time. The chart
+was just showing it in **hours**, and a real study session is six or eight minutes,
+which is 0.1 of an hour. That rounds down to a flat line sitting on the bottom of
+the chart, so genuine work looked identical to no work at all.
+
+**What changed.** The weekly chart's second view is now **Study Minutes** instead of
+Study Hours, and the scale follows along — a week of 3, 6 and 2 minutes now draws
+real peaks instead of three dots on the floor.
+
+**The tile at the top still reads in hours**, and that is deliberate rather than an
+oversight. It covers a whole **month**, where minutes stop being useful: "1,240m" is
+a worse way of saying "20.7h". So the same measurement appears in two units on one
+page, because the two are measuring different lengths of time — one day versus one
+month.
+
+**One rounding rule worth knowing.** A month with only a minute or two in it would
+round to "0h", which is the same problem all over again. So any real study time shows
+at least "0.1h"; only genuinely zero shows "0h". The figure can round a very first
+session up slightly — it will never tell you that you did not study when you did.
+
+**What to re-test.** Do a flashcard deck or a section for a few minutes, then open
+Progress. The Study Time tile should move, and switching the weekly chart to Study
+Minutes should show a visible bump on today.
+
+**Still worth remembering:** the timer only runs while you are actually *in* a lesson,
+a section, a deck or a quiz. Browsing the subject path or a lesson list does not count,
+and it pauses after two minutes without touching the screen, or when the tab is hidden.
+
+---
+
 ## 16 Sep 2026 — Most of the Progress page shows your real work now
 
 *Landed in commit `325204e`.* **Needed a database step — already applied to the live project on 16 Sep.**
