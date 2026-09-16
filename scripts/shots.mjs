@@ -185,7 +185,7 @@ const seededContent = Object.fromEntries(
 );
 
 const seededActivity = Object.fromEntries([
-  // `minutes` is what the Study Time tile and the chart's Study Hours series
+  // `minutes` is what the Study Time tile and the chart's Study Minutes series
   // read; without it both photograph at zero and the toggle looks broken.
   ...Array.from({ length: 12 }, (_, i) => [
     dayKey(-(i + 1)),

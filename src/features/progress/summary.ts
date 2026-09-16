@@ -63,10 +63,21 @@ export interface WeekDay {
   /** "Mon". en-GB, matching formatHeatmapCellLabel's existing choice. */
   label: string;
   xp: number;
-  /** ACTIVE study hours, one decimal. Derived from minutes at the edge so the
-   *  chart never divides, and so "0.5" is a real half hour rather than a
-   *  rounding of 29 seconds. */
-  hours: number;
+  /**
+   * ACTIVE study minutes, as counted — no conversion.
+   *
+   * MINUTES RATHER THAN HOURS, and the unit is the whole point at this
+   * granularity. This is ONE DAY, and a real day of study here is single or
+   * double digit minutes, which in hours is 0.1 — so a student who studied for
+   * six minutes read the chart as a flat line at zero and reasonably concluded
+   * the timer was broken. That was reported. An hours axis only starts saying
+   * anything at half an hour a day, which is not the scale this app is used at.
+   *
+   * The monthly Study Time tile still switches to hours past 60 (see
+   * score-hero.tsx) — a MONTH's total genuinely does outgrow minutes, where a
+   * single day's does not.
+   */
+  minutes: number;
 }
 
 export interface ProgressSummary {
@@ -182,7 +193,7 @@ export function buildProgressSummary(
       key,
       label: parseDayKey(key).toLocaleDateString("en-GB", { weekday: "short" }),
       xp: day?.xp ?? 0,
-      hours: Math.round(((day?.minutes ?? 0) / 60) * 10) / 10,
+      minutes: day?.minutes ?? 0,
     });
   }
   const weekXp = week.reduce((n, d) => n + d.xp, 0);

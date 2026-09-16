@@ -111,10 +111,11 @@ export function ScoreHero({ summary }: { summary: ProgressSummary }) {
           label="Questions"
           color="text-pink"
         />
-        {/* ACTIVE study minutes — see hooks/use-study-timer.ts for what counts.
-            Shown as minutes below an hour and as hours above it: "0.3h" is a
-            worse answer than "18m" for a student who has done one section, and
-            "127m" is a worse answer than "2.1h" for one who has done a week. */}
+        {/* ACTIVE study minutes — see hooks/use-study-timer.ts for what counts —
+            rendered in HOURS, because this figure is a month's total. The
+            weekly chart below deliberately shows the same measurement in
+            MINUTES, since one day at this app's scale does not fill an hour.
+            Same number, two windows, two units. */}
         <Metric
           value={formatStudyTime(summary.minutesThisMonth)}
           label="Study Time"
@@ -135,12 +136,28 @@ export function ScoreHero({ summary }: { summary: ProgressSummary }) {
   );
 }
 
-/** "0m" / "18m" / "2.1h". Zero is honest here, unlike a percentage: "you have
- *  studied for no minutes this month" is true and useful, where "0%" would be a
- *  claim about work that was never attempted. */
+/**
+ * "0h" / "0.3h" / "20.7h" — ALWAYS hours, at the user's call.
+ *
+ * This tile is a MONTH's total, which is the window where hours is the right
+ * unit: "1,240m" is a worse answer than "20.7h" for a student who has been
+ * studying all month. The per-day chart went the other way for the mirror-image
+ * reason — see WeekDay.minutes in ../summary.ts.
+ *
+ * THE 0.1 FLOOR IS THE LOAD-BEARING PART. A month holding one or two real
+ * minutes rounds to 0.0 and renders "0h", which is precisely the "I did biology
+ * and it still says nothing" report that started this. A tenth is the smallest
+ * thing this format can express, so it is what real work floors at — the figure
+ * is allowed to overstate a first session by a rounding, but it may never tell a
+ * student who studied that they did not.
+ *
+ * Exactly zero still prints "0h", and that is honest rather than absent: unlike
+ * a percentage, "you have not studied yet this month" is a true and useful thing
+ * to say, where "0%" would be a claim about work that was never attempted.
+ */
 function formatStudyTime(minutes: number): string {
-  if (minutes < 60) return `${minutes}m`;
-  return `${Math.round((minutes / 60) * 10) / 10}h`;
+  if (minutes <= 0) return "0h";
+  return `${Math.max(Math.round((minutes / 60) * 10) / 10, 0.1)}h`;
 }
 
 function Metric({

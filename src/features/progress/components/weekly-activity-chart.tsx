@@ -25,23 +25,30 @@ import { cn } from "@/utils/cn";
  *    It used to be a fixed `weeklyActivityChangePct` the old file apologised
  *    for in a comment, because the week it compared against was never plotted.
  *
- * BOTH SERIES ARE REAL NOW. Study Hours was invented until the study timer
+ * BOTH SERIES ARE REAL NOW. Study time was invented until the study timer
  * existed, and this card shipped XP-only in the interim rather than drawing a
  * flat line at zero — which would have been a visual claim that the student
  * studied and earned nothing. See hooks/use-study-timer.ts for what a counted
  * minute is.
+ *
+ * THE SECOND SERIES IS MINUTES, NOT HOURS, and that is a correction rather than
+ * a preference. It shipped as hours and a student who had just finished a
+ * biology deck reported the chart showing nothing: six real minutes is 0.1h,
+ * which rounds onto the axis floor and draws the same flat line the empty state
+ * exists to avoid. A day is the wrong window to measure in hours at this app's
+ * scale. See WeekDay.minutes in ../summary.ts.
  */
 
-type Metric = "xp" | "hours";
+type Metric = "xp" | "minutes";
 
 const METRIC_META: Record<
   Metric,
   { label: string; icon: LucideIcon; unit: (v: number) => string }
 > = {
   xp: { label: "XP Points", icon: Zap, unit: (v) => `${v} XP` },
-  hours: { label: "Study Hours", icon: Clock, unit: (v) => `${v}h` },
+  minutes: { label: "Study Minutes", icon: Clock, unit: (v) => `${v}m` },
 };
-const METRICS: Metric[] = ["xp", "hours"];
+const METRICS: Metric[] = ["xp", "minutes"];
 
 /**
  * A real numeric [lo, hi], not Recharts' `domain={["dataMin", "dataMax"]}`
@@ -54,10 +61,15 @@ const METRICS: Metric[] = ["xp", "hours"];
  * returned [0, 0], a degenerate axis Recharts cannot lay out.
  *
  * The step LADDER is what lets one function serve both series, where the old
- * two-branch heuristic had to guess: hours land at 0.5 or 1, XP at 20 or 50,
- * without either being named here.
+ * two-branch heuristic had to guess: a light day of minutes lands at 1 or 2, a
+ * heavy one at 20, XP at 20 or 50, without any of them being named here.
+ *
+ * A standard 1-2-5 ladder, and it starts at 1 because BOTH series are whole
+ * numbers now — XP is awarded in tens, minutes are floored before they are ever
+ * stored. It used to open at 0.5 for the hours series it no longer carries, and
+ * left over that would draw a half-minute gridline under an integer count.
  */
-const STEPS = [0.5, 1, 2, 5, 10, 20, 50, 100];
+const STEPS = [1, 2, 5, 10, 20, 50, 100, 200, 500];
 
 function niceDomain(values: number[]): [number, number] {
   const max = Math.max(...values, 0);
@@ -84,7 +96,7 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
   const flat = weekChangePct === 0;
 
   // The best day is computed on XP by the summary, so it is only meaningful on
-  // that series. Rather than print an XP day's name over an hours chart, the
+  // that series. Rather than print an XP day's name over a minutes chart, the
   // footer's left half goes absent — the same absent-rather-than-wrong rule the
   // empty week already follows.
   const showBest = metric === "xp" && bestDay !== null;
@@ -232,7 +244,7 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
           <span />
         )}
         {/* The change is computed on XP, so it is shown on the XP series only —
-            labelling an hours chart with an XP delta would be a quietly wrong
+            labelling a minutes chart with an XP delta would be a quietly wrong
             number rather than a missing one. */}
         {metric === "xp" && weekChangePct !== null && (
           <span
