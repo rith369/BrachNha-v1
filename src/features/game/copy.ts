@@ -99,6 +99,22 @@ export const GAME_COPY = {
     /** Shown when competitions exist but this student has played them all —
      *  distinct from competitionsEmpty, which means none exist at all. */
     allPlayed: "You have played every competition. Create one of your own!",
+    // ── Inviting one particular friend ──
+    //
+    // The competition is still public and still in everyone's browse list; this
+    // is only a faster way to reach one person. The copy therefore says "invite"
+    // and never "private", which would be a promise the feature does not make.
+    invite: "👋 Invite a friend",
+    /** The hub row's button. A LABEL, not a bare icon: the whole complaint this
+     *  answers was that the link was hard to find, and an unlabelled glyph does
+     *  not fix that. Short because it sits in a list row at the 320px floor. */
+    inviteShort: "Invite",
+    inviteBlurb: "Play this competition against me!",
+    qrHint: "Let your friend scan this, or send them the link.",
+    copyLink: "Copy link",
+    copied: "Copied!",
+    copyFailed: "Could not copy — select the link above instead.",
+    shareLink: "Share",
     // ── The review: what each side answered, and the working they showed ──
     //
     // THE QUESTIONS AND OPTIONS ARE STILL NEVER TRANSLATED. These are the labels
@@ -202,6 +218,14 @@ export const GAME_COPY = {
     alreadyPlayed: "អ្នកបានលេងការប្រកួតនេះរួចហើយ។",
     seeResult: "មើលលទ្ធផល",
     allPlayed: "អ្នកបានលេងការប្រកួតទាំងអស់ហើយ។ បង្កើតមួយរបស់អ្នកទៅ!",
+    invite: "👋 អញ្ជើញមិត្តភក្តិ",
+    inviteShort: "អញ្ជើញ",
+    inviteBlurb: "មកប្រកួតនឹងខ្ញុំក្នុងការប្រកួតនេះ!",
+    qrHint: "ឱ្យមិត្តភក្តិស្កេនកូដនេះ ឬផ្ញើតំណទៅគេ។",
+    copyLink: "ចម្លងតំណ",
+    copied: "បានចម្លង!",
+    copyFailed: "មិនអាចចម្លងបានទេ — សូមជ្រើសរើសតំណខាងលើជំនួសវិញ។",
+    shareLink: "ចែករំលែក",
     reviewTitle: "ចម្លើយ 📝",
     seeAnswers: "មើលចម្លើយ",
     questionLabel: "សំណួរទី",

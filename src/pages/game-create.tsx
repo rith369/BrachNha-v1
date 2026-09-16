@@ -154,6 +154,9 @@ export default function GameCreatePage() {
         score={posted.score}
         total={posted.total}
         shared={posted.shared}
+        // The invite link points here. `Posted` already carried the id for the
+        // review, so nothing new had to be threaded through for the share.
+        competitionId={posted.competitionId}
         onExit={exit}
         // The review is REPLACED into history rather than pushed: this route's
         // three phases cannot be returned to — the competition is posted and the
