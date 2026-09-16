@@ -19,7 +19,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 16 Sep 2026 — Photos of your working go with each question now, and each can have several pages
 
-*Not yet committed.* **Needs a database step — see the end of this entry.**
+*Landed in commit `37fde01`.* **Needed a database step — already applied to the live project on 16 Sep; see the end of this entry if you ever set up a second one.**
 
 **Why.** After a competition you could take ONE photo of your working. But one
 photo of your whole paper does not tell your classmate which working goes with
