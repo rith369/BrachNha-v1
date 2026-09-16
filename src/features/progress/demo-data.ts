@@ -1,171 +1,37 @@
 // ============================================================
 // DEMO DATA — Progress Dashboard
 // ------------------------------------------------------------
-// Deliberately fake, fixed numbers (ported from the original
-// kruai-progress.html static demo). Chosen over real store data
-// so this dashboard always renders something polished and never
-// breaks on an edge case like a brand-new user with zero exams.
+// THREE CARDS, and only three. This file used to feed the whole
+// page; the score hero, the weekly chart, the subject bar chart
+// and the subject breakdown all read real student data now (see
+// ../summary.ts). What is left is what has no real source:
 //
-// When real per-subject tracking + a daily activity log exist,
-// swap this file's contents for live selectors off useBrachNhaStore
-// — every component below only reads from here, so that's a
-// one-file change.
+//   focusAreas      Focus Areas 🔍    — per-TOPIC accuracy, a finer
+//                                       grain than anything the app
+//                                       records. Lesson level is the
+//                                       finest honest grain there is.
+//   activityHeatmap Study Activity 🗓️ — questions per calendar day.
+//                                       contentLog could feed this;
+//                                       kept demo at the user's
+//                                       explicit request (16 Sep 2026).
+//   aiInsights      AI Insights 🤖✨   — needs an LLM pass plus a badge
+//                                       system. A live /api/chat call
+//                                       from a bottom-nav tab would
+//                                       exhaust the shared Gemini quota
+//                                       (~20 requests/DAY for the whole
+//                                       deployment) and break KruAI.
 //
-// FAKE NUMBERS, REAL SUBJECTS. The numbers may be invented; the
-// list of subjects they are attached to may not. This file used to
-// carry its own subject list — five hand-written rows including a
-// "Geo" that the app has never had a lesson, an exam paper or a
-// colour token for, alongside two spellings of the other four
-// ("Chem"/"Chemistry") and the shared brand accents rather than the
-// per-subject palette every other screen keys off. `subjectStats`
-// below is now keyed by SubjectId, so a subject that is not in the
-// catalog cannot be given a score, and ../subjects.ts supplies the
-// name, icon and colour from that same catalog.
+// BECAUSE THESE THREE STAY, `PreviewTag` STAYS on pages/progress.tsx.
+// The rule is "the tags ARE the list of what is still fake", and with
+// two or more demo cards the tag belongs at page level — the Game page
+// is the precedent. The mechanical test for removing it: delete this
+// file. If the build passes, nothing on the page invents a number.
+//
+// KNOWN AND ACCEPTED: the heatmap's "tap a day to see questions
+// answered" now sits on a page whose bar chart shows REAL per-subject
+// question counts, and the two will not add up. That is the cost of
+// keeping this card demo, and the page-level tag is what covers it.
 // ============================================================
-
-import type { SubjectId } from "@/features/lessons/subjects";
-
-export const overallReadiness = {
-  pct: 83,
-  change: "▲ +8% vs last month",
-};
-
-export interface DailyActivity {
-  day: string;
-  xp: number;
-  /** Study time, in hours, to one decimal place. */
-  hours: number;
-}
-
-// One week, Mon..Sun, both metrics WeeklyActivityChart's toggle can show.
-export const weeklyActivity: DailyActivity[] = [
-  { day: "Mon", xp: 20, hours: 0.5 },
-  { day: "Tue", xp: 45, hours: 1.2 },
-  { day: "Wed", xp: 35, hours: 0.8 },
-  { day: "Thu", xp: 70, hours: 1.8 },
-  { day: "Fri", xp: 85, hours: 2.2 },
-  { day: "Sat", xp: 120, hours: 3.0 },
-  { day: "Sun", xp: 100, hours: 2.5 },
-];
-
-// The chart's footer compares this week to LAST week — a week that, unlike
-// "Highest productivity", was never plotted, so there's nothing in
-// weeklyActivity to derive it from. Fixed, same idiom as
-// overallReadiness.change above, rather than fabricated data for a week that
-// doesn't exist on screen.
-export const weeklyActivityChangePct: Record<"xp" | "hours", number> = {
-  xp: 28,
-  hours: 15,
-};
-
-export interface SubjectStats {
-  sessions: number;
-  questions: number;
-  score: number;
-  /**
-   * Signed percentage change, ONE field rather than the old
-   * `trend: "▲ +6%"` string beside a `trendUp` boolean — two hand-written
-   * values describing one fact, free to disagree. The arrow and the colour
-   * are derived from the sign at render time.
-   */
-  trendPct: number;
-  /** 7 relative heights, 0-100. */
-  sparkline: number[];
-}
-
-/**
- * Keyed by SubjectId, so every row belongs to a subject the app actually
- * teaches and a missing row fails to compile rather than rendering blank.
- * The bar chart and the breakdown list both read this, which is what stops a
- * subject's question count differing between the two cards the way Math's
- * once could.
- *
- * ENGLISH AND FRENCH CARRY IDENTICAL NUMBERS on purpose. Only one of them is
- * ever on screen (the student picks at Login), so they are one "your language
- * subject" row shown twice — and keeping them equal is what lets the
- * Questions total below be computed without knowing which was chosen.
- */
-export const subjectStats: Record<SubjectId, SubjectStats> = {
-  math: {
-    sessions: 24,
-    questions: 98,
-    score: 78,
-    trendPct: 6,
-    sparkline: [40, 55, 50, 65, 70, 75, 78],
-  },
-  physics: {
-    sessions: 22,
-    questions: 85,
-    score: 91,
-    trendPct: 11,
-    sparkline: [55, 65, 72, 78, 84, 88, 91],
-  },
-  chemistry: {
-    sessions: 18,
-    questions: 72,
-    score: 65,
-    trendPct: -2,
-    sparkline: [70, 68, 72, 66, 60, 63, 65],
-  },
-  biology: {
-    sessions: 12,
-    questions: 54,
-    score: 54,
-    trendPct: 3,
-    sparkline: [48, 50, 45, 52, 50, 53, 54],
-  },
-  history: {
-    sessions: 9,
-    questions: 41,
-    score: 72,
-    trendPct: 4,
-    sparkline: [60, 62, 66, 64, 70, 71, 72],
-  },
-  khmer: {
-    sessions: 11,
-    questions: 46,
-    score: 80,
-    trendPct: 2,
-    sparkline: [72, 74, 73, 76, 78, 79, 80],
-  },
-  english: {
-    sessions: 8,
-    questions: 36,
-    score: 69,
-    trendPct: -3,
-    sparkline: [75, 73, 74, 70, 68, 70, 69],
-  },
-  french: {
-    sessions: 8,
-    questions: 36,
-    score: 69,
-    trendPct: -3,
-    sparkline: [75, 73, 74, 70, 68, 70, 69],
-  },
-};
-
-/**
- * The hero's "Questions" figure, SUMMED from the rows above rather than
- * authored beside them — the same rule lessonCountFor() follows on the Study
- * page. The old hand-written 342 was the sum of the five subjects this file
- * used to list, geography included, so removing that subject would have left
- * a total no row on the page adds up to.
- *
- * French is skipped rather than filtered by the student's choice because the
- * two language rows are deliberately identical; see subjectStats.
- */
-export const totalQuestions = (
-  Object.entries(subjectStats) as [SubjectId, SubjectStats][]
-)
-  .filter(([id]) => id !== "french")
-  .reduce((sum, [, s]) => sum + s.questions, 0);
-
-export const miniMetrics = [
-  { label: "Questions", value: String(totalQuestions), color: "text-pink" },
-  { label: "Study Time", value: "28h", color: "text-blue" },
-  { label: "Day Streak", value: "12🔥", color: "text-mint" },
-  { label: "XP Earned", value: "1,240", color: "text-yellow" },
-];
 
 export const focusAreas = [
   {

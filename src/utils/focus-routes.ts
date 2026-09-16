@@ -140,6 +140,37 @@ export function isAssessmentRoute(pathname: string): boolean {
 }
 
 /**
+ * Routes where the student is STUDYING, for the purpose of counting minutes.
+ *
+ * Deliberately NOT the same set as isFocusRoute(), although it looks like it
+ * could be, and the two differences are the whole point:
+ *
+ *  - **The game review is excluded.** It is a focus route because the screen is
+ *    a task frame, but reading back what you both answered afterwards is not
+ *    study time by any definition the migration comment would accept.
+ *  - **The mock exam is NOT a route at all.** /exam is an ordinary destination
+ *    until a question is on screen, so hooks/use-study-timer.ts ORs the store's
+ *    `focusMode` flag in — exactly the way useFocusMode() already does, and for
+ *    the same reason.
+ *
+ * WHAT IS DELIBERATELY ABSENT, and this is the decision to not quietly reverse:
+ * the KruAI overlay. Asking the mentor a question IS studying, but the overlay
+ * is global, has no natural end, and is the single easiest place in the app to
+ * leave open on a pocketed phone. Counting it would reopen the hole this whole
+ * metric exists to close. So the figure UNDERCOUNTS, which is the only direction
+ * a defeatable number is allowed to be wrong in.
+ */
+export function isStudyRoute(pathname: string): boolean {
+  return (
+    pathname.startsWith("/lessons/") ||
+    pathname.startsWith("/sections/") ||
+    pathname === "/practice/review" ||
+    isPracticeRunRoute(pathname) ||
+    pathname.startsWith("/placement-test/")
+  );
+}
+
+/**
  * Routes whose page does NOT render BottomNav. Roadmap is a single sequential
  * journey rather than a tab destination, and Profile is a short settings page
  * — neither pages/roadmap.tsx nor pages/profile.tsx mount one.

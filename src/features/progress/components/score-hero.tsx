@@ -1,10 +1,30 @@
-import { overallReadiness, miniMetrics } from "../demo-data";
+import { useBrachNhaStore } from "@/lib/store";
+import type { ProgressSummary } from "../summary";
 
 const R = 40;
 const CIRC = 2 * Math.PI * R;
 
-export function ScoreHero() {
-  const dash = (overallReadiness.pct / 100) * CIRC;
+/** An em dash, not "0%" — a zero here would claim exams were sat and failed. */
+const NO_VALUE = "—";
+
+export function ScoreHero({ summary }: { summary: ProgressSummary }) {
+  // The only two numbers on this card that are not derived from the summary,
+  // and the two that used to be invented. The global StatBar renders the same
+  // `streak` about forty pixels above this card, so a second hardcoded copy was
+  // guaranteed to contradict it — the bug /streak already hit once.
+  const streak = useBrachNhaStore((s) => s.streak);
+
+  const { pct, changePct, examCount } = summary.overall;
+
+  // Computed from the null check rather than `?? 0` inside the arithmetic: a
+  // NaN here renders as strokeDasharray="NaN 251" and the arc silently does not
+  // draw at all, which looks like a styling bug rather than missing data.
+  const dash = pct === null ? 0 : (pct / 100) * CIRC;
+
+  // `> 0`, not `>= 0`: two months averaging the same is "no change", and an
+  // up-arrow on it would be the same small lie the subject trend used to tell.
+  const up = (changePct ?? 0) > 0;
+  const flat = changePct === 0;
 
   return (
     <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
@@ -14,15 +34,34 @@ export function ScoreHero() {
             Overall Readiness
           </div>
           <div className="font-heading text-4xl font-bold">
-            {overallReadiness.pct}
-            <span className="text-lg text-muted">%</span>
+            {pct ?? NO_VALUE}
+            {/* The % is part of the NUMBER, so it goes when the number does —
+                "—%" reads as a percentage that failed to load rather than as a
+                figure the app does not have yet. */}
+            {pct !== null && <span className="text-lg text-muted">%</span>}
           </div>
           <div className="mt-0.5 text-xs font-bold text-muted">
-            Average exam score this month
+            {examCount > 0
+              ? "Average exam score this month"
+              : "No mock exams yet"}
           </div>
-          <div className="mt-1 text-xs font-extrabold text-mint">
-            {overallReadiness.change}
-          </div>
+          {/* Absent rather than "+0%" when there is nothing to compare against,
+              and coloured from its own sign — this line was hardcoded mint,
+              which would have turned a real drop green. */}
+          {changePct !== null && (
+            <div
+              className={`mt-1 text-xs font-extrabold ${
+                flat ? "text-muted" : up ? "text-mint" : "text-pink"
+              }`}
+            >
+              {/* POINTS, not percent: this is the difference between two
+                  percentages, so 60 -> 75 is fifteen points. "+15%" would be a
+                  different and wrong number. */}
+              {flat
+                ? "No change vs last month"
+                : `${up ? "▲ +" : "▼ "}${changePct} pts vs last month`}
+            </div>
+          )}
         </div>
 
         <div className="relative size-25 shrink-0">
@@ -42,20 +81,24 @@ export function ScoreHero() {
               stroke="var(--color-chart-track)"
               strokeWidth="10"
             />
-            <circle
-              cx="50"
-              cy="50"
-              r={R}
-              fill="none"
-              stroke="url(#donutGrad)"
-              strokeWidth="10"
-              strokeLinecap="round"
-              strokeDasharray={`${dash} ${CIRC}`}
-            />
+            {/* Not rendered at all with no exams: a zero-length arc with a round
+                cap still paints a dot at twelve o'clock, which reads as 1%. */}
+            {dash > 0 && (
+              <circle
+                cx="50"
+                cy="50"
+                r={R}
+                fill="none"
+                stroke="url(#donutGrad)"
+                strokeWidth="10"
+                strokeLinecap="round"
+                strokeDasharray={`${dash} ${CIRC}`}
+              />
+            )}
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <div className="font-heading text-lg font-bold">
-              {overallReadiness.pct}%
+              {pct === null ? NO_VALUE : `${pct}%`}
             </div>
             <div className="text-[9px] font-bold text-muted">ready</div>
           </div>
@@ -63,15 +106,58 @@ export function ScoreHero() {
       </div>
 
       <div className="mt-4 grid grid-cols-4 gap-2 border-t border-purple/8 pt-3.5">
-        {miniMetrics.map((m) => (
-          <div key={m.label} className="text-center">
-            <div className={`font-heading text-base font-extrabold ${m.color}`}>
-              {m.value}
-            </div>
-            <div className="text-[9px] font-bold text-muted">{m.label}</div>
-          </div>
-        ))}
+        <Metric
+          value={String(summary.questionsThisMonth)}
+          label="Questions"
+          color="text-pink"
+        />
+        {/* ACTIVE study minutes — see hooks/use-study-timer.ts for what counts.
+            Shown as minutes below an hour and as hours above it: "0.3h" is a
+            worse answer than "18m" for a student who has done one section, and
+            "127m" is a worse answer than "2.1h" for one who has done a week. */}
+        <Metric
+          value={formatStudyTime(summary.minutesThisMonth)}
+          label="Study Time"
+          color="text-blue"
+        />
+        <Metric value={`${streak}🔥`} label="Day Streak" color="text-mint" />
+        {/* THIS MONTH's XP, not the lifetime total. Lifetime would restate the
+            number the global StatBar already shows a few pixels above, which is
+            exactly the "could not tell which were real" confusion this page's
+            Preview tag was added for. */}
+        <Metric
+          value={summary.xpThisMonth.toLocaleString("en-GB")}
+          label="XP This Month"
+          color="text-yellow"
+        />
       </div>
+    </div>
+  );
+}
+
+/** "0m" / "18m" / "2.1h". Zero is honest here, unlike a percentage: "you have
+ *  studied for no minutes this month" is true and useful, where "0%" would be a
+ *  claim about work that was never attempted. */
+function formatStudyTime(minutes: number): string {
+  if (minutes < 60) return `${minutes}m`;
+  return `${Math.round((minutes / 60) * 10) / 10}h`;
+}
+
+function Metric({
+  value,
+  label,
+  color,
+}: {
+  value: string;
+  label: string;
+  color: string;
+}) {
+  return (
+    <div className="text-center">
+      <div className={`font-heading text-base font-extrabold ${color}`}>
+        {value}
+      </div>
+      <div className="text-[9px] font-bold text-muted">{label}</div>
     </div>
   );
 }

@@ -17,6 +17,150 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 16 Sep 2026 — Most of the Progress page shows your real work now
+
+*Not yet committed.*
+
+**Why.** You asked whether the Progress dashboard could stop being sample data, and
+what the risk was. The honest answer was that some of it already existed and was
+just being ignored — the page claimed a 12-day streak and 1,240 XP a few pixels
+below the bar at the top showing your real numbers — while the per-subject scores
+had no source at all, because nothing in the app had ever recorded **which
+subject** a question belonged to or whether you got it right.
+
+**What is real now — four cards:**
+
+- **Overall Readiness** — your actual average mock-exam score this month, and the
+  real change against last month.
+- **The four figures under it** — Questions answered this month, Accuracy, your
+  real Day Streak, and XP earned this month.
+- **Weekly Learning Activity** — the last 7 days of real XP, labelled with real
+  weekdays, and a real "vs last week".
+- **Questions Answered** and **Subject Breakdown** — real per-subject counts,
+  scores, trends and activity strips.
+
+**What is still sample data, as you asked:** Focus Areas 🔍, Study Activity 🗓️
+and AI Insights 🤖✨ are untouched. Because those three remain, the
+**"Preview · sample data" label stays on the page.**
+
+**The app now records your work as you do it.** Answering a quiz question in a
+lesson, in practice, or in an exam records which subject it was and whether it
+was right. Nothing about those screens looks different — it just keeps a record
+now, which is what the subject cards read.
+
+**Two things to expect, so they don't look like faults:**
+
+- **A brand-new student sees a mostly empty page**, and that is correct rather
+  than broken: "No mock exams yet", "Not started yet" on each subject, and no
+  invented percentages. It fills in as they study. **The subject cards will look
+  thin for a few weeks even for existing students** — the app only starts
+  recording from today, so past work is not in it.
+- **The Study Activity calendar and the Questions Answered chart will not agree.**
+  One is real and one is sample data; that is the cost of keeping the calendar as
+  it is, and the Preview label is what covers it.
+
+**Study Time is real too.** The app now counts how long you actually study — the
+"Study Time" figure and the "Study Hours" option on the weekly chart are both
+live. See the note below on exactly what counts.
+
+**How study time is counted — worth knowing, because it counts LESS than you
+might expect, on purpose.** The clock runs only while you are on a lesson,
+section, practice deck, quiz, or an exam you are actually sitting. It stops when
+you put the phone down (two minutes without touching the screen), and it stops
+when you switch away from the app — and coming back does **not** credit the time
+you were away.
+
+Three deliberate exclusions:
+
+- **Browsing doesn't count.** Looking at the subject list, Home, or Progress
+  itself earns nothing.
+- **Asking KruAI doesn't count**, even though it is real studying. The chat can
+  be opened from anywhere and left open indefinitely, so counting it would be
+  the easiest way to inflate the number.
+- **Reading back a finished competition doesn't count.**
+
+The result is that the figure **under-counts slightly**, and that is the
+intended direction. A number anyone can inflate by leaving a phone unlocked is
+worse than useless — it would reward exactly the opposite of studying.
+
+**One limit to be aware of before this is ever used competitively:** the count
+happens on the phone, so a determined student could keep a lesson open and tap
+occasionally. That is fine for your own private figure. It is **not** safe to
+rank students on, and it should not be added to the Leaderboard without a
+server-side check first.
+
+**What to re-test.** Open Progress on your account — the streak and XP at the top
+should match the bar above them. Then answer a lesson quiz or a flashcard deck,
+come back, and check the Questions and Subject Breakdown numbers went up. For
+study time, sit on a lesson for a few minutes while touching the screen and
+check the Study Time figure rises; then leave the app for a while and check it
+does **not** jump when you come back.
+
+**One database step is needed** before this syncs to the server: the new
+`20260916000001_content_activity.sql` has to be run once in the Supabase SQL
+editor. Until then everything on the page still works from the phone itself; it
+just won't follow you to a new device.
+
+---
+
+## 16 Sep 2026 — Invite a friend to your competition with a link or a QR code
+
+*Not yet committed.*
+
+**Why.** If you wanted to play against one particular friend, there was no way to
+reach them — the only route into a competition was the public "Challenge
+Someone" list, which is everyone's list.
+
+**Where to find it.** On the **Game** page, every competition under
+**My Competitions** has an **Invite** button. Tap it and the QR opens right there
+in the row. That is two taps from opening the app, which matters — the moment you
+need the link is usually not when you made the competition, it is later, when
+your friend is sitting next to you.
+
+The "Competition created!" screen has the same button, for the moment you have
+just made one.
+
+**What it shows.** Tapping Invite shows:
+
+- a **QR code** — hold your phone up and your friend scans it, which is the
+  fastest thing in the world when you are sitting next to each other
+- the **link**, which you can select and copy by hand
+- **Copy link**, and **Share** (your phone's normal share sheet — Telegram,
+  Messenger, whatever you use), when your browser supports them
+
+**Nothing else changed.** Competitions are still public and still appear in
+"Challenge Someone" for everybody. This is only a faster way to get one
+particular person in.
+
+One thing worth knowing, because it sounds like a problem and is not: **a
+stranger playing your competition never blocked your friend.** Everyone who joins
+is measured against you alone, so your friend can still play it whoever got there
+first. The invite is about reaching the person you meant, not about reserving a
+spot.
+
+**The invite only appears once the competition has actually been shared.** If it
+saved on your device but could not reach the internet, there is no Invite button
+on that row — it will say "Not shared yet" instead. That is deliberate: the link
+would take your friend to "this competition is no longer available", and they
+would hit that on their phone with nothing to explain it. Once it syncs, the
+button appears on its own.
+
+**One real limitation to know before you test it.** The QR contains the web
+address of wherever the app is running. Generated on a development machine it
+says `localhost`, which no phone can reach — so **a QR only truly works on the
+real site**, not on a laptop running the app locally. The code itself is correct
+either way; we decoded it back and checked it matches exactly, and the quiet
+border scanners need is there. What has not been tested is an actual phone camera
+pointed at a real screen — that needs two phones and the deployed site.
+
+**What to re-test.** Open Game, find one of your competitions under My
+Competitions, tap Invite, and check the QR appears and the link is right. Check a
+competition marked "Not shared yet" has no Invite button. On a phone, check Share opens your normal share
+sheet. Then, on the deployed site, have someone actually scan it and confirm they
+land in your competition.
+
+---
+
 ## 14 Sep 2026 — Compare answers after a competition, and swap a photo of your working
 
 *Landed in commit `14a35ad`.* **Needed a database step — already applied to the live project on 14 Sep; see the bottom of this entry if you ever set up a second one.**

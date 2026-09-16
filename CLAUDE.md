@@ -581,11 +581,17 @@ study-time board can stop being demo data. **It is the server copy of the
 store's `activityLog` now** — `xp_earned` carries a day's XP and the three goal
 task flags carry whether the daily goal was met — which is what the Profile study
 calendar and the real streak are built on (see that section). The push sends
-today's row plus the previous 14 days, and the pull reads the last 400 back. `questions_answered` / `study_minutes` are still written by
-nothing and are there so the row has somewhere to put them; an empty column
-costs nothing, a migration on a live table costs a deploy. When `study_minutes`
-is finally populated it must mean ACTIVE minutes — see the leaderboard section
-for why.
+today's row plus the previous 14 days, and the pull reads the last 400 back.
+
+**`daily_content_activity` (20260916000001) is its companion**, and the split is
+the point: this table knows a day happened, that one knows what it was OF. It is
+the server copy of `contentLog` and the thing four Progress cards are built on;
+see the Progress section. **`study_minutes` IS written now** — by `hooks/use-study-timer.ts`, and it does
+mean ACTIVE minutes, which is what that column's original comment demanded. See
+the Progress section for what counts and for why the figure must not be ranked
+on without a server-side cap. `questions_answered` is still written by nothing
+and is deliberately left that way: its only consumer would be the Study Activity
+heatmap, which is still demo, and `contentLog` already carries the number.
 
 **`exam_results` has a `kind`.** The store's `examResults` holds generated mock
 exams ONLY, and three things depend on that: Home's "from mock exams" stat pill,
@@ -635,6 +641,12 @@ thing. Two invariants worth re-checking after any change to the store:
 
 Both were verified mechanically when this landed — 21/21 fields, 74/74 columns
 across 8 tables — and both are the kind of thing that rots quietly.
+
+`contentLog` is the newest entry on both sides: one key in `partializeState`,
+one line in `syncRelevantChange`, one table (`daily_content_activity`) mirrored
+in `database.ts`. `ExamResult.subject` added no column — `exam_results.subject`
+has existed since the initial schema and was simply never written until the
+store had a subject to put in it.
 
 `tasksDate` is listed in `syncRelevantChange` although it has NO column of its
 own — `daily_activity` keys on `activity_date`, which the push derives itself.
@@ -2653,10 +2665,10 @@ survey.
 
 **Progress dashboard** (`features/progress`) — score hero (SVG donut), Recharts
 trend line + bar chart, subject breakdown w/ sparklines, focus areas, activity
-heatmap, AI insights. The NUMBERS are fake/demo data on purpose (see below); the
-SUBJECTS they hang off are not — see the section directly below.
+heatmap, AI insights. FOUR of those seven cards run on real student data now;
+three are still invented — see the section directly below.
 
-### Progress: the numbers are invented, the SUBJECTS are not
+### Progress: four cards are REAL now, three are still invented
 
 This page shipped with its own hand-written subject list and it had drifted from
 the app in five separate ways at once, which is worth listing because each is a
@@ -2727,13 +2739,183 @@ panel) so it can read `payload[0].payload` — the whole `ProgressSubject` row
 `interval={0}` on the `XAxis` keeps Recharts from thinning ticks on its own,
 which it otherwise does at this width even with room for all of them.
 
-**`focusAreas` and `aiInsights` were deliberately left alone.** Their subjects
-(Chemistry, Physics, Math) are real, and their topics are demo prose rather than
-a subject list — there is nothing for them to drift from yet.
+#### The numbers came off demo data (16 Sep 2026) — four cards, not seven
 
-**Still demo, and still tagged:** the hero's XP / streak / study-time row is
-sample data, which is the recorded decision `PreviewTag` exists for. Making
-those real is a separate call, not part of this.
+The subject LIST stopped being invented first (above); the NUMBERS followed. The
+user's scope: **Score Hero, Weekly Learning Activity, Questions Answered and
+Subject Breakdown go real. Focus Areas 🔍, Study Activity 🗓️ and AI Insights 🤖✨
+stay exactly as they are.** (Study minutes was staged after those four and is
+now built too — see its own subsection below.) So `demo-data.ts` shrank to those three exports
+rather than being deleted, and **`PreviewTag` STAYS on `pages/progress.tsx`** —
+two or more demo cards means the tag belongs at page level, the Game page's own
+precedent.
+
+**WHAT NOTHING RECORDED, AND NOW DOES.** `activityLog` has always known a day
+earned XP; it has never known what FOR. That single gap is why every per-subject
+number here was fiction, and why `exam_results.subject` sat nullable and
+unwritten since the schema was created — the store's `ExamResult` had no subject
+field to supply it from.
+
+`contentLog: Record<dayKey, Record<contentKey, ContentDay>>` is the fix. A
+content key is a LESSON key (`biology-3-1`) or a bare subject id for work not
+attached to a lesson; the value is `{ answered, correct, reviewed, sessions }`.
+
+- **AGGREGATE, NOT AN EVENT LOG.** A row per question grows with the fastest-
+  growing quantity in the app and would need a `MAX_` cap like `reviewHistory`'s
+  — and a cap silently truncates exactly the history the 30-day trend reads. This
+  grows with days × content touched, so 200 questions in one lesson costs the
+  same as 2. Trimmed by `MAX_ACTIVITY_DAYS`, so it expires with `activityLog`.
+- **LESSON grain, although nothing reads that grain yet.** The call sites already
+  hold a lesson key, so collapsing to the subject would mean calling
+  `subjectOfKey()` at every write and discarding the rest — not less code. Focus
+  Areas is what would read it, and Focus Areas is still demo.
+- **`reviewed` never reaches an accuracy figure.** A flashcard grade is a
+  self-report, not a scored answer; folding it in would make "average score" a
+  blend of measured and claimed that no caption on the page distinguishes.
+- **Five writers:** `section-detail.tsx`, `quiz-runner.tsx` (unreachable today,
+  since `PRACTICE_QUIZZES` is empty — wired anyway), `exam-view.tsx` and
+  `review-session.tsx`. **Not** `placement-test-runner.tsx`: placement is a
+  diagnostic taken BEFORE studying, the same reasoning that already keeps it out
+  of `examResults`.
+- **BOTH exam kinds are recorded**, unlike `examResults`, which excludes past
+  papers. Deliberate: `examResults` captions Home's "from mock exams" pill and
+  feeds KruAI an average it states as fact, so a past paper in it makes both
+  wrong. The content log has no such caption, and a past paper is unambiguously
+  questions the student answered. **Don't "fix" the asymmetry.**
+
+`features/progress/content-keys.ts` is the ONLY place a key is parsed back into a
+subject. `subjectOfKey()` checks the real catalog and returns `null` rather than
+guessing, which is what stops a student-authored card id (`crypto.randomUUID()`)
+being attributed to whatever its first hyphen-separated chunk happens to spell.
+
+**`ExamResult.subject` is OPTIONAL and `version` stays 4.** Two distinct
+no-migration reasons, worth keeping apart: a new top-level key (`contentLog`) is
+covered by `merge()`'s top-level spread, while a new optional field on an
+existing array ELEMENT works for a different reason — `merge` spreads at the top
+level only, so `rest.examResults` is taken whole, nothing fills in `subject`, and
+`undefined` reads correctly as "unknown". Same as `Competition.sharedAt`. A
+migration would be actively wrong here: it could only invent a subject it does
+not know.
+
+**`summary.ts` returns a TOTAL object, never null — a React Compiler property
+rather than a style choice.** `ProgressSummary | null` would put
+`if (!summary) return <Empty/>` in every card, and the compiler narrows a
+closure's memo dependency to the exact property path it reads and emits that
+check where the closure is BUILT, above any guard later in source order. That is
+the `review-session.tsx` crash, reproduced once per card. Nullability therefore
+lives on LEAF fields. `todayKey()` is likewise called ONCE, in
+`pages/progress.tsx`, and threaded down — the two subject cards used to call
+`progressSubjects()` independently, so one screen could hold two answers.
+
+**Verified rather than reasoned about:** the compiled chunk shows
+`t[9] !== D.card.id || t[10] !== D.deckKey` emitted AFTER both guards in
+`review-session.tsx`, and a real browser graded all six Biology cards through to
+the summary and answered both section-quiz questions with no page error.
+
+**Empty states, because real data starts empty.** No exams → the ring draws its
+track only, the figure is `—` with no stray `%`, and the caption reads "No mock
+exams yet". An all-zero week → one line replaces the chart body, card and header
+staying. A subject with no work → `SubjectRowEmpty`, its own component so the
+branch is a one-line return: name, "Not started yet", and **no score, no trend,
+no progress bar, no sparkline**. It still gets a row — a missing row reads as a
+subject BrachNha does not teach, the mirror image of the geography bug.
+
+Three silent failures `tsc` caught only because those fields became nullable:
+`width: "null%"` is ignored by CSS and fails invisibly, `trendPct >= 0` is
+`false` for null and paints a pink ▼ on a subject with no trend at all, and the
+sparkline's opacity ramp divides by `length`.
+
+**POINTS, NOT PERCENT — and zero gets its own branch.** `trendPct` and the hero's
+month-over-month line are differences between two percentages, so 70 → 76 is six
+POINTS; "+6%" would be a different and wrong number. And with real data two
+windows scoring the same is common, where `>= 0` painted a green "▲ +0%" on a
+subject that had not moved; it reads "no change", in muted.
+
+**Sparklines changed meaning: daily question VOLUME, not accuracy.** Real daily
+accuracy on a one-question day swings to 0 or 100 and the strip becomes noise.
+
+**The three demo cards, and why each cannot be real today:**
+
+- **Focus Areas** — per-TOPIC accuracy. Lesson grain is the finest honest grain
+  the app has; topic grain exists nowhere in it.
+- **Study Activity** — `contentLog` COULD feed this one. Kept demo at the user's
+  explicit request. **Known and accepted:** its "tap a day to see questions
+  answered" now sits beside a bar chart showing REAL per-subject counts, and the
+  two will not add up. The page-level tag is what covers that.
+- **AI Insights** — needs an LLM pass plus a badge system. A live `/api/chat`
+  call from a bottom-nav tab would exhaust the shared Gemini quota (~20
+  requests/DAY for the whole deployment) and break KruAI, the app's actual AI
+  feature, on a screen nobody asked a question on.
+
+#### Study minutes — `hooks/use-study-timer.ts`
+
+Built last, deliberately: it is the only piece that adds an always-on timer to
+every screen, and the only one with a design problem rather than a plumbing one.
+`daily_activity.study_minutes` has carried its own instruction since the initial
+schema — it "must mean ACTIVE minutes … counting 'app was open' would make
+leaving a phone unlocked a winning strategy" — and every constant in that file
+is a defence of that sentence.
+
+**THE TRADE, and do not reuse this without revisiting it:** the figure is
+CLIENT-SIDE and therefore DEFEATABLE. A student who wants a bigger number can
+leave a lesson open and touch the screen every two minutes. That is fine for a
+private figure on their own Progress card, which is the only place it appears.
+**It is NOT fine for ranking students.** If the leaderboard ever adopts it, it
+needs a server-side sanity cap — `study_minutes <=` the wall-clock minutes
+between the day's first and last write — and that belongs with the leaderboard's
+cross-user work, not here.
+
+**Every judgement call rounds DOWN.** A defeatable number is allowed to be wrong
+in one direction only: a student who studied and was not credited is
+disappointed; a student credited for a pocketed phone makes the figure worthless
+for everyone.
+
+- **30s tick.** 5s is 720 wakeups an hour on a phone for a figure shown to one
+  decimal; 60s under-credits a 90-second section by a third.
+- **120s idle timeout**, on passive `pointerdown`/`keydown`/`wheel`/`touchstart`/
+  `scroll`. Long enough that reading a paragraph of dense Khmer without touching
+  the screen still counts, short enough that a pocketed phone stops earning.
+- **`visibilitychange` RESETS the stamp and never credits the gap.** Coming back
+  is activity; the time away is not study time.
+- **`lastInputAt` and `pendingSeconds` are MODULE-LEVEL, not refs.** StrictMode
+  gives each effect pass its own ref — the trap that once produced two anonymous
+  users per page load — and two half-counters would double-credit every minute.
+  Module scope is also what lets a sub-minute remainder survive navigation, so a
+  student moving between short sections is not zeroed at every screen.
+- **At most one `set()` per minute.** Every store write re-serialises through
+  `persist` and arms the sync debounce, so a per-second counter would be a write
+  loop rather than a measurement.
+
+**`isStudyRoute()` is NOT `isFocusRoute()`**, and the two differences are the
+point: the game REVIEW is excluded (reading back what you both answered is not
+studying), and the mock exam is not a route at all, so the store's `focusMode`
+is ORed in exactly as `useFocusMode()` does. **The KruAI overlay is deliberately
+absent** — asking the mentor IS studying, but the overlay is global, has no
+natural end and is the easiest place in the app to leave open on a pocketed
+phone. Counting it would reopen the hole the metric exists to close.
+
+**A trap this change had to fix first:** `logXp` and `logGoal` each rebuilt the
+day entry as `{ xp, goal }` literally, which was correct while those were the
+only two fields — and would have silently dropped `minutes` every time a student
+earned XP, so a day's study time vanished the moment they answered a question.
+Both spread `prev` now, so any field added to `DayActivity` later survives.
+
+**Verified with a fake clock** (`page.clock`), because a timer cannot be proven
+by a screenshot: 6 minutes of simulated active study credits exactly 6; 10
+minutes idle credits 1 and then stops at the 120s mark; a non-study route and a
+hidden tab each credit 0. **Note `fastForward` fires a repeating interval ONCE
+per call regardless of how far it jumps** — stepping 60s at a time silently
+halves the tick count and makes correct code look broken. Step at `TICK_MS`.
+
+**Server side:** `20260916000001_content_activity.sql` adds
+`daily_content_activity`, with its own RLS in the same file (the
+`20260913000001_competitions.sql` pattern). ONE push batch is correct there, but
+only because every row carries all four counters from a fixed literal so
+postgrest's column union is stable — a conditional spread would reintroduce
+exactly the NOT NULL failure the two-batch split exists to avoid, silently, on
+whichever day had no flashcard grades. `daily_activity.questions_answered` is
+deliberately left unwritten: its only consumer would be the heatmap, which stays
+demo, and `contentLog` already carries the number.
 
 **Game** (`features/game`) — asynchronous competitions between real students.
 See its own section below.
@@ -3319,6 +3501,149 @@ it except close the screen. A report path needs somewhere for a report to GO,
 which this app has no notion of yet: no teacher role, no moderation queue, no
 admin. That is the design problem to solve before a real classroom uses this, not
 another button.
+
+#### Inviting one friend: the link already existed, only the sending is new
+
+A student who wanted to play against ONE friend had no way to reach them — the
+only route into a competition was the public browse list, which is everybody's.
+
+**`/game/play/:competitionId` has been a real linkable route since the joiner
+side was built.** Nothing about the mechanism needed building; what was missing
+was a way to SEND it. That is the whole shape of this change, and it is why it
+touches no schema, no store field, no route table and no policy.
+
+**COMPETITIONS STAY PUBLIC — the user's call, and it is the cheaper right
+answer.** A "friends only" visibility column was offered and declined. Worth
+recording why it was never urgent: **a stranger playing your competition has
+never blocked your friend.** Every joiner is measured against the creator alone
+and `unique (competition_id, user_id)` is per person, so the friend can still
+play it whoever got there first. The complaint was noise and intent, not
+correctness, and a share affordance answers that without a migration.
+
+If it is ever revisited, the honest framing matters: with
+`competitions: read all` being `using (true)`, hiding a row from the browse list
+is a QUERY FILTER, so it would be **unlisted, not secret**. Real secrecy needs an
+invite token and a `security definer` function, because RLS cannot see a URL's
+query string. Don't ship the first and call it the second.
+
+**The invite is gated on `shared`, and that gate is the load-bearing part.** A
+competition that never reached the server exists on one device, so a link to it
+lands the friend on "no longer available" — a failure that surfaces on the OTHER
+student's phone, minutes later, with nothing to explain it. Same `sharedAt`
+reasoning MyCompetitions uses for its "Not shared yet" label, and it applies in
+both places the invite appears.
+
+##### It lives on the HUB ROW, and shipping it only on the posted screen was wrong
+
+The first version put the invite on "Competition created!" alone. That meant it
+**existed for about ten seconds and was then unreachable forever** — tap through
+and there was no way back to the link. The user found it immediately, and the
+diagnosis is that the moment was misjudged: creation is not when you need the
+link. Later is, when the friend is actually standing there.
+
+So **`MyCompetitions` carries it**, which is two taps from opening the app. The
+row is a `<Link>` to the review and the Invite button is its SIBLING — a button
+inside a link is invalid markup, and the invite has to stay independently
+tappable so a student can hand the link over without first opening the answers.
+Same split `PileList`'s rows already use for their star. The posted screen keeps
+its copy; they are two different moments, not a duplicate.
+
+**DELIBERATELY NOT ONLY ON THE REVIEW PAGE**, which was the tidier-looking home
+and is the trap: that screen asks for a photo of your working before it shows
+anything, so the single route to an invite would have sat behind a gate that has
+nothing to do with sending someone a link.
+
+**The shared status moved off the right edge onto the meta line** (`⏱ 10 min · 5
+questions · Open for joiners`). It was eating ~90px there, and with a button
+beside it the subject name was left with room for roughly six characters at the
+320px floor. It wraps rather than truncating — "Not shared yet" is the one thing
+on that row a student has to be able to read in full.
+
+**A LABELLED PILL, NOT A BARE ICON.** The complaint this answers was that the
+link was hard to find; an unlabelled glyph does not fix that. `t.inviteShort`
+exists for exactly this and is short because it sits in a list row.
+
+**One `openId`, not a set.** Two QR codes open at once is two things to scan and
+no way to tell which is which, so opening one closes the other.
+
+`InvitePanel` takes a `className` because it now renders in two frames: alone on
+the posted screen, where it needs its own card, and nested inside a row that
+already is one. `cn()` is twMerge, so `border-0 bg-transparent p-0 shadow-none`
+wins over the defaults — the same override-by-className shape `SubjectArt` uses.
+
+`scripts/shots.mjs`' seeded competition carries `sharedAt` for this: without it
+the row correctly hides the button and the whole new layout goes unphotographed
+at all nine widths.
+
+##### The QR code, and why a dependency was right here
+
+`uqr`, added for this. **That is not a reversal of `utils/image-compress.ts`'s
+refusal to take one — it is the same rule giving the opposite answer.** A browser
+already decodes and re-encodes photographs, so compressing one needed nothing;
+nothing in a browser generates a QR code, and doing it by hand means
+Reed-Solomon error correction over GF(256), which is the wrong code to write
+from memory.
+
+**NOT `qrcode`, which is the popular one.** Measured before choosing: it depends
+on `yargs` and `pngjs` for its Node command-line tool, and a terminal argument
+parser has no business in a bundle served to a phone. `uqr` is MIT, has **zero
+dependencies** (7 lines in the lockfile, verified), ships its own types, and
+returns a raw module matrix rather than markup — which is what lets the SVG be
+drawn here.
+
+Four decisions in `invite-qr.tsx` that look arbitrary and are not:
+
+- **DARK-ON-WHITE IN BOTH THEMES. This is the one place in the app that
+  deliberately ignores the theme tokens.** A QR is a machine-readable target,
+  not a themed graphic: the spec assumes dark modules on a light ground, and
+  while modern scanners cope with an inverted code plenty of older ones do not.
+  It keeps its own white card on the dark theme. Don't "fix" it to match.
+- **The quiet zone is part of the code, not padding.** Four clear modules a side,
+  which scanners use to find the symbol's edges. `uqr` defaults `border` to **1**,
+  so it has to be passed — the default is the one thing here that looks safe and
+  is not.
+- **Error correction "M", deliberately not the highest.** Every step up adds
+  modules, so the same link is drawn at a finer pitch in the same space, which
+  makes it HARDER for a phone camera to resolve. Redundancy is for print that
+  gets creased; a screen is clean and lit.
+- **One `<path>`, not one `<rect>` per module.** A production URL lands at 37
+  modules, so a rect apiece is ~500 DOM nodes for one graphic.
+
+**It is a LAZY BOUNDARY** — `invite-panel.tsx` reaches it through `React.lazy`,
+so the encoder downloads on the tap that opens the panel. Same boundary KaTeX,
+MathLive and three.js sit behind, and it breaks the same silent way. Verified
+twice: `invite-qr-*.js` is its own chunk and the entry chunk contains no
+`maskPattern`, AND in a real browser the chunk is requested **0 times before the
+tap, 2 after**.
+
+##### Sharing, and the two APIs that may not be there
+
+`navigator.share` opens the phone's own sheet (Telegram and Messenger are how
+this audience actually sends things); `navigator.clipboard` is the laptop path.
+
+**A CANCELLED SHARE IS NOT A FAILURE.** Dismissing the sheet rejects with
+`AbortError`, indistinguishable from a real error at the call site and
+overwhelmingly the common case. Telling a student something went wrong because
+they changed their mind is the bug to avoid; nothing is reported either way.
+
+**Both need a secure context and neither exists everywhere.** Share is absent
+rather than disabled when missing (`sidebar-nav.tsx`'s `href: null` rule), and
+**the URL is always rendered in a `select-all` box** — that is the fallback, not
+decoration, because a panel whose only two controls might both be missing needs
+something underneath them that cannot be. It is `break-all`, never truncated: a
+link that is cut off cannot be read out or copied by hand.
+
+##### What cannot be checked from here
+
+The code encodes `window.location.origin`, so one generated on a laptop at
+`localhost` encodes exactly that and a phone pointed at the screen cannot reach
+it. **Scanning is a deployed-site test with two phones.** Everything short of
+that IS checkable and was: `tmp` harness rendered the real component through
+Vite's `ssrLoadModule`, rasterised its SVG in Chrome and decoded it back with
+`jsqr` (installed to the scratchpad, never to `package.json`) — both a
+production-shaped URL and a `c<base36>` id round-tripped exactly, quiet zone
+confirmed at 4. A QR that renders beautifully and encodes the wrong string looks
+identical to a correct one, so rendering it is not evidence.
 
 #### Avatars are DERIVED, and that is a privacy decision
 
@@ -4164,12 +4489,18 @@ surface under the wrong tab on the same screen. XP *is* awarded for both. When
 past papers deserve a history of their own it should be a separate persisted
 field, not a widening of this one.
 
-**Progress, Grade Prediction, Leaderboard and Streak intentionally use
-fake, fixed demo data** (`features/*/demo-data.ts`), not live store data. An
-explicit user decision to avoid edge-case bugs (e.g. a brand-new user with zero
-exams breaking a chart). The files have comments noting what real data would
-need to exist (per-subject score tracking, a daily activity log) before
-switching over. The leaderboard's list is the longest of those: cross-student
+**Grade Prediction, Leaderboard and Streak intentionally use fake, fixed demo
+data** (`features/*/demo-data.ts`), not live store data. An explicit user
+decision to avoid edge-case bugs (e.g. a brand-new user with zero exams breaking
+a chart). The files have comments noting what real data would need to exist
+(per-subject score tracking, a daily activity log) before switching over.
+
+**PROGRESS HAS LEFT THAT LIST — mostly.** Four of its seven cards run on the
+student's own `contentLog`/`activityLog`/`examResults` now, and the edge cases
+this decision was taken to avoid were handled rather than avoided (see its own
+section). Three cards are still demo, which is why the page keeps its tag. The
+"per-subject score tracking" that entry names as the blocker is the thing that
+got built. The leaderboard's list is the longest of those: cross-student
 ranking, an XP ledger with timestamps, a daily activity log, and **active**
 study minutes with idle time excluded — counting "app is open" would make
 leaving a phone unlocked a winning strategy, which is exactly what that screen
@@ -4200,10 +4531,17 @@ with Friends — and on Game, which carries it for two reasons at once: its hero
 card is decoration by the user’s own request, and until competitions reach a
 server nobody else can see or join what a student posts. Every other section on
 that page is real. The tag comes off when both are true. Added
-11 Sep 2026: Progress's top row says 1,240 XP and a 12🔥 streak and the
+11 Sep 2026 because Progress's top row said 1,240 XP and a 12🔥 streak and the
 Leaderboard's "You" row 2,430 XP, a few pixels under the bar's real numbers, and
 the user could not tell which were real. Labelling was chosen over making those
-numbers real, for now. **The tags ARE the list of what is still fake** — a new
+numbers real — **on Progress that was then reversed and the numbers were made
+real (16 Sep 2026), so the top row no longer contradicts the bar.** Its tag
+stays only for the three cards that are still demo, and comes off the day any
+one of Focus Areas / Study Activity / AI Insights is the last of them to go.
+The mechanical test for that: delete `features/progress/demo-data.ts` and see
+whether the build passes.
+
+**The tags ARE the list of what is still fake** — a new
 demo screen gets one, and a screen that switches to real data loses it. `/streak`
 is deliberately untagged: its count is real, and its demo goal card is the
 user's recorded call (see the Streak section). The label is `text-text`, not
@@ -4750,8 +5088,15 @@ dev server — with and without a key — since neither typecheck nor lint cover
 For anything touching Supabase, additionally:
 
 ```bash
-npm run db:check     # env → reachability → Google sign-in → all 10 tables
+npm run db:check     # env → reachability → Google sign-in → all 11 tables
 ```
+
+**Progress needs `20260916000001_content_activity.sql` applied**, by hand, in the
+SQL editor. Until it is, `db:check` names `daily_content_activity` as missing and
+the content-log push fails silently while every Progress card keeps working off
+the LOCAL log — which is the usual degradation here (localStorage is the live
+copy; Supabase is the durable second one), so the only visible symptom is that a
+new device pulls no per-subject history.
 
 **The Game feature needs BOTH its migrations applied before db:check passes** —
 `20260913000001_competitions.sql` and

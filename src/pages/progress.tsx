@@ -7,8 +7,16 @@ import { ActivityHeatmap } from "@/features/progress/components/activity-heatmap
 import { AiInsights } from "@/features/progress/components/ai-insights";
 import { BottomNav } from "@/components/shell/bottom-nav";
 import { PreviewTag } from "@/components/preview-tag";
+import { useProgressSummary } from "@/features/progress/use-progress-summary";
 
 export default function ProgressPage() {
+  // Computed ONCE here and threaded down, rather than each card reading the
+  // store for itself. Two cards used to call progressSubjects() independently,
+  // which let one screen hold two answers to the same question; and the window
+  // maths needs today's date, so deriving it per card would let a render that
+  // crosses local midnight window two cards against two different days.
+  const summary = useProgressSummary();
+
   return (
     <div className="flex h-full flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-20 lg:pb-8 md:px-6 lg:px-8">
@@ -31,10 +39,10 @@ export default function ProgressPage() {
           {/* The score donut is the summary for everything below it, so it
               keeps the full width rather than sitting in a column. */}
           <div className="md:col-span-2">
-            <ScoreHero />
+            <ScoreHero summary={summary} />
           </div>
-          <WeeklyActivityChart />
-          <SubjectBarChart />
+          <WeeklyActivityChart summary={summary} />
+          <SubjectBarChart summary={summary} />
           {/* SubjectBreakdown grows with the number of subjects (up to 7 rows)
               and has no naturally similar-height neighbour left to pair with,
               so it spans full width rather than stretching a short card next
@@ -43,7 +51,7 @@ export default function ProgressPage() {
               followed it) sitting under the floating chat button at md/lg
               widths. */}
           <div className="md:col-span-2">
-            <SubjectBreakdown />
+            <SubjectBreakdown summary={summary} />
           </div>
           {/* Same reasoning as StatPills/GameStatsCard elsewhere: a fixed
               2x2 stat grid reads as a banner across the full width, not as a

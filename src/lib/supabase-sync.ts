@@ -4,6 +4,7 @@ import type { ExamResult } from "@/lib/store";
 import type {
   AccountSnapshot,
   ActivityLog,
+  ContentLog,
   Commitment,
   Conversation,
   PendingPlacementTest,
@@ -238,6 +239,7 @@ export async function pushLocalState(userId: string, s: StoreState) {
         task_flashcards: s.tasks.flashcards,
         task_challenge: s.tasks.challenge,
         xp_earned: s.activityLog[todayDate]?.xp ?? 0,
+        study_minutes: s.activityLog[todayDate]?.minutes ?? 0,
       },
       { onConflict: "user_id,activity_date" }
     )
@@ -261,14 +263,23 @@ export async function pushLocalState(userId: string, s: StoreState) {
     ([day]) => day >= windowStart && day < todayDate
   );
 
-  const xpRows = recentDays
-    .filter(([, d]) => d.xp > 0)
-    .map(([day, d]) => ({ user_id: userId, activity_date: day, xp_earned: d.xp }));
-  if (xpRows.length) {
-    await attempt("daily_activity: recent xp", () =>
+  // FILTERED ON "has any counter", not on xp alone. Study minutes can exist on a
+  // day with no XP — re-reading a section earns nothing — and that day would
+  // otherwise never reach the server at all. Every row carries BOTH columns so
+  // postgrest's column union stays stable; see the two-batch note above.
+  const counterRows = recentDays
+    .filter(([, d]) => d.xp > 0 || (d.minutes ?? 0) > 0)
+    .map(([day, d]) => ({
+      user_id: userId,
+      activity_date: day,
+      xp_earned: d.xp,
+      study_minutes: d.minutes ?? 0,
+    }));
+  if (counterRows.length) {
+    await attempt("daily_activity: recent counters", () =>
       db
         .from("daily_activity")
-        .upsert(xpRows, { onConflict: "user_id,activity_date" })
+        .upsert(counterRows, { onConflict: "user_id,activity_date" })
     );
   }
 
@@ -291,6 +302,41 @@ export async function pushLocalState(userId: string, s: StoreState) {
     );
   }
 
+  // ── the content log ──
+  // What the studying was OF, one row per (day, piece of content). Same window
+  // as the study log above and for the same reason: pushes are debounced and
+  // the network comes and goes, so a day worked entirely offline would
+  // otherwise never reach the server.
+  //
+  // ONE batch is correct here, unlike the two above — but only because every
+  // row carries all four counters from a fixed literal, so the column union
+  // postgrest sends is the same for every row. Writing
+  // `...(d.reviewed ? { reviewed: d.reviewed } : {})` would reintroduce exactly
+  // the NOT NULL failure the two-batch split exists to avoid, and it would do
+  // it silently, on whichever day happened to have no flashcard grades.
+  const contentRows: InsertOf<"daily_content_activity">[] = [];
+  for (const [day, byKey] of Object.entries(s.contentLog)) {
+    if (day < windowStart) continue;
+    for (const [content_key, d] of Object.entries(byKey)) {
+      contentRows.push({
+        user_id: userId,
+        activity_date: day,
+        content_key,
+        answered: d.answered,
+        correct: d.correct,
+        reviewed: d.reviewed,
+        sessions: d.sessions,
+      });
+    }
+  }
+  if (contentRows.length) {
+    await attempt("daily_content_activity", () =>
+      db.from("daily_content_activity").upsert(contentRows, {
+        onConflict: "user_id,activity_date,content_key",
+      })
+    );
+  }
+
   // ── exam results ──
   // kind is 'mock' for everything in this array by definition: exam-view.tsx
   // only calls addExamResult when run.kind === "generated". Past-paper and
@@ -301,6 +347,13 @@ export async function pushLocalState(userId: string, s: StoreState) {
       (r: ExamResult) => ({
         user_id: userId,
         kind: "mock" as const,
+        // Explicit null rather than a conditional spread: postgrest sends the
+        // UNION of the rows' keys as the column list, so a row that omitted
+        // `subject` in a batch where others carried it would be written as NULL
+        // anyway — stating it keeps the column set stable and the intent plain.
+        // `undefined` here means the attempt predates exam-view.tsx recording a
+        // subject, which is genuinely unknown and must not be guessed.
+        subject: r.subject ?? null,
         score: r.score,
         total: r.total,
         pct: r.pct,
@@ -445,8 +498,15 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
   }
   if (!profile || !profile.display_name) return false;
 
-  const [pending, commitments, exams, sessions, conversations, activity] =
-    await Promise.all([
+  const [
+    pending,
+    commitments,
+    exams,
+    sessions,
+    conversations,
+    activity,
+    contentActivity,
+  ] = await Promise.all([
       db
         .from("pending_placement_tests")
         .select("*")
@@ -475,8 +535,21 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
       db
         .from("daily_activity")
         .select(
-          "activity_date, xp_earned, task_lesson, task_practice, task_flashcards, task_challenge"
+          // study_minutes must be NAMED here. This select lists columns
+          // explicitly, so one left out comes back absent and every pulled day
+          // silently rebuilds with no study time at all.
+          "activity_date, xp_earned, study_minutes, task_lesson, task_practice, task_flashcards, task_challenge"
         )
+        .eq("user_id", userId)
+        .gt("activity_date", addDaysKey(new Date(), -MAX_ACTIVITY_DAYS)),
+      // What the studying was OF. Same window as the study log above, so the
+      // two halves of a day arrive together and neither is trimmed off on
+      // arrival. Without this, a student on a new phone keeps their streak and
+      // their calendar but every per-subject figure on Progress restarts at
+      // zero — the work would look undone rather than merely unsynced.
+      db
+        .from("daily_content_activity")
+        .select("activity_date, content_key, answered, correct, reviewed, sessions")
         .eq("user_id", userId)
         .gt("activity_date", addDaysKey(new Date(), -MAX_ACTIVITY_DAYS)),
     ]);
@@ -501,7 +574,28 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
     ].filter(Boolean).length;
     const xp = r.xp_earned > 0 ? r.xp_earned : ticked * TASK_XP;
     const goal = r.task_lesson && r.task_practice && r.task_flashcards;
-    if (xp > 0 || goal) activityLog[r.activity_date] = { xp, goal };
+    const minutes = r.study_minutes ?? 0;
+    if (xp > 0 || goal || minutes > 0) {
+      // `minutes` is omitted rather than written as 0 when the row has none:
+      // the field is optional precisely so "not measured" and "measured zero"
+      // stay distinguishable, and a rebuilt 0 would erase that.
+      activityLog[r.activity_date] = minutes > 0 ? { xp, goal, minutes } : { xp, goal };
+    }
+  }
+
+  // Same "absent means nothing happened" rule as the loop above: a row whose
+  // four counters are all zero records no work, so it is skipped rather than
+  // rebuilt into an entry the dashboard would then have to filter out again.
+  const contentLog: ContentLog = {};
+  for (const r of contentActivity.data ?? []) {
+    if (!r.answered && !r.reviewed && !r.sessions) continue;
+    const day = (contentLog[r.activity_date] ??= {});
+    day[r.content_key] = {
+      answered: r.answered,
+      correct: r.correct,
+      reviewed: r.reviewed,
+      sessions: r.sessions,
+    };
   }
 
   type MessageRow = Pick<Tables<"chat_messages">, "seq" | "role" | "content">;
@@ -538,6 +632,11 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
       total: r.total,
       pct: Number(r.pct),
       date: r.taken_at,
+      // `undefined`, NOT null — the column is nullable but the store's field is
+      // optional, and a row written before exam-view.tsx recorded a subject has
+      // to come back shaped exactly like one created locally today. Two
+      // spellings of "unknown" is how a reader ends up handling only one.
+      subject: r.subject ?? undefined,
     })),
     completedSessions: (sessions.data ?? []).map((r) => r.lesson_id),
     conversations: restored,
@@ -558,6 +657,7 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
     // immediately wipes it, which looks like the pull silently failing.
     tasksDate: todayDate,
     activityLog,
+    contentLog,
     // Re-derived, deliberately overriding the `streak` storeFromProfile() just
     // spread in: profiles.streak is only the last value some device pushed,
     // while the rows are the history it was computed from.

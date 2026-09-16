@@ -99,15 +99,23 @@ export function ReviewSession({
   progress?: DeckProgress;
   onExit: () => void;
 }) {
-  const { gradeCard, completeTask, starredCards, toggleStarredCard } =
-    useBrachNhaStore(
-      useShallow((s) => ({
-        gradeCard: s.gradeCard,
-        completeTask: s.completeTask,
-        starredCards: s.starredCards,
-        toggleStarredCard: s.toggleStarredCard,
-      }))
-    );
+  const {
+    gradeCard,
+    completeTask,
+    starredCards,
+    toggleStarredCard,
+    recordReviews,
+    recordSession,
+  } = useBrachNhaStore(
+    useShallow((s) => ({
+      gradeCard: s.gradeCard,
+      completeTask: s.completeTask,
+      starredCards: s.starredCards,
+      toggleStarredCard: s.toggleStarredCard,
+      recordReviews: s.recordReviews,
+      recordSession: s.recordSession,
+    }))
+  );
 
   const [liveQueue] = useState(queue);
   const [index, setIndex] = useState(0);
@@ -145,6 +153,12 @@ export function ReviewSession({
 
   function rate(grade: ReviewGrade) {
     gradeCard(current.card.id, grade);
+    // `deckKey` IS already a lesson key ("biology-1-1"), so there is nothing to
+    // derive here — and deriving it ABOVE, next to `current`, is precisely the
+    // crash the comment above describes: the compiler would memoize it with
+    // dependency `current.deckKey` and emit that check outside both guards. Read
+    // it inside this closure, where the guards have already run.
+    recordReviews(current.deckKey, 1);
     setResults((r) => [
       ...r,
       { cardId: current.card.id, grade, reviewedAt: new Date().toISOString() },
@@ -157,6 +171,7 @@ export function ReviewSession({
       // Daily Mission read — one real completion, whether this session came
       // from a single lesson or the Daily Review aggregate.
       completeTask("flashcards");
+      recordSession(current.deckKey);
     }
 
     setIndex(nextIndex);

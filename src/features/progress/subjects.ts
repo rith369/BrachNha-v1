@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import { T } from "@/data/translations";
 import { allSubjects, type SubjectId } from "@/features/lessons/subjects";
-import { subjectStats, type SubjectStats } from "./demo-data";
+import type { ProgressSummary, SubjectStat } from "./summary";
 
 /**
  * The Progress dashboard's subject rows, DERIVED from the app's own catalog.
@@ -34,11 +34,18 @@ import { subjectStats, type SubjectStats } from "./demo-data";
  * same card stayed English — a new inconsistency, not the fix this page needed.
  * If the whole dashboard is localized later, revisit this alongside that work.
  *
- * Only `subjectStats` is invented, and the PreviewTag on this page is what says
- * so. When real per-subject tracking exists, this function keeps its shape and
- * only that import changes.
+ * THE NUMBERS ARE REAL NOW. They used to come from demo-data.ts's hand-written
+ * `subjectStats`; they come from the student's own contentLog via
+ * buildProgressSummary(). The shape of this function did not change when that
+ * happened — only where the stats come from — which is what the previous
+ * version of this comment predicted.
+ *
+ * A subject with NO recorded work is absent from `summary.subjects` and gets
+ * ZEROED stats with every derived figure null. It still gets a row: dropping
+ * untouched subjects would make a missing subject read as one BrachNha does not
+ * teach, which is the mirror image of the geography bug above.
  */
-export interface ProgressSubject extends SubjectStats {
+export interface ProgressSubject extends SubjectStat {
   id: SubjectId;
   name: string;
   /** "Chem", "Phys" — for the bar chart's axis, where a full name doesn't fit. */
@@ -72,9 +79,23 @@ const SHORT_LABEL: Record<SubjectId, string> = {
   french: "Fr",
 };
 
-export function progressSubjects(userLanguage: string | undefined): ProgressSubject[] {
+/** A subject the student has not worked on yet. Not "zero score" — `null`
+ *  everywhere a percentage would otherwise be invented. */
+const NOT_STARTED: SubjectStat = {
+  questions: 0,
+  correct: 0,
+  score: null,
+  trendPct: null,
+  sparkline: null,
+  sessions: 0,
+};
+
+export function progressSubjects(
+  summary: ProgressSummary,
+  userLanguage: string | undefined
+): ProgressSubject[] {
   return allSubjects(userLanguage).map((s) => ({
-    ...subjectStats[s.id],
+    ...(summary.subjects[s.id] ?? NOT_STARTED),
     id: s.id,
     name: T.en[s.id],
     shortLabel: SHORT_LABEL[s.id],
@@ -83,7 +104,19 @@ export function progressSubjects(userLanguage: string | undefined): ProgressSubj
   }));
 }
 
-/** "▲ +6%" / "▼ -2%", from the one signed number the stats actually carry. */
+/**
+ * "▲ +6 pts" / "▼ -2 pts" / "no change", from the one signed number the stats
+ * carry.
+ *
+ * ZERO GETS ITS OWN BRANCH. With demo data the trend was never actually 0, so
+ * `>= 0` folding it in with the rises was invisible; with real data two windows
+ * scoring the same is common, and "▲ +0%" paints a green up-arrow on a subject
+ * that has not moved.
+ *
+ * "pts", not "%": this is a difference between two percentages, so 70 → 76 is
+ * six POINTS. Calling that "+6%" would be a different and wrong number.
+ */
 export function trendLabel(trendPct: number): string {
-  return trendPct >= 0 ? `▲ +${trendPct}%` : `▼ ${trendPct}%`;
+  if (trendPct === 0) return "no change";
+  return trendPct > 0 ? `▲ +${trendPct} pts` : `▼ ${trendPct} pts`;
 }

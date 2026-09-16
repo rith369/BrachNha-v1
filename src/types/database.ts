@@ -185,6 +185,43 @@ export type Database = {
         Relationships: [ProfileFk<"daily_activity_user_id_fkey">];
       };
 
+      /**
+       * One row per (student, day, piece of content) — the server copy of the
+       * store's `contentLog`, and the only place a scored question is
+       * attributed to a subject. See 20260916000001_content_activity.sql.
+       *
+       * `content_key` is a lesson key ("biology-3-1") or a bare subject id.
+       * Deliberately not a foreign key: the content itself lives in src/data/.
+       */
+      daily_content_activity: {
+        Row: {
+          id: string;
+          user_id: string;
+          activity_date: string;
+          content_key: string;
+          answered: number;
+          correct: number;
+          reviewed: number;
+          sessions: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          activity_date: string;
+          content_key: string;
+          answered?: number;
+          correct?: number;
+          reviewed?: number;
+          sessions?: number;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["daily_content_activity"]["Insert"]
+        >;
+        Relationships: [ProfileFk<"daily_content_activity_user_id_fkey">];
+      };
+
       exam_results: {
         Row: {
           id: string;

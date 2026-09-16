@@ -14,6 +14,8 @@ import type {
   AuthFeature,
   AccountConflict,
   ActivityLog,
+  ContentDay,
+  ContentLog,
   Competition,
   CompetitionAttempt,
 } from "@/types";
@@ -77,6 +79,26 @@ export interface ExamResult {
   total: number;
   pct: number;
   date: string;
+  /**
+   * The subject of the paper.
+   *
+   * OPTIONAL, and that is what makes it need no `persist` version bump: every
+   * result already sitting in a student's browser was recorded before
+   * exam-view.tsx had a subject to supply, and `undefined` reads correctly as
+   * "unknown". Same no-migration reasoning as Competition.sharedAt. A migration
+   * would be actively wrong here — it could only invent a subject it does not
+   * know.
+   *
+   * THE OBLIGATION THIS CREATES: `undefined` means unknown, NEVER a subject.
+   * Per-subject figures on Progress read `contentLog`, not this array; this is
+   * used only for the subject-agnostic overall average. A future "scores by
+   * subject" view must EXCLUDE undefined rows rather than bucket them anywhere.
+   *
+   * A SubjectId as a plain string, the same call Competition.subject makes and
+   * for the same reason: SubjectId lives in features/lessons, and nothing in
+   * lib/ imports from features/.
+   */
+  subject?: string;
 }
 
 export type Theme = "dark" | "light";
@@ -180,6 +202,20 @@ interface BrachNhaState {
    *  written by `award()`, the goal by `completeTask()`; capped at
    *  MAX_ACTIVITY_DAYS; synced through daily_activity. */
   activityLog: ActivityLog;
+  /**
+   * What the studying was OF: per local day, per piece of content, how many
+   * questions were answered and how many were right. See ContentLog in
+   * types/index.ts for why it is an aggregate rather than an event log.
+   *
+   * This is the source for every per-subject number on the Progress dashboard.
+   * `activityLog` above records that a day earned XP and has never recorded
+   * what for, which is the single reason those numbers were demo data.
+   *
+   * Written by recordQuestions/recordReviews/recordSession, never by `award()`
+   * — a reward and a score are different facts and the call sites already hand
+   * them over separately.
+   */
+  contentLog: ContentLog;
   tasks: Tasks;
   /**
    * The local calendar day (`YYYY-MM-DD`) `tasks` describes.
@@ -333,6 +369,35 @@ interface BrachNhaState {
   addXp: (amount: number, coins?: number) => void;
   completeTask: (task: keyof Tasks) => void;
   completeSession: (lessonId: string) => void;
+  /**
+   * Record scored questions against one piece of content, for today.
+   * Additive, so a per-question caller passes (key, 1, correct ? 1 : 0).
+   *
+   * `answered` and `correct` arrive TOGETHER so `correct <= answered` is
+   * structurally true at the call site rather than an invariant two separate
+   * actions could break — the same constraint the Postgres table carries.
+   *
+   * Awards nothing. The callers already route their reward through
+   * addXp/completeTask, which is what keeps "studied" one fact (see `award`).
+   */
+  recordQuestions: (
+    contentKey: string,
+    answered: number,
+    correct: number
+  ) => void;
+  /** Flashcard grades against one piece of content, for today. VOLUME ONLY —
+   *  never reaches an accuracy figure; see ContentDay.reviewed. */
+  recordReviews: (contentKey: string, count: number) => void;
+  /** One completed sitting at this content today. Deliberately NOT idempotent:
+   *  two sittings at one lesson in a day are two sessions. */
+  recordSession: (contentKey: string) => void;
+  /**
+   * Add ACTIVE study minutes to today. Called only by hooks/use-study-timer.ts,
+   * at most once a minute — every `set()` re-serialises the whole store through
+   * `persist` and arms the sync debounce, so a per-second counter would be a
+   * write loop rather than a measurement.
+   */
+  addStudyMinutes: (minutes: number) => void;
   /** Grade one flashcard, advance its schedule (see utils/spaced-repetition.ts)
    *  and award the flat per-card reward. Works for a card never graded before —
    *  it starts from a fresh state rather than requiring one to exist. */
@@ -463,7 +528,13 @@ function logXp(log: ActivityLog, today: string, amount: number): ActivityLog {
   if (amount <= 0) return log;
   const prev = log[today];
   return trimLog(
-    { ...log, [today]: { xp: (prev?.xp ?? 0) + amount, goal: prev?.goal === true } },
+    // SPREAD `prev`, don't rebuild the entry from its two known fields. This
+    // and logGoal below each used to write `{ xp, goal }` literally, which was
+    // correct while those were the only two — and would now silently drop
+    // `minutes` every time a student earned XP, so a day's study time would
+    // vanish the moment they answered a question. Any field added to
+    // DayActivity later is preserved by this for free.
+    { ...log, [today]: { ...prev, xp: (prev?.xp ?? 0) + amount, goal: prev?.goal === true } },
     today
   );
 }
@@ -472,8 +543,69 @@ function logXp(log: ActivityLog, today: string, amount: number): ActivityLog {
 function logGoal(log: ActivityLog, today: string): ActivityLog {
   const prev = log[today];
   if (prev?.goal === true) return log;
-  return trimLog({ ...log, [today]: { xp: prev?.xp ?? 0, goal: true } }, today);
+  return trimLog(
+    { ...log, [today]: { ...prev, xp: prev?.xp ?? 0, goal: true } },
+    today
+  );
 }
+
+/**
+ * Adds ACTIVE study minutes onto today's entry.
+ *
+ * Unlike logXp this does NOT make the day a studied day on its own — it only
+ * ever runs while the student is on a study screen, and a day with minutes but
+ * no XP is a day spent reading rather than answering, which is real. It creates
+ * the entry if nothing else has yet.
+ */
+function logMinutes(log: ActivityLog, today: string, minutes: number): ActivityLog {
+  if (minutes <= 0) return log;
+  const prev = log[today];
+  return trimLog(
+    {
+      ...log,
+      [today]: {
+        ...prev,
+        xp: prev?.xp ?? 0,
+        goal: prev?.goal === true,
+        minutes: (prev?.minutes ?? 0) + minutes,
+      },
+    },
+    today
+  );
+}
+
+/** Adds counters onto today's entry for one piece of content, creating the day
+ *  and the entry as needed, and trimming to the same window activityLog uses so
+ *  the two logs expire together. A zero-everywhere delta still writes, because
+ *  only the callers know whether nothing happened — and they check first. */
+function bumpContent(
+  log: ContentLog,
+  contentKey: string,
+  delta: Partial<ContentDay>
+): ContentLog {
+  const today = todayKey();
+  const day = log[today] ?? {};
+  const prev = day[contentKey] ?? EMPTY_CONTENT_DAY;
+  const next: ContentDay = {
+    answered: prev.answered + (delta.answered ?? 0),
+    correct: prev.correct + (delta.correct ?? 0),
+    reviewed: prev.reviewed + (delta.reviewed ?? 0),
+    sessions: prev.sessions + (delta.sessions ?? 0),
+  };
+  const cutoff = addDaysKey(parseDayKey(today), -MAX_ACTIVITY_DAYS);
+  return Object.fromEntries(
+    Object.entries({ ...log, [today]: { ...day, [contentKey]: next } }).filter(
+      ([d]) => d > cutoff
+    )
+  );
+}
+
+const EMPTY_CONTENT_DAY: ContentDay = {
+  answered: 0,
+  correct: 0,
+  reviewed: 0,
+  sessions: 0,
+};
 
 function award(
   state: { xp: number; level: number; coins: number; activityLog: ActivityLog },
@@ -537,6 +669,7 @@ const partializeState = (state: BrachNhaState) => ({
   coins: state.coins,
   streak: state.streak,
   activityLog: state.activityLog,
+  contentLog: state.contentLog,
   tasks: state.tasks,
   tasksDate: state.tasksDate,
   examResults: state.examResults,
@@ -590,6 +723,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       // a seeded 12 (DEMO_SEED_STREAK) that nothing ever incremented.
       streak: 0,
       activityLog: {},
+      contentLog: {},
       tasks: emptyTasks,
       tasksDate: "",
       examResults: [],
@@ -728,6 +862,50 @@ export const useBrachNhaStore = create<BrachNhaState>()(
             ? state
             : { completedSessions: [...state.completedSessions, lessonId] }
         ),
+
+      // ── the content log ────────────────────────────────────────────────
+      // All three go through bumpContent(), so the trim rule, the "today" key
+      // and the immutable-replacement shape are written once. Every one of them
+      // returns a NEW outer object, a new day object and a new entry, because
+      // syncRelevantChange compares contentLog by reference — mutating in place
+      // would record the work and never push it.
+
+      recordQuestions: (contentKey, answered, correct) =>
+        set((state) =>
+          answered <= 0
+            ? state
+            : {
+                contentLog: bumpContent(state.contentLog, contentKey, {
+                  answered,
+                  // Clamped rather than trusted: `correct <= answered` is a
+                  // CHECK constraint on the table, so a caller that got the
+                  // argument order wrong would otherwise fail the whole push
+                  // days later, far from the mistake.
+                  correct: Math.max(0, Math.min(correct, answered)),
+                }),
+              }
+        ),
+
+      recordReviews: (contentKey, count) =>
+        set((state) =>
+          count <= 0
+            ? state
+            : { contentLog: bumpContent(state.contentLog, contentKey, { reviewed: count }) }
+        ),
+
+      recordSession: (contentKey) =>
+        set((state) => ({
+          contentLog: bumpContent(state.contentLog, contentKey, { sessions: 1 }),
+        })),
+
+      addStudyMinutes: (minutes) =>
+        set((state) => {
+          const next = logMinutes(state.activityLog, todayKey(), minutes);
+          // Returning the SAME object when nothing moved keeps a no-op flush
+          // from publishing a store update and arming a sync push — the same
+          // rule rolloverDailyTasks() follows for a quiet tab wake.
+          return next === state.activityLog ? state : { activityLog: next };
+        }),
 
       // A card with no prior record starts from a fresh ReviewState rather
       // than requiring one to already exist — this is what lets a "new" card
@@ -1015,6 +1193,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           coins: 0,
           streak: 0,
           activityLog: {},
+          contentLog: {},
           tasks: emptyTasks,
           tasksDate: "",
           examResults: [],

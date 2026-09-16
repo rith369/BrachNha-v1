@@ -29,6 +29,7 @@ const TABLES = [
   "pending_placement_tests",
   "commitments",
   "daily_activity",
+  "daily_content_activity",
   "exam_results",
   "completed_sessions",
   "conversations",

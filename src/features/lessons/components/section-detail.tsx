@@ -10,6 +10,7 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
+import { lessonKeyOf } from "@/features/progress/content-keys";
 import { useShallow } from "zustand/react/shallow";
 import { FocusLayout, FocusButton } from "@/components/shell/focus-layout";
 import {
@@ -197,14 +198,28 @@ export function SectionDetail({
   section: SectionContent;
 }) {
   const navigate = useNavigate();
-  const { lang, addXp, completeTask, completeSession } = useBrachNhaStore(
+  const {
+    lang,
+    addXp,
+    completeTask,
+    completeSession,
+    recordQuestions,
+    recordSession,
+  } = useBrachNhaStore(
     useShallow((s) => ({
       lang: s.lang,
       addXp: s.addXp,
       completeTask: s.completeTask,
       completeSession: s.completeSession,
+      recordQuestions: s.recordQuestions,
+      recordSession: s.recordSession,
     }))
   );
+
+  // The LESSON this section belongs to — "biology-3-1-1" -> "biology-3-1".
+  // Computed here rather than inside the handlers because it depends only on a
+  // prop, and both handlers want it.
+  const contentKey = lessonKeyOf(sectionId);
 
   const [step, setStep] = useState(0);
   // Keyed by question index rather than a single value, because the quiz is a
@@ -233,8 +248,13 @@ export function SectionDetail({
    */
   function answerQuestion(index: number, option: string) {
     if (answers[index]) return;
+    const right = option === quiz[index].correct;
     setAnswers((prev) => ({ ...prev, [index]: option }));
-    if (option === quiz[index].correct) addXp(QUIZ_XP, QUIZ_COINS);
+    if (right) addXp(QUIZ_XP, QUIZ_COINS);
+    // The same once-per-question guarantee the XP relies on covers this, so the
+    // count cannot be inflated by re-tapping. Progress reads this and nothing
+    // else for its per-subject figures.
+    recordQuestions(contentKey, 1, right ? 1 : 0);
   }
 
   function exit() {
@@ -243,6 +263,7 @@ export function SectionDetail({
 
   function finish() {
     completeTask("lesson");
+    recordSession(contentKey);
     // completedSessions matches on the SECTION id, which is the same string the
     // path node carries — there is no second id to keep in step.
     completeSession(sectionId);

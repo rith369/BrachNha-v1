@@ -13,6 +13,7 @@ import { AuthPromptOverlay } from "@/features/auth/components/auth-prompt-overla
 import { AccountConflictView } from "@/features/auth/components/account-conflict-view";
 import { useBrachNhaStore } from "@/lib/store";
 import { useSupabaseSync } from "@/hooks/use-supabase-sync";
+import { useStudyTimer } from "@/hooks/use-study-timer";
 import { useAuthSession } from "@/hooks/use-auth-session";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -75,6 +76,12 @@ export function AppShell({
   // it a no-op, and the app stays entirely local: the supported state, not a
   // degraded one.
   useSupabaseSync();
+
+  // Counts ACTIVE study minutes. Mounted here for the same reason the sync hook
+  // is — it has to outlive every navigation, and a student moving between two
+  // short sections would otherwise lose the part-minute each time. It is a
+  // no-op on every screen that is not a study screen, which is most of them.
+  useStudyTimer();
 
   // `tasks` is TODAY's checklist, and something has to be the thing that says
   // so. Mounted here rather than on Home because the daily rows are read from

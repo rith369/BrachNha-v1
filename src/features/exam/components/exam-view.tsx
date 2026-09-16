@@ -41,9 +41,15 @@ type Run =
  * runner brings FocusLayout's own and must not be nested inside a second one.
  */
 export function ExamView() {
-  const { addXp, addExamResult } = useBrachNhaStore(
-    useShallow((s) => ({ addXp: s.addXp, addExamResult: s.addExamResult }))
-  );
+  const { addXp, addExamResult, recordQuestions, recordSession } =
+    useBrachNhaStore(
+      useShallow((s) => ({
+        addXp: s.addXp,
+        addExamResult: s.addExamResult,
+        recordQuestions: s.recordQuestions,
+        recordSession: s.recordSession,
+      }))
+    );
 
   const [tab, setTab] = useState<ExamTab>("past");
   const [run, setRun] = useState<Run | null>(null);
@@ -52,11 +58,27 @@ export function ExamView() {
   >(null);
 
   function handleSubmit(score: ExamScore) {
-    const result: ExamResult = { ...score, date: new Date().toISOString() };
+    const subject = run?.paper.subject.id;
+    const result: ExamResult = {
+      ...score,
+      date: new Date().toISOString(),
+      subject,
+    };
 
     // XP for both kinds: it is the app's effort currency, and withholding it
     // from the harder artefact would be backwards.
     addXp(score.score * 20);
+
+    // BOTH KINDS ARE RECORDED HERE, unlike examResults below — and that
+    // asymmetry is deliberate rather than an oversight. examResults captions
+    // Home's "from mock exams" pill and feeds chat-prompt.ts an average it
+    // states to KruAI as fact, so a past paper in it would make those two
+    // wrong. The content log has no such caption to break, and a past paper is
+    // unambiguously questions this student answered. Don't "fix" the mismatch.
+    if (subject) {
+      recordQuestions(subject, score.total, score.score);
+      recordSession(subject);
+    }
 
     // But a PAST-PAPER attempt deliberately does NOT go into examResults. That
     // array captions Home's stat pill "from mock exams" and feeds

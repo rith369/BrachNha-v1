@@ -83,6 +83,7 @@ export default function PracticeRunPage() {
     <QuizRunner
       questions={questions}
       subjectId={subject.id}
+      contentKey={key}
       mode="quiz"
       title={title}
     />

@@ -45,20 +45,31 @@ import type { PracticeMode } from "../practice";
 export function QuizRunner({
   questions,
   subjectId,
+  contentKey,
   mode,
   title,
 }: {
   questions: SectionQuestion[];
   subjectId: string;
+  /** The lesson key this quiz belongs to ("biology-3-1"), for the content log
+   *  Progress reads. Passed in rather than rebuilt from subjectId + lessonRef,
+   *  because pages/practice-run.tsx already has it. */
+  contentKey: string;
   /** Carried only so the X returns to the list the student came from. */
   mode: PracticeMode;
   /** The lesson's name, shown on the completion screen. */
   title: string;
 }) {
   const navigate = useNavigate();
-  const { addXp, completeTask } = useBrachNhaStore(
-    useShallow((s) => ({ addXp: s.addXp, completeTask: s.completeTask }))
-  );
+  const { addXp, completeTask, recordQuestions, recordSession } =
+    useBrachNhaStore(
+      useShallow((s) => ({
+        addXp: s.addXp,
+        completeTask: s.completeTask,
+        recordQuestions: s.recordQuestions,
+        recordSession: s.recordSession,
+      }))
+    );
 
   const [index, setIndex] = useState(0);
   // Keyed by question index rather than a single value, so stepping back shows
@@ -80,6 +91,7 @@ export function QuizRunner({
     // Mission read, so a finished quiz is one real completion rather than a
     // second tracker beside the self-reported one.
     completeTask("practice");
+    recordSession(contentKey);
     setIndex(total);
   }
 
@@ -120,8 +132,10 @@ export function QuizRunner({
    */
   function answerQuestion(option: string) {
     if (answers[index]) return;
+    const right = option === question.correct;
     setAnswers((prev) => ({ ...prev, [index]: option }));
-    if (option === question.correct) addXp(QUIZ_XP, QUIZ_COINS);
+    if (right) addXp(QUIZ_XP, QUIZ_COINS);
+    recordQuestions(contentKey, 1, right ? 1 : 0);
   }
 
   const footer = (

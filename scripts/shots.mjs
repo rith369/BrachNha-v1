@@ -159,8 +159,38 @@ function dayKey(offset) {
 // "studied" mark is photographed too. Today shows its "not yet" ring and the
 // nudge, the everyday state. The seeded `streak` below is what this log
 // derives to; AppShell's rollover recomputes it on load anyway (tasksDate "").
+// What the studying was OF, the twin of seededActivity above. Without this
+// /progress photographs seven "Not started yet" rows and two empty charts —
+// technically correct for a student who has done nothing, and useless as a
+// screenshot of the page this seed exists to show. Two subjects with real work
+// and the rest untouched is the honest mix: it captures the populated row, the
+// not-started row and a subject below the trend's minimum sample all at once.
+const seededContent = Object.fromEntries(
+  Array.from({ length: 40 }, (_, i) => i)
+    .filter((i) => i % 3 !== 2)
+    .map((i) => [
+      dayKey(-i),
+      {
+        [i % 2 === 0 ? "biology-1-1" : "math"]: {
+          answered: 2 + (i % 4),
+          correct: Math.max(0, 2 + (i % 4) - (i % 3)),
+          reviewed: i % 2,
+          sessions: 1,
+        },
+        ...(i % 5 === 0
+          ? { "chemistry-2-1": { answered: 3, correct: 1, reviewed: 0, sessions: 1 } }
+          : {}),
+      },
+    ])
+);
+
 const seededActivity = Object.fromEntries([
-  ...Array.from({ length: 12 }, (_, i) => [dayKey(-(i + 1)), { xp: 80 + i * 5, goal: true }]),
+  // `minutes` is what the Study Time tile and the chart's Study Hours series
+  // read; without it both photograph at zero and the toggle looks broken.
+  ...Array.from({ length: 12 }, (_, i) => [
+    dayKey(-(i + 1)),
+    { xp: 80 + i * 5, goal: true, minutes: 18 + i * 3 },
+  ]),
   [dayKey(-20), { xp: 24, goal: false }],
   [dayKey(-21), { xp: 40, goal: false }],
   [dayKey(-25), { xp: 90, goal: true }],
@@ -196,12 +226,19 @@ const seeded = (theme) => ({
     coins: 30,
     streak: 12,
     activityLog: seededActivity,
+    contentLog: seededContent,
     tasks: { lesson: false, practice: false, flashcards: false, challenge: false },
     // The day `tasks` describes. "" means nothing has been completed yet, so
     // AppShell's rollover stamps today and leaves the (already empty) checklist
     // alone — no screenshot shows a reset that just happened.
     tasksDate: "",
-    examResults: [],
+    // Two this month and one last, so the hero shows a real average AND the
+    // "vs last month" line — which is absent, by design, with fewer.
+    examResults: [
+      { score: 8, total: 10, pct: 80, date: new Date(new Date().setDate(3)).toISOString(), subject: "math" },
+      { score: 7, total: 10, pct: 70, date: new Date(new Date().setDate(6)).toISOString(), subject: "biology" },
+      { score: 6, total: 10, pct: 60, date: (() => { const d = new Date(); d.setMonth(d.getMonth() - 1, 12); return d.toISOString(); })() },
+    ],
     // One posted competition and one played attempt, so /game photographs the
     // cards a real student sees rather than the hero alone. Both are hidden when
     // empty (see pages/game.tsx), which is exactly why the seed has to carry
@@ -226,6 +263,10 @@ const seeded = (theme) => ({
         creatorMs: 96_000,
         total: 5,
         createdAt: new Date().toISOString(),
+        // SHARED, so My Competitions renders its Invite button and the harness
+        // photographs the control rather than the row without it. Absent here,
+        // the row correctly hides the button and the new layout goes unchecked.
+        sharedAt: new Date().toISOString(),
       },
     ],
     competitionAttempts: [

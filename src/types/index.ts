@@ -80,12 +80,70 @@ export interface DayActivity {
   /** All three daily-goal tasks (utils/streak.ts's DAILY_GOAL_TASKS) were done
    *  that day. ONLY these days count toward the streak. */
   goal: boolean;
+  /**
+   * ACTIVE study minutes that day — time on a study screen with the tab visible
+   * and the student actually touching it. See hooks/use-study-timer.ts for what
+   * counts and what deliberately does not.
+   *
+   * OPTIONAL, and that is what makes it need no migration: every day already
+   * logged predates the timer, and `?? 0` reads that correctly as "not
+   * measured" rather than as "studied for zero minutes". Same no-migration
+   * reasoning as Competition.sharedAt.
+   *
+   * It lives on the DAY rather than on contentLog's per-content entry because
+   * idle time is not attributable to a lesson — a student can sit on one
+   * section for an hour and study for ten minutes of it — and because the two
+   * cards that read it are subject-agnostic.
+   */
+  minutes?: number;
 }
 
 /** Keyed `YYYY-MM-DD` by utils/day.ts's todayKey(). The streak, the "+N today"
  *  label and the Profile calendar are all derived from this and nothing else.
  *  An absent day was not studied at all. */
 export type ActivityLog = Record<string, DayActivity>;
+
+/**
+ * Work done against ONE piece of content on ONE local day.
+ *
+ * This is the record nothing in the app kept before: a scored question,
+ * attributed to a subject. `activityLog` knows a day earned XP; it has never
+ * known what the XP was for, which is why every per-subject number on the
+ * Progress dashboard was invented.
+ */
+export interface ContentDay {
+  /** Scored questions answered — section quizzes, practice quizzes, exams. */
+  answered: number;
+  /** Of those, right first time. `correct <= answered` always. */
+  correct: number;
+  /**
+   * Flashcard grades. Counted for VOLUME and never folded into accuracy: a
+   * grade is a self-report ("I remembered it"), not a scored answer, and
+   * mixing the two would make "average score" a blend of measured and claimed
+   * that no caption on the page distinguishes.
+   */
+  reviewed: number;
+  /** Sittings at this content that day. Two sittings at one lesson are two. */
+  sessions: number;
+}
+
+/**
+ * day key (`YYYY-MM-DD`) → content key → counters.
+ *
+ * A CONTENT KEY is either a LESSON key (`biology-3-1`) or a bare subject id
+ * (`biology`) for work not attached to a lesson — an exam paper. The subject is
+ * the first segment of both, which works because every SubjectId is a single
+ * hyphen-free token; see features/progress/content-keys.ts, which is the only
+ * place that parsing is allowed to happen.
+ *
+ * AGGREGATE, NOT AN EVENT LOG, and the distinction is load-bearing. A row per
+ * question would grow with the fastest-growing quantity in the app and would
+ * need a MAX_ cap the way reviewHistory does — and a cap silently truncates
+ * exactly the history the 30-day trend reads. This grows with days × content
+ * touched instead, so answering 200 questions in one lesson costs the same
+ * bytes as answering 2. Trimmed to MAX_ACTIVITY_DAYS alongside activityLog.
+ */
+export type ContentLog = Record<string, Record<string, ContentDay>>;
 
 export interface PendingPlacementTest {
   subject: string;
