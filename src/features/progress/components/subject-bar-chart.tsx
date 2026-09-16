@@ -2,6 +2,7 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, Tooltip, Cell } from "rechar
 import { useBrachNhaStore } from "@/lib/store";
 import { progressSubjects, type ProgressSubject } from "../subjects";
 import type { ProgressSummary } from "../summary";
+import { InfoTip } from "@/components/ui/info-tip";
 
 /**
  * Recharts' tooltip content signature — not exported from the package, so
@@ -43,7 +44,15 @@ export function SubjectBarChart({ summary }: { summary: ProgressSummary }) {
     <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
       <div className="mb-3">
         <div className="font-heading text-sm font-extrabold">
-          Questions Answered 📊
+          Questions{" "}
+          <span className="whitespace-nowrap">
+            Answered 📊
+            <InfoTip label="About Questions Answered" className="ml-1.5 align-middle">
+              How many quiz and exam questions you&apos;ve answered in each
+              subject, all time. Flashcards aren&apos;t counted. Tap a bar to see
+              the exact number.
+            </InfoTip>
+          </span>
         </div>
         <div className="text-[11px] font-bold text-muted">
           Per subject, all time

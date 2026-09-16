@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import type { ProgressSummary } from "../summary";
 import { cn } from "@/utils/cn";
+import { InfoTip } from "@/components/ui/info-tip";
 
 /**
  * A ROLLING 7 days ending today, not a fixed Mon-Sun week.
@@ -118,7 +119,27 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
           </div>
           <div className="min-w-0">
             <div className="font-heading text-sm font-extrabold">
-              Weekly Learning Activity
+              Weekly Learning{" "}
+              <span className="whitespace-nowrap">
+                Activity
+                <InfoTip label="About Weekly Learning Activity" className="ml-1.5 align-middle">
+                  <span className="block">
+                    The last 7 days, with today on the right.
+                  </span>
+                  <span className="mt-1 block">
+                    <b className="font-extrabold">XP Points</b> — the XP you
+                    earned each day.
+                  </span>
+                  <span className="mt-1 block">
+                    <b className="font-extrabold">Study Minutes</b> — the time you
+                    actively studied each day.
+                  </span>
+                  <span className="mt-1 block">
+                    &ldquo;vs last week&rdquo; compares this week&apos;s XP with
+                    the 7 days before.
+                  </span>
+                </InfoTip>
+              </span>
             </div>
             <div className="text-[11px] font-bold text-muted">
               Your study time &amp; XP over the last 7 days.

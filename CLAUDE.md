@@ -2917,6 +2917,82 @@ whichever day had no flashcard grades. `daily_activity.questions_answered` is
 deliberately left unwritten: its only consumer would be the heatmap, which stays
 demo, and `contentLog` already carries the number.
 
+#### Every real number explains itself on HOVER or TAP — `components/ui/info-tip.tsx`
+
+Added after a student had to ask three questions in a row: how Subject Breakdown
+differs from Questions Answered, why a subject had no bar, and what 88% meant.
+Offered labels written into the cards or plain sentences, **the user chose
+tooltips** — the cards stay as uncluttered as before and the explanation is one
+gesture away. All four REAL cards carry them; the three demo cards do not.
+
+Two trigger shapes, one component. A card TITLE gets an ⓘ explaining the card.
+A NUMBER is itself the trigger, **with no marker at all**: the four stat tiles
+(the whole ~70px tile is the target, not a speck of an icon), a subject's score
+("7 of 8 correct, all time", plus the trend as a sentence), and — on a row below
+`MIN_SAMPLE` — the question count, which says how many more answers a score
+needs. `MIN_SAMPLE` is exported from `summary.ts` for exactly that line, so the
+threshold is written once.
+
+Four things that look arbitrary and are not:
+
+- **Hover with a mouse, tap with a finger — it shipped tap-only, and a dotted
+  underline marked every number.** The user found the underlines ugly and asked
+  for what other apps do. Both reversals hold together: once a mouse sees the
+  explanation on hover, the underline has nothing left to announce. A mouse
+  gets `cursor-help`; a phone user learns from each card's ⓘ.
+- **The flicker that justified tap-only is avoided, not accepted.** Hover-open
+  plus click-toggle shuts under the cursor the moment the click lands, so the
+  click is judged by what MADE it: `onPointerDown` records `pointerType`, a
+  mouse click only ever OPENS, and a touch or a keyboard Enter toggles. Hover is
+  filtered to `pointerType === "mouse"` — a touch fires `pointerenter` too, and
+  reading that as a hover would open on the way in and toggle shut on the click.
+- **Two delays, ONE timer.** `HOVER_OPEN_MS` (150) stops a pointer sweeping the
+  four tiles from flashing four popups. `HOVER_CLOSE_MS` (120) is the grace for
+  crossing the 6px gap into the popup — hover lives on the WRAPPER, which
+  contains the popup, so arriving on it re-fires `pointerenter` and cancels the
+  close. One ref holds whichever intent is pending, so a leave followed by a
+  quick re-enter cannot race into a shut popup. Also closes on an outside tap
+  or click and on Escape — `ActivityHeatmap`'s rule. A tap INSIDE the popup
+  keeps it open, so an open popup can cover the next trigger; a test that taps
+  down a list must close each one first.
+- **Measured, not aligned.** The heatmap aligns from the grid column it knows.
+  A shared popup cannot, and overflow here is not cosmetic: every page scroller
+  is `overflow-y-auto`, which forces overflow-x to auto, so a popup past the
+  edge makes the page scroll sideways. It centres under the trigger, clamps
+  inside the nearest clipping ancestor (8px clear), and flips above only when
+  below is cut off and above fits. Position is written to `style` in a LAYOUT
+  effect — before paint, so no jump, and not `setState`, which
+  `react(set-state-in-effect)` refuses.
+- **The ⓘ is glued to the title's LAST WORD** (`whitespace-nowrap` span). As a
+  flex item it floated to the far edge once the title wrapped; as a plain inline
+  it wrapped onto a line of its own ("OVERALL READINESS" fills a 320px line).
+- **The popup's font is `[font-family:var(--font-body),sans-serif]`, not the
+  `font-body` utility.** `--font-body` carries no generic fallback — `body` adds
+  `sans-serif` itself in `globals.css` — so before Nunito arrives on a slow
+  connection the utility renders in the browser's default SERIF. Seen in a real
+  screenshot, not theorised. `study-calendar.tsx` still uses `font-body` on its
+  Today button and has the same latent flash.
+
+**THE COPY IS A CLAIM ABOUT THE CODE, and goes stale silently.** Each tooltip
+states a rule — flashcards don't count toward questions or score, past papers
+don't count toward readiness, the study clock pauses after 2 minutes and ignores
+KruAI, the trend needs 5 in both windows. Changing any of those rules means
+editing the sentence too; nothing will fail if it isn't.
+
+**Known and left alone:** a subject studied ONLY with flashcards still reads
+"Not started yet" (`questions` counts scored answers, and that is the row's
+branch). The legend tells the truth about flashcards but cannot fix a row label
+that says otherwise; changing the branch was offered and not asked for.
+
+Verified in a real browser at 320px and 1280px, dark and light: all 11 triggers
+open with the right text, stay inside their clip box, add no sideways scroll,
+and inherit no uppercase/centring/heading font. Then with a REAL MOUSE at 1280:
+each opens on hover and closes on leave with no click; a 60ms-per-tile sweep
+opens nothing; a click after hover leaves it open; the pointer can travel into
+the popup. And with REAL TOUCH (`hasTouch`) at 320: tap opens, tap again closes,
+nothing opens from the touch's own `pointerenter`, a tap inside keeps it open.
+No trigger renders a text decoration.
+
 **Game** (`features/game`) — asynchronous competitions between real students.
 See its own section below.
 

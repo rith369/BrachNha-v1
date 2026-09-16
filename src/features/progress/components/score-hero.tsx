@@ -1,4 +1,5 @@
 import { useBrachNhaStore } from "@/lib/store";
+import { InfoTip } from "@/components/ui/info-tip";
 import type { ProgressSummary } from "../summary";
 
 const R = 40;
@@ -31,7 +32,16 @@ export function ScoreHero({ summary }: { summary: ProgressSummary }) {
       <div className="flex items-center gap-4">
         <div className="flex-1">
           <div className="text-[11px] font-extrabold tracking-widest text-muted uppercase">
-            Overall Readiness
+            Overall{" "}
+            <span className="whitespace-nowrap">
+              Readiness
+              <InfoTip label="What is Overall Readiness?" className="ml-1.5 align-middle">
+                Your average score on the mock exams you took this month — the
+                វិញ្ញាសារបង្កើតថ្មី papers. Past papers don&apos;t count here. The
+                line underneath compares it with last month: 70% → 76% shows as +6
+                pts.
+              </InfoTip>
+            </span>
           </div>
           <div className="font-heading text-4xl font-bold">
             {pct ?? NO_VALUE}
@@ -110,6 +120,7 @@ export function ScoreHero({ summary }: { summary: ProgressSummary }) {
           value={String(summary.questionsThisMonth)}
           label="Questions"
           color="text-pink"
+          hint="Quiz and exam questions you answered this month. Flashcards aren't counted."
         />
         {/* ACTIVE study minutes — see hooks/use-study-timer.ts for what counts —
             rendered in HOURS, because this figure is a month's total. The
@@ -120,8 +131,14 @@ export function ScoreHero({ summary }: { summary: ProgressSummary }) {
           value={formatStudyTime(summary.minutesThisMonth)}
           label="Study Time"
           color="text-blue"
+          hint="Time spent actively studying this month: lessons, sections, flashcards, quizzes and exams. It pauses after 2 minutes without a tap or scroll, and while you're out of the app. Chatting with KruAI isn't counted."
         />
-        <Metric value={`${streak}🔥`} label="Day Streak" color="text-mint" />
+        <Metric
+          value={`${streak}🔥`}
+          label="Day Streak"
+          color="text-mint"
+          hint="Days in a row you finished all 3 daily tasks: a lesson, practice and flashcards. Today is added once all 3 are done."
+        />
         {/* THIS MONTH's XP, not the lifetime total. Lifetime would restate the
             number the global StatBar already shows a few pixels above, which is
             exactly the "could not tell which were real" confusion this page's
@@ -130,6 +147,7 @@ export function ScoreHero({ summary }: { summary: ProgressSummary }) {
           value={summary.xpThisMonth.toLocaleString("en-GB")}
           label="XP This Month"
           color="text-yellow"
+          hint="XP you've earned since the 1st of this month. Your all-time total is in the bar at the top of the screen."
         />
       </div>
     </div>
@@ -160,21 +178,40 @@ function formatStudyTime(minutes: number): string {
   return `${Math.max(Math.round((minutes / 60) * 10) / 10, 0.1)}h`;
 }
 
+/**
+ * One stat tile. The WHOLE TILE is the hover and tap target for its
+ * explanation, not a separate ⓘ: four icons crammed into a four-column strip at
+ * the 320px floor would each be a hard-to-hit speck, and a ~70px tile is an easy
+ * one. Deliberately unmarked — a dotted underline under each label was tried and
+ * removed as ugly; see components/ui/info-tip.tsx.
+ */
 function Metric({
   value,
   label,
   color,
+  hint,
 }: {
   value: string;
   label: string;
   color: string;
+  hint: string;
 }) {
   return (
-    <div className="text-center">
-      <div className={`font-heading text-base font-extrabold ${color}`}>
-        {value}
-      </div>
-      <div className="text-[9px] font-bold text-muted">{label}</div>
-    </div>
+    <InfoTip
+      className="flex w-full"
+      triggerClassName="flex w-full flex-col items-center py-0.5"
+      trigger={
+        <>
+          <span className={`font-heading text-base font-extrabold ${color}`}>
+            {value}
+          </span>
+          <span className="text-[9px] font-bold text-muted">
+            {label}
+          </span>
+        </>
+      }
+    >
+      {hint}
+    </InfoTip>
   );
 }

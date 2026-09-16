@@ -25,8 +25,11 @@ import { subjectOfKey } from "./content-keys";
  */
 
 /** Below this many answered questions a percentage is noise dressed as a
- *  finding — one right answer out of two is not "50% in Chemistry". */
-const MIN_SAMPLE = 5;
+ *  finding — one right answer out of two is not "50% in Chemistry".
+ *
+ *  Exported because SubjectBreakdown tells a student how many more questions a
+ *  score needs; a second hardcoded 5 there would drift from this one. */
+export const MIN_SAMPLE = 5;
 
 /** Days in each half of the trend comparison. */
 const TREND_WINDOW_DAYS = 30;
@@ -73,7 +76,7 @@ export interface WeekDay {
    * the timer was broken. That was reported. An hours axis only starts saying
    * anything at half an hour a day, which is not the scale this app is used at.
    *
-   * The monthly Study Time tile still switches to hours past 60 (see
+   * The monthly Study Time tile shows the same measurement in HOURS (see
    * score-hero.tsx) — a MONTH's total genuinely does outgrow minutes, where a
    * single day's does not.
    */
