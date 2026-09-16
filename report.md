@@ -19,7 +19,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 16 Sep 2026 — Most of the Progress page shows your real work now
 
-*Not yet committed.*
+*Landed in commit `325204e`.* **Needed a database step — already applied to the live project on 16 Sep.**
 
 **Why.** You asked whether the Progress dashboard could stop being sample data, and
 what the risk was. The honest answer was that some of it already existed and was
@@ -105,7 +105,7 @@ just won't follow you to a new device.
 
 ## 16 Sep 2026 — Invite a friend to your competition with a link or a QR code
 
-*Not yet committed.*
+*Landed in commit `188211b`.*
 
 **Why.** If you wanted to play against one particular friend, there was no way to
 reach them — the only route into a competition was the public "Challenge
