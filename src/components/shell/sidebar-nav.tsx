@@ -67,7 +67,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <>
-      <div className="shrink-0 border-b border-purple/10 bg-[image:var(--drawer-header)] px-6 pt-13 pb-5 lg:pt-6">
+      <div className="shrink-0 border-b border-purple/10 bg-[image:var(--drawer-header)] px-6 pt-4 pr-14 pb-5 lg:pt-6 lg:pr-6">
         <Wordmark
           subtitle={
             <div className="text-xs font-bold text-muted">
