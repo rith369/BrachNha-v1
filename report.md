@@ -99,6 +99,11 @@ were not affected.
   first tried telling the AI to stop; that made no difference, so that instruction was taken
   back out. Instead **the chat bubble now shows those formulas properly.** The raw code shown
   in the test answers went from as many as 30 pieces per answer down to 0–4.
+- **A third problem, spotted by you while testing, also fixed.** When KruAI wrote Khmer
+  words *inside* a formula, e.g. an answer ending "Au + H₂O → គ្មានប្រតិកម្ម", the whole
+  formula showed as raw code, because the formula font has no Khmer letters. Now the
+  bubble splits it: the chemistry shows as a proper formula and the Khmer words show as
+  normal Khmer text right after it.
 - **What's left:** occasionally a plain sum like "2 + 2" still appears with a pair of `$`
   signs around it. We left that on purpose. Making the bubble accept those too would start
   treating ordinary prices written with a dollar sign as formulas, which is a worse problem.

@@ -67,6 +67,123 @@ function looksLikeMath(tex: string, display: boolean): boolean {
   return TEX_MARKER.test(tex);
 }
 
+/** A text-mode command whose argument the model fills with words. Sticky, so it
+ *  matches only at the index it is pointed at. */
+const TEXT_COMMAND = /\\(?:text|textrm|mathrm|mbox)\s*\{/y;
+
+/** Index of the `}` closing a group whose `{` sits just before `start`, or -1.
+ *  An escaped `\{` or `\}` does not count. */
+function closingBrace(tex: string, start: number): number {
+  let depth = 1;
+  for (let i = start; i < tex.length; i++) {
+    const ch = tex[i];
+    if (ch === "\\") {
+      i++;
+      continue;
+    }
+    if (ch === "{") depth++;
+    else if (ch === "}" && --depth === 0) return i;
+  }
+  return -1;
+}
+
+/**
+ * A formula with Khmer words inside `\text{…}`, split into math and plain text —
+ * or null when it is anything less clear-cut than that.
+ *
+ * The model writes `$\mathrm{Au} + \mathrm{H_2O} \to \text{គ្មានប្រតិកម្ម}$`
+ * ("no reaction") although data/bac2-format.ts tells it not to put Khmer in
+ * \text{}. The Khmer guard in looksLikeMath then refuses the WHOLE formula and
+ * the student reads raw LaTeX — the same all-or-nothing failure the padding
+ * rule had, and prompt instructions have already been shown not to fix that
+ * class of habit (see the padding note in looksLikeMath).
+ *
+ * So the Khmer comes OUT of the formula instead: the math before and after it
+ * is typeset, and the words become an ordinary text segment in the page's
+ * Khmer font. That keeps the guard's promise — KaTeX never receives a Khmer
+ * glyph — while no longer throwing the chemistry away with it.
+ *
+ * Returns null, leaving today's safe behaviour, whenever the split would be a
+ * guess:
+ *   - Khmer anywhere OUTSIDE a text command (prose dollars in a Khmer sentence
+ *     look exactly like that, and must stay text);
+ *   - a text command nested inside a group, e.g. `\frac{\text{ខ្មែរ}}{2}` —
+ *     cutting there would leave unbalanced braces;
+ *   - a text argument holding a backslash or a dollar, which is not plain words;
+ *   - inline math spanning a newline, the same rule looksLikeMath applies.
+ *
+ * Every piece is emitted INLINE, even from a `$$…$$` block: a display formula
+ * followed by its own words on the next line reads worse than one flowing line.
+ */
+function liftKhmerText(tex: string, display: boolean): MathSegment[] | null {
+  if (!display && tex.includes("\n")) return null;
+
+  const parts: MathSegment[] = [];
+  let math = "";
+  let depth = 0;
+  let lifted = false;
+
+  const pushMath = () => {
+    const value = math.trim();
+    if (value) parts.push({ type: "math", value, display: false });
+    math = "";
+  };
+
+  let i = 0;
+  while (i < tex.length) {
+    const ch = tex[i];
+
+    if (ch === "\\" && depth === 0) {
+      TEXT_COMMAND.lastIndex = i;
+      const command = TEXT_COMMAND.exec(tex);
+      if (command) {
+        const open = i + command[0].length;
+        const close = closingBrace(tex, open);
+        if (close === -1) return null;
+        const words = tex.slice(open, close);
+
+        if (KHMER.test(words)) {
+          if (words.includes("\\") || words.includes("$")) return null;
+          pushMath();
+          parts.push({ type: "text", value: words.trim() });
+          lifted = true;
+        } else {
+          // A text command with no Khmer in it is ordinary TeX. Keep it whole.
+          math += tex.slice(i, close + 1);
+        }
+        i = close + 1;
+        continue;
+      }
+    }
+
+    if (ch === "\\") {
+      // Any other command or escaped character, copied as a unit so an escaped
+      // brace is never counted as a group.
+      math += tex.slice(i, i + 2);
+      i += 2;
+      continue;
+    }
+    if (ch === "{") depth++;
+    else if (ch === "}") depth--;
+    math += ch;
+    i++;
+  }
+  pushMath();
+
+  if (!lifted) return null;
+  // Khmer left in a math piece was not inside a top-level text command.
+  if (parts.some((p) => p.type === "math" && KHMER.test(p.value))) return null;
+
+  // Space the words off the formula beside them; the delimiters that used to
+  // separate them are gone.
+  return parts.map((part, n) => {
+    if (part.type !== "text") return part;
+    const before = parts[n - 1]?.type === "math" ? " " : "";
+    const after = parts[n + 1]?.type === "math" ? " " : "";
+    return { type: "text", value: `${before}${part.value}${after}` };
+  });
+}
+
 export function splitMath(input: string): MathSegment[] {
   const segments: MathSegment[] = [];
   let buffer = "";
@@ -100,6 +217,17 @@ export function splitMath(input: string): MathSegment[] {
 
       const tex = input.slice(i + delim.length, close);
       if (!looksLikeMath(tex, display)) {
+        // A formula refused only because Khmer sits inside a \text{…} can be
+        // split into math and plain text rather than shown as raw source.
+        // See liftKhmerText.
+        const lifted = KHMER.test(tex) ? liftKhmerText(tex, display) : null;
+        if (lifted) {
+          flush();
+          segments.push(...lifted);
+          i = close + delim.length;
+          continue;
+        }
+
         // Not a formula. Emit just this delimiter as text and keep scanning
         // from the next character, so a genuine `$…$` later in the line can
         // still open correctly.

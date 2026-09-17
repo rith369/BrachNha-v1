@@ -5309,6 +5309,22 @@ That keeps the original guard — "costs $ and $x^2$" still refuses to pair
 inside dollars, an unclosed stream fragment and a newline-spanning span.
 Re-scoring the saved answers took stray dollars from 30/10/28/6/30 to 4/0/2/0/2.
 
+**A THIRD failure, found by the user the same day: Khmer inside `\text{}`.** An
+answer ended `$\mathrm{Au} + \mathrm{H_2O} \to \text{គ្មានប្រតិកម្ម}$` ("no
+reaction"), although the rules forbid it. The Khmer guard refused the whole
+formula, so the student saw raw LaTeX. `liftKhmerText()` in
+`utils/math-render.ts` now splits such a formula instead: the math either side is
+typeset and the Khmer becomes an ordinary text segment in the Khmer font, so
+KaTeX still never receives a Khmer glyph. It covers `\text`, `\textrm`,
+`\mathrm` and `\mbox` at brace depth 0 only, and returns null — the old safe
+behaviour — for bare Khmer in math (prose dollars look exactly like that), a
+text command nested in a group (`\frac{\text{…}}{2}` would unbalance braces), an
+argument holding `\` or `$`, or inline math spanning a newline. Pieces from a
+`$$…$$` block are emitted INLINE: formula-then-words on one line reads better
+than a display block with its words stranded underneath. Checked offline, no
+API calls, on 15 cases including every earlier guard: 0 KaTeX errors, 0 math
+segments containing Khmer.
+
 **Deliberately left: padded plain arithmetic** (`$ 2 + 2 $`) still shows raw.
 Accepting `+` or `=` as a TeX marker would start typesetting dollar AMOUNTS in
 prose ("$5 + $3"). The rules already tell the model not to wrap bare numbers, and
