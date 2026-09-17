@@ -8,10 +8,10 @@
 // changed and the left-hand fighter swapped to the real student. This file is
 // what feeds that.
 //
-// SO THIS IS DECORATION, NOT A CLAIM, and the page carries `PreviewTag` for
-// exactly this reason: the app's rule was never "no sample data", it is "sample
-// data must be labelled". That pill is the label, and it stays until this file
-// no longer feeds anything.
+// SO THIS IS DECORATION, NOT A CLAIM. The page used to carry `PreviewTag` to
+// say so; the user asked for that pill to be removed (17 Sep 2026), so this card
+// is the app's one knowingly unlabelled piece of sample data. The kicker reads
+// "Battle" rather than "Live Game" — which also stops it claiming a live match.
 //
 // WHAT IS REAL ON THAT CARD: the left fighter's name and avatar, and the button.
 // WHAT COMES FROM HERE: the opponent, both scores, the HP split, the subject,

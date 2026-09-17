@@ -19,9 +19,9 @@ import { avatarSeedFor } from "@/utils/avatar-seed";
  *
  * Everything else on the card is decoration from ../demo-data: the opponent, the
  * scoreline, the HP split, the subject, the question count and the clock. That
- * is a deliberate product decision, not an oversight — and it is why `PreviewTag`
- * stays on this page. The rule this codebase actually holds to is that sample
- * data must be LABELLED, and that pill is the label.
+ * is a deliberate product decision, not an oversight. The page's `PreviewTag`
+ * that used to label it was removed at the user's request (17 Sep 2026) — see
+ * pages/game.tsx.
  *
  * Don't quietly make the fake numbers real by wiring them to a competition: the
  * card would then claim a live match, which is the one thing the feature cannot

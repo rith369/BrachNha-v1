@@ -6,7 +6,6 @@ import { OpenCompetitions } from "@/features/game/components/open-competitions";
 import { GameStatsCard } from "@/features/game/components/game-stats-card";
 import { GameHistory } from "@/features/game/components/game-history";
 import { BottomNav } from "@/components/shell/bottom-nav";
-import { PreviewTag } from "@/components/preview-tag";
 import { gameCopy } from "@/features/game/copy";
 import { useSharePendingCompetitions } from "@/features/game/share-pending";
 
@@ -22,10 +21,11 @@ import { useSharePendingCompetitions } from "@/features/game/share-pending";
  * instead of a hole where one rendered null. A first-time /game is the hero
  * alone, which is the honest picture of having posted nothing.
  *
- * PreviewTag is DELIBERATE and stays for two reasons at once: the hero card is
- * decoration by the user's own request (see new-match-card.tsx), and until
- * competitions reach a server nobody else can see or join what a student posts.
- * The app's rule is that sample data must be labelled, and this is the label.
+ * NO PreviewTag, on the user's explicit request (17 Sep 2026). The hero card is
+ * still decoration (see new-match-card.tsx) and every other section is real; the
+ * user chose to drop the "Preview · sample data" pill rather than keep labelling
+ * that one card. This is the app's one knowing exception to "sample data must be
+ * labelled" — don't restore the tag without asking.
  */
 export default function GamePage() {
   const { lang, competitions, attempts } = useBrachNhaStore(
@@ -47,10 +47,9 @@ export default function GamePage() {
         <div className="mb-0.5 font-heading pr-14 text-xl font-extrabold">
           {t.title}
         </div>
-        <div className="mb-2 pr-14 text-xs font-bold text-muted">
+        <div className="mb-4 pr-14 text-xs font-bold text-muted">
           {t.subtitle}
         </div>
-        <PreviewTag className="mb-4" />
 
         {/* See pages/progress.tsx for why two columns at lg needs no changes
             inside the cards themselves. */}
