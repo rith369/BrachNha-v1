@@ -145,8 +145,10 @@ export function ChatOverlay() {
    * Drop a MathLive formula into the message at the cursor.
    *
    * The padding goes OUTSIDE the dollars, never inside. splitMath applies the
-   * standard TeX rule that inline math may not be hugged by whitespace, so
-   * `$ x^2 $` is not math — it would reach the bubble as literal dollar signs.
+   * standard TeX rule that inline math may not be hugged by whitespace. It now
+   * forgives padding around unmistakable TeX (`$ x^2 $` renders — the model
+   * pads constantly, see looksLikeMath), but a padded `$ x $` is still refused,
+   * so inserting inside the dollars would silently break the simplest formulas.
    */
   function insertLatex(latex: string) {
     const { start, end } = selection();

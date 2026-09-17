@@ -20,6 +20,10 @@ export type MathSegment =
 /** Khmer block, U+1780–U+17FF. */
 const KHMER = /[ក-៿]/;
 
+/** Something that appears in TeX and essentially never in a sentence: a
+ *  backslash command, a super/subscript, or a brace. See looksLikeMath. */
+const TEX_MARKER = /\\[A-Za-z]|[\^_{}]/;
+
 /**
  * Is this really a formula, or two stray dollar signs that happened to pair up
  * across a sentence?
@@ -44,7 +48,23 @@ function looksLikeMath(tex: string, display: boolean): boolean {
   // two dollars in "costs $ and $x^2$" from pairing with each other and
   // stealing the real formula that follows.
   if (tex.includes("\n")) return false;
-  return !/^\s|\s$/.test(tex);
+  if (!/^\s|\s$/.test(tex)) return true;
+
+  // ...EXCEPT when what sits between the padded dollars is unmistakably TeX.
+  //
+  // The model writes `$ \mathrm{CH_4} $` often, and no prompt instruction
+  // stops it. Measured on "balance the combustion of CH₄" once the prompt's
+  // LaTeX rules were fixed (data/bac2-format.ts): 5 of 6 answers padded
+  // their formulas, 30 raw dollar signs in one reply, and an explicit "no
+  // space inside the dollars" rule changed nothing (3 of 3 still padded). The
+  // student saw the source code of every formula.
+  //
+  // So the whitespace rule now guards only what it was written for — prose
+  // dollars pairing up. " and " contains no backslash command, no ^ or _ and
+  // no brace, so "costs $ and $x^2$" still refuses to pair the wrong two. A
+  // padded span that DOES contain one is a formula by any reading, and KaTeX
+  // ignores spaces in math mode, so it renders identically unpadded.
+  return TEX_MARKER.test(tex);
 }
 
 export function splitMath(input: string): MathSegment[] {

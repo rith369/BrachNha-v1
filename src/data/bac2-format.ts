@@ -18,6 +18,25 @@ import type { Bac2Example } from "../types/index.js";
  * teacher-verified yet — they are drawn from the app's own math/biology lesson
  * content (data/lessons.ts) so the bot at least stays consistent with what the
  * student sees elsewhere in the app.
+ *
+ * EVERY LaTeX BACKSLASH IN THIS FILE IS DOUBLED, AND MUST STAY THAT WAY. These
+ * are JavaScript template literals, so `\frac` is not a backslash and "frac" —
+ * `\f` is a FORM FEED, `\r` (in `\right`) a carriage return, `\t` (`\theta`,
+ * `\to`, `\times`) a tab, `\b` (`\beta`, `\begin`) a backspace, `\n` (`\ne`) a
+ * LINE BREAK, and every other letter simply loses its backslash. Write `\\frac`
+ * and the string holds `\frac`.
+ *
+ * This was a real bug, not a theoretical one. The rules blocks shipped with
+ * single backslashes, so Gemini received 9 control characters and ZERO real
+ * backslashes, and the chemistry rule taught `$mathrm{H_2O}$`. Measured before
+ * the fix: asked to balance CH₄ combustion, KruAI wrote 15 formulas opening
+ * `$mathrm{…}$` — which KaTeX does not reject, it renders the italic letters
+ * "mathrmCH4" — copying the corrupted example exactly. Oxlint's
+ * `no-useless-escape` was reporting every one of them all along.
+ *
+ * To check what the model actually receives, load this module and
+ * JSON.stringify a rules string: a real backslash prints as `\\`, a control
+ * character as `\f` / `\t` / `\b`.
  */
 
 export const BAC2_ANSWER_RULES: { en: string; km: string } = {
@@ -40,10 +59,10 @@ WRITING RULES:
   Khmer glyphs, so Khmer between two dollar signs renders as a row of empty boxes. Write
   the Khmer sentence, then the formula: ជំនួស $x = 2$ ក្នុងរូបមន្ត.
 - Every dollar sign must be part of a pair. A lone $ left in a sentence is a bug.
-- Use only commands KaTeX supports: \frac \sqrt \lim \int \sum \prod \left \right \mathrm
-  \pi \theta \alpha \beta \omega \Delta \infty \le \ge \ne \approx \to \times \cdot \pm
-  and ^ _ for powers and indices. No \begin{align}, no \text{} holding Khmer, no raw HTML.
-- Chemistry uses \mathrm: $\mathrm{H_2O}$, $2\mathrm{H_2} + \mathrm{O_2} \to 2\mathrm{H_2O}$.
+- Use only commands KaTeX supports: \\frac \\sqrt \\lim \\int \\sum \\prod \\left \\right \\mathrm
+  \\pi \\theta \\alpha \\beta \\omega \\Delta \\infty \\le \\ge \\ne \\approx \\to \\times \\cdot \\pm
+  and ^ _ for powers and indices. No \\begin{align}, no \\text{} holding Khmer, no raw HTML.
+- Chemistry uses \\mathrm: $\\mathrm{H_2O}$, $2\\mathrm{H_2} + \\mathrm{O_2} \\to 2\\mathrm{H_2O}$.
 - Do not wrap bare numbers or short units in dollar signs. Write 25%, 9.8 m/s², not
   $25$%. Dollar signs are for expressions, not for every digit.
 - The student's question may already contain LaTeX between dollar signs, because the
@@ -84,10 +103,10 @@ WRITING RULES:
 - កុំដាក់អក្សរខ្មែរ ឬពាក្យធម្មតា នៅក្នុងសញ្ញាដុល្លារជាដាច់ខាត។ ពុម្ពអក្សរគណិតគ្មានតួអក្សរខ្មែរទេ
   ដូច្នេះខ្មែរនៅចន្លោះសញ្ញាដុល្លារនឹងក្លាយជាប្រអប់ទទេ។ សរសេរប្រយោគខ្មែរជាមុន រួចទើបរូបមន្ត៖
   ជំនួស $x = 2$ ក្នុងរូបមន្ត។
-- ប្រើតែពាក្យបញ្ជាដែល KaTeX ស្គាល់៖ \frac \sqrt \lim \int \sum \prod \left \right \mathrm
-  \pi \theta \alpha \beta \omega \Delta \infty \le \ge \ne \approx \to \times \cdot \pm
-  និង ^ _ សម្រាប់ស្វ័យគុណនិងសន្ទស្សន៍។ កុំប្រើ \begin{align} កុំដាក់ខ្មែរក្នុង \text{}។
-- គីមីប្រើ \mathrm៖ $\mathrm{H_2O}$, $2\mathrm{H_2} + \mathrm{O_2} \to 2\mathrm{H_2O}$។
+- ប្រើតែពាក្យបញ្ជាដែល KaTeX ស្គាល់៖ \\frac \\sqrt \\lim \\int \\sum \\prod \\left \\right \\mathrm
+  \\pi \\theta \\alpha \\beta \\omega \\Delta \\infty \\le \\ge \\ne \\approx \\to \\times \\cdot \\pm
+  និង ^ _ សម្រាប់ស្វ័យគុណនិងសន្ទស្សន៍។ កុំប្រើ \\begin{align} កុំដាក់ខ្មែរក្នុង \\text{}។
+- គីមីប្រើ \\mathrm៖ $\\mathrm{H_2O}$, $2\\mathrm{H_2} + \\mathrm{O_2} \\to 2\\mathrm{H_2O}$។
 - កុំដាក់លេខធម្មតា ឬឯកតាខ្លីៗ ក្នុងសញ្ញា $ ដូចជាសរសេរ 25%, 9.8 m/s²។
 - សំណួររបស់សិស្សអាចមាន LaTeX ក្នុងសញ្ញា $ រួចហើយ ព្រោះក្តារចុចគណិតរបស់កម្មវិធីសរសេរបែបនោះ។
   វាក៏អាចជាតួអក្សរធម្មតា (x², √, lim(x→2), H₂O) ដែលវាយដោយដៃដែរ។ អានបានទាំងពីរ
