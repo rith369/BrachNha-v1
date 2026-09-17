@@ -2,20 +2,27 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, Tooltip, Cell } from "rechar
 import { useBrachNhaStore } from "@/lib/store";
 import { progressSubjects, type ProgressSubject } from "../subjects";
 import type { ProgressSummary } from "../summary";
-import { InfoTip } from "@/components/ui/info-tip";
+import { PROGRESS_COPY } from "../copy";
+import { TitleWithTip } from "./title-with-tip";
 
 /**
  * Recharts' tooltip content signature — not exported from the package, so
  * shaped by hand. `payload[0].payload` is the full ProgressSubject row Bar was
  * given, which is where the full name lives (the axis only shows the short
  * code).
+ *
+ * `questionsCount` is passed in as a prop rather than read from the store here:
+ * Recharts clones this element and ADDS `active`/`payload` to the props it was
+ * given, so anything set on `<ChartTooltip … />` survives into every render.
  */
 function ChartTooltip({
   active,
   payload,
+  questionsCount,
 }: {
   active?: boolean;
   payload?: { payload: ProgressSubject }[];
+  questionsCount: (n: number) => string;
 }) {
   if (!active || !payload?.length) return null;
   const s = payload[0].payload;
@@ -30,38 +37,34 @@ function ChartTooltip({
         color: "var(--color-text)",
       }}
     >
-      <span style={{ color: s.color }}>{s.name}</span>: {s.questions} questions
+      <span style={{ color: s.color }}>{s.name}</span>: {questionsCount(s.questions)}
     </div>
   );
 }
 
 export function SubjectBarChart({ summary }: { summary: ProgressSummary }) {
   const userLanguage = useBrachNhaStore((s) => s.userLanguage);
-  const subjects = progressSubjects(summary, userLanguage);
+  const lang = useBrachNhaStore((s) => s.lang);
+  const c = PROGRESS_COPY[lang];
+  const subjects = progressSubjects(summary, userLanguage, lang);
   const empty = subjects.every((s) => s.questions === 0);
 
   return (
     <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
       <div className="mb-3">
         <div className="font-heading text-sm font-extrabold">
-          Questions{" "}
-          <span className="whitespace-nowrap">
-            Answered 📊
-            <InfoTip label="About Questions Answered" className="ml-1.5 align-middle">
-              How many quiz and exam questions you&apos;ve answered in each
-              subject, all time. Flashcards aren&apos;t counted. Tap a bar to see
-              the exact number.
-            </InfoTip>
-          </span>
+          <TitleWithTip text={c.answeredTitle} label={c.answeredAbout}>
+            {c.answeredTip}
+          </TitleWithTip>
         </div>
         <div className="text-[11px] font-bold text-muted">
-          Per subject, all time
+          {c.answeredSubtitle}
         </div>
       </div>
 
       {empty ? (
         <div className="flex h-36 items-center justify-center px-4 text-center text-xs font-bold text-muted">
-          No questions answered yet. Finish a lesson quiz to fill this in.
+          {c.answeredEmpty}
         </div>
       ) : (
         /* VERTICAL bars with SHORT axis labels — 7 real names don't fit under a
@@ -84,7 +87,7 @@ export function SubjectBarChart({ summary }: { summary: ProgressSummary }) {
               />
               <Tooltip
                 cursor={{ fill: "var(--color-chart-grid)" }}
-                content={<ChartTooltip />}
+                content={<ChartTooltip questionsCount={c.questionsCount} />}
               />
               {/* See the note in weekly-activity-chart.tsx — mount animation
                   off, for the same reason and to keep the two charts on this

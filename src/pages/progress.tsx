@@ -8,6 +8,8 @@ import { AiInsights } from "@/features/progress/components/ai-insights";
 import { BottomNav } from "@/components/shell/bottom-nav";
 import { PreviewTag } from "@/components/preview-tag";
 import { useProgressSummary } from "@/features/progress/use-progress-summary";
+import { useBrachNhaStore } from "@/lib/store";
+import { T } from "@/data/translations";
 
 export default function ProgressPage() {
   // Computed ONCE here and threaded down, rather than each card reading the
@@ -16,12 +18,15 @@ export default function ProgressPage() {
   // maths needs today's date, so deriving it per card would let a render that
   // crosses local midnight window two cards against two different days.
   const summary = useProgressSummary();
+  // The same word the drawer and bottom nav use for this page, so the title
+  // cannot drift from the link that brought the student here.
+  const lang = useBrachNhaStore((s) => s.lang);
 
   return (
     <div className="flex h-full flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-20 lg:pb-8 md:px-6 lg:px-8">
         <div className="font-heading mb-2 bg-brand-tri bg-clip-text pr-14 text-xl font-extrabold text-transparent">
-          📈 Progress
+          📈 {T[lang].progress}
         </div>
         <PreviewTag className="mb-4" />
         {/* One column on a phone, two from md (tablet) and no further. Columns

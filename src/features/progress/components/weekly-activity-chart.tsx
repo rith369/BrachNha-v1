@@ -10,9 +10,36 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
-import type { ProgressSummary } from "../summary";
+import type { ProgressSummary, WeekDay } from "../summary";
 import { cn } from "@/utils/cn";
-import { InfoTip } from "@/components/ui/info-tip";
+import { parseDayKey } from "@/utils/day";
+import { KM_WEEKDAYS } from "@/utils/khmer-dates";
+import { useBrachNhaStore } from "@/lib/store";
+import type { Lang } from "@/types";
+import { weekdayLabel } from "@/features/streak/copy";
+import type { WeekdayId } from "@/features/streak/demo-data";
+import { PROGRESS_COPY } from "../copy";
+import { TitleWithTip } from "./title-with-tip";
+
+/** Sunday first — the index `Date.getDay()` returns. */
+const WEEKDAY_IDS: WeekdayId[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+
+/**
+ * The axis label for one day. English keeps the summary's own "Mon"; Khmer uses
+ * the streak screens' initials (ច, អ, ព…) — seven full Khmer day names do not
+ * fit under a 320px chart, and those initials are what a student already reads
+ * on the Streak page.
+ */
+function axisLabel(day: WeekDay, lang: Lang): string {
+  if (lang === "en") return day.label;
+  return weekdayLabel(WEEKDAY_IDS[parseDayKey(day.key).getDay()], "km");
+}
+
+/** The best day named in full — the footer has the room the axis does not. */
+function fullDayName(day: WeekDay, lang: Lang): string {
+  if (lang === "en") return day.label;
+  return KM_WEEKDAYS[parseDayKey(day.key).getDay()];
+}
 
 /**
  * A ROLLING 7 days ending today, not a fixed Mon-Sun week.
@@ -42,13 +69,7 @@ import { InfoTip } from "@/components/ui/info-tip";
 
 type Metric = "xp" | "minutes";
 
-const METRIC_META: Record<
-  Metric,
-  { label: string; icon: LucideIcon; unit: (v: number) => string }
-> = {
-  xp: { label: "XP Points", icon: Zap, unit: (v) => `${v} XP` },
-  minutes: { label: "Study Minutes", icon: Clock, unit: (v) => `${v}m` },
-};
+const METRIC_ICON: Record<Metric, LucideIcon> = { xp: Zap, minutes: Clock };
 const METRICS: Metric[] = ["xp", "minutes"];
 
 /**
@@ -87,9 +108,18 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
   // right now, not something a reload should inherit — the same call the
   // leaderboard's metric/period pair makes.
   const [metric, setMetric] = useState<Metric>("xp");
-  const meta = METRIC_META[metric];
+  const lang = useBrachNhaStore((s) => s.lang);
+  const c = PROGRESS_COPY[lang];
+  const metricLabel: Record<Metric, string> = { xp: c.metricXp, minutes: c.metricMinutes };
+  const metricValue: Record<Metric, (v: number) => string> = {
+    xp: c.xpValue,
+    minutes: c.minutesValue,
+  };
 
-  const { week, bestDay, weekChangePct } = summary;
+  const { week: rawWeek, bestDay, weekChangePct } = summary;
+  // Relabelled here rather than in summary.ts, which stays language-free: the
+  // summary is pure data, and a weekday name is presentation.
+  const week = rawWeek.map((d) => ({ ...d, label: axisLabel(d, lang) }));
   const values = week.map((d) => d[metric]);
   const domain = niceDomain(values);
   const empty = values.every((v) => v === 0);
@@ -119,42 +149,30 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
           </div>
           <div className="min-w-0">
             <div className="font-heading text-sm font-extrabold">
-              Weekly Learning{" "}
-              <span className="whitespace-nowrap">
-                Activity
-                <InfoTip label="About Weekly Learning Activity" className="ml-1.5 align-middle">
-                  <span className="block">
-                    The last 7 days, with today on the right.
+              <TitleWithTip text={c.weeklyTitle} label={c.weeklyAbout}>
+                <span className="block">{c.weeklyTipIntro}</span>
+                {c.weeklyTipItems.map((item) => (
+                  <span key={item.term} className="mt-1 block">
+                    <b className="font-extrabold">{item.term}</b> — {item.text}
                   </span>
-                  <span className="mt-1 block">
-                    <b className="font-extrabold">XP Points</b> — the XP you
-                    earned each day.
-                  </span>
-                  <span className="mt-1 block">
-                    <b className="font-extrabold">Study Minutes</b> — the time you
-                    actively studied each day.
-                  </span>
-                  <span className="mt-1 block">
-                    &ldquo;vs last week&rdquo; compares this week&apos;s XP with
-                    the 7 days before.
-                  </span>
-                </InfoTip>
-              </span>
+                ))}
+                <span className="mt-1 block">{c.weeklyTipNote}</span>
+              </TitleWithTip>
             </div>
             <div className="text-[11px] font-bold text-muted">
-              Your study time &amp; XP over the last 7 days.
+              {c.weeklySubtitle}
             </div>
           </div>
         </div>
 
         <div
           role="group"
-          aria-label="Weekly Learning Activity metric"
+          aria-label={c.metricGroup}
           className="ml-auto flex shrink-0 items-center gap-0.5 rounded-full border border-purple/10 bg-control p-0.5"
         >
           {METRICS.map((m) => {
             const active = metric === m;
-            const Icon = METRIC_META[m].icon;
+            const Icon = METRIC_ICON[m];
             return (
               <button
                 key={m}
@@ -169,7 +187,7 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
                 )}
               >
                 <Icon className="size-3" strokeWidth={2.5} />
-                {METRIC_META[m].label}
+                {metricLabel[m]}
               </button>
             );
           })}
@@ -182,9 +200,7 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
         // the page does not lose a block on a new student's first day, and the
         // toggle stays live so the other series is still reachable.
         <div className="flex h-40 items-center justify-center px-4 text-center text-xs font-bold text-muted">
-          {metric === "xp"
-            ? "No activity in the last 7 days. Finish a lesson to start the chart."
-            : "No study time recorded in the last 7 days."}
+          {metric === "xp" ? c.emptyXp : c.emptyMinutes}
         </div>
       ) : (
         <div className="h-40">
@@ -226,7 +242,7 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
                 }}
                 itemStyle={{ color: "var(--color-text)" }}
                 labelStyle={{ color: "var(--color-muted)" }}
-                formatter={(v) => [meta.unit(v as number), meta.label]}
+                formatter={(v) => [metricValue[metric](v as number), metricLabel[metric]]}
               />
               {/* isAnimationActive={false}: Recharts animates on MOUNT by
                   default, for 1500ms, and a route is a fresh mount — see the
@@ -256,9 +272,9 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
         {showBest && bestDay ? (
           <span className="flex items-center gap-1.5 text-muted">
             <span className="size-2 shrink-0 rounded-full bg-mint" />
-            Highest productivity on{" "}
+            {c.bestDayPrefix}{" "}
             <span className="font-extrabold text-text">
-              {bestDay.label} ({bestDay.xp} XP)
+              {fullDayName(bestDay, lang)} ({bestDay.xp} XP)
             </span>
           </span>
         ) : (
@@ -274,9 +290,7 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
               flat ? "text-muted" : up ? "text-mint" : "text-pink"
             )}
           >
-            {flat
-              ? "No change vs last week"
-              : `${up ? "+" : ""}${weekChangePct}% vs last week`}
+            {flat ? c.noChangeWeek : c.changeWeek(weekChangePct)}
             {!flat &&
               (up ? (
                 <ArrowUpRight className="size-3.5" strokeWidth={3} />

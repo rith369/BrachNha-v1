@@ -26,30 +26,13 @@ import {
   type YearMonth,
 } from "@/utils/study-calendar";
 import { cn } from "@/utils/cn";
+import { KM_MONTHS } from "@/utils/khmer-dates";
 
 // Sunday first, matching buildMonthGrid and the Progress heatmap.
 const WEEK: WeekdayId[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 
-// Hand-written, NOT Intl. Desktop Chrome was measured reporting no Khmer
-// locale data at all — Intl.DateTimeFormat.supportedLocalesOf(["km"]) is
-// empty — and it formats "km-KH" in English without complaint; Android builds
-// ship trimmed locale data too. The streak screens hand-write their Khmer
-// weekday initials for the same reason. Digits stay Latin, matching them.
-const KM_MONTHS = [
-  "មករា",
-  "កុម្ភៈ",
-  "មីនា",
-  "មេសា",
-  "ឧសភា",
-  "មិថុនា",
-  "កក្កដា",
-  "សីហា",
-  "កញ្ញា",
-  "តុលា",
-  "វិច្ឆិកា",
-  "ធ្នូ",
-];
-
+// Hand-written Khmer month names, shared with the Progress page — see
+// utils/khmer-dates.ts for why they are not taken from Intl.
 function monthLabel({ year, month }: YearMonth, lang: Lang): string {
   if (lang === "km") return `${KM_MONTHS[month]} ${year}`;
   return new Date(year, month, 1).toLocaleDateString("en-GB", {

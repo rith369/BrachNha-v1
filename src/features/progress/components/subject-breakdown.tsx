@@ -1,59 +1,42 @@
 import { useBrachNhaStore } from "@/lib/store";
-import { progressSubjects, trendLabel, type ProgressSubject } from "../subjects";
-import { MIN_SAMPLE, type ProgressSummary } from "../summary";
 import { InfoTip } from "@/components/ui/info-tip";
+import { progressSubjects, type ProgressSubject } from "../subjects";
+import { MIN_SAMPLE, type ProgressSummary } from "../summary";
+import { PROGRESS_COPY, type ProgressCopy } from "../copy";
+import { TitleWithTip } from "./title-with-tip";
 
 export function SubjectBreakdown({ summary }: { summary: ProgressSummary }) {
-  // Only userLanguage matters here — which language subject shows. The name
-  // itself is always English; see progressSubjects()'s own comment for why.
+  // `userLanguage` decides WHICH language subject shows (English or French);
+  // `lang` decides what language the page is written in. Different questions.
   const userLanguage = useBrachNhaStore((s) => s.userLanguage);
-  const subjects = progressSubjects(summary, userLanguage);
+  const lang = useBrachNhaStore((s) => s.lang);
+  const c = PROGRESS_COPY[lang];
+  const subjects = progressSubjects(summary, userLanguage, lang);
 
   return (
     <div>
       <div className="mb-3 font-heading text-sm font-extrabold">
-        Subject{" "}
-        <span className="whitespace-nowrap">
-          Breakdown 🎯
-          {/* The legend for every part of a row. The rows themselves carry only
-              what is specific to THEM — "7 of 8 correct" on the score — so this
-              is where the rules that apply to all of them are said once. */}
-          <InfoTip label="How to read Subject Breakdown" className="ml-1.5 align-middle">
-            <span className="block">
-              <b className="font-extrabold">%</b> — how many questions you got
-              right, all time. It appears after {MIN_SAMPLE} questions. Tap it to
-              see the count.
+        {/* The legend for every part of a row. The rows themselves carry only
+            what is specific to THEM — "7 of 8 correct" on the score — so this
+            is where the rules that apply to all of them are said once. */}
+        <TitleWithTip text={c.breakdownTitle} label={c.breakdownAbout}>
+          {c.legend(MIN_SAMPLE).map((item, i) => (
+            <span key={item.term} className={i === 0 ? "block" : "mt-1 block"}>
+              <b className="font-extrabold">{item.term}</b> — {item.text}
             </span>
-            <span className="mt-1 block">
-              <b className="font-extrabold">Long bar</b> — the same score, as a
-              bar.
-            </span>
-            <span className="mt-1 block">
-              <b className="font-extrabold">▲ ▼</b> — your last 30 days compared
-              with the 30 before, in points. It appears once both have{" "}
-              {MIN_SAMPLE}+ questions.
-            </span>
-            <span className="mt-1 block">
-              <b className="font-extrabold">Small bars</b> — how much you
-              practised on each of the last 7 days, today on the right.
-            </span>
-            <span className="mt-1 block">
-              <b className="font-extrabold">Sessions</b> — how many times you
-              finished a lesson, quiz, exam or flashcard deck. Repeating one on
-              the same day counts once.
-            </span>
-            <span className="mt-1 block">
-              Flashcards don&apos;t change your score.
-            </span>
-          </InfoTip>
-        </span>
+          ))}
+        </TitleWithTip>
       </div>
       <div className="flex flex-col gap-3.5">
+        {/* "Not started" means NOTHING recorded — not "no scored questions".
+            It branched on `questions` alone once, which put a subject studied
+            only with flashcards on the dimmed "Not started yet" row: the page
+            telling a student that work they had done did not exist. */}
         {subjects.map((s) =>
-          s.questions === 0 ? (
-            <SubjectRowEmpty key={s.id} subject={s} />
+          s.questions === 0 && s.reviewed === 0 && s.sessions === 0 ? (
+            <SubjectRowEmpty key={s.id} subject={s} c={c} />
           ) : (
-            <SubjectRow key={s.id} subject={s} />
+            <SubjectRow key={s.id} subject={s} c={c} />
           )
         )}
       </div>
@@ -71,7 +54,7 @@ export function SubjectBreakdown({ summary }: { summary: ProgressSummary }) {
  * NO score, NO trend, NO progress bar, NO sparkline. `0%` beside `▲ +0%` would
  * be two invented facts about a subject the student has never opened.
  */
-function SubjectRowEmpty({ subject: s }: { subject: ProgressSubject }) {
+function SubjectRowEmpty({ subject: s, c }: { subject: ProgressSubject; c: ProgressCopy }) {
   const Icon = s.icon;
   return (
     <div className="rounded-2xl border border-purple/10 bg-surface p-3.5 opacity-60 shadow-panel-sm">
@@ -84,33 +67,32 @@ function SubjectRowEmpty({ subject: s }: { subject: ProgressSubject }) {
         />
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm font-extrabold">{s.name}</div>
-          <div className="text-[10px] font-bold text-muted">Not started yet</div>
+          <div className="text-[10px] font-bold text-muted">{c.notStarted}</div>
         </div>
       </div>
     </div>
   );
 }
 
-/** "3 sessions · 8 questions". Fragment text, because on an unscored row it
- *  renders inside a button, which may only hold phrasing content. */
-function RowMeta({ subject: s }: { subject: ProgressSubject }) {
-  return (
-    <>
-      {s.sessions} {s.sessions === 1 ? "session" : "sessions"} ·{" "}
-      {s.questions} {s.questions === 1 ? "question" : "questions"}
-    </>
-  );
+/**
+ * "3 sessions · 8 questions · 12 flashcards". Plain text, because on an unscored
+ * row it renders inside a button, which may only hold phrasing content.
+ *
+ * FLASHCARDS APPEAR WHENEVER THERE ARE ANY, on scored rows too. Showing them
+ * only until a first question was answered would make the count vanish the
+ * moment a student did more work, which reads as the app losing it.
+ *
+ * "0 questions" is dropped when flashcards are all there is — "1 session · 0
+ * questions · 12 flashcards" leads with the one thing they have not done.
+ */
+function RowMeta({ subject: s, c }: { subject: ProgressSubject; c: ProgressCopy }) {
+  const parts = [c.sessions(s.sessions)];
+  if (s.questions > 0 || s.reviewed === 0) parts.push(c.questions(s.questions));
+  if (s.reviewed > 0) parts.push(c.flashcards(s.reviewed));
+  return <>{parts.join(" · ")}</>;
 }
 
-/** The trend said as a sentence, for the score's explanation — the row itself
- *  keeps the compact "▲ +6 pts" from trendLabel(). */
-function trendSentence(trendPct: number): string {
-  if (trendPct === 0) return "The same as the 30 days before.";
-  const dir = trendPct > 0 ? "Up" : "Down";
-  return `${dir} ${Math.abs(trendPct)} pts on the 30 days before.`;
-}
-
-function SubjectRow({ subject: s }: { subject: ProgressSubject }) {
+function SubjectRow({ subject: s, c }: { subject: ProgressSubject; c: ProgressCopy }) {
   const Icon = s.icon;
   const up = s.trendPct !== null && s.trendPct > 0;
   const flat = s.trendPct === 0;
@@ -135,14 +117,20 @@ function SubjectRow({ subject: s }: { subject: ProgressSubject }) {
           {s.score === null ? (
             <InfoTip
               triggerClassName="text-left text-[10px] font-bold text-muted"
-              trigger={<RowMeta subject={s} />}
+              trigger={<RowMeta subject={s} c={c} />}
             >
-              {s.correct} of {s.questions} correct so far. Answer{" "}
-              {MIN_SAMPLE - s.questions} more to see your score.
+              {/* Two different reasons a row has no score, and the sentence has
+                  to name the right one: "0 of 0 correct so far" would be true
+                  and would explain nothing to a student who only did flashcards. */}
+              {s.questions > 0
+                ? c.unscoredTip(s.correct, s.questions, MIN_SAMPLE - s.questions)
+                : s.reviewed > 0
+                  ? c.flashcardsOnlyTip(MIN_SAMPLE)
+                  : c.noScoreTip(MIN_SAMPLE)}
             </InfoTip>
           ) : (
             <div className="text-[10px] font-bold text-muted">
-              <RowMeta subject={s} />
+              <RowMeta subject={s} c={c} />
             </div>
           )}
         </div>
@@ -174,17 +162,15 @@ function SubjectRow({ subject: s }: { subject: ProgressSubject }) {
                       flat ? "text-muted" : up ? "text-mint" : "text-pink"
                     }`}
                   >
-                    {trendLabel(s.trendPct)}
+                    {c.trend(s.trendPct)}
                   </span>
                 )}
               </>
             }
           >
-            <span className="block">
-              {s.correct} of {s.questions} correct, all time.
-            </span>
+            <span className="block">{c.scoreTip(s.correct, s.questions)}</span>
             {s.trendPct !== null && (
-              <span className="mt-1 block">{trendSentence(s.trendPct)}</span>
+              <span className="mt-1 block">{c.trendSentence(s.trendPct)}</span>
             )}
           </InfoTip>
         )}

@@ -33,34 +33,45 @@
 // keeping this card demo, and the page-level tag is what covers it.
 // ============================================================
 
+// BOTH LANGUAGES, since the page follows `lang` (see ../copy.ts). The subject
+// is an id rather than a name so it renders through the catalog's own
+// translation, and `stat` is data rather than a pre-written sentence so each
+// language can put the number where its own grammar wants it.
+/** A card shows an average OR a movement, never both. */
+type FocusStat = { avg: number } | { trend: string };
+
 export const focusAreas = [
   {
     icon: "⚠️",
-    label: "Need Work",
+    label: "needWork" as const,
     kind: "weak" as const,
-    topic: "Oxidation States",
-    sub: "Chemistry · 48% avg",
+    topic: { en: "Oxidation States", km: "ចំនួនអុកស៊ីតកម្ម" },
+    subject: "chemistry" as const,
+    stat: { avg: 48 } as FocusStat,
   },
   {
     icon: "⭐",
-    label: "Strongest",
+    label: "strongest" as const,
     kind: "strong" as const,
-    topic: "Mechanics",
-    sub: "Physics · 95% avg",
+    topic: { en: "Mechanics", km: "មេកានិច" },
+    subject: "physics" as const,
+    stat: { avg: 95 } as FocusStat,
   },
   {
     icon: "📉",
-    label: "Declining",
+    label: "declining" as const,
     kind: "weak" as const,
-    topic: "Organic Chem",
-    sub: "Chemistry · ▼ -5%",
+    topic: { en: "Organic Chem", km: "គីមីសរីរាង្គ" },
+    subject: "chemistry" as const,
+    stat: { trend: "▼ -5%" } as FocusStat,
   },
   {
     icon: "🚀",
-    label: "Most Improved",
+    label: "improved" as const,
     kind: "strong" as const,
-    topic: "Calculus",
-    sub: "Math · ▲ +14%",
+    topic: { en: "Calculus", km: "ដេរីវេ និងអាំងតេក្រាល" },
+    subject: "math" as const,
+    stat: { trend: "▲ +14%" } as FocusStat,
   },
 ];
 
@@ -77,21 +88,33 @@ export const activityHeatmap: number[][] = [
 
 export const aiInsights = [
   {
+    id: "study-tip",
     icon: "💡",
-    title: "Study Tip",
-    body: "Your Physics score jumps after morning sessions. Try studying it before 10am!",
+    title: { en: "Study Tip", km: "គន្លឹះរៀន" },
+    body: {
+      en: "Your Physics score jumps after morning sessions. Try studying it before 10am!",
+      km: "ពិន្ទុរូបវិទ្យារបស់អ្នកកើនឡើងក្រោយពេលរៀនពេលព្រឹក។ សាកល្បងរៀនវាមុនម៉ោង 10 ព្រឹក!",
+    },
     color: "purple" as const,
   },
   {
+    id: "watch-out",
     icon: "⚠️",
-    title: "Watch Out",
-    body: "Chemistry is dropping. You haven't practiced Organic in 5 days.",
+    title: { en: "Watch Out", km: "ប្រយ័ត្ន" },
+    body: {
+      en: "Chemistry is dropping. You haven't practiced Organic in 5 days.",
+      km: "ពិន្ទុគីមីកំពុងធ្លាក់ចុះ។ អ្នកមិនបានហាត់គីមីសរីរាង្គ 5 ថ្ងៃមកហើយ។",
+    },
     color: "pink" as const,
   },
   {
+    id: "next-goal",
     icon: "🎯",
-    title: "Next Goal",
-    body: "Reach 85% avg score to unlock the Gold badge. Only 2% away!",
+    title: { en: "Next Goal", km: "គោលដៅបន្ទាប់" },
+    body: {
+      en: "Reach 85% avg score to unlock the Gold badge. Only 2% away!",
+      km: "ទទួលបានពិន្ទុមធ្យម 85% ដើម្បីដោះសោមេដាយមាស។ នៅសល់តែ 2% ទៀតប៉ុណ្ណោះ!",
+    },
     color: "blue" as const,
   },
 ];

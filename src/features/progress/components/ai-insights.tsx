@@ -1,4 +1,6 @@
+import { useBrachNhaStore } from "@/lib/store";
 import { aiInsights } from "../demo-data";
+import { PROGRESS_COPY } from "../copy";
 
 const COLOR_MAP = {
   purple: "border-purple/20 bg-purple/6 text-purple",
@@ -7,11 +9,12 @@ const COLOR_MAP = {
 };
 
 export function AiInsights() {
+  const lang = useBrachNhaStore((s) => s.lang);
+  const c = PROGRESS_COPY[lang];
+
   return (
     <div>
-      <div className="mb-3 font-heading text-sm font-extrabold">
-        AI Insights 🤖✨
-      </div>
+      <div className="mb-3 font-heading text-sm font-extrabold">{c.aiTitle}</div>
       {/* Full-bleed carousel on a phone: -mx-4 cancels the page's px-4 so the
           cards run to both screen edges, which is what makes it read as
           scrollable. From md the card sits inside a grid column instead, where
@@ -21,13 +24,13 @@ export function AiInsights() {
       <div className="-mx-4 flex gap-2.5 overflow-x-auto px-4 pb-1 md:mx-0 md:px-0">
         {aiInsights.map((ins) => (
           <div
-            key={ins.title}
+            key={ins.id}
             className={`w-56 shrink-0 rounded-2xl border p-3.5 ${COLOR_MAP[ins.color]}`}
           >
             <div className="mb-1.5 text-lg">{ins.icon}</div>
-            <div className="mb-1 text-xs font-extrabold">{ins.title}</div>
+            <div className="mb-1 text-xs font-extrabold">{ins.title[lang]}</div>
             <div className="text-[11px] font-semibold text-text/80">
-              {ins.body}
+              {ins.body[lang]}
             </div>
           </div>
         ))}

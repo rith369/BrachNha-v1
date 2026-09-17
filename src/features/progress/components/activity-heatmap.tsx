@@ -1,12 +1,40 @@
 import { useEffect, useRef, useState } from "react";
+import { useBrachNhaStore } from "@/lib/store";
+import type { Lang } from "@/types";
 import { activityHeatmap } from "../demo-data";
+import { PROGRESS_COPY, type ProgressCopy } from "../copy";
 import {
   buildHeatmapWeeks,
   formatHeatmapCellLabel,
   heatmapCellKey,
+  type HeatmapCell,
 } from "@/utils/activity-heatmap";
+import { KM_MONTHS, KM_WEEKDAYS } from "@/utils/khmer-dates";
+import { weekdayLabel } from "@/features/streak/copy";
+import type { WeekdayId } from "@/features/streak/demo-data";
 
-const DAYS = ["S", "M", "T", "W", "T", "F", "S"];
+/** Column headers, Sunday first. Khmer reuses the streak screens' initials. */
+const WEEK: WeekdayId[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+const DAYS: Record<Lang, string[]> = {
+  en: ["S", "M", "T", "W", "T", "F", "S"],
+  km: WEEK.map((id) => weekdayLabel(id, "km")),
+};
+
+/**
+ * "Today · 13 questions" / "Sun 2 Aug · No activity". English keeps the pure
+ * helper in utils/activity-heatmap.ts; Khmer is built here from hand-written
+ * names, because utils/ may not import the streak feature's initials and
+ * `toLocaleDateString("km-KH")` prints English on desktop Chrome.
+ */
+function cellLabel(cell: HeatmapCell, lang: Lang, c: ProgressCopy): string {
+  if (lang === "en") return formatHeatmapCellLabel(cell);
+  const d = cell.date;
+  const day = cell.isToday
+    ? c.today
+    : `${KM_WEEKDAYS[d.getDay()]} ${d.getDate()} ${KM_MONTHS[d.getMonth()]}`;
+  const activity = cell.count === 0 ? c.noActivity : c.questionsCount(cell.count);
+  return `${day} · ${activity}`;
+}
 
 // Intensity 0-4 → color (mirrors the original app's --pink-tinted scale).
 //
@@ -23,6 +51,8 @@ const LEVELS = [
 ];
 
 export function ActivityHeatmap() {
+  const lang = useBrachNhaStore((s) => s.lang);
+  const c = PROGRESS_COPY[lang];
   const weeks = buildHeatmapWeeks(activityHeatmap);
   const [openKey, setOpenKey] = useState<string | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -53,15 +83,15 @@ export function ActivityHeatmap() {
     <div>
       <div className="mb-3">
         <div className="font-heading text-sm font-extrabold">
-          Study Activity 🗓️
+          {c.activityTitle}
         </div>
         <div className="text-[11px] font-bold text-muted">
-          Tap a day to see questions answered
+          {c.activitySubtitle}
         </div>
       </div>
 
       <div ref={gridRef} className="grid grid-cols-7 gap-1.5">
-        {DAYS.map((d, i) => (
+        {DAYS[lang].map((d, i) => (
           <div
             key={`lbl-${i}`}
             className="text-center text-[10px] font-extrabold text-muted"
@@ -92,7 +122,7 @@ export function ActivityHeatmap() {
                 <button
                   type="button"
                   onClick={() => setOpenKey(open ? null : key)}
-                  aria-label={formatHeatmapCellLabel(cell)}
+                  aria-label={cellLabel(cell, lang, c)}
                   aria-expanded={open}
                   className={`aspect-square w-full rounded-md transition-transform active:scale-90 ${LEVELS[cell.level]} ${
                     cell.isToday ? "ring-2 ring-purple/50 ring-offset-1 ring-offset-bg" : ""
@@ -105,7 +135,7 @@ export function ActivityHeatmap() {
                       di <= 1 ? "left-0" : di >= 5 ? "right-0" : "left-1/2 -translate-x-1/2"
                     }`}
                   >
-                    {formatHeatmapCellLabel(cell)}
+                    {cellLabel(cell, lang, c)}
                   </div>
                 )}
               </div>
@@ -115,11 +145,11 @@ export function ActivityHeatmap() {
       </div>
 
       <div className="mt-3 flex items-center justify-end gap-1.5">
-        <span className="text-[10px] font-bold text-muted">Less</span>
+        <span className="text-[10px] font-bold text-muted">{c.less}</span>
         {LEVELS.map((l, i) => (
           <div key={i} className={`size-2.5 rounded-sm ${l}`} />
         ))}
-        <span className="text-[10px] font-bold text-muted">More</span>
+        <span className="text-[10px] font-bold text-muted">{c.more}</span>
       </div>
     </div>
   );

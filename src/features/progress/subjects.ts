@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import { T } from "@/data/translations";
+import type { Lang } from "@/types";
 import { allSubjects, type SubjectId } from "@/features/lessons/subjects";
 import type { ProgressSummary, SubjectStat } from "./summary";
 
@@ -19,20 +20,18 @@ import type { ProgressSummary, SubjectStat } from "./summary";
  *   - the LIST and its ORDER from allSubjects(), so the student's chosen
  *     language subject appears and the other one doesn't — the same call the
  *     Study, Exam and Practice pages make;
- *   - the NAME from translations' English column;
+ *   - the NAME from translations.ts, in the page's language;
  *   - the SHORT LABEL from SHORT_LABEL below, for the bar chart's axis;
  *   - the ICON from the catalog's own SubjectMeta, replacing four hand-picked
  *     emoji — the swap the rest of the app already made, because emoji render
  *     differently on every handset;
  *   - the COLOUR from the per-subject scale.
  *
- * ALWAYS ENGLISH, not `T[lang]` — this is a deliberate reversal from an earlier
- * version of this file. Every other label on this page ("Overall Readiness",
- * "Questions Answered", the "📈 Progress" title) is a hardcoded English string;
- * nothing here reads the store's `lang`. Following `lang` for the subject names
- * only would have made them switch to Khmer while every surrounding word on the
- * same card stayed English — a new inconsistency, not the fix this page needed.
- * If the whole dashboard is localized later, revisit this alongside that work.
+ * THE NAME FOLLOWS `lang` NOW. It was deliberately held in English while every
+ * other label on this page was a hardcoded English string — switching only the
+ * names would have put Khmer words inside English cards. The whole page follows
+ * `lang` since the user asked for it (see ./copy.ts), so the names do too; that
+ * is the "revisit alongside that work" this paragraph used to promise.
  *
  * THE NUMBERS ARE REAL NOW. They used to come from demo-data.ts's hand-written
  * `subjectStats`; they come from the student's own contentLog via
@@ -67,16 +66,32 @@ export interface ProgressSubject extends SubjectStat {
  * name anywhere else (SubjectBreakdown uses the full `name`). This is a single
  * consistent map, unlike the old chart's own hand-picked "Chem"/"Phys" that had
  * already drifted from the "Chemistry"/"Physics" the list below it used.
+ *
+ * The Khmer column is the short forms Cambodian classrooms already say — រូប for
+ * រូបវិទ្យា, ជីវៈ for ជីវវិទ្យា — because seven upright bars leave each label
+ * about 36px at the 320px floor.
  */
-const SHORT_LABEL: Record<SubjectId, string> = {
-  math: "Math",
-  physics: "Phys",
-  chemistry: "Chem",
-  biology: "Bio",
-  history: "Hist",
-  khmer: "Khmer",
-  english: "Eng",
-  french: "Fr",
+const SHORT_LABEL: Record<Lang, Record<SubjectId, string>> = {
+  en: {
+    math: "Math",
+    physics: "Phys",
+    chemistry: "Chem",
+    biology: "Bio",
+    history: "Hist",
+    khmer: "Khmer",
+    english: "Eng",
+    french: "Fr",
+  },
+  km: {
+    math: "គណិត",
+    physics: "រូប",
+    chemistry: "គីមី",
+    biology: "ជីវៈ",
+    history: "ប្រវត្តិ",
+    khmer: "ខ្មែរ",
+    english: "អង់គ្លេស",
+    french: "បារាំង",
+  },
 };
 
 /** A subject the student has not worked on yet. Not "zero score" — `null`
@@ -88,35 +103,20 @@ const NOT_STARTED: SubjectStat = {
   trendPct: null,
   sparkline: null,
   sessions: 0,
+  reviewed: 0,
 };
 
 export function progressSubjects(
   summary: ProgressSummary,
-  userLanguage: string | undefined
+  userLanguage: string | undefined,
+  lang: Lang
 ): ProgressSubject[] {
   return allSubjects(userLanguage).map((s) => ({
     ...(summary.subjects[s.id] ?? NOT_STARTED),
     id: s.id,
-    name: T.en[s.id],
-    shortLabel: SHORT_LABEL[s.id],
+    name: T[lang][s.id],
+    shortLabel: SHORT_LABEL[lang][s.id],
     icon: s.icon,
     color: `var(--color-subj-${s.id})`,
   }));
-}
-
-/**
- * "▲ +6 pts" / "▼ -2 pts" / "no change", from the one signed number the stats
- * carry.
- *
- * ZERO GETS ITS OWN BRANCH. With demo data the trend was never actually 0, so
- * `>= 0` folding it in with the rises was invisible; with real data two windows
- * scoring the same is common, and "▲ +0%" paints a green up-arrow on a subject
- * that has not moved.
- *
- * "pts", not "%": this is a difference between two percentages, so 70 → 76 is
- * six POINTS. Calling that "+6%" would be a different and wrong number.
- */
-export function trendLabel(trendPct: number): string {
-  if (trendPct === 0) return "no change";
-  return trendPct > 0 ? `▲ +${trendPct} pts` : `▼ ${trendPct} pts`;
 }

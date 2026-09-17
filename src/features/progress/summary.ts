@@ -58,6 +58,16 @@ export interface SubjectStat {
   sparkline: number[] | null;
   /** Distinct sittings — (day, content) pairs carrying at least one session. */
   sessions: number;
+  /**
+   * Flashcard grades, all time. VOLUME ONLY: it never reaches `score`, because a
+   * grade is the student rating themselves rather than an answer being marked.
+   *
+   * It exists so a subject studied only with flashcards is not rendered as
+   * "Not started yet". `questions` counts scored answers alone, so without this
+   * such a subject looked exactly like one never opened — the row told a student
+   * that work they had done did not exist.
+   */
+  reviewed: number;
 }
 
 export interface WeekDay {
@@ -254,6 +264,7 @@ export function buildProgressSummary(
       sparkline:
         peak > 0 ? daily.map((n) => Math.round((n / peak) * 100)) : null,
       sessions: all.sittings,
+      reviewed: all.reviewed,
     };
   }
 
