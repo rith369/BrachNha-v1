@@ -2692,8 +2692,7 @@ different failure and only the first was visible:
 Study, Exam and Practice pages make — over `demo-data.ts`'s `subjectStats`,
 picking up the list, its order, the student's chosen language subject, the
 catalog's Lucide icon, a name in the page's language and the per-subject
-colour. Only the numbers come from the demo file, and `PreviewTag` is what says
-so.
+colour. Only the numbers came from the demo file.
 
 **The name follows `lang` — the page is bilingual now.** It was held ALWAYS
 ENGLISH for a while, on the reasoning that every other label on this page was a
@@ -2748,9 +2747,9 @@ user's scope: **Score Hero, Weekly Learning Activity, Questions Answered and
 Subject Breakdown go real. Focus Areas 🔍, Study Activity 🗓️ and AI Insights 🤖✨
 stay exactly as they are.** (Study minutes was staged after those four and is
 now built too — see its own subsection below.) So `demo-data.ts` shrank to those three exports
-rather than being deleted, and **`PreviewTag` STAYS on `pages/progress.tsx`** —
-two or more demo cards means the tag belongs at page level, the Game page's own
-precedent.
+rather than being deleted. **`PreviewTag` was then REMOVED from
+`pages/progress.tsx` (17 Sep 2026), at the user's request**, although those three
+cards are still demo — the same call the Game page got. Don't restore it unasked.
 
 **WHAT NOTHING RECORDED, AND NOW DOES.** `activityLog` has always known a day
 earned XP; it has never known what FOR. That single gap is why every per-subject
@@ -2843,7 +2842,7 @@ accuracy on a one-question day swings to 0 or 100 and the strip becomes noise.
 - **Study Activity** — `contentLog` COULD feed this one. Kept demo at the user's
   explicit request. **Known and accepted:** its "tap a day to see questions
   answered" now sits beside a bar chart showing REAL per-subject counts, and the
-  two will not add up. The page-level tag is what covers that.
+  two will not add up. The page tag used to cover that; it is gone, so nothing does.
 - **AI Insights** — needs an LLM pass plus a badge system. A live `/api/chat`
   call from a bottom-nav tab would exhaust the shared Gemini quota (~20
   requests/DAY for the whole deployment) and break KruAI, the app's actual AI
@@ -4757,7 +4756,8 @@ a chart). The files have comments noting what real data would need to exist
 **PROGRESS HAS LEFT THAT LIST — mostly.** Four of its seven cards run on the
 student's own `contentLog`/`activityLog`/`examResults` now, and the edge cases
 this decision was taken to avoid were handled rather than avoided (see its own
-section). Three cards are still demo, which is why the page keeps its tag. The
+section). Three cards are still demo; the page's tag was removed anyway, at the
+user's request (17 Sep 2026). The
 "per-subject score tracking" that entry names as the blocker is the thing that
 got built.
 
@@ -4787,18 +4787,16 @@ same problem** and should read the store rather than invent one.
 
 **Every screen still on demo data carries `PreviewTag`** —
 `components/preview-tag.tsx`, a dashed "Preview · sample data" pill — on its own
-line under the title on Progress, Grade Prediction and Streak with Friends. **Game
-no longer carries it** — removed at the user's request (17 Sep 2026) although its
-hero card is still decoration; that is the one recorded exception. Added
+line under the title on Grade Prediction and Streak with Friends. **Game and
+Progress no longer carry it** — both removed at the user's request (17 Sep 2026)
+although Game's hero card and three Progress cards are still demo; those are the
+two recorded exceptions. Added
 11 Sep 2026 because Progress's top row said 1,240 XP and a 12🔥 streak and the
 Leaderboard's "You" row 2,430 XP, a few pixels under the bar's real numbers, and
 the user could not tell which were real. Labelling was chosen over making those
 numbers real — **on Progress that was then reversed and the numbers were made
-real (16 Sep 2026), so the top row no longer contradicts the bar.** Its tag
-stays only for the three cards that are still demo, and comes off the day any
-one of Focus Areas / Study Activity / AI Insights is the last of them to go.
-The mechanical test for that: delete `features/progress/demo-data.ts` and see
-whether the build passes.
+real (16 Sep 2026), so the top row no longer contradicts the bar.** The tag was
+kept for the three cards still demo until the user had it removed (17 Sep 2026).
 
 **The Leaderboard LOST its page tag (16 Sep 2026)** when real students joined the
 sample cohort: a page-level tag would call the real rows sample too. It carries a

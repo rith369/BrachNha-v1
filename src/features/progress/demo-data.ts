@@ -21,16 +21,16 @@
 //                                       (~20 requests/DAY for the whole
 //                                       deployment) and break KruAI.
 //
-// BECAUSE THESE THREE STAY, `PreviewTag` STAYS on pages/progress.tsx.
-// The rule is "the tags ARE the list of what is still fake", and with
-// two or more demo cards the tag belongs at page level — the Game page
-// is the precedent. The mechanical test for removing it: delete this
-// file. If the build passes, nothing on the page invents a number.
+// These three are still demo, but the page carries NO `PreviewTag` any more:
+// the user asked for the "Preview · sample data" pill to go (17 Sep 2026),
+// the same call made for the Game page. That is a knowing exception to "the
+// tags ARE the list of what is still fake" — don't restore it without asking.
 //
 // KNOWN AND ACCEPTED: the heatmap's "tap a day to see questions
 // answered" now sits on a page whose bar chart shows REAL per-subject
 // question counts, and the two will not add up. That is the cost of
-// keeping this card demo, and the page-level tag is what covers it.
+// keeping this card demo, and with the page tag gone nothing on screen
+// covers it any more.
 // ============================================================
 
 // BOTH LANGUAGES, since the page follows `lang` (see ../copy.ts). The subject
