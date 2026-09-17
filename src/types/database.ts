@@ -414,7 +414,26 @@ export type Database = {
       };
     };
     Views: { [_ in never]: never };
-    Functions: { [_ in never]: never };
+    Functions: {
+      // supabase/migrations/20260916000004_leaderboard.sql. Returns real
+      // students only (never the caller) with public-safe columns.
+      leaderboard: {
+        Args: { p_today: string };
+        Returns: {
+          id: string;
+          display_name: string;
+          xp_week: number;
+          xp_month: number;
+          xp_all: number;
+          minutes_week: number;
+          minutes_month: number;
+          minutes_all: number;
+          streak_now: number;
+          streak_month: number;
+          streak_all: number;
+        }[];
+      };
+    };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };
   };

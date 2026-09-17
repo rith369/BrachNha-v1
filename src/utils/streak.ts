@@ -72,10 +72,13 @@ export function currentStreak(log: ActivityLog, today: string): number {
 
 /** The longest run anywhere in the log. Always >= currentStreak, since the
  *  current run is one of the runs it considers. */
-export function bestStreak(log: ActivityLog): number {
-  // YYYY-MM-DD sorts chronologically as a plain string.
+export function bestStreak(log: ActivityLog, since?: string): number {
+  // YYYY-MM-DD sorts chronologically as a plain string, which is also what
+  // makes `d >= since` a date comparison. With `since`, a run that started
+  // before it counts only its days inside the window — the leaderboard's
+  // monthly board, matching streak_month in 20260916000004_leaderboard.sql.
   const days = Object.keys(log)
-    .filter((d) => goalMet(log, d))
+    .filter((d) => goalMet(log, d) && (since === undefined || d >= since))
     .sort();
 
   let best = 0;

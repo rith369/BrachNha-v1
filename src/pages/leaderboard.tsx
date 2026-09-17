@@ -1,7 +1,6 @@
 import { LeaderboardView } from "@/features/leaderboard/components/leaderboard-view";
 import { COHORT_LABEL } from "@/features/leaderboard/demo-data";
 import { BottomNav } from "@/components/shell/bottom-nav";
-import { PreviewTag } from "@/components/preview-tag";
 import { useBrachNhaStore } from "@/lib/store";
 import { useT } from "@/data/translations";
 
@@ -20,10 +19,13 @@ export default function LeaderboardPage() {
           <div className="font-heading mb-0.5 bg-brand-tri bg-clip-text pr-14 text-xl font-extrabold text-transparent">
             🏆 {t.leaderboard}
           </div>
-          <div className="mb-2 pr-14 text-xs font-bold text-muted">
+          {/* No page-level PreviewTag: the board mixes real students with the
+              sample cohort, and each sample row carries its own mark — see
+              components/sample-mark.tsx. A page tag would call the real rows
+              sample too. */}
+          <div className="mb-4 pr-14 text-xs font-bold text-muted">
             {COHORT_LABEL[lang]} · {t.leaderboardSubtitle}
           </div>
-          <PreviewTag className="mb-4" />
           <LeaderboardView />
         </div>
       </div>

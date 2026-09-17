@@ -1,6 +1,7 @@
 import { Avatar } from "@/components/ui/avatar";
 import { useT } from "@/data/translations";
 import { METRIC_META, PODIUM_STYLE, TITLE_LABEL_KEY } from "../metric-meta";
+import { SampleMark } from "./sample-mark";
 import {
   formatMetricValue,
   formatMetricWithUnit,
@@ -86,8 +87,12 @@ export function Podium({
             <div className="mt-1.5 w-full truncate text-[11px] font-extrabold md:text-sm">
               {mine ? currentUserName : row.student.name}
             </div>
-            <div className="w-full truncate text-[9px] font-bold text-muted md:text-[11px]">
-              {t[TITLE_LABEL_KEY[row.title]]}
+            {/* The mark sits on the title line rather than beside the name: a
+                podium column is ~91px at the 320px floor, and the name needs
+                all of it. The title truncates; the mark never does. */}
+            <div className="flex w-full items-center justify-center gap-1 text-[9px] font-bold text-muted md:text-[11px]">
+              <span className="truncate">{t[TITLE_LABEL_KEY[row.title]]}</span>
+              {row.student.isSample && <SampleMark lang={lang} />}
             </div>
 
             <div

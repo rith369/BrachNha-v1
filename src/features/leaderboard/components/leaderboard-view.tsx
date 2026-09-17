@@ -5,6 +5,9 @@ import { useBrachNhaStore } from "@/lib/store";
 import { useT } from "@/data/translations";
 import { LEADERBOARD_STUDENTS } from "../demo-data";
 import { METRIC_META, PERIOD_LABEL_KEY } from "../metric-meta";
+import { useRealStudents } from "../use-real-students";
+import { todayKey } from "@/utils/day";
+import { avatarSeedFor } from "@/utils/avatar-seed";
 import { LeaderboardControls } from "./leaderboard-controls";
 import { PersonalSummary } from "./personal-summary";
 import { Podium } from "./podium";
@@ -12,11 +15,18 @@ import { RankingList } from "./ranking-list";
 import { StickyUserCard } from "./sticky-user-card";
 import {
   findCurrentUser,
+  fromDemo,
+  fromReal,
   gapToNext,
+  localStudentStats,
   rankBoard,
   supportingMetrics,
 } from "@/utils/leaderboard";
-import type { LeaderboardMetric, LeaderboardPeriod } from "@/utils/leaderboard";
+import type {
+  LeaderboardMetric,
+  LeaderboardPeriod,
+  LeaderboardStudent,
+} from "@/utils/leaderboard";
 
 /** See the note beside the observers below for why the bottom band is cut. */
 const WATCH_OPTIONS = { rootMargin: "0px 0px -150px 0px" };
@@ -30,10 +40,15 @@ const WATCH_OPTIONS = { rootMargin: "0px 0px -150px 0px" };
  * metric that rewards learning rather than sitting in the app, weekly because a
  * board you can still change today motivates more than a lifetime total.
  *
- * Nothing is precomputed per metric/period. rankBoard() sorts 30 rows on every
- * change, which is free at this size and means the three boards can never drift
- * out of agreement with the summary and the sticky card — they all read the
- * same array.
+ * THE ROSTER IS THREE SOURCES: the sample cohort (every row marked "Sample" on
+ * screen), real students from the server, and the viewer's own row built from
+ * the live store. The viewer is never in the server list — the SQL function
+ * excludes the caller — so they cannot appear twice.
+ *
+ * Nothing is precomputed per metric/period. rankBoard() sorts the roster on
+ * every change, which is free at this size and means the three boards can never
+ * drift out of agreement with the summary and the sticky card — they all read
+ * the same array.
  *
  * The page caps this at max-w-2xl, the app's one content-column width, already
  * used by every reading and answering screen. A leaderboard is a list to read,
@@ -42,18 +57,45 @@ const WATCH_OPTIONS = { rootMargin: "0px 0px -150px 0px" };
  * the rest of the screen.
  */
 export function LeaderboardView() {
-  const { lang, userName } = useBrachNhaStore(
-    useShallow((s) => ({ lang: s.lang, userName: s.userName }))
+  const { lang, userName, xp, activityLog, authUserId } = useBrachNhaStore(
+    useShallow((s) => ({
+      lang: s.lang,
+      userName: s.userName,
+      xp: s.xp,
+      activityLog: s.activityLog,
+      authUserId: s.authUser?.id ?? "",
+    }))
   );
   const t = useT(lang);
 
   const [metric, setMetric] = useState<LeaderboardMetric>("xp");
   const [period, setPeriod] = useState<LeaderboardPeriod>("weekly");
 
-  const board = rankBoard(LEADERBOARD_STUDENTS, metric, period);
+  // Once per render, and threaded into both the viewer's windows and the
+  // server's, so the two are measured against the same day.
+  const today = todayKey();
+  const realStudents = useRealStudents(today);
+  const name = userName || t.youLabel;
+
+  const meRow: LeaderboardStudent = {
+    id: "you",
+    name,
+    // Keyed on the account id where there is one, so the viewer's face here is
+    // the one classmates see on their competitions.
+    avatarSeed: avatarSeedFor(authUserId || userName),
+    isCurrentUser: true,
+    stats: localStudentStats(activityLog, xp, today),
+    momentum: { streak: 0, xp: 0, studyTime: 0 },
+  };
+  const roster = [
+    ...LEADERBOARD_STUDENTS.map(fromDemo),
+    ...realStudents.map(fromReal),
+    meRow,
+  ];
+
+  const board = rankBoard(roster, metric, period);
   const me = findCurrentUser(board);
   const gap = me ? gapToNext(board, me.rank) : 0;
-  const name = userName || t.youLabel;
   const meta = METRIC_META[metric];
 
   // The sticky card is a stand-in for something already on the page, so it is
@@ -82,7 +124,8 @@ export function LeaderboardView() {
 
   // Whichever element is currently showing the student — a list row normally,
   // a podium column if they ever crack the top three. Re-runs on metric/period
-  // because a new board can put a different DOM node under the ref.
+  // because a new board can put a different DOM node under the ref — and on the
+  // roster size, because real students arriving can do the same.
   const anchorRef = useRef<HTMLElement | null>(null);
   const [meOnScreen, setMeOnScreen] = useState(false);
   const setAnchor = (el: HTMLElement | null) => {
@@ -100,7 +143,7 @@ export function LeaderboardView() {
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [metric, period]);
+  }, [metric, period, board.length]);
 
   return (
     <div className="flex flex-col gap-4">

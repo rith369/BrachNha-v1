@@ -1,28 +1,20 @@
 // ============================================================
-// DEMO DATA — Leaderboard
+// SAMPLE COHORT — Leaderboard
 // ------------------------------------------------------------
-// Fake, fixed data on purpose, the same call already made for
-// Progress, Game and Grade Prediction. A real leaderboard needs
-// a server: cross-student ranking, a per-day activity log and a
-// notion of "productive" minutes that the app does not track
-// yet. Until that exists, a hard-coded cohort keeps the screen
-// polished and crash-proof instead of showing one student alone
-// at #1 with 0 XP.
+// Made-up students, KEPT ON PURPOSE beside the real ones. The
+// board ranks three sources together (see utils/leaderboard.ts):
+// these rows, real students from the leaderboard() SQL function,
+// and the viewer's own live row. The user's call: a board with
+// a handful of real students looks empty, so the sample cohort
+// stays and fills it.
 //
-// What real data would have to exist to switch this over:
-//   • a per-student XP ledger with timestamps (weekly/monthly
-//     windows are sums over it, not stored totals)
-//   • a daily activity log, so "current streak" and "longest
-//     streak in the last 30 days" are derivable
-//   • ACTIVE study minutes — time inside a lesson, practice
-//     question or exam, with idle time excluded. This is the
-//     one the product cares most about: minutes counted from
-//     "app is open" would make leaving a phone unlocked a
-//     winning strategy, which is the opposite of the point.
+// THE CONDITION THEY ARE KEPT ON: every row here renders with a
+// visible "Sample" mark (podium and list alike), so no student
+// mistakes one for a classmate. fromDemo() sets `isSample`; the
+// mark reads it. Don't render these rows anywhere without it.
 //
-// The one live value on this screen is the student's own NAME,
-// read from the store at render time — the rows below are the
-// cohort they are being placed against.
+// There is NO "You" row here any more. The viewer's row is built
+// from the store — their real XP, streak and study minutes.
 //
 // Rows are written in WEEKLY XP order for readability only.
 // Nothing depends on the array order; every board is ranked by
@@ -30,12 +22,12 @@
 // three metrics disagree about who is #1.
 // ============================================================
 
-import type { LeaderboardStudent } from "@/utils/leaderboard";
+import type { DemoLeaderboardStudent } from "@/utils/leaderboard";
 
 /** Shown under the page title — this is a class-sized board, not the country. */
 export const COHORT_LABEL = { en: "Grade 12 · Science", km: "ថ្នាក់ទី១២ · វិទ្យាសាស្ត្រ" };
 
-export const LEADERBOARD_STUDENTS: LeaderboardStudent[] = [
+export const LEADERBOARD_STUDENTS: DemoLeaderboardStudent[] = [
   {
     id: "dara",
     name: "Dara Chhun",
@@ -222,25 +214,6 @@ export const LEADERBOARD_STUDENTS: LeaderboardStudent[] = [
     streakMonth: 14,
     streakAllTime: 17,
     momentum: { xp: 2, streak: 5, studyTime: -1 },
-  },
-  {
-    // The signed-in student. `name` is only a fallback — the components render
-    // the real name off the store, so the board says "Keo", not "You", once
-    // someone has logged in. Deliberately outside the top 10 on all three
-    // boards: the sticky card and the "N to reach #X" line are the parts of
-    // this screen most worth seeing, and a demo that opens at #2 never shows
-    // them. The three ranks that fall out are #18 XP, #12 streak, #24 study
-    // time — one student, three different standings, which is the whole point.
-    id: "you",
-    name: "You",
-    avatarSeed: "panharith",
-    isCurrentUser: true,
-    weekly: { xp: 2430, streak: 12, studyMinutes: 522 },
-    monthFactor: 3.6,
-    allTimeFactor: 7.4,
-    streakMonth: 18,
-    streakAllTime: 24,
-    momentum: { xp: 3, streak: 4, studyTime: 2 },
   },
   {
     id: "rattana",

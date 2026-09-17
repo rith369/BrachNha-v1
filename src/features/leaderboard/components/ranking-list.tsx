@@ -1,6 +1,7 @@
 import { Avatar } from "@/components/ui/avatar";
 import { useT } from "@/data/translations";
 import { METRIC_META, TITLE_LABEL_KEY } from "../metric-meta";
+import { SampleMark } from "./sample-mark";
 import {
   formatMetricValue,
   formatMetricWithUnit,
@@ -82,6 +83,7 @@ export function RankingList({
                     {t.youLabel}
                   </span>
                 )}
+                {row.student.isSample && <SampleMark lang={lang} />}
               </div>
               <div className="truncate text-[10px] font-bold text-muted md:text-[11px]">
                 {t[TITLE_LABEL_KEY[row.title]]}

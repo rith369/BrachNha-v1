@@ -1,7 +1,12 @@
 /**
- * Leaderboard maths and wording. Pure functions only — the roster itself lives
- * in features/leaderboard/demo-data.ts and is passed in, the same way
- * utils/gradePrediction.ts takes subject performance rather than importing it.
+ * Leaderboard maths and wording. Pure functions only — the roster is passed in,
+ * the same way utils/gradePrediction.ts takes subject performance rather than
+ * importing it. It is assembled from THREE sources, all normalised to one
+ * LeaderboardStudent shape before ranking:
+ *   • the fixed sample cohort in features/leaderboard/demo-data.ts (fromDemo),
+ *     every row flagged `isSample` and visibly marked on screen;
+ *   • real students from the leaderboard() SQL function (lib/leaderboard.ts);
+ *   • the viewer's own row, from the live store (localStudentStats).
  *
  * The important idea in here: there are THREE boards, not one board with three
  * columns. Each metric is ranked independently, so a student can sit at #3 on
@@ -9,7 +14,9 @@
  * blends the three into a composite score, deliberately — a composite would let
  * hours-in-app buy a rank that learning should have earned.
  */
-import type { Lang } from "@/types";
+import type { ActivityLog, Lang } from "@/types";
+import { addDaysKey, parseDayKey } from "@/utils/day";
+import { bestStreak, currentStreak } from "@/utils/streak";
 
 export type LeaderboardMetric = "streak" | "xp" | "studyTime";
 export type LeaderboardPeriod = "weekly" | "monthly" | "allTime";
@@ -33,7 +40,7 @@ export interface MetricStats {
 }
 
 /**
- * One student's demo row. Only the WEEKLY numbers are written out; the monthly
+ * One SAMPLE student, as authored. Only the WEEKLY numbers are written out; the monthly
  * and all-time windows are derived from them by a per-student factor. That's
  * both less data to keep consistent and more honest — a student who put in a
  * heavy month earned more XP and logged more minutes that month, so one factor
@@ -45,12 +52,10 @@ export interface MetricStats {
  * `streakMonth` is the longest run inside the last 30 days, `streakAllTime` the
  * longest run ever. Both are >= the current weekly streak by definition.
  */
-export interface LeaderboardStudent {
+export interface DemoLeaderboardStudent {
   id: string;
   name: string;
   avatarSeed: string;
-  /** The signed-in student. Exactly one row in the roster carries this. */
-  isCurrentUser?: boolean;
   weekly: MetricStats;
   monthFactor: number;
   allTimeFactor: number;
@@ -60,6 +65,28 @@ export interface LeaderboardStudent {
    *  longer windows by positionChange() — an all-time board barely moves. */
   momentum: Record<LeaderboardMetric, number>;
 }
+
+/** One row on the board, whatever it came from. */
+export interface LeaderboardStudent {
+  id: string;
+  name: string;
+  avatarSeed: string;
+  /** The signed-in student. Exactly one row in the roster carries this. */
+  isCurrentUser?: boolean;
+  /** A made-up student from the sample cohort. Rendered with a visible mark —
+   *  that mark is the condition the sample rows are kept on. */
+  isSample?: boolean;
+  stats: Record<LeaderboardPeriod, MetricStats>;
+  /** Weekly positions moved. All zero for real rows: nothing records where a
+   *  real student stood last week, and an invented arrow would be a claim. */
+  momentum: Record<LeaderboardMetric, number>;
+}
+
+const NO_MOMENTUM: Record<LeaderboardMetric, number> = {
+  streak: 0,
+  xp: 0,
+  studyTime: 0,
+};
 
 export interface RankedStudent {
   student: LeaderboardStudent;
@@ -78,8 +105,8 @@ export interface RankedStudent {
 // "13h 07m" precision the demo can't justify.
 const roundTo = (n: number, step: number) => Math.round(n / step) * step;
 
-export function statsFor(
-  student: LeaderboardStudent,
+function scaledDemoStats(
+  student: DemoLeaderboardStudent,
   period: LeaderboardPeriod
 ): MetricStats {
   if (period === "weekly") return student.weekly;
@@ -91,6 +118,92 @@ export function statsFor(
     streak: monthly ? student.streakMonth : student.streakAllTime,
     studyMinutes: roundTo(student.weekly.studyMinutes * factor, 5),
   };
+}
+
+export function fromDemo(student: DemoLeaderboardStudent): LeaderboardStudent {
+  return {
+    id: `sample-${student.id}`,
+    name: student.name,
+    avatarSeed: student.avatarSeed,
+    isSample: true,
+    stats: {
+      weekly: scaledDemoStats(student, "weekly"),
+      monthly: scaledDemoStats(student, "monthly"),
+      allTime: scaledDemoStats(student, "allTime"),
+    },
+    momentum: student.momentum,
+  };
+}
+
+/** A real student's numbers, already windowed by the server. */
+export interface RealStudentRow {
+  id: string;
+  name: string;
+  avatarSeed: string;
+  stats: Record<LeaderboardPeriod, MetricStats>;
+}
+
+export function fromReal(row: RealStudentRow): LeaderboardStudent {
+  return { ...row, momentum: NO_MOMENTUM };
+}
+
+/**
+ * The viewer's own numbers, from the live store rather than the server copy
+ * that trails it. Windows match the leaderboard() SQL function exactly — last 7
+ * and last 30 days including today, all-time XP from the running total — so the
+ * viewer is measured the same way as everyone they are ranked against.
+ */
+export function localStudentStats(
+  log: ActivityLog,
+  totalXp: number,
+  today: string
+): Record<LeaderboardPeriod, MetricStats> {
+  const base = parseDayKey(today);
+  const weekStart = addDaysKey(base, -6);
+  const monthStart = addDaysKey(base, -29);
+
+  let xpWeek = 0;
+  let xpMonth = 0;
+  let minWeek = 0;
+  let minMonth = 0;
+  let minAll = 0;
+  for (const [day, entry] of Object.entries(log)) {
+    // Optional chaining for the same reason utils/streak.ts uses it: an old
+    // device can hold a bare number here.
+    if (day > today) continue;
+    const xp = entry?.xp ?? 0;
+    const minutes = entry?.minutes ?? 0;
+    minAll += minutes;
+    if (day >= monthStart) {
+      xpMonth += xp;
+      minMonth += minutes;
+    }
+    if (day >= weekStart) {
+      xpWeek += xp;
+      minWeek += minutes;
+    }
+  }
+
+  return {
+    weekly: {
+      xp: xpWeek,
+      streak: currentStreak(log, today),
+      studyMinutes: minWeek,
+    },
+    monthly: {
+      xp: xpMonth,
+      streak: bestStreak(log, monthStart),
+      studyMinutes: minMonth,
+    },
+    allTime: { xp: totalXp, streak: bestStreak(log), studyMinutes: minAll },
+  };
+}
+
+export function statsFor(
+  student: LeaderboardStudent,
+  period: LeaderboardPeriod
+): MetricStats {
+  return student.stats[period];
 }
 
 export function metricValue(
