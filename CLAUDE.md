@@ -608,10 +608,12 @@ Every table denies by default and then allows exactly `auth.uid() = user_id`
 (`= id` on `profiles`), with `(select auth.uid())` so Postgres evaluates it once
 per statement rather than once per row.
 
-The leaderboard needs cross-user reads and is fixed demo data partly for that
-reason. When it goes live it wants a view or a `security definer` function
-exposing rank and display name only — **not** a "profiles are readable by
-everyone" policy, which hands out email, age and location with it.
+The leaderboard's cross-user read EXISTS now, as exactly the shape this
+paragraph asked for: `public.leaderboard(p_today)`
+(`20260916000004_leaderboard.sql`), a `security definer` function returning a
+display name and numbers only — **not** a "profiles are readable by everyone"
+policy, which hands out email, age and location with it. Granted to
+`authenticated` only. See the Leaderboard section.
 
 **`/streak/friends` is now a SECOND screen waiting on that same function**, and
 it needs two things more. A **friendship model** — a one-sided "following" turns
@@ -1712,10 +1714,10 @@ History paper — which the catalog has cards for.
 
 **Two follow-ups, deliberately not done here:** a separate persisted
 `pastPaperResults` so Tab A grows its own history, and feeding past papers into
-`buildKnowledgeBlock` / `BAC2_EXAMPLES` once content exists. The second edit is
-also the right moment to fix the known `no-useless-escape` backslash bug in
-`BAC2_ANSWER_RULES`, which needs an answer-quality re-test rather than a silent
-change.
+`buildKnowledgeBlock` / `BAC2_EXAMPLES` once content exists. (The
+`no-useless-escape` backslash bug this paragraph used to pair with that second
+edit has since been fixed on its own — see "The LaTeX rules reached Gemini
+garbled" near the end of this file.)
 
 `scripts/shots.mjs`'s `focus-exam` route now clicks Tab B's math card
 specifically (`button:has-text("វិញ្ញាសារគណិតវិទ្យា")`) rather than a fixed "start"
@@ -2689,16 +2691,16 @@ different failure and only the first was visible:
 `progressSubjects(userLanguage)` maps `allSubjects()` — the same call the
 Study, Exam and Practice pages make — over `demo-data.ts`'s `subjectStats`,
 picking up the list, its order, the student's chosen language subject, the
-catalog's Lucide icon, an English name and the per-subject colour. Only the
-numbers come from the demo file, and `PreviewTag` is what says so.
+catalog's Lucide icon, a name in the page's language and the per-subject
+colour. Only the numbers come from the demo file, and `PreviewTag` is what says
+so.
 
-**The name is ALWAYS ENGLISH — not `T[lang]`, although an earlier version of
-this file made it follow the store's language.** That was reverted: every other
-label on this page ("Overall Readiness", "Questions Answered", the "📈 Progress"
-title) is a hardcoded English string, so making only the subject names switch to
-Khmer would have traded one inconsistency for another — Khmer names sitting
-inside otherwise-English cards. If the whole dashboard is localized later,
-revisit this alongside that work rather than in isolation.
+**The name follows `lang` — the page is bilingual now.** It was held ALWAYS
+ENGLISH for a while, on the reasoning that every other label on this page was a
+hardcoded English string, so switching only the names would have put Khmer words
+inside English cards. That paragraph promised to revisit "alongside" localizing
+the whole dashboard, and that happened (17 Sep 2026) — see "Both languages"
+below.
 
 **`subjectStats` is `Record<SubjectId, SubjectStats>`, not an array**, which is
 what makes the geography row unrepresentable rather than merely deleted: a
@@ -2977,12 +2979,24 @@ Four things that look arbitrary and are not:
 states a rule — flashcards don't count toward questions or score, past papers
 don't count toward readiness, the study clock pauses after 2 minutes and ignores
 KruAI, the trend needs 5 in both windows. Changing any of those rules means
-editing the sentence too; nothing will fail if it isn't.
+editing the sentence too — in BOTH languages in `features/progress/copy.ts` —
+and nothing will fail if it isn't.
 
-**Known and left alone:** a subject studied ONLY with flashcards still reads
-"Not started yet" (`questions` counts scored answers, and that is the row's
-branch). The legend tells the truth about flashcards but cannot fix a row label
-that says otherwise; changing the branch was offered and not asked for.
+**"Not started yet" means NOTHING recorded — fixed right after shipping.** The
+row used to branch on `questions === 0`, and `questions` counts scored answers
+only, so a subject studied purely with flashcards rendered as the dimmed
+"Not started yet" row: the page telling a student that work they had done did
+not exist. `SubjectStat.reviewed` (all-time flashcard grades — VOLUME only,
+never part of `score`) now carries the count, and the empty row needs questions,
+reviewed AND sessions all at zero. Such a subject is an ordinary row reading
+"1 session · 5 flashcards", no score and no bar, and its info line explains
+itself: flashcards don't give a score, answer `MIN_SAMPLE` questions to see one.
+
+The flashcard count shows on EVERY row that has one, scored rows included.
+Showing it only until a first question would make it vanish the moment a student
+did more work, which reads as the app losing it. "0 questions" is dropped when
+flashcards are all there is. Measured at 320px: "1 session · 8 questions · 12
+flashcards" still fits on one line.
 
 Verified in a real browser at 320px and 1280px, dark and light: all 11 triggers
 open with the right text, stay inside their clip box, add no sideways scroll,
@@ -2993,6 +3007,51 @@ the popup. And with REAL TOUCH (`hasTouch`) at 320: tap opens, tap again closes,
 nothing opens from the touch's own `pointerenter`, a tap inside keeps it open.
 No trigger renders a text decoration.
 
+#### Both languages — `features/progress/copy.ts`
+
+The page was hardcoded English until the user asked for it to follow the app's
+language "like other pages" (17 Sep 2026), with technical words left alone.
+Every string on all seven cards — tooltips and the three sample cards included —
+lives in `PROGRESS_COPY`, `{ en, km }`, the pattern `features/streak/copy.ts`
+and `features/game/copy.ts` already use. **`km` is typed `typeof en`**, so a line
+added in one language and not the other fails to compile. Strings with numbers
+in them are functions, because Khmer puts the number somewhere else and has no
+plural ("1 វគ្គ · 5 Flashcard", never "sessions").
+
+Decisions a later edit could undo by accident:
+
+- **Latin script is kept for Streak, XP, Flashcard, Quiz, KruAI and AI** in the
+  Khmer column — the user's instruction, and the spelling a student meets for
+  those terms everywhere else. The Day Streak tile reads plain `Streak` in Khmer;
+  the Streak page's own ថ្ងៃជាប់ៗគ្នា is kept for sentences that need the meaning.
+- **`uppercase` and letter-spacing are ENGLISH ONLY** (the Overall Readiness
+  label, Focus Areas labels). Khmer has no case, and tracking pulls a Khmer
+  cluster — consonant, subscript, vowel — visibly apart.
+- **Chart day labels in Khmer are the streak screens' initials** (ច, អ, ព…) via
+  `weekdayLabel()`; the best-day footer uses full names from
+  `utils/khmer-dates.ts`. `summary.ts` stays language-free — its `WeekDay.label`
+  is still English, and the chart relabels at render.
+- **The bar chart's Khmer short labels** (គណិត រូប គីមី ជីវៈ ប្រវត្តិ ខ្មែរ អង់គ្លេស)
+  were measured to fit seven columns at 320px without overlapping.
+- **The Study Time tile's unit is drawn SMALL and held on one line** (`Metric`'s
+  `unit` prop), like the hero's "%". "2.6 ម៉ោង" at full size wrapped the unit
+  onto a second line in a 58px tile and made that tile taller than its three
+  neighbours; the "fits" check had missed it, because wrapping is not overflow.
+  English reads "2.6h" with a smaller h as a result.
+- **`TitleWithTip`** (`components/title-with-tip.tsx`) glues each card title's ⓘ
+  to its last word, splitting on the last space — so a Khmer title, which has no
+  spaces, is held whole with its icon.
+- **Subject names come from `T[lang]`** in `translations.ts`, and the page title
+  from `T[lang].progress` — the word the nav already uses for this page.
+
+Verified in a real browser, Khmer and English, 320px touch and 1280px mouse: no
+Latin word on the Khmer page outside that list; every tile's value on one line;
+all seven chart labels drawn without overlap; nothing new scrolling sideways;
+tooltips open in Khmer; and the sidebar's language switch updates the page live.
+
+**Not this page, noticed while testing:** the sidebar's section headings "Main"
+and "Features" stay English in Khmer mode.
+
 **Game** (`features/game`) — asynchronous competitions between real students.
 See its own section below.
 
@@ -3000,10 +3059,10 @@ See its own section below.
 plus a Home widget, both fed by one source: `demo-data.ts`. Nine components plus
 the rule-based model in `use-grade-prediction.ts`. Fake/demo data on purpose.
 
-**Leaderboard** (`features/leaderboard`) — `/leaderboard`, five components over
-one 30-student `demo-data.ts` and the pure ranking layer in
-`utils/leaderboard.ts`. Fake/demo data on purpose, with one exception noted
-below. Its own section follows.
+**Leaderboard** (`features/leaderboard`) — `/leaderboard`, a MIXED board: a
+29-student sample cohort (`demo-data.ts`, every row marked "Sample"), real
+students from the `leaderboard()` SQL function, and the viewer's own live row,
+ranked together by `utils/leaderboard.ts`. Its own section follows.
 
 **Streak** (`features/streak`) — TWO routes measuring TWO DIFFERENT THINGS.
 `/streak` is the student's own solo streak (`demo-data.ts` + the milestone maths
@@ -3061,8 +3120,10 @@ tables missing` and the browse list shows its failed state while everything else
 on the page keeps working. That degradation is deliberate, not a fallback bolted
 on afterwards.
 
-`PreviewTag` still stays, for the one reason left: the hero card is decoration by
-request. Everything else on the page is real.
+**`PreviewTag` is GONE from this page (17 Sep 2026), at the user's request.** The
+hero card is still decoration by request; everything else on the page is real.
+Its kicker reads **Battle** (`t.liveGame`, km `ការប្រយុទ្ធ`), no longer "Live
+Game" — the key name was kept so no caller moved.
 
 #### Two denormalisations, both load-bearing, neither a shortcut
 
@@ -3201,11 +3262,11 @@ split, the subject, the question progress and the clock all come from
 signed-in student (display name, and their Google photo when they have one), and
 the button, which reads Create Game Now and routes to `/game/create`.
 
-That is a deliberate product decision rather than an oversight, and it is why
-`PreviewTag` stays on this page. **The rule this codebase actually holds to is
-not "no sample data" — it is that sample data must be LABELLED**, which is what
-that pill is for and what `preview-tag.tsx` says in its own header. Every other
-section on the page is real and derived from the store.
+That is a deliberate product decision rather than an oversight. **It is the
+app's ONE knowingly unlabelled piece of sample data**: the rule elsewhere is that
+sample data must be LABELLED, and this page carried `PreviewTag` for exactly that
+until the user asked for the pill to be removed. Don't restore it unasked. Every
+other section on the page is real and derived from the store.
 
 Don't quietly make the fake numbers real by wiring them to a competition: the
 card would then be claiming a live match, which is the one thing this feature
@@ -3858,16 +3919,65 @@ lets hours-in-app buy a rank that learning is supposed to earn, which is the one
 thing this screen must not teach. Study time is shown because effort deserves to
 be seen, and kept in its own ranking for the same reason.
 
-`utils/leaderboard.ts` is pure and owns the maths and the wording;
-`features/leaderboard/demo-data.ts` owns the roster and satisfies the interface
-the utils file declares (same direction as `utils/gradePrediction.ts` — utils
-never imports from `features/`). Five components:
+`utils/leaderboard.ts` is pure and owns the maths and the wording (utils never
+imports from `features/`). Six components:
 `leaderboard-view` (state + both observers) → `personal-summary`,
-`leaderboard-controls`, `podium`, `ranking-list`, `sticky-user-card`.
+`leaderboard-controls`, `podium`, `ranking-list`, `sticky-user-card`, plus
+`sample-mark`.
+
+#### The roster is SAMPLE + REAL + YOU, and every sample row is marked
+
+The user's call (16 Sep 2026): keep the 29 invented students so the board looks
+full, add real students beside them, and **put a visible "Sample" mark on every
+invented row** so no student mistakes one for a classmate. That mark is the
+condition the sample rows are kept on — `SampleMark` renders on the podium's
+title line and beside the name in the list, and a `fromDemo()` row must never be
+rendered without it. Three sources, normalised to one `LeaderboardStudent`
+(`stats: Record<period, MetricStats>`) before `rankBoard()`:
+
+| source | built by | marked |
+| --- | --- | --- |
+| sample cohort, `features/leaderboard/demo-data.ts` | `fromDemo()` | **Sample** |
+| other real students, `lib/leaderboard.ts` → `use-real-students.ts` | `fromReal()` | no |
+| the viewer, from the live store | `localStudentStats()` | "You" chip |
+
+- **The fake "You" row is DELETED.** The viewer's row is their real XP, streak
+  and minutes now. The known consequence, weighed and accepted: against a
+  cohort authored at 1,300–3,400 XP a WEEK, a real student sits at or near the
+  bottom. The sample numbers were not rescaled.
+- **The viewer is never in the server list** — the SQL function excludes
+  `auth.uid()` — so they cannot appear twice, and their own row is always the
+  fresher local copy rather than the one trailing it on the server.
+- **`public.leaderboard(p_today)` lists non-anonymous accounts with a display
+  name.** `is_anonymous = false` is what hides the ~205 screenshot-harness
+  accounts without deleting them. Windows are last 7 / last 30 days INCLUDING
+  today; all-time XP is `profiles.xp`. **Streak is derived from the three goal
+  flags in `daily_activity`, never read from `profiles.streak`** — that column is
+  only recomputed on the student's own device at day rollover, so a student who
+  stops opening the app would keep their old streak on the board forever.
+  `streak_now` follows `currentStreak()`'s ending-today-or-yesterday rule, and
+  `localStudentStats()` mirrors the SQL windows so the viewer is measured the way
+  everyone else is. `p_today` is the client's LOCAL date, clamped server-side to
+  within a day of `current_date`.
+- **Nothing waits on the network.** The board paints at once with sample + you;
+  real rows slot in when the RPC lands. Guest, unconfigured, loading and failed
+  all collapse to "no real rows" — a guest fetches nothing, because the function
+  is granted to `authenticated` only and a guest has no business reading
+  classmates' names. The anchor observer re-runs on `board.length` too, since
+  real rows arriving can move the viewer between list and podium.
+- **Real rows carry zero momentum**, so no arrow: nothing records where a real
+  student stood last week, and an invented one would be a claim.
+- **No page-level `PreviewTag` any more** — a page tag would call the real rows
+  sample too. The per-row mark replaced it.
+- **Not cheat-proof, knowingly.** Every number was written by the student's own
+  device under own-row RLS. Accepted by the user; revisit before the board
+  rewards anything.
+- **Migration applied by hand**, and `db:check` cannot see a function. Until it
+  is applied the RPC 404s and the board is simply sample + you.
 
 Things worth knowing before editing it:
 
-- **Only WEEKLY numbers are authored.** Monthly and all-time XP/minutes are the
+- **Only WEEKLY SAMPLE numbers are authored.** Monthly and all-time XP/minutes are the
   weekly value times one per-student factor, because a student who put in a
   heavy month earned more XP *and* logged more minutes that month — one factor
   for both is the honest model, not a shortcut. The boards still reorder between
@@ -3884,11 +3994,6 @@ Things worth knowing before editing it:
 - **`gapToNext` takes no metric** — every row already carries the selected
   metric's `value`, which is what makes it impossible to compute the gap against
   a different board than the one being rendered.
-- **The student's NAME is the one live value on the page**, read from the store
-  at render time; the row's `name: "You"` is only a fallback for a logged-out
-  render. Their stats are demo like everyone else's, for the reason Progress and
-  Game are: a real new user has 0 XP and would sit alone at the bottom of an
-  empty board.
 - **Messaging is forward-only for the current user.** Peer rows show movement
   both ways in one neutral grey; the student's own card renders a change badge
   only while it's positive, and always pairs the rank with a next step. A red
@@ -3897,8 +4002,8 @@ Things worth knowing before editing it:
   column**, not `fixed` — it floats over the list while there's list left, then
   lands in place at the end. It is unmounted while *either* the summary card at
   the top *or* the student's own row is on screen (two `IntersectionObserver`s,
-  the row one re-run on metric/period because a new board can put a different
-  DOM node under the ref); watching only the row floats a duplicate over the
+  the row one re-run on metric/period/roster size because a new board can put a
+  different DOM node under the ref); watching only the row floats a duplicate over the
   podium at first paint. `rootMargin` cuts the bottom 150px — that band is the
   tab bar plus the card itself, and without it the row counts as visible while
   sitting underneath the very card being dismissed, and the two flicker.
@@ -3923,8 +4028,8 @@ Things worth knowing before editing it:
 
 `metric` and `period` are component state, not store state: they're how the
 screen is being looked at right now, not something a reload should inherit.
-Defaults are **XP + Weekly**. Nothing is precomputed — `rankBoard()` re-sorts 30
-rows on every change, which is free at this size and is what stops the summary,
+Defaults are **XP + Weekly**. Nothing is precomputed — `rankBoard()` re-sorts the
+whole roster on every change, which is free at this size and is what stops the summary,
 the podium and the sticky card from ever disagreeing.
 
 **24 new avatars** were downloaded into `public/avatars/` for this roster (same
@@ -4339,7 +4444,8 @@ Five things that look like choices anyone would make and are not:
   the full ramp for large text and glyphs.
 - **Days are `<div>`s with an `aria-label`, never buttons.** There is nothing
   behind a day to open.
-- **The Khmer month names are HAND-WRITTEN (`KM_MONTHS`), not `Intl`.** Desktop
+- **The Khmer month names are HAND-WRITTEN (`KM_MONTHS`, now in
+  `utils/khmer-dates.ts`, shared with Progress), not `Intl`.** Desktop
   Chrome was measured with NO Khmer locale data —
   `Intl.DateTimeFormat.supportedLocalesOf(["km"])` is empty — and formats
   `km-KH` in English without a warning; Android ships trimmed locale data too.
@@ -4526,9 +4632,10 @@ Four things about that panel that are not obvious:
   empty boxes. Keeping them separate is what lets a student write Khmer around
   their formula, which was the whole point of the old inline keyboard.
 - **`insertLatex` pads OUTSIDE the dollars, never inside.** `splitMath` applies
-  the TeX rule that inline math may not be hugged by whitespace, so `$ x^2 $`
-  reaches the bubble as literal dollar signs. Get this backwards and every
-  inserted formula silently stops rendering.
+  the TeX rule that inline math may not be hugged by whitespace. It now forgives
+  padding around unmistakable TeX (`$ x^2 $` renders), but a padded `$ x $` is
+  still refused — so get this backwards and the simplest inserted formulas
+  silently stop rendering.
 - **The lazy boundary is load-bearing, not a nicety.** MathLive is ~800KB of JS
   plus twenty font files — it builds its own chunk because `chat-overlay.tsx`
   reaches it through `React.lazy`, so it downloads on the first tap of Σ rather
@@ -4652,11 +4759,13 @@ student's own `contentLog`/`activityLog`/`examResults` now, and the edge cases
 this decision was taken to avoid were handled rather than avoided (see its own
 section). Three cards are still demo, which is why the page keeps its tag. The
 "per-subject score tracking" that entry names as the blocker is the thing that
-got built. The leaderboard's list is the longest of those: cross-student
-ranking, an XP ledger with timestamps, a daily activity log, and **active**
-study minutes with idle time excluded — counting "app is open" would make
-leaving a phone unlocked a winning strategy, which is exactly what that screen
-is built to argue against. Its one live read is the student's own name.
+got built.
+
+**THE LEADERBOARD HAS LEFT IT TOO — by mixing, not replacing.** Its blockers
+(cross-student reads, a daily log, active minutes) all exist now, and the user
+chose to keep the sample cohort beside real students with a "Sample" mark on
+every invented row, rather than drop it. The viewer's own row is real. See its
+own section.
 
 **"Demo data" means demo NUMBERS. It never licensed inventing a CURRICULUM.**
 Progress had a geography bar for a subject the app does not teach, which no
@@ -4678,11 +4787,9 @@ same problem** and should read the store rather than invent one.
 
 **Every screen still on demo data carries `PreviewTag`** —
 `components/preview-tag.tsx`, a dashed "Preview · sample data" pill — on its own
-line under the title on Progress, Grade Prediction, the Leaderboard and Streak
-with Friends — and on Game, which carries it for two reasons at once: its hero
-card is decoration by the user’s own request, and until competitions reach a
-server nobody else can see or join what a student posts. Every other section on
-that page is real. The tag comes off when both are true. Added
+line under the title on Progress, Grade Prediction and Streak with Friends. **Game
+no longer carries it** — removed at the user's request (17 Sep 2026) although its
+hero card is still decoration; that is the one recorded exception. Added
 11 Sep 2026 because Progress's top row said 1,240 XP and a 12🔥 streak and the
 Leaderboard's "You" row 2,430 XP, a few pixels under the bar's real numbers, and
 the user could not tell which were real. Labelling was chosen over making those
@@ -4692,6 +4799,12 @@ stays only for the three cards that are still demo, and comes off the day any
 one of Focus Areas / Study Activity / AI Insights is the last of them to go.
 The mechanical test for that: delete `features/progress/demo-data.ts` and see
 whether the build passes.
+
+**The Leaderboard LOST its page tag (16 Sep 2026)** when real students joined the
+sample cohort: a page-level tag would call the real rows sample too. It carries a
+per-ROW "Sample" mark instead (`features/leaderboard/components/sample-mark.tsx`),
+same dashed look — the one place in the app where real and invented rows share a
+list, and so the one place the label has to be per row.
 
 **The tags ARE the list of what is still fake** — a new
 demo screen gets one, and a screen that switches to real data loses it. `/streak`
@@ -5157,28 +5270,63 @@ content for it, skip the quiz step if there's no practice question).
 **3. Redundant store action removed:** `doTask` (mark done only) was superseded
 by `completeTask` (marks done + awards XP atomically) and deleted.
 
-## Known bug, NOT yet fixed — decide before touching
+## The LaTeX rules reached Gemini garbled — FIXED (17 Sep 2026)
 
-`src/data/bac2-format.ts` — the LaTeX instructions inside the
-`BAC2_ANSWER_RULES` template literal use single backslashes, so JavaScript eats
-them before the string ever reaches Gemini:
+This section used to be "Known bug, NOT yet fixed". It was fixed, with the
+answer-quality re-test it asked for, and two things came out of that test that
+the original note did not predict.
 
-```
-source:  Use only commands KaTeX supports: \frac \sqrt \lim \int \sum ...
-actual:  Use only commands KaTeX supports: \f rac sqrt lim int sum ...
-```
+**The bug was worse than recorded.** `BAC2_ANSWER_RULES` is a template literal
+and its KaTeX command list used single backslashes. Loading the module and
+`JSON.stringify`-ing the string showed **zero real backslashes and nine control
+characters per language**: `\f` a form feed, `\r` (`\right`) a carriage return,
+`\t` (`\theta`, `\to`, `\times`, `\text`) a tab, `\b` (`\beta`, `\begin`) a
+backspace, and `\ne` a LINE BREAK followed by "e". The worked examples were
+already double-escaped, so the note's "and in the worked examples" was wrong —
+only lines in the two rules blocks needed it. `bac2-format.ts` now carries a
+header comment so the doubled backslashes are not "tidied" back.
 
-`\f` survives as a formfeed, `\r` in `\right` becomes a carriage return, `\t` in
-`\theta` a tab, and the rest lose their backslash entirely. The fix is to double
-every backslash (`\\frac`) in that block, in both the `en` and `km` copies and
-in the worked examples. It was left alone deliberately because it changes the
-mentor's system prompt and deserves a re-test of answer quality, not a silent
-edit. Oxlint reports all ~45 of these as `no-useless-escape` — that is the same
-bug, not noise to silence.
+**It was doing measurable damage, in exactly one place.** The corrupted
+chemistry rule taught `$mathrm{H_2O}$`. Asked to balance CH₄ combustion, three
+runs against the broken prompt wrote **15, 23 and 20** formulas opening
+`$mathrm{…}$` — KaTeX accepts that and renders the italic letters "mathrmCH4",
+so nothing ever errored. After the fix: **0, 0, 0**. Trig, limit and domain
+questions were clean both before and after; the model's own LaTeX knowledge
+wins everywhere the prompt is not copied verbatim.
+
+**The fix exposed a SECOND rendering failure: padded dollars.** With real
+backslashes in the rules, the model started writing `$ \mathrm{CH_4} $`, and
+`splitMath` refuses whitespace-hugged inline math — 5 of 6 chemistry answers
+showed raw source (30 stray `$` in one reply). **A prompt rule did not fix it**:
+an explicit "no space inside the dollars" rule, in both languages, left 3 of 3
+answers padded, so it was REMOVED rather than left costing prompt budget on
+every request. (A negative example also shows the model the very pattern it
+forbids.)
+
+**The fix is in the renderer: `looksLikeMath` forgives padding around
+unmistakable TeX.** Padded inline math is accepted only if it contains a
+backslash command, `^`, `_` or a brace (`TEX_MARKER` in `utils/math-render.ts`).
+That keeps the original guard — "costs $ and $x^2$" still refuses to pair
+" and " — and was checked against 12 cases including prose dollars, Khmer
+inside dollars, an unclosed stream fragment and a newline-spanning span.
+Re-scoring the saved answers took stray dollars from 30/10/28/6/30 to 4/0/2/0/2.
+
+**Deliberately left: padded plain arithmetic** (`$ 2 + 2 $`) still shows raw.
+Accepting `+` or `=` as a TeX marker would start typesetting dollar AMOUNTS in
+prose ("$5 + $3"). The rules already tell the model not to wrap bare numbers, and
+a stray `$ 2 $` is a far smaller failure than eating a sentence.
+
+**How it was measured, so it can be repeated:** answers came from the real
+`handleChat` via `ssrLoadModule` (no Supabase URL, so dev-mode verification is
+skipped), and were scored with the app's own path — `splitMath`, then
+`katex.renderToString` with `throwOnError`. Count bare command names inside math
+segments (`mathrm`, `frac`, `theta`… with no backslash) and `$` left in text
+segments. **Eyeballing is not enough**: the broken output rendered without a
+single error.
 
 Other standing lint warning: `src/components/ui/button.tsx`
 `only-export-components` (the shadcn `buttonVariants` export). Cosmetic,
-fast-refresh only.
+fast-refresh only. It is now the ONLY warning oxlint reports.
 
 ## Environment notes
 
@@ -5242,6 +5390,13 @@ For anything touching Supabase, additionally:
 ```bash
 npm run db:check     # env → reachability → Google sign-in → all 11 tables
 ```
+
+**The Leaderboard needs `20260916000004_leaderboard.sql` applied**, by hand, in the
+SQL editor — and `db:check` CANNOT see it (a function, not a table). Check it
+directly: `POST {VITE_SUPABASE_URL}/rest/v1/rpc/leaderboard` with the publishable
+key answers `PGRST202` ("could not find the function") while it is missing, and a
+permission error once it exists (it is granted to `authenticated` only). Until
+then the board is just the sample cohort plus the viewer, with no error shown.
 
 **Progress needs `20260916000001_content_activity.sql` applied**, by hand, in the
 SQL editor. Until it is, `db:check` names `daily_content_activity` as missing and

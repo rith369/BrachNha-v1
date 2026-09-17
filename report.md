@@ -17,6 +17,99 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 17 Sep 2026 — The Progress page speaks Khmer
+
+*Landed in commit `86673de`.* **No database step needed.**
+
+**Why.** Every other page follows the language you pick in the menu, but Progress was
+always in English.
+
+**What changed.** Switch the app to ខ្មែរ and the whole Progress page switches with it:
+the title, all seven cards, the chart labels, the sample cards at the bottom, and every
+explanation you get by tapping a number. Switching back to English puts it all back.
+
+A few words deliberately stay in English letters even in Khmer, because students meet them
+that way everywhere else in the app: **Streak, XP, Flashcard, Quiz, KruAI and AI.**
+
+**One small change in English too:** the Study Time figure's "h" is now drawn a little
+smaller ("2.6h"), the same way the % sits beside the big score. That was needed so the
+Khmer "2.6 ម៉ោង" fits on one line on a small phone.
+
+**What to re-test.** Switch the language to ខ្មែរ from the menu and open Progress. Read the
+card titles and the explanations behind a few numbers — the wording is a first draft, so
+tell us anything that sounds wrong. Check the four small figures at the top stay on one
+line on your phone.
+
+**Not fixed here:** the menu's own section headings, "Main" and "Features", are still in
+English when the app is in Khmer.
+
+---
+
+## 17 Sep 2026 — Flashcard-only subjects no longer say "Not started yet"
+
+*Landed in commit `86673de`.* **No database step needed.**
+
+**Why.** If you had only done flashcards in a subject, Progress still showed that subject
+as greyed out and "Not started yet" — as if the work you did didn't exist. That happened
+because the score only counts quiz and exam questions.
+
+**What changed.** A subject you've studied with flashcards now shows as a normal card, for
+example "1 session · 5 flashcards", with its little activity bars. Tap the line and it
+explains that flashcards don't give a score, because you mark them yourself, and how many
+quiz or exam questions you need for one. Subjects with flashcards and questions show both
+counts. "Not started yet" is now only for subjects with nothing at all.
+
+**What to re-test.** Review a flashcard deck in a subject you haven't done quizzes in, then
+open Progress and check that subject no longer says "Not started yet".
+
+---
+
+## 17 Sep 2026 — Menu logo lines up with the close button
+
+*Landed in commit `7a9eae2`.* **No database step needed.**
+
+**What changed.** When you open the menu on a phone, the BrachNha logo now sits on the same
+line as the close (✕) button, instead of lower down with an empty strip above it.
+
+---
+
+## 17 Sep 2026 — KruAI writes chemistry formulas properly now
+
+*Landed in commit `0c2cce4`.* **No database step needed.**
+
+**Why.** KruAI's instructions include a list of rules for writing math and chemistry
+formulas. A long-known typing problem in that list meant the instructions arrived at the AI
+scrambled: the special character every formula command starts with was being deleted, and in
+a few places swapped for invisible junk characters. We tested whether this was actually
+hurting students before fixing it, and it was.
+
+**What students were seeing.** Ask KruAI to balance a chemistry equation and many of its
+formulas showed the word **"mathrm"** glued to the front, e.g. *mathrmCH₄* instead of *CH₄*.
+The AI was copying the scrambled example in its instructions word for word. Across three test
+answers this happened 15, 23 and 20 times. Maths questions (limits, trigonometry, domains)
+were not affected.
+
+**What changed.**
+
+- **The instructions are fixed.** Tested again with the same chemistry question three times:
+  *mathrm* appeared **zero times** in all three.
+- **Fixing that uncovered a second problem, also fixed.** Once the AI was writing formulas
+  correctly, it often put a space just inside the formula markers. The chat bubble was built
+  to ignore formulas written that way, so the student saw the raw formula code instead. We
+  first tried telling the AI to stop; that made no difference, so that instruction was taken
+  back out. Instead **the chat bubble now shows those formulas properly.** The raw code shown
+  in the test answers went from as many as 30 pieces per answer down to 0–4.
+- **What's left:** occasionally a plain sum like "2 + 2" still appears with a pair of `$`
+  signs around it. We left that on purpose. Making the bubble accept those too would start
+  treating ordinary prices written with a dollar sign as formulas, which is a worse problem.
+
+**What to re-test.** Ask KruAI to balance a chemistry equation (e.g. the burning of methane)
+and check the formulas look like CH₄ and H₂O, with no "mathrm" and no raw code. Then ask a
+maths question with fractions or a limit and check those still display as proper formulas.
+Also type a message that mentions a price in dollars and check it shows as normal text.
+
+---
+
 ## 17 Sep 2026 — Tap or point at any number on Progress to see what it means
 
 *Landed in commit `d9a7039`.* **No database step needed.**
@@ -57,6 +150,69 @@ off the edge, and never make the page slide sideways.
 only done flashcards still says "Not started yet", because the score counts only
 quiz and exam questions. The explanations say flashcards don't count toward a
 score, but that row label is still misleading.
+
+---
+
+## 17 Sep 2026 — Game page: "Battle" heading, no sample-data pill
+
+*Landed in commit `93d832b`.*
+
+**What changed.** On the Game page, the dashed **"Preview · sample data"** pill
+under the title is gone, and the big card at the top now says **Battle** instead
+of **Live Game** (Khmer: ការប្រយុទ្ធ).
+
+**Worth knowing.** Nothing else on that card changed — the opponent and the
+scores on it are still an example picture, not a real match. The pill used to
+say that; we decided the page reads better without it.
+
+**What to re-test.** Open Game in English and Khmer: no pill under the title, and
+the top card's label reads Battle / ការប្រយុទ្ធ.
+
+---
+
+## 16 Sep 2026 — Real students on the leaderboard, beside the sample ones
+
+*Landed in commit `7b108d3`.* **Needs a database step — see the end of this entry.**
+
+**Why.** The leaderboard was 30 made-up students, and even the "You" row was
+invented, so your own numbers never showed there. We wanted real students on it,
+but a board with only a handful of real accounts would look empty.
+
+**What changed.**
+
+- **The made-up students stay**, so the board still looks full.
+- **Every made-up student now has a small "Sample" mark** (Khmer: គំរូ) next to
+  their name, on the podium and in the list, so nobody mistakes one for a
+  classmate.
+- **Real students who signed in with Google now appear too**, with no mark.
+  Their XP, streak and study time come from what they actually did.
+- **Your own row is real now** — your actual XP, streak and study minutes, not an
+  invented 2,430 XP. Expect to sit near the bottom: the sample students have much
+  bigger numbers.
+- **The "Preview · sample data" pill at the top of the page is gone**, because the
+  page is no longer all sample data — the marks on each row replace it.
+
+**Good to know.**
+
+- **Guests don't see real students**, only the sample ones and themselves. Other
+  students' names are only shown to people who are signed in.
+- **A streak on the board drops when someone stops studying.** It is worked out
+  from the days they actually finished their daily goal, not from a saved number.
+- **The ~205 old test accounts** from screenshot runs do not appear.
+- **The numbers are not cheat-proof.** Each student's app reports its own
+  numbers, so someone who knows how could fake theirs. That was a known choice.
+- Only the student's name and numbers are shared — never email, age or location.
+
+**The database step.** Run `20260916000004_leaderboard.sql` in the Supabase SQL
+editor (steps in `supabase/README.md`). Until it has run, the board just shows
+the sample students plus you — nothing breaks and no error shows. `npm run
+db:check` cannot tell whether this one has run.
+
+**What to re-test.** Before the database step: open the leaderboard, check every
+sample student has the "Sample" mark and your row shows your real XP. After it:
+sign in with Google on two accounts, study a little on one, then open the
+leaderboard on the other and check the first student appears with no mark, and
+that you don't appear twice. Also check as a guest that no real names show.
 
 ---
 
