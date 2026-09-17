@@ -17,6 +17,49 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 17 Sep 2026 — Tap or point at any number on Progress to see what it means
+
+*Landed in commit `d9a7039`.* **No database step needed.**
+
+**Why.** You asked three questions about the Progress page in a row: how the
+Subject Breakdown card differs from Questions Answered, why some subjects had no
+bar, and what the 88% on a subject meant. The page was showing numbers without
+ever saying what they were.
+
+**What changed.** Every real number on the page can now explain itself.
+
+- **On a phone**, tap it. Tap again, or tap anywhere else, to close it.
+- **On a laptop**, just point at it with the mouse — the explanation appears on
+  its own, and disappears when you move away.
+
+There is no mark or dotted line under anything. A first version had one and it
+looked cluttered under every figure, so it was removed.
+
+**What you can ask about:**
+
+- The four small figures at the top — Questions, Study Time, Day Streak and XP
+  This Month — each say exactly what they count and what they ignore.
+- **Overall Readiness** explains that it averages this month's mock exams and
+  that past papers are not included.
+- **Weekly Learning Activity** and **Questions Answered** each have a small ⓘ
+  next to the title explaining what the card measures.
+- **Subject Breakdown** has an ⓘ explaining every part of a row, and each
+  subject's percentage tells you the actual count behind it — "7 of 8 correct,
+  all time" — plus whether you are up or down on the previous month.
+- A subject with too little work to score yet now tells you how close you are:
+  "2 of 3 correct so far. Answer 2 more to see your score."
+
+**What to re-test.** Open Progress and tap a few numbers on your phone, then try
+pointing at them on a laptop. The explanation should stay on screen, never run
+off the edge, and never make the page slide sideways.
+
+**One thing still not right, if you want it changed:** a subject where you have
+only done flashcards still says "Not started yet", because the score counts only
+quiz and exam questions. The explanations say flashcards don't count toward a
+score, but that row label is still misleading.
+
+---
+
 ## 16 Sep 2026 — Photos of your working go with each question now, and each can have several pages
 
 *Landed in commit `37fde01`.* **Needed a database step — already applied to the live project on 16 Sep; see the end of this entry if you ever set up a second one.**
