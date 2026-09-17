@@ -240,8 +240,9 @@ call, so a flood costs nothing. In dev there's no proxy and everything keys to
 
 Chat answer quality is **prompt engineering, not fine-tuning** —
 `gemini-3-flash-preview` can't be fine-tuned, and the whole content corpus still
-fits in one system prompt, so no embeddings/RAG **yet** (see the staging note at
-the end of this section). `src/utils/chat-prompt.ts` composes: persona + honesty
+fits in one system prompt, so no embeddings/RAG **yet** — the six textbooks will
+not fit, and that search is now planned (see the staging note at the end of this
+section). `src/utils/chat-prompt.ts` composes: persona + honesty
 guardrails + `src/data/bac2-format.ts`'s `BAC2_ANSWER_RULES` (the Given → Method
 → numbered Steps → Answer → Exam tip skeleton) + `BAC2_EXAMPLES` (few-shot
 worked answers) + the CATALOG + the CONTEXT + the student's real profile.
@@ -340,9 +341,14 @@ about it would be the code complaining about its own decision. Only the first
 has anyone to tell. **If `PROMPT_BUDGET_CHARS` fires, something has been added
 that neither of the other two governs.**
 
-All three are in CHARACTERS, not an estimated token count: Khmer tokenizes at
-roughly a token per glyph, so a Latin-calibrated estimate understates a Khmer
-prompt several times over.
+All three are in CHARACTERS, not an estimated token count. **Measured on
+`gemini-3-flash-preview` (17 Sep 2026): Khmer is ≈ 0.45 tokens per character**,
+against the ~0.25 a Latin rule of thumb (4 characters a token) assumes — so a
+Latin-calibrated estimate understates a Khmer prompt by nearly 2×. (Earlier
+notes here said "a token per glyph"; that was a guess, and ~2× too high.)
+Characters stay the unit anyway: they are exact, they don't change when the
+model or its tokenizer does, and a budget's job is to bound size, not to price
+it.
 
 `CONTEXT_BUDGET_CHARS` drops **whole chunks, never a slice**. A cut at an
 arbitrary character index in Khmer lands inside an orthographic cluster (base
@@ -376,11 +382,51 @@ to SELECT, since a top-6 over 29 chunks is a top-6 over a list you could send
 whole. The screen the student is on beats any search until they routinely ask
 about content that is not in front of them.
 
-**Trigger: roughly 15 authored sections / 150 chunks.** Stage 1 already
-established every interface stage 2 needs — `RetrievedChunk`,
-`buildContextBlock`, `CONTEXT_BUDGET_CHARS`, the `context = []` default and the
-select-never-supply invariant — so stage 2 changes exactly one thing: *where the
-non-pinned chunks come from*.
+**The trigger was "roughly 15 authored sections / 150 chunks", and the textbook
+plan (17 Sep 2026) supersedes it.** That number assumed retrievable content would
+be the app's own authored sections, arriving a few at a time. The user decided
+instead to bring in the six Grade 12 textbooks whole (~1,200 pages), which is
+past the trigger on day one — so stage 2 is being built now rather than waited
+for. Stage 1 already established every interface stage 2 needs —
+`RetrievedChunk`, `buildContextBlock`, `CONTEXT_BUDGET_CHARS`, the
+`context = []` default and the select-never-supply invariant — so stage 2 still
+changes exactly one thing: *where the non-pinned chunks come from*.
+
+**The textbook pipeline, in order** (a plan, not built yet):
+
+1. The PDFs go in `sources/textbooks/`, which is **git-ignored** — large, and not
+   ours to publish in a public repo.
+2. Check whether each PDF has a text layer before scanning anything. Khmer
+   extracted from a PDF text layer is often mis-ordered (legacy fonts, reordered
+   vowels), so a text layer may still lose to OCR — it has to be compared, not
+   assumed.
+3. OCR a 10-page sample on BOTH `gemini-3-flash-preview` and `gemini-3.6-flash`;
+   a human judges the Khmer. The full run uses the winner in **batch mode**, and
+   if that is 3.6, **before 1 Jan 2027**, when its price doubles.
+4. A Khmer reader checks the text — science terms and formulas especially.
+   Unchecked text is not fed to students.
+5. Chunk on the books' OWN headings (chapter → lesson → sub-heading), the textbook
+   equivalent of the authored-boundary rule below.
+6. Index with `gemini-embedding-001`, then connect and test on ~10 real
+   questions.
+
+**The Khmer spike can run BEFORE the OCR, and should.** It needs Khmer curriculum
+text, not the textbooks — `data/sections.ts` already has some. If it fails, the
+OCR is not wasted (the text can still be pinned by lesson), but the index is.
+
+**Textbook text must only be reachable from server code.** Where the checked
+text is committed is not decided yet; what is decided is that nothing the
+browser bundles may value-import it. That holds today by construction — the
+client reaches `chat-prompt.ts` only through `import type`, which is erased — and
+one value import of a multi-megabyte corpus would put it in every student's
+download. **Check the entry chunk's size after connecting it.** The
+committed-file index decision below was made with this corpus size (~1,200
+chunks) in mind, so it stands.
+
+**Cost will move.** The ~0.5 cent per question estimate is for today's prompt;
+excerpts add to every question that retrieves them, bounded by
+`CONTEXT_BUDGET_CHARS` (9,000 chars ≈ 4,000 tokens at 0.45/char). Re-measure
+once it is connected.
 
 **The index store is a COMMITTED FILE bundled into the function, not pgvector**
 (the user's call, and it reverses what the Supabase section used to assert). At

@@ -454,8 +454,9 @@ ${rendered}`;
  * A section is the unit real curriculum is written in, so it has to be in here
  * or the mentor will deny that a lesson the student is literally reading
  * exists. But it cannot go in whole. Measured on the first authored section:
- * ~7,000 characters, 3,362 of them Khmer glyphs, and Khmer tokenizes at roughly
- * a token per glyph. Forty-three biology nodes at that size is not a prompt.
+ * ~7,000 characters, 3,362 of them Khmer glyphs, and Khmer runs at ~0.45 tokens
+ * per character (measured, 17 Sep 2026). Forty-three biology nodes at that size
+ * is not a prompt.
  *
  * So this emits the SKELETON: title, the `label` of every item, and the
  * misconceptions in full. Labels are the curriculum's own names for things,
@@ -719,9 +720,9 @@ ${rendered}`;
  *
  * Not a hard limit — the model would accept far more — but every added token is
  * paid on every question the student asks. Khmer is the reason this is measured
- * in CHARACTERS rather than a token estimate: it tokenizes at roughly a token
- * per glyph, so a Latin-calibrated guess understates a Khmer prompt several
- * times over.
+ * in CHARACTERS rather than a token estimate: it runs at ~0.45 tokens per
+ * character (measured, 17 Sep 2026), so a Latin-calibrated guess of ~0.25
+ * understates a Khmer prompt by nearly 2×.
  *
  * THIS ONE WARNS ON PURPOSE. It bounds AUTHORED content, so the fix is a human
  * condensing a source. The two budgets that bound ASSEMBLED content —

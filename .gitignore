@@ -53,3 +53,8 @@ shots-*/
 # file that is meant to be committed. Removed on purpose; if a future
 # `vercel link` puts them back, delete them again rather than dropping the
 # negation.
+
+# Source textbooks (PDFs) and anything derived from them before a Khmer reader
+# has checked it. Large, and not ours to publish in a public repo. Checked
+# text that the app actually uses gets committed elsewhere, on purpose.
+sources/
