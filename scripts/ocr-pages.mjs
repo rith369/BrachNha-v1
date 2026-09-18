@@ -82,7 +82,7 @@ const PROMPT = `You are transcribing one page of a Cambodian Grade 12 biology te
 Transcribe EXACTLY what is printed. Do not summarise, translate, correct, reorder or add anything.
 
 Output Markdown only, with no preamble and no closing remark:
-- Khmer text as Unicode Khmer, exactly as printed. Keep Khmer numerals (១២៣) as Khmer numerals and Arabic digits as Arabic digits — whichever the page uses.
+- Khmer text as Unicode Khmer, exactly as printed. Write EVERY number with Arabic digits (0-9), even where the page prints a Khmer numeral: the app renders every number in Latin digits, so converting here is what keeps transcribed content compliant the day it becomes app content. A Khmer reader checking this text against the page reads a digit either way.
 - Keep Latin words (scientific names, English terms in brackets) exactly as printed.
 - Headings as Markdown headings (#, ##, ###) following the page's own hierarchy (chapter, lesson, section, sub-section).
 - Numbered and lettered lists as lists, keeping the printed numbering and letters (ក. ខ. គ. / A. B. C. D.).

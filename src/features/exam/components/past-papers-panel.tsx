@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useBrachNhaStore } from "@/lib/store";
 import { PAST_PAPER_YEARS } from "@/data/past-papers";
-import { toKhmerDigits } from "@/utils/khmer-num";
 import { cn } from "@/utils/cn";
 import { ExamPaperCard } from "./exam-paper-card";
 import { papersForYear, type PastPaper } from "../papers";
@@ -69,13 +68,13 @@ export function PastPapersPanel({
                 : "border border-purple/15 bg-purple/8 text-purple hover:bg-purple/12"
             )}
           >
-            {toKhmerDigits(y)}
+            {y}
           </button>
         ))}
       </div>
 
       <div className="font-heading mb-3 text-base font-extrabold">
-        សម័យប្រឡង {toKhmerDigits(year)}
+        សម័យប្រឡង {year}
       </div>
 
       <div>

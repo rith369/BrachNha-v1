@@ -6,7 +6,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { FocusLayout, FocusButton } from "@/components/shell/focus-layout";
 import { findSubject } from "@/features/lessons/subjects";
 import { attemptFor, OUTCOME_STYLE, outcomeOf } from "@/features/game/game";
-import { OUTCOME_LABEL, gameCopy, num } from "@/features/game/copy";
+import { OUTCOME_LABEL, gameCopy } from "@/features/game/copy";
 import { AnswerReview } from "@/features/game/components/answer-review";
 import { QuestionPhotos } from "@/features/game/components/question-photos";
 import { WorkPhotoStep } from "@/features/game/components/work-photo-step";
@@ -191,7 +191,7 @@ export default function GameReviewPage() {
             {t.reviewTitle}
           </div>
           <div className="text-xs font-bold text-muted">
-            {subject?.name ?? ""} · {num(questions.length, lang)} {t.questions}
+            {subject?.name ?? ""} · {questions.length} {t.questions}
           </div>
         </div>
 
@@ -283,7 +283,7 @@ function Scoreline({
         {t.you} vs {attempt.opponentName}
       </div>
       <div className="shrink-0 font-heading text-sm font-extrabold">
-        {num(attempt.score, lang)} – {num(attempt.opponentScore, lang)}
+        {attempt.score} – {attempt.opponentScore}
       </div>
     </div>
   );
@@ -353,7 +353,7 @@ function JoinerPicker({
                     cannot recover from. The comparison belongs in the answer
                     list this row selects, where both sides are labelled. */}
                 <span className="shrink-0 rounded-full bg-purple/10 px-2 py-0.5 text-[9px] font-extrabold text-purple">
-                  {num(j.score, lang)}/{num(total, lang)}
+                  {j.score}/{total}
                 </span>
               </button>
             );

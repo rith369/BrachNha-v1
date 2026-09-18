@@ -57,7 +57,7 @@ export function GeneratedExamPanel({ onStart }: { onStart: () => void }) {
                       {r.score}/{r.total}
                     </div>
                     <div className="text-[11px] font-bold text-muted">
-                      {new Date(r.date).toLocaleDateString()}
+                      {new Date(r.date).toLocaleDateString("en-GB")}
                     </div>
                   </div>
                   <div

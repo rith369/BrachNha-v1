@@ -56,10 +56,16 @@ const ROUTES = [
   { name: "lesson-detail", path: "/lessons/math-limits" },
   { name: "subject-path", path: "/subjects/biology" },
   { name: "section-detail", path: "/sections/biology-3-1-1" },
-  // /exam now has two tabs and lands on the past-papers one.
   { name: "practice", path: "/practice" },
   { name: "practice-subject", path: "/practice/flashcards/biology" },
+  // The Mimo-style quiz path: math is the longest one (8 lessons x 6
+  // sections), so it is the route that proves the per-lesson banners and
+  // the zigzag trail hold at the 320px floor.
+  { name: "practice-quiz-path", path: "/practice/quiz/math" },
+  // /exam is the Subject Mock Exams / Bac II Simulation chooser; the two tabs
+  // live one level down and land on the past-papers one.
   { name: "exam", path: "/exam" },
+  { name: "exam-subjects", path: "/exam/subjects" },
   { name: "progress", path: "/progress" },
   { name: "game", path: "/game" },
   { name: "grade-prediction", path: "/grade-prediction" },
@@ -68,11 +74,11 @@ const ROUTES = [
   { name: "streak", path: "/streak" },
   { name: "streak-friends", path: "/streak/friends" },
   { name: "profile", path: "/profile" },
-  // Tab B of /exam. Ordinary navigation is still on screen here — this is
+  // Tab B of /exam/subjects. Ordinary navigation is still on screen here — this is
   // NOT a focus route; only the running exam below is.
   {
     name: "exam-generated",
-    path: "/exam",
+    path: "/exam/subjects",
     clicks: ['button:has-text("វិញ្ញាសារបង្កើតថ្មី")'],
   },
   // The streak page after its one interaction. Worth photographing separately
@@ -96,14 +102,28 @@ const ROUTES = [
     path: "/lessons/math-limits",
     clicks: ['button:has-text("Start Learning")'],
   },
+  // The 2025 English paper's own screen: what the paper is, and its history.
+  // A real route, so no click chain — tapping its card on /exam/subjects lands
+  // exactly here rather than starting the exam.
+  { name: "exam-paper", path: "/exam/subjects/2025-english" },
+  // The same paper being SAT — the only route that photographs the gap-fill
+  // step. Start from the detail screen, then one more click past the part-one
+  // intro onto the passage itself.
+  {
+    name: "focus-exam-english",
+    path: "/exam/subjects/2025-english",
+    clicks: [
+      'button:has-text("ចាប់ផ្តើមប្រឡង")',
+      'button:has-text("បន្ត")',
+    ],
+  },
   // Tab B's math card specifically: GENERATED_EXAM_QUESTIONS derives from the
   // old MOCK_QS test, so math (and biology) are the only two subjects with
-  // guaranteed content to click into — see data/generated-exams.ts. Every
-  // exam-paper card IS a single <button> now (see exam-paper-card.tsx), so
-  // there's no button-vs-heading trap here the way there was in lessons above.
+  // guaranteed content to click into — see data/generated-exams.ts. Tab B still
+  // runs its papers in place, so this is a two-click chain from the tab list.
   {
     name: "focus-exam",
-    path: "/exam",
+    path: "/exam/subjects",
     clicks: [
       'button:has-text("វិញ្ញាសារបង្កើតថ្មី")',
       'button:has-text("វិញ្ញាសារគណិតវិទ្យា")',

@@ -18,9 +18,9 @@ import { BottomNav } from "@/components/shell/bottom-nav";
  *
  * TWO RENDERINGS FOR THE SAME ROUTE SHAPE. Quiz mode checks quizPathFor() and,
  * when it has an entry, renders the Mimo-style QuizPathView instead of the
- * ordinary PracticeLessonList row list — today that is physics only, and it is
- * fixed sample data (see quiz-path.ts). Every other subject, and Flashcard mode
- * on every subject including physics, keeps the plain list. That check lives
+ * ordinary PracticeLessonList row list — today that is math and physics, and it
+ * is fixed sample data (see quiz-path.ts). Every other subject, and Flashcard
+ * mode on every subject including physics, keeps the plain list. That check lives
  * here rather than inside PracticeLessonList so the two stay two components,
  * not one branching on a mode it otherwise has no reason to know about.
  */

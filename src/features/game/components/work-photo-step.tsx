@@ -1,6 +1,6 @@
 import { Camera } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
-import { gameCopy, num } from "../copy";
+import { gameCopy } from "../copy";
 import { QuestionPhotos } from "./question-photos";
 import type { MyWorkPhotos } from "../use-work-photos";
 import type { ExamQuestion } from "@/types";
@@ -72,7 +72,7 @@ export function WorkPhotoStep({
           className="rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel-sm"
         >
           <div className="mb-1 text-[10px] font-extrabold text-muted">
-            {t.questionLabel} {num(i + 1, lang)}
+            {t.questionLabel} {i + 1}
           </div>
           {/* Two lines, clamped: enough to recognise which question this is on
               the paper in front of you. The full text and its options belong to

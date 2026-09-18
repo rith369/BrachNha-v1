@@ -1,7 +1,6 @@
 import { Link } from "react-router";
 import { ChevronLeft, ChevronRight, Layers, ListChecks } from "lucide-react";
 import { cn } from "@/utils/cn";
-import { toKhmerDigits } from "@/utils/khmer-num";
 import { SUBJECT_STYLE } from "@/features/lessons/subject-styles";
 import { SubjectArt } from "@/features/lessons/components/subject-art";
 import { lessonHeading } from "@/features/lessons/sessions";
@@ -26,7 +25,7 @@ import { practiceLessonsFor, type PracticeLesson, type PracticeMode } from "../p
 
 /** Chapter banner. A titleless chapter shows its number alone — an empty string
  *  is the pending marker in lessons/sessions.ts, and a made-up Khmer title is
- *  worse than none. Prose keeps Khmer numerals, per utils/khmer-num.ts. */
+ *  worse than none. Digits are Latin everywhere — see CLAUDE.md. */
 function ChapterKicker({
   number,
   title,
@@ -46,7 +45,7 @@ function ChapterKicker({
         first ? "mt-0" : "mt-6"
       )}
     >
-      ជំពូក {toKhmerDigits(number)}
+      ជំពូក {number}
       {title && ` · ${title}`}
     </div>
   );
@@ -133,7 +132,7 @@ function LessonRow({
         </div>
         <div className="mt-1 flex items-center gap-1 text-[11px] font-bold opacity-90 md:text-xs">
           <Icon className="size-3 shrink-0" strokeWidth={2.5} />
-          {toKhmerDigits(lesson.count)} {unit}
+          {lesson.count} {unit}
         </div>
       </div>
       <ChevronRight className="size-5 shrink-0" strokeWidth={2.5} />

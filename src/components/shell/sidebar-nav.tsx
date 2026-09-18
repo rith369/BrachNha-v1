@@ -24,7 +24,12 @@ function NavRow({
 }) {
   const { pathname } = useLocation();
   const lang = useBrachNhaStore((s) => s.lang);
-  const active = item.href && pathname === item.href;
+  // A sub-page keeps its section lit (/exam/subjects under Mock Exam). The
+  // "/" guard stops Home matching every path.
+  const active =
+    item.href &&
+    (pathname === item.href ||
+      (item.href !== "/" && pathname.startsWith(`${item.href}/`)));
   const Icon = item.icon;
 
   const content = (

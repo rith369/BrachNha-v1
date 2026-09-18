@@ -202,7 +202,7 @@ export function milestoneCountLabel(current: number, target: number, lang: Lang)
   return `${current} / ${target} days`;
 }
 
-/** A milestone card's own heading: "7 Days" / "៧ ថ្ងៃ" is over-clever — keep digits Latin. */
+/** A milestone card's own heading: "7 Days" / "7 ថ្ងៃ" — digits are Latin everywhere, see CLAUDE.md. */
 export function milestoneDaysLabel(days: number, lang: Lang): string {
   if (lang === "km") return `${days} ថ្ងៃ`;
   return `${days} ${days === 1 ? "Day" : "Days"}`;

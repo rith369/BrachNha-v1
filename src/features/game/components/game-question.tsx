@@ -91,7 +91,7 @@ export function GameQuestion({
           the countdown above is the only thing that actually runs out. */}
       <div className="mb-3 flex items-center justify-end gap-1 text-[10px] font-bold text-muted md:text-xs">
         <Timer className="size-3 shrink-0" strokeWidth={2.5} aria-hidden />
-        {t.thisQuestion} {clockLabel(spent, lang)}
+        {t.thisQuestion} {clockLabel(spent)}
       </div>
       <div className={cn("mb-4 md:mb-6", focusPrompt)}>{question.q[lang]}</div>
       <div className="flex flex-col gap-2 md:gap-3">

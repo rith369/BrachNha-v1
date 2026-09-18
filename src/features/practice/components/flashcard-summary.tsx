@@ -1,6 +1,5 @@
 import { Trophy } from "lucide-react";
 import { FocusLayout, FocusButton } from "@/components/shell/focus-layout";
-import { toKhmerDigits } from "@/utils/khmer-num";
 import type { ReviewResult } from "@/utils/spaced-repetition";
 import { encouragementFor } from "../encouragement";
 import type { DeckProgress } from "../review";
@@ -80,7 +79,7 @@ export function FlashcardSummary({
         </div>
         <div className="mx-auto mb-4 w-fit rounded-2xl bg-brand px-6 py-3 text-center text-white">
           <div className="text-lg font-extrabold">
-            {toKhmerDigits(results.length)} កាត
+            {results.length} កាត
           </div>
           <div className="text-xs font-bold opacity-90">បានពិនិត្យ</div>
         </div>
@@ -92,7 +91,7 @@ export function FlashcardSummary({
               className="rounded-xl border border-purple/10 bg-surface p-3"
             >
               <div className={`text-lg font-extrabold ${s.tone}`}>
-                {toKhmerDigits(s.value)}
+                {s.value}
               </div>
               <div className="text-[11px] font-bold text-muted">{s.label}</div>
             </div>

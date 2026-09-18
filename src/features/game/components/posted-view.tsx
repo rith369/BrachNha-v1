@@ -3,7 +3,7 @@ import { Hourglass } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { FocusLayout, FocusButton } from "@/components/shell/focus-layout";
 import { InvitePanel } from "./invite-panel";
-import { gameCopy, num } from "../copy";
+import { gameCopy } from "../copy";
 
 /**
  * What the CREATOR sees the moment their own run ends.
@@ -84,7 +84,7 @@ export function PostedView({
 
         <div className="mx-auto mb-4 w-fit rounded-2xl bg-brand px-6 py-3 text-center text-white">
           <div className="text-lg font-extrabold md:text-2xl">
-            {num(score, lang)} / {num(total, lang)}
+            {score} / {total}
           </div>
           <div className="text-xs font-bold opacity-90">{t.yourScore}</div>
         </div>

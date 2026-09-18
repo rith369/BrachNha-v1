@@ -17,6 +17,170 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 18 Sep 2026 — A paper now has its own page, with a history
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Tapping the English paper started the exam on the spot, with the 60-minute
+clock already running. You should get to see what the paper is first, and decide.
+
+**What changed.** Old papers → 2025 → វិញ្ញាសារអង់គ្លេស now opens the paper's own page
+instead of the exam. It has two tabs:
+
+- **ព័ត៌មានវិញ្ញាសា** — what the paper is: 20 scored questions, 60 minutes, 50 points on
+  the real paper, 4 parts; the parts listed (Reading, Grammar, Vocabulary, Writing); and
+  a short "before you begin" list. The exam only starts when you press **ចាប់ផ្តើមប្រឡង**.
+- **ប្រវត្តិធ្វើតេស្ត** — every time you have sat this paper: the date, your score and how
+  long you took. **Tap a row to reopen that attempt's full review**, with the correct
+  answers, the explanations and the practice exercises, exactly as you saw them the day
+  you sat it. Your best score also shows on the first tab.
+
+The phone's back button goes from the paper's page back to the list of papers.
+
+**Two notes.** The page shows no difficulty rating, because nobody has graded this paper's
+difficulty and I did not want to invent one. And the history is kept **on this device
+only** — it does not follow you to another phone yet; that needs a small database change
+first.
+
+**Nothing else moved.** The newly-generated papers tab works exactly as before, and a
+past-paper attempt still stays out of the "from mock exams" figures on Home.
+
+**What to re-test.** Open the English paper, check the two tabs, sit it, then come back
+and reopen the attempt from the history.
+
+## 18 Sep 2026 — Every number in the app is now written 1, 2, 3 — not Khmer numerals
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** You asked for it, and it removes a split the app had been living with.
+Some screens wrote numbers in Khmer numerals and some in ordinary ones, so the
+same student could see `2/6` on one screen and the Khmer spelling of the same
+`2/6` on the next. Numbers also do not change meaning with the language, and
+everything a student actually holds in their hand — the exam paper, a clock, a
+calculator, the app's own maths keyboard — already uses ordinary digits.
+
+**What changed.** Every number on every screen, in both languages. The bigger
+ones you will notice:
+
+- **Study and Practice paths** — chapter and lesson banners (`ជំពូក 3 ·
+  មេរៀនទី 1`), the `0/48` progress counts, the per-lesson `2/6` counts.
+- **Mock Exam** — the countdown card's days-left figure, papers done, average
+  score, the exam-session year chips, the paper timer (`45:09`), the score line
+  and every part's score on the results screen.
+- **Flashcards and Quiz** — the deck ring's percentage, the ចងចាំ /
+  មិនទាន់ចងចាំ / សំខាន់ counts, the question counter, the review summary.
+- **Game** — scores, times, minutes, question counts, "N days ago".
+- **Dates** — the exam date on the Roadmap, the date on a signed commitment,
+  and the date on each KruAI conversation in the history list.
+- **Lesson content and the English past paper** — the few numbers written into
+  the Khmer text itself ("the 4 groups", "at least 80 words", and so on).
+- **The Privacy page**, the "Grade 12" wording in the sidebar and on the
+  Leaderboard.
+
+**Two extra things this fixed on the way.**
+
+- **Three date labels were quietly printing in English on most phones.** The
+  exam date, the commitment date and the chat history dates asked the browser
+  to format a Khmer date, and most browsers have no Khmer date data and fall
+  back to English without saying so. All three are now written by hand, so they
+  read as Khmer months with ordinary digits on every device.
+- **KruAI was being taught the wrong habit.** The worked examples in its
+  instructions numbered their steps in Khmer numerals, so it copied that into
+  answers. Its instructions now say, in both languages, to write every number
+  with ordinary digits.
+
+**One judgement call to check.** Where Khmer ran a number straight onto a word
+with no gap — "ថ្នាក់ទី១២" — it now reads **"ថ្នាក់ទី 12"**, with a space,
+because an ordinary digit pushed up against Khmer script looks cramped. If you
+would rather have "ថ្នាក់ទី12" with no space, say so and it is a quick change.
+
+**A guard so it stays this way.** There is a new check (`npm run check:digits`)
+that fails if a Khmer numeral appears anywhere in the app's code, and it is now
+part of the standard checks run before anything is called done. It exists
+because nothing else could catch this: to the usual checks, a Khmer "12" and an
+ordinary "12" are both just text.
+
+**What to re-test.** Switch between Khmer and English and walk the app: Study →
+ជីវវិទ្យា, Practice → Quiz → គណិតវិទ្យា, Practice → Flashcard → Biology lesson 1
+(open a review and finish it), Mock Exam → វិញ្ញាសារតាមមុខវិជ្ជា → the 2025
+English paper, the Roadmap, and Profile. Every number on those screens should be
+1, 2, 3. Then ask KruAI a maths question and check its numbered steps are too.
+
+---
+
+## 18 Sep 2026 — Math's Quiz tab is a real path now, starting at lesson 1
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** The winding quiz path started as a design sample: six nodes with a few
+ticks already on them, invented. Math needed the real thing — the same shape a
+biology lesson page has, where **one lesson holds several squares** — starting
+where a student actually starts.
+
+**What changed on Practice → Quiz → គណិតវិទ្យា.**
+
+- **Eight lessons, your names**, each with its own coloured banner and its own
+  panel of **six squares** below it — so it is obvious where one lesson ends and
+  the next begins. Forty-eight squares in all.
+- **It starts at the very first square.** Nothing is ticked, the counter reads
+  ០/៤៨, and the ចាប់ផ្តើម bubble sits on square one.
+- **No more invented progress anywhere.** Ticks now come only from quizzes a
+  student has actually finished — finishing one ticks its square, moves the
+  bubble on and advances both counters. The two ticks the sample used to show
+  are gone, on Physics too.
+- **Squares are full colour instead of dashed grey**, the same way the Study
+  path's lesson circles are: a path that looks finished reads as "this is
+  coming", where a page of grey dashes reads as "you can't have this". They
+  still don't respond to a tap until there is a quiz behind them.
+- Tapping the subject card at the top still opens the list — now **one row per
+  lesson** with its own ០/៦ count, and picking one jumps to that lesson.
+- **The back link and the subject card now follow you down the page.** They stay
+  pinned at the top however far into the path you scroll, so the way out and the
+  ០/៤៨ progress bar are always there.
+
+**Section names are still blank on purpose.** The eight LESSON names are yours;
+the six sections inside each are numbered only, waiting for the names. Nothing
+needs re-coding when they arrive — they drop straight in.
+
+**Physics** now follows the same shape (its two chapters, each with one lesson of
+six squares) and starts at the beginning too. Its names are still pending.
+
+**What to re-test.** Practice → Quiz → Math starts at square one with ០/៤៨;
+scrolling shows a banner per lesson; the subject card opens the eight-lesson
+list and picking a lesson jumps to it. Physics shows its ជំពូក headings. Both
+work in dark mode and down to a small phone screen.
+
+---
+
+## 18 Sep 2026 — Mock Exam opens on a choice of two
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Mock Exam is getting a second kind of exam — a full Bac II simulation — so the
+page needs a front door that lets students pick which kind they want.
+
+**What changed.** Tapping Mock Exam now shows two cards:
+
+- **វិញ្ញាសារតាមមុខវិជ្ជា (Subject Mock Exams)** — tap it to reach the same screen as
+  before, with the past-papers and new-papers tabs. Nothing on that screen changed
+  except its title and a small back link at the top that returns to the two cards.
+- **ប្រឡងបាក់ឌុបសាកល្បង (Bac II Simulation)** — shown faded with a "coming soon" label.
+  It can't be tapped yet; what it does will be decided later.
+
+The front screen also got a bolder look: a card at the top counting down the days to the
+Bac II and showing how many mock exams you've done and your average score, a bright
+pink-purple card for Subject Mock Exams that presses in when tapped, and a dark, locked
+card for the simulation. It works in both light and dark theme.
+
+Mock Exam in the bottom bar and the side menu now stays highlighted on the inner screen
+too (and Flashcards/Quiz stays highlighted inside its own inner screens).
+
+**What to re-test.** Open Mock Exam → tap Subject Mock Exams → start a math paper from the
+second tab and finish it. Use the phone's back button from the tabs screen: it should go
+back to the two cards.
+
+---
+
 ## 17 Sep 2026 — The Progress page speaks Khmer
 
 *Landed in commit `86673de`.* **No database step needed.**

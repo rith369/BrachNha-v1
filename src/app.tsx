@@ -31,6 +31,8 @@ const routeModules = {
   gamePlay: () => import("@/pages/game-play"),
   gameReview: () => import("@/pages/game-review"),
   exam: () => import("@/pages/exam"),
+  examSubjects: () => import("@/pages/exam-subjects"),
+  examPaper: () => import("@/pages/exam-paper"),
   gradePrediction: () => import("@/pages/grade-prediction"),
   leaderboard: () => import("@/pages/leaderboard"),
   lessons: () => import("@/pages/lessons"),
@@ -55,6 +57,8 @@ const GameCreatePage = lazy(routeModules.gameCreate);
 const GamePlayPage = lazy(routeModules.gamePlay);
 const GameReviewPage = lazy(routeModules.gameReview);
 const ExamPage = lazy(routeModules.exam);
+const ExamSubjectsPage = lazy(routeModules.examSubjects);
+const ExamPaperPage = lazy(routeModules.examPaper);
 const GradePredictionPage = lazy(routeModules.gradePrediction);
 const LeaderboardPage = lazy(routeModules.leaderboard);
 const LessonsPage = lazy(routeModules.lessons);
@@ -222,6 +226,13 @@ export default function App() {
             element={<GameReviewPage />}
           />
           <Route path="exam" element={<ExamPage />} />
+          {/* The two-tab past/generated screen, one level under the chooser at
+              /exam so the back button steps between them. */}
+          <Route path="exam/subjects" element={<ExamSubjectsPage />} />
+          {/* One paper: its detail screen, the run and the review. Static
+              prefix + one dynamic segment, so it cannot collide with the tab
+              list above it. */}
+          <Route path="exam/subjects/:paperKey" element={<ExamPaperPage />} />
           <Route path="grade-prediction" element={<GradePredictionPage />} />
           <Route path="leaderboard" element={<LeaderboardPage />} />
           <Route path="lessons" element={<LessonsPage />} />

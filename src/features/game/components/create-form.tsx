@@ -6,7 +6,7 @@ import { cn } from "@/utils/cn";
 import { SubjectArt } from "@/features/lessons/components/subject-art";
 import { SUBJECT_STYLE } from "@/features/lessons/subject-styles";
 import { DIFFICULTIES, MATCH_MINUTES, gameSubjects } from "../game";
-import { gameCopy, num } from "../copy";
+import { gameCopy } from "../copy";
 import { useBrachNhaStore } from "@/lib/store";
 import type { GameDifficulty } from "@/types";
 import type { SubjectId } from "@/features/lessons/subjects";
@@ -121,7 +121,7 @@ export function CreateForm({
                         className={cn("size-2.5 shrink-0", style.text)}
                         strokeWidth={2.5}
                       />
-                      {num(questions.length, lang)} {t.questions}
+                      {questions.length} {t.questions}
                     </span>
                   )}
                 </div>
@@ -180,7 +180,7 @@ export function CreateForm({
             <Chip key={m} selected={m === minutes} onClick={() => setMinutes(m)}>
               <span className="flex items-center gap-1">
                 <Timer className="size-3 shrink-0" strokeWidth={2.5} />
-                {num(m, lang)} {t.minutes}
+                {m} {t.minutes}
               </span>
             </Chip>
           ))}

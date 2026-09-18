@@ -11,10 +11,10 @@ import {
   focusPrompt,
 } from "@/utils/focus-styles";
 import { QUIZ_COINS, QUIZ_XP } from "@/utils/rewards";
-import { toKhmerDigits } from "@/utils/khmer-num";
 import { Callout } from "@/features/lessons/components/callout";
 import type { SectionQuestion } from "@/types";
 import type { PracticeMode } from "../practice";
+import { quizSessionId } from "../quiz-path";
 
 /**
  * A lesson's quiz, one question at a time.
@@ -61,10 +61,11 @@ export function QuizRunner({
   title: string;
 }) {
   const navigate = useNavigate();
-  const { addXp, completeTask, recordQuestions, recordSession } =
+  const { addXp, completeSession, completeTask, recordQuestions, recordSession } =
     useBrachNhaStore(
       useShallow((s) => ({
         addXp: s.addXp,
+        completeSession: s.completeSession,
         completeTask: s.completeTask,
         recordQuestions: s.recordQuestions,
         recordSession: s.recordSession,
@@ -92,6 +93,14 @@ export function QuizRunner({
     // second tracker beside the self-reported one.
     completeTask("practice");
     recordSession(contentKey);
+    // Ticks this quiz's node on the Mimo-style quiz path, which derives every
+    // status from completedSessions rather than authoring one — see
+    // ../quiz-path. quizSessionId() rather than the bare key because that path
+    // shares one progress list with the Study path, whose section ids are the
+    // bare keys; the prefix is what keeps a foundation-review section from
+    // ticking a Bac II quiz node. Idempotent in the store, and harmless for a
+    // lesson-level quiz that no path node points at.
+    completeSession(quizSessionId(contentKey));
     setIndex(total);
   }
 
@@ -156,7 +165,7 @@ export function QuizRunner({
       // Absent on the first question — the X is the only way out there.
       onBack={index > 0 ? () => setIndex(index - 1) : undefined}
       showStats
-      meta={`${toKhmerDigits(index + 1)} / ${toKhmerDigits(total)}`}
+      meta={`${index + 1} / ${total}`}
       footer={footer}
     >
       <div>
@@ -248,7 +257,7 @@ function QuizSummary({
       // No onBack: the quiz is already banked, and stepping back into it would
       // put answered questions back on screen with nothing left to do.
       showStats
-      meta={`${toKhmerDigits(total)} / ${toKhmerDigits(total)}`}
+      meta={`${total} / ${total}`}
       footer={<FocusButton onClick={onExit}>← ត្រឡប់</FocusButton>}
     >
       <div className="text-center">
@@ -261,7 +270,7 @@ function QuizSummary({
         </div>
         <div className="mx-auto mb-3 w-fit rounded-2xl bg-brand px-6 py-3 text-center text-white">
           <div className="text-lg font-extrabold">
-            {toKhmerDigits(score)} / {toKhmerDigits(total)}
+            {score} / {total}
           </div>
           <div className="text-xs font-bold opacity-90">ចម្លើយត្រឹមត្រូវ</div>
         </div>

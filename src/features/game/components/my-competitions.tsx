@@ -6,7 +6,7 @@ import { findSubject } from "@/features/lessons/subjects";
 import { SUBJECT_STYLE } from "@/features/lessons/subject-styles";
 import { cn } from "@/utils/cn";
 import { DIFFICULTIES } from "../game";
-import { gameCopy, num, relativeDay } from "../copy";
+import { gameCopy, relativeDay } from "../copy";
 import { InvitePanel } from "./invite-panel";
 
 /**
@@ -103,10 +103,10 @@ export function MyCompetitions() {
                         must be able to read in full. */}
                     <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] font-extrabold text-muted">
                       <span>
-                        ⏱ {num(c.minutes, lang)} {t.minutes}
+                        ⏱ {c.minutes} {t.minutes}
                       </span>
                       <span>
-                        {num(c.questions.length, lang)} {t.questions}
+                        {c.questions.length} {t.questions}
                       </span>
                       {/* A competition that never reached the server is NOT open
                           for joiners — nobody can see it. Saying so is the whole
@@ -125,7 +125,7 @@ export function MyCompetitions() {
                   </div>
 
                   <div className="font-heading shrink-0 text-sm font-extrabold text-purple">
-                    {num(c.creatorScore, lang)}/{num(c.total, lang)}
+                    {c.creatorScore}/{c.total}
                   </div>
                 </Link>
 

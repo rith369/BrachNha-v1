@@ -46,7 +46,7 @@ the same four variables (`--font-nunito`, `--font-space-grotesk`,
 Neither Nunito nor Space Grotesk nor Caveat ships Khmer glyphs — Khmer isn't
 even an available subset for them. Noto Sans Khmer sits as a **fallback** in
 each stack and the browser resolves it *per glyph*: Latin keeps Nunito, Khmer
-picks up Noto, and mixed strings like "មេរៀនគ្រឹះ & ទី១២" render correctly from
+picks up Noto, and mixed strings like "មេរៀនគ្រឹះ & ទី 12" render correctly from
 one stack. **Removing that fallback silently breaks every Khmer string in the
 app.** Weights 400/600/700/800 only — `font-black` has zero usages, which is
 why Nunito is requested as `wght@400..800` and not `400..900`.
@@ -63,6 +63,59 @@ fetch moved. Don't "tidy" Caveat back into the blocking link.
 A narrowed **range** (`400..800`), not a discrete weight list (`400;600;700;800`)
 — Google serves one variable file for a range and four static instances for a
 list, and the variable file is the smaller of the two here.
+
+### Digits are Latin everywhere — the rule, and how it is enforced
+
+**EVERY number this app shows a student is written with Latin digits (0-9), in
+both languages.** Khmer prose, Latin numbers: `ជំពូក 3 · មេរៀនទី 1`, `45:09`,
+`0/48`, `10 សីហា 2027`. There is no per-screen exception and no `lang` branch —
+a number does not change meaning with the interface language, and the student
+sits an exam paper, reads a clock and types into a math field that are all in
+Latin digits already.
+
+**This reverses the app's original convention and `src/utils/khmer-num.ts` is
+DELETED.** That module (`toKhmerDigits`) converted counts, scores, chapter
+numbers and clocks to Khmer numerals on the Khmer-only pages, and
+`features/game/copy.ts`'s `num(value, lang)` did the same per language on the
+bilingual ones. Both are gone along with all ~90 call sites, rather than left
+in place unused — a helper that exists is a helper that gets called again.
+
+Four places this can come back, and none of them is a string literal:
+
+- **`toLocaleDateString`/`toLocaleString` with `km-KH`, or with NO locale at
+  all.** A device that ships Khmer locale data formats both with Khmer
+  numerals. Every call now passes `"en-GB"` explicitly, and Khmer dates go
+  through **`formatKmDate()` in `utils/khmer-dates.ts`**, which builds the
+  string by hand from `KM_MONTHS`. That fixes the *second* bug those call sites
+  had too — the one this file has flagged for months, that desktop Chrome has no
+  Khmer locale data and silently formats `km-KH` in ENGLISH. `commitment-banner.tsx`
+  and `utils/exam-date.ts` were the two named offenders; both are fixed.
+- **KruAI's own answers.** `data/bac2-format.ts` had its numbered skeleton
+  (`១. ២. ៣.`) and both worked examples written in Khmer numerals, so the model
+  copied them into student-visible replies — an example outweighs a sentence, the
+  same trap `ANSWER_LANG` already records. They are Latin now, and
+  `BAC2_ANSWER_RULES` carries an explicit rule in BOTH columns.
+- **Transcribed textbook content.** `scripts/ocr-pages.mjs` used to tell the
+  model to keep a printed Khmer numeral as a Khmer numeral. It now converts at
+  OCR time, so nothing non-compliant can reach `src/data/` in the first place.
+  A Khmer reader checking the text against the page reads a digit either way.
+- **A comment quoting the old rendering.** They teach the convention to the next
+  person, which is how it would come back. They were all rewritten too.
+
+**`npm run check:digits` is the enforcement** (`scripts/check-digits.mjs`): it
+fails on any Khmer numeral (U+17E0-U+17E9) in `src/` or `index.html`, comments
+included, and prints the Latin version of each offending line. Neither `tsc` nor
+oxlint can see the difference between `"១២"` and `"12"` in a string literal, so
+this is the only thing that can. Run it with the other checks — see the
+verification standard at the end of this file.
+
+Not scanned, deliberately: `report.md` (a dated changelog; old entries describe
+what shipped then and must not be rewritten), CLAUDE.md (it has to be able to
+name the characters it is banning) and `scripts/` (dev tooling, never served).
+
+**Khmer NUMERALS are what this bans, not Khmer numbers written as WORDS.**
+`ផ្នែកសំខាន់ទាំងបី` ("the three main parts") is prose and stays. The script is
+the rule, not the language.
 
 ### Theming: two accent scales, and why one isn't enough
 
@@ -1337,11 +1390,11 @@ Naming, both bits of which look like mistakes and are not:
   invites renaming a persisted field, which needs a migration and buys nothing.
 
 **The page renders ONE BANNER PER LESSON, with the chapter as its kicker** —
-`ជំពូក ៣ · តម្រូវផ្សេងៗរបស់សារពាង្គកាយ` over `តម្រូវប្រសាទ`. The third level has to
+`ជំពូក 3 · តម្រូវផ្សេងៗរបស់សារពាង្គកាយ` over `តម្រូវប្រសាទ`. The third level has to
 surface somewhere and that is Duolingo's own unit-header shape. The kicker used to
 repeat the subject name, which the header card directly above already says. A
 chapter whose real title hasn't been supplied carries `title: ""` and the banner
-shows `ជំពូក ១` alone — an empty string is the "pending" marker, deliberately,
+shows `ជំពូក 1` alone — an empty string is the "pending" marker, deliberately,
 because a made-up Khmer title is worse than none.
 
 **Node labels are `{chapter}.{lesson}.{section}` in Arabic digits** (`3.1.1`),
@@ -1359,7 +1412,7 @@ node's box without it. A three-line title only pushes the next connector down; t
 connector is its own fixed-height element between rows, so no geometry breaks.
 
 **Session structure is DERIVED until it is authored.** `SUBJECT_SESSIONS` holds
-the authored structure — the same shape as `PAST_PAPER_QUESTIONS`, and most
+the authored structure — the same shape as `PAST_PAPERS`, and most
 subjects are absent, which is the normal state. `chaptersFor()` falls back to one
 session per lesson that genuinely exists in `data/lessons.ts` plus
 `PLACEHOLDER_SESSIONS` locked nodes, wrapped in one chapter and one lesson so the
@@ -1375,7 +1428,7 @@ pending a legible scan. Two things follow that are easy to mistake for bugs:
   are still reachable at `/lessons/biology-body` and `/lessons/biology-brain`, and
   the 3D brain lesson is intact.
 - **`lessonCountFor("biology")` still says 2**, because it counts `LESSONS`. The
-  Study card therefore reads "២ មេរៀន" while the path shows 7 locked lessons.
+  Study card therefore reads "2 មេរៀន" while the path shows 7 locked lessons.
   Left alone on purpose: making the card count *authored* lessons would have it
   claim seven lessons of content that does not exist, which is the rule that
   function exists to enforce. Revisit when content lands, not before.
@@ -1391,7 +1444,7 @@ be done. The target has two sources and the order is load-bearing:
 2. failing that, a lesson flagged `openHere` in the authored data.
 
 `openHere` exists because a path with no content yet has no playable session for
-rule 1 to find; biology carries it on ជំពូក ៣ · មេរៀនទី ១, the lesson being
+rule 1 to find; biology carries it on ជំពូក 3 · មេរៀនទី 1, the lesson being
 authored. **It retires itself** — the day that lesson has content, rule 1 returns
 the same lesson and the flag stops being consulted. That is why it is the fallback
 and not an override. The scroll is instant, never smooth (an animated scroll on
@@ -1425,7 +1478,7 @@ every answer wrong.
 **`SectionVideoPlayer` is a player for a video that does not exist.** The design
 calls for one at the top of a section; none are recorded, so `SectionContent.video`
 carries a poster and a duration and the component draws the chrome — poster, play
-button, ០:០០ / duration, fullscreen glyph, scrub bar. Same idea as the mascot slot
+button, 0:00 / duration, fullscreen glyph, scrub bar. Same idea as the mascot slot
 and the empty past papers: build the shape now, drop the real thing in later.
 
 **NOTHING IN IT IS INTERACTIVE.** It first shipped with a real `<button>` under
@@ -1435,7 +1488,7 @@ A `<button>` that answers a tap with silence is the broken-app pattern
 `sidebar-nav.tsx` and the survey's `StudiedStep` both exist to avoid — with the
 explanation gone, plain spans are the only honest form. Identical on screen, no
 pointer cursor, no focus ring, nothing announced as pressable. **Don't reinstate
-the `<button>` without reinstating something for it to say.** Elapsed reads ០:០០
+the `<button>` without reinstating something for it to say.** Elapsed reads 0:00
 and the scrub sits at zero because both are true — a pre-filled bar would invent a
 state the app cannot know. Posters live in `public/sections/` named by section id, 16:9
 at 800px (not the cards' 4:3 at 600px — the player is ~720px wide at `max-w-3xl`);
@@ -1464,8 +1517,8 @@ breaking them up. `list-outside` keeps wrapped lines aligned under the text
 rather than under the bullet, which matters here because Khmer lines wrap often.
 `data/sections.ts` holds `SECTION_CONTENT` keyed by the id `sectionsFor()`
 generates (`"biology-3-1-1"`); the types live in `types/index.ts` beside `Lesson`.
-**One entry today** — ៣.១.១ សេចក្ដីផ្ដើម — and nearly-empty is the normal state,
-same as `PAST_PAPER_QUESTIONS`.
+**One entry today** — 3.1.1 សេចក្ដីផ្ដើម — and nearly-empty is the normal state,
+same as `PAST_PAPERS`.
 
 **This is deliberately NOT `Lesson`, and `SectionDetail` is deliberately not a
 branch inside `lesson-detail.tsx`.** That component runs the older
@@ -1620,6 +1673,38 @@ refill-over-time rules and a paywall story nobody has designed.
 
 ### The Mock Exam page is two tabs over one subject catalog
 
+**`/exam` IS A CHOOSER NOW, and the two tabs below live at `/exam/subjects`**
+(18 Sep 2026). `features/exam/components/exam-hub.tsx` shows two cards:
+**វិញ្ញាសារតាមមុខវិជ្ជា** (Subject Mock Exams), a `<Link>` to `/exam/subjects`,
+and **ប្រឡងបាក់ឌុបសាកល្បង** (Bac II Simulation, the full 2-day exam), which is a
+dimmed `<div>` with a `ឆាប់ៗនេះ` chip because nothing is designed behind it yet
+— the user will specify it later. Don't make it tappable until it has somewhere
+to go. The tabs are a ROUTE rather than state in the hub so the phone's back
+button steps tabs → chooser, the same reason `/practice`'s levels are routes;
+`ExamView` carries a `<Link to="/exam">` back link and its title is now
+វិញ្ញាសារតាមមុខវិជ្ជា. Everything below describes `/exam/subjects`. The chooser
+is Khmer-only too, and uses Lucide icons, not the reference sketch's emoji.
+
+The chooser was then restyled on request ("make it look cool"). Three blocks:
+a **countdown card** whose numbers are all real (`daysUntilExam()`, plus the
+count and average of `examResults` — generated mocks only, so it agrees with
+Home's pill); the **subject card** as a `bg-brand` fill with the path nodes'
+black-mixed lip and press, glass icon tile and a row of `SubjectArt` avatars;
+and the **simulation card** on a new `bg-night` utility
+(`--brand-night-from/to`, brand scale — a fill under white text, identical in
+both themes) with a padlock chip, dotted texture and two dashed "day" tiles.
+**Only the card that goes somewhere gets the lip** — the simulation card must
+stay unpressable-looking until it is built. Stacked on phones (two 136px columns
+broke the Khmer titles mid-word), two columns from `md`. Nothing loops; the
+blurred blobs are static. `scripts/shots.mjs` reports soft hits on `exam` at
+every width because those decorative blobs sit past their card's box — they are
+clipped by `overflow-hidden`, and there is no hard overflow.
+
+**`BottomNav` and `SidebarNav` highlight on PREFIX now** (`pathname === href` or
+starts with `href + "/"`, with `/` excluded so Home doesn't match everything), so
+Mock Exam stays lit on `/exam/subjects`. Side effect, intended: `/practice/...`
+sub-pages light Flashcards/Quiz too.
+
 `/exam` was a single "start the 10-question mock exam" card plus the last three
 results. It is now **វិញ្ញាសារឆ្នាំចាស់** (real MoEYS past papers, browsed by exam
 session then by subject) and **វិញ្ញាសារបង្កើតថ្មី** (newly-generated papers, one
@@ -1641,15 +1726,16 @@ on the exam and English on a lesson in the same session. The now-unused
 Khmer was `ប្រឡងល្បិច`, "trick exam" — a mistranslation this change retires.)
 
 **Past papers are DERIVED, never authored.** `data/past-papers.ts` holds
-`PAST_PAPER_YEARS` and a `PAST_PAPER_QUESTIONS` record keyed `"{year}-{subjectId}"`
-that is **empty today, and that is the normal state**. `papersForYear()` builds
+`PAST_PAPER_YEARS` and a `PAST_PAPERS` record keyed `"{year}-{subjectId}"` that
+holds **one paper — 2025 English** (see its own section below); every other card
+is still empty, and that is the normal state. `papersForYear()` builds
 one paper per subject from `allSubjects(userLanguage)` — so a session is 7 cards,
 not 8 — and looks the questions up. Filtering to subjects that *have* content
 would render zero cards, and zero cards is not a screen. The payoff: dropping one
 entry into that record turns a card on, and `paper.questions.length === 0` in
 `PastPapersPanel.handleTest` is the only line whose behaviour changes. Don't add
 an authored question count (it's `questions.length`) or a duration (there is no
-timer, and a "១៨០ នាទី" label on an untimed paper is the scrapped
+timer, and a "180 នាទី" label on an untimed paper is the scrapped
 placement-scheduling failure again). `data/past-papers.ts` imports nothing from
 `features/`; the typed `paperKey()` lives in `features/exam/papers.ts`.
 
@@ -1758,14 +1844,150 @@ banner* card defeats it, and 7 cards is odd so a 2-column last row would hole.
 end to end and labels the paper, and `MockExamSubject` cannot express a Khmer or
 History paper — which the catalog has cards for.
 
-**Two follow-ups, deliberately not done here:** a separate persisted
-`pastPaperResults` so Tab A grows its own history, and feeding past papers into
+### The 2025 English paper — the first REAL past paper, and the shape one takes
+
+`PAST_PAPER_QUESTIONS` was empty for as long as Tab A existed. The MoEYS **Bac II
+English paper, 28 សីហា 2025** (50 points, 60 minutes) is the first real one in the
+app, transcribed from photographs of the paper, its answer key and its printed
+sample essay.
+
+**A PAPER IS NOT A FLAT QUESTION LIST, which is why the data shape changed.** It
+has numbered parts, each with its own instruction and worked example; one of them
+is a gap-fill over a shared passage with a single word box; and it ends in an
+essay nothing can mark. `data/past-papers.ts` therefore exports **`PAST_PAPERS`**
+(`Record<"{year}-{subjectId}", PastPaperContent>`) in place of the old
+`PAST_PAPERS`, with each paper in its own file under `data/papers/`.
+`ExamQuestion` was NOT widened — it is shared with `MOCK_QS`, the placement test
+and the Game feature, and `skill`/`explanation` mean nothing to any of them. The
+new types (`PaperQuestion`, `PaperGap`, `PaperGapFill`, `PaperSection`,
+`PaperWriting`, `PastPaperContent`, `SkillId`, `SkillHelp`, `DrillQuestion`) sit
+beside it in `types/index.ts`.
+
+**The flat list every existing caller wants is DERIVED**, by `paperQuestions()`
+in `features/exam/papers.ts`: a gap-fill contributes its answerable gaps as
+questions whose options are the whole word bank, and the EXAMPLE gap is excluded
+because the paper fills it in for you. So `ExamPaperCard`'s
+`questions.length > 0` readiness rule and `PastPapersPanel.handleTest` are
+untouched, and a card still cannot claim content the app lacks. **Answers are
+keyed by question ID, never by index** — a paper is answered across several steps
+and reviewed in another order, and an index would re-point a saved answer the
+moment a section gained a question.
+
+**A PAPER HAS ITS OWN SCREEN NOW — `/exam/subjects/:paperKey`** (18 Sep 2026,
+the user's request). Tapping a card on the tab list used to drop straight into
+question one with a 60-minute clock already running, which is a real exam's worst
+property reproduced with none of its warning. `pages/exam-paper.tsx` resolves the
+key through `pastPaperByKey()` — the same builder `papersForYear()` uses, so the
+paper's own screen cannot be titled differently from the card that opened it —
+and `PaperScreen` owns the three states behind it: detail → run → review.
+
+`PaperDetail` is TWO TABS: **ព័ត៌មានវិញ្ញាសា** (a 2×2 stat grid, the parts as
+chips, a "before you begin" list, Start) and **ប្រវត្តិធ្វើតេស្ត** (every attempt
+at this paper). Two rules carried over from everywhere else in this file:
+
+- **Every number is derived or printed.** Questions from `paperQuestions()`,
+  parts from the sections, minutes and `points` off the paper's own header —
+  `points` is OPTIONAL precisely so a paper whose header prints none is not given
+  one. The reference sketch also shows a difficulty ("Medium"); nobody graded
+  this paper's difficulty, so that tile is simply absent.
+- **"Before you begin" describes THIS runner.** The sketch promises "you can mark
+  questions for review" and `PastPaperRunner` has no such control, so that line
+  is not there. Each bullet is a fact about the code: the clock starts on mount,
+  ← steps back, writing is on paper, running out submits rather than discards,
+  and the review comes after submitting.
+
+**`paperResults` is the separate persisted field this section used to ask for**
+— NOT a widening of `examResults`, which still captions Home's "from mock exams"
+pill and feeds KruAI an average. It keeps the ANSWERS as well as the score, which
+is what lets a history row REOPEN the real review (`PastPaperResults` re-marks
+from `content` + `answers`, so the explanations for a paper sat last week are
+still there) rather than showing a remembered percentage. Capped at
+`MAX_PAPER_RESULTS`, cleared by `logout()`, and **LOCAL-ONLY**: `exam_results`
+has a `kind` column that could carry these but no column saying WHICH paper, so a
+pulled row could not be told apart from another year's paper in the same subject.
+Syncing it needs a `paper_key` column first, and `syncRelevantChange` names it as
+a deliberate exception alongside `guestMode`/`syncedUserId`.
+
+**Tab B is unchanged and still runs its papers in place.** A generated paper has
+no printed minutes, points or parts, so a detail screen for one could only invent
+them — the detail screen exists because a real paper has facts to show.
+`ExamView`'s `Run` type is therefore generated-only now, and its `addExamResult`
+branch lost its `kind === "generated"` guard because that is the only kind left.
+
+**`PastPaperRunner` is a SECOND runner, and `ExamRunner` is untouched.** Tab B's
+generated papers still go through the old one. Parts, a passage, a word bank, a
+clock and an unmarkable essay are a different content shape, and one component
+serving both would be the fork `SectionDetail` exists to avoid — what is shared
+is the FRAME (`FocusLayout`/`FocusButton` + `utils/focus-styles.ts`), which is
+exactly what that rule prescribes. It performs no store writes; `paper-screen.tsx`
+decides what an attempt counts as, and the rules are unchanged except for the
+history: XP, `recordQuestions`/`recordSession`, `addPaperResult`, and **never
+`addExamResult`**.
+
+**THE CLOCK IS REAL DATA, which reverses a rule this file used to state.**
+`data/past-papers.ts` warned against a duration label because there was no timer
+and "180 នាទី" on an untimed paper is a promise the app can't keep. `minutes`
+comes off the paper's own printed header now and the runner counts it down, from
+a deadline stamped at mount rather than by counting ticks — so a backgrounded tab
+cannot gain time (`competition-run.tsx`'s pattern). **Running out submits what is
+answered rather than discarding the attempt.** A paper with no printed time
+simply omits the field.
+
+**The Reading part is ONE step, not one per gap.** A gap-fill is solved by
+reading around it, and paging through eleven screens hides the context the
+exercise is about. Tap a gap, tap a word; a word already placed MOVES rather than
+duplicating, because the printed box holds one of each. **The word bank is
+`sticky bottom-0` inside the card** — the passage is taller than a phone screen,
+and a bank pinned under it would mean scrolling down to pick and back up to see
+where it landed.
+
+**`PastPaperResults` replaces `ExamResults` for past papers only.** A percentage
+is all there is to say about a five-question practice test; a real paper has
+parts, a clock and twenty explanations to give back. It re-marks from
+`content` + `answers` through `scorePaper()` rather than trusting the runner's
+numbers, so the headline and the review list cannot disagree — the same reason
+`features/practice/review.ts` owns its queries.
+
+**A wrong answer gets more than a cross** (the user's request): the Khmer
+explanation, then `SKILLS[skill]` from `data/papers/english-drills.ts` — the rule
+in two to four lines, plus **two or three similar exercises** run inline with
+immediate feedback, the practice shape rather than the exam's. The drill awards
+nothing: the paper's XP is paid once by `exam-view.tsx`, and paying per drill
+question would make a wrong answer the most profitable thing on the screen.
+**No lesson links** — English has no entries in `data/lessons.ts`, and pointing at
+one would be the Progress geography bar again.
+
+**The score is the 20 objective questions, shown as `x/20`.** The paper is
+printed out of 50 but the pages supplied do not give the per-part split, so a
+conversion would be a number nobody wrote. **Writing is task + model essay, no
+typing** (the user's call): the app cannot mark an essay, and a textarea nobody
+reads would promise marking it does not do. The model essay is **written for
+BrachNha**, not the paper's own printed sample, which the user asked not to copy
+and which carries grammar errors of its own; it sits behind a tap on the results
+screen so it is something to compare against rather than copy from.
+
+**TWO DELIBERATE DEPARTURES FROM THE PRINTED PAPER**, listed exhaustively in
+`data/papers/english-2025.ts`'s header: the key's `5. a- would buy` is recorded
+as option **d** (the word is right, the letter is wrong, and the second
+conditional agrees), and Vocabulary 3's "The restaurant service **are** bad"
+reads "is". An English exam must not teach an agreement error.
+
+**The transcription and every Khmer explanation are UNVERIFIED** — best-effort,
+exactly like `data/practice.ts`'s first deck, and the file says so. A misread word
+is a plain data edit there and nothing else in the app changes.
+
+**One follow-up left** (the other, a persisted past-paper history, is
+`paperResults` above): feeding past papers into
 `buildKnowledgeBlock` / `BAC2_EXAMPLES` once content exists. (The
 `no-useless-escape` backslash bug this paragraph used to pair with that second
 edit has since been fixed on its own — see "The LaTeX rules reached Gemini
 garbled" near the end of this file.)
 
-`scripts/shots.mjs`'s `focus-exam` route now clicks Tab B's math card
+`scripts/shots.mjs` photographs the chooser as `exam`, the tab list as
+`exam-subjects`, the paper's own screen as `exam-paper` (a real route, no
+clicks), and the gap-fill step as `focus-exam-english` (Start from that screen).
+Its `focus-exam` route (at `/exam/subjects`, as is `exam-generated`) clicks Tab
+B's math card
 specifically (`button:has-text("វិញ្ញាសារគណិតវិទ្យា")`) rather than a fixed "start"
 button that no longer exists — math is the one subject on either tab
 guaranteed to have content, via the `MOCK_QS` derivation above. If math's
@@ -1877,7 +2099,7 @@ subject list in the app stays in one order. Quiz uses `allSubjects()`, which
 drops the unchosen language — 7 cards, not 8.
 
 **`data/practice.ts` was EMPTY, and that was the normal state**, exactly as
-`PAST_PAPER_QUESTIONS` shipped — until `"biology-1-1"` became the first real
+`PAST_PAPERS` shipped — until `"biology-1-1"` became the first real
 deck (see the spaced-repetition section below). Counts are read from it rather
 than authored beside it (`lessonCountFor()`'s rule), so a row cannot claim a
 deck the app lacks and playability is derived from the same number. Adding an
@@ -2204,7 +2426,7 @@ daily bonus is unchanged and stacks on top per session.
 
 **Biology Lesson 1's deck is the first REAL content in `data/practice.ts`**
 — six cards transcribed from the textbook's own Q&A study page for
-ជំពូក ១ · មេរៀនទី ១ (Gymnosperms), matching the chapter/lesson numbers
+ជំពូក 1 · មេរៀនទី 1 (Gymnosperms), matching the chapter/lesson numbers
 already authored in `features/lessons/sessions.ts`'s `SUBJECT_SESSIONS`.
 **Transcribed from a photographed page, not a digital source** — dense
 Khmer script is genuinely easy to misread character-by-character, so this
@@ -2605,47 +2827,106 @@ raises. `daysUntilDue` itself stays in `utils/spaced-repetition.ts`; it is a
 correct pure function and the obvious thing for a future "next review" surface
 to call.
 
-### One subject's Quiz tab is a Mimo-style path instead of the plain list
+### Two subjects' Quiz tab is a Mimo-style path instead of the plain list
 
-`/practice/quiz/physics` renders differently from every other `/practice/:mode/:subjectId`
-— a zigzag trail of square nodes over a dot-grid background, instead of
-`PracticeLessonList`'s rows. This is a DESIGN SAMPLE requested ahead of the real
-physics chapter/lesson/quiz content, which is still to be supplied — see the
-header of `features/practice/quiz-path.ts`.
+`/practice/quiz/math` and `/practice/quiz/physics` render differently from every
+other `/practice/:mode/:subjectId` — a zigzag trail of square nodes over a
+dot-grid background, instead of `PracticeLessonList`'s rows.
 
 **`quizPathFor(subjectId)` decides which rendering a subject gets**, checked in
 `pages/practice-subject.tsx` and gated to Quiz mode only — Flashcard keeps the
-plain list on every subject, physics included. Physics is the only entry in
-`QUIZ_PATHS` today; that map is a `Partial<Record<SubjectId, …>>`, the same
-shape `SUBJECT_SESSIONS` uses, so a second subject is one entry rather than a
-hardcoded `if (subjectId === "physics")` spreading across callers.
+plain list on every subject, math and physics included. `QUIZ_PATHS` is a
+`Partial<Record<SubjectId, Chapter[]>>`, the same shape `SUBJECT_SESSIONS` uses,
+so a third subject is one entry rather than a hardcoded
+`if (subjectId === "physics")` spreading across callers.
 
-**The six nodes and their done/current/locked statuses are FIXED DEMO DATA**,
-authored by hand rather than derived from real content or `completedSessions` —
-the same explicitly-sanctioned move `features/progress`, `features/game` and
-`features/leaderboard`'s `demo-data.ts` already make to preview a screen before
-the real tracking behind it exists. **Every node is a non-interactive `<div>`,
-even "done" and "current" ones** — `quiz-path-node.tsx` explains why: there is
-nothing behind any of these sample ids yet, and a tappable node leading nowhere
-is exactly the broken-app pattern this codebase avoids everywhere else. When the
-real content lands, replace the file's contents with an authored structure keyed
-the way `SUBJECT_SESSIONS` is (chapter → lesson), derive `status` the way
-`sessionStatus()` does, and point each node at
-`/practice/quiz/physics/{chapter}-{lesson}` — the same runner route the plain
-list already links to — turning each node back into a real `<Link>`.
+**IT IS THE REAL CURRICULUM SHAPE AND REAL PROGRESS NOW — this reverses what
+this section used to say.** It first shipped as a flat list of six hand-authored
+nodes carrying hand-authored done/current/locked statuses, as a design sample.
+Both halves of that are gone:
+
+- **Shape.** A path is CHAPTER → LESSON → SECTION, and ONE LESSON HOLDS SEVERAL
+  SECTION SQUARES — the structure biology's Study path already renders, and what
+  the textbooks look like. `quiz-path.ts` imports the app's own
+  `Chapter`/`PathLesson`/`Session` types rather than re-declaring a flatter set,
+  so one curriculum cannot be described two ways. A flat run of nodes could not
+  express a lesson at all, which is why the old `QuizPathNode` interface and its
+  `quizNodeHeading()` are both deleted.
+- **Progress.** Nothing is authored as done. `sessionStatus(session,
+  completedSessions)` derives every node's state, so a fresh student starts at
+  the first node of the first lesson and a tick can only appear because they
+  earned it. `QuizRunner` now calls `completeSession(quizSessionId(contentKey))`
+  on finish, which is what closes that loop.
+
+**THE `quiz-` ID PREFIX IS LOAD-BEARING.** `completedSessions` is ONE list shared
+by every path in the app, and the Study path's own math sections are already
+`math-1-1-1…` — the exact ids this path's first lesson would otherwise generate.
+Unprefixed, finishing a foundation-review section on `/subjects/math` would tick
+a Bac II quiz node here. `quizSessionId()` is exported so `QuizRunner` writes the
+same spelling this path reads; a second literal in that file is how the two would
+silently stop matching.
+
+**WHY THIS IS NOT IN `SUBJECT_SESSIONS`.** That map already holds a math entry —
+the មូលដ្ឋានគ្រឹះ foundation-review path on the Study page's foundation tab — and
+`PATH_TAB`'s own comment states the rule: "one id cannot open two paths". Bac II
+math therefore needs its own data, and `features/practice/quiz-path.ts` is it.
+
+**Math's LESSON NAMES are real** (the user's own Grade 12 list, លីមីតនៃអនុគមន៍ …
+ផលគុណនៃវិចទ័រក្នុងលំហ), in ONE FLAT CHAPTER because the list supplied has no
+chapters in it — `Chapter.flat`, the same marker the Study path already uses, so
+no banner prints a "ជំពូក 1" that groups nothing. **Its SECTION names are not
+supplied yet and carry `title: ""`**, read back by `lessonHeading()` as the
+number alone rather than a made-up name. `SECTIONS_PER_LESSON` (6, matching a
+real biology lesson) reserves their positions — the `PLACEHOLDER_SECTIONS` move,
+which permits reserving structure and never inventing names.
+
+**PLAYABILITY IS DERIVED, NOT AUTHORED.** A section's `href` is non-null iff a
+quiz exists under its content key in `data/practice.ts`, so today every node is
+locked and renders as a `<div>`, and authoring `PRACTICE_QUIZZES["math-1-3-2"]`
+turns that one node into a real `<Link>` with no code change. `keyFromRef()` in
+`features/practice/practice.ts` was widened to accept an optional third number
+for exactly that — two numbers is a lesson, three is one section of it, and
+`pages/practice-run.tsx`'s lesson-name lookup reads the first two either way.
+
+**A LOCKED NODE NOW LOOKS IDENTICAL TO A PLAYABLE ONE** — full colour, same lip,
+same glyph, no padlock. It used to be a dashed grey outline, which was right for
+six sample nodes and wrong for a 48-node curriculum: a whole path of dashed grey
+squares reads as "you can't have this", where a path that already looks finished
+reads as "this is coming". That is the user's explicit call on the Study path,
+argued at length in `session-node.tsx`, and it applies here for the same reason.
+The one thing that still separates them: a locked node is a `<div>`, never a
+`<Link>`, and it does not press.
+
+**`nextQuizSectionId()` is DELIBERATELY NOT the Study path's bubble rule.** That
+one points at the first PLAYABLE unfinished section and therefore returns nothing
+at all while a path has no content, which is the gap `subject-path-view.tsx`
+covers with an authored `openHere` flag. Here the bubble sits on the first
+UNFINISHED section, playable or not: "where do I start" has an obvious answer
+whether or not the content is written, and it is the top of the path. The bubble
+means *this is where you begin*, not *this is playable*. It needs no authored
+flag and walks down the path on its own as sections are finished.
+
+**`quizPathProgress()` is NOT `pathProgress()`, and the difference was a real
+bug.** `pathProgress()` counts only sections that are playable AND finished,
+which on the Study path can never differ from what is on screen. Here the header
+used it while each lesson banner counted plain completions — so a finished
+section whose quiz was later unpublished drew a tick on the trail, `2/6` on its
+banner and `0/48` in the header at the same time. One rule for both counters now:
+done means in `completedSessions`, which is exactly what makes a node draw its
+tick.
 
 **The visual language is deliberately NOT a recolour of `subject-path-view.tsx`'s
 Duolingo-style trail.** `quiz-path-node.tsx`'s badges are rounded SQUARES with a
-Check/Zap/Lock glyph, not `session-node.tsx`'s circular discs, and the connector
+Check/Zap glyph, not `session-node.tsx`'s circular discs, and the connector
 between them (`ElbowConnector` in `quiz-path-view.tsx`) is two straight legs
 meeting one `strokeLinejoin="round"` corner rather than the lesson path's smooth
 cubic S-curve. The one thing kept IDENTICAL on purpose is the "lip" 3D press
 effect (`0 5px 0` box-shadow, colour mixed toward black) — see `session-node.tsx`
 for why that mix is the only one correct in both themes; it's what makes either
 shape read as a physical button rather than a flat icon. Per-node curriculum text
-also moved off the trail: with nothing authored yet there is no title to print
-under six identical squares, so the one title that matters — what's next — lives
-in the header pill above the trail instead.
+stays OFF the trail: eight Khmer lesson titles under eight nodes on a 320px trail
+would collide with the connectors, so the banner above each lesson names it and
+the jump list carries the full list.
 
 **The header is TWO tiers, reusing pieces from `subject-path-view.tsx` rather
 than a thinner invention — a plain single pill shipped first and read as
@@ -2655,16 +2936,41 @@ noticeably less finished than the rest of the app, so it was replaced.**
    path — is the identical treatment the lesson path's own header already uses.
    `bg-surface` with the subject's tinted `--color-subj-*` border, never a solid
    fill: it's a card holding text and a thin bar, not white text sitting on one.
-2. A solid-fill chapter/lesson banner directly below it, naming the CURRENT
-   node — again the same banner `subject-path-view.tsx` prints before each
-   lesson as the trail scrolls, carrying its own `0 4px 0 color-mix(...black)`
-   lip so the two screens read as one material. The difference is cardinality:
-   the lesson path prints one banner per lesson as you scroll past it, this path
-   prints exactly one, because per-node titles are off the trail itself (see
-   below) and this is the one place left to say what's current.
-3. The current node ALSO carries the lesson path's `ចាប់ផ្តើម` bubble —
+   Tapping it swaps the trail for `QuizJumpList`. **It and the back link STICK to the top
+   of the scroll area** — the way out and the progress bar have to stay reachable
+   on a 48-node path, and they scroll away otherwise.
+2. **ONE SOLID-FILL BANNER PER LESSON**, each followed by that lesson's own
+   dot-grid panel of squares — the same banner `subject-path-view.tsx` prints
+   before each lesson, carrying its own `0 4px 0 color-mix(...black)` lip so the
+   two screens read as one material. The cardinality used to be the difference
+   between the two paths (this one printed exactly one banner, naming whatever
+   was current); with a real curriculum the per-lesson banner IS what tells a
+   student where one lesson's sections end and the next begins. The chapter
+   kicker is skipped for a `flat` subject.
+3. The next node carries the lesson path's `ចាប់ផ្តើម` bubble —
    `quiz-path-node.tsx` reuses the exact tail-pointing pill from
    `session-node.tsx`'s `isNext` treatment, not a new one.
+
+**THE STICKY HEADER'S OFFSET IS `-top-4`, AND `top-0` IS A BUG THERE.** A sticky
+element pins against the scrollport's **PADDING box**, not its border box, and
+this page's scroller carries `pt-4` (`pages/practice-subject.tsx`) — so `top-0`
+parks the header 16px BELOW the top of the scroll area and the trail slides
+through that band in plain sight (measured at 390px: scrollport top 38, block top
+54, with a node visibly peeking over the card). `-top-4` cancels exactly that
+padding; `-mt-4` pulls the block up by the same amount and `pt-4` pads it back
+inside, so its BACKGROUND covers the band while the back link keeps its breathing
+room, and the stuck and unstuck positions coincide so nothing jumps as it pins.
+The background is `bg-bg` (the PAGE token, since this band is the page showing
+through) and `z-20` clears the node's own `z-10` START bubble. `pb-3` replaces the
+children's `mb-3`: a margin below a sticky element sits outside its background
+box, which is one more strip the trail shows through.
+
+**`QuizJumpList` is ONE ROW PER LESSON, not per node** — the same grain
+`ChapterJumpList` uses, and what makes it worth having on a real path: math is
+eight lessons of six sections, and a list of 48 unnamed squares would be no
+easier to scan than the trail. Picking a row scrolls to that lesson's BANNER
+(`scrollIntoView`, because this component does not own its scroll container —
+`pages/practice-subject.tsx` does).
 
 **The dot grid takes its colour from the subject too**, via a pure CSS
 `radial-gradient(circle, var(--color-border) 1.5px, transparent 1.5px)` tile —
@@ -3360,7 +3666,7 @@ formats `km-KH` in English with no warning.
 #### Content, and the difficulty that does nothing yet
 
 `data/game-questions.ts`'s `GAME_QUESTIONS` is **empty, and that is the normal
-state** — the `PAST_PAPER_QUESTIONS` discipline. `gameQuestionsFor()` falls back
+state** — the `PAST_PAPERS` discipline. `gameQuestionsFor()` falls back
 to `GENERATED_EXAM_QUESTIONS`, so math and biology are playable today from the
 5+5 real questions `MOCK_QS` already holds; every other subject is a dimmed,
 unselectable tile on the create form. That fallback is one `??` clause to delete.
@@ -5433,13 +5739,18 @@ fast-refresh only. It is now the ONLY warning oxlint reports.
 
 ## Verification standard used throughout
 
-Every feature is checked with **both** of these, zero errors, before being
+Every feature is checked with **all three** of these, zero errors, before being
 considered done:
 
 ```bash
-npx tsc -b          # NOT `tsc --noEmit -p tsconfig.json` — this is a solution build
-npx oxlint          # NOT eslint — there is no eslint config in this repo
+npx tsc -b            # NOT `tsc --noEmit -p tsconfig.json` — this is a solution build
+npx oxlint            # NOT eslint — there is no eslint config in this repo
+npm run check:digits  # no Khmer numerals — see "Digits are Latin everywhere"
 ```
+
+The third is there because the first two cannot see it: to `tsc` and to oxlint,
+`"១២"` and `"12"` are both just strings. It is instant and has no dependencies,
+so there is no reason to skip it on a change that "obviously" touches no copy.
 
 `npm run build` runs `tsc -b && vite build` and must also pass. For anything
 touching the mentor, additionally exercise `POST /api/chat` against a running

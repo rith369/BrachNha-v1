@@ -137,7 +137,13 @@ export function FocusLayout({
           sits in the middle of the screen (the whole point on a laptop), while
           a long one overflows and scrolls from the top instead of being
           centred out of view. */}
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      {/* data-focus-body names THIS element as the task's scroller, so a screen
+          with several steps can scroll it back to the top when the step changes
+          — a long step otherwise leaves the next one opening half-way down. The
+          attribute rather than a forwarded ref, because the caller's step
+          content is a child and finding the scroller with closest() needs no
+          new prop on every task screen. */}
+      <div data-focus-body className="min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto flex min-h-full w-full max-w-2xl flex-col justify-center px-4 py-6 md:max-w-3xl md:px-6 md:py-10">
           {children}
         </div>

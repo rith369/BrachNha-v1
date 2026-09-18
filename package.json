@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "db:check": "node scripts/supabase-check.mjs"
+    "db:check": "node scripts/supabase-check.mjs",
+    "check:digits": "node scripts/check-digits.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.18.0",

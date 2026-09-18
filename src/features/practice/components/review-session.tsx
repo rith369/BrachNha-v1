@@ -3,7 +3,6 @@ import { Check, X } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
 import { FocusLayout, FocusButton } from "@/components/shell/focus-layout";
-import { toKhmerDigits } from "@/utils/khmer-num";
 import type { ReviewGrade, ReviewResult } from "@/utils/spaced-repetition";
 import type { DeckProgress, QueueCard } from "../review";
 import { SwipeableFlashcard } from "./swipeable-flashcard";
@@ -190,7 +189,7 @@ export function ReviewSession({
       progressPct={(index / liveQueue.length) * 100}
       onExit={onExit}
       showStats
-      meta={`${toKhmerDigits(index + 1)} / ${toKhmerDigits(liveQueue.length)}`}
+      meta={`${index + 1} / ${liveQueue.length}`}
       onBack={
         index > 0
           ? () => {
@@ -223,10 +222,10 @@ export function ReviewSession({
       <div>
         <div className="mb-4 flex items-center justify-center gap-3">
           <span className="rounded-full border border-pink/30 px-3 py-1 text-xs font-extrabold text-pink">
-            {toKhmerDigits(dontKnowSoFar)}
+            {dontKnowSoFar}
           </span>
           <span className="rounded-full border border-mint/30 px-3 py-1 text-xs font-extrabold text-mint">
-            {toKhmerDigits(knowSoFar)}
+            {knowSoFar}
           </span>
         </div>
 

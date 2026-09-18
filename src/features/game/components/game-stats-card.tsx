@@ -1,6 +1,6 @@
 import { useBrachNhaStore } from "@/lib/store";
 import { gameStats } from "../game";
-import { gameCopy, num } from "../copy";
+import { gameCopy } from "../copy";
 
 /**
  * This student's record across the competitions they have JOINED.
@@ -27,25 +27,25 @@ export function GameStatsCard() {
         <div className="grid grid-cols-4 gap-2 text-center">
           <div>
             <div className="font-heading text-lg font-extrabold text-mint">
-              {num(stats.wins, lang)}
+              {stats.wins}
             </div>
             <div className="text-[10px] font-bold text-muted">{t.wins}</div>
           </div>
           <div>
             <div className="font-heading text-lg font-extrabold text-pink">
-              {num(stats.losses, lang)}
+              {stats.losses}
             </div>
             <div className="text-[10px] font-bold text-muted">{t.losses}</div>
           </div>
           <div>
             <div className="font-heading text-lg font-extrabold text-yellow">
-              {num(stats.draws, lang)}
+              {stats.draws}
             </div>
             <div className="text-[10px] font-bold text-muted">{t.draws}</div>
           </div>
           <div>
             <div className="font-heading text-lg font-extrabold text-purple">
-              {num(stats.winRate, lang)}%
+              {stats.winRate}%
             </div>
             <div className="text-[10px] font-bold text-muted">{t.winRate}</div>
           </div>
@@ -54,13 +54,13 @@ export function GameStatsCard() {
         <div className="mt-4">
           <div className="mb-1.5 flex justify-between text-[10px] font-extrabold">
             <span className="text-mint">
-              {t.winsShort} {num(stats.winPct, lang)}%
+              {t.winsShort} {stats.winPct}%
             </span>
             <span className="text-yellow">
-              {t.drawShort} {num(stats.drawPct, lang)}%
+              {t.drawShort} {stats.drawPct}%
             </span>
             <span className="text-pink">
-              {t.lossesShort} {num(stats.lossPct, lang)}%
+              {t.lossesShort} {stats.lossPct}%
             </span>
           </div>
           {/* Three segments from two rounds and a remainder, so they always sum

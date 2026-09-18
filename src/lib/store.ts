@@ -61,6 +61,11 @@ const MAX_COMPETITIONS = 50;
 // already follow.
 const MAX_REVIEW_HISTORY = 1000;
 
+// Past-paper attempts. Each carries its answers, so these are heavier than an
+// ExamResult but still tiny (~20 keys); 50 is years of real use on a catalog
+// this size, and oldest drop first like every other capped list here.
+const MAX_PAPER_RESULTS = 50;
+
 // activityLog gains at most one key per day studied, so this is roughly a
 // year and a month of history — longer than a Bac II cohort uses the app, and
 // the same window the sync layer pulls back on a fresh device.
@@ -99,6 +104,34 @@ export interface ExamResult {
    * lib/ imports from features/.
    */
   subject?: string;
+}
+
+/**
+ * One attempt at a REAL past paper, kept so a paper's own screen can show its
+ * history and reopen any attempt's review.
+ *
+ * SEPARATE FROM `examResults`, which is the follow-up CLAUDE.md has flagged
+ * since Tab A was built. That array captions Home's "from mock exams" pill and
+ * feeds chat-prompt.ts an average it states to KruAI as fact, so a MoEYS past
+ * paper in it would make both wrong — widening it was never the answer.
+ *
+ * It keeps the ANSWERS, not just the score: the review screen re-marks from
+ * `content` + `answers` (paper-scoring.ts owns what a paper is out of), so
+ * storing the answers is what lets a student reopen the explanations for an
+ * attempt they made last week. A paper is ~20 keys, and the list is capped.
+ */
+export interface PaperResult {
+  /** `"{year}-{subjectId}"` — the key PAST_PAPERS is keyed by. */
+  paperKey: string;
+  /** ISO instant, so it sorts and formats without a second field. */
+  date: string;
+  score: number;
+  total: number;
+  pct: number;
+  /** How long the attempt took, already capped at the paper's own budget. */
+  ms: number;
+  /** Question id → the option picked. Unanswered ids are simply absent. */
+  answers: Record<string, string>;
 }
 
 export type Theme = "dark" | "light";
@@ -234,6 +267,20 @@ interface BrachNhaState {
    */
   tasksDate: string;
   examResults: ExamResult[];
+  /**
+   * Attempts at real MoEYS past papers, oldest first, capped at
+   * MAX_PAPER_RESULTS.
+   *
+   * LOCAL-ONLY, and deliberately absent from `syncRelevantChange` in
+   * hooks/use-supabase-sync.ts — the same documented exception
+   * cardReviews/studentCards/reviewHistory already are, for a sharper reason
+   * here: `exam_results` has a `kind` column that could carry these, but no
+   * column for WHICH paper, so a pulled row could not be told apart from
+   * another year's paper in the same subject. Syncing this needs a
+   * `paper_key` column first; until then a student's paper history is this
+   * device's.
+   */
+  paperResults: PaperResult[];
   /**
    * Competitions this student CREATED.
    *
@@ -413,6 +460,12 @@ interface BrachNhaState {
   deleteStudentCard: (deckKey: string, cardId: string) => void;
   toggleStarredCard: (cardId: string) => void;
   addExamResult: (result: ExamResult) => void;
+  /**
+   * Records an attempt at a past paper. MINTS THE TIMESTAMP ITSELF, like
+   * addCompetition: Date.now()/new Date() in a component body is the purity
+   * violation oxlint's react(purity) rule and the React Compiler both object to.
+   */
+  addPaperResult: (result: Omit<PaperResult, "date">) => void;
   /**
    * Posts a competition this student created, and pays for their own run.
    *
@@ -673,6 +726,7 @@ const partializeState = (state: BrachNhaState) => ({
   tasks: state.tasks,
   tasksDate: state.tasksDate,
   examResults: state.examResults,
+  paperResults: state.paperResults,
   competitions: state.competitions,
   competitionAttempts: state.competitionAttempts,
   completedSessions: state.completedSessions,
@@ -727,6 +781,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       tasks: emptyTasks,
       tasksDate: "",
       examResults: [],
+      paperResults: [],
       competitions: [],
       competitionAttempts: [],
       completedSessions: [],
@@ -1013,6 +1068,14 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       addExamResult: (result) =>
         set((state) => ({ examResults: [...state.examResults, result] })),
 
+      addPaperResult: (result) =>
+        set((state) => ({
+          paperResults: [
+            ...state.paperResults,
+            { ...result, date: new Date().toISOString() },
+          ].slice(-MAX_PAPER_RESULTS),
+        })),
+
       addCompetition: (competition, xp) =>
         set((state) => ({
           competitions: [
@@ -1197,6 +1260,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           tasks: emptyTasks,
           tasksDate: "",
           examResults: [],
+          paperResults: [],
           competitions: [],
           competitionAttempts: [],
           completedSessions: [],

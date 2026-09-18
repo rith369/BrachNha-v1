@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Timer } from "lucide-react";
 import { FocusLayout } from "@/components/shell/focus-layout";
 import { useBrachNhaStore } from "@/lib/store";
-import { clockLabel, gameCopy, num } from "../copy";
+import { clockLabel, gameCopy } from "../copy";
 import { cn } from "@/utils/cn";
 import { GameQuestion } from "./game-question";
 import type { ExamQuestion } from "@/types";
@@ -145,7 +145,7 @@ export function CompetitionRun({
       // Leaving discards the run, so it asks first — the mock exam's call. No
       // onBack: a scored answer is final.
       confirmExit
-      meta={`${num(index + 1, lang)} / ${num(total, lang)}`}
+      meta={`${index + 1} / ${total}`}
     >
       <div>
         <div className="mb-2 flex items-center justify-between gap-2">
@@ -159,7 +159,7 @@ export function CompetitionRun({
             )}
           >
             <span className="font-bold">{t.timeLeft} </span>
-            {clockLabel(remaining, lang)}
+            {clockLabel(remaining)}
           </span>
         </div>
 

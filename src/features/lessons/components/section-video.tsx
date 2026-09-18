@@ -1,5 +1,4 @@
 import { Maximize2, Play } from "lucide-react";
-import { toKhmerDigits } from "@/utils/khmer-num";
 import type { SectionVideo } from "@/types";
 
 /**
@@ -21,13 +20,13 @@ import type { SectionVideo } from "@/types";
  * When a real video arrives this becomes the player's poster state and the
  * elements below become its actual controls.
  *
- * The elapsed time reads ០:០០ and the scrub bar sits at zero: nothing has been
+ * The elapsed time reads 0:00 and the scrub bar sits at zero: nothing has been
  * watched, and a part-filled bar would show progress the app cannot know.
  */
 function clock(totalSeconds: number): string {
   const m = Math.floor(totalSeconds / 60);
   const s = totalSeconds % 60;
-  return `${toKhmerDigits(m)}:${toKhmerDigits(String(s).padStart(2, "0"))}`;
+  return `${m}:${String(s).padStart(2, "0")}`;
 }
 
 export function SectionVideoPlayer({ video }: { video: SectionVideo }) {
@@ -60,7 +59,7 @@ export function SectionVideoPlayer({ video }: { video: SectionVideo }) {
       <div className="absolute inset-x-0 bottom-0 px-3 pb-2">
         <div className="mb-1.5 flex items-center justify-between">
           <span className="rounded bg-black/45 px-1.5 py-0.5 text-[10px] font-bold text-white">
-            ០:០០ / {clock(video.durationSec)}
+            0:00 / {clock(video.durationSec)}
           </span>
           <Maximize2 className="size-4 text-white/85" strokeWidth={2.5} />
         </div>

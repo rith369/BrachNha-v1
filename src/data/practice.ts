@@ -4,7 +4,7 @@ import type { PracticeCard, SectionQuestion } from "../types/index.js";
  * Per-lesson flashcard decks and quizzes — the content slot behind the two tabs
  * on /practice.
  *
- * Exactly the discipline PAST_PAPER_QUESTIONS follows in data/past-papers.ts;
+ * Exactly the discipline PAST_PAPERS follows in data/past-papers.ts;
  * read its header for the longer version of the same argument. A missing key
  * means "no deck/quiz written yet," which is the normal state for every key
  * except the one below.
@@ -17,7 +17,7 @@ import type { PracticeCard, SectionQuestion } from "../types/index.js";
 
 /**
  * The key both records use: `"{subjectId}-{chapter}-{lesson}"` — e.g.
- * `"biology-1-1"` for ជំពូក ១ · មេរៀនទី ១, which matches the chapter/lesson
+ * `"biology-1-1"` for ជំពូក 1 · មេរៀនទី 1, which matches the chapter/lesson
  * numbering already authored in features/lessons/sessions.ts's
  * SUBJECT_SESSIONS.biology[0].lessons[0] — the same lesson the Study path
  * renders, so this deck and that path node describe the same real lesson.
@@ -26,7 +26,7 @@ import type { PracticeCard, SectionQuestion } from "../types/index.js";
 /**
  * Flashcards per lesson. A missing key means "no deck written yet".
  *
- * "biology-1-1" — ជំពូក ១ · មេរៀនទី ១ (Gymnosperms) — is the first REAL content
+ * "biology-1-1" — ជំពូក 1 · មេរៀនទី 1 (Gymnosperms) — is the first REAL content
  * in this record, transcribed from the textbook's own Q&A study page for the
  * lesson. TRANSCRIBED FROM A PHOTOGRAPHED PAGE, not typed from a digital
  * source — dense Khmer script is genuinely easy to misread character-by-
@@ -65,7 +65,7 @@ export const PRACTICE_DECKS: Record<string, PracticeCard[]> = {
       "ចូរពណ៌នាពីស៊ីមណូស្ពែមទាំងបួនក្រុម។",
       [
         "• ប្រង់ (Cycad)៖ ប្រើមាននៅតំបន់ត្រូពិច និងក្សេត្រូពិច ដែលជាប្រភេទមួយមានច្រើនជាងគេ។ ដើមមានទម្រង់ដូចដើមឆ្កាត ហើយមានស្លឹកទុំនៅខាងចុង។",
-        "• កូនីភែ (Conifer)៖ មានក្រុមច្រើនជាងគេ ដែលភាគច្រើនមានស្លឹករាងតូចមូល។ ស្លឹកមានពណ៌បៃតងពេញមួយឆ្នាំ ហើយអាចរស់បានពី ២ ទៅ ៤ ឆ្នាំ។ គ្រាប់របស់វាមានអាហារបម្រុងសម្រាប់សត្វកកេវ។",
+        "• កូនីភែ (Conifer)៖ មានក្រុមច្រើនជាងគេ ដែលភាគច្រើនមានស្លឹករាងតូចមូល។ ស្លឹកមានពណ៌បៃតងពេញមួយឆ្នាំ ហើយអាចរស់បានពី 2 ទៅ 4 ឆ្នាំ។ គ្រាប់របស់វាមានអាហារបម្រុងសម្រាប់សត្វកកេវ។",
         "• គីងកូ (Ginkgo)៖ មាននៅប្រទេសចិន ជប៉ុន និងកូរ៉េ វាជាប្រភេទដែលធន់នឹងបរិយាកាសខ្ពស់។",
         "• ស៊ីណេគូតី (Gnetophyte)៖ ជារុក្ខជាតិដែលដុះនៅតំបន់វាលខ្សាច់ និងអាកាសធាតុក្ដៅ ព្រមទាំងតំបន់ត្រូពិចដែលមានឈើឡើម។ អាចជាដើម ជាវល្លិ ឬជាឧបព្រឹក្សសម្រាប់លម្អ។",
       ].join("\n\n")

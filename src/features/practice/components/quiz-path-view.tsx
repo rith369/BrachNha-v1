@@ -1,29 +1,51 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import {
+  BookOpen,
   Check,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  ChevronUp,
-  Lock,
-  Zap,
+  ChevronUp
 } from "lucide-react";
+import { useBrachNhaStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
-import { toKhmerDigits } from "@/utils/khmer-num";
 import { SUBJECT_STYLE } from "@/features/lessons/subject-styles";
 import { SubjectArt } from "@/features/lessons/components/subject-art";
 import type { SubjectId, SubjectMeta } from "@/features/lessons/subjects";
+import {
+  lessonHeading,
+  sessionStatus,
+  type Chapter,
+  type PathLesson
+} from "@/features/lessons/sessions";
 import { QuizPathNode } from "./quiz-path-node";
-import { quizPathFor, type QuizPathNode as QuizPathNodeData } from "../quiz-path";
+import {
+  nextQuizSectionId,
+  quizPathFor,
+  quizPathProgress
+} from "../quiz-path";
 
 /**
  * Mimo-style quiz path — a zigzag trail of square nodes over a dot-grid
  * background, headed by the same TWO-TIER header subject-path-view.tsx's
  * Duolingo-style trail uses: an illustrated subject summary card with a
- * progress bar, then a solid-fill chapter/lesson banner naming what's current.
- * Shown instead of PracticeLessonList for a subject whose Quiz tab has a
- * `quizPathFor()` entry — physics only today; see quiz-path.ts for why.
+ * progress bar, then a solid-fill lesson banner. Shown instead of
+ * PracticeLessonList for a subject whose Quiz tab has a `quizPathFor()` entry —
+ * math and physics today; see quiz-path.ts.
+ *
+ * IT RENDERS THE REAL CURRICULUM SHAPE: chapter → lesson → sections, ONE BANNER
+ * PER LESSON followed by that lesson's own squares, which is what "a lesson has
+ * many sections" looks like on screen and is the same structure biology's Study
+ * path draws. It used to be one flat run of six nodes under a single banner
+ * naming whatever was current; that shape cannot express a lesson at all.
+ *
+ * NOTHING ON IT IS AUTHORED AS PROGRESS. Statuses come from `sessionStatus()`
+ * against the store's `completedSessions`, and every counter comes from
+ * `quizPathProgress()`, so a fresh student starts at the first node of the first
+ * lesson and every tick was earned. The ចាប់ផ្តើម bubble sits on the first
+ * unfinished section — see nextQuizSectionId() for why that rule differs from
+ * the Study path's by design.
  *
  * THE HEADER IS DELIBERATELY THE SAME TREATMENT AS THE LESSON PATH'S, not a
  * simplified stand-in — reusing proven pieces (SubjectArt, the progress bar,
@@ -77,7 +99,7 @@ const centreAt = (i: number) => CENTRES[i % CENTRES.length];
 function ElbowConnector({
   from,
   to,
-  color,
+  color
 }: {
   from: number;
   to: number;
@@ -104,112 +126,101 @@ function ElbowConnector({
   );
 }
 
-const STATUS_LABEL: Record<QuizPathNodeData["status"], string> = {
-  done: "បញ្ចប់",
-  current: "បន្ទាប់",
-  locked: "ចាក់សោ",
-};
-
 /**
- * The chapter/node quick-jump list for the quiz path — same idea and same row
- * shape as subject-path-view.tsx's ChapterJumpList, adapted to this path's
- * flatter data (nodes carry a chapterNumber directly rather than nesting in a
- * chapter → lesson tree). Only six sample nodes exist today, so this mostly
- * exists for the SAME header interaction to feel consistent across both
- * winding paths — see quiz-path.ts: once real content replaces the sample
- * data here, it is expected to gain the same chapter/lesson shape
- * SUBJECT_SESSIONS already has, at which point this list earns its keep the
- * same way the lesson path's does.
+ * The chapter/lesson quick-jump list — the same idea, the same row shape and now
+ * the same GRAIN as subject-path-view.tsx's ChapterJumpList: one row per LESSON,
+ * not per node. That is what makes it worth having on a real path — math is
+ * eight lessons of six sections, and a list of forty-eight unnamed squares would
+ * be no easier to scan than the trail itself.
  *
- * Locked rows use THIS path's own dashed/muted look (matching
- * quiz-path-node.tsx), not the lesson path's "locked looks full-colour too"
- * rule — the two paths already draw that distinction differently, and this
- * list should agree with the path it belongs to, not the other one.
+ * A chapter heading is skipped for a `flat` subject, the same rule the banner's
+ * kicker follows, so math's eight lessons read as one list rather than sitting
+ * under a "ជំពូក 1" that groups nothing.
  */
 function QuizJumpList({
-  nodes,
+  chapters,
   subjectId,
-  onPick,
+  completed,
+  onPick
 }: {
-  nodes: QuizPathNodeData[];
+  chapters: Chapter[];
   subjectId: SubjectId;
-  onPick: (node: QuizPathNodeData) => void;
+  completed: string[];
+  onPick: (lesson: PathLesson) => void;
 }) {
   const c = SUBJECT_STYLE[subjectId];
-  const chapterNumbers = Array.from(
-    new Set(nodes.map((n) => n.chapterNumber))
-  );
 
   return (
     <div className="flex flex-col">
-      {chapterNumbers.map((chapterNumber) => (
-        <div key={chapterNumber}>
-          <div
-            className={cn(
-              "mt-6 mb-2.5 text-[11px] font-extrabold first:mt-0 md:text-xs",
-              c.text
-            )}
-          >
-            ជំពូក {toKhmerDigits(chapterNumber)}
-          </div>
+      {chapters.map((chapter) => (
+        <div key={chapter.number}>
+          {!chapter.flat && (
+            <div
+              className={cn(
+                "mt-6 mb-2.5 flex items-baseline gap-1.5 truncate text-[11px] font-extrabold first:mt-0 md:text-xs",
+                c.text
+              )}
+            >
+              <span>ជំពូក {chapter.number}</span>
+              {chapter.title && (
+                <span className="truncate text-muted">· {chapter.title}</span>
+              )}
+            </div>
+          )}
           <div className="flex flex-col gap-2.5">
-            {nodes
-              .filter((n) => n.chapterNumber === chapterNumber)
-              .map((node) => {
-                const locked = node.status === "locked";
-                const done = node.status === "done";
-                const Icon = done ? Check : locked ? Lock : Zap;
-                return (
-                  <button
-                    key={node.id}
-                    type="button"
-                    onClick={() => onPick(node)}
-                    className={cn(
-                      "flex w-full items-center gap-3.5 rounded-2xl border px-4 py-3.5 text-left shadow-panel-sm transition hover:brightness-[1.03] active:scale-[0.985] md:gap-4 md:px-5 md:py-4",
-                      c.card
-                    )}
+            {chapter.lessons.map((lesson) => {
+              const total = lesson.sessions.length;
+              const done = lesson.sessions.filter((s) =>
+                completed.includes(s.id)
+              ).length;
+              // Only a FULLY finished lesson steps back, the one distinction
+              // QuizPathNode draws for its own discs — so a lesson with nothing
+              // written keeps reading as "coming", not "forbidden".
+              const allDone = total > 0 && done === total;
+
+              return (
+                <button
+                  key={`${chapter.number}-${lesson.number}`}
+                  type="button"
+                  onClick={() => onPick(lesson)}
+                  className={cn(
+                    "flex w-full items-center gap-3.5 rounded-2xl border px-4 py-3.5 text-left shadow-panel-sm transition hover:brightness-[1.03] active:scale-[0.985] md:gap-4 md:px-5 md:py-4",
+                    c.card
+                  )}
+                >
+                  <span
+                    className="flex size-10 shrink-0 items-center justify-center rounded-xl text-white md:size-11"
+                    style={{
+                      backgroundColor: allDone
+                        ? `color-mix(in srgb, ${c.fill} 45%, var(--color-surface))`
+                        : c.fill,
+                    }}
                   >
+                    {allDone ? (
+                      <Check className="size-5" strokeWidth={3} />
+                    ) : (
+                      <BookOpen className="size-4.5" strokeWidth={2.25} />
+                    )}
+                  </span>
+
+                  <span className="min-w-0 flex-1">
+                    <span className="font-heading block truncate text-sm font-extrabold text-text md:text-base">
+                      {lessonHeading(lesson.number, lesson.title)}
+                    </span>
                     <span
-                      className={cn(
-                        "flex size-10 shrink-0 items-center justify-center rounded-xl md:size-11",
-                        locked
-                          ? "border-2 border-dashed border-muted/40 bg-control text-muted"
-                          : "text-white"
-                      )}
-                      style={
-                        locked
-                          ? undefined
-                          : {
-                              backgroundColor: done
-                                ? `color-mix(in srgb, ${c.fill} 45%, var(--color-surface))`
-                                : c.fill,
-                            }
-                      }
+                      className={cn("mt-0.5 block text-xs font-bold", c.text)}
                     >
-                      <Icon
-                        className={cn("size-4.5", !locked && !done && "fill-current")}
-                        strokeWidth={done ? 3 : locked ? 2.5 : 0}
-                      />
+                      {done}/{total} សម្រេច
                     </span>
+                  </span>
 
-                    <span className="min-w-0 flex-1">
-                      <span className="font-heading block truncate text-sm font-extrabold text-text md:text-base">
-                        {node.title}
-                      </span>
-                      <span
-                        className={cn("mt-0.5 block text-xs font-bold", c.text)}
-                      >
-                        {STATUS_LABEL[node.status]}
-                      </span>
-                    </span>
-
-                    <ChevronRight
-                      className={cn("size-5 shrink-0", c.text)}
-                      strokeWidth={2.5}
-                    />
-                  </button>
-                );
-              })}
+                  <ChevronRight
+                    className={cn("size-5 shrink-0", c.text)}
+                    strokeWidth={2.5}
+                  />
+                </button>
+              );
+            })}
           </div>
         </div>
       ))}
@@ -218,177 +229,251 @@ function QuizJumpList({
 }
 
 export function QuizPathView({ subject }: { subject: SubjectMeta }) {
+  const completedSessions = useBrachNhaStore((s) => s.completedSessions);
   const c = SUBJECT_STYLE[subject.id];
-  const nodes = quizPathFor(subject.id) ?? [];
+  const chapters = quizPathFor(subject.id) ?? [];
 
-  const doneCount = nodes.filter((n) => n.status === "done").length;
-  const total = nodes.length;
-  const pct = total ? Math.round((doneCount / total) * 100) : 0;
-  const current = nodes.find((n) => n.status === "current") ?? null;
+  const progress = quizPathProgress(chapters, completedSessions);
+  const pct = progress.total
+    ? Math.round((progress.done / progress.total) * 100)
+    : 0;
+  const nextId = nextQuizSectionId(chapters, completedSessions);
 
   // Same tap-to-jump interaction as subject-path-view.tsx's header card —
-  // "path" is the zigzag trail, "jump" swaps it for a flat chapter list. See
-  // QuizJumpList's header comment for why this earns its keep even on a
-  // six-node sample path.
+  // "path" is the zigzag trail, "jump" swaps it for a flat lesson list.
   const [mode, setMode] = useState<"path" | "jump">("path");
   function toggleMode() {
     setMode((m) => (m === "path" ? "jump" : "path"));
   }
 
-  // Keyed by node id (already a stable string, unlike the lesson path's
-  // object-identity trick) so a jump pick can scrollIntoView the right node
-  // once the path view has remounted. scrollIntoView, not manual
-  // getBoundingClientRect math: this component does not own its scroll
-  // container (practice-subject.tsx's page does), so it cannot compute an
-  // offset against a scroller it has no ref to — scrollIntoView finds
-  // whichever ancestor actually scrolls on its own.
-  const nodeRefs = useRef(new Map<string, HTMLDivElement>());
+  // Keyed by "{chapter}-{lesson}" so a jump pick can scrollIntoView the right
+  // lesson BANNER once the path view has remounted — the banner rather than the
+  // node, because the banner names the thing about to be done, which is the
+  // same call subject-path-view.tsx's landing rule makes. scrollIntoView, not
+  // manual getBoundingClientRect math: this component does not own its scroll
+  // container (practice-subject.tsx's page does), so it cannot compute an offset
+  // against a scroller it has no ref to.
+  const bannerRefs = useRef(new Map<string, HTMLDivElement>());
   const [jumpTarget, setJumpTarget] = useState<string | null>(null);
-  function handleJumpPick(node: QuizPathNodeData) {
+  function handleJumpPick(lesson: PathLesson) {
     setMode("path");
-    setJumpTarget(node.id);
+    setJumpTarget(lessonKeyOf(chapters, lesson));
   }
   useEffect(() => {
     if (!jumpTarget) return;
-    nodeRefs.current
+    bannerRefs.current
       .get(jumpTarget)
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [jumpTarget]);
 
   return (
     <div className="mx-auto w-full max-w-md">
-      <Link
-        to="/practice"
-        className="mb-3 inline-flex items-center gap-1 pr-14 text-xs font-extrabold text-muted transition hover:text-text md:text-sm"
-      >
-        <ChevronLeft className="size-4 shrink-0" strokeWidth={2.5} />
-        ការអនុវត្ត
-      </Link>
+      {/* THE BACK LINK AND THE SUBJECT CARD FOLLOW THE SCROLL. A path is long —
+          math is 48 nodes over eight lessons — so without this the way out and
+          the progress bar are only visible at the very top, and a student deep
+          in lesson six has neither.
 
-      {/* Subject summary card — SubjectArt + name + a progress bar over the
+          `-top-4` IS THE WHOLE TRICK, AND `top-0` IS THE BUG IT FIXES. A sticky
+          element is pinned against the scrollport's PADDING box, not its border
+          box — and this page's scroller carries `pt-4`
+          (pages/practice-subject.tsx). So `top-0` parked the block 16px BELOW
+          the top of the scroll area and the trail slid through that band in
+          plain sight: measured at 390px, scrollport top 38, block top 54, one
+          blue node visibly peeking over the card. `-top-4` cancels exactly that
+          padding.
+
+          The rest of the offsets follow from it:
+
+          - `-mt-4` pulls the block up by the same 16px and `pt-4` pads it back
+            INSIDE, so its BACKGROUND covers the band while the back link keeps
+            its breathing room. Stuck and unstuck positions then coincide, so
+            the header does not jump as it pins.
+          - `bg-bg`, the PAGE token, not `bg-surface`: this band is the page
+            showing through behind the card, so it has to be the same colour
+            the page is in both themes.
+          - `z-20` clears the trail below, including the node's own `z-10`
+            START bubble, which would otherwise ride over the card.
+          - `pb-3` replaces the two children's own `mb-3` — margin below a
+            sticky element is outside its background box, so a gap there is one
+            more strip the trail shows through. */}
+      <div className="sticky -top-4 z-20 -mt-4 bg-bg pt-4 pb-3">
+        <Link
+          to="/practice"
+          className="mb-3 inline-flex items-center gap-1 pr-14 text-xs font-extrabold text-muted transition hover:text-text md:text-sm"
+        >
+          <ChevronLeft className="size-4 shrink-0" strokeWidth={2.5} />
+          ការអនុវត្ត
+        </Link>
+
+        {/* Subject summary card — SubjectArt + name + a progress bar over the
           WHOLE path, the exact treatment subject-path-view.tsx's own header
           uses, reused rather than re-invented. bg-surface with the subject's
           tinted border, never a solid fill: this is a card holding text and a
           thin bar, not a fill under white text — see subject-styles.ts.
-          Now a BUTTON, same as that header: tapping it opens QuizJumpList
-          below in place of the trail. */}
-      <button
-        type="button"
-        onClick={toggleMode}
-        aria-expanded={mode === "jump"}
-        className={cn(
-          "mb-3 flex w-full items-center gap-3 rounded-2xl border p-3 text-left shadow-panel transition hover:brightness-[1.03]",
-          c.card
-        )}
-      >
-        <SubjectArt subject={subject} className="size-16 shrink-0 rounded-xl" />
-        <div className="min-w-0 flex-1">
-          <div className="font-heading truncate text-base font-extrabold text-text">
-            {subject.name}
-          </div>
-          <div className="mt-1.5 flex items-center gap-2">
-            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface">
-              <div
-                className="h-full rounded-full transition-[width] duration-500"
-                style={{ width: `${pct}%`, backgroundColor: c.fill }}
-              />
+          A BUTTON, same as that header: tapping it opens QuizJumpList below in
+          place of the trail. */}
+        <button
+          type="button"
+          onClick={toggleMode}
+          aria-expanded={mode === "jump"}
+          className={cn(
+            "flex w-full items-center gap-3 rounded-2xl border p-3 text-left shadow-panel transition hover:brightness-[1.03]",
+            c.card
+          )}
+        >
+          <SubjectArt
+            subject={subject}
+            className="size-16 shrink-0 rounded-xl"
+          />
+          <div className="min-w-0 flex-1">
+            <div className="font-heading truncate text-base font-extrabold text-text">
+              {subject.name}
             </div>
-            <span className="shrink-0 text-[10px] font-extrabold text-muted">
-              {toKhmerDigits(doneCount)}/{toKhmerDigits(total)}
-            </span>
+            <div className="mt-1.5 flex items-center gap-2">
+              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface">
+                <div
+                  className="h-full rounded-full transition-[width] duration-500"
+                  style={{ width: `${pct}%`, backgroundColor: c.fill }}
+                />
+              </div>
+              <span className="shrink-0 text-[10px] font-extrabold text-muted">
+                {progress.done}/{progress.total}
+              </span>
+            </div>
           </div>
-        </div>
-        {mode === "jump" ? (
-          <ChevronUp className={cn("size-4 shrink-0", c.text)} strokeWidth={3} />
-        ) : (
-          <ChevronDown className={cn("size-4 shrink-0", c.text)} strokeWidth={3} />
-        )}
-      </button>
+          {mode === "jump" ? (
+            <ChevronUp
+              className={cn("size-4 shrink-0", c.text)}
+              strokeWidth={3}
+            />
+          ) : (
+            <ChevronDown
+              className={cn("size-4 shrink-0", c.text)}
+              strokeWidth={3}
+            />
+          )}
+        </button>
+      </div>
 
       {mode === "jump" ? (
         <QuizJumpList
-          nodes={nodes}
+          chapters={chapters}
           subjectId={subject.id}
+          completed={completedSessions}
           onPick={handleJumpPick}
         />
       ) : (
-        <>
-          {/* Chapter/lesson banner — SAME treatment as subject-path-view.tsx's
-              unit banner: a solid subject-colour fill under white text,
-              carrying its own lip so it reads as one material with the nodes
-              below it. Unlike the lesson path, where one banner precedes EACH
-              lesson as the trail scrolls past it, this path has exactly one —
-              naming the current stop, since per-node titles were moved off
-              the trail itself (there is nothing to print under six identical
-              sample squares yet). */}
-          {current && (
-            <div
-              className="mb-8 flex items-center justify-between gap-3 rounded-2xl px-4 py-3 text-white"
-              style={{
-                backgroundColor: c.fill,
-                boxShadow: `0 4px 0 color-mix(in srgb, ${c.fill} 62%, black)`,
-              }}
-            >
-              <div className="min-w-0">
-                <div className="truncate text-[10px] font-bold opacity-80">
-                  ជំពូក {toKhmerDigits(current.chapterNumber)}
-                </div>
-                <div className="font-heading truncate text-sm font-extrabold">
-                  {current.title}
-                </div>
-              </div>
-              <span className="shrink-0 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-extrabold">
-                {toKhmerDigits(doneCount)}/{toKhmerDigits(total)}
-              </span>
-            </div>
-          )}
+        // One flat list of lesson blocks rather than nested maps, so `first:`
+        // below resolves against the lesson blocks themselves — nested arrays
+        // would make the first block a sibling of the header button instead.
+        <div>
+          {chapters.flatMap((chapter) =>
+            chapter.lessons.map((lesson) => {
+              const key = `${chapter.number}-${lesson.number}`;
+              const done = lesson.sessions.filter((s) =>
+                completedSessions.includes(s.id)
+              ).length;
 
-          {/* The dot grid — a pure-CSS radial-gradient tile, no image. Uses
-              --color-border, which is already a low-alpha subject-purple tint
-              defined per theme, so the dots stay subtle and correct in both
-              themes with no extra token. pt-10 gives the ចាប់ផ្តើម bubble on
-              the current node room to sit above it without colliding with the
-              banner — the same clearance subject-path-view.tsx reserves for
-              its own bubble, and for the same reason. */}
-          <div
-            className="relative overflow-hidden rounded-3xl border border-purple/10 bg-surface/40 px-6 pt-10 pb-10"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle, var(--color-border) 1.5px, transparent 1.5px)",
-              backgroundSize: "22px 22px",
-            }}
-          >
-            {nodes.map((node, i) => (
-              <div
-                key={node.id}
-                ref={(el) => {
-                  if (el) nodeRefs.current.set(node.id, el);
-                  else nodeRefs.current.delete(node.id);
-                }}
-              >
-                {i > 0 && (
-                  <ElbowConnector
-                    from={centreAt(i - 1)}
-                    to={centreAt(i)}
-                    color={c.fill}
-                  />
-                )}
-                {/* paddingLeft + -translate-x-1/2 puts the node's CENTRE on its
-                    percentage — the same coordinate the connector is drawn to. */}
-                <div className="flex" style={{ paddingLeft: `${centreAt(i)}%` }}>
-                  <div className="-translate-x-1/2">
-                    <QuizPathNode node={node} subjectId={subject.id} />
+              return (
+                <div key={key} className="mt-8 first:mt-0">
+                  {/* Lesson banner — SAME treatment as subject-path-view.tsx's
+                    unit banner: a solid subject-colour fill under white text,
+                    carrying its own lip so it reads as one material with the
+                    squares below it. ONE PER LESSON, which is the whole point
+                    of this shape: it is what tells a student where one lesson's
+                    sections end and the next lesson begins. The chapter kicker
+                    is skipped for a flat subject — a bare number grouping
+                    nothing is worse than no kicker. */}
+                  <div
+                    ref={(el) => {
+                      if (el) bannerRefs.current.set(key, el);
+                      else bannerRefs.current.delete(key);
+                    }}
+                    className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3 text-white"
+                    style={{
+                      backgroundColor: c.fill,
+                      boxShadow: `0 4px 0 color-mix(in srgb, ${c.fill} 62%, black)`,
+                    }}
+                  >
+                    <div className="min-w-0">
+                      {!chapter.flat && (
+                        <div className="truncate text-[10px] font-bold opacity-80">
+                          ជំពូក {chapter.number}
+                          {chapter.title && ` · ${chapter.title}`}
+                        </div>
+                      )}
+                      <div className="font-heading truncate text-sm font-extrabold">
+                        {lessonHeading(lesson.number, lesson.title)}
+                      </div>
+                    </div>
+                    <span className="shrink-0 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-extrabold">
+                      {done}/
+                      {lesson.sessions.length}
+                    </span>
+                  </div>
+
+                  {/* The dot grid — a pure-CSS radial-gradient tile, no image.
+                    Uses --color-border, which is already a low-alpha tint
+                    defined per theme, so the dots stay subtle and correct in
+                    both themes with no extra token. ONE PANEL PER LESSON rather
+                    than one around the whole path, so the grouping the banner
+                    announces is visible as a block rather than only implied.
+                    pt-10 gives the ចាប់ផ្តើម bubble room to sit above the first
+                    node without colliding with the banner — the same clearance
+                    subject-path-view.tsx reserves for its own bubble. */}
+                  <div
+                    className="relative mt-3 overflow-hidden rounded-3xl border border-purple/10 bg-surface/40 px-6 pt-10 pb-10"
+                    style={{
+                      backgroundImage:
+                        "radial-gradient(circle, var(--color-border) 1.5px, transparent 1.5px)",
+                      backgroundSize: "22px 22px",
+                    }}
+                  >
+                    {lesson.sessions.map((session, i) => (
+                      <div key={session.id}>
+                        {i > 0 && (
+                          <ElbowConnector
+                            from={centreAt(i - 1)}
+                            to={centreAt(i)}
+                            color={c.fill}
+                          />
+                        )}
+                        {/* paddingLeft + -translate-x-1/2 puts the node's CENTRE
+                          on its percentage — the same coordinate the connector
+                          is drawn to. */}
+                        <div
+                          className="flex"
+                          style={{ paddingLeft: `${centreAt(i)}%` }}
+                        >
+                          <div className="-translate-x-1/2">
+                            <QuizPathNode
+                              session={session}
+                              status={sessionStatus(session, completedSessions)}
+                              subjectId={subject.id}
+                              isNext={session.id === nextId}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </>
+              );
+            })
+          )}
+        </div>
       )}
 
       <p className="mt-4 text-center text-[11px] font-bold text-muted">
-        គំរូការរចនា — មេរៀន និងសំណួរពិតនឹងបន្ថែមនាពេលក្រោយ
+        សំណួរនៃផ្នែកនីមួយៗនឹងបន្ថែមនាពេលក្រោយ
       </p>
     </div>
   );
+}
+
+/** A lesson's "{chapter}-{lesson}" key, found by identity — the same object the
+ *  jump list was handed, so no id has to be threaded through the callback. */
+function lessonKeyOf(chapters: Chapter[], lesson: PathLesson): string {
+  const chapter = chapters.find((ch) => ch.lessons.includes(lesson));
+  return `${chapter?.number ?? 1}-${lesson.number}`;
 }

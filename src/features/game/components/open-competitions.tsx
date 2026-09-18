@@ -5,7 +5,7 @@ import { useShallow } from "zustand/react/shallow";
 import { Avatar } from "@/components/ui/avatar";
 import { findSubject } from "@/features/lessons/subjects";
 import { DIFFICULTIES, attemptFor } from "../game";
-import { gameCopy, num, relativeDay } from "../copy";
+import { gameCopy, relativeDay } from "../copy";
 import { avatarSeedFor } from "@/utils/avatar-seed";
 import {
   fetchMyAttemptIds,
@@ -190,11 +190,11 @@ export function OpenCompetitions() {
                   </div>
                   <div className="mt-1 flex gap-2.5 text-[10px] font-extrabold text-muted">
                     <span>
-                      ⏱ {num(c.minutes, lang)} {t.minutes}
+                      ⏱ {c.minutes} {t.minutes}
                     </span>
                     <span>
-                      {t.scoreToBeat} {num(c.creatorScore, lang)}/
-                      {num(c.total, lang)}
+                      {t.scoreToBeat} {c.creatorScore}/
+                      {c.total}
                     </span>
                   </div>
                 </div>

@@ -3,7 +3,7 @@ import { Camera, X } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
 import { MAX_PHOTOS_PER_QUESTION, type WorkPhoto } from "@/lib/competition-photos";
-import { gameCopy, num } from "../copy";
+import { gameCopy } from "../copy";
 
 /**
  * A row of thumbnails for the photos attached to one question.
@@ -57,7 +57,7 @@ export function PhotoStrip({
                   // "Page 2", not the question — the question is already the
                   // card's own heading, and a student with three pages needs to
                   // know which is which.
-                  alt={`${t.photoPage} ${num(i + 1, lang)}`}
+                  alt={`${t.photoPage} ${i + 1}`}
                   className="size-full object-cover"
                   loading="lazy"
                 />
@@ -126,7 +126,7 @@ export function AddPhotosButton({
   if (full && uploading === 0) {
     return (
       <p className="text-[10px] font-bold text-muted">
-        {t.photoLimitReached} ({num(MAX_PHOTOS_PER_QUESTION, lang)})
+        {t.photoLimitReached} ({MAX_PHOTOS_PER_QUESTION})
       </p>
     );
   }
@@ -155,7 +155,7 @@ export function AddPhotosButton({
         className="flex items-center gap-1.5 rounded-xl border border-purple/20 bg-purple/8 px-3 py-2 text-[11px] font-extrabold text-purple transition hover:bg-purple/15 disabled:opacity-50"
       >
         <Camera className="size-3.5 shrink-0" strokeWidth={2.5} />
-        {uploading > 0 ? `${t.uploadingPhoto} (${num(uploading, lang)})` : t.addPhoto}
+        {uploading > 0 ? `${t.uploadingPhoto} (${uploading})` : t.addPhoto}
       </button>
     </>
   );

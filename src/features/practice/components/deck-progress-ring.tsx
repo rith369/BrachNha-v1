@@ -1,4 +1,3 @@
-import { toKhmerDigits } from "@/utils/khmer-num";
 import type { DeckProgress } from "../review";
 
 const R = 40;
@@ -95,7 +94,7 @@ export function DeckProgressRing({
 
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <div className="font-heading text-2xl font-extrabold text-text">
-            {toKhmerDigits(pct)}%
+            {pct}%
           </div>
           <div className="text-[10px] font-bold text-muted">ចងចាំ</div>
         </div>
@@ -108,11 +107,11 @@ export function DeckProgressRing({
         <div className="mt-2 flex items-center justify-center gap-3">
           <span className="flex items-center gap-1.5 text-[11px] font-bold text-muted">
             <span className="size-2 rounded-full bg-mint" />
-            ចងចាំ {toKhmerDigits(remembered)}
+            ចងចាំ {remembered}
           </span>
           <span className="flex items-center gap-1.5 text-[11px] font-bold text-muted">
             <span className="size-2 rounded-full bg-pink" />
-            មិនទាន់ចងចាំ {toKhmerDigits(notRemembered)}
+            មិនទាន់ចងចាំ {notRemembered}
           </span>
         </div>
       )}

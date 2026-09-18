@@ -12,7 +12,7 @@ import type { ExamQuestion } from "@/types";
  * generatedPapers() derives one card per subject regardless of what is in here,
  * so a subject with no entry below simply renders ឆាប់ៗនេះ.
  *
- * NOT EMPTY, unlike PAST_PAPER_QUESTIONS when that tab shipped — DERIVED from
+ * NOT EMPTY, unlike PAST_PAPERS when that tab shipped — DERIVED from
  * MOCK_QS, grouped by `subj`, rather than hand-authored or left blank. MOCK_QS
  * already has 5 real math questions and 5 real biology ones; retiring the old
  * single mixed-subject UI must not also retire the only way a student could

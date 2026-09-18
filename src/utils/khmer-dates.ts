@@ -43,3 +43,23 @@ export const KM_WEEKDAYS = [
   "សុក្រ",
   "សៅរ៍",
 ] as const;
+
+/**
+ * A Khmer date with LATIN digits: "10 សីហា 2027", or "10 សីហា" without the year.
+ *
+ * Replaces `toLocaleDateString("km-KH", …)` at every call site, and fixes two
+ * separate things at once:
+ *
+ *  - the documented `Intl` bug above — desktop Chrome has no Khmer locale data
+ *    and silently formats `km-KH` in ENGLISH;
+ *  - the digits. A device that DOES ship Khmer locale data formats `km-KH` with
+ *    Khmer numerals, which is the one thing no number in this app may be. See
+ *    "Digits are Latin everywhere" in CLAUDE.md.
+ *
+ * Latin digits are not a fallback here — they are the rule, so this builds the
+ * string by hand rather than asking `Intl` for a numbering system.
+ */
+export function formatKmDate(date: Date, opts: { year?: boolean } = {}): string {
+  const dayAndMonth = `${date.getDate()} ${KM_MONTHS[date.getMonth()]}`;
+  return opts.year === false ? dayAndMonth : `${dayAndMonth} ${date.getFullYear()}`;
+}

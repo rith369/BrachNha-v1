@@ -1,6 +1,5 @@
 import { LESSONS } from "@/data/lessons";
 import { hasSectionContent } from "@/data/sections";
-import { toKhmerDigits } from "@/utils/khmer-num";
 import type { SubjectId, SubjectTab } from "./subjects";
 
 /**
@@ -104,7 +103,7 @@ export interface Chapter {
  * same data) can call it without a type mismatch.
  */
 export function lessonHeading(number: number, title: string): string {
-  const base = `មេរៀនទី ${toKhmerDigits(number)}`;
+  const base = `មេរៀនទី ${number}`;
   return title ? `${base} · ${title}` : base;
 }
 
@@ -126,7 +125,7 @@ export function lessonHeading(number: number, title: string): string {
 const LESSON_TAIL = ["កំហុស", "សេចក្តីសង្ខេប", "តេស្ត"] as const;
 
 /** Placeholder names for a lesson whose real section titles haven't arrived. */
-const PLACEHOLDER_SECTIONS = ["ផ្នែកទី ១", "ផ្នែកទី ២", "ផ្នែកទី ៣"];
+const PLACEHOLDER_SECTIONS = ["ផ្នែកទី 1", "ផ្នែកទី 2", "ផ្នែកទី 3"];
 
 /**
  * Build a lesson's sections from their titles.
@@ -163,7 +162,7 @@ function sectionsFor(
 
 /**
  * Authored chapter structure, keyed by subject. Most subjects are absent, and
- * that is the normal state — exactly like PAST_PAPER_QUESTIONS in
+ * that is the normal state — exactly like PAST_PAPERS in
  * data/past-papers.ts. Adding an entry turns a real path on for that subject.
  *
  * Biology is the first real curriculum in the app, entered from the Grade 12
@@ -172,7 +171,7 @@ function sectionsFor(
  * Chapter 2 still carries NO TITLE — the scan it came from is too soft to
  * transcribe Khmer safely, and a wrong glyph in a chapter title is worse than
  * an empty one. Its shape (two lessons) is correct; only the names are
- * pending, and its banner shows "ជំពូក ២" alone until they arrive.
+ * pending, and its banner shows "ជំពូក 2" alone until they arrive.
  *
  * Every section is locked because no content is written behind any of them yet.
  * Note this REPLACES the derived fallback below, so biology-body and
@@ -193,7 +192,7 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
           title: "ប្រមាណវិធីបូក ដក គុណ ចែក",
           // Nothing on this path is playable yet, so without this the page
           // would open at the top with nothing to scroll to — same reason
-          // biology's ជំពូក ៣ · មេរៀនទី ១ carries it.
+          // biology's ជំពូក 3 · មេរៀនទី 1 carries it.
           openHere: true,
           // Own tail (`tail: []`), not LESSON_TAIL: this lesson's តេស្ដ folds
           // កំហុស into itself — the ~20 exercises it will hold plus a
@@ -244,7 +243,7 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
           number: 1,
           title: "តម្រូវប្រសាទ",
           // The lesson being authored right now. Nothing on this path is
-          // playable, so without this the page opens on ជំពូក ១ and every
+          // playable, so without this the page opens on ជំពូក 1 and every
           // visit starts with a scroll past 20 locked nodes.
           openHere: true,
           sessions: sectionsFor("biology", 3, 1, [

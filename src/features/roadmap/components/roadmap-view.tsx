@@ -244,7 +244,7 @@ export function RoadmapView() {
                     >
                       {overdue
                         ? t.overdue
-                        : `${t.scheduledFor} ${new Date(p.scheduledDate).toLocaleDateString()}`}
+                        : `${t.scheduledFor} ${new Date(p.scheduledDate).toLocaleDateString("en-GB")}`}
                     </div>
                   </div>
                   <Link

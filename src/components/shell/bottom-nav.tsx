@@ -32,7 +32,12 @@ export function BottomNav() {
     <div className="shrink-0 border-t border-purple/10 bg-surface lg:hidden">
       <div className="mx-auto flex w-full max-w-lg items-center justify-around px-2 pt-2 pb-5">
         {bottomNavItems.map((item) => {
-          const active = item.href && pathname === item.href;
+          // A sub-page keeps its section lit (/exam/subjects under Mock Exam).
+          // The "/" guard stops Home matching every path.
+          const active =
+            item.href &&
+            (pathname === item.href ||
+              (item.href !== "/" && pathname.startsWith(`${item.href}/`)));
           const Icon = item.icon;
           return (
             <Link

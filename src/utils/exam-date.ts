@@ -1,3 +1,5 @@
+import { formatKmDate } from "./khmer-dates";
+
 /**
  * The countdown to the Bac II exam.
  *
@@ -40,9 +42,10 @@ export function monthsUntilExam(now: Date = new Date()): number {
   return Math.max(1, Math.round(daysUntilExam(now) / DAYS_PER_MONTH));
 }
 
-/** "10 August 2027" / "១០ សីហា ២០២៧" — the date itself, spelled out. */
+/** "10 August 2027" / "10 សីហា 2027" — the date itself, spelled out. */
 export function formatExamDate(lang: "en" | "km"): string {
-  return BAC2_EXAM_DATE.toLocaleDateString(lang === "en" ? "en-GB" : "km-KH", {
+  if (lang === "km") return formatKmDate(BAC2_EXAM_DATE);
+  return BAC2_EXAM_DATE.toLocaleDateString("en-GB", {
     day: "numeric",
     month: "long",
     year: "numeric",

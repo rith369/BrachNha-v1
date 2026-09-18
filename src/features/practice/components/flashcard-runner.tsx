@@ -14,7 +14,6 @@ import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
 import { FocusLayout, FocusButton } from "@/components/shell/focus-layout";
 import { cn } from "@/utils/cn";
-import { toKhmerDigits } from "@/utils/khmer-num";
 import type { PracticeCard } from "@/types";
 import type { PracticeMode } from "../practice";
 import {
@@ -89,7 +88,7 @@ function PileButton({
   const body = (
     <>
       <Icon className="mx-auto mb-0.5 size-4" strokeWidth={2.5} />
-      <div className="text-lg font-extrabold">{toKhmerDigits(count)}</div>
+      <div className="text-lg font-extrabold">{count}</div>
       <div className="text-[10px] font-bold text-muted">{label}</div>
     </>
   );
@@ -158,7 +157,7 @@ function PileList({
       showStats
       footer={
         <FocusButton onClick={onStartAll} disabled={cards.length === 0}>
-          ចាប់ផ្តើម ({toKhmerDigits(cards.length)})
+          ចាប់ផ្តើម ({cards.length})
         </FocusButton>
       }
     >
@@ -382,9 +381,9 @@ export function FlashcardRunner({
           disabled={all.length === 0}
         >
           {due.length > 0
-            ? `ចាប់ផ្តើមពិនិត្យ (${toKhmerDigits(due.length)})`
+            ? `ចាប់ផ្តើមពិនិត្យ (${due.length})`
             : all.length > 0
-              ? `ពិនិត្យម្តងទៀត (${toKhmerDigits(all.length)})`
+              ? `ពិនិត្យម្តងទៀត (${all.length})`
               : "គ្មានកាតនៅឡើយទេ"}
         </FocusButton>
       }
@@ -438,7 +437,7 @@ export function FlashcardRunner({
             least one card in this deck has actually been reviewed. */}
         {retention !== null && (
           <div className="mt-3 text-xs font-bold text-muted">
-            ប្រូបាបចងចាំប្រហាក់ប្រហែល ~{toKhmerDigits(retention)}%
+            ប្រូបាបចងចាំប្រហាក់ប្រហែល ~{retention}%
           </div>
         )}
       </div>

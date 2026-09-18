@@ -1,4 +1,5 @@
 import type { Lang } from "@/types";
+import { formatKmDate } from "./khmer-dates";
 
 /**
  * Pure helpers for KruAI's conversation list. No store access — the
@@ -46,12 +47,17 @@ export function relativeDay(iso: string, lang: Lang, now: Date = new Date()): st
   if (diff <= 0) return lang === "en" ? "Today" : "ថ្ងៃនេះ";
   if (diff === 1) return lang === "en" ? "Yesterday" : "ម្សិលមិញ";
 
-  return new Date(iso).toLocaleDateString(lang === "en" ? "en-GB" : "km-KH", {
+  const date = new Date(iso);
+  // Only show the year once the conversation is from a previous one.
+  const withYear = date.getFullYear() !== now.getFullYear();
+
+  // Khmer is hand-built: `km-KH` formats in English on desktop Chrome, and in
+  // Khmer numerals where the data IS present. Digits are Latin — see CLAUDE.md.
+  if (lang === "km") return formatKmDate(date, { year: withYear });
+
+  return date.toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
-    // Only show the year once the conversation is from a previous one.
-    ...(new Date(iso).getFullYear() !== now.getFullYear()
-      ? { year: "numeric" }
-      : {}),
+    ...(withYear ? { year: "numeric" } : {}),
   });
 }

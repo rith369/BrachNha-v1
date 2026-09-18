@@ -1,8 +1,13 @@
-import { PAST_PAPER_QUESTIONS } from "@/data/past-papers";
+import { PAST_PAPERS } from "@/data/past-papers";
 import { GENERATED_EXAM_QUESTIONS } from "@/data/generated-exams";
-import type { ExamQuestion } from "@/types";
+import type { ExamQuestion, PastPaperContent } from "@/types";
 import type { UnderlineTab } from "@/components/ui/underline-tabs";
-import { allSubjects, type SubjectId, type SubjectMeta } from "@/features/lessons/subjects";
+import {
+  allSubjects,
+  findSubject,
+  type SubjectId,
+  type SubjectMeta,
+} from "@/features/lessons/subjects";
 
 /**
  * THIS PAGE IS KHMER-ONLY, ON PURPOSE.
@@ -62,6 +67,42 @@ export interface ExamPaper {
 
 export interface PastPaper extends ExamPaper {
   year: number;
+  /**
+   * The paper as printed — sections, the reading passage, the writing task.
+   * Undefined for every paper with no content yet, which is what `questions`
+   * being empty already says; the two can never disagree because `questions` is
+   * derived from this.
+   */
+  content?: PastPaperContent;
+}
+
+/**
+ * Every scored question on a paper, in the order it is sat.
+ *
+ * DERIVED, never authored beside the sections. The card's readiness rule, the
+ * results screen's total and the content log all count this array, so a paper
+ * cannot show "7 questions" while holding 6 — the same discipline
+ * `lessonCountFor()` enforces on the Study page.
+ *
+ * A gap-fill section contributes its answerable gaps as questions whose options
+ * are the whole word bank: that is exactly what a student picks from, and it
+ * keeps a gap scorable by the same `answers[id] === correct` rule an a/b/c/d
+ * question uses. The EXAMPLE gap is excluded — the paper fills it in for you.
+ */
+export function paperQuestions(content: PastPaperContent): ExamQuestion[] {
+  return content.sections.flatMap((section) => {
+    if (section.gapFill) {
+      const bank = section.gapFill.wordBank;
+      return section.gapFill.gaps
+        .filter((gap) => !gap.example)
+        .map((gap) => ({
+          q: { en: `(${gap.number})`, km: `(${gap.number})` },
+          correct: gap.correct,
+          options: bank,
+        }));
+    }
+    return section.questions ?? [];
+  });
 }
 
 export function paperKey(year: number, id: SubjectId): string {
@@ -86,6 +127,37 @@ function paperBlurb(subject: SubjectMeta): string {
 }
 
 /**
+ * ONE past paper, resolved from the key in a URL.
+ *
+ * `/exam/subjects/:paperKey` needs the same object the card list builds, and
+ * building it there by hand is how the paper's own screen would end up titled
+ * differently from the card that opened it — so both go through paperTitle()
+ * here. Returns null for an unknown key, a subject outside the catalog, or a
+ * paper with no content: none of those is a screen, and the page redirects.
+ */
+export function pastPaperByKey(key: string): PastPaper | null {
+  const dash = key.indexOf("-");
+  const year = Number(key.slice(0, dash));
+  const subject = findSubject(key.slice(dash + 1));
+  // Object.hasOwn, never `in` and never a truthiness test — PAST_PAPERS is a
+  // plain object literal, so "constructor" is `in` it and "toString" resolves
+  // to a function. Same guard chat-handler.ts documents for SECTION_CONTENT.
+  const content = Object.hasOwn(PAST_PAPERS, key) ? PAST_PAPERS[key] : undefined;
+
+  if (!subject || !content || !Number.isFinite(year)) return null;
+
+  return {
+    key,
+    year,
+    subject,
+    title: paperTitle(subject),
+    blurb: paperBlurb(subject),
+    content,
+    questions: paperQuestions(content),
+  };
+}
+
+/**
  * The papers offered for one past exam session.
  *
  * DERIVED FROM THE SUBJECT CATALOG, not from the content. Filtering to subjects
@@ -102,13 +174,15 @@ export function papersForYear(
 ): PastPaper[] {
   return allSubjects(userLanguage).map((subject) => {
     const key = paperKey(year, subject.id);
+    const content = PAST_PAPERS[key];
     return {
       key,
       year,
       subject,
       title: paperTitle(subject),
       blurb: paperBlurb(subject),
-      questions: PAST_PAPER_QUESTIONS[key] ?? [],
+      content,
+      questions: content ? paperQuestions(content) : [],
     };
   });
 }

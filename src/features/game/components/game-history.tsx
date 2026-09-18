@@ -3,7 +3,7 @@ import { useBrachNhaStore } from "@/lib/store";
 import { Avatar } from "@/components/ui/avatar";
 import { findSubject } from "@/features/lessons/subjects";
 import { OUTCOME_STYLE, outcomeOf, type MatchOutcome } from "../game";
-import { OUTCOME_LABEL, gameCopy, num, relativeDay } from "../copy";
+import { OUTCOME_LABEL, gameCopy, relativeDay } from "../copy";
 import { avatarSeedFor } from "@/utils/avatar-seed";
 
 const SCORE_TONE: Record<MatchOutcome, string> = {
@@ -84,12 +84,12 @@ export function GameHistory() {
                   vs {a.opponentName}
                 </div>
                 <div className="truncate text-[10px] font-bold text-muted">
-                  {subject?.name ?? ""} · {num(a.total, lang)} {t.questions}
+                  {subject?.name ?? ""} · {a.total} {t.questions}
                 </div>
               </div>
               <div className="shrink-0 text-right">
                 <div className={`text-sm font-extrabold ${SCORE_TONE[outcome]}`}>
-                  {num(a.score, lang)} – {num(a.opponentScore, lang)}
+                  {a.score} – {a.opponentScore}
                 </div>
                 <div className="text-[9px] font-bold text-muted">
                   {relativeDay(a.playedAt, lang)}

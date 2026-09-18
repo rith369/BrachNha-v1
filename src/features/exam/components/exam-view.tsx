@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { ChevronLeft } from "lucide-react";
 import { useBrachNhaStore, type ExamResult } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { UnderlineTabs } from "@/components/ui/underline-tabs";
@@ -9,31 +11,26 @@ import { GeneratedPapersPanel } from "./generated-papers-panel";
 import { PastPapersPanel } from "./past-papers-panel";
 
 /**
- * Which kind of attempt is in flight. The distinction outlives the run, because
- * it also decides what Retake restarts AND whether handleSubmit writes into
- * examResults. Both kinds now carry a `paper` — Tab B stopped being one fixed
- * mixed-subject test the moment it became a per-subject card list, so a
- * "generated" run needs to know WHICH subject's paper it's running exactly like
- * a "past" run already does. See generatedPapers() in ../papers.
+ * A generated paper being answered. Tab B stopped being one fixed mixed-subject
+ * test the moment it became a per-subject card list, so a run needs to know
+ * WHICH subject's paper it is — see generatedPapers() in ../papers.
+ *
+ * REAL PAST PAPERS ARE NOT RUN HERE ANY MORE. Tapping one opens its own screen
+ * at /exam/subjects/:paperKey (pages/exam-paper.tsx), which shows what the paper
+ * is and its history before anything starts a 60-minute clock.
  */
-type Run =
-  | { kind: "generated"; paper: ExamPaper }
-  | { kind: "past"; paper: ExamPaper };
+type Run = { kind: "generated"; paper: ExamPaper };
 
 /**
- * The /exam screen: two tabs over one exam catalog, plus the runner and results
- * that both tabs share.
+ * The /exam/subjects screen: two tabs over one exam catalog, plus the runner
+ * and results that both tabs share. Reached from the chooser at /exam
+ * (exam-hub.tsx), which is why it carries a back link up to it.
  *
  * KHMER-ONLY, on purpose. See EXAM_PAGE_LANG in ../papers for the why and for
  * the two carve-outs it does NOT cover.
  *
- * Two departures from the reference design, both because this is a bottom-nav
- * tab inside existing app chrome rather than a standalone screen — the same two
- * the Study page makes:
- *
- *  - No back arrow. You do not "go back" from a tab; BottomNav is how you leave.
- *  - Title left with pr-14 on the header, because TopBar's floating hamburger
- *    already owns `absolute top-3 right-4`.
+ * Title left with pr-14 on the header, because TopBar's floating hamburger
+ * already owns `absolute top-3 right-4`.
  *
  * THIS COMPONENT OWNS ITS OWN FRAME, unlike the Study page where lessons.tsx
  * supplies the padding. That is deliberate: the two branches need different
@@ -51,12 +48,13 @@ export function ExamView() {
       }))
     );
 
+  const navigate = useNavigate();
+
   const [tab, setTab] = useState<ExamTab>("past");
   const [run, setRun] = useState<Run | null>(null);
   const [finished, setFinished] = useState<
     { run: Run; result: ExamResult } | null
   >(null);
-
   function handleSubmit(score: ExamScore) {
     const subject = run?.paper.subject.id;
     const result: ExamResult = {
@@ -80,16 +78,14 @@ export function ExamView() {
       recordSession(subject);
     }
 
-    // But a PAST-PAPER attempt deliberately does NOT go into examResults. That
-    // array captions Home's stat pill "from mock exams" and feeds
-    // chat-prompt.ts's "average mock-exam percentage" to KruAI as a fact about
-    // the student — a real MoEYS past paper is the opposite end of that
-    // spectrum from a generated practice paper, not another mock exam. Same
-    // rule that already keeps placement-test attempts out.
-    //
-    // When past papers get a history of their own it should be a SEPARATE
-    // persisted field, not a widening of this one.
-    if (run?.kind === "generated") addExamResult(result);
+    // Only a GENERATED paper reaches examResults — which is now every run this
+    // component owns, since real past papers moved to their own screen. The
+    // rule it encodes has not changed: that array captions Home's "from mock
+    // exams" pill and feeds chat-prompt.ts's average, and a real MoEYS paper is
+    // the opposite end of that spectrum. A past-paper attempt lands in
+    // `paperResults` instead — the separate persisted field this comment used
+    // to ask for. See features/exam/components/paper-screen.tsx.
+    addExamResult(result);
 
     if (run) setFinished({ run, result });
     setRun(null);
@@ -126,15 +122,29 @@ export function ExamView() {
           />
         ) : (
           <>
+            {/* Up to the /exam chooser. A Link, not navigate(-1): history could
+                have come from anywhere, and this always means "up one level" —
+                same call practice-lesson-list.tsx makes. */}
+            <Link
+              to="/exam"
+              className="mb-3 inline-flex items-center gap-1 text-xs font-extrabold text-muted transition hover:text-text md:text-sm"
+            >
+              <ChevronLeft className="size-4 shrink-0" strokeWidth={2.5} />
+              វិញ្ញាសារត្រៀមប្រឡង
+            </Link>
+
             <div className="font-heading mb-4 bg-brand-tri bg-clip-text pr-14 text-xl font-extrabold text-transparent">
-              វិញ្ញាសារត្រៀមប្រឡងបាក់ឌុប
+              វិញ្ញាសារតាមមុខវិជ្ជា
             </div>
 
             <UnderlineTabs tabs={EXAM_TABS} value={tab} onChange={setTab} />
 
             {tab === "past" ? (
+              // A real paper OPENS ITS OWN SCREEN rather than starting here —
+              // the detail and history live at /exam/subjects/:paperKey, and
+              // nothing starts a 60-minute clock on the tap that opened a card.
               <PastPapersPanel
-                onStartPaper={(paper) => setRun({ kind: "past", paper })}
+                onStartPaper={(paper) => navigate(`/exam/subjects/${paper.key}`)}
               />
             ) : (
               <GeneratedPapersPanel

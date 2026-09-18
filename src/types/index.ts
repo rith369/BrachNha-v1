@@ -397,6 +397,140 @@ export interface MockExamQuestion extends ExamQuestion {
   subj: MockExamSubject;
 }
 
+/**
+ * ── A REAL MoEYS PAST PAPER ──────────────────────────────────────────────────
+ *
+ * A past paper is not a flat question list: it has numbered PARTS, each with its
+ * own instruction and worked example, one of which may be a gap-fill over a
+ * shared passage, and a writing task nothing can mark automatically.
+ *
+ * These types sit BESIDE `ExamQuestion` rather than widening it. That type is
+ * shared with MOCK_QS, the placement test and the Game feature, and a `skill` or
+ * an `explanation` means nothing to any of them. `PaperQuestion` extends it
+ * instead, so one flattened `ExamQuestion[]` can still be derived for the card's
+ * readiness rule (see features/exam/papers.ts) with nothing authored twice.
+ */
+
+/**
+ * What a question tests, and therefore which study note and drill a student who
+ * got it wrong is offered. Keyed into SKILLS in data/papers/english-drills.ts.
+ *
+ * English-specific today because the 2025 English paper is the only real paper
+ * in the app. A maths paper would add its own ids here rather than reusing
+ * these; nothing derives a subject from a skill.
+ */
+export type SkillId =
+  | "quantifiers"
+  | "past-simple"
+  | "future-passive"
+  | "because-of"
+  | "conditional-2"
+  | "collocation"
+  | "word-choice"
+  | "gap-context";
+
+/** One scored question on a past paper. */
+export interface PaperQuestion extends ExamQuestion {
+  /**
+   * Stable within the paper — `"g1"`, `"v3"`, `"r7"`. Answers are keyed on it
+   * rather than on a running index, so reordering a section or inserting a
+   * missed question cannot silently re-point a saved answer at another one.
+   */
+  id: string;
+  skill: SkillId;
+  /** Why the correct answer is correct, in Khmer. Shown in the review. */
+  explanation: string;
+}
+
+/** One blank in a gap-fill passage. */
+export interface PaperGap {
+  id: string;
+  /** Printed gap number — `(3)`. Not the array index: gap 1 is the example. */
+  number: number;
+  /** The word from the bank that belongs here. */
+  correct: string;
+  /** True for the gap the paper prints already filled in as an example. */
+  example?: boolean;
+  skill: SkillId;
+  explanation: string;
+}
+
+/**
+ * The Reading part: one passage, one shared word bank, many gaps.
+ *
+ * `body` is the passage with `{1}`, `{2}` … where the gaps go — authored as one
+ * string rather than as an array of alternating text/gap pieces, so the prose
+ * stays readable and proofreadable in the data file. The renderer splits it.
+ */
+export interface PaperGapFill {
+  title: string;
+  body: string;
+  /** Every word offered, in the order the paper's box prints them. */
+  wordBank: string[];
+  gaps: PaperGap[];
+}
+
+/** One numbered part of a paper. Exactly one of `questions`/`gapFill` is set. */
+export interface PaperSection {
+  id: string;
+  /** As printed: "I. Reading", "II. Grammar". */
+  title: string;
+  instruction: string;
+  /** The worked example the paper gives before the questions. */
+  example?: string;
+  questions?: PaperQuestion[];
+  gapFill?: PaperGapFill;
+}
+
+/**
+ * The writing task. NOT typed into the app and NOT scored — the student writes
+ * on paper, and afterwards compares against `modelEssay`, which is written for
+ * BrachNha rather than copied from the paper's own printed sample.
+ */
+export interface PaperWriting {
+  title: string;
+  prompt: string;
+  minWords: number;
+  modelEssay: string[];
+  /** What a good answer has to contain, for self-marking. */
+  checklist: string[];
+}
+
+/** A whole past paper, as printed. */
+export interface PastPaperContent {
+  /** From the paper's own header — the only honest source for a timer. */
+  minutes: number;
+  /**
+   * The mark the printed paper is out of, off its own header.
+   *
+   * OPTIONAL, because a paper whose header does not print one must not be given
+   * a number. It is shown on the paper's detail screen as a fact about the real
+   * exam and is NOT what the app scores out of — the pages supplied do not give
+   * the per-part split, so scorePaper() counts the objective questions and the
+   * results screen says so.
+   */
+  points?: number;
+  sections: PaperSection[];
+  writing?: PaperWriting;
+}
+
+/** One practice question offered after a wrong answer. */
+export interface DrillQuestion {
+  prompt: string;
+  options: string[];
+  correct: string;
+  explanation: string;
+}
+
+/** A skill's study note plus its drill. */
+export interface SkillHelp {
+  /** Khmer name of what this tests, shown as the review's ចំណាំ heading. */
+  label: string;
+  /** The rule, in Khmer. Two to four short lines. */
+  note: string[];
+  questions: DrillQuestion[];
+}
+
 // A worked past-paper answer, used as a few-shot example in KruAI's
 // system prompt (see data/bac2-format.ts). `verified` means a teacher has
 // checked the answer against a real MoEYS paper / answer key.

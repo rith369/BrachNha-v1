@@ -3,7 +3,7 @@ import { useBrachNhaStore } from "@/lib/store";
 import { FocusLayout, FocusButton } from "@/components/shell/focus-layout";
 import { cn } from "@/utils/cn";
 import { outcomeOf, type MatchOutcome, type Run } from "../game";
-import { gameCopy, num } from "../copy";
+import { gameCopy } from "../copy";
 import type { Lang } from "@/types";
 
 function Side({
@@ -32,16 +32,16 @@ function Side({
               : "text-text"
         )}
       >
-        {num(run.score, lang)}
+        {run.score}
         <span className="text-sm font-bold text-muted">
-          /{num(total, lang)}
+          /{total}
         </span>
       </div>
       <div className="truncate text-[10px] font-extrabold text-muted md:text-xs">
         {label}
       </div>
       <div className="text-[10px] font-bold text-muted">
-        {num(Math.round(run.ms / 1000), lang)}
+        {Math.round(run.ms / 1000)}
         {t.seconds}
       </div>
     </div>

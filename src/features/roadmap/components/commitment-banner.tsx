@@ -2,10 +2,15 @@ import { PenLine } from "lucide-react";
 import type { Commitment, Lang } from "@/types";
 import { PLEDGE_COPY } from "@/features/commitment/copy";
 import { SignatureDisplay } from "@/features/commitment/components/signature-display";
+import { formatKmDate } from "@/utils/khmer-dates";
 
-// Same locale pair the chat history uses for its date lines.
+// Same pair the chat history uses for its date lines: `Intl` for English, and
+// hand-built Khmer, because `km-KH` formats in English on desktop Chrome AND in
+// Khmer numerals where it does have the data. Digits are Latin — see CLAUDE.md.
 function formatSignedDate(iso: string, lang: Lang): string {
-  return new Date(iso).toLocaleDateString(lang === "en" ? "en-GB" : "km-KH", {
+  const date = new Date(iso);
+  if (lang === "km") return formatKmDate(date);
+  return date.toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
     year: "numeric",

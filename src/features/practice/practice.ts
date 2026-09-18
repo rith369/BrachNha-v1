@@ -110,7 +110,7 @@ export interface PracticeLesson {
   ref: string;
   chapterNumber: number;
   /** Empty string when the chapter's real name hasn't been supplied — the
-   *  banner then shows "ជំពូក ១" alone. See Chapter in lessons/sessions.ts. */
+   *  banner then shows "ជំពូក 1" alone. See Chapter in lessons/sessions.ts. */
   chapterTitle: string;
   /** True when the subject has no chapter grouping at all — see Chapter.flat
    *  in lessons/sessions.ts. The list then skips the kicker entirely rather
@@ -171,11 +171,22 @@ export function parseMode(value: string | undefined): PracticeMode | null {
   return value === "flashcards" || value === "quiz" ? value : null;
 }
 
-/** Resolve a `:lessonRef` back to its content key, or null if malformed. */
+/**
+ * Resolve a `:lessonRef` back to its content key, or null if malformed.
+ *
+ * TWO NUMBERS FOR A LESSON, THREE FOR ONE SECTION OF IT (`3-2` vs `1-3-2`).
+ * The third is what the quiz path's section nodes link to — see quizSections()
+ * in ./quiz-path, where a node's playability is derived from a quiz existing
+ * under exactly this key. Both shapes resolve to a key in the same
+ * `{subjectId}-…` namespace data/practice.ts is keyed by, so authoring
+ * `PRACTICE_QUIZZES["math-1-3-2"]` is the only step needed to turn that node
+ * on. The lesson-name lookup in pages/practice-run.tsx reads the first two
+ * numbers, so it names the right lesson for either shape.
+ */
 export function keyFromRef(
   subjectId: SubjectId,
   ref: string | undefined
 ): string | null {
-  // Two positive integers, nothing else — this comes straight off the URL.
-  return ref && /^\d+-\d+$/.test(ref) ? `${subjectId}-${ref}` : null;
+  // Positive integers only, nothing else — this comes straight off the URL.
+  return ref && /^\d+-\d+(-\d+)?$/.test(ref) ? `${subjectId}-${ref}` : null;
 }

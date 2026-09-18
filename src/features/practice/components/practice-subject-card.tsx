@@ -1,7 +1,6 @@
 import { Link } from "react-router";
 import { Layers, ListChecks } from "lucide-react";
 import { cn } from "@/utils/cn";
-import { toKhmerDigits } from "@/utils/khmer-num";
 import { SUBJECT_STYLE } from "@/features/lessons/subject-styles";
 import { SubjectArt } from "@/features/lessons/components/subject-art";
 import type { SubjectMeta } from "@/features/lessons/subjects";
@@ -39,9 +38,9 @@ import { quizPathFor } from "../quiz-path";
  * screen with real content to look at (colour, progress, a trail of nodes), even
  * though the nodes on it are still a design sample. The tap is not silent, so
  * the "nothing empty is tappable" rule does not apply to it — the same logic
- * that keeps PastPaperCard tappable on an empty paper. Physics is the only
- * subject in this state today; it opens up automatically for any subject added
- * to QUIZ_PATHS in ../quiz-path, no second flag to set here.
+ * that keeps PastPaperCard tappable on an empty paper. Math and physics are
+ * the subjects in this state today; a tile opens up automatically for any
+ * subject added to QUIZ_PATHS in ../quiz-path, no second flag to set here.
  *
  * The count is lessons with content IN THIS MODE, so switching tabs can change
  * both the number and whether the tile is tappable — a subject may have a quiz
@@ -93,7 +92,7 @@ export function PracticeSubjectCard({
             )}
           >
             <Icon className="size-3 shrink-0" strokeWidth={2.5} />
-            {toKhmerDigits(ready)} មេរៀន
+            {ready} មេរៀន
           </span>
         ) : preview ? (
           // Distinct from both the real-count chip above and the dimmed

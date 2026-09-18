@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
-import { toKhmerDigits } from "@/utils/khmer-num";
 import { SubjectArt } from "./subject-art";
 import { SessionNode } from "./session-node";
 import { SUBJECT_STYLE } from "../subject-styles";
@@ -189,7 +188,7 @@ function ChapterJumpList({
                 c.text
               )}
             >
-              <span>ជំពូក {toKhmerDigits(chapter.number)}</span>
+              <span>ជំពូក {chapter.number}</span>
               {chapter.title && (
                 <span className="truncate text-muted">
                   · {chapter.title}
@@ -495,7 +494,7 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
                     <div className="min-w-0">
                       {!chapter.flat && (
                         <div className="truncate text-[10px] font-bold opacity-80">
-                          ជំពូក {toKhmerDigits(chapter.number)}
+                          ជំពូក {chapter.number}
                           {chapter.title && ` · ${chapter.title}`}
                         </div>
                       )}

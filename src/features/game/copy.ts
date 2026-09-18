@@ -1,5 +1,4 @@
 import { addDaysKey, todayKey } from "@/utils/day";
-import { toKhmerDigits } from "@/utils/khmer-num";
 import type { Lang } from "@/types";
 
 /**
@@ -278,12 +277,6 @@ export function gameCopy(lang: Lang) {
   return GAME_COPY[lang];
 }
 
-/** Digits follow the language: Khmer numerals in Khmer, Latin in English —
- *  matching how the rest of the bilingual chrome reads. */
-export function num(value: number | string, lang: Lang): string {
-  return lang === "km" ? toKhmerDigits(value) : String(value);
-}
-
 /**
  * `m:ss` from milliseconds.
  *
@@ -297,12 +290,9 @@ export function num(value: number | string, lang: Lang): string {
  * export from a `.tsx` trips oxlint's `only-export-components` — the rule
  * `utils/focus-styles.ts` exists for.
  */
-export function clockLabel(ms: number, lang: Lang): string {
+export function clockLabel(ms: number): string {
   const s = Math.max(0, Math.ceil(ms / 1000));
-  return `${num(Math.floor(s / 60), lang)}:${num(
-    String(s % 60).padStart(2, "0"),
-    lang
-  )}`;
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
 /**
@@ -332,7 +322,7 @@ export function relativeDay(iso: string, lang: Lang): string {
   // knows how to step a calendar day.
   for (let n = 2; n <= 30; n++) {
     if (day === addDaysKey(now, -n)) {
-      return lang === "en" ? `${n} days ago` : `${toKhmerDigits(n)} ថ្ងៃមុន`;
+      return lang === "en" ? `${n} days ago` : `${n} ថ្ងៃមុន`;
     }
   }
   return lang === "en" ? "A while ago" : "យូរមកហើយ";

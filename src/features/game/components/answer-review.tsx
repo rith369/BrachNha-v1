@@ -1,7 +1,7 @@
 import { Check, Minus } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
-import { gameCopy, num } from "../copy";
+import { gameCopy } from "../copy";
 import type { ExamQuestion } from "@/types";
 
 /**
@@ -71,7 +71,7 @@ export function AnswerReview({
             className="rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel-sm md:p-4"
           >
             <div className="mb-1 text-[10px] font-extrabold text-muted md:text-xs">
-              {t.questionLabel} {num(i + 1, lang)}
+              {t.questionLabel} {i + 1}
             </div>
             <div className="mb-3 text-sm font-extrabold md:text-base">
               {question.q[lang]}

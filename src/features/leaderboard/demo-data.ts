@@ -25,7 +25,7 @@
 import type { DemoLeaderboardStudent } from "@/utils/leaderboard";
 
 /** Shown under the page title — this is a class-sized board, not the country. */
-export const COHORT_LABEL = { en: "Grade 12 · Science", km: "ថ្នាក់ទី១២ · វិទ្យាសាស្ត្រ" };
+export const COHORT_LABEL = { en: "Grade 12 · Science", km: "ថ្នាក់ទី 12 · វិទ្យាសាស្ត្រ" };
 
 export const LEADERBOARD_STUDENTS: DemoLeaderboardStudent[] = [
   {

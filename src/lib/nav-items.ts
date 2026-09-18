@@ -35,7 +35,7 @@ export const mainNavItems: NavItem[] = [
   {
     id: "lessons",
     href: "/lessons",
-    label: { en: "Lessons", km: "មេរៀនគ្រឹះ & ទី១២" },
+    label: { en: "Lessons", km: "មេរៀនគ្រឹះ & ទី 12" },
     shortLabel: { en: "Study", km: "រៀន" },
     icon: BookOpen,
   },

@@ -75,7 +75,7 @@ export default function PrivacyPage() {
           គោលការណ៍ឯកជនភាព
         </p>
         <p className="mb-8 text-xs font-bold text-muted">
-          Last updated 10 September 2026 · ធ្វើបច្ចុប្បន្នភាព ១០ កញ្ញា ២០២៦
+          Last updated 10 September 2026 · ធ្វើបច្ចុប្បន្នភាព 10 កញ្ញា 2026
         </p>
 
         <Section
@@ -88,7 +88,7 @@ export default function PrivacyPage() {
             school or the Ministry of Education.
           </p>
           <p>
-            BrachNha គឺជាកម្មវិធីសិក្សាសម្រាប់សិស្សថ្នាក់ទី១២
+            BrachNha គឺជាកម្មវិធីសិក្សាសម្រាប់សិស្សថ្នាក់ទី 12
             ដែលត្រៀមប្រឡងបាក់ឌុប។ វាដំណើរការដោយក្រុមឯករាជ្យតូចមួយ
             មិនមែនដោយសាលារៀន ឬក្រសួងអប់រំទេ។
           </p>
@@ -206,7 +206,7 @@ export default function PrivacyPage() {
 
         <Section
           title="Students under 18"
-          km="សិស្សអាយុក្រោម ១៨ ឆ្នាំ"
+          km="សិស្សអាយុក្រោម 18 ឆ្នាំ"
         >
           <p>
             BrachNha is made for Grade 12 students, and some are under 18. If
@@ -215,7 +215,7 @@ export default function PrivacyPage() {
             anything at all.
           </p>
           <p>
-            បើអ្នកមានអាយុក្រោម ១៨ ឆ្នាំ
+            បើអ្នកមានអាយុក្រោម 18 ឆ្នាំ
             សូមអានទំព័រនេះជាមួយឪពុកម្តាយ ឬអាណាព្យាបាលមុននឹងចូលគណនី។
             អ្នកអាចប្រើកម្មវិធីទាំងមូលជាភ្ញៀវ ដោយមិនផ្តល់អ្វីមកយើងទេ។
           </p>

@@ -1,13 +1,15 @@
-import { ExamView } from "@/features/exam/components/exam-view";
+import { ExamHub } from "@/features/exam/components/exam-hub";
 import { BottomNav } from "@/components/shell/bottom-nav";
 
-// ExamView owns its own scroller and padding, unlike lessons.tsx where the page
-// supplies them: the runner branch brings FocusLayout's scroller and must not be
-// nested inside a second one. See the comment in exam-view.tsx.
+/**
+ * `/exam` — the chooser between Subject Mock Exams and the Bac II Simulation.
+ * The two-tab past/generated papers screen lives at `/exam/subjects`; see
+ * exam-hub.tsx for why it is a route rather than a state here.
+ */
 export default function ExamPage() {
   return (
     <div className="flex h-full flex-col">
-      <ExamView />
+      <ExamHub />
       <BottomNav />
     </div>
   );
