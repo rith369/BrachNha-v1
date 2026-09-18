@@ -6,10 +6,12 @@ import {
   ChevronRight,
   Clock,
   FileText,
+  Info,
   Layers,
   Timer,
 } from "lucide-react";
 import type { PaperResult } from "@/lib/store";
+import { MAX_EXAM_LEAVES } from "@/hooks/use-leave-guard";
 import { formatKmDate } from "@/utils/khmer-dates";
 import { UnderlineTabs } from "@/components/ui/underline-tabs";
 import { SubjectArt } from "@/features/lessons/components/subject-art";
@@ -37,6 +39,12 @@ type DetailTab = "detail" | "history";
  * difficulty, so the tile is absent rather than guessed — the same rule that
  * keeps a made-up chapter title out of the Study path.
  *
+ * THE START BUTTON IS GATED ON ACCEPTING THE RULES — one of them ends the paper
+ * after the third absence from the screen (hooks/use-leave-guard.ts), and a
+ * penalty nobody agreed to is one a student first meets by being punished by it.
+ * The tick is re-asked on every visit, since this screen unmounts while the
+ * paper is being sat.
+ *
  * "BEFORE YOU BEGIN" DESCRIBES THIS RUNNER, not a generic exam. The sketch
  * promises "you can mark questions for review"; PastPaperRunner has no such
  * control, so that line is not here. Each bullet is a fact about the code: the
@@ -58,6 +66,9 @@ export function PaperDetail({
   onOpenResult: (result: PaperResult) => void;
 }) {
   const [tab, setTab] = useState<DetailTab>("detail");
+  // Re-asked every time, because this component unmounts while the paper is
+  // being sat: coming back from a run or a review lands on an unticked box.
+  const [agreed, setAgreed] = useState(false);
   const content = paper.content;
 
   // The route resolves the paper before mounting this, so content is present;
@@ -111,6 +122,17 @@ export function PaperDetail({
 
       {tab === "detail" ? (
         <>
+          {/* What the app holds of this paper, when that is not the whole of
+              it. The maths paper is parts I to III of VII and is answered by
+              choosing rather than by writing — a student must not discover
+              either of those by starting. */}
+          {content.note && (
+            <div className="mb-4 flex items-start gap-2 rounded-2xl border border-blue/25 bg-blue/5 p-3.5 text-xs font-bold text-text md:text-sm">
+              <Info className="mt-0.5 size-4 shrink-0 text-blue" strokeWidth={2.5} />
+              <span>{content.note}</span>
+            </div>
+          )}
+
           <div className="mb-4 grid grid-cols-2 gap-2.5 rounded-2xl border border-purple/10 bg-surface p-3.5 shadow-panel md:gap-3 md:p-4">
             <Stat
               icon={<FileText className="size-4" strokeWidth={2.5} />}
@@ -171,6 +193,12 @@ export function PaperDetail({
               )}
               <li>បើអស់ម៉ោង ចម្លើយដែលឆ្លើយរួចនឹងត្រូវដាក់ស្នើ មិនបាត់បង់ទេ។</li>
               <li>លទ្ធផល ចម្លើយត្រឹមត្រូវ និងការពន្យល់ បង្ហាញក្រោយដាក់ស្នើ។</li>
+              {/* The one rule that can END the paper, so it is said here and
+                  again on the exam's first screen. */}
+              <li className="text-pink">
+                ហាមចាកចេញពីកម្មវិធី ឬ បិទអេក្រង់។ ការចាកចេញលើសពី{" "}
+                {MAX_EXAM_LEAVES} ដង នឹងធ្វើឱ្យការប្រឡងត្រូវបញ្ចប់ភ្លាមៗ។
+              </li>
             </ul>
           </div>
 
@@ -182,9 +210,28 @@ export function PaperDetail({
             </div>
           )}
 
+          {/* THE RULES HAVE TO BE ACCEPTED BEFORE THE CLOCK CAN START, at the
+              user's request. A native checkbox rather than a styled div: it is
+              keyboard-reachable, announces its own state, and the whole row is
+              the target because <label> wraps it. `accent-*` colours the tick
+              with the brand fill, which is a fill under a white mark and so
+              takes --brand-purple rather than the per-theme scale. */}
+          <label className="mb-3 flex cursor-pointer items-start gap-3 rounded-2xl border border-purple/15 bg-surface p-3.5 shadow-panel">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-0.5 size-4 shrink-0 accent-[var(--brand-purple)]"
+            />
+            <span className="text-xs font-bold text-text md:text-sm">
+              ខ្ញុំបានអាន និងយល់ព្រមតាមបទបញ្ជានៃការប្រឡង
+            </span>
+          </label>
+
           <button
             onClick={onStart}
-            className="block w-full rounded-2xl bg-brand px-6 py-3.5 text-sm font-extrabold text-white shadow-cta md:text-base"
+            disabled={!agreed}
+            className="block w-full rounded-2xl bg-brand px-6 py-3.5 text-sm font-extrabold text-white shadow-cta transition disabled:opacity-40 disabled:shadow-none md:text-base"
           >
             {results.length ? "ធ្វើម្តងទៀត →" : "ចាប់ផ្តើមប្រឡង →"}
           </button>
@@ -271,6 +318,12 @@ function HistoryList({
                 <Timer className="size-3 shrink-0" strokeWidth={2.5} />
                 {clockLabel(result.ms)}
               </span>
+              {/* Only when the rule actually ended it: a clean attempt says
+                  nothing, and one that merely used a warning is not the
+                  student's business to be reminded of forever. */}
+              {result.leaves !== undefined && result.leaves > MAX_EXAM_LEAVES && (
+                <span className="text-pink">បញ្ចប់មុនកំណត់</span>
+              )}
             </span>
           </span>
           <ChevronRight

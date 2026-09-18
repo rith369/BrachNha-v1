@@ -3,6 +3,7 @@ import { deckFor, quizFor } from "@/data/practice";
 import { findSubject } from "@/features/lessons/subjects";
 import { chaptersFor, lessonHeading } from "@/features/lessons/sessions";
 import { keyFromRef, parseMode } from "@/features/practice/practice";
+import { findQuizSection } from "@/features/practice/quiz-path";
 import { FlashcardRunner } from "@/features/practice/components/flashcard-runner";
 import { QuizRunner } from "@/features/practice/components/quiz-runner";
 
@@ -43,18 +44,38 @@ export default function PracticeRunPage() {
   const key = keyFromRef(subject.id, lessonRef);
   if (!key) return <Navigate to={`/practice/${parsed}/${subject.id}`} replace />;
 
-  // The lesson's own name for the completion screen, found in the same
-  // chaptersFor() structure the list was built from — so the two cannot disagree
-  // about what this lesson is called. lessonHeading() prefixes "មេរៀនទី N",
-  // matching how the Study path and the lesson list above both name a lesson;
-  // an unfound lesson falls back to the bare subject name instead.
+  // The name for the completion screen, taken from THE SAME structure the list
+  // or path was built from, so the two cannot disagree about what this is
+  // called. lessonHeading() prefixes "មេរៀនទី N", matching how the Study path
+  // and the lesson list both name a lesson; anything unfound falls back to the
+  // bare subject name.
+  //
+  // TWO SOURCES, and which one is right depends on the SUBJECT, not on the
+  // shape of the ref. A subject with a quiz path (math, physics) has its own
+  // curriculum in features/practice/quiz-path.ts, and reading chaptersFor() for
+  // math returns the FOUNDATION review path instead — which is how a Bac II
+  // limits quiz came to be captioned "មេរៀនទី 1 · ប្រមាណវិធីបូក ដក គុណ ចែក".
+  // Biology's future lesson quiz has no quiz path and must keep the
+  // chaptersFor() lookup, so the branch cannot key on "the ref has three
+  // numbers".
+  const onQuizPath = parsed === "quiz" ? findQuizSection(subject.id, key) : null;
   const [chapterNo, lessonNo] = lessonRef!.split("-").map(Number);
   const foundLesson = chaptersFor(subject.id)
     .find((c) => c.number === chapterNo)
     ?.lessons.find((l) => l.number === lessonNo);
-  const title = foundLesson
-    ? lessonHeading(foundLesson.number, foundLesson.title)
-    : subject.name;
+
+  const title = onQuizPath
+    ? // The SECTION's name when it has one — "មេរៀនទី 1 · ប្រមាណវិធីលើលីមីត"
+      // says more than the lesson alone and is what the student just tapped.
+      // Three levels deep would not fit the summary screen's text-xs line at
+      // 320px, so the section replaces the lesson name rather than following it.
+      lessonHeading(
+        onQuizPath.lesson.number,
+        onQuizPath.section.title || onQuizPath.lesson.title
+      )
+    : foundLesson
+      ? lessonHeading(foundLesson.number, foundLesson.title)
+      : subject.name;
 
   if (parsed === "flashcards") {
     // Gate on the OFFICIAL deck only, matching practiceLessonsFor()'s `count` —

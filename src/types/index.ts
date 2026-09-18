@@ -293,6 +293,22 @@ export interface SectionQuestion {
    *  so the ក./ខ./គ./ឃ. prefix has to be carried here too. */
   correct: string;
   explanation: string;
+  /**
+   * The rule behind this question, the mistake students make on it, and the
+   * exercises to practise it on — rendered under the answer by SkillDrill.
+   *
+   * THE HELP OBJECT ITSELF, not a key into a table, so the renderer needs no
+   * lookup, no id union and no import from a subject's data file. The data file
+   * still keys its own record by a skill id (see data/quizzes/math-1-1-1.ts), so
+   * a future "give me more of what I got wrong" matcher has stable ids to group
+   * on; the reference here is what links the two without the component learning
+   * about either.
+   *
+   * OPTIONAL: every question already authored — biology's section quizzes — has
+   * none, and `undefined` reads correctly as "no help written yet", which is the
+   * same no-migration reasoning ExamQuestion.difficulty uses.
+   */
+  help?: SkillHelp;
 }
 
 /** Poster + duration for a section's video. There is no video file yet; see
@@ -437,7 +453,24 @@ export interface PaperQuestion extends ExamQuestion {
    * missed question cannot silently re-point a saved answer at another one.
    */
   id: string;
-  skill: SkillId;
+  /**
+   * What this question tests, which is what a wrong answer offers a drill on.
+   *
+   * OPTIONAL, because `SkillId` is the ENGLISH paper's vocabulary and a maths
+   * paper has none of those skills. A question with no skill simply shows its
+   * explanation and no drill — absent rather than empty, and the honest state
+   * until maths drills are written.
+   */
+  skill?: SkillId;
+  /**
+   * What the printed paper marks this part out of, where it says.
+   *
+   * SHOWN, NEVER SCORED ON. scorePaper() counts parts answered correctly,
+   * because the app marks a tap and the real paper marks written working — see
+   * the results screen's caption. Optional: a paper that prints no per-part
+   * mark must not be given one.
+   */
+  points?: number;
   /** Why the correct answer is correct, in Khmer. Shown in the review. */
   explanation: string;
 }
@@ -501,6 +534,12 @@ export interface PastPaperContent {
   /** From the paper's own header — the only honest source for a timer. */
   minutes: number;
   /**
+   * One line about what the app holds of this paper, shown on its detail
+   * screen. For a paper transcribed in parts — the maths paper is I to III of
+   * VII — this is what stops the parts list reading as the whole exam.
+   */
+  note?: string;
+  /**
    * The mark the printed paper is out of, off its own header.
    *
    * OPTIONAL, because a paper whose header does not print one must not be given
@@ -514,7 +553,7 @@ export interface PastPaperContent {
   writing?: PaperWriting;
 }
 
-/** One practice question offered after a wrong answer. */
+/** One practice question offered alongside an answer. */
 export interface DrillQuestion {
   prompt: string;
   options: string[];
@@ -522,13 +561,33 @@ export interface DrillQuestion {
   explanation: string;
 }
 
-/** A skill's study note plus its drill. */
+/**
+ * A skill's study note plus its exercises.
+ *
+ * Shared by the English past paper (offered only after a WRONG answer — see
+ * past-paper-results.tsx) and the math practice quiz (offered after EVERY
+ * answer, because practice is not measurement). The component renders whatever
+ * it is handed; WHEN to hand it over is the caller's decision.
+ *
+ * `mistake` and `foundation` are OPTIONAL so the eight English entries in
+ * data/papers/english-drills.ts stay valid untouched. A record that means to
+ * carry all four should type itself `Record<Id, Required<SkillHelp>>`, which is
+ * what makes forgetting one of ten a compile error rather than a missing line
+ * on question 7.
+ */
 export interface SkillHelp {
   /** Khmer name of what this tests, shown as the review's ចំណាំ heading. */
   label: string;
   /** The rule, in Khmer. Two to four short lines. */
   note: string[];
+  /** Exercises in the same shape as the question this hangs off. */
   questions: DrillQuestion[];
+  /** The កំហុសញឹកញាប់ line — the error students actually make here. One
+   *  sentence, and every distractor in `questions` should trace back to it. */
+  mistake?: string;
+  /** Prerequisite exercises, shown under their own heading below `questions`:
+   *  the step a student who missed this one probably never had. */
+  foundation?: DrillQuestion[];
 }
 
 // A worked past-paper answer, used as a few-shot example in KruAI's

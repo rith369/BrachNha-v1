@@ -4,7 +4,11 @@ import { cn } from "@/utils/cn";
 import { SUBJECT_STYLE } from "@/features/lessons/subject-styles";
 import { SubjectArt } from "@/features/lessons/components/subject-art";
 import type { SubjectMeta } from "@/features/lessons/subjects";
-import { readyLessonCount, type PracticeMode } from "../practice";
+import {
+  readyLessonCount,
+  readyQuizSectionCount,
+  type PracticeMode,
+} from "../practice";
 import { quizPathFor } from "../quiz-path";
 
 /**
@@ -54,8 +58,18 @@ export function PracticeSubjectCard({
   mode: PracticeMode;
 }) {
   const style = SUBJECT_STYLE[subject.id];
-  const ready = readyLessonCount(subject.id, mode);
-  const preview = mode === "quiz" && quizPathFor(subject.id) !== null;
+  // A quiz-path subject is counted in SECTIONS, because that is what its nodes
+  // are; every other tile counts lessons. Two units, so the chip names the one
+  // it is showing rather than saying "មេរៀន" over a number of sections.
+  const onPath = mode === "quiz" && quizPathFor(subject.id) !== null;
+  const ready = onPath
+    ? readyQuizSectionCount(subject.id)
+    : readyLessonCount(subject.id, mode);
+  const unit = onPath ? "ផ្នែក" : "មេរៀន";
+  // The "design sample" chip retires ITSELF the moment a path has real content —
+  // it says what is behind the tile is a look rather than a finished lesson set,
+  // and that stops being true at the first authored quiz.
+  const preview = onPath && ready === 0;
   const openable = ready > 0 || preview;
   const Icon = mode === "flashcards" ? Layers : ListChecks;
 
@@ -92,7 +106,7 @@ export function PracticeSubjectCard({
             )}
           >
             <Icon className="size-3 shrink-0" strokeWidth={2.5} />
-            {ready} មេរៀន
+            {ready} {unit}
           </span>
         ) : preview ? (
           // Distinct from both the real-count chip above and the dimmed

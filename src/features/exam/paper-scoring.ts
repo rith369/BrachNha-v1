@@ -30,7 +30,12 @@ export interface ReviewItem {
   /** Undefined when the question was left blank (the clock, or a skip). */
   answer?: string;
   explanation: string;
-  skill: SkillId;
+  /** Absent on a maths question — SkillId is the English paper's vocabulary,
+   *  and the review simply shows no drill. */
+  skill?: SkillId;
+  /** What the printed paper marks this part out of, where it says. Shown in the
+   *  review; the score itself counts parts, not marks. */
+  points?: number;
   ok: boolean;
 }
 
@@ -108,6 +113,7 @@ export function scorePaper(
             answer,
             explanation: question.explanation,
             skill: question.skill,
+            points: question.points,
             ok: answer === question.correct,
           };
         });

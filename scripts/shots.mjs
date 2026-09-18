@@ -62,6 +62,11 @@ const ROUTES = [
   // sections), so it is the route that proves the per-lesson banners and
   // the zigzag trail hold at the 320px floor.
   { name: "practice-quiz-path", path: "/practice/quiz/math" },
+  // The first authored quiz. KaTeX renders formulas as inline-block with
+  // no wrapping, so a long option like the limits-at-infinity one is
+  // exactly the shape of thing that widens a page at 320px — this route is
+  // here to measure that, not just to look at it.
+  { name: "focus-practice-quiz", path: "/practice/quiz/math/1-1-1" },
   // /exam is the Subject Mock Exams / Bac II Simulation chooser; the two tabs
   // live one level down and land on the past-papers one.
   { name: "exam", path: "/exam" },
@@ -106,6 +111,9 @@ const ROUTES = [
   // A real route, so no click chain — tapping its card on /exam/subjects lands
   // exactly here rather than starting the exam.
   { name: "exam-paper", path: "/exam/subjects/2025-english" },
+  // The maths paper: the only screen in the app that typesets LaTeX outside the
+  // mentor, so it is the one that proves KaTeX renders inside the exam chunk.
+  { name: "exam-paper-math", path: "/exam/subjects/2025-math" },
   // The same paper being SAT — the only route that photographs the gap-fill
   // step. Start from the detail screen, then one more click past the part-one
   // intro onto the passage itself.

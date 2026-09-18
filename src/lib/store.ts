@@ -132,6 +132,16 @@ export interface PaperResult {
   ms: number;
   /** Question id → the option picked. Unanswered ids are simply absent. */
   answers: Record<string, string>;
+  /**
+   * Times the student left the exam screen during this attempt.
+   *
+   * OPTIONAL, so attempts recorded before the rule existed read as "unknown"
+   * rather than as a clean run — the same no-migration reasoning as
+   * ExamResult.subject. More than MAX_EXAM_LEAVES means the paper ENDED because
+   * of them: derived rather than stored beside it, so a count and a flag can
+   * never disagree.
+   */
+  leaves?: number;
 }
 
 export type Theme = "dark" | "light";

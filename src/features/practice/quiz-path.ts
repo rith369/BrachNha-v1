@@ -76,7 +76,8 @@ function quizSections(
   chapter: number,
   lesson: number,
   count: number,
-  flat: boolean
+  flat: boolean,
+  titles: readonly string[] = []
 ): Session[] {
   return Array.from({ length: count }, (_, i) => {
     const n = i + 1;
@@ -88,7 +89,12 @@ function quizSections(
       // number too rather than printing a "1." that groups nothing — the same
       // rule Chapter.flat already applies to the banner's kicker.
       label: flat ? `${lesson}.${n}` : `${chapter}.${lesson}.${n}`,
-      title: "",
+      // Named sections first, then "" for the rest — the same shape
+      // sectionsFor()'s `titles` argument takes on the Study path, and the same
+      // "" convention Chapter.title and PathLesson.title already use for a name
+      // that has not been supplied. A count is structure and may be reserved; a
+      // name is content and may not be invented.
+      title: titles[i] ?? "",
       href:
         quizFor(contentKey).length > 0
           ? `/practice/quiz/${subjectId}/${ref}`
@@ -108,13 +114,14 @@ export function quizSessionId(contentKey: string): string {
   return `quiz-${contentKey}`;
 }
 
-/** A lesson of `SECTIONS_PER_LESSON` unnamed sections. */
+/** A lesson of `SECTIONS_PER_LESSON` sections, named as far as the names go. */
 function quizLesson(
   subjectId: SubjectId,
   chapter: number,
   number: number,
   title: string,
-  flat: boolean
+  flat: boolean,
+  sectionTitles: readonly string[] = []
 ): PathLesson {
   return {
     number,
@@ -124,7 +131,8 @@ function quizLesson(
       chapter,
       number,
       SECTIONS_PER_LESSON,
-      flat
+      flat,
+      sectionTitles
     ),
   };
 }
@@ -138,24 +146,29 @@ function quizLesson(
  * eight turn out to sit under real chapters, split them here — nothing else
  * needs to change.
  */
-const MATH_LESSON_TITLES = [
-  "លីមីតនៃអនុគមន៍",
-  "ដេរីវេ និងព្រីមីទីវនៃអនុគមន៍",
-  "ចំនួនកុំផ្លិច",
-  "កោនិក",
-  "អាំងតេក្រាលកំណត់",
-  "សមីការឌីផេរ៉ង់ស្យែល",
-  "ប្រូបាប",
-  "ផលគុណនៃវិចទ័រក្នុងលំហ",
-] as const;
+const MATH_LESSONS: readonly {
+  title: string;
+  /** Named sections, in order. The rest of the lesson's SECTIONS_PER_LESSON
+   *  nodes stay untitled until their content is supplied. */
+  sections?: readonly string[];
+}[] = [
+  { title: "លីមីតនៃអនុគមន៍", sections: ["ប្រមាណវិធីលើលីមីត"] },
+  { title: "ដេរីវេ និងព្រីមីទីវនៃអនុគមន៍" },
+  { title: "ចំនួនកុំផ្លិច" },
+  { title: "កោនិក" },
+  { title: "អាំងតេក្រាលកំណត់" },
+  { title: "សមីការឌីផេរ៉ង់ស្យែល" },
+  { title: "ប្រូបាប" },
+  { title: "ផលគុណនៃវិចទ័រក្នុងលំហ" },
+];
 
 const MATH_QUIZ_PATH: Chapter[] = [
   {
     number: 1,
     title: "",
     flat: true,
-    lessons: MATH_LESSON_TITLES.map((title, i) =>
-      quizLesson("math", 1, i + 1, title, true)
+    lessons: MATH_LESSONS.map((lesson, i) =>
+      quizLesson("math", 1, i + 1, lesson.title, true, lesson.sections)
     ),
   },
 ];
@@ -210,6 +223,36 @@ export function quizPathProgress(chapters: Chapter[], completed: string[]) {
     done: all.filter((s) => completed.includes(s.id)).length,
     total: all.length,
   };
+}
+
+/**
+ * The lesson and section a quiz's content key belongs to, or null when the
+ * subject has no quiz path.
+ *
+ * MATCHED ON THE NODE'S OWN ID, not re-derived by splitting the ref into
+ * numbers and indexing. The node already builds `quizSessionId(contentKey)`, so
+ * matching on it means the title a student reads and the link they tapped
+ * cannot come apart — the property sectionsFor() argues for when it generates
+ * ids from position rather than letting them be typed twice.
+ *
+ * This exists because pages/practice-run.tsx used to take the title from
+ * chaptersFor(), which for math is the FOUNDATION review path: a Bac II limits
+ * quiz was captioned "មេរៀនទី 1 · ប្រមាណវិធីបូក ដក គុណ ចែក", the wrong lesson
+ * of the wrong curriculum. Bac II math lives here precisely because one id
+ * cannot open two paths (see PATH_TAB in features/lessons/sessions.ts).
+ */
+export function findQuizSection(
+  subjectId: SubjectId,
+  contentKey: string
+): { lesson: PathLesson; section: Session } | null {
+  const id = quizSessionId(contentKey);
+  for (const chapter of quizPathFor(subjectId) ?? []) {
+    for (const lesson of chapter.lessons) {
+      const section = lesson.sessions.find((s) => s.id === id);
+      if (section) return { lesson, section };
+    }
+  }
+  return null;
 }
 
 /**

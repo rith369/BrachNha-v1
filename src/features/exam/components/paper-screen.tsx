@@ -11,7 +11,7 @@ import { PastPaperResults } from "./past-paper-results";
 type Mode =
   | { kind: "detail" }
   | { kind: "run" }
-  | { kind: "result"; answers: PaperAnswers; ms: number };
+  | { kind: "result"; answers: PaperAnswers; ms: number; leaves?: number };
 
 /**
  * One paper, end to end: its detail screen, the run, and the review — the whole
@@ -62,12 +62,23 @@ export function PaperScreen({ paper }: { paper: PastPaper }) {
       pct: attempt.pct,
       ms: attempt.ms,
       answers: attempt.answers,
+      leaves: attempt.leaves,
     });
-    setMode({ kind: "result", answers: attempt.answers, ms: attempt.ms });
+    setMode({
+      kind: "result",
+      answers: attempt.answers,
+      ms: attempt.ms,
+      leaves: attempt.leaves,
+    });
   }
 
   function openResult(result: PaperResult) {
-    setMode({ kind: "result", answers: result.answers, ms: result.ms });
+    setMode({
+      kind: "result",
+      answers: result.answers,
+      ms: result.ms,
+      leaves: result.leaves,
+    });
   }
 
   // The route guarantees it; the guard keeps the type honest.
@@ -97,6 +108,7 @@ export function PaperScreen({ paper }: { paper: PastPaper }) {
             content={content}
             answers={mode.answers}
             ms={mode.ms}
+            leaves={mode.leaves}
             title={paper.title}
             onRetake={() => setMode({ kind: "run" })}
             onBack={() => setMode({ kind: "detail" })}

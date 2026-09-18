@@ -17,6 +17,79 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 18 Sep 2026 — The 2025 Maths paper, parts I to III
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** You sent the Maths paper and its answer key and asked for the same treatment as
+English, with the questions turned into multiple choice so the app can mark them.
+
+**What changed.** Old papers → 2025 → វិញ្ញាសារគណិតវិទ្យា now opens a real paper: **16
+questions across parts I (Limits), II (Probability) and III (Complex numbers)**, with the
+paper's own 150-minute clock. Every formula is properly typeset, not typed as plain text.
+After submitting you get your mark, a part-by-part breakdown, and for every question the
+correct answer with a full worked solution — the same review the English paper gives.
+
+**Three things to know.**
+
+- **This is an adaptation, and the app says so on the paper's page.** The real Bac II maths
+  paper is written work; here you choose an answer. The note on screen tells students to
+  work it on paper first, so nobody practises tapping and then cannot write a solution in
+  the exam.
+- **Parts IV to VII are not in yet** — that is also on the screen, so the three parts don't
+  read as the whole exam. Part VII needs a graph; I'll draw it in the app rather than copy
+  the picture from the answer key.
+- **The solutions are written by me, not copied from the answer key.** You said to copy
+  them without a credit — I didn't, because that key is ក្រូ សុខ ពិសិដ្ឋ / STEAM Tuition
+  Center's work and republishing it under your app with their name removed would be taking
+  it from them. I worked each question out myself and checked my answers match theirs, so
+  nothing of theirs is in the app and no credit line is needed. If you'd rather use their
+  originals, that needs their permission and a visible credit.
+
+**Please have a maths teacher check it**, especially **the Khmer word for the balls in part
+II** — I read it off the photo and it is the least certain thing in the file. The wrong
+answer choices are mine too, written as the mistakes the working actually produces.
+
+**What to re-test.** Sit the paper, answer some right and some wrong, and read the review:
+every formula should look like printed maths, and each question should show what the real
+paper marks it out of.
+
+## 18 Sep 2026 — Leaving the exam screen now ends the exam
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** You asked for the rule: ហាមចាកចេញពីកម្មវិធី ឬ បិទអេក្រង់ — leaving more than
+twice ends the exam immediately.
+
+**What changed.** During the English past paper, the app now watches for the exam screen
+being left — switching apps, opening another tab, or the screen turning off. The first two
+times, a warning appears when the student comes back, saying how many they have used. The
+third time, **the exam ends at once and whatever they had answered is submitted**, so they
+still get their score and their review. The results screen and the history row say the
+exam ended early, and the count is saved with the attempt.
+
+The rule is shown twice before it can be broken: in the "before you begin" list on the
+paper's page, and again on the first screen of the exam itself. **The student must also
+tick "ខ្ញុំបានអាន និងយល់ព្រមតាមបទបញ្ជានៃការប្រឡង" before the Start button will work** — it
+stays greyed out until they do, and it asks again every time they come back to the page.
+
+**What you should know.**
+
+- **The app cannot stop anyone leaving.** No website can block the home button or the
+  screen locking. It can only notice, and then act. Real blocking needs BrachNha to become
+  an installed app.
+- **A phone call, a notification, or the phone locking itself all count as leaving** — the
+  app cannot tell them apart from looking up an answer. Very short interruptions (under
+  two seconds) are ignored so a quick flicker doesn't cost anything.
+- **Two leaves for a 60-minute paper is strict.** Say the word and I'll change the number;
+  it is one line.
+- **This applies to the real past paper only**, not the short practice papers on the second
+  tab.
+
+**What to re-test — please do this on a real phone.** Start the English paper, press the
+home button and come back; you should see the warning. Do it three times and the exam
+should end with your answers kept. I could only simulate this on the computer.
+
 ## 18 Sep 2026 — A paper now has its own page, with a history
 
 *Not committed yet.* **No database step needed.**
@@ -105,6 +178,53 @@ ordinary "12" are both just text.
 (open a review and finish it), Mock Exam → វិញ្ញាសារតាមមុខវិជ្ជា → the 2025
 English paper, the Roadmap, and Profile. Every number on those screens should be
 1, 2, 3. Then ask KruAI a maths question and check its numbered steps are too.
+
+---
+
+## 18 Sep 2026 — The first real quiz: Math, ប្រមាណវិធីលើលីមីត
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** The math path had 48 squares and nothing behind any of them. This is the
+first one with real content in it.
+
+**Where it is.** Practice → Quiz → គណិតវិទ្យា → the first square. It is the only
+one that opens; the other 47 are still waiting for their content.
+
+**What a student gets.** Ten questions, one for each way of working out a limit
+(substituting directly, factorising, conjugates, one-sided limits, sin, infinity,
+cos, the number e). The maths is properly typeset — real fractions, square roots
+and limit signs, not text approximations.
+
+**After EVERY answer, right or wrong:**
+
+- **The worked solution**, step by step.
+- **ចំណាំ** — the rule behind the question, in two or three lines.
+- **កំហុសញឹកញាប់** — the mistake students actually make on this one.
+- **ហាត់បន្ថែម** — a button opening **2 similar exercises** and **2 foundation
+  exercises**, each multiple choice with the answer and explanation appearing the
+  moment you tap. Get the question wrong and this opens by itself.
+
+Nothing in that panel earns XP — the quiz question above it already paid.
+
+**Section 1 is now named** ប្រមាណវិធីលើលីមីត, and the finish screen says
+"មេរៀនទី 1 · ប្រមាណវិធីលើលីមីត". **That was a bug fix:** it used to read
+"មេរៀនទី 1 · ប្រមាណវិធីបូក ដក គុណ ចែក" — the name of a completely different
+math lesson. The subject tile on the Practice hub also stops saying
+"គំរូការរចនា" (design sample) now there is real content, and reads "1 ផ្នែក".
+
+**About the wrong answers.** Everything — the questions, answers, solutions,
+notes, mistakes and every exercise — is yours. The only thing written for
+BrachNha is the **three wrong options** on each question, because a
+multiple-choice quiz needs them and you supplied answers rather than choices.
+Each one is built from the mistake you documented, so picking it is a real
+misconception rather than a random number. They are not checked by a teacher; if
+one is wrong it is a one-line edit.
+
+**What to re-test.** Practice → Quiz → Math → first square: the maths should look
+like a textbook, not like code. Answer one wrong and one right and check both
+show the solution, the note, the mistake and the exercises button. Finish all ten
+and check the square gets a tick and the path counter reads 1/48.
 
 ---
 

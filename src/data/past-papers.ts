@@ -1,5 +1,6 @@
 import type { PastPaperContent } from "@/types";
 import { ENGLISH_2025 } from "./papers/english-2025";
+import { MATH_2025 } from "./papers/math-2025";
 
 /**
  * REAL MoEYS Bac II past papers — the content slot for the Study-style
@@ -50,4 +51,5 @@ export const PAST_PAPER_YEARS: readonly number[] = [2025, 2024, 2023, 2022, 2021
  */
 export const PAST_PAPERS: Record<string, PastPaperContent> = {
   "2025-english": ENGLISH_2025,
+  "2025-math": MATH_2025,
 };

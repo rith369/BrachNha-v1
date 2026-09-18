@@ -29,7 +29,7 @@ warning it carried still stands: do not copy Next.js-specific patterns back in.
 | **Lucide React** | ✅ Use | Replaced emoji icons (inconsistent rendering across phones) |
 | **Framer Motion** | ✅ Use | Chat overlay slide-up; CSS keyframes still used for simple fixed animations (fab pulse, shimmer) |
 | **Recharts** | ✅ Use | Score trend line + subject bar chart on Progress. Sparklines and the score donut are still hand-coded |
-| **KaTeX** | ✅ Use | Typesets both sides of the KruAI conversation. Pulled in through a lazy import of `ChatOverlay` so its JS and web fonts stay out of the first-paint bundle |
+| **KaTeX** | ✅ Use | Typesets both sides of the KruAI conversation AND the maths in a practice quiz. Reached only through `components/shell/math-text.tsx`, which two lazy routes import — so it builds its own shared `math-text-*.js` chunk and stays out of the entry chunk. **Verify that after any build**; it is one eager import away from first paint |
 | **MathLive** | ✅ Use | The math keyboard and formula editor in the chat composer, replacing ~570 lines of hand-built Unicode keyboard. Lazy-imported one level deeper than KaTeX — see the mentor section below, the boundary is load-bearing |
 | **Zustand (+ persist)** | ✅ Use | Single global store; replaces scattered `useState` + manual localStorage |
 | **Supabase** (`@supabase/supabase-js`) | ✅ Use | Postgres + auth behind the store. A durable SECOND copy — the app still reads localStorage first and works with Supabase absent. Lazily imported so it stays out of the entry chunk; see its own section below |
@@ -1896,6 +1896,57 @@ at this paper). Two rules carried over from everywhere else in this file:
   ← steps back, writing is on paper, running out submits rather than discards,
   and the review comes after submitting.
 
+**LEAVING THE EXAM SCREEN ENDS IT ON THE THIRD TIME** (`hooks/use-leave-guard.ts`,
+the user's rule: "ការចាកចេញលើសពី 2 ដង នឹងធ្វើឱ្យការប្រឡងត្រូវបញ្ចប់ភ្លាមៗ"). Two
+absences are forgiven with a warning screen; the third submits the paper.
+
+**IT CANNOT PREVENT LEAVING AND NOTHING IN A BROWSER CAN** — no page blocks the
+home button, app switching, the notification shade or the screen locking. That
+needs an installed app and the phone's own exam mode (Android screen pinning,
+iOS Guided Access). This is detect-and-penalise; don't let any copy promise more.
+
+Four decisions in it, each of which a later edit could quietly undo:
+
+- **`visibilitychange`, measured from a TIMESTAMP.** A hidden page's timers are
+  throttled or stopped, so counting ticks while away measures nothing — the same
+  reason the paper's clock is a deadline stamped at mount.
+- **`LEAVE_GRACE_MS` (2s) exists because the signal is ambiguous.** A permission
+  sheet, a fingerprint prompt or a rotate hides the page exactly as switching
+  apps does. The window is what stops a flicker costing a student their paper.
+  **A phone call, a notification and an automatic screen-off still count** — the
+  app cannot tell them apart, and that is the accepted cost of the rule rather
+  than a bug to fix. The user declined a Wake Lock, so a phone that locks itself
+  during a long passage does spend one of the two allowances.
+- **It SUBMITS, never discards.** Ending a paper because a call came in AND
+  throwing the answers away would punish the same accident twice.
+- **The count is the only record.** `PaperResult.leaves` is optional (older
+  attempts read as unknown, no migration), and "ended early" is DERIVED from
+  `leaves > MAX_EXAM_LEAVES` rather than stored beside it, so a count and a flag
+  cannot disagree. The results screen and the history row both say so.
+
+**THE START BUTTON IS GATED ON A TICKBOX** — "ខ្ញុំបានអាន និងយល់ព្រមតាមបទបញ្ជា
+នៃការប្រឡង", the user's request. A penalty nobody agreed to is one a student
+first meets by being punished by it. It is a native `<input type="checkbox">`
+inside a `<label>` rather than a styled `<div>`: keyboard-reachable, announces
+its own state, and the whole row is the tap target for free. The tick is asked
+for AGAIN on every visit, because `PaperDetail` unmounts while the paper is
+being sat — the one path that skips it is ប្រឡងម្តងទៀត on the results screen,
+where the student has already agreed once in that sitting.
+
+The rule is stated twice — in the detail screen's "before you begin" list and
+again on the paper's first step — because by the second one the clock is already
+running. **Tab B's generated papers do NOT have this**: they are short untimed
+practice, and ending one for taking a call would be punishment with no exam
+behind it.
+
+Verified in a real browser by driving the visibility API: a 0.7s absence does not
+count, the first two show the warning (the second saying the next one ends it),
+the third submits with the note on the results screen and `leaves: 3` stored, and
+absences AFTER the paper ends change nothing. **The browser's own signal was
+simulated, not produced by really backgrounding a tab** — Playwright cannot
+background one — so confirm the behaviour on a real phone before trusting it in
+a classroom.
+
 **`paperResults` is the separate persisted field this section used to ask for**
 — NOT a widening of `examResults`, which still captions Home's "from mock exams"
 pill and feeds KruAI an average. It keeps the ANSWERS as well as the score, which
@@ -1975,6 +2026,69 @@ reads "is". An English exam must not teach an agreement error.
 **The transcription and every Khmer explanation are UNVERIFIED** — best-effort,
 exactly like `data/practice.ts`'s first deck, and the file says so. A misread word
 is a plain data edit there and nothing else in the app changes.
+
+### The 2025 MATHS paper — an adaptation, and it says so
+
+The second real paper (28 សីហា 2025, science stream, 125 points, 150 minutes),
+and it is not the paper as sat. **The real maths paper is written work end to
+end** — limits, probability, complex numbers, integrals, a differential
+equation, vectors, a function study — and nothing here can mark a written
+solution. The user's call: turn each part into MULTIPLE CHOICE so it can be
+marked at all. `data/papers/math-2025.ts` carries all of this in its header.
+
+**PARTS I TO III ONLY** (16 questions, 40 of the 125 points). IV–VII are not
+transcribed; VII also needs a graph, which will be DRAWN (an SVG sampling the
+curve, its asymptotes and the tangent) rather than cropped out of the answer
+key's photo.
+
+Three rules the file states and a later edit must keep:
+
+- **The prompt is the paper's; the OPTIONS are ours.** The correct answer comes
+  from the paper's key; the three wrong ones are written here as the results the
+  working actually produces when it goes wrong — a dropped sign, a forgotten
+  conjugate, `arg(z₁/z₂)` added instead of subtracted. A distractor must never
+  be a second correct answer.
+- **The SOLUTIONS are ours too.** The supplied key is ក្រូ សុខ ពិសិដ្ឋ / STEAM
+  Tuition Center's, watermarked on every page. The user asked to copy it with no
+  credit; that is republishing another teacher's work, so every answer was
+  worked out here and then CHECKED against theirs. Pasting theirs in later needs
+  their permission and a visible credit, the way the Freepik line does.
+- **`note` carries what the screen cannot show**: three parts of seven, and that
+  the real exam is written. A student must not discover either by starting.
+
+**`PaperQuestion.skill` is OPTIONAL now, and `points` is new.** `SkillId` is the
+English paper's vocabulary (`quantifiers`, `because-of`…), so a maths question
+carries none and the review renders no drill — absent rather than a button that
+opens nothing. `points` is what the PRINTED paper marks that part out of, shown
+beside each review row and **never scored on**: `scorePaper()` still counts parts
+answered correctly, because the app marks a tap and the paper marks working.
+
+**`MathText` renders the exam now, not just the mentor** — the prompt, every
+option and every explanation. One renderer for both papers: `splitMath` leaves a
+dollar-free English sentence untouched. The explanation block carries
+`whitespace-pre-line`, which is what keeps a worked solution's steps on their own
+lines. **KHMER NEVER GOES INSIDE `$…$`** (KaTeX has no Khmer glyphs and
+`splitMath` refuses such a span), and every LaTeX string in the data file is a
+`String.raw` template — a plain template literal turns `	`, `` and `` into
+control characters, which is exactly the bug `data/bac2-format.ts` warns about.
+
+**KaTeX moved into a SHARED chunk** (`math-text-*.js`, 255KB raw) the moment the
+exam imported it; it used to sit inside `chat-overlay-*.js`. Still lazy, still
+absent from the entry chunk — verified after the build, the same way the
+MathLive and Supabase boundaries are.
+
+**Verified by a script rather than by eye**, because KaTeX renders broken TeX in
+red instead of throwing: every prompt, option and explanation was split with the
+app's own `splitMath` through `ssrLoadModule` and each of the **159 math
+segments** typeset with `throwOnError: true` — 0 failures, 0 Khmer inside math,
+0 stray dollars left in text, and every `correct` present exactly once among its
+options. Then a real browser sat the paper end to end at 390px and photographed
+it at all nine widths: formulas typeset in the runner and the review, no drill
+button, no sideways scroll.
+
+**UNVERIFIED CONTENT, like every transcription here.** The most doubtful thing
+is the Khmer word for the balls in part II (កូនប្ញើ), read off a photograph —
+the biology deck already proved how a plausible misreading survives a first look.
 
 **One follow-up left** (the other, a persisted past-paper history, is
 `paperResults` above): feeding past papers into
@@ -2887,6 +3001,105 @@ turns that one node into a real `<Link>` with no code change. `keyFromRef()` in
 `features/practice/practice.ts` was widened to accept an optional third number
 for exactly that — two numbers is a lesson, three is one section of it, and
 `pages/practice-run.tsx`'s lesson-name lookup reads the first two either way.
+
+### The first real quiz — math 1.1, and the answer is more than a cross
+
+`PRACTICE_QUIZZES["math-1-1-1"]` is the first authored quiz in the app, and the
+first content behind a node on the quiz path: **មេរៀនទី 1 លីមីតនៃអនុគមន៍ · ផ្នែកទី 1
+ប្រមាណវិធីលើលីមីត**, ten limit techniques, one question each. Authoring that one
+key is what turned node 1.1 into a real `<Link>` — no code change in
+`quiz-path.ts`, which is the whole point of deriving `href` from `quizFor()`.
+
+**EVERY ANSWER GETS THE FULL TREATMENT, right or wrong**: the worked solution in
+the existing Callout, then a ចំណាំ rule, then a កំហុសញឹកញាប់ line, then — behind
+one button — **two similar exercises and two foundation exercises**, multiple
+choice with immediate feedback. That is 50 questions and ~200 options in one
+file.
+
+**It reuses the ENGLISH PAPER's drill machinery rather than inventing a second
+one.** `SkillHelp`/`DrillQuestion` already existed for the 2025 paper's
+"a wrong answer gets more than a cross" review. Three changes made them shared:
+
+- `SkillHelp` gained OPTIONAL `mistake?` and `foundation?`, so the eight English
+  entries in `data/papers/english-drills.ts` stay valid untouched — verified by
+  typechecking before any content existed.
+- `SectionQuestion` gained OPTIONAL `help?: SkillHelp` — **the help OBJECT, not a
+  key into a table**, so the renderer needs no lookup, no id union and no import
+  from a subject's data file. The data file still keys its own record by a
+  `MathLimitSkillId`, which is what a future "give me more of what I got wrong"
+  matcher groups on; the reference is what links the two.
+- `SkillDrill` moved to `src/components/skill-drill.tsx` and takes `help` as a
+  prop instead of reaching into `SKILLS` itself. **That import had to go, not
+  merely become unused**: a shared component importing one subject's drill corpus
+  would drag the whole of it into every chunk that renders a question. Verified —
+  `practice-run-*.js` contains no English drill text.
+
+**Math's record is `Record<MathLimitSkillId, Required<SkillHelp>>`**, and that is
+the highest-value line in the file: the two new fields are optional on the type,
+so forgetting one of ten would otherwise be silent — no type error, just a
+missing កំហុសញឹកញាប់ on question 7. `Required` makes tsc find it.
+
+**`MathLimitSkillId` is a LOCAL union, deliberately not added to `SkillId`.** That
+one keys a total `Record` for the English paper, so widening it would force
+`english-drills.ts` to author ten maths entries it has no business having.
+
+**Three traps in the component, each a bug it prevents rather than tidiness:**
+
+- **`DrillGroup` is its own component.** One `picks` map shared by both groups
+  would key similar-1 and foundation-1 on the same index, so answering either
+  would instantly mark and lock the other. It also keeps `help.foundation` — an
+  OPTIONAL array — from being read by a closure built above its own JSX guard,
+  which is the React Compiler crash `review-session.tsx` documents, and which
+  here would throw for every English entry.
+- **`SkillDrill` is `key={index}` in the runner.** It owns which exercises are
+  open and how they were answered, and that state belongs to the PRESENTATION,
+  not the slot. Without the key it leaks on exactly one path: answer Q1, expand
+  it, then press ← back from an answered Q2 — the panel stays mounted carrying
+  Q2's state under Q1's help. An effect resetting it would trip oxlint's
+  `react(set-state-in-effect)`; the key is the fix, not the effect.
+- **Drill lists are keyed on POSITION, not on the prompt.** Two limit exercises
+  can legitimately read the same, and these lists never reorder.
+
+**`quizPathProgress` vs `readyLessonCount` — the second bug of the same family.**
+`practice-run.tsx` took the runner's title from `chaptersFor()`, which for math
+is the FOUNDATION review path, so a Bac II limits quiz was captioned
+"មេរៀនទី 1 · ប្រមាណវិធីបូក ដក គុណ ចែក" — the wrong lesson of the wrong
+curriculum. `readyLessonCount()` had it too: lesson-keyed off the same function,
+so authoring a SECTION quiz moved it by nothing and the hub tile kept calling
+itself a design sample on the day it stopped being one. Both now branch on
+**whether the subject has a quiz path**, never on the shape of the ref — biology's
+future lesson quiz has no path and must keep the `chaptersFor()` lookup.
+`findQuizSection()` matches on the node's own `quizSessionId(contentKey)` rather
+than re-deriving from numbers, so the title a student reads and the link they
+tapped cannot come apart. The tile counts SECTIONS for a path subject and says
+`ផ្នែក` rather than `មេរៀន`, because those are two different units.
+
+**The content log is written at LESSON grain (`math-1-1`), not section grain.**
+`contentLog`'s documented grain is the lesson and every other writer already
+holds a lesson key; this is the first caller that does not, so `QuizRunner`
+collapses through `lessonKeyOf()`. Logging `math-1-1-1` would put two grains in
+one record for one real lesson.
+
+**KaTeX now has a chunk of its own, and this was a deliberate trade.** It used to
+live inside the lazy `chat-overlay-*.js`, paid for only by students who opened
+KruAI. `quiz-runner.tsx` imports the same `MathText`, so Rolldown hoists katex
+into a shared **`math-text-*.js`** (261KB raw, ~74KB gzip) plus its own stylesheet
+carrying the KaTeX fonts. Measured after the change: the entry chunk has **zero**
+katex hits and grew by 77 bytes. The real cost is that `practice-run` is in
+`routeModules`, so `usePrefetchRoutes` warms that chunk at idle for every student
+rather than only for KruAI users. Accepted — the content is maths, and hand-
+converting ~150 LaTeX expressions to Unicode is a transcription risk with no
+upper bound on how quietly it fails. **`math-text.tsx` stays under
+`components/shell/` on purpose**: moving it beside `error-boundary.tsx`, which
+`app.tsx` imports EAGERLY, puts one careless future import between katex and the
+entry chunk.
+
+**Section 1 of lesson 1 is the only NAMED section.** `quizSections()` takes an
+optional `titles` array per lesson now, mirroring `sectionsFor()` on the Study
+path, and fills the rest with `""` — a count is structure and may be reserved, a
+name is content and may not be invented. Note the trail itself still prints no
+per-node titles (see below), so the name surfaces in the node's `aria-label` and
+in the runner's own title, not on the path.
 
 **A LOCKED NODE NOW LOOKS IDENTICAL TO A PLAYABLE ONE** — full colour, same lip,
 same glyph, no padlock. It used to be a dashed grey outline, which was right for
@@ -5746,11 +5959,33 @@ considered done:
 npx tsc -b            # NOT `tsc --noEmit -p tsconfig.json` — this is a solution build
 npx oxlint            # NOT eslint — there is no eslint config in this repo
 npm run check:digits  # no Khmer numerals — see "Digits are Latin everywhere"
+npm run check:quiz    # authored quiz content — see below
 ```
 
 The third is there because the first two cannot see it: to `tsc` and to oxlint,
 `"១២"` and `"12"` are both just strings. It is instant and has no dependencies,
 so there is no reason to skip it on a change that "obviously" touches no copy.
+
+**`check:quiz` is the same argument for authored QUIZ content**
+(`scripts/check-quiz.mjs`). Every field in `PRACTICE_QUIZZES` is a string to a
+typechecker, so nothing else in the repo can tell you that `correct` is not
+actually one of the `options`, that two options are spelled identically, that a
+`$` was never closed, or that a Khmer word ended up inside `$…$` where KaTeX has
+no glyphs and renders a row of empty boxes. It runs the app's own path —
+`splitMath`, then `katex.renderToString` with `throwOnError: true` — for the
+reason recorded under the LaTeX bug below: **eyeballing is not enough, because
+the broken output rendered without a single error.** A `$` left in a TEXT segment
+is an error even though nothing throws: `splitMath` refusing a formula is correct
+in a streamed chat reply and a bug in authored content, where it means the
+student reads raw LaTeX. It loads the module through Vite's `ssrLoadModule`,
+since `data/*.ts` uses `.js` specifiers that only resolve under a bundler.
+
+What it cannot catch, and no mechanical check can short of a CAS, is **two
+options that are the same VALUE in different forms** — `\frac{1}{4}` beside
+`0.25`. That is why `data/quizzes/math-1-1-1.ts` states a canonical-form rule
+instead: fractions are always `\frac{a}{b}` and a decimal is never a legal
+option, which makes the largest family of those collisions unwriteable rather
+than merely discouraged.
 
 `npm run build` runs `tsc -b && vite build` and must also pass. For anything
 touching the mentor, additionally exercise `POST /api/chat` against a running

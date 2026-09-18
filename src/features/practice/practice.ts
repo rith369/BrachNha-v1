@@ -1,5 +1,6 @@
 import { deckFor, quizFor } from "@/data/practice";
 import { chaptersFor } from "@/features/lessons/sessions";
+import { quizPathFor } from "./quiz-path";
 import { SUBJECTS, allSubjects, type SubjectId, type SubjectMeta } from "@/features/lessons/subjects";
 import type { UnderlineTab } from "@/components/ui/underline-tabs";
 
@@ -164,6 +165,26 @@ export function readyLessonCount(
   mode: PracticeMode
 ): number {
   return practiceLessonsFor(subjectId, mode).filter((l) => l.count > 0).length;
+}
+
+/**
+ * Sections with a quiz actually written, on a subject rendered as a quiz path.
+ *
+ * readyLessonCount() cannot answer this. It counts LESSONS, and it derives them
+ * from chaptersFor() — which for math is the foundation-review path, a different
+ * curriculum from the Bac II one the quiz path shows. So authoring
+ * PRACTICE_QUIZZES["math-1-1-1"] moved that count by exactly nothing, and the
+ * hub tile kept calling itself a design sample on the day it stopped being one.
+ *
+ * DERIVED from `href`, which quiz-path.ts already sets from `quizFor(...)` — so
+ * the number on the tile and the nodes a student can actually tap are the same
+ * fact, not two that agree today.
+ */
+export function readyQuizSectionCount(subjectId: SubjectId): number {
+  return (quizPathFor(subjectId) ?? [])
+    .flatMap((chapter) => chapter.lessons)
+    .flatMap((lesson) => lesson.sessions)
+    .filter((session) => session.href).length;
 }
 
 /** Narrow a `:mode` route param, or null for anything else. */

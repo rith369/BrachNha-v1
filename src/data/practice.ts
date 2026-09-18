@@ -1,4 +1,5 @@
 import type { PracticeCard, SectionQuestion } from "../types/index.js";
+import { MATH_LIMIT_OPERATIONS_QUIZ } from "./quizzes/math-1-1-1.js";
 
 /**
  * Per-lesson flashcard decks and quizzes — the content slot behind the two tabs
@@ -107,7 +108,12 @@ export const PRACTICE_DECKS: Record<string, PracticeCard[]> = {
  * questions (now the flashcard deck above), not a multiple-choice quiz.
  */
 export const PRACTICE_QUIZZES: Record<string, SectionQuestion[]> = {
-  // "biology-1-1": [ { q: "…", options: [...], correct: "…", explanation: "…" } ],
+  // A SECTION key, three numbers — the quiz path routes at
+  // /practice/quiz/math/1-1-1, one node per section, where biology's lesson
+  // quizzes would be keyed "biology-3-1". keyFromRef() in
+  // features/practice/practice.ts accepts both shapes, and the node in
+  // features/practice/quiz-path.ts unlocks itself the moment this key exists.
+  "math-1-1-1": MATH_LIMIT_OPERATIONS_QUIZ,
 };
 
 /** A lesson's deck, or an empty array when none is written. */

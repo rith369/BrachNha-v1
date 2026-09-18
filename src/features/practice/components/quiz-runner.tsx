@@ -12,9 +12,12 @@ import {
 } from "@/utils/focus-styles";
 import { QUIZ_COINS, QUIZ_XP } from "@/utils/rewards";
 import { Callout } from "@/features/lessons/components/callout";
+import { MathText } from "@/components/shell/math-text";
+import { SkillDrill } from "@/components/skill-drill";
 import type { SectionQuestion } from "@/types";
 import type { PracticeMode } from "../practice";
 import { quizSessionId } from "../quiz-path";
+import { lessonKeyOf } from "@/features/progress/content-keys";
 
 /**
  * A lesson's quiz, one question at a time.
@@ -92,7 +95,7 @@ export function QuizRunner({
     // Mission read, so a finished quiz is one real completion rather than a
     // second tracker beside the self-reported one.
     completeTask("practice");
-    recordSession(contentKey);
+    recordSession(lessonKeyOf(contentKey));
     // Ticks this quiz's node on the Mimo-style quiz path, which derives every
     // status from completedSessions rather than authoring one — see
     // ../quiz-path. quizSessionId() rather than the bare key because that path
@@ -144,7 +147,12 @@ export function QuizRunner({
     const right = option === question.correct;
     setAnswers((prev) => ({ ...prev, [index]: option }));
     if (right) addXp(QUIZ_XP, QUIZ_COINS);
-    recordQuestions(contentKey, 1, right ? 1 : 0);
+    // lessonKeyOf, because contentKey is a SECTION key here — the quiz path
+    // routes at `math-1-1-1`, three numbers, where every other writer in the
+    // app holds a lesson key already (section-detail.tsx collapses the same
+    // way). The content log's documented grain is the lesson; logging the
+    // section would put two grains in one record for one real lesson.
+    recordQuestions(lessonKeyOf(contentKey), 1, right ? 1 : 0);
   }
 
   const footer = (
@@ -177,10 +185,16 @@ export function QuizRunner({
         <div className={focusCard}>
           {question.scenario && (
             <p className={`mb-3 whitespace-pre-line text-muted ${focusBody}`}>
-              {question.scenario}
+              <MathText text={question.scenario} />
             </p>
           )}
-          <div className={`mb-4 md:mb-6 ${focusPrompt}`}>{question.q}</div>
+          {/* MathText, not a bare string, so a maths question can carry LaTeX —
+              `$\lim_{x 	o 3}(2x^2-5x+1)$` typesets, and a question with no
+              dollar signs (every biology one) comes back as a single text
+              segment, i.e. exactly what it rendered before. */}
+          <div className={`mb-4 md:mb-6 ${focusPrompt}`}>
+            <MathText text={question.q} />
+          </div>
 
           <div className="flex flex-col gap-2 md:gap-3">
             {question.options.map((opt) => {
@@ -209,7 +223,7 @@ export function QuizRunner({
                         : "border-purple/10 bg-surface text-text hover:bg-purple/5")
                   }
                 >
-                  {opt}
+                  <MathText text={opt} />
                 </button>
               );
             })}
@@ -224,8 +238,30 @@ export function QuizRunner({
               }
               className="mt-3 md:mt-4"
             >
-              <p className={focusBody}>{question.explanation}</p>
+              <p className={focusBody}>
+                <MathText text={question.explanation} />
+              </p>
             </Callout>
+          )}
+
+          {/* KEYED ON THE QUESTION'S POSITION. SkillDrill owns which exercises
+              are expanded and how they were answered, and that state belongs to
+              THIS presentation, not to the component's slot. Without the key it
+              survives one path: answer Q1, expand it, press ← back from an
+              answered Q2 — the panel stays mounted carrying Q2's state under
+              Q1's help. An effect resetting it instead would trip oxlint's
+              react(set-state-in-effect); the key is the fix, not the effect.
+
+              Shown after EVERY answer, right or wrong, unlike the English
+              paper's review — this is practice, not measurement, and a student
+              who wants more reps should always be able to get them. It only
+              opens ITSELF for someone who got it wrong. */}
+          {answer && question.help && (
+            <SkillDrill
+              key={index}
+              help={question.help}
+              defaultOpen={answer !== question.correct}
+            />
           )}
         </div>
       </div>

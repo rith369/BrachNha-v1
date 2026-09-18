@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { Timer } from "lucide-react";
+import { ShieldAlert, Timer } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
+import { MathText } from "@/components/shell/math-text";
+import { useLeaveGuard, MAX_EXAM_LEAVES } from "@/hooks/use-leave-guard";
 import { FocusLayout, FocusButton } from "@/components/shell/focus-layout";
 import {
   focusCard,
@@ -23,6 +25,12 @@ export interface PaperAttempt {
   answers: PaperAnswers;
   /** How long it took, capped at the paper's own budget. */
   ms: number;
+  /**
+   * Counted absences from the exam screen — see hooks/use-leave-guard.ts.
+   * Greater than MAX_EXAM_LEAVES means the paper ENDED because of them, which
+   * is derived rather than stored as a second flag so the two cannot disagree.
+   */
+  leaves: number;
 }
 
 type Step =
@@ -85,9 +93,18 @@ export function PastPaperRunner({
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<PaperAnswers>({});
   const [submitted, setSubmitted] = useState(false);
-  // Fires onSubmit exactly once: pressing ដាក់ស្នើ and the clock expiring can
-  // land on the same render.
+  // Fires onSubmit exactly once: pressing ដាក់ស្នើ, the clock expiring and the
+  // leave allowance running out can all land on the same render.
   const reported = useRef(false);
+
+  // Leaving the app or letting the screen lock ends the paper on the third
+  // time. It SUBMITS rather than discards — a dropped call or an automatic
+  // screen-off is indistinguishable from looking something up, so the student
+  // keeps whatever they had answered. See hooks/use-leave-guard.ts.
+  const guard = useLeaveGuard({
+    active: !submitted,
+    onExceeded: () => setSubmitted(true),
+  });
 
   // Mount means focus on, unmount means focus off — copied from ExamRunner,
   // where the cleanup is the load-bearing half: a browser-back out of a running
@@ -124,8 +141,18 @@ export function PastPaperRunner({
       pct: marked.pct,
       answers,
       ms: Math.min(Date.now(), deadline) - startedAt,
+      leaves: guard.leaves,
     });
-  }, [submitted, expired, content, answers, deadline, startedAt, onSubmit]);
+  }, [
+    submitted,
+    expired,
+    content,
+    answers,
+    deadline,
+    startedAt,
+    guard.leaves,
+    onSubmit,
+  ]);
 
   const steps: Step[] = [];
   for (const section of content.sections) {
@@ -173,9 +200,13 @@ export function PastPaperRunner({
           {clockLabel(deadline - now)}
         </span>
       }
-      onBack={index > 0 ? () => setIndex(index - 1) : undefined}
+      // No stepping back out of the warning: it has one thing to say and one
+      // button to answer it with.
+      onBack={index > 0 && !guard.warning ? () => setIndex(index - 1) : undefined}
       footer={
-        last ? (
+        guard.warning ? (
+          <FocusButton onClick={guard.acknowledge}>បន្តប្រឡង →</FocusButton>
+        ) : last ? (
           <FocusButton onClick={() => setSubmitted(true)}>
             ដាក់ស្នើ · {answeredCount}/{scored}
           </FocusButton>
@@ -184,7 +215,17 @@ export function PastPaperRunner({
         )
       }
     >
-      <div ref={stepRef}>
+      {guard.warning && <LeaveWarning leaves={guard.leaves} />}
+
+      {/* Hidden rather than unmounted while the warning is up: unmounting would
+          throw away the gap-fill step's own selection state, so a student who
+          took a call would come back to the passage with no gap chosen. */}
+      <div ref={stepRef} className={cn(guard.warning && "hidden")}>
+        {/* The rule, where it is unavoidable: on the very first screen of the
+            paper. It also sits in the detail screen's "before you begin" list,
+            because by here the clock is already running. */}
+        {index === 0 && <LeaveRuleBanner />}
+
         {step.kind === "intro" && <SectionIntro section={step.section} />}
 
         {step.kind === "gaps" && step.section.gapFill && (
@@ -200,8 +241,12 @@ export function PastPaperRunner({
             <div className={`mb-2.5 text-purple ${focusKicker}`}>
               {kicker} · {step.section.title}
             </div>
+            {/* MathText, not plain text: a maths paper's prompt is LaTeX inside
+                `$…$`, and an English paper's is a sentence with no dollars in
+                it — splitMath leaves that untouched, so one renderer serves
+                both. Khmer stays OUTSIDE the delimiters; see the data file. */}
             <div className={`mb-4 md:mb-6 ${focusPrompt}`}>
-              {step.question.q.en}
+              <MathText text={step.question.q.en} />
             </div>
             <div className="flex flex-col gap-2 md:gap-3">
               {step.question.options.map((opt) => {
@@ -217,7 +262,7 @@ export function PastPaperRunner({
                         : "border-purple/10 bg-surface text-text hover:bg-purple/5",
                     )}
                   >
-                    {opt}
+                    <MathText text={opt} />
                   </button>
                 );
               })}
@@ -230,6 +275,56 @@ export function PastPaperRunner({
         )}
       </div>
     </FocusLayout>
+  );
+}
+
+/**
+ * The rule, stated before the student can break it.
+ *
+ * Pink and plain: this is the one thing on the screen that can end the paper,
+ * and the app genuinely cannot stop it happening — it can only count. The
+ * wording is the user's own.
+ */
+function LeaveRuleBanner() {
+  return (
+    <div className="mb-3 flex items-start gap-2 rounded-2xl border border-pink/25 bg-pink/8 p-3.5 text-xs font-bold text-text md:text-sm">
+      <ShieldAlert className="mt-0.5 size-4 shrink-0 text-pink" strokeWidth={2.5} />
+      <span>
+        បម្រាម: ហាមចាកចេញពីកម្មវិធី ឬ បិទអេក្រង់។ ការចាកចេញលើសពី{" "}
+        {MAX_EXAM_LEAVES} ដង នឹងធ្វើឱ្យការប្រឡងត្រូវបញ្ចប់ភ្លាមៗ។
+      </span>
+    </div>
+  );
+}
+
+/**
+ * Shown on RETURN, after an absence that counted.
+ *
+ * It says which attempt this was out of how many, because "you have been
+ * warned" without a number leaves a student guessing how much rope is left. The
+ * clock kept running while they were away, and the copy says so rather than
+ * letting them discover it.
+ */
+function LeaveWarning({ leaves }: { leaves: number }) {
+  const last = leaves >= MAX_EXAM_LEAVES;
+  return (
+    <div className={`${focusCard} border-pink/25 bg-pink/8`}>
+      <div className={`mb-2.5 flex items-center gap-1.5 text-pink ${focusKicker}`}>
+        <ShieldAlert className="size-4 shrink-0" strokeWidth={2.5} />
+        ការព្រមាន
+      </div>
+      <div className={`mb-3 ${focusPrompt}`}>
+        អ្នកបានចាកចេញពីអេក្រង់ប្រឡង {leaves}/{MAX_EXAM_LEAVES} ដង
+      </div>
+      <p className="text-sm font-semibold text-text md:text-base">
+        {last
+          ? "បើចាកចេញម្តងទៀត ការប្រឡងនឹងបញ្ចប់ភ្លាមៗ ហើយចម្លើយដែលឆ្លើយរួចនឹងត្រូវដាក់ស្នើ។"
+          : "សូមនៅលើអេក្រង់នេះរហូតដល់ដាក់ស្នើ។ ការបិទអេក្រង់ ឬ ការចេញទៅកម្មវិធីផ្សេង ក៏រាប់ដែរ។"}
+      </p>
+      <p className="mt-2 text-xs font-bold text-muted md:text-sm">
+        នាឡិកាមិនបានឈប់ទេ ពេលអ្នកចាកចេញ។
+      </p>
+    </div>
   );
 }
 

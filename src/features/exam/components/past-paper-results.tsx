@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Check, PenLine, Timer, X } from "lucide-react";
+import { Check, PenLine, ShieldAlert, Timer, X } from "lucide-react";
 import type { PastPaperContent } from "@/types";
 import { cn } from "@/utils/cn";
 import { scoreColor, scoreColorHex } from "../score-styles";
@@ -9,7 +9,10 @@ import {
   type PaperAnswers,
   type ReviewItem,
 } from "../paper-scoring";
-import { SkillDrill } from "./skill-drill";
+import { MAX_EXAM_LEAVES } from "@/hooks/use-leave-guard";
+import { SkillDrill } from "@/components/skill-drill";
+import { SKILLS } from "@/data/papers/english-drills";
+import { MathText } from "@/components/shell/math-text";
 
 /**
  * The results screen for a real past paper: the mark, how it was earned part by
@@ -32,6 +35,7 @@ export function PastPaperResults({
   content,
   answers,
   ms,
+  leaves,
   title,
   onRetake,
   onBack,
@@ -39,6 +43,9 @@ export function PastPaperResults({
   content: PastPaperContent;
   answers: PaperAnswers;
   ms: number;
+  /** Counted absences from the exam screen, or undefined for an attempt
+   *  recorded before the rule existed — see hooks/use-leave-guard.ts. */
+  leaves?: number;
   title: string;
   onRetake: () => void;
   onBack: () => void;
@@ -85,6 +92,23 @@ export function PastPaperResults({
           ប្រើពេល {clockLabel(ms)} / {content.minutes} នាទី
         </div>
       </div>
+
+      {/* WHY IT ENDED, above everything else. A paper cut short by the leave
+          rule is otherwise indistinguishable from one the student rushed, and
+          the unanswered questions in the review below would read as their
+          choice. Derived from the count rather than a second stored flag. */}
+      {leaves !== undefined && leaves > MAX_EXAM_LEAVES && (
+        <div className="mb-5 flex items-start gap-2 rounded-2xl border border-pink/25 bg-pink/8 p-3.5 text-xs font-bold text-text md:text-sm">
+          <ShieldAlert
+            className="mt-0.5 size-4 shrink-0 text-pink"
+            strokeWidth={2.5}
+          />
+          <span>
+            ការប្រឡងត្រូវបានបញ្ចប់មុនកំណត់ ព្រោះអ្នកបានចាកចេញពីអេក្រង់ {leaves} ដង។
+            ចម្លើយដែលអ្នកឆ្លើយរួចត្រូវបានរាប់បញ្ចូល។
+          </span>
+        </div>
+      )}
 
       {/* Part by part — where the marks went, which is the first thing a
           student wants after the total. */}
@@ -182,26 +206,48 @@ function ReviewRow({ item }: { item: ReviewItem }) {
         <span className="text-[11px] font-extrabold text-muted md:text-xs">
           {item.label}
         </span>
-      </div>
-
-      <div className="mb-2 text-sm font-bold text-text md:text-base">
-        {item.prompt}
-      </div>
-
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-extrabold md:text-sm">
-        <span className={item.ok ? "text-mint" : "text-pink"}>
-          ចម្លើយរបស់អ្នក: {item.answer ?? "មិនបានឆ្លើយ"}
-        </span>
-        {!item.ok && (
-          <span className="text-mint">ចម្លើយត្រឹមត្រូវ: {item.correct}</span>
+        {/* What the PRINTED paper marks this part out of. Information, never
+            what the app scores on — see scorePaper() and the caption above. */}
+        {item.points !== undefined && (
+          <span className="text-[11px] font-bold text-muted md:text-xs">
+            · {item.points} ពិន្ទុ
+          </span>
         )}
       </div>
 
-      <div className="mt-2 text-xs font-semibold text-text md:text-sm">
-        {item.explanation}
+      <div className="mb-2 text-sm font-bold text-text md:text-base">
+        <MathText text={item.prompt} />
       </div>
 
-      {!item.ok && <SkillDrill skill={item.skill} />}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-extrabold md:text-sm">
+        <span
+          className={`inline-flex flex-wrap items-center gap-1 ${item.ok ? "text-mint" : "text-pink"}`}
+        >
+          ចម្លើយរបស់អ្នក:{" "}
+          {item.answer === undefined ? (
+            "មិនបានឆ្លើយ"
+          ) : (
+            <MathText text={item.answer} />
+          )}
+        </span>
+        {!item.ok && (
+          <span className="inline-flex flex-wrap items-center gap-1 text-mint">
+            ចម្លើយត្រឹមត្រូវ: <MathText text={item.correct} />
+          </span>
+        )}
+      </div>
+
+      {/* whitespace-pre-line so a worked solution keeps its steps on their own
+          lines — a maths explanation is several display-math blocks with Khmer
+          prose between them. */}
+      <div className="mt-2 text-xs font-semibold whitespace-pre-line text-text md:text-sm">
+        <MathText text={item.explanation} />
+      </div>
+
+      {/* The lookup is the CALLER's job now that SkillDrill is shared —
+          a component under src/components/ importing this paper's drill corpus
+          would drag the whole of it into every chunk that renders a question. */}
+      {!item.ok && item.skill && <SkillDrill help={SKILLS[item.skill]} />}
     </div>
   );
 }
