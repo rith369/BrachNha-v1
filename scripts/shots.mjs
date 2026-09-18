@@ -62,11 +62,20 @@ const ROUTES = [
   // sections), so it is the route that proves the per-lesson banners and
   // the zigzag trail hold at the 320px floor.
   { name: "practice-quiz-path", path: "/practice/quiz/math" },
-  // The first authored quiz. KaTeX renders formulas as inline-block with
-  // no wrapping, so a long option like the limits-at-infinity one is
-  // exactly the shape of thing that widens a page at 320px — this route is
-  // here to measure that, not just to look at it.
-  { name: "focus-practice-quiz", path: "/practice/quiz/math/1-1-1" },
+  // The first authored quiz. Two shots, because the route now opens on the
+  // section's DETAIL screen (what is in it, best score, history) and the
+  // questions are one click past it.
+  //
+  // The second one is not decoration: KaTeX renders formulas as inline-block
+  // with no wrapping, so a long option like the limits-at-infinity one is
+  // exactly the shape of thing that widens a page at 320px, and only the
+  // runner has any on screen.
+  { name: "practice-quiz-detail", path: "/practice/quiz/math/1-1-1" },
+  {
+    name: "focus-practice-quiz",
+    path: "/practice/quiz/math/1-1-1",
+    clicks: ['button:has-text("ចាប់ផ្តើម")'],
+  },
   // /exam is the Subject Mock Exams / Bac II Simulation chooser; the two tabs
   // live one level down and land on the past-papers one.
   { name: "exam", path: "/exam" },

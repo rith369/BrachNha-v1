@@ -102,7 +102,8 @@ async function runPush(userId: string): Promise<void> {
  *
  * Keep this in step with `partializeState` in lib/store.ts: a persisted field
  * missing here is a field that silently never reaches the server. `guestMode`
- * and `syncedUserId` are deliberately absent, and so is `paperResults` — a
+ * and `syncedUserId` are deliberately absent, and so are `paperResults` and
+ * `quizResults` — a
  * past-paper attempt could ride `exam_results.kind`, but that table has no
  * column saying WHICH paper, so a pulled row could not be told apart from
  * another year's paper in the same subject. Each field says why at its own

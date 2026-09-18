@@ -181,6 +181,40 @@ English paper, the Roadmap, and Profile. Every number on those screens should be
 
 ---
 
+## 18 Sep 2026 — Quizzes get a start screen, timers, a review and a history
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Tapping a square dropped you straight into question one, and finishing
+gave you a score and nothing else. It now works the way the mock exam does.
+
+**Tapping a square opens the section first.** It shows how many questions and
+exercises are inside, your best score, and a ចាប់ផ្តើម button. Once you have
+done it at least once the button reads **ធ្វើម្តងទៀត** and a **ប្រវត្តិ** tab
+appears listing every attempt with its score, time and date. Tapping an old
+attempt reopens its full review — not a remembered percentage, the real
+explanations.
+
+**Two clocks while you answer.** One counts the whole sitting, shown at the top;
+one counts the question you are on, shown beside the Quiz label. **Neither is a
+limit** — nothing runs out and nothing fails. They are there so you can see
+yourself getting faster. A question's clock stops the moment you answer, so
+reading the explanation afterwards does not count against you.
+
+**The result screen is like the mock exam's.** A score ring, your total time, and
+the question that took you longest. Below that, every question as a **closed
+row** — tap one to open its answer, the solution, the ចំណាំ, the កំហុសញឹកញាប់
+and the practice exercises. **Questions you got wrong are already open**, so you
+do not have to hunt for them.
+
+**What to re-test.** Practice → Quiz → Math → first square: you should land on
+the start screen, not question one. Answer a few, deliberately get one wrong, and
+finish. On the result screen the wrong one should be open and the right ones
+closed until tapped. Come back to the square and check ប្រវត្តិ shows the
+attempt, and that opening it shows the same review again.
+
+---
+
 ## 18 Sep 2026 — The first real quiz: Math, ប្រមាណវិធីលើលីមីត
 
 *Not committed yet.* **No database step needed.**

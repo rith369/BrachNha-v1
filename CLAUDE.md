@@ -3101,6 +3101,87 @@ name is content and may not be invented. Note the trail itself still prints no
 per-node titles (see below), so the name surfaces in the node's `aria-label` and
 in the runner's own title, not on the path.
 
+### A quiz section is three screens, two clocks and a history
+
+Tapping a section on the quiz path no longer drops straight into question one.
+`/practice/quiz/:subjectId/:lessonRef` is `QuizScreen` now — **detail → run →
+review**, three screens on ONE route, **modelled on `PaperScreen` almost line for
+line** because it is the same problem: a thing you can attempt more than once,
+with a history of attempts and a review that reopens from a stored one. Copying
+that structure is what stops the two growing two different ideas of what an
+attempt is.
+
+**The detail screen shows EVERY time, not only once the section is finished** —
+the user's call. One screen whose button reads ចាប់ផ្តើម before the first
+attempt and ធ្វើម្តងទៀត after, rather than a square that does two different
+things depending on state. The **ប្រវត្តិ tab appears only once there is a
+history**, the absent-rather-than-empty rule the starred list and the retention
+line already follow. Every number on it is derived: questions from the array,
+the exercise count from the questions' own `help`, the best score from the
+history. The reference design's "difficulty" tile is simply absent — nobody
+graded these, so there is nothing to put in it.
+
+**TWO CLOCKS, AND BOTH COUNT UP.** One for the sitting, one for the question on
+screen. Neither is a limit and nothing runs out. The Game's own per-question
+COUNTDOWN was built and then removed for the reason recorded in its section —
+there is no honest number for how long one question should take, so any limit
+would be invented — and a practice quiz has even less claim to one than a race
+against another student. They measure so a student can watch themselves get
+faster; that is the whole feature.
+
+Three mechanics in `quiz-runner.tsx` that are decisions, not incidentals:
+
+- **The times live in STATE, written only from event handlers.** A ref mutated
+  during render trips oxlint's `react(purity)`, and an effect syncing them trips
+  `react(set-state-in-effect)`. The start of question N+1 is stamped by the tap
+  that advances to it — the one moment that cannot be wrong.
+- **ONE interval for both**, the Game's rule, so a second timer is never started
+  beside the first. `setNow` runs from the interval CALLBACK, never synchronously
+  in the effect body.
+- **A question's clock FREEZES on the answer**, not on leaving the question. What
+  is reported is thinking time, not however long the student then spent reading
+  the explanation and the four exercises underneath it.
+
+**The review is COLLAPSED, and that was the ask.** Ten questions each carrying a
+solution, a rule, a mistake and four exercises is several screens of wall, and a
+student who has just finished came to see how they did. Each row opens to the
+full answer, rendered by the SAME `SkillDrill` the runner showed inline, so a
+review cannot teach something the quiz did not. **Wrong rows open on arrival**:
+nothing is hidden from a student who got it right, but making them tap every row
+to find out which they missed is work the screen can do for them. It **re-marks
+from the questions** rather than trusting the attempt's stored numbers — the rule
+`PastPaperResults` follows — which is also what lets a row from last week reopen
+the real explanations instead of a remembered percentage.
+
+**`quizResults` is a new persisted field, and it is NOT a widening of anything.**
+`examResults` captions Home's "from mock exams" pill and feeds KruAI an average
+it states as fact; `paperResults` is a paper, with parts and a clock budget. It
+keeps the ANSWERS and the PER-QUESTION TIMES, not just the score, because that is
+what makes a history row reopen a review. **LOCAL-ONLY**, listed beside
+`paperResults` as a deliberate exception in `syncRelevantChange`: `exam_results`
+has a `kind` column that could carry these but no column saying WHICH quiz, so a
+pulled row could not be told apart from another section's. Syncing it needs a
+`quiz_key` column first.
+
+**`QuizRunner` reports the attempt OUT now** (`onSubmit`), the shape
+`PastPaperRunner` and `ExamRunner` already use. Per-question XP stays in the
+runner, paid as each answer lands — that is what makes this practice rather than
+a test — while the daily task, the content-log session, the path node and the
+history row belong to the SITTING, so `QuizScreen` owns them and one place
+decides what a finished sitting counts as.
+
+**The slowest-question line is guarded on `>= 1000ms`.** `clockLabel()` rounds to
+whole seconds, so on a fast sitting every question reads 0:00 and "slowest:
+question 1 (0:00)" is noise dressed as a finding.
+
+**Testing note that cost a debugging pass: Playwright's `addInitScript` re-runs
+on EVERY page load in that context.** Seeding the store that way and then calling
+`page.reload()` or `page.goto()` silently rewrites localStorage with the seed, so
+anything the test just saved disappears and the feature looks broken. It read
+exactly like a persistence bug and was not one. Test a second visit by NAVIGATING
+INSIDE the app — which is what a student does anyway — or seed after the first
+load instead.
+
 **A LOCKED NODE NOW LOOKS IDENTICAL TO A PLAYABLE ONE** — full colour, same lip,
 same glyph, no padlock. It used to be a dashed grey outline, which was right for
 six sample nodes and wrong for a 48-node curriculum: a whole path of dashed grey

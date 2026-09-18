@@ -66,6 +66,9 @@ const MAX_REVIEW_HISTORY = 1000;
 // this size, and oldest drop first like every other capped list here.
 const MAX_PAPER_RESULTS = 50;
 
+/** Kept per section, so this is generous — see MAX_PAPER_RESULTS. */
+const MAX_QUIZ_RESULTS = 50;
+
 // activityLog gains at most one key per day studied, so this is roughly a
 // year and a month of history — longer than a Bac II cohort uses the app, and
 // the same window the sync layer pulls back on a fresh device.
@@ -142,6 +145,43 @@ export interface PaperResult {
    * never disagree.
    */
   leaves?: number;
+}
+
+/**
+ * One finished attempt at a practice quiz section.
+ *
+ * SEPARATE from `examResults` for the reason every other attempt type is: that
+ * array captions Home's "from mock exams" pill and feeds chat-prompt.ts an
+ * average it states to KruAI as fact. Separate from `paperResults` too — a
+ * practice quiz is not a paper, has no parts and no clock budget.
+ *
+ * It keeps the ANSWERS and the PER-QUESTION TIMES, not just the score, because
+ * the results screen is a review: every row reopens the explanation, the note,
+ * the mistake and the exercises for that question. A row in the history
+ * therefore reopens the real review rather than a remembered percentage — the
+ * same reasoning PaperResult records for storing its answers.
+ *
+ * LOCAL-ONLY, and deliberately absent from syncRelevantChange: `exam_results`
+ * has a `kind` column that could carry these but no column saying WHICH quiz,
+ * so a pulled row could not be told apart from another section's. Syncing it
+ * needs a `quiz_key` column first.
+ */
+export interface QuizResult {
+  /** The content key — `"math-1-1-1"`, what PRACTICE_QUIZZES is keyed by. */
+  quizKey: string;
+  /** ISO instant, so it sorts and formats without a second field. */
+  date: string;
+  score: number;
+  total: number;
+  pct: number;
+  /** How long the whole sitting took. */
+  ms: number;
+  /** Time spent on each question, index-aligned with the quiz. */
+  questionMs: number[];
+  /** The option picked per question, index-aligned. `null` never happens today
+   *  — the runner will not advance unanswered — but the review renders it as
+   *  "not answered" rather than as a wrong guess if it ever does. */
+  answers: (string | null)[];
 }
 
 export type Theme = "dark" | "light";
@@ -291,6 +331,8 @@ interface BrachNhaState {
    * device's.
    */
   paperResults: PaperResult[];
+  /** Finished practice-quiz attempts, newest last. See QuizResult. */
+  quizResults: QuizResult[];
   /**
    * Competitions this student CREATED.
    *
@@ -476,6 +518,7 @@ interface BrachNhaState {
    * violation oxlint's react(purity) rule and the React Compiler both object to.
    */
   addPaperResult: (result: Omit<PaperResult, "date">) => void;
+  addQuizResult: (result: Omit<QuizResult, "date">) => void;
   /**
    * Posts a competition this student created, and pays for their own run.
    *
@@ -737,6 +780,7 @@ const partializeState = (state: BrachNhaState) => ({
   tasksDate: state.tasksDate,
   examResults: state.examResults,
   paperResults: state.paperResults,
+  quizResults: state.quizResults,
   competitions: state.competitions,
   competitionAttempts: state.competitionAttempts,
   completedSessions: state.completedSessions,
@@ -792,6 +836,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       tasksDate: "",
       examResults: [],
       paperResults: [],
+      quizResults: [],
       competitions: [],
       competitionAttempts: [],
       completedSessions: [],
@@ -1078,6 +1123,14 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       addExamResult: (result) =>
         set((state) => ({ examResults: [...state.examResults, result] })),
 
+      addQuizResult: (result) =>
+        set((state) => ({
+          quizResults: [
+            ...state.quizResults,
+            { ...result, date: new Date().toISOString() },
+          ].slice(-MAX_QUIZ_RESULTS),
+        })),
+
       addPaperResult: (result) =>
         set((state) => ({
           paperResults: [
@@ -1271,6 +1324,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           tasksDate: "",
           examResults: [],
           paperResults: [],
+          quizResults: [],
           competitions: [],
           competitionAttempts: [],
           completedSessions: [],

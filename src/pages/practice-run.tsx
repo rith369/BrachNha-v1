@@ -5,7 +5,7 @@ import { chaptersFor, lessonHeading } from "@/features/lessons/sessions";
 import { keyFromRef, parseMode } from "@/features/practice/practice";
 import { findQuizSection } from "@/features/practice/quiz-path";
 import { FlashcardRunner } from "@/features/practice/components/flashcard-runner";
-import { QuizRunner } from "@/features/practice/components/quiz-runner";
+import { QuizScreen } from "@/features/practice/components/quiz-screen";
 
 /**
  * `/practice/:mode/:subjectId/:lessonRef` — the deck or the quiz.
@@ -100,12 +100,15 @@ export default function PracticeRunPage() {
   if (questions.length === 0) {
     return <Navigate to={`/practice/quiz/${subject.id}`} replace />;
   }
+  // QuizScreen, not QuizRunner: a quiz section is a thing you can attempt more
+  // than once, so it opens on its own detail screen — what is in it, how you
+  // have done before, and the button that starts it — and ends on a review.
+  // All three are one route, the same call PaperScreen makes.
   return (
-    <QuizRunner
+    <QuizScreen
       questions={questions}
       subjectId={subject.id}
       contentKey={key}
-      mode="quiz"
       title={title}
     />
   );

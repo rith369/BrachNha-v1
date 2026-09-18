@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { CircleCheck, CircleX, ListChecks, Trophy } from "lucide-react";
+import { CircleCheck, CircleX, ListChecks, Timer } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { FocusLayout, FocusButton } from "@/components/shell/focus-layout";
@@ -11,12 +11,12 @@ import {
   focusPrompt,
 } from "@/utils/focus-styles";
 import { QUIZ_COINS, QUIZ_XP } from "@/utils/rewards";
+import { clockLabel } from "@/features/exam/paper-scoring";
 import { Callout } from "@/features/lessons/components/callout";
 import { MathText } from "@/components/shell/math-text";
 import { SkillDrill } from "@/components/skill-drill";
 import type { SectionQuestion } from "@/types";
 import type { PracticeMode } from "../practice";
-import { quizSessionId } from "../quiz-path";
 import { lessonKeyOf } from "@/features/progress/content-keys";
 
 /**
@@ -43,14 +43,46 @@ import { lessonKeyOf } from "@/features/progress/content-keys";
  *    case; when practice deserves a history it should be a separate persisted
  *    field, not a widening of this one.
  *
+ * TWO CLOCKS, AND BOTH COUNT UP. One for the sitting, one for the question on
+ * screen. Neither is a limit and nothing runs out: CLAUDE.md records why a
+ * per-question COUNTDOWN was built for the Game and then removed — there is no
+ * honest number for how long one question should take, so any limit would be
+ * invented, and a practice quiz has even less claim to one than a race against
+ * another student. They measure, so a student can see themselves getting
+ * faster; that is all.
+ *
+ * The times are kept in STATE, written only from event handlers. A ref mutated
+ * during render would trip oxlint's react(purity), and an effect syncing them
+ * would trip react(set-state-in-effect); the start of question N+1 is stamped
+ * by the tap that advances to it, which is the one moment that cannot be wrong.
+ *
+ * IT REPORTS THE ATTEMPT OUT rather than recording it — `onSubmit` — the same
+ * shape PastPaperRunner and ExamRunner use. Per-question XP stays here because
+ * it is paid as each answer lands, which is the whole point of practice; what
+ * belongs to the ATTEMPT (the history row, the daily task, the path node) is
+ * QuizScreen's, so one place decides what a finished sitting counts as.
+ *
  * KHMER-ONLY. See PRACTICE_PAGE_LANG in ../practice.
  */
+
+/** What a finished sitting reports out. */
+export interface QuizAttempt {
+  score: number;
+  total: number;
+  pct: number;
+  /** Whole sitting, milliseconds. */
+  ms: number;
+  /** Per question, index-aligned. */
+  questionMs: number[];
+  answers: (string | null)[];
+}
+
 export function QuizRunner({
   questions,
   subjectId,
   contentKey,
   mode,
-  title,
+  onSubmit,
 }: {
   questions: SectionQuestion[];
   subjectId: string;
@@ -60,26 +92,38 @@ export function QuizRunner({
   contentKey: string;
   /** Carried only so the X returns to the list the student came from. */
   mode: PracticeMode;
-  /** The lesson's name, shown on the completion screen. */
-  title: string;
+  /** Handed the finished sitting. QuizScreen decides what it counts as. */
+  onSubmit: (attempt: QuizAttempt) => void;
 }) {
   const navigate = useNavigate();
-  const { addXp, completeSession, completeTask, recordQuestions, recordSession } =
-    useBrachNhaStore(
-      useShallow((s) => ({
-        addXp: s.addXp,
-        completeSession: s.completeSession,
-        completeTask: s.completeTask,
-        recordQuestions: s.recordQuestions,
-        recordSession: s.recordSession,
-      }))
-    );
+  const { addXp, recordQuestions } = useBrachNhaStore(
+    useShallow((s) => ({ addXp: s.addXp, recordQuestions: s.recordQuestions }))
+  );
 
   const [index, setIndex] = useState(0);
   // Keyed by question index rather than a single value, so stepping back shows
   // the locked previous answer. An index is safe as the key: the questions come
   // from static data and the array never reorders while this is mounted.
   const [answers, setAnswers] = useState<Record<number, string>>({});
+
+  // Lazy initial state, so the clock starts when the runner mounts rather than
+  // whenever a render happens to run. `starts` stamps the moment each question
+  // came on screen; `spent` freezes it the moment the question is answered.
+  const [startedAt] = useState(() => Date.now());
+  const [starts, setStarts] = useState<Record<number, number>>(() => ({
+    0: Date.now(),
+  }));
+  const [spent, setSpent] = useState<Record<number, number>>({});
+  const [now, setNow] = useState(() => Date.now());
+
+  // One interval for both clocks — the Game's rule, so a second timer is never
+  // started beside the first. setState from the interval CALLBACK, never
+  // synchronously in the effect body, which is what react(set-state-in-effect)
+  // objects to.
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   const total = questions.length;
   const done = index >= total;
@@ -91,20 +135,14 @@ export function QuizRunner({
   }
 
   function finish() {
-    // The SAME `tasks.practice` field Home's daily checklist and Roadmap's Daily
-    // Mission read, so a finished quiz is one real completion rather than a
-    // second tracker beside the self-reported one.
-    completeTask("practice");
-    recordSession(lessonKeyOf(contentKey));
-    // Ticks this quiz's node on the Mimo-style quiz path, which derives every
-    // status from completedSessions rather than authoring one — see
-    // ../quiz-path. quizSessionId() rather than the bare key because that path
-    // shares one progress list with the Study path, whose section ids are the
-    // bare keys; the prefix is what keeps a foundation-review section from
-    // ticking a Bac II quiz node. Idempotent in the store, and harmless for a
-    // lesson-level quiz that no path node points at.
-    completeSession(quizSessionId(contentKey));
-    setIndex(total);
+    onSubmit({
+      score,
+      total,
+      pct: total === 0 ? 0 : Math.round((score / total) * 100),
+      ms: Date.now() - startedAt,
+      questionMs: questions.map((_, i) => spent[i] ?? 0),
+      answers: questions.map((_, i) => answers[i] ?? null),
+    });
   }
 
   /**
@@ -125,9 +163,11 @@ export function QuizRunner({
    * flow after touching this file.
    */
   if (done) {
-    return (
-      <QuizSummary score={score} total={total} title={title} onExit={exit} />
-    );
+    // Unreachable in practice — finish() hands the attempt up and QuizScreen
+    // swaps this component out for the review in the same commit. It stays as a
+    // one-line guard above `answerQuestion` for the reason the comment above
+    // gives: the guard's JOB is to sit there, not to be reached.
+    return null;
   }
 
   const question = questions[index];
@@ -153,13 +193,32 @@ export function QuizRunner({
     // way). The content log's documented grain is the lesson; logging the
     // section would put two grains in one record for one real lesson.
     recordQuestions(lessonKeyOf(contentKey), 1, right ? 1 : 0);
+    // Freeze this question's clock at the tap. It keeps ticking on screen only
+    // while the question is unanswered, so the time reported is thinking time
+    // rather than however long the student then spent reading the explanation
+    // and the exercises under it.
+    setSpent((prev) =>
+      prev[index] !== undefined
+        ? prev
+        : { ...prev, [index]: Date.now() - (starts[index] ?? startedAt) }
+    );
   }
+
+  /** Advance, stamping the next question's start in the same tap. */
+  function next() {
+    const to = index + 1;
+    setStarts((prev) => (prev[to] === undefined ? { ...prev, [to]: Date.now() } : prev));
+    setIndex(to);
+  }
+
+  // Live while the question is open, frozen once it is answered.
+  const questionMs = spent[index] ?? now - (starts[index] ?? startedAt);
 
   const footer = (
     // Disabled until answered rather than absent: a button that appears out of
     // nowhere shifts the layout under the student's thumb.
     <FocusButton
-      onClick={() => (index === total - 1 ? finish() : setIndex(index + 1))}
+      onClick={() => (index === total - 1 ? finish() : next())}
       disabled={!answer}
     >
       {index === total - 1 ? "បញ្ចប់ →" : "បន្ត →"}
@@ -173,13 +232,22 @@ export function QuizRunner({
       // Absent on the first question — the X is the only way out there.
       onBack={index > 0 ? () => setIndex(index - 1) : undefined}
       showStats
-      meta={`${index + 1} / ${total}`}
+      meta={`${index + 1} / ${total} · ${clockLabel(now - startedAt)}`}
       footer={footer}
     >
       <div>
         <div className="mb-3 flex items-center gap-1.5 text-xs font-extrabold text-muted md:mb-4 md:text-sm">
           <ListChecks className="size-4 shrink-0" strokeWidth={2.5} />
           Quiz
+          {/* The question's own clock, beside the label rather than in the top
+              bar: at the 320px floor that row is already a 32px button, a
+              flexible progress bar and "3 / 10", and a fourth chip would leave
+              the bar a few pixels wide — the same argument FocusLayout's
+              showStats row settles the same way. */}
+          <span className="ml-auto inline-flex items-center gap-1 tabular-nums">
+            <Timer className="size-3.5 shrink-0" strokeWidth={2.5} />
+            {clockLabel(questionMs)}
+          </span>
         </div>
 
         <div className={focusCard}>
@@ -264,53 +332,6 @@ export function QuizRunner({
             />
           )}
         </div>
-      </div>
-    </FocusLayout>
-  );
-}
-
-/**
- * The completion screen, extracted so QuizRunner's `if (done) return` can be a
- * one-line guard placed above the closures that read into `questions[index]`.
- * See the comment on that return — this component exists for that reason, not
- * because the markup needed reusing.
- */
-function QuizSummary({
-  score,
-  total,
-  title,
-  onExit,
-}: {
-  score: number;
-  total: number;
-  title: string;
-  onExit: () => void;
-}) {
-  return (
-    <FocusLayout
-      progressPct={100}
-      onExit={onExit}
-      // No onBack: the quiz is already banked, and stepping back into it would
-      // put answered questions back on screen with nothing left to do.
-      showStats
-      meta={`${total} / ${total}`}
-      footer={<FocusButton onClick={onExit}>← ត្រឡប់</FocusButton>}
-    >
-      <div className="text-center">
-        <Trophy
-          className="mx-auto mb-3 size-14 text-yellow md:mb-5 md:size-20"
-          strokeWidth={2}
-        />
-        <div className="font-heading mb-2.5 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent md:text-3xl">
-          បញ្ចប់ Quiz!
-        </div>
-        <div className="mx-auto mb-3 w-fit rounded-2xl bg-brand px-6 py-3 text-center text-white">
-          <div className="text-lg font-extrabold">
-            {score} / {total}
-          </div>
-          <div className="text-xs font-bold opacity-90">ចម្លើយត្រឹមត្រូវ</div>
-        </div>
-        <div className="text-xs font-bold text-muted">{title}</div>
       </div>
     </FocusLayout>
   );
