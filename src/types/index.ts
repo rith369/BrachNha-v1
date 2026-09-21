@@ -509,6 +509,27 @@ export interface PaperSection {
   /** As printed: "I. Reading", "II. Grammar". */
   title: string;
   instruction: string;
+  /**
+   * THE WHOLE EXERCISE AS PRINTED, shown on the part's cover before its first
+   * question — the user's rule: "write the whole exercise first before start to
+   * qcm".
+   *
+   * It exists because turning a written maths part into several multiple-choice
+   * sub-questions hides the thing a student is actually sitting: the paper asks
+   * one exercise with lettered parts, and meeting it as a run of isolated taps
+   * teaches a shape the real exam does not have. So the cover prints the
+   * exercise exactly as the paper does, and the sub-questions that follow are
+   * how the app marks it.
+   *
+   * Rendered through MathText with `whitespace-pre-line`, so it carries LaTeX in
+   * `$…$` and keeps its own line breaks. KHMER STAYS OUTSIDE THE DELIMITERS —
+   * KaTeX has no Khmer glyphs and splitMath refuses such a span outright.
+   *
+   * Optional: the English paper's parts are a sentence of instruction and
+   * nothing more, and inventing a statement for one would be printing something
+   * the paper does not.
+   */
+  statement?: string;
   /** The worked example the paper gives before the questions. */
   example?: string;
   questions?: PaperQuestion[];

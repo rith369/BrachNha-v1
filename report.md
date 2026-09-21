@@ -17,6 +17,68 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 19 Sep 2026 — The whole exercise now comes before the questions, and the maths wording is fixed
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Three things you asked for after seeing the maths paper: show the whole exercise
+before its multiple-choice questions, use the answer key freely since it is Ministry
+material, and fix the Khmer and the maths symbols that were wrong.
+
+**What changed.**
+
+- **Each part now opens with the exercise exactly as the paper prints it** — all its
+  lettered sub-parts together on one screen — and only then do the multiple-choice
+  questions start. Every question is labelled with the letter it belongs to (ក., គ.2), so
+  the taps read as that one exercise rather than as loose questions. **The review reprints
+  the exercise too**, above its own questions: a line like "P(A): both the same colour"
+  means nothing without the box and the counts, and those are in the exercise, not in the
+  question.
+- **The maths in the exercise is now properly typeset.** Part III used to show
+  `z₁⁷ / z₂⁶` as ordinary text — smaller, a different style, and not matching the answers
+  underneath it. It is drawn as real maths now, like everything else on the paper.
+- **Five Khmer terms were wrong and are corrected**: the word for an indeterminate form,
+  for a conjugate expression, for an arrangement, and — the clearest one — the word for a
+  QUADRANT of the plane, which said ត្រីមាស (a quarter of a *year*) instead of ចតុភាគ.
+- **One real maths mistake, fixed.** The solution to the first limit said the function is
+  continuous at that point. It is not: the square root only exists on one side, so the
+  limit is taken from the right. The answer, 3, is unchanged.
+- **The app now checks its own formulas.** `npm run check:quiz` used to cover only the
+  practice quizzes; it covers the real past papers as well, so a broken formula, a Khmer
+  word trapped inside a formula, or an answer that is not among its own options now fails
+  a check instead of reaching a student. It found a small issue in the **English** paper
+  on its first run, which is fixed.
+
+- **All three exercises are now the paper's own words, letter for letter.** You asked for
+  the exercise to be shown exactly as printed, with the multiple-choice questions being
+  the only part I invent — and you were right to check, because the lettered lines I had
+  written under parts II and III were my phrasing, not the Ministry's. You re-sent the
+  paper, so they are replaced with the real text. Three things that fixes, all of which I
+  had guessed wrong:
+  - **Part I labels its limits a, b, c, d in Latin letters**, not Khmer ones.
+  - **Part II never asks for the total number of cases as a question** — it asks only for
+    the three probabilities, and names each event in « » quotes. The total is still asked
+    in the app as a first step, because the answer key gives 4 of that part's 10 points
+    for it; that is the "not every question has to be the final answer" you asked for.
+  - **Part III is a single paragraph with no lettering**, so the questions under it carry
+    none either.
+  - **The marks match the paper**: 3+4+4+4 for part I, 4+2+2+2 for part II, and
+    2+2+2+2+1+1+2+3 for part III — 15, 10 and 15, exactly as printed. Checked by script,
+    not by eye.
+- **One of my Khmer "fixes" was itself wrong, and the answer key proved it.** I had
+  changed រាងមិនកំណត់ to ទម្រង់មិនកំណត់; the key writes រាងមិនកំណត់ throughout, so it is
+  back. Where your source names a term, that name wins. The quadrant wording that was
+  also wrong is simply gone — the key works the argument out from cos and sin and never
+  uses the word.
+- **Part II's marbles were misread and you corrected them**: I had transcribed កូនប្ញើ,
+  which is not a real Khmer word; it is **កូនឃ្លី**. It appeared twelve times in the file
+  and all twelve are fixed — a name correction given for one line has to be chased through
+  the whole file, which is the same lesson the Biology flashcards taught.
+
+**What to re-test.** Open the maths paper, start it, and check the first screen of each of
+the three parts shows the whole exercise; then finish and confirm the review shows it
+again above that part's questions.
+
 ## 18 Sep 2026 — The 2025 Maths paper, parts I to III
 
 *Not committed yet.* **No database step needed.**
@@ -39,12 +101,11 @@ correct answer with a full worked solution — the same review the English paper
 - **Parts IV to VII are not in yet** — that is also on the screen, so the three parts don't
   read as the whole exam. Part VII needs a graph; I'll draw it in the app rather than copy
   the picture from the answer key.
-- **The solutions are written by me, not copied from the answer key.** You said to copy
-  them without a credit — I didn't, because that key is ក្រូ សុខ ពិសិដ្ឋ / STEAM Tuition
-  Center's work and republishing it under your app with their name removed would be taking
-  it from them. I worked each question out myself and checked my answers match theirs, so
-  nothing of theirs is in the app and no credit line is needed. If you'd rather use their
-  originals, that needs their permission and a visible credit.
+- **The solutions follow the answer key's method, and no credit line is owed.** I queried
+  this at first because the copy you sent carries a ក្រូ សុខ ពិសិដ្ឋ / STEAM Tuition
+  Center watermark; you confirmed the paper and its key are Ministry material and
+  therefore public, and that settles it. Either way every answer was also worked out
+  independently and agrees with the key, so nothing in the app rests on the photo alone.
 
 **Please have a maths teacher check it**, especially **the Khmer word for the balls in part
 II** — I read it off the photo and it is the least certain thing in the file. The wrong

@@ -143,6 +143,15 @@ export function PastPaperResults({
           <div className="font-heading mb-2 text-base font-extrabold">
             {section.title}
           </div>
+          {/* The exercise again, above its own questions. A row reading
+              "P(A): both the same colour" says nothing without the box, the
+              counts and the draw — all of which live in the statement, not in
+              the sub-question. Same reason the runner prints it first. */}
+          {section.statement && (
+            <div className="mb-3 rounded-xl border border-border bg-control p-3 text-sm leading-relaxed font-semibold whitespace-pre-line text-text">
+              <MathText text={section.statement} />
+            </div>
+          )}
           {section.items.map((item) => (
             <ReviewRow key={item.id} item={item} />
           ))}

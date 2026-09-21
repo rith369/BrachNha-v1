@@ -340,8 +340,27 @@ function SectionIntro({ section }: { section: PaperSection }) {
         {count} សំណួរ
       </div>
       <div className={`mb-3 ${focusPrompt}`}>{section.title}</div>
+
+      {/* THE WHOLE EXERCISE, BEFORE ANY OF ITS SUB-QUESTIONS — the user's rule.
+          A written maths part is one exercise with lettered sub-parts, and
+          meeting it as a run of isolated taps hides the shape the real exam
+          actually has. So the paper's own wording is printed here first, and
+          the multiple-choice steps that follow are only how the app marks it.
+
+          MathText + whitespace-pre-line: the statement is LaTeX inside `$…$`
+          with Khmer prose around it, and its line breaks are the paper's
+          lettered layout. */}
+      {section.statement && (
+        <div className="mb-4 rounded-xl border border-border bg-control p-3 text-sm leading-relaxed font-semibold whitespace-pre-line text-text md:p-4 md:text-base">
+          <MathText text={section.statement} />
+        </div>
+      )}
+
+      {/* The instruction is how to ANSWER it here, so it reads as the app's
+          voice rather than the paper's — which is exactly why it sits under the
+          statement rather than above it. */}
       <p className="text-sm font-semibold text-text md:text-base">
-        {section.instruction}
+        <MathText text={section.instruction} />
       </p>
 
       {section.example && (

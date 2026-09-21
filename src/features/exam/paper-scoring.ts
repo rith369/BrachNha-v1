@@ -42,6 +42,13 @@ export interface ReviewItem {
 export interface SectionReview {
   id: string;
   title: string;
+  /**
+   * The whole exercise as printed, carried through so the review can reprint it
+   * above that part's questions. Without it a row like "P(A): both the same
+   * colour" is unreadable on its own — the box, the counts and the draw are all
+   * in the statement. Optional, exactly as on PaperSection.
+   */
+  statement?: string;
   score: number;
   total: number;
   items: ReviewItem[];
@@ -121,6 +128,7 @@ export function scorePaper(
     return {
       id: section.id,
       title: section.title,
+      statement: section.statement,
       score: items.filter((item) => item.ok).length,
       total: items.length,
       items,

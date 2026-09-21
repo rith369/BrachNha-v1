@@ -1,6 +1,13 @@
-// Content check for the practice quizzes — the things tsc and oxlint cannot see.
+// Content check for the practice quizzes AND the real past papers — the things
+// tsc and oxlint cannot see.
 //
 //   npm run check:quiz
+//
+// The papers were added after a maths paper shipped with a Khmer term and some
+// notation that were wrong on screen and invisible to every other check. A
+// paper is authored the same way a quiz is, so it gets the same guards: every
+// `$…$` typeset for real, `correct` matched against its own options, and a gap's
+// answer matched against its own word bank.
 //
 // To a typechecker every field below is just a string. Nothing else in the repo
 // can tell you that an option list has two entries spelled the same, that
@@ -52,7 +59,18 @@ function checkMath(splitMath, where, text) {
 
   for (const segment of splitMath(text)) {
     if (segment.type === "text") {
-      if (segment.value.includes("$")) {
+      // A "$" IMMEDIATELY FOLLOWED BY A DIGIT IS MONEY, NOT A BROKEN FORMULA.
+      // The English paper's vocabulary note says "The room costs $20", and
+      // there is no way to escape a dollar in a plain string that MathText
+      // renders — `\$` would print as `\$`. This is the same carve-out
+      // utils/math-render.ts already makes in the other direction: it refuses
+      // to treat `+` or `=` as a TeX marker precisely so prose prices are not
+      // typeset. Anything else — a dollar before a space, a letter or a
+      // backslash — is an unclosed, padded or newline-split span, which means
+      // the student reads raw LaTeX.
+      const dollars = (segment.value.match(/\$/g) ?? []).length;
+      const prices = (segment.value.match(/\$\d/g) ?? []).length;
+      if (dollars > prices) {
         fail(
           where,
           `a "$" survived into plain text — unclosed, padded, or split across a newline: ${JSON.stringify(segment.value.slice(0, 80))}`
@@ -155,6 +173,54 @@ try {
     });
   }
 
+  // ── the real past papers ────────────────────────────────────────────────
+  //
+  // Same rules, a richer shape: a part carries the whole printed exercise
+  // (`statement`) above its sub-questions, and an English part carries a
+  // gap-fill whose answers must come out of its own word bank.
+  const { PAST_PAPERS } = await server.ssrLoadModule("/src/data/past-papers.ts");
+  const paperKeys = Object.keys(PAST_PAPERS);
+  let paperQuestions = 0;
+
+  for (const key of paperKeys) {
+    const paper = PAST_PAPERS[key];
+    checkMath(splitMath, `${key} · note`, paper.note);
+
+    for (const section of paper.sections) {
+      const at = `${key} · ${section.id}`;
+      checkMath(splitMath, `${at} statement`, section.statement);
+      checkMath(splitMath, `${at} instruction`, section.instruction);
+      checkMath(splitMath, `${at} example`, section.example);
+
+      (section.questions ?? []).forEach((question) => {
+        paperQuestions += 1;
+        const where = `${at} · ${question.id}`;
+        checkMath(splitMath, `${where} q.en`, question.q.en);
+        checkMath(splitMath, `${where} q.km`, question.q.km);
+        checkMath(splitMath, `${where} explanation`, question.explanation);
+        for (const opt of question.options ?? [])
+          checkMath(splitMath, `${where} option`, opt);
+        checkChoices(where, question.options, question.correct);
+      });
+
+      const gapFill = section.gapFill;
+      if (!gapFill) continue;
+      checkMath(splitMath, `${at} passage`, gapFill.body);
+      for (const gap of gapFill.gaps) {
+        // The bank prints one of each word, so an answer outside it is a gap
+        // no student can fill — the same class of error as `correct` not being
+        // among a question's options.
+        if (!gapFill.wordBank.includes(gap.correct)) {
+          fail(
+            `${at} · gap ${gap.number}`,
+            `answer ${JSON.stringify(gap.correct)} is not in the word bank`
+          );
+        }
+        checkMath(splitMath, `${at} · gap ${gap.number}`, gap.explanation);
+      }
+    }
+  }
+
   if (problems.length) {
     console.error(`\ncheck:quiz — ${problems.length} problem(s):\n`);
     for (const p of problems) console.error("  " + p + "\n");
@@ -162,7 +228,9 @@ try {
   } else {
     const n = keys.reduce((s, k) => s + PRACTICE_QUIZZES[k].length, 0);
     console.log(
-      `check:quiz — ok. ${n} question(s) across ${keys.length} quiz(zes); ${checked} string(s) with math typeset cleanly.`
+      `check:quiz — ok. ${n} question(s) across ${keys.length} quiz(zes), ` +
+        `${paperQuestions} across ${paperKeys.length} past paper(s); ` +
+        `${checked} string(s) with math typeset cleanly.`
     );
   }
 } finally {
