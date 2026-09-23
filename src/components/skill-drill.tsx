@@ -49,7 +49,7 @@ import { cn } from "@/utils/cn";
  * makes both unrepresentable. Same move, same reason, as QuizSummary in
  * quiz-runner.tsx.
  */
-function DrillGroup({
+export function DrillGroup({
   questions,
   heading,
 }: {

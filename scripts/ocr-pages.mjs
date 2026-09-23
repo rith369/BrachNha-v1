@@ -41,6 +41,8 @@ const THINKING = flag("thinking", "low");
 // Only used for images. "high" is worth it here: the pages are dense Khmer at
 // 8pt, and a coeng (the subscript consonant under a letter) is a few pixels.
 const RESOLUTION = flag("resolution", "high");
+/** "6-25" or "5,7,24", or every page when absent. */
+const PAGES = flag("pages", "");
 
 /**
  * PDF or image, and the choice is not cosmetic.
@@ -111,7 +113,26 @@ const usageLog = path.join(OUT_DIR, "usage.jsonl");
 
 const SOURCE = /\.(pdf|png|jpg|jpeg)$/i;
 const mdName = (f) => f.replace(SOURCE, ".md");
-const pages = fs.readdirSync(IN_DIR).filter((f) => SOURCE.test(f)).sort();
+function wantedPages() {
+  if (!PAGES) return null;
+  const out = new Set();
+  for (const part of PAGES.split(",")) {
+    const [a, b] = part.split("-").map(Number);
+    for (let p = a; p <= (b || a); p++) out.add(p);
+  }
+  return out;
+}
+
+const wanted = wantedPages();
+const pages = fs
+  .readdirSync(IN_DIR)
+  .filter((f) => {
+    if (!SOURCE.test(f)) return false;
+    if (!wanted) return true;
+    const m = f.match(/\d+/);
+    return m ? wanted.has(Number(m[0])) : true;
+  })
+  .sort();
 const todo = pages.filter((f) => !fs.existsSync(path.join(OUT_DIR, mdName(f))));
 
 console.log(`${MODEL}: ${pages.length} pages, ${pages.length - todo.length} already done, ${todo.length} to go`);

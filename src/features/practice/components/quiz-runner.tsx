@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { CircleCheck, CircleX, ListChecks, Timer } from "lucide-react";
+import { ListChecks, Timer } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { FocusLayout, FocusButton } from "@/components/shell/focus-layout";
@@ -12,9 +12,8 @@ import {
 } from "@/utils/focus-styles";
 import { QUIZ_COINS, QUIZ_XP } from "@/utils/rewards";
 import { clockLabel } from "@/features/exam/paper-scoring";
-import { Callout } from "@/features/lessons/components/callout";
+import { QuizFeedback } from "@/components/feedback-accordion";
 import { MathText } from "@/components/shell/math-text";
-import { SkillDrill } from "@/components/skill-drill";
 import type { SectionQuestion } from "@/types";
 import type { PracticeMode } from "../practice";
 import { lessonKeyOf } from "@/features/progress/content-keys";
@@ -298,37 +297,12 @@ export function QuizRunner({
           </div>
 
           {answer && (
-            <Callout
-              tone={answer === question.correct ? "mint" : "pink"}
-              icon={answer === question.correct ? CircleCheck : CircleX}
-              label={
-                answer === question.correct ? "ត្រឹមត្រូវ!" : "មិនត្រឹមត្រូវ"
-              }
-              className="mt-3 md:mt-4"
-            >
-              <p className={focusBody}>
-                <MathText text={question.explanation} />
-              </p>
-            </Callout>
-          )}
-
-          {/* KEYED ON THE QUESTION'S POSITION. SkillDrill owns which exercises
-              are expanded and how they were answered, and that state belongs to
-              THIS presentation, not to the component's slot. Without the key it
-              survives one path: answer Q1, expand it, press ← back from an
-              answered Q2 — the panel stays mounted carrying Q2's state under
-              Q1's help. An effect resetting it instead would trip oxlint's
-              react(set-state-in-effect); the key is the fix, not the effect.
-
-              Shown after EVERY answer, right or wrong, unlike the English
-              paper's review — this is practice, not measurement, and a student
-              who wants more reps should always be able to get them. It only
-              opens ITSELF for someone who got it wrong. */}
-          {answer && question.help && (
-            <SkillDrill
+            <QuizFeedback
               key={index}
+              answer={answer}
+              correct={question.correct}
+              explanation={question.explanation}
               help={question.help}
-              defaultOpen={answer !== question.correct}
             />
           )}
         </div>

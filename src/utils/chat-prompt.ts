@@ -94,7 +94,8 @@ export interface ChatProfile {
 /** Strips control characters and caps length. Everything in ChatProfile is
  *  user-typed or user-chosen and arrives from the client, so it is treated as
  *  untrusted display text before being embedded in the prompt. */
-function clean(value: string, max = 60): string {
+function clean(value: unknown, max = 60): string {
+  if (typeof value !== "string") return "";
   // \p{Cc} = control chars, \p{Cf} = format chars (e.g. bidi overrides).
   return value.replace(/[\p{Cc}\p{Cf}]/gu, " ").trim().slice(0, max);
 }

@@ -31,6 +31,7 @@ const routeModules = {
   gamePlay: () => import("@/pages/game-play"),
   gameReview: () => import("@/pages/game-review"),
   exam: () => import("@/pages/exam"),
+  examSimulation: () => import("@/pages/exam-simulation"),
   examSubjects: () => import("@/pages/exam-subjects"),
   examPaper: () => import("@/pages/exam-paper"),
   gradePrediction: () => import("@/pages/grade-prediction"),
@@ -57,6 +58,7 @@ const GameCreatePage = lazy(routeModules.gameCreate);
 const GamePlayPage = lazy(routeModules.gamePlay);
 const GameReviewPage = lazy(routeModules.gameReview);
 const ExamPage = lazy(routeModules.exam);
+const ExamSimulationPage = lazy(routeModules.examSimulation);
 const ExamSubjectsPage = lazy(routeModules.examSubjects);
 const ExamPaperPage = lazy(routeModules.examPaper);
 const GradePredictionPage = lazy(routeModules.gradePrediction);
@@ -226,6 +228,8 @@ export default function App() {
             element={<GameReviewPage />}
           />
           <Route path="exam" element={<ExamPage />} />
+          {/* 2-Day Bac II Simulation overview page */}
+          <Route path="exam/simulation" element={<ExamSimulationPage />} />
           {/* The two-tab past/generated screen, one level under the chooser at
               /exam so the back button steps between them. */}
           <Route path="exam/subjects" element={<ExamSubjectsPage />} />

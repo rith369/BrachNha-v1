@@ -7,7 +7,7 @@ import {
   ClipboardCheck,
   GraduationCap,
   Library,
-  Lock,
+  Sparkles,
   Target,
 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
@@ -73,6 +73,7 @@ export function ExamHub() {
       : null;
 
   const lip = "color-mix(in oklab, var(--brand-purple) 55%, black)";
+  const lipNight = "color-mix(in oklab, var(--brand-night-to) 55%, black)";
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-20 lg:pb-8">
@@ -173,8 +174,17 @@ export function ExamHub() {
             </div>
           </Link>
 
-          {/* ── Bac II Simulation (not built) ── */}
-          <div className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-night p-4 text-white shadow-panel md:p-5">
+          {/* ── Bac II Simulation ── */}
+          <Link
+            to="/exam/simulation"
+            className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-night p-4 text-white shadow-panel transition-[transform,box-shadow,filter] duration-75 hover:brightness-105 active:translate-y-[6px] active:shadow-[0_0_0_var(--lip)] md:p-5"
+            style={
+              {
+                boxShadow: `0 6px 0 ${lipNight}`,
+                "--lip": lipNight,
+              } as CSSProperties
+            }
+          >
             <div
               className="pointer-events-none absolute inset-0 opacity-60"
               style={{
@@ -198,9 +208,9 @@ export function ExamHub() {
                   strokeWidth={2.25}
                 />
               </GlassIcon>
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-extrabold md:text-xs">
-                <Lock className="size-3 shrink-0" strokeWidth={2.75} />
-                ឆាប់ៗនេះ
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-extrabold text-[var(--brand-yellow)] md:text-xs">
+                <Sparkles className="size-3 shrink-0" strokeWidth={2.75} />
+                2 ថ្ងៃពេញ
               </span>
             </div>
 
@@ -208,24 +218,31 @@ export function ExamHub() {
               ប្រឡងបាក់ឌុបសាកល្បង
             </div>
             <div className="relative mt-1 text-xs font-semibold text-white/85 md:text-sm">
-              សាកល្បងប្រឡងបាក់ឌុបពេញលេញ រយៈពេល 2 ថ្ងៃ។
+              សាកល្បងប្រឡងបាក់ឌុបពេញលេញ រយៈពេល 2 ថ្ងៃ 6 មុខវិជ្ជា។
             </div>
 
-            <div className="relative mt-auto grid grid-cols-2 gap-2 pt-5">
-              {["ថ្ងៃទី 1", "ថ្ងៃទី 2"].map((day) => (
-                <div
-                  key={day}
-                  className="flex items-center gap-1.5 rounded-xl border border-dashed border-white/25 bg-white/5 px-3 py-2 text-xs font-extrabold"
-                >
-                  <CalendarDays
-                    className="size-3.5 shrink-0 text-[var(--brand-yellow)]"
-                    strokeWidth={2.5}
-                  />
-                  {day}
-                </div>
-              ))}
+            <div className="relative mt-auto flex items-center justify-between gap-2 pt-5">
+              <div className="grid grid-cols-2 gap-1.5">
+                {["ថ្ងៃទី 1", "ថ្ងៃទី 2"].map((day) => (
+                  <div
+                    key={day}
+                    className="flex items-center gap-1 rounded-lg border border-dashed border-white/25 bg-white/5 px-2 py-1 text-[11px] font-extrabold"
+                  >
+                    <CalendarDays
+                      className="size-3 shrink-0 text-[var(--brand-yellow)]"
+                      strokeWidth={2.5}
+                    />
+                    {day}
+                  </div>
+                ))}
+              </div>
+
+              <span className="flex shrink-0 items-center gap-1 rounded-full bg-[var(--brand-yellow)] px-3 py-1.5 text-xs font-extrabold text-[#1e1b4b] md:text-sm">
+                ព័ត៌មានលម្អិត
+                <ArrowRight className="size-3.5 shrink-0" strokeWidth={3} />
+              </span>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
     </div>

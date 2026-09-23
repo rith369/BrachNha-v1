@@ -17,6 +17,39 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 23 Sep 2026 — 2-Day Bac II Simulation Overview Page
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Give Grade 12 students a realistic, comprehensive orientation and briefing page for the full 2-day Bac II examination simulation before beginning the multi-hour, multi-subject examination.
+
+**What changed.**
+
+- **New 2-Day Bac II Simulation Overview Page (`/exam/simulation`).** Created a dedicated overview screen with modern dark academic aesthetics, deep indigo/navy backdrop, ambient glowing gradients, and subtle academic micro-grid texture.
+- **Top Header & Breadcrumb.** Includes BrachNha wordmark logo, a "Mock Exams" breadcrumb link returning cleanly to `/exam`, page title **2-Day Bac II Simulation**, subtitle **Experience the Bac II exam like the real thing**, and a glowing **REALISTIC EXAM EXPERIENCE** badge.
+- **Hero Section & Exam Calendar Graphic.** Large glassmorphism hero card highlighting the 2-day science stream simulation, three compact stat badges (**2 Days**, **6 Subjects**, **Timed Sessions**), a prominent primary **Start Simulation →** button with sheen animations, and an examination timetable calendar illustration with interactive Day 1 / Day 2 preview tabs.
+- **Side-by-Side Simulation Schedule.** Two distinct large horizontal cards for **DAY 01** (Mathematics 150 min, Physics 90 min, Chemistry 90 min) and **DAY 02** (Biology 90 min, Khmer Literature 90 min, Foreign Language 60 min) with official time slots, subject icons, points allocation, and session type indicators.
+- **Testing Rules Cards.** Four compact cards highlighting **Timed Sessions**, **Continuous Timer**, **Auto Submit**, and **Exam Conditions**.
+- **Bottom CTA & Readiness Dialog.** Strong closing CTA card with glowing ambient halo and a high-contrast **Start Simulation** button that triggers a realistic pre-exam environment checklist.
+- **Mobile-First Layout Polish & Collision Elimination.** Fixed the collision between the top hamburger menu and the back navigation breadcrumb by reserving `pr-14` spacing on the header. Removed duplicate title repetition on mobile, streamlined stat tiles to fit neatly without line-wrapping on narrow screens (e.g. 375px), made the primary "Start Simulation" button full-width on mobile for thumb accessibility, converted rules into a scannable 2-column grid, and added `pb-36` bottom padding to prevent KruAI's floating chat button (FAB) or the bottom navigation bar from overlapping any cards or CTAs.
+- **Digit Standard Compliance.** Fully audited to ensure 100% Latin digits across all counts, scores, and schedules (`npm run check:digits` passed).
+
+## 22 Sep 2026 — KruAI Biology textbook grounding (Chapter 1), exam comparison tables, and resilient chat
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Three main improvements to KruAI: ground chat answers in the official MoEYS Grade 12 Biology textbook for 100% curriculum accuracy, format comparison questions with proper Ministry-standard comparison tables, and eliminate mid-answer timeouts and quota errors.
+
+**What changed.**
+
+- **MoEYS Grade 12 Biology Chapter 1 textbook grounding.** All 20 pages of Biology Chapter 1 (Flower plants & Gymnosperms, p006–p025) were extracted from the Ministry PDF into high-resolution images, transcribed via OCR, and verified with 0 errors. When a student asks about Biology Chapter 1 concepts (e.g. monocots vs dicots, flowers, fruits, gymnosperms), KruAI grounds its answer directly in the official textbook text rather than generic knowledge.
+- **Bac II comparison tables rendered in chat.** Upgraded KruAI's message renderer (`math-text.tsx`) to parse and display full Markdown tables. Tables render with clean styling, header rows, borders, and responsive horizontal scrolling on mobile phones.
+- **Bac II comparison prompt rules and worked examples.** Updated `bac2-format.ts` with the official Ministry marking scheme for comparison questions: listing similarities (`+ លក្ខណៈដូចគ្នា`) first, followed by a structured difference table (`+ លក្ខណៈខុសគ្នា`), and concluding with exam tips. Added the official worked example for monocotyledons vs dicotyledons.
+- **Multi-model resilient fallback in chat handler.** Rather than relying on a single model that could fail on quota limits or server demand spikes, `server/chat-handler.ts` now automatically falls back across candidate models (`gemini-3.5-flash`, `gemini-flash-latest`, `gemini-3.6-flash`). If a model experiences high traffic or hits free-tier quota limits, the server seamlessly falls back without dropping the student's request.
+- **Increased response token budget.** Raised `max_output_tokens` from 1,200 to 3,000 tokens so lengthy Khmer answers with detailed comparison tables are never truncated mid-sentence.
+- **Removed provider branding from student-visible messages.** Any temporary traffic delay notices now attribute errors strictly to KruAI / the system, preserving product secrecy without leaking external vendor names.
+- **Safe profile handling.** Made `clean()` in `chat-prompt.ts` null-safe to prevent runtime crashes when student profiles omit optional fields.
+
 ## 19 Sep 2026 — The whole exercise now comes before the questions, and the maths wording is fixed
 
 *Not committed yet.* **No database step needed.**

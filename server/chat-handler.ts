@@ -13,6 +13,7 @@ import {
 import type { ScreenRef } from "../src/utils/chat-screen.js";
 import { checkRateLimit } from "./rate-limit.js";
 import { isVerificationConfigured, verifyRequestUser } from "./verify-user.js";
+import { searchBiologyChapter1 } from "./textbook-search.js";
 
 /**
  * KruAI endpoint. Started life as a Netlify function, then a Next.js route
@@ -36,8 +37,12 @@ import { isVerificationConfigured, verifyRequestUser } from "./verify-user.js";
  * Runs on the default Node.js runtime; streaming works there with no config.
  */
 
-/** https://ai.google.dev/gemini-api/docs/gemini-3 — Gemini 3 Flash. */
-const GEMINI_MODEL = "gemini-3-flash-preview";
+/** Candidate models in priority order to handle free-tier quotas and high demand. */
+const GEMINI_MODELS = [
+  "gemini-3.5-flash",
+  "gemini-flash-latest",
+  "gemini-3.6-flash",
+];
 
 /** How many past bubbles to replay as context. Bounds cost and latency; the
  *  store keeps more than this for display purposes. */
@@ -192,14 +197,18 @@ function isQuotaError(err: unknown): boolean {
     text.includes("quota") ||
     text.includes("rate limit") ||
     text.includes("resource_exhausted") ||
-    text.includes("429")
+    text.includes("429") ||
+    text.includes("service_unavailable") ||
+    text.includes("high demand") ||
+    text.includes("overloaded") ||
+    text.includes("503")
   );
 }
 
 function busyMessage(lang: Lang): string {
   return lang === "km"
-    ? "⏳ សំណួរច្រើនពេកក្នុងពេលតែមួយ។ សូមរង់ចាំមួយភ្លែត រួចសួរម្ដងទៀត។"
-    : "⏳ Too many questions at once. Please wait a moment and ask again.";
+    ? "⏳ សំណួរច្រើនពេកក្នុងពេលតែមួយ ឬប្រព័ន្ធកំពុងរវល់បណ្ដោះអាសន្ន។ សូមរង់ចាំមួយភ្លែត រួចសួរម្ដងទៀត។"
+    : "⏳ Too many questions at once or the system is temporarily busy. Please wait a moment and ask again.";
 }
 
 /**
@@ -390,34 +399,54 @@ export async function handleChat(req: Request): Promise<Response> {
   // pinnedContextFor, which is what makes the text safe — it comes from the
   // app's own content, never from the request.
   const screen = cleanScreen(body.screen);
-  const context = pinnedContextFor(screen);
+  const pinned = pinnedContextFor(screen);
+
+  // Ground KruAI in official MoEYS textbook text (Biology Chapter 1)
+  const lastUserText =
+    input
+      .filter((step) => step.type === "user_input")
+      .at(-1)
+      ?.content.map((c) => c.text)
+      .join(" ") ?? "";
+  const textbook = searchBiologyChapter1(lastUserText);
+  const context = [...pinned, ...textbook];
 
   try {
     const ai = new GoogleGenAI({ apiKey });
-    const stream = await ai.interactions.create({
-      model: GEMINI_MODEL,
-      stream: true,
-      // Don't let Google retain a student's conversation server-side; we keep
-      // the history ourselves in the Zustand store and replay it each turn.
-      store: false,
-      // No `lang` here on purpose: the mentor always answers in Khmer (see
-      // ANSWER_LANG in utils/chat-prompt.ts). `lang` still drives this route's
-      // own error messages, which follow the app's UI language.
-      system_instruction: buildSystemPrompt({
-        profile,
-        context,
-        focusSubject: screen.subjectId,
-      }),
-      generation_config: {
-        // Measured on this prompt: "minimal" gives ~2.7s to first character vs
-        // ~11.2s on "low" — a big deal on a phone, and accuracy held up on
-        // multi-step Bac II math (conjugate limits, conditional probability).
-        // Raise to "low"/"medium" if harder content later starts coming out wrong.
-        thinking_level: "minimal",
-        max_output_tokens: 1200,
-      },
-      input,
+    const system_instruction = buildSystemPrompt({
+      profile,
+      context,
+      focusSubject: screen.subjectId,
     });
+    const generation_config = {
+      thinking_level: "minimal" as const,
+      max_output_tokens: 3000,
+    };
+
+    // Try candidate models in order so free-tier quota limits (429) or high-demand
+    // spikes (503) on one model automatically fall back to the next available model.
+    let stream: any = null;
+    let lastErr: unknown = null;
+    for (const model of GEMINI_MODELS) {
+      try {
+        stream = await ai.interactions.create({
+          model,
+          stream: true,
+          store: false,
+          system_instruction,
+          generation_config,
+          input,
+        });
+        break;
+      } catch (err) {
+        console.warn(`[api/chat] model ${model} failed to start, trying fallback:`, err);
+        lastErr = err;
+      }
+    }
+
+    if (!stream) {
+      throw lastErr ?? new Error("Failed to initialize chat stream with any model");
+    }
 
     const encoder = new TextEncoder();
     const out = new ReadableStream<Uint8Array>({

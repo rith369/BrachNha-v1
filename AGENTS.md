@@ -293,8 +293,8 @@ than relying on that.
 
 ### Model and prompt
 
-Model is Gemini 3 Flash (`gemini-3-flash-preview`) through the official
-`@google/genai` SDK's **Interactions API** (`ai.interactions.create`), NOT the
+Model selection uses a multi-model fallback chain (`["gemini-3.5-flash", "gemini-flash-latest", "gemini-3.6-flash"]`)
+through the official `@google/genai` SDK's **Interactions API** (`ai.interactions.create`), NOT the
 older `models/*:generateContent` endpoint the original Netlify function used.
 Replies stream as plain UTF-8 text (not SSE — there's one stream of text, so the
 client just reads `response.body.getReader()`).
@@ -303,27 +303,28 @@ client just reads `response.body.getReader()`).
 conversations server-side; we replay history ourselves from the Zustand store.
 `thinking_level` is `"minimal"` on purpose: measured ~2.7s to first character vs
 ~11.2s on `"low"`, and accuracy held on multi-step Bac II math (conjugate
-limits, conditional probability). Don't raise it without re-measuring.
+limits, conditional probability). `max_output_tokens` is set to 3000 (bumped from 1200)
+to ensure complete rendering of detailed Bac II comparison tables without mid-stream truncation.
 
-Free-tier quota is the routine failure mode, not an edge case —
-`gemini-3-flash-preview` allows roughly 5 requests/minute and 20/day, so a
-classroom exhausts it fast. `isQuotaError()` / `busyMessage()` detect that (both
-as a thrown 429 and as an in-stream `event_type: "error"`) and return "Too many
-questions at once" instead of the misleading generic apology. Real classroom use
-needs billing enabled on the Google AI Studio key.
+Free-tier quota and server demand spikes are handled by the fallback loop and
+resilient error catching: `isQuotaError()` detects rate limits (429), quota exhaustion,
+and high demand (503 / `service_unavailable`) both on initialization and in-stream,
+returning a polite temporary-busy notice. Crucially, vendor names ("Gemini" / "Google")
+are kept strictly out of student-visible copy to preserve product identity and secrecy.
 
 `server/rate-limit.ts` adds our own per-IP cap (30/min) before any upstream
 call, so a flood costs nothing. In dev there's no proxy and everything keys to
 `"local"`, which is fine — it exists to protect a deployment.
 
-Chat answer quality is **prompt engineering, not fine-tuning** —
-`gemini-3-flash-preview` can't be fine-tuned, and the whole content corpus still
-fits in one system prompt, so no embeddings/RAG **yet** — the six textbooks will
-not fit, and that search is now planned (see the staging note at the end of this
-section). `src/utils/chat-prompt.ts` composes: persona + honesty
+Chat answer quality is **prompt engineering, plus curriculum grounding** —
+the whole content corpus fits in one system prompt, supplemented by
+**MoEYS textbook excerpts (`server/textbook-search.ts`)** for Biology.
+`src/utils/chat-prompt.ts` composes: persona + honesty
 guardrails + `src/data/bac2-format.ts`'s `BAC2_ANSWER_RULES` (the Given → Method
-→ numbered Steps → Answer → Exam tip skeleton) + `BAC2_EXAMPLES` (few-shot
-worked answers) + the CATALOG + the CONTEXT + the student's real profile.
+→ numbered Steps → Answer → Exam tip skeleton, including comparison tables) +
+`BAC2_EXAMPLES` (few-shot worked answers) + the CATALOG + the CONTEXT + the student's real profile.
+`src/components/shell/math-text.tsx` includes a block Markdown table parser so
+comparison matrices render as responsive, scrollable HTML tables rather than raw text.
 `src/data/bac2-format.ts` is the intended drop-in point for real MoEYS past
 papers — add entries to `BAC2_EXAMPLES` and flip `verified: true` once a teacher
 checks them; no code change needed.
