@@ -145,11 +145,11 @@ export const SECTION_CONTENT: Record<string, SectionContent> = {
         q: "តើផ្នែកណានៃប្រព័ន្ធប្រសាទដែលជាអ្នកបញ្ជាឱ្យលើកជើងចេញភ្លាមៗនេះ?",
         options: [
           "ក. ខួរក្បាល (Brain)",
-          "ខ. ខួរឆ្អឹងខ្នង (Spinal cord)",
-          "គ. បេះដូង (Heart)",
+          "ខ. បេះដូង (Heart)",
+          "គ. ខួរឆ្អឹងខ្នង (Spinal cord)",
           "ឃ. ក្រពះ (Stomach)",
         ],
-        correct: "ខ. ខួរឆ្អឹងខ្នង (Spinal cord)",
+        correct: "គ. ខួរឆ្អឹងខ្នង (Spinal cord)",
         explanation:
           "ខួរឆ្អឹងខ្នងជាអ្នកបញ្ជាសកម្មភាពផ្លាតស្វ័យប្រវត្តិដើម្បីឆ្លើយតបបានលឿនបំផុត។",
       },

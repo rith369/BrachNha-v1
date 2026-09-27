@@ -13,7 +13,12 @@ import {
 import type { ScreenRef } from "../src/utils/chat-screen.js";
 import { checkRateLimit } from "./rate-limit.js";
 import { isVerificationConfigured, verifyRequestUser } from "./verify-user.js";
-import { searchBiologyChapter1 } from "./textbook-search.js";
+import { searchBiologyTextbook } from "./textbook-search.js";
+import {
+  getCachedAnswer,
+  recordCachedAnswer,
+  createCachedStreamResponse,
+} from "./chat-cache.js";
 
 /**
  * KruAI endpoint. Started life as a Netlify function, then a Next.js route
@@ -42,7 +47,43 @@ const GEMINI_MODELS = [
   "gemini-3.5-flash",
   "gemini-flash-latest",
   "gemini-3.6-flash",
+  "gemini-3-flash-preview",
 ];
+
+/**
+ * Resolves all available Gemini API keys from environment variables.
+ * Supports GEMINI_API_KEYS (comma-delimited), GEMINI_API_KEY (single or comma-delimited),
+ * and GEMINI_API_KEY_1..5 for rotation pools.
+ */
+function getApiKeys(): string[] {
+  const keys: string[] = [];
+  const envVars = [
+    process.env.GEMINI_API_KEYS,
+    process.env.GEMINI_API_KEY,
+    process.env.GEMINI_API_KEY_1,
+    process.env.GEMINI_API_KEY_2,
+    process.env.GEMINI_API_KEY_3,
+    process.env.GEMINI_API_KEY_4,
+    process.env.GEMINI_API_KEY_5,
+  ];
+
+  for (const raw of envVars) {
+    if (!raw) continue;
+    const parts = raw
+      .split(",")
+      .map((k) => k.trim().replace(/^["']|["']$/g, ""))
+      .filter(Boolean);
+    for (const p of parts) {
+      if (!keys.includes(p)) {
+        keys.push(p);
+      }
+    }
+  }
+  return keys;
+}
+
+/** Round-robin pointer across available API keys in the pool. */
+let keyRotationIndex = 0;
 
 /** How many past bubbles to replay as context. Bounds cost and latency; the
  *  store keeps more than this for display purposes. */
@@ -295,6 +336,33 @@ export async function handleChat(req: Request): Promise<Response> {
     });
   }
 
+  const input: InteractionStep[] = messages
+    .slice(-MAX_HISTORY)
+    .filter((m) => typeof m?.text === "string" && m.text.trim())
+    .map((m) => ({
+      type: m.role === "bot" ? "model_output" : "user_input",
+      content: [{ type: "text", text: m.text.slice(0, MAX_MESSAGE_CHARS) }],
+    }));
+
+  if (!input.length || input[input.length - 1].type !== "user_input") {
+    return textResponse("No message.", 400);
+  }
+
+  const lastUserText =
+    input
+      .filter((step) => step.type === "user_input")
+      .at(-1)
+      ?.content.map((c) => c.text)
+      .join(" ") ?? "";
+
+  // ── 0-token cache check ──────────────────────────────────────────────────
+  // Check if we have a pre-computed Bac II curriculum answer or dynamic cache hit.
+  // Returns instant simulated stream with 0 API tokens and 0 delay, even for guest testers.
+  const cachedAnswer = getCachedAnswer(lastUserText);
+  if (cachedAnswer) {
+    return createCachedStreamResponse(cachedAnswer);
+  }
+
   // ── who is asking ─────────────────────────────────────────────────────────
   //
   // Hiding the button in the UI is not a gate; this is. Without it a guest can
@@ -342,14 +410,10 @@ export async function handleChat(req: Request): Promise<Response> {
     }
   }
 
-  // Without a key the chat degrades to a friendly notice instead of a 500, so
-  // a fresh clone of the repo still runs end to end.
-  //
-  // The wording is environment-aware on purpose: the .env.local hint is useful
-  // to a developer running the repo, but it's a confusing internal instruction
-  // if it ever surfaces to a real student on the deployed site.
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
+  // ── API Key Pool & Rotation ──────────────────────────────────────────────
+  // Collect all available Gemini API keys from environment variables.
+  const apiKeys = getApiKeys();
+  if (apiKeys.length === 0) {
     const devHint = process.env.NODE_ENV !== "production";
     return textResponse(
       lang === "km"
@@ -361,18 +425,6 @@ export async function handleChat(req: Request): Promise<Response> {
           : "🔑 KruAI is temporarily unavailable. Please try again shortly.",
       503
     );
-  }
-
-  const input: InteractionStep[] = messages
-    .slice(-MAX_HISTORY)
-    .filter((m) => typeof m?.text === "string" && m.text.trim())
-    .map((m) => ({
-      type: m.role === "bot" ? "model_output" : "user_input",
-      content: [{ type: "text", text: m.text.slice(0, MAX_MESSAGE_CHARS) }],
-    }));
-
-  if (!input.length || input[input.length - 1].type !== "user_input") {
-    return textResponse("No message.", 400);
   }
 
   const profile: ChatProfile = {
@@ -402,58 +454,79 @@ export async function handleChat(req: Request): Promise<Response> {
   const pinned = pinnedContextFor(screen);
 
   // Ground KruAI in official MoEYS textbook text (Biology Chapter 1)
-  const lastUserText =
-    input
-      .filter((step) => step.type === "user_input")
-      .at(-1)
-      ?.content.map((c) => c.text)
-      .join(" ") ?? "";
-  const textbook = searchBiologyChapter1(lastUserText);
+  const textbook = searchBiologyTextbook(lastUserText);
   const context = [...pinned, ...textbook];
 
   try {
-    const ai = new GoogleGenAI({ apiKey });
     const system_instruction = buildSystemPrompt({
       profile,
       context,
       focusSubject: screen.subjectId,
     });
-    const generation_config = {
-      thinking_level: "minimal" as const,
-      max_output_tokens: 3000,
-    };
 
-    // Try candidate models in order so free-tier quota limits (429) or high-demand
-    // spikes (503) on one model automatically fall back to the next available model.
+    // Build ordered list of keys starting from current rotation index
+    const keysInOrder: string[] = [];
+    const startIdx = keyRotationIndex % apiKeys.length;
+    keyRotationIndex = (keyRotationIndex + 1) % apiKeys.length;
+    for (let i = 0; i < apiKeys.length; i++) {
+      keysInOrder.push(apiKeys[(startIdx + i) % apiKeys.length]);
+    }
+
+    // Try candidate models & keys in priority order so free-tier quota limits (429)
+    // or temporary spikes (503) automatically fall back across the model chain and key pool.
     let stream: any = null;
     let lastErr: unknown = null;
-    for (const model of GEMINI_MODELS) {
-      try {
-        stream = await ai.interactions.create({
-          model,
-          stream: true,
-          store: false,
-          system_instruction,
-          generation_config,
-          input,
-        });
-        break;
-      } catch (err) {
-        console.warn(`[api/chat] model ${model} failed to start, trying fallback:`, err);
-        lastErr = err;
+
+    outerLoop:
+    for (let k = 0; k < keysInOrder.length; k++) {
+      const currentKey = keysInOrder[k];
+      const ai = new GoogleGenAI({ apiKey: currentKey });
+
+      for (const model of GEMINI_MODELS) {
+        try {
+          const thinking_level =
+            model === "gemini-flash-latest" || model === "gemini-3.7-flash"
+              ? ("low" as const)
+              : ("minimal" as const);
+
+          const generation_config = {
+            thinking_level,
+            max_output_tokens: 3000,
+          };
+
+          stream = await ai.interactions.create({
+            model,
+            stream: true,
+            store: false,
+            system_instruction,
+            generation_config,
+            input,
+          });
+          break outerLoop;
+        } catch (err) {
+          console.warn(
+            `[api/chat] Key #${k + 1} (${model}) failed, trying fallback:`,
+            err instanceof Error ? err.message : err
+          );
+          lastErr = err;
+        }
       }
     }
 
     if (!stream) {
-      throw lastErr ?? new Error("Failed to initialize chat stream with any model");
+      throw lastErr ?? new Error("Failed to initialize chat stream with any key or model");
     }
 
     const encoder = new TextEncoder();
+    let accumulatedText = "";
+    let streamHasError = false;
+
     const out = new ReadableStream<Uint8Array>({
       async start(controller) {
         try {
           for await (const event of stream) {
             if (event.event_type === "error") {
+              streamHasError = true;
               // Log it: the student only sees a short apology, so without this
               // an upstream failure mid-stream is undiagnosable.
               console.error("[api/chat] upstream error event:", event.error);
@@ -471,10 +544,12 @@ export async function handleChat(req: Request): Promise<Response> {
             // `type: "text"` is unique to TextDelta, so this also filters out
             // the model's internal thought summaries.
             if (event.event_type === "step.delta" && event.delta.type === "text") {
+              accumulatedText += event.delta.text;
               controller.enqueue(encoder.encode(event.delta.text));
             }
           }
         } catch (err) {
+          streamHasError = true;
           console.error("[api/chat] stream failed:", err);
           controller.enqueue(
             encoder.encode(
@@ -484,6 +559,15 @@ export async function handleChat(req: Request): Promise<Response> {
             )
           );
         } finally {
+          // Record successful full response in dynamic cache to serve next students with 0 tokens
+          if (
+            !streamHasError &&
+            accumulatedText.length >= 30 &&
+            !accumulatedText.includes("⚠️") &&
+            !accumulatedText.includes("🔒")
+          ) {
+            recordCachedAnswer(lastUserText, accumulatedText);
+          }
           controller.close();
         }
       },

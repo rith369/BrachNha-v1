@@ -99,13 +99,18 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     questions: [
       {
         prompt: "គណនា $\\lim_{x \\to 2}(3x^2 - 4x + 5)$",
-        options: ["$9$", "$25$", "$33$", "$-1$"],
+        options: ["$25$", "$9$", "$33$", "$-1$"],
         correct: "$9$",
         explanation: "$3(2)^2 - 4(2) + 5 = 12 - 8 + 5 = 9$",
       },
       {
         prompt: "គណនា $\\lim_{x \\to -1}(x^3 - 2x^2 + 4)$",
-        options: ["$1$", "$5$", "$3$", "$7$"],
+        options: [
+          "$3$",
+          "$5$",
+          "$1$",
+          "$7$",
+        ],
         correct: "$1$",
         explanation:
           "$(-1)^3 - 2(-1)^2 + 4 = -1 - 2 + 4 = 1$។ ចំណាំថា $(-1)^2 = +1$ មិនមែន $-1$ ទេ។",
@@ -114,7 +119,12 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     foundation: [
       {
         prompt: "គណនាតម្លៃអនុគមន៍ $f(x) = 2x^2 - 5x + 1$ ត្រង់ $x = 3$",
-        options: ["$4$", "$22$", "$34$", "$-2$"],
+        options: [
+          "$22$",
+          "$34$",
+          "$-2$",
+          "$4$",
+        ],
         correct: "$4$",
         explanation:
           "$f(3) = 2(3)^2 - 5(3) + 1 = 18 - 15 + 1 = 4$។ ដកសញ្ញា $\\lim$ ចេញ វាគ្រាន់តែជាការគណនាតម្លៃអនុគមន៍ធម្មតា។",
@@ -147,14 +157,24 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     questions: [
       {
         prompt: "គណនា $\\lim_{x \\to 3}\\frac{x^2 - 9}{x - 3}$",
-        options: ["$6$", "$0$", "$3$", "គ្មានលីមីត"],
+        options: [
+          "$0$",
+          "$3$",
+          "$6$",
+          "គ្មានលីមីត",
+        ],
         correct: "$6$",
         explanation:
           "$\\frac{(x - 3)(x + 3)}{x - 3} = x + 3 \\Rightarrow 3 + 3 = 6$",
       },
       {
         prompt: "គណនា $\\lim_{x \\to -5}\\frac{x^2 - 25}{x + 5}$",
-        options: ["$-10$", "$10$", "$0$", "គ្មានលីមីត"],
+        options: [
+          "គ្មានលីមីត",
+          "$10$",
+          "$0$",
+          "$-10$",
+        ],
         correct: "$-10$",
         explanation:
           "$\\frac{(x - 5)(x + 5)}{x + 5} = x - 5 \\Rightarrow -5 - 5 = -10$",
@@ -163,13 +183,18 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     foundation: [
       {
         prompt: "បំបែកជាផលគុណកត្តា៖ $x^2 - 16$",
-        options: ["$(x - 4)(x + 4)$", "$(x - 8)(x + 8)$", "$(x - 4)^2$", "$(x - 16)(x + 1)$"],
+        options: ["$(x - 4)(x + 4)$", "$(x - 8)(x + 8)$", "$(x - 16)(x + 1)$", "$(x - 4)^2$"],
         correct: "$(x - 4)(x + 4)$",
         explanation: "$x^2 - 16 = x^2 - 4^2 = (x - 4)(x + 4)$",
       },
       {
         prompt: "សម្រួលកន្សោម $\\frac{(x - 2)(x + 5)}{x - 2}$ ចំពោះ $x \\neq 2$",
-        options: ["$x + 5$", "$x - 5$", "$x + 2$", "$5$"],
+        options: [
+          "$x - 5$",
+          "$x + 5$",
+          "$x + 2$",
+          "$5$",
+        ],
         correct: "$x + 5$",
         explanation:
           "កត្តា $(x - 2)$ មាននៅទាំងភាគយក និងភាគបែង ដូច្នេះសម្រួលចោលបាន នៅសល់ $x + 5$។",
@@ -189,14 +214,24 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     questions: [
       {
         prompt: "គណនា $\\lim_{x \\to 2}\\frac{x^2 - 5x + 6}{x - 2}$",
-        options: ["$-1$", "$1$", "$5$", "$-5$"],
+        options: [
+          "$1$",
+          "$-5$",
+          "$5$",
+          "$-1$",
+        ],
         correct: "$-1$",
         explanation:
           "$\\frac{(x - 2)(x - 3)}{x - 2} = x - 3 \\Rightarrow 2 - 3 = -1$",
       },
       {
         prompt: "គណនា $\\lim_{x \\to -4}\\frac{x^2 + 3x - 4}{x + 4}$",
-        options: ["$-5$", "$5$", "$-3$", "$3$"],
+        options: [
+          "$-5$",
+          "$5$",
+          "$-3$",
+          "$3$",
+        ],
         correct: "$-5$",
         explanation:
           "$\\frac{(x + 4)(x - 1)}{x + 4} = x - 1 \\Rightarrow -4 - 1 = -5$",
@@ -205,7 +240,7 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     foundation: [
       {
         prompt: "ដាក់ត្រីធាជាផលគុណកត្តា៖ $x^2 + 5x + 6$",
-        options: ["$(x + 3)(x + 2)$", "$(x - 3)(x - 2)$", "$(x + 6)(x + 1)$", "$(x + 5)(x + 1)$"],
+        options: ["$(x - 3)(x - 2)$", "$(x + 3)(x + 2)$", "$(x + 6)(x + 1)$", "$(x + 5)(x + 1)$"],
         correct: "$(x + 3)(x + 2)$",
         explanation:
           "រក​ចំនួនពីរដែលផលគុណស្មើ $6$ និងផលបូកស្មើ $5$ គឺ $3$ និង $2$ ដូច្នេះ $(x + 3)(x + 2)$។",
@@ -213,7 +248,12 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
       {
         prompt:
           "តើទទួលបានរាងអ្វី ពេលជំនួស $x = -3$ ផ្ទាល់ក្នុង $\\frac{x^2 + 5x + 6}{x + 3}$?",
-        options: ["$\\frac{0}{0}$ (រាងមិនកំណត់)", "$0$", "$\\frac{6}{0}$", "$\\frac{0}{6}$"],
+        options: [
+          "$\\frac{6}{0}$",
+          "$0$",
+          "$\\frac{0}{0}$ (រាងមិនកំណត់)",
+          "$\\frac{0}{6}$",
+        ],
         correct: "$\\frac{0}{0}$ (រាងមិនកំណត់)",
         explanation:
           "ភាគយក $(-3)^2 + 5(-3) + 6 = 0$ និងភាគបែង $-3 + 3 = 0$ ដូច្នេះជារាងមិនកំណត់ ដែលជាសញ្ញាថាត្រូវបំបែកកត្តា។",
@@ -233,14 +273,24 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     questions: [
       {
         prompt: "គណនា $\\lim_{x \\to 0}\\frac{\\sqrt{x + 9} - 3}{x}$",
-        options: ["$\\frac{1}{6}$", "$\\frac{1}{3}$", "$0$", "$6$"],
+        options: [
+          "$\\frac{1}{6}$",
+          "$\\frac{1}{3}$",
+          "$0$",
+          "$6$",
+        ],
         correct: "$\\frac{1}{6}$",
         explanation:
           "គុណនឹងកន្សោមឆ្លាស់ $\\Rightarrow \\frac{x}{x(\\sqrt{x + 9} + 3)} = \\frac{1}{\\sqrt{x + 9} + 3} \\Rightarrow \\frac{1}{3 + 3} = \\frac{1}{6}$",
       },
       {
         prompt: "គណនា $\\lim_{x \\to 0}\\frac{\\sqrt{x + 1} - 1}{x}$",
-        options: ["$\\frac{1}{2}$", "$1$", "$0$", "$2$"],
+        options: [
+          "$1$",
+          "$\\frac{1}{2}$",
+          "$0$",
+          "$2$",
+        ],
         correct: "$\\frac{1}{2}$",
         explanation:
           "$\\frac{x}{x(\\sqrt{x + 1} + 1)} = \\frac{1}{\\sqrt{x + 1} + 1} \\Rightarrow \\frac{1}{1 + 1} = \\frac{1}{2}$",
@@ -249,14 +299,24 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     foundation: [
       {
         prompt: "តើអ្វីជាកន្សោមឆ្លាស់នៃ $\\sqrt{x + 4} - 2$?",
-        options: ["$\\sqrt{x + 4} + 2$", "$\\sqrt{x - 4} + 2$", "$-\\sqrt{x + 4} - 2$", "$\\sqrt{x + 4} - 2$"],
+        options: [
+          "$\\sqrt{x - 4} + 2$",
+          "$-\\sqrt{x + 4} - 2$",
+          "$\\sqrt{x + 4} + 2$",
+          "$\\sqrt{x + 4} - 2$",
+        ],
         correct: "$\\sqrt{x + 4} + 2$",
         explanation:
           "កន្សោមឆ្លាស់ប្ដូរតែសញ្ញានៅចន្លោះពីរតួ ដូច្នេះ $\\sqrt{x + 4} - 2$ ក្លាយជា $\\sqrt{x + 4} + 2$។",
       },
       {
         prompt: "ពន្លាតផលគុណ៖ $(\\sqrt{A} - B)(\\sqrt{A} + B)$",
-        options: ["$A - B^2$", "$A^2 - B^2$", "$A - B$", "$\\sqrt{A} - B^2$"],
+        options: [
+          "$A^2 - B^2$",
+          "$A - B$",
+          "$\\sqrt{A} - B^2$",
+          "$A - B^2$",
+        ],
         correct: "$A - B^2$",
         explanation:
           "ជារាងផលដកពីរការេ៖ $(\\sqrt{A})^2 - B^2 = A - B^2$។ ឫសការេបាត់ទៅ ដែលជាគោលបំណងទាំងមូល។",
@@ -276,14 +336,24 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     questions: [
       {
         prompt: "គណនា $\\lim_{x \\to 3^-}\\frac{|x - 3|}{x - 3}$",
-        options: ["$-1$", "$1$", "$0$", "គ្មានលីមីត"],
+        options: [
+          "$1$",
+          "$-1$",
+          "$0$",
+          "គ្មានលីមីត",
+        ],
         correct: "$-1$",
         explanation:
           "ចំពោះ $x < 3$ យើងបាន $|x - 3| = -(x - 3)$ ដូច្នេះផលធៀបស្មើ $-1$។",
       },
       {
         prompt: "គណនា $\\lim_{x \\to 2^+}\\frac{|x - 2|}{x - 2}$",
-        options: ["$1$", "$-1$", "$0$", "គ្មានលីមីត"],
+        options: [
+          "$0$",
+          "$-1$",
+          "$1$",
+          "គ្មានលីមីត",
+        ],
         correct: "$1$",
         explanation:
           "ចំពោះ $x > 2$ យើងបាន $|x - 2| = x - 2$ ដូច្នេះផលធៀបស្មើ $1$។ សញ្ញាខាងស្ដាំផ្ទុយពីខាងឆ្វេង។",
@@ -292,7 +362,12 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     foundation: [
       {
         prompt: "បើ $x < 1$ តើកន្សោម $(x - 1)$ មានសញ្ញាអ្វី?",
-        options: ["អវិជ្ជមាន", "វិជ្ជមាន", "សូន្យ", "អាស្រ័យលើ $x$"],
+        options: [
+          "អាស្រ័យលើ $x$",
+          "វិជ្ជមាន",
+          "សូន្យ",
+          "អវិជ្ជមាន",
+        ],
         correct: "អវិជ្ជមាន",
         explanation:
           "$x < 1$ នាំឱ្យ $x - 1 < 0$។ សញ្ញានេះហើយជាអ្វីដែលកំណត់លទ្ធផលនៃលីមីតខាងឆ្វេង។",
@@ -319,14 +394,24 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     questions: [
       {
         prompt: "គណនា $\\lim_{x \\to 0}\\frac{\\sin 3x}{x}$",
-        options: ["$3$", "$1$", "$0$", "$\\frac{1}{3}$"],
+        options: [
+          "$1$",
+          "$0$",
+          "$3$",
+          "$\\frac{1}{3}$",
+        ],
         correct: "$3$",
         explanation:
           "$3 \\cdot \\lim_{x \\to 0}\\frac{\\sin 3x}{3x} = 3(1) = 3$",
       },
       {
         prompt: "គណនា $\\lim_{x \\to 0}\\frac{\\sin 7x}{2x}$",
-        options: ["$\\frac{7}{2}$", "$7$", "$1$", "$\\frac{2}{7}$"],
+        options: [
+          "$\\frac{2}{7}$",
+          "$7$",
+          "$1$",
+          "$\\frac{7}{2}$",
+        ],
         correct: "$\\frac{7}{2}$",
         explanation:
           "$\\frac{7}{2} \\cdot \\lim_{x \\to 0}\\frac{\\sin 7x}{7x} = \\frac{7}{2}(1) = \\frac{7}{2}$",
@@ -343,8 +428,8 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
       {
         prompt: "សរសេរ $\\frac{\\sin 5x}{x}$ ឡើងវិញដោយគុណ និងចែកភាគបែងនឹង $5$",
         options: [
-          "$5 \\cdot \\frac{\\sin 5x}{5x}$",
           "$\\frac{1}{5} \\cdot \\frac{\\sin 5x}{5x}$",
+          "$5 \\cdot \\frac{\\sin 5x}{5x}$",
           "$5 \\cdot \\frac{\\sin x}{x}$",
           "$\\frac{\\sin x}{x}$",
         ],
@@ -367,7 +452,12 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     questions: [
       {
         prompt: "គណនា $\\lim_{x \\to +\\infty}\\frac{4x^2 + 1}{2x^2 - 3x}$",
-        options: ["$2$", "$\\frac{1}{2}$", "$0$", "$+\\infty$"],
+        options: [
+          "$\\frac{1}{2}$",
+          "$0$",
+          "$+\\infty$",
+          "$2$",
+        ],
         correct: "$2$",
         explanation: "ផលធៀបមេគុណនៃតួដឺក្រេធំបំផុត៖ $\\frac{4}{2} = 2$",
       },
@@ -382,14 +472,24 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     foundation: [
       {
         prompt: "តើ $\\lim_{x \\to +\\infty}\\frac{1}{x}$ ស្មើនឹងប៉ុន្មាន?",
-        options: ["$0$", "$1$", "$+\\infty$", "គ្មានលីមីត"],
+        options: [
+          "$1$",
+          "$0$",
+          "$+\\infty$",
+          "គ្មានលីមីត",
+        ],
         correct: "$0$",
         explanation:
           "ភាគបែងកាន់តែធំ ប្រភាគកាន់តែតូច ដូច្នេះវាខិតទៅ $0$។ នេះជាមូលដ្ឋាននៃវិធីចែកនឹង $x^n$។",
       },
       {
         prompt: "កំណត់តួដែលមានដឺក្រេធំបំផុតនៃពហុធា $5x^2 + 4x - 7$",
-        options: ["$5x^2$", "$4x$", "$-7$", "$5$"],
+        options: [
+          "$-7$",
+          "$4x$",
+          "$5x^2$",
+          "$5$",
+        ],
         correct: "$5x^2$",
         explanation:
           "ដឺក្រេធំបំផុតគឺ $2$ ដូច្នេះតួនោះគឺ $5x^2$ — តួនេះហើយដែលគ្រប់គ្រងឥរិយាបថនៅអនន្ត។",
@@ -415,7 +515,12 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
       },
       {
         prompt: "គណនា $\\lim_{x \\to +\\infty}\\frac{6x^2 - 1}{x^3 + 4x^2}$",
-        options: ["$0$", "$6$", "$+\\infty$", "$\\frac{3}{2}$"],
+        options: [
+          "$6$",
+          "$0$",
+          "$+\\infty$",
+          "$\\frac{3}{2}$",
+        ],
         correct: "$0$",
         explanation: "ដឺក្រេ $2$ លើដឺក្រេ $3$ ភាគបែងធំជាង ដូច្នេះលីមីតស្មើ $0$។",
       },
@@ -423,14 +528,24 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     foundation: [
       {
         prompt: "តើដឺក្រេនៃភាគយកក្នុង $\\frac{4x^3 + 2}{x^4 - 3x + 1}$ ស្មើនឹងប៉ុន្មាន?",
-        options: ["$3$", "$4$", "$2$", "$1$"],
+        options: [
+          "$2$",
+          "$4$",
+          "$3$",
+          "$1$",
+        ],
         correct: "$3$",
         explanation:
           "ភាគយកគឺ $4x^3 + 2$ ដែលមានស្វ័យគុណខ្ពស់បំផុតស្មើ $3$។ ភាគបែងមានដឺក្រេ $4$ ធំជាង។",
       },
       {
         prompt: "គណនា $\\lim_{x \\to +\\infty}\\frac{4}{x}$",
-        options: ["$0$", "$4$", "$+\\infty$", "$\\frac{1}{4}$"],
+        options: [
+          "$\\frac{1}{4}$",
+          "$4$",
+          "$+\\infty$",
+          "$0$",
+        ],
         correct: "$0$",
         explanation: "ចំនួនថេរចែកនឹងចំនួនកាន់តែធំឥតកំណត់ ខិតទៅ $0$។",
       },
@@ -449,14 +564,24 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     questions: [
       {
         prompt: "គណនា $\\lim_{x \\to 0}\\frac{1 - \\cos 2x}{x}$",
-        options: ["$0$", "$2$", "$\\frac{1}{2}$", "$1$"],
+        options: [
+          "$2$",
+          "$0$",
+          "$\\frac{1}{2}$",
+          "$1$",
+        ],
         correct: "$0$",
         explanation:
           "$2 \\cdot \\lim_{u \\to 0}\\frac{1 - \\cos u}{u} = 2(0) = 0$។ ភាគបែងជា $x$ ដឺក្រេទី $1$ ដូច្នេះលទ្ធផលនៅតែ $0$។",
       },
       {
         prompt: "គណនា $\\lim_{x \\to 0}\\frac{1 - \\cos x}{2x}$",
-        options: ["$0$", "$\\frac{1}{2}$", "$\\frac{1}{4}$", "$1$"],
+        options: [
+          "$\\frac{1}{4}$",
+          "$\\frac{1}{2}$",
+          "$0$",
+          "$1$",
+        ],
         correct: "$0$",
         explanation:
           "$\\frac{1}{2} \\cdot \\lim_{x \\to 0}\\frac{1 - \\cos x}{x} = \\frac{1}{2}(0) = 0$",
@@ -465,7 +590,12 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     foundation: [
       {
         prompt: "តើ $\\cos 0$ ស្មើនឹងប៉ុន្មាន?",
-        options: ["$1$", "$0$", "$-1$", "$\\frac{1}{2}$"],
+        options: [
+          "$\\frac{1}{2}$",
+          "$0$",
+          "$-1$",
+          "$1$",
+        ],
         correct: "$1$",
         explanation:
           "$\\cos 0 = 1$ ដូច្នេះ $1 - \\cos 0 = 0$ ដែលជាមូលហេតុឱ្យកន្សោមនេះជារាងមិនកំណត់។",
@@ -492,13 +622,23 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
     questions: [
       {
         prompt: "គណនា $\\lim_{x \\to +\\infty}\\left(1 + \\frac{5}{x}\\right)^x$",
-        options: ["$e^5$", "$e$", "$5e$", "$e^{-5}$"],
+        options: [
+          "$e$",
+          "$5e$",
+          "$e^5$",
+          "$e^{-5}$",
+        ],
         correct: "$e^5$",
         explanation: "ប្រើរូបមន្តផ្ទាល់ដោយ $a = 5$ ដូច្នេះលទ្ធផលគឺ $e^5$។",
       },
       {
         prompt: "គណនា $\\lim_{x \\to +\\infty}\\left(1 - \\frac{2}{x}\\right)^x$",
-        options: ["$e^{-2}$", "$e^2$", "$-e^2$", "$e$"],
+        options: [
+          "$e$",
+          "$e^2$",
+          "$-e^2$",
+          "$e^{-2}$",
+        ],
         correct: "$e^{-2}$",
         explanation:
           "ត្រង់នេះ $a = -2$ ដូច្នេះលទ្ធផលគឺ $e^{-2}$។ សញ្ញាដកត្រូវយកមកជាមួយ។",
@@ -514,7 +654,12 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
       },
       {
         prompt: "សម្រួលកន្សោម $(e^a)^b$ ដោយប្រើវិធានស្វ័យគុណ",
-        options: ["$e^{ab}$", "$e^{a + b}$", "$e^{a - b}$", "$abe$"],
+        options: [
+          "$e^{a + b}$",
+          "$e^{ab}$",
+          "$e^{a - b}$",
+          "$abe$",
+        ],
         correct: "$e^{ab}$",
         explanation:
           "ស្វ័យគុណជាន់គុណនឹងគ្នា៖ $(e^a)^b = e^{ab}$ ដែលជាមូលហេតុឱ្យរូបមន្តទូទៅឱ្យ $e^{ab}$។",
@@ -527,31 +672,31 @@ export const MATH_LIMIT_SKILLS: Record<MathLimitSkillId, Required<SkillHelp>> = 
 export const MATH_LIMIT_OPERATIONS_QUIZ: SectionQuestion[] = [
   {
     q: "គណនា $\\lim_{x \\to 3}(2x^2 - 5x + 1)$",
-    options: ["ក. $4$", "ខ. $22$", "គ. $34$", "ឃ. $-2$"],
-    correct: "ក. $4$",
+    options: ["ក. $22$", "ខ. $4$", "គ. $34$", "ឃ. $-2$"],
+    correct: "ខ. $4$",
     explanation: "$2(3)^2 - 5(3) + 1 = 18 - 15 + 1 = 4$",
     help: MATH_LIMIT_SKILLS["direct-substitution"],
   },
   {
     q: "គណនា $\\lim_{x \\to 2}\\frac{x^2 - 4}{x - 2}$",
-    options: ["ក. $4$", "ខ. $0$", "គ. $2$", "ឃ. គ្មានលីមីត"],
-    correct: "ក. $4$",
+    options: ["ក. $0$", "ខ. $2$", "គ. $4$", "ឃ. គ្មានលីមីត"],
+    correct: "គ. $4$",
     explanation:
       "ជំនួសផ្ទាល់ឱ្យរាង $\\frac{0}{0}$ ដូច្នេះបំបែកកត្តា៖ $\\frac{(x - 2)(x + 2)}{x - 2} = x + 2 \\Rightarrow 2 + 2 = 4$",
     help: MATH_LIMIT_SKILLS["difference-of-squares"],
   },
   {
     q: "គណនា $\\lim_{x \\to -3}\\frac{x^2 + 5x + 6}{x + 3}$",
-    options: ["ក. $-1$", "ខ. $1$", "គ. $5$", "ឃ. $-5$"],
-    correct: "ក. $-1$",
+    options: ["ក. $1$", "ខ. $-1$", "គ. $5$", "ឃ. $-5$"],
+    correct: "ខ. $-1$",
     explanation:
       "$\\frac{(x + 3)(x + 2)}{x + 3} = x + 2 \\Rightarrow -3 + 2 = -1$",
     help: MATH_LIMIT_SKILLS.trinomial,
   },
   {
     q: "គណនា $\\lim_{x \\to 0}\\frac{\\sqrt{x + 4} - 2}{x}$",
-    options: ["ក. $\\frac{1}{4}$", "ខ. $\\frac{1}{2}$", "គ. $0$", "ឃ. $4$"],
-    correct: "ក. $\\frac{1}{4}$",
+    options: ["ក. $\\frac{1}{2}$", "ខ. $0$", "គ. $4$", "ឃ. $\\frac{1}{4}$"],
+    correct: "ឃ. $\\frac{1}{4}$",
     explanation:
       "គុណនឹង $\\frac{\\sqrt{x + 4} + 2}{\\sqrt{x + 4} + 2} \\Rightarrow \\frac{x}{x(\\sqrt{x + 4} + 2)} = \\frac{1}{\\sqrt{x + 4} + 2} \\Rightarrow \\frac{1}{2 + 2} = \\frac{1}{4}$",
     help: MATH_LIMIT_SKILLS.rationalization,
@@ -566,24 +711,24 @@ export const MATH_LIMIT_OPERATIONS_QUIZ: SectionQuestion[] = [
   },
   {
     q: "គណនា $\\lim_{x \\to 0}\\frac{\\sin 5x}{x}$",
-    options: ["ក. $5$", "ខ. $1$", "គ. $0$", "ឃ. $\\frac{1}{5}$"],
-    correct: "ក. $5$",
+    options: ["ក. $1$", "ខ. $0$", "គ. $5$", "ឃ. $\\frac{1}{5}$"],
+    correct: "គ. $5$",
     explanation:
       "$\\lim_{x \\to 0} 5 \\cdot \\frac{\\sin 5x}{5x} = 5(1) = 5$",
     help: MATH_LIMIT_SKILLS["trig-sin-over-x"],
   },
   {
     q: "គណនា $\\lim_{x \\to +\\infty}\\frac{3x^2 - 2x + 1}{5x^2 + 4x - 7}$",
-    options: ["ក. $\\frac{3}{5}$", "ខ. $0$", "គ. $+\\infty$", "ឃ. $\\frac{5}{3}$"],
-    correct: "ក. $\\frac{3}{5}$",
+    options: ["ក. $0$", "ខ. $+\\infty$", "គ. $\\frac{3}{5}$", "ឃ. $\\frac{5}{3}$"],
+    correct: "គ. $\\frac{3}{5}$",
     explanation:
       "ចែកភាគយក និងភាគបែងនឹង $x^2 \\Rightarrow \\frac{3 - \\frac{2}{x} + \\frac{1}{x^2}}{5 + \\frac{4}{x} - \\frac{7}{x^2}} \\Rightarrow \\frac{3}{5}$",
     help: MATH_LIMIT_SKILLS["infinity-equal-degree"],
   },
   {
     q: "គណនា $\\lim_{x \\to +\\infty}\\frac{4x^3 + 2}{x^4 - 3x + 1}$",
-    options: ["ក. $0$", "ខ. $+\\infty$", "គ. $4$", "ឃ. $\\frac{1}{4}$"],
-    correct: "ក. $0$",
+    options: ["ក. $+\\infty$", "ខ. $0$", "គ. $4$", "ឃ. $\\frac{1}{4}$"],
+    correct: "ខ. $0$",
     explanation:
       "ដឺក្រេភាគបែង ($4$) ធំជាងដឺក្រេភាគយក ($3$) ដូច្នេះលីមីតខិតទៅ $0$។",
     help: MATH_LIMIT_SKILLS["infinity-bottom-heavy"],
@@ -598,8 +743,8 @@ export const MATH_LIMIT_OPERATIONS_QUIZ: SectionQuestion[] = [
   },
   {
     q: "គណនា $\\lim_{x \\to +\\infty}\\left(1 + \\frac{3}{x}\\right)^x$",
-    options: ["ក. $e^3$", "ខ. $e$", "គ. $3e$", "ឃ. $e^{-3}$"],
-    correct: "ក. $e^3$",
+    options: ["ក. $e$", "ខ. $3e$", "គ. $e^{-3}$", "ឃ. $e^3$"],
+    correct: "ឃ. $e^3$",
     explanation:
       "រូបមន្តនិយមន័យគ្រឹះ $\\lim_{k \\to +\\infty}\\left(1 + \\frac{a}{k}\\right)^k = e^a$ ដោយ $a = 3$ ដូច្នេះលទ្ធផលគឺ $e^3$។",
     help: MATH_LIMIT_SKILLS["euler-number"],

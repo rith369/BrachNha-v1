@@ -15,6 +15,137 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 27 Sep 2026 — KruAI Competition Multi-Key Rotation Pool, Expanded Model Fallback Chain & 0-Token Bac II Query Cache
+
+Commit `e81cc64`. **No database step needed.**
+
+**Why.** Ahead of app demonstrations and competition testing by ~20 judges and students, KruAI needed bulletproof reliability and zero-cost scaling. The Google AI Studio free tier limits each API key to 20 requests per day per model. Additionally, frequent Bac II comparison questions (such as Monocot vs Dicot or Mitosis vs Meiosis) should not consume quota when tested repeatedly by multiple users.
+
+**What changed.**
+- **API Key Rotation Pool ([`server/chat-handler.ts`](file:///e:/Kru%20AI/Brachnha-v2/server/chat-handler.ts), [`server/vite-chat-plugin.ts`](file:///e:/Kru%20AI/Brachnha-v2/server/vite-chat-plugin.ts)):**
+  - Accepts a pool of multiple Gemini API keys via `GEMINI_API_KEYS` (comma-separated) or `GEMINI_API_KEY_1` through `GEMINI_API_KEY_5`.
+  - Implements round-robin rotation so consecutive student requests distribute load evenly across accounts.
+  - Automatically falls back to the next key in the pool if a key encounters rate limits (429), quota exhaustion, or server demand spikes.
+- **Expanded Model Fallback Chain ([`server/chat-handler.ts`](file:///e:/Kru%20AI/Brachnha-v2/server/chat-handler.ts)):**
+  - Expanded candidate models to: `["gemini-3.5-flash", "gemini-flash-latest", "gemini-3.6-flash", "gemini-3-flash-preview"]`.
+  - With 4 keys x 4 models, the app now supports up to 16 fallback tiers (~320 queries/day) with $0 cost.
+  - Dynamically configures thinking parameters per model (`thinking_level: "low"` for `gemini-flash-latest`, `"minimal"` for 3.x flash models).
+- **0-Token Bac II Cache & Simulated Streaming ([`server/chat-cache.ts`](file:///e:/Kru%20AI/Brachnha-v2/server/chat-cache.ts)):**
+  - Pre-computed verified Bac II curriculum answers for high-frequency exam questions (Monocot vs Dicot, Auxin vs Cytokinin, Sympathetic vs Parasympathetic, 3 Brain Parts, Mitosis vs Meiosis, DNA Replication, 3 RNA Types, Mendel's Laws).
+  - Emits natural simulated streaming (12ms micro-delay) so users see realistic typing animation without making any external API calls.
+  - Serves cached responses before the auth gate so judges and guests can test key exam questions instantly without logging in.
+  - Dynamic LRU cache (200 items) caches successful model answers for repeated questions from other testers.
+
+**What to re-test.**
+- Ask KruAI "compare monocot and dicot" or "ប្រៀបធៀបម៉ូណូកូទីលេដូន និងឌីកូទីលេដូន": verify answer streams instantly with 0 delay and formatted comparison table.
+- Ask "compare mitosis and meiosis": verify structured table and Bac II exam tips appear.
+- Test with multiple keys defined in `.env.local` (`GEMINI_API_KEYS="key1,key2,key3"`).
+
+---
+
+## 27 Sep 2026 — Math 2025 Bac II Exam Completed: Parts VI (Geometry & Parabola) & VII (Functions) Added (Full 125 Points)
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** The Mathematics 2025 Bac II mock exam paper had Parts I through V completed (65 points), but was missing the two final large sections: Part VI (Geometry in Space & Parabola, 20 points) and Part VII (Full Function Study & Logarithmic Integral Area, 40 points). Adding these completes the full 125-point national Bac II exam paper so students can practice the entire exam end-to-end under real 150-minute exam conditions.
+
+**What changed.**
+- **Completed Part VI ([`math-2025.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/papers/math-2025.ts), 20 points):**
+  - **3D Vectors (5 points)**: Vector coordinate calculations $\vec{AC}=(-3,1,2)$, $\vec{AE}=(1,7,-2)$, $\vec{BD}=(0,1,-1)$, $\vec{BF}=(1,0,-1)$, $\vec{DF}=(1,-1,0)$.
+  - **Geometric Proofs (5 points)**: Scalar product $\vec{AC} \cdot \vec{AE} = 0 \Rightarrow \triangle ACE$ is a right triangle at $A$ (2 pts); side lengths $|\vec{BD}|=|\vec{BF}|=|\vec{DF}|=\sqrt{2} \Rightarrow \triangle BDF$ is equilateral (3 pts).
+  - **Parabola (10 points)**: Standard equation $y^2 = 8x$ with vertex $O(0,0)$, axis of symmetry $y=0$, passing through $A(2,4)$ (7 pts); finding abscissa $x_1 = 8$ for $B(x_1,-8)$ (3 pts).
+- **Completed Part VII ([`math-2025.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/papers/math-2025.ts), 40 points):**
+  - **Domain & Parity (5 points)**: Domain $D=(-3, 3)$ from sign table $\frac{-x-3}{x-3}>0$ (3 pts); algebraic proof that $g(-x) = -g(x) \Rightarrow g$ is an odd function (2 pts).
+  - **Limits & Asymptotes (6 points)**: $\lim_{x \to -3^+} g(x) = -\infty$ with vertical asymptote $x=-3$ (3 pts); $\lim_{x \to 3^-} g(x) = +\infty$ with vertical asymptote $x=3$ (3 pts).
+  - **Derivatives & Monotonicity (10 points)**: Derivative $g'(x) = \frac{6}{9-x^2} > 0$ for all $x \in (-3, 3)$ (5 pts); strict increasing variation and table with no extrema (5 pts).
+  - **Tangent & Geometry (8 points)**: Tangent line $T: y = \frac{2}{3}x$ at $x_0 = 0$ (5 pts); geometric properties of curve $C$ with inflection/symmetry center at $O(0,0)$ (3 pts).
+  - **Sign Study (5 points)**: $g(x) < 0$ on $(-3, 0)$, $g(0)=0$, $g(x) > 0$ on $(0, 3)$.
+  - **Integration & Area (6 points)**: Product derivative $h'(x) = [x g(x)]' = g(x) + \frac{6x}{9-x^2}$ (3 pts); exact plane area $S = \int_0^1 g(x)dx = [h(x) + 3\ln|x^2-9|]_0^1 = 10\ln 2 - 6\ln 3$ area units (3 pts).
+- **Exam completion**: 7 of 7 sections complete, exactly 125/125 points accounted for, 0 Khmer digits, and option answers balanced across all four choices (ក, ខ, គ, ឃ).
+
+**What to re-test.**
+- Open **Exams -> Mathematics 2025** on the app.
+- Check that all 7 sections appear in the exam overview:
+  - I. លីមីត (15 pts)
+  - II. ប្រូបាប (10 pts)
+  - III. ចំនួនកុំផ្លិច (15 pts)
+  - IV. អាំងតេក្រាល (15 pts)
+  - V. សមីការឌីផេរ៉ង់ស្យែល (10 pts)
+  - VI. ធរណីមាត្រក្នុងលំហ និងកោនិក (20 pts)
+  - VII. សិក្សាអនុគមន៍ (40 pts)
+- Tap into Section VI and Section VII: verify problem statements match the printed exam, KaTeX equations render sharply, and selecting options reveals step-by-step solutions with MoEYS points.
+
+---
+
+## 27 Sep 2026 — Grade 12 Biology Chapter 3 Lesson 1 (Nervous Regulation) Digitized & Grounded in KruAI
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Chapter 3 covers **ជំពូក 3 ៖ តម្រូវផ្សេងៗរបស់សារពាង្គកាយ** (Regulation and Coordination in Organisms). Lesson 1 (Nervous Regulation) contains foundational, high-frequency Bac II questions on neuron structure and classifications, nerve impulse propagation (120 m/s), synapse neurotransmitter mechanisms, central vs. peripheral nervous systems, brain lobes and functions (cerebrum, cerebellum, brainstem), the reflex arc, and the autonomic sympathetic vs. parasympathetic comparison table.
+
+**What changed.**
+- **19 textbook pages digitized & verified**: Pages `p060.md` to `p077.md` and chapter review page `p121.md` transcribed in `sources/ocr/biology/chapter3/` with 0 errors via `ocr-check` and 100% Latin digits compliance.
+- **Search index expanded ([`textbook-search.ts`](file:///e:/Kru%20AI/Brachnha-v2/server/textbook-search.ts))**: Added 6 high-yield Chapter 3 sections (`tb:bio:ch3:*`) covering CNS & PNS divisions, neuron structure and classifications, nerve impulse & synapse neurotransmitter transmission, brain anatomy & lobes, spinal cord & reflex arc, and autonomic sympathetic vs parasympathetic nervous systems.
+- **Bac II comparison format example ([`bac2-format.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/bac2-format.ts))**: Added a verified comparison example for **Sympathetic vs. Parasympathetic Nervous Systems** with similarities, differences table, and marking scheme exam tips.
+
+**What to re-test.**
+- Ask KruAI in chat:
+  - "ប្រៀបធៀបប្រព័ន្ធប្រសាទសាំប៉ាទិច និងប៉ារ៉ាសាំប៉ាទិច" (Sympathetic vs. Parasympathetic)
+  - "តើអាំងភ្លុចប្រសាទឆ្លងកាត់ស៊ីណាប់ដូចម្តេច?" (Nerve impulse across synapse)
+  - "រៀបរាប់ផ្នែកសំខាន់ទាំង 3 នៃខួរក្បាលមនុស្ស" (3 main parts of human brain)
+  - "តើអ្វីជាធ្នូរ៉េផ្លិច?" (Reflex arc)
+- Verify answers cite official MoEYS definitions and render structured comparison tables with exam tips.
+
+---
+
+## 27 Sep 2026 — Math 2025 Mock Test Parts IV & V Added + Correct Answer Option Positions Shuffled Across All Quizzes
+
+*Not committed yet.* **No database step needed.**
+
+**Why.**
+1. The 2025 Bac II Mathematics mock exam paper had Parts I–III completed, but was missing Exercises IV (Integrals) and V (Differential Equations). Students needed the full 5 core analytical sections of the exam ready for practice with authentic MoEYS problem statements, point allocations, and detailed step-by-step explanations.
+2. In several quizzes, skill drills, and foundation exercises, the correct answer was previously clustered at option position 1 (index 0). Students taking the quizzes could guess the first option and pass without working out the problems.
+
+**What changed.**
+- **Math 2025 Mock Paper ([`math-2025.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/papers/math-2025.ts)):**
+  - Added **Part IV: Integrals (IV. អាំងតេក្រាល, 15 points)** covering polynomial and rational integrals ($I, J_1, J_1+J_2, J_2$) and trigonometric power reduction integral ($K = \int_0^{\pi/2}(\sin^2 x\cos^4 x + \sin^4 x\cos^2 x)dx = \pi/16$).
+  - Added **Part V: Differential Equations (V. សមីការឌីផេរ៉ង់ស្យែល, 10 points)** covering characteristic equation, real distinct roots, general solution, and finding the particular solution given boundary conditions ($y(0)=1, y'(1)=e \Rightarrow y=e^x$).
+  - Total covered points now reach 65/125 points across parts I to V with verified marking keys.
+- **Answer Option Shuffling Across All Quizzes:**
+  - Shuffled option orders across all 10 limit skill drills and foundation exercises in [`math-1-1-1.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/quizzes/math-1-1-1.ts) (40 questions), ensuring a balanced 25% distribution across positions 1, 2, 3, 4 without repetition within skills.
+  - Balanced question option positions across [`questions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/questions.ts) (Placement Test / Survey questions), [`lessons.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/lessons.ts) (PRACTICE questions), and [`sections.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/sections.ts) (curriculum quizzes).
+
+**What to re-test.**
+- Navigate to **Exams -> Mathematics 2025** and verify all 5 sections are playable:
+  - Check Part IV (Integrals) and Part V (Differential Equations) questions, options, KaTeX typesetting, and solution explanations.
+- Take quizzes in **Practice -> Limits** and **Placement Test / Survey**:
+  - Notice the correct answers are randomly and evenly distributed across positions (ក, ខ, គ, ឃ), preventing guessing patterns.
+
+---
+
+## 27 Sep 2026 — Grade 12 Biology Chapter 2 (Plant Growth, Transport & Hormones) Digitized & Grounded in KruAI
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Chapter 1 (Plant Reproduction & Diversity) was previously digitized and connected to KruAI. Chapter 2 — **ជំពូកទី 2 ៖ ការលូតលាស់និងកំណបរំញោចរុក្ខជាតិ** (Plant Growth, Transport, and Responses/Hormones) — contains some of the most heavily tested Bac II biology questions: water and mineral transport mechanisms (xylem, transpiration pull, root pressure), stomata regulation (potassium ions and ABA), phloem translocation, primary vs. secondary growth (cambium, tree rings), the 5 plant hormones (Auxin, Gibberellin, Cytokinin, Ethylene, ABA), and plant tropisms (phototropism, gravitropism, etc.). Students asking KruAI about these topics now receive answers grounded directly in the official MoEYS textbook.
+
+**What changed.**
+
+- **34 textbook pages digitized**: All pages from PDF page 26 through 59 (`sources/ocr/biology/chapter2/p026.md`–`p059.md`) were transcribed with rigorous OCR verification (0 errors) and 100% Latin digits compliance.
+- **Search and grounding index expanded**: Added 6 high-yield Chapter 2 curriculum sections to `server/textbook-search.ts` covering water transport, stomata regulation, phloem transport, meristems and cambium growth, plant hormones synthesis and functions, and plant tropisms.
+- **Bac II comparison format example**: Added a new worked Bac II exam comparison example to `src/data/bac2-format.ts` for plant hormones (Auxin vs Cytokinin), complete with both "Similarities" and a responsive Markdown "Differences" table, plus official marking scheme exam tips.
+- **Zero cost & vendor privacy maintained**: Processed via Google AI Studio Free Tier and fully compliant with vendor confidentiality guidelines (students only see KruAI).
+
+**What to re-test.**
+
+- Open KruAI chat on the web app.
+- Ask questions about Chapter 2 topics in Khmer or English:
+  - "តើអរម៉ូនអុកស៊ីន និងស៊ីតូគីនីនខុសគ្នាយ៉ាងដូចម្តេច?" (Compare Auxin and Cytokinin)
+  - "ពន្យល់ពីយន្តការនៃការបិទបើកស្តូម៉ាត" (Explain stomata opening and closing mechanism)
+  - "តើការលូតលាស់បឋម និងការលូតលាស់ទុតិយភូមិខុសគ្នាយ៉ាងដូចម្តេច?" (Primary vs Secondary plant growth)
+  - "តើទឹក និងអំបិលខនិជឡើងទៅលើតាមយន្តការអ្វីខ្លះ?" (How do water and minerals travel upward in plants?)
+- Notice that KruAI cites MoEYS definitions, provides structured comparison tables, and includes exam tips.
+
 ---
 
 ## 27 Sep 2026 — "Open in Browser" screen for links opened from Telegram and Messenger

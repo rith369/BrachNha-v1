@@ -169,7 +169,7 @@ After a few days I realised that I wasn't very good at dancing. But then I never
             en: "We saw ......... children in the park.",
             km: "We saw ......... children in the park.",
           },
-          options: ["any", "some", "a", "much"],
+          options: ["some", "any", "a", "much"],
           correct: "some",
           skill: "quantifiers",
           explanation:
@@ -181,7 +181,7 @@ After a few days I realised that I wasn't very good at dancing. But then I never
             en: "I was going to do the washing, but the machine ............ down.",
             km: "I was going to do the washing, but the machine ............ down.",
           },
-          options: ["broken", "break", "breaks", "broke"],
+          options: ["broken", "broke", "breaks", "break"],
           correct: "broke",
           skill: "past-simple",
           explanation:
@@ -194,9 +194,9 @@ After a few days I realised that I wasn't very good at dancing. But then I never
             km: "The new bridge ......... before the end of next month.",
           },
           options: [
-            "will be completed",
             "is completed",
             "completes",
+            "will be completed",
             "will complete",
           ],
           correct: "will be completed",
@@ -210,7 +210,7 @@ After a few days I realised that I wasn't very good at dancing. But then I never
             en: "Several trees fell down last night ...... the strong wind.",
             km: "Several trees fell down last night ...... the strong wind.",
           },
-          options: ["because", "so", "because of", "since"],
+          options: ["because", "because of", "so", "since"],
           correct: "because of",
           skill: "because-of",
           explanation:
@@ -245,7 +245,7 @@ After a few days I realised that I wasn't very good at dancing. But then I never
             en: "According to the weather ......... there will be rain tomorrow.",
             km: "According to the weather ......... there will be rain tomorrow.",
           },
-          options: ["programme", "survey", "forecast", "information"],
+          options: ["programme", "forecast", "survey", "information"],
           correct: "forecast",
           skill: "collocation",
           explanation:
@@ -257,7 +257,7 @@ After a few days I realised that I wasn't very good at dancing. But then I never
             en: "How much do they ...... for cleaning your room?",
             km: "How much do they ...... for cleaning your room?",
           },
-          options: ["cost", "need", "demand", "charge"],
+          options: ["cost", "need", "charge", "demand"],
           correct: "charge",
           skill: "word-choice",
           explanation:
@@ -269,7 +269,7 @@ After a few days I realised that I wasn't very good at dancing. But then I never
             en: "The restaurant service is bad, so we should write a ...... to the manager.",
             km: "The restaurant service is bad, so we should write a ...... to the manager.",
           },
-          options: ["complaint", "information", "message", "essay"],
+          options: ["information", "complaint", "message", "essay"],
           correct: "complaint",
           skill: "word-choice",
           explanation:
@@ -281,7 +281,7 @@ After a few days I realised that I wasn't very good at dancing. But then I never
             en: "Most people in the town ....... the idea of clean and green city.",
             km: "Most people in the town ....... the idea of clean and green city.",
           },
-          options: ["support", "agree", "believe", "approve"],
+          options: ["agree", "believe", "support", "approve"],
           correct: "support",
           skill: "word-choice",
           explanation:
@@ -293,7 +293,7 @@ After a few days I realised that I wasn't very good at dancing. But then I never
             en: "Please confirm your reservation in ......",
             km: "Please confirm your reservation in ......",
           },
-          options: ["writing", "words", "letter", "paper"],
+          options: ["words", "letter", "writing", "paper"],
           correct: "writing",
           skill: "collocation",
           explanation:

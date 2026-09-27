@@ -263,4 +263,86 @@ Exam tip: write each function immediately next to its part, not in a separate pa
 គន្លឹះប្រឡង៖ ពេលប្រឡងបាក់ឌុប សំណួរប្រៀបធៀបត្រូវឆ្លើយទាំង «លក្ខណៈដូចគ្នា» និង «លក្ខណៈខុសគ្នា» ជាតារាងជានិច្ច។ បើឆ្លើយតែលក្ខណៈខុសគ្នា នោះនឹងបាត់ពិន្ទុពាក់កណ្តាលលើលក្ខណៈដូចគ្នា!`,
     },
   },
+  {
+    subject: "biology",
+    verified: true,
+    question: {
+      en: "Compare the plant hormones Auxin and Cytokinin.",
+      km: "ប្រៀបធៀបអរម៉ូនអុកស៊ីន (Auxin) និងស៊ីតូគីនីន (Cytokinin)។",
+    },
+    answer: {
+      en: `+ Similarities
+- Both are plant growth hormones (phytohormones) that regulate plant development.
+- Both are synthesized in tiny amounts but produce significant physiological effects.
+
++ Differences
+| Feature | Auxin | Cytokinin |
+| :--- | :--- | :--- |
+| Primary synthesis site | Shoot apical meristem, young leaves | Root apical meristem, actively dividing tissues |
+| Cellular action | Promotes cell elongation | Promotes cell division (cytokinesis) |
+| Lateral bud effect | Inhibits lateral bud growth (apical dominance) | Stimulates lateral bud sprouting and branching |
+| Leaf senescence | Promotes abscission of older leaves | Delays leaf senescence (retains chlorophyll) |
+
+Exam tip: Highlight the antagonistic relationship regarding lateral buds (Auxin inhibits, Cytokinin promotes). In Bac II exams, comparison questions always require both "Similarities" and a "Differences table" to receive full marks.`,
+      km: `+ លក្ខណៈដូចគ្នា
+- ជាអរម៉ូនលូតលាស់រុក្ខជាតិ (ភីតូអរម៉ូន) ដូចគ្នា
+- ត្រូវបានផលិតក្នុងបរិមាណតិចតួចបំផុត ប៉ុន្តែមានប្រសិទ្ធភាពខ្ពស់លើការលូតលាស់ និងការអភិវឌ្ឍរុក្ខជាតិដូចគ្នា។
+
++ លក្ខណៈខុសគ្នា
+| លក្ខណៈ | អរម៉ូនអុកស៊ីន (Auxin) | អរម៉ូនស៊ីតូគីនីន (Cytokinin) |
+| :--- | :--- | :--- |
+| កន្លែងផលិតចម្បង | ចុងពន្លកកំពូល ស្លឹកខ្ចី និងអំប្រ៊ីយ៉ុង | ចុងឫស (មេរីស្តែមឫស) និងជាលិកាកំពុងលូតលាស់ |
+| ឥទ្ធិពលលើកោសិកា | ជំរុញការលូតវែងនៃកោសិកា | ជំរុញការចែកកោសិកា (ស៊ីតូគីណេស) |
+| ឥទ្ធិពលលើពន្លកចំហៀង | ទប់ស្កាត់ការលូតលាស់ពន្លកចំហៀង (ភាពត្រួតត្រានៃពន្លកកំពូល) | ជំរុញការលូតលាស់ពន្លកចំហៀង (បែកមែកធាង) |
+| ឥទ្ធិពលលើភាពចាស់នៃស្លឹក | ជំរុញការជ្រុះស្លឹកចាស់ | ពន្យឺតភាពចាស់នៃស្លឹក (រក្សាជាតិបៃតង) |
+
+គន្លឹះប្រឡង៖ ចងចាំថាអុកស៊ីន និងស៊ីតូគីនីន មានឥទ្ធិពលប្រឆាំងគ្នាលើពន្លកចំហៀង (អុកស៊ីនទប់ស្កាត់ ស៊ីតូគីនីនជំរុញ)។ ក្នុងវិញ្ញាសាបាក់ឌុប សំណួរប្រៀបធៀបត្រូវសរសេរទាំង «លក្ខណៈដូចគ្នា» និង «លក្ខណៈខុសគ្នា» ជាតារាងជានិច្ចដើម្បីទទួលបានពិន្ទុពេញ!`,
+    },
+  },
+  {
+    subject: "biology",
+    verified: true,
+    question: {
+      en: "Compare the sympathetic and parasympathetic nervous systems.",
+      km: "ប្រៀបធៀបប្រព័ន្ធប្រសាទសាំប៉ាទិច និងប៉ារ៉ាសាំប៉ាទិច។",
+    },
+    answer: {
+      en: `+ Similarities
+- Both are divisions of the autonomic (involuntary) nervous system.
+- Both innervate internal visceral organs (heart, lungs, digestive tract, blood vessels, glands).
+- Both work cooperatively to maintain internal homeostasis.
+
++ Differences
+| Feature | Sympathetic Nervous System | Parasympathetic Nervous System |
+| :--- | :--- | :--- |
+| Primary state | Active during emergencies or stress (Fight or Flight) | Active during rest and recovery (Rest and Digest) |
+| Heart rate | Increases heart rate and contraction strength | Decreases heart rate back to baseline |
+| Pupils | Dilates pupils (pupil dilation) | Constricts pupils |
+| Bronchi | Dilates bronchi (increases airflow) | Constricts bronchi to normal caliber |
+| Digestion | Inhibits salivation, gastric secretion, and peristalsis | Stimulates salivation, digestive enzymes, and motility |
+| Blood glucose | Liver converts glycogen to glucose (releases energy) | Liver converts glucose to glycogen (stores energy) |
+| Hormone secretion | Stimulates adrenal glands to secrete epinephrine | Decreases epinephrine secretion |
+| Urinary bladder | Relaxes bladder muscles | Contracts bladder muscles for urination |
+
+Exam tip: Always state both "Similarities" and a "Differences table". Highlight that they have antagonistic (opposite) actions on the same target organs to finely regulate the internal environment.`,
+      km: `+ លក្ខណៈដូចគ្នា
+- ជាផ្នែកទាំងពីរនៃប្រព័ន្ធប្រសាទស្វ័យប្រវត្តិ (អឆន្ទៈ) ដូចគ្នា
+- ត្រួតពិនិត្យ និងសម្របសម្រួលសរីរាង្គខាងក្នុង (បេះដូង សរសៃឈាម ទងសួត ក្រពះ-ពោះវៀន ក្រពេញ) ដូចគ្នា
+- ធ្វើការរួមគ្នាដើម្បីរក្សាលំនឹង (Homeostasis) ក្នុងសារពាង្គកាយដូចគ្នា។
+
++ លក្ខណៈខុសគ្នា
+| លក្ខណៈ | ប្រព័ន្ធប្រសាទសាំប៉ាទិច (Sympathetic) | ប្រព័ន្ធប្រសាទប៉ារ៉ាសាំប៉ាទិច (Parasympathetic) |
+| :--- | :--- | :--- |
+| ស្ថានភាពសកម្មភាព | សកម្មក្នុងគ្រាអាសន្ន ឬតានតឹង (Fight or Flight) | សកម្មក្នុងពេលសម្រាក និងរំលាយអាហារ (Rest and Digest) |
+| ចង្វាក់បេះដូង | បង្កើនល្បឿន និងកម្លាំងកន្ត្រាក់បេះដូង | បន្ថយល្បឿនចង្វាក់បេះដូងមកធម្មតា |
+| ប្រស្រីភ្នែក | ពង្រីកប្រស្រីភ្នែក | បង្រួមប្រស្រីភ្នែក |
+| ទងសួត | ពង្រីកទងសួត (ស្រូប O_2 បានច្រើន) | បង្រួមទងសួតមកធម្មតា |
+| ការរំលាយអាហារ | បន្ថយការបញ្ចេញទឹកមាត់ និងការរំលាយអាហារ | ជំរុញការបញ្ចេញទឹកមាត់ និងការរំលាយអាហារ |
+| ជាតិស្ករក្នុងឈាម | ថ្លើមបំប្លែងគ្លីកូសែនជាគ្លុយកូស (បញ្ចេញថាមពល) | ថ្លើមបំប្លែងគ្លុយកូសជាគ្លីកូសែន (ស្តុកទុកជាតិស្ករ) |
+| ការបញ្ចេញអរម៉ូន | ជំរុញការបញ្ចេញអេពីណេព្រីនពីក្រពេញលើតម្រងនោម | បន្ថយការបញ្ចេញអេពីណេព្រីន |
+| ប្លោកនោម | បន្ធូរប្លោកនោម | បង្រួមប្លោកនោម |
+
+គន្លឹះប្រឡង៖ ក្នុងវិញ្ញាសាបាក់ឌុប សំណួរប្រៀបធៀបត្រូវសរសេរទាំង «លក្ខណៈដូចគ្នា» និង «លក្ខណៈខុសគ្នាជាតារាង» ជានិច្ចដើម្បីកុំឱ្យបាត់ពិន្ទុ។ សម្គាល់ថា ប្រព័ន្ធទាំងពីរមានសកម្មភាពផ្ទុយគ្នាជានិច្ចលើសរីរាង្គគោលដៅដដែល (សាំប៉ាទិចជំរុញពេលអាសន្ន ប៉ារ៉ាសាំប៉ាទិចសម្រាលពេលសម្រាក)។`,
+    },
+  },
 ];

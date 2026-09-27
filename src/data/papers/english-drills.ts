@@ -30,7 +30,7 @@ export const SKILLS: Record<SkillId, SkillHelp> = {
     questions: [
       {
         prompt: "There is ......... milk in the fridge.",
-        options: ["many", "some", "a", "few"],
+        options: ["many", "a", "some", "few"],
         correct: "some",
         explanation: "milk ជានាមរាប់មិនបាន ក្នុងប្រយោគបញ្ជាក់ → some។",
       },
@@ -88,7 +88,7 @@ export const SKILLS: Record<SkillId, SkillHelp> = {
     questions: [
       {
         prompt: "The new school ......... next year.",
-        options: ["will build", "will be built", "builds", "is building"],
+        options: ["will build", "builds", "will be built", "is building"],
         correct: "will be built",
         explanation: "សាលាមិនសាងសង់ខ្លួនឯង → will be + built។",
       },
@@ -105,7 +105,7 @@ export const SKILLS: Record<SkillId, SkillHelp> = {
       },
       {
         prompt: "The road ......... before the rainy season starts.",
-        options: ["will repair", "will be repaired", "repairs", "repaired"],
+        options: ["will be repaired", "will repair", "repairs", "repaired"],
         correct: "will be repaired",
         explanation: "ផ្លូវត្រូវបានជួសជុលដោយគេ → will be repaired។",
       },
@@ -122,7 +122,7 @@ export const SKILLS: Record<SkillId, SkillHelp> = {
     questions: [
       {
         prompt: "The match was cancelled ......... the heavy rain.",
-        options: ["because", "because of", "so", "although"],
+        options: ["because", "so", "because of", "although"],
         correct: "because of",
         explanation: "the heavy rain ជានាម → because of។",
       },
@@ -134,7 +134,7 @@ export const SKILLS: Record<SkillId, SkillHelp> = {
       },
       {
         prompt: "He couldn't sleep ......... the noise from the street.",
-        options: ["because", "so", "because of", "since"],
+        options: ["because", "so", "since", "because of"],
         correct: "because of",
         explanation: "the noise ជានាម → because of។",
       },
@@ -180,7 +180,7 @@ export const SKILLS: Record<SkillId, SkillHelp> = {
     questions: [
       {
         prompt: "She soon ......... friends with her new classmates.",
-        options: ["did", "made", "took", "got"],
+        options: ["did", "got", "made", "took"],
         correct: "made",
         explanation: "make friends (with somebody) = ចងមិត្ត។",
       },
@@ -209,7 +209,7 @@ export const SKILLS: Record<SkillId, SkillHelp> = {
     questions: [
       {
         prompt: "The hotel ......... us $30 for one night.",
-        options: ["cost", "charged", "paid", "spent"],
+        options: ["charged", "cost", "paid", "spent"],
         correct: "charged",
         explanation: "charge somebody for something = គិតថ្លៃពីមនុស្ស។",
       },
@@ -221,7 +221,7 @@ export const SKILLS: Record<SkillId, SkillHelp> = {
       },
       {
         prompt: "He wrote a ......... about the noisy room to the manager.",
-        options: ["complaint", "information", "advice", "news"],
+        options: ["information", "complaint", "advice", "news"],
         correct: "complaint",
         explanation: "write a complaint = សរសេរពាក្យតវ៉ា; ពាក្យផ្សេងជានាមរាប់មិនបាន។",
       },
@@ -239,7 +239,7 @@ export const SKILLS: Record<SkillId, SkillHelp> = {
     questions: [
       {
         prompt: "It was a good way to ......... new people.",
-        options: ["met", "meeting", "meet", "meets"],
+        options: ["met", "meet", "meeting", "meets"],
         correct: "meet",
         explanation: "បន្ទាប់ពី to ត្រូវការកិរិយាមូលដ្ឋាន → meet។",
       },

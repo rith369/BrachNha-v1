@@ -295,7 +295,7 @@ export const PRACTICE: Record<string, PracticeQuestion[]> = {
     {
       q: { en: "P(both heads, 2 flips)?", km: "P(ក្បាលទាំងពីរ)?" },
       correct: "1/4",
-      options: ["1/2", "1/4", "1/3", "2/3"],
+      options: ["1/2", "1/3", "1/4", "2/3"],
       explanation: { en: "1/2 × 1/2 = 1/4", km: "1/2 × 1/2 = 1/4" },
     },
   ],
@@ -303,7 +303,7 @@ export const PRACTICE: Record<string, PracticeQuestion[]> = {
     {
       q: { en: "Which part coordinates balance?", km: "ផ្នែកណាសម្របតុល្យភាព?" },
       correct: "Cerebellum",
-      options: ["Cerebrum", "Cerebellum", "Brain stem", "Neuron"],
+      options: ["Cerebellum", "Cerebrum", "Brain stem", "Neuron"],
       explanation: {
         en: "Cerebellum controls coordination and balance",
         km: "សេរេបែលគ្រប់គ្រងតុល្យភាព",
@@ -312,7 +312,7 @@ export const PRACTICE: Record<string, PracticeQuestion[]> = {
     {
       q: { en: "Stomach lining regenerates every?", km: "ស្រទាប់ក្រពះកើតឡើងវិញ?" },
       correct: "3-4 days",
-      options: ["1 day", "3-4 days", "1 week", "1 month"],
+      options: ["1 day", "1 week", "1 month", "3-4 days"],
       explanation: {
         en: "Stomach regenerates every 3-4 days to protect from acid",
         km: "ក្រពះកើតឡើងវិញ 3-4 ថ្ងៃ",

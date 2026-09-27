@@ -178,7 +178,7 @@ for (const file of todo) {
     // Quota is the routine failure on the free tier, not an error worth a
     // stack trace: stop, and the next run resumes from here.
     if (/429|RESOURCE_EXHAUSTED|quota/i.test(msg)) {
-      console.log(`  ${file}: quota reached — stopping. Run again later to resume.`);
+      console.log(`  ${file}: quota reached [${msg.slice(0, 160)}] — stopping. Run again later to resume.`);
       break;
     }
     console.error(`  ${file}: failed — ${msg.slice(0, 300)}`);

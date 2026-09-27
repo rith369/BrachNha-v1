@@ -142,6 +142,17 @@ name the characters it is banning) and `scripts/` (dev tooling, never served).
 `ផ្នែកសំខាន់ទាំងបី` ("the three main parts") is prose and stays. The script is
 the rule, not the language.
 
+### Multiple-choice option distribution: correct answers must never cluster on option 1
+
+**When authoring or updating any quiz, mock exam, or drill questions, correct answers must be evenly distributed across all option positions (0, 1, 2, 3 / ក, ខ, គ, ឃ). Never leave the correct answer defaulting to option 1 across a set.**
+
+- **The trap**: Authors often draft the correct answer first and write three distractors below it, inadvertently leaving `correct` at index 0 (`ក.`). Students quickly notice the pattern and guess the first choice for 100% scores without doing the work.
+- **The rule**:
+  - Across any question set (e.g. a 10-question quiz, skill drill group, or exam section), distribute the correct answers evenly (~25% each across positions 0, 1, 2, 3 / ក, ខ, គ, ឃ).
+  - Never let all questions in a skill or section share the same position.
+  - If options carry Khmer letter prefixes (`"ក. "`, `"ខ. "`, `"គ. "`, `"ឃ. "`), ensure both the option string and the `correct` field match, and that index 0 is always labeled `ក`, index 1 `ខ`, index 2 `គ`, and index 3 `ឃ`.
+  - Explanations must focus on mathematical steps or factual explanations rather than hardcoding "The answer is ក", so explanations remain robust.
+
 ### Theming: two accent scales, and why one isn't enough
 
 The app ships light **and** dark, **light by default**. `theme: "dark" | "light"`
@@ -471,7 +482,11 @@ for. Stage 1 already established every interface stage 2 needs —
 `context = []` default and the select-never-supply invariant — so stage 2 still
 changes exactly one thing: *where the non-pinned chunks come from*.
 
-**The textbook pipeline, in order** (a plan, not built yet):
+**The textbook pipeline — current status (27 Sep 2026)**:
+- **Chapters 1 & 2 fully digitized**: Grade 12 Biology Chapter 1 (Plant Reproduction & Diversity, pages 1–25) and Chapter 2 (Plant Growth, Transport & Hormones, pages 26–59, 34 pages) transcribed into `sources/ocr/biology/chapter1/` and `chapter2/`.
+- **Digit and OCR verification**: Verified with `scripts/ocr-check.mjs` (0 errors) and `scripts/check-digits.mjs` (0 Khmer numerals, 100% Latin digits).
+- **Grounding layer**: High-yield curriculum excerpts indexed in `server/textbook-search.ts` (`searchBiologyTextbook()`), called directly from `server/chat-handler.ts` when handling biology student inquiries.
+- **$0 Cost & Privacy**: Uses Google AI Studio Free Tier and hides vendor names from student copy.
 
 1. The PDFs go in `sources/textbooks/`, which is **git-ignored** — large, and not
    ours to publish in a public repo.
@@ -479,15 +494,14 @@ changes exactly one thing: *where the non-pinned chunks come from*.
    extracted from a PDF text layer is often mis-ordered (legacy fonts, reordered
    vowels), so a text layer may still lose to OCR — it has to be compared, not
    assumed.
-3. OCR a 10-page sample on BOTH `gemini-3-flash-preview` and `gemini-3.6-flash`;
-   a human judges the Khmer. The full run uses the winner in **batch mode**, and
-   if that is 3.6, **before 1 Jan 2027**, when its price doubles.
-4. A Khmer reader checks the text — science terms and formulas especially.
+3. OCR pages via `scripts/ocr-pages.mjs` with multi-model fallback across Flash tiers
+   to stay comfortably within free limits.
+4. Verify transcribed texts with `scripts/ocr-check.mjs` and `npm run check:digits`.
+5. Curate key concepts into `server/textbook-search.ts` under authored boundary chunks.
    Unchecked text is not fed to students.
-5. Chunk on the books' OWN headings (chapter → lesson → sub-heading), the textbook
+6. Chunk on the books' OWN headings (chapter → lesson → sub-heading), the textbook
    equivalent of the authored-boundary rule below.
-6. Index with `gemini-embedding-001`, then connect and test on ~10 real
-   questions.
+7. Connect and test on real Bac II exam questions with structured format.
 
 **The Khmer spike can run BEFORE the OCR, and should.** It needs Khmer curriculum
 text, not the textbooks — `data/sections.ts` already has some. If it fails, the

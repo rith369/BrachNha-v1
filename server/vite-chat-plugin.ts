@@ -107,8 +107,16 @@ export function chatApi(): Plugin {
     // from this call is exposed to the browser bundle.
     config(_config, { mode }) {
       const env = loadEnv(mode, process.cwd(), "");
-      if (env.GEMINI_API_KEY && !process.env.GEMINI_API_KEY) {
-        process.env.GEMINI_API_KEY = env.GEMINI_API_KEY;
+      for (const key of [
+        "GEMINI_API_KEY",
+        "GEMINI_API_KEYS",
+        "GEMINI_API_KEY_1",
+        "GEMINI_API_KEY_2",
+        "GEMINI_API_KEY_3",
+        "GEMINI_API_KEY_4",
+        "GEMINI_API_KEY_5",
+      ]) {
+        if (env[key] && !process.env[key]) process.env[key] = env[key];
       }
       // verify-user.ts needs the project URL to fetch the JWKS it checks
       // bearer tokens against. On Vercel every project variable is already in

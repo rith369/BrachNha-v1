@@ -12,19 +12,19 @@ export const MOCK_QS: MockExamQuestion[] = [
     subj: "math",
     q: { en: "P(rolling 6 on a dice)?", km: "P(ទទួល 6 ពីការបោះឡូតូ)?" },
     correct: "1/6",
-    options: ["1/2", "1/6", "1/3", "1/12"],
+    options: ["1/6", "1/2", "1/3", "1/12"],
   },
   {
     subj: "math",
     q: { en: "What is the derivative of x²?", km: "ដេរីវេ x² ជាអ្វី?" },
     correct: "2x",
-    options: ["x", "2x", "x²", "2"],
+    options: ["x", "x²", "2x", "2"],
   },
   {
     subj: "math",
     q: { en: "lim(x→∞) 1/x = ?", km: "lim(x→∞) 1/x = ?" },
     correct: "0",
-    options: ["0", "1", "∞", "undefined"],
+    options: ["1", "undefined", "∞", "0"],
   },
   {
     subj: "math",
@@ -41,7 +41,7 @@ export const MOCK_QS: MockExamQuestion[] = [
     subj: "biology",
     q: { en: "Main function of neurons?", km: "មុខងារណឺរ៉ូន?" },
     correct: "Transmit signals",
-    options: ["Produce energy", "Transmit signals", "Store memory", "Digest food"],
+    options: ["Transmit signals", "Produce energy", "Store memory", "Digest food"],
   },
   {
     subj: "biology",
@@ -56,19 +56,19 @@ export const MOCK_QS: MockExamQuestion[] = [
       km: "បេះដូងមានប្រហោងប៉ុន្មាន?",
     },
     correct: "4",
-    options: ["2", "3", "4", "5"],
+    options: ["2", "3", "5", "4"],
   },
   {
     subj: "biology",
     q: { en: "What is the powerhouse of the cell?", km: "អ្វីដែលផ្គត់ផ្គង់ថាមពលក្នុងកោសិកា?" },
     correct: "Mitochondria",
-    options: ["Nucleus", "Mitochondria", "Ribosome", "Vacuole"],
+    options: ["Nucleus", "Ribosome", "Mitochondria", "Vacuole"],
   },
   {
     subj: "biology",
     q: { en: "Where does photosynthesis occur?", km: "ការបំប្លែងពន្លឺកើតឡើងនៅឯណា?" },
     correct: "Chloroplast",
-    options: ["Nucleus", "Mitochondria", "Chloroplast", "Ribosome"],
+    options: ["Chloroplast", "Nucleus", "Mitochondria", "Ribosome"],
   },
 ];
 
