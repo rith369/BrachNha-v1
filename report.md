@@ -15,6 +15,47 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 28 Sep 2026 — Grade 12 Biology Chapter 3 Lesson 1 ("តម្រូវប្រសាទ"): Sections 2, 3, and 4 Authored & Playable
+
+Commit `1936bd3`. **No database step needed.**
+
+**Why.** Chapter 3 Lesson 1 ("តម្រូវប្រសាទ" / Nervous Regulation) is a core foundational topic in Grade 12 Biology for the Bac II exam. Only Section 1 ("សេចក្ដីផ្ដើម") was playable on the Study path; sections 2, 3, and 4 were locked placeholders awaiting full curriculum transcription from official MoEYS textbooks.
+
+**What changed.**
+- **Authored 3 Complete Biology Sections ([`src/data/sections.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/sections.ts)):**
+  - `biology-3-1-2` ("តម្រូវប្រសាទសត្វឥតឆ្អឹងកង"): Hydra nerve net (បណ្ដាញប្រសាទ), Planaria & Earthworm ventral nerve cord and ganglia, Arthropod sensory organs (compound eyes, antennae), cephalization (ក្បាលវិវត្ត).
+  - `biology-3-1-3` ("តម្រូវប្រសាទសត្វឆ្អឹងកង"): Dorsal hollow nerve cord, structural breakdown (nerve fibers $\to$ fascicles $\to$ nerves; nuclei vs ganglia), 5 brain divisions across vertebrates (olfactory, cerebrum, optic lobes, cerebellum, medulla oblongata) showing evolutionary expansion from fish to mammals.
+  - `biology-3-1-4` ("ប្រព័ន្ធប្រសាទរបស់មនុស្ស"): Neuron anatomy (dendrite, soma, axon with myelin), nerve impulses ($120\text{ m/s}$), synaptic transmission via neurotransmitters, CNS (cerebral hemispheres, thalamus, hypothalamus, cerebellum, medulla, spinal cord), PNS (12 cranial pairs, 31 spinal pairs), 5-part reflex arc (ធ្នូរ៉េផ្លិច), autonomic sympathetic vs parasympathetic regulation, and interactive 3D brain model.
+- **Strict Digit Discipline & Balanced Quiz Options:**
+  - 100% Latin digits (`0-9`) used across all prose and explanations; passed `npm run check:digits`.
+  - Authored 7 new authentic multiple-choice scenario questions with balanced answer distributions across positions `ក`, `ខ`, `គ`, `ឃ`.
+
+**What to re-test.**
+- Open `/subjects/biology` on the Study page: observe that Sections 3.1.2, 3.1.3, and 3.1.4 on the path are unlocked and playable.
+- Click each section to verify the 7-step flow: Introduction, Lesson details, Real-world examples, Key notes, Misconceptions, 3D Brain Viewer (Section 4), and Section Quizzes.
+
+## 28 Sep 2026 — Math 2025 Bac II Full Exam Paper with Tables & SVG Graphs, Option Balancing & MathText SVG Rendering
+
+Commit `pending`. **No database step needed.**
+
+**Why.** Students preparing for the national Bac II exam require complete, verified solutions for the latest 2025 National Mathematics Examination (125 total points across all 7 exercises). Several questions (such as function study, sign analysis, and integral area) require sign tables, variation tables, and geometric coordinate graphs. Additionally, multiple-choice quiz questions were updated to ensure correct answers do not cluster on the first choice.
+
+**What changed.**
+- **Complete Math 2025 Paper ([`src/data/papers/math-2025.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/papers/math-2025.ts)):**
+  - Fully authored all 7 MoEYS exam exercises (125 points total): Limits (15 pts), Probability (10 pts), Complex Numbers (15 pts), Integrals (15 pts), Differential Equations (10 pts), Space Vectors & Parabola (20 pts), and Function Study $g(x) = \ln\frac{-x-3}{x-3}$ (40 pts).
+  - Included step-by-step verified worked answers adhering to MoEYS grading criteria (Given $\to$ Method $\to$ Steps $\to$ Answer $\to$ Exam tip).
+  - Formatted sign tables and the function variation table (តារាងអថេរភាព) as Markdown comparison tables.
+  - Added responsive SVG diagrams with coordinate grids, asymptotes ($x = \pm 3$), tangent line $T$, curve $(C)$, and shaded region $S$.
+- **SVG & Table Rendering in MathText ([`src/components/shell/math-text.tsx`](file:///e:/Kru%20AI/Brachnha-v2/src/components/shell/math-text.tsx)):**
+  - Upgraded the block parser to recognize `<svg ... </svg>` elements alongside Markdown tables.
+  - SVG elements render inline with dark/light mode CSS color inheritance, responsive scaling, and XSS sanitization (scripts stripped).
+- **Quiz Option Distribution ([`src/data/quizzes/math-1-1-1.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/quizzes/math-1-1-1.ts), [`src/data/questions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/questions.ts), [`src/data/lessons.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/lessons.ts)):**
+  - Shuffled multiple-choice quiz questions evenly across choices 0, 1, 2, 3 (ក, ខ, គ, ឃ) to eliminate option 1 clustering.
+
+**What to re-test.**
+- Open `/mock-exam` and navigate to Math 2025: verify all 7 exercises show complete statements and point values totaling 125.
+- Expand Exercise VII in Math 2025: verify the variation table, sign table, and both SVG coordinate graphs render crisp and centered in both light and dark themes.
+
 ## 27 Sep 2026 — KruAI Competition Multi-Key Rotation Pool, Expanded Model Fallback Chain & 0-Token Bac II Query Cache
 
 Commit `e81cc64`. **No database step needed.**

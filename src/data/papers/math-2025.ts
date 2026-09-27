@@ -801,9 +801,16 @@ b. រកផ្ទៃក្រឡានៃផ្នែកប្លង់នៅ�
           explanation: String.raw`អនុគមន៍ $g(x)=\ln\left(\dfrac{-x-3}{x-3}\right)$ មានន័យលុះត្រាតែ $\dfrac{-x-3}{x-3} > 0$ និង $x-3 \ne 0$។
 ឫសភាគយក៖ $-x-3=0 \Rightarrow x=-3$
 ឫសភាគបែង៖ $x-3=0 \Rightarrow x=3$
-តារាងសញ្ញានៃ $\dfrac{-x-3}{x-3}$៖
-- ក្រៅចន្លោះឫស $(-\infty, -3)$ និង $(3, +\infty)$ ផលចែកមានសញ្ញាដក ($-$)
-- ក្នុងចន្លោះឫស $(-3, 3)$ ផលចែកមានសញ្ញាបូក ($+$)
+
+តារាងសញ្ញានៃ $\dfrac{-x-3}{x-3}$ ៖
+
+| $x$ | $-\infty$ | $-3$ | $3$ | $+\infty$ |
+| :--- | :---: | :---: | :---: | :---: |
+| $-x-3$ | $+$ | $0$ | $-$ | $-$ |
+| $x-3$ | $-$ | $-$ | $0$ | $+$ |
+| $\dfrac{-x-3}{x-3}$ | $-$ | $0$ | $+$ | $-$ |
+
+តាមតារាងសញ្ញា កន្សោមវិជ្ជមាន ($>0$) លើចន្លោះ $(-3, 3)$។
 ដូចនេះ ដែនកំណត់គឺ $D = (-3, 3)$។`,
         },
         {
@@ -900,7 +907,13 @@ $$g'(x) = \frac{u'}{u} = \frac{\dfrac{6}{(x-3)^2}}{\dfrac{-x-3}{x-3}} = \frac{6}
 ដោយភាគយក $6 > 0$ និងភាគបែង $9-x^2 > 0$ នាំឱ្យ៖
 $$g'(x) = \frac{6}{9-x^2} > 0 \quad (\forall x \in D)$$
 ដូចនេះ អនុគមន៍ $g$ ជាអនុគមន៍កើនដាច់ខាតលើដែនកំណត់ $D=(-3, 3)$ របស់វា និងគ្មានតម្លៃបរមា (extreme values) ឡើយ។
-តារាងអថេរភាពបង្ហាញ $g'(x) > 0$ ($+$) និង $g(x)$ កើនពី $-\infty$ ទៅ $+\infty$។`,
+
+តារាងអថេរភាពនៃអនុគមន៍ $g$ ៖
+
+| $x$ | $-3$ | | $3$ |
+| :--- | :---: | :---: | :---: |
+| $g'(x)$ | | $+$ | |
+| $g(x)$ | $-\infty$ | $\nearrow$ | $+\infty$ |`,
         },
         {
           id: "g7",
@@ -921,7 +934,13 @@ $$g'(x) = \frac{6}{9-x^2} > 0 \quad (\forall x \in D)$$
 $$g(0) = \ln\left(\frac{-0-3}{0-3}\right) = \ln 1 = 0$$
 $$g'(0) = \frac{6}{9 - 0^2} = \frac{6}{9} = \frac{2}{3}$$
 ជំនួសចូលរូបមន្ត៖
-$$T: y = \frac{2}{3}(x - 0) + 0 \quad\Rightarrow\quad T: y = \frac{2}{3}x$$`,
+$$T: y = \frac{2}{3}(x - 0) + 0 \quad\Rightarrow\quad T: y = \frac{2}{3}x$$
+
+តារាងតម្លៃចំណុចសម្រាប់សង់បន្ទាត់ប៉ះ $T$ ៖
+
+| $x$ | $0$ | $3$ |
+| :--- | :---: | :---: |
+| $y$ | $0$ | $2$ |`,
         },
         {
           id: "g8",
@@ -941,7 +960,35 @@ $$T: y = \frac{2}{3}(x - 0) + 0 \quad\Rightarrow\quad T: y = \frac{2}{3}x$$`,
 - គល់តម្រុយ $O(0,0)$ ជាផ្ចិតឆ្លុះនៃក្រាប $C$ ដោយសារ $g$ ជាអនុគមន៍សេស ($g(-x)=-g(x)$)។
 - ក្រាប $C$ កាត់តាម $O(0,0)$ ព្រោះ $g(0)=0$។
 - មានអាស៊ីមតូតឈរពីរគឺបន្ទាត់ $x = -3$ និង $x = 3$។
-- បន្ទាត់ប៉ះ $T: y = \dfrac{2}{3}x$ កាត់តាមចំណុច $(0,0)$ និង $(3,2)$ ដោយប៉ះក្រាប $C$ ចំគល់តម្រុយ $O$។`,
+- បន្ទាត់ប៉ះ $T: y = \dfrac{2}{3}x$ កាត់តាមចំណុច $(0,0)$ និង $(3,2)$ ដោយប៉ះក្រាប $C$ ចំគល់តម្រុយ $O$។
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 320" width="100%" height="auto" style="max-width:360px">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="currentColor" opacity="0.6"/>
+    </marker>
+  </defs>
+  <line x1="24" y1="160" x2="336" y2="160" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="180" y1="300" x2="180" y2="20" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="338" y="156" fill="currentColor" font-size="11" font-weight="bold" font-family="sans-serif">x</text>
+  <text x="186" y="24" fill="currentColor" font-size="11" font-weight="bold" font-family="sans-serif">y</text>
+  <text x="170" y="174" fill="currentColor" opacity="0.7" font-size="10" font-family="sans-serif">O</text>
+  <text x="102" y="174" fill="currentColor" opacity="0.6" font-size="9" text-anchor="middle" font-family="sans-serif">-3</text>
+  <text x="258" y="174" fill="currentColor" opacity="0.6" font-size="9" text-anchor="middle" font-family="sans-serif">3</text>
+  <text x="206" y="174" fill="currentColor" opacity="0.6" font-size="9" text-anchor="middle" font-family="sans-serif">1</text>
+  <text x="172" y="112" fill="currentColor" opacity="0.6" font-size="9" text-anchor="end" font-family="sans-serif">2</text>
+  <line x1="102" y1="25" x2="102" y2="295" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <line x1="258" y1="25" x2="258" y2="295" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <text x="102" y="18" fill="#a855f7" font-size="10" font-weight="bold" text-anchor="middle" font-family="sans-serif">x = -3</text>
+  <text x="258" y="18" fill="#a855f7" font-size="10" font-weight="bold" text-anchor="middle" font-family="sans-serif">x = 3</text>
+  <line x1="63" y1="238" x2="297" y2="82" stroke="#3b82f6" stroke-width="1.8"/>
+  <text x="290" y="74" fill="#3b82f6" font-size="10.5" font-weight="bold" font-family="sans-serif">T: y = 2/3 x</text>
+  <path d="M 106,255 L 110,237 L 115,222 L 123,209 L 133,196 L 144,186 L 154,178 L 164,171 L 172,165 L 180,160 L 188,155 L 196,149 L 206,142 L 216,134 L 227,124 L 237,111 L 245,98 L 250,83 L 254,65" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="240" y="55" fill="#ef4444" font-size="12" font-weight="bold" font-family="sans-serif">(C)</text>
+  <circle cx="180" cy="160" r="3" fill="#ef4444"/>
+  <circle cx="258" cy="108" r="3" fill="#3b82f6"/>
+  <text x="264" y="112" fill="#3b82f6" font-size="9" font-family="sans-serif">(3, 2)</text>
+</svg>`,
         },
         {
           id: "g9",
@@ -958,9 +1005,13 @@ $$T: y = \frac{2}{3}(x - 0) + 0 \quad\Rightarrow\quad T: y = \frac{2}{3}x$$`,
           ],
           correct: String.raw`$g(x) < 0$ ចំពោះ $x \in (-3, 0)$ ; $g(0)=0$ ; $g(x) > 0$ ចំពោះ $x \in (0, 3)$`,
           explanation: String.raw`ដោយ $g(0)=0$ និង $g$ ជាអនុគមន៍កើនដាច់ខាតលើ $(-3, 3)$ (ឬពិនិត្យលើក្រាប $C$)៖
-- បើ $-3 < x < 0$ នាំឱ្យ $g(x) < g(0) = 0$ គឺ $g(x) < 0$ (ក្រាបនៅក្រោមអ័ក្ស $Ox$)
-- បើ $x = 0$ នាំឱ្យ $g(0) = 0$ (ក្រាបកាត់អ័ក្ស $Ox$)
-- បើ $0 < x < 3$ នាំឱ្យ $g(x) > g(0) = 0$ គឺ $g(x) > 0$ (ក្រាបនៅខាងលើអ័ក្ស $Ox$)។`,
+
+តារាងសញ្ញាសង្ខេបនៃ $g(x)$ ៖
+
+| ចន្លោះ $x$ | $(-3, 0)$ | $0$ | $(0, 3)$ |
+| :--- | :---: | :---: | :---: |
+| សញ្ញា $g(x)$ | $g(x) < 0$ (អវិជ្ជមាន) | $0$ | $g(x) > 0$ (វិជ្ជមាន) |
+| ទីតាំងក្រាប $C$ | នៅក្រោមអ័ក្ស $Ox$ | កាត់គល់ $O$ | នៅខាងលើអ័ក្ស $Ox$ |`,
         },
         {
           id: "g10",
@@ -1000,7 +1051,34 @@ $$S = \int_{0}^{1}\left[h'(x) + \frac{3 \cdot 2x}{x^2-9}\right]dx = \left[h(x) +
 $$= \left[x \ln\left(\frac{-x-3}{x-3}\right) + 3\ln|x^2-9|\right]_{0}^{1}$$
 ជំនួស $x=1$៖ $1 \cdot \ln\left(\frac{-4}{-2}\right) + 3\ln|1-9| = \ln 2 + 3\ln 8 = \ln 2 + 3\ln(2^3) = \ln 2 + 9\ln 2 = 10\ln 2$
 ជំនួស $x=0$៖ $0 \cdot \ln 1 + 3\ln|-9| = 0 + 3\ln 9 = 3\ln(3^2) = 6\ln 3$
-$$S = 10\ln 2 - 6\ln 3\text{ (ឯកតាផ្ទៃ)}$$`,
+$$S = 10\ln 2 - 6\ln 3\text{ (ឯកតាផ្ទៃ)}$$
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 320" width="100%" height="auto" style="max-width:360px">
+  <defs>
+    <marker id="arr2" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="currentColor" opacity="0.6"/>
+    </marker>
+  </defs>
+  <!-- Shaded Area S for x in [0, 1] -->
+  <polygon points="180,160 188,155 196,149 206,142 206,160" fill="rgba(236,72,153,0.3)" stroke="none"/>
+  <text x="194" y="152" fill="#ec4899" font-size="10" font-weight="bold">S</text>
+  <line x1="206" y1="142" x2="206" y2="160" stroke="#ec4899" stroke-width="1.5" stroke-dasharray="2,2"/>
+  <line x1="24" y1="160" x2="336" y2="160" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <line x1="180" y1="300" x2="180" y2="20" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <text x="338" y="156" fill="currentColor" font-size="11" font-weight="bold" font-family="sans-serif">x</text>
+  <text x="186" y="24" fill="currentColor" font-size="11" font-weight="bold" font-family="sans-serif">y</text>
+  <text x="170" y="174" fill="currentColor" opacity="0.7" font-size="10" font-family="sans-serif">O</text>
+  <text x="102" y="174" fill="currentColor" opacity="0.6" font-size="9" text-anchor="middle" font-family="sans-serif">-3</text>
+  <text x="258" y="174" fill="currentColor" opacity="0.6" font-size="9" text-anchor="middle" font-family="sans-serif">3</text>
+  <text x="206" y="174" fill="#ec4899" font-size="9" font-weight="bold" text-anchor="middle" font-family="sans-serif">x=1</text>
+  <line x1="102" y1="25" x2="102" y2="295" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <line x1="258" y1="25" x2="258" y2="295" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <text x="102" y="18" fill="#a855f7" font-size="10" font-weight="bold" text-anchor="middle" font-family="sans-serif">x = -3</text>
+  <text x="258" y="18" fill="#a855f7" font-size="10" font-weight="bold" text-anchor="middle" font-family="sans-serif">x = 3</text>
+  <path d="M 106,255 L 110,237 L 115,222 L 123,209 L 133,196 L 144,186 L 154,178 L 164,171 L 172,165 L 180,160 L 188,155 L 196,149 L 206,142 L 216,134 L 227,124 L 237,111 L 245,98 L 250,83 L 254,65" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="240" y="55" fill="#ef4444" font-size="12" font-weight="bold" font-family="sans-serif">(C)</text>
+  <circle cx="180" cy="160" r="3" fill="#ef4444"/>
+</svg>`,
         },
       ],
     },
