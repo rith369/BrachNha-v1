@@ -5997,6 +5997,85 @@ No database migration was needed. RLS already keys on `auth.uid()`, which works
 identically for a Google user, and the avatar comes from the session rather than
 a column.
 
+### Links arrive from Telegram, and an in-app browser cannot sign in
+
+Most students meet a BrachNha link in a chat app, which opens it in that app's
+own webview rather than Chrome or Safari. The webview has its **own cookie jar**,
+so the Google session already on the phone is not in it — Google answers the
+OAuth redirect with a bare email-and-password form instead of the account
+chooser, and increasingly refuses the embedded user agent outright
+(`disallowed_useragent`). **None of that is fixable from inside the webview**, so
+the app detects it and asks to be reopened in the real browser.
+
+`utils/in-app-browser.ts` decides, and `features/auth/components/in-app-browser-view.tsx`
+is the screen. **Nothing else changed** — no new sign-in path, no change to
+`lib/auth.ts`, no route, no store field, no migration.
+
+**THE GATE IS ONE BRANCH, EXACTLY WHERE `EntryView` WOULD RENDER**, in
+`app-shell.tsx`. That placement is the whole design, and every "must not" falls
+out of it rather than needing a condition of its own: Chrome and Safari are not
+in-app browsers so they never reach it; a signed-in student already failed
+`!isAuthenticated`, in any browser, so **an OAuth callback resolves into a
+session and the chain moves past this branch on its own** — nothing here can
+interrupt a callback or touch a session; a student who already chose guest is
+past it too; and an unconfigured Supabase makes `hasFullAccess` true, so a fresh
+fork and `scripts/shots.mjs` behave exactly as before. Don't move the check onto
+a route or into a hook that runs earlier.
+
+**TWO KINDS OF SIGNAL, because Telegram stamps nothing.** Named UA tokens
+(`FBAN`, `FB_IAB`, `Instagram`, `MicroMessenger`, `Zalo`, `Line/`…) are the
+strongest evidence where a vendor provides one. Telegram provides none, so it is
+caught by SHAPE: on Android the platform's own `; wv)` WebView marker, and on iOS
+a WKWebView's missing `Version/`+`Safari/` pair. Those two heuristics are the
+only part that can produce a false positive, and **a false positive is strictly
+worse than a false negative** — it strands someone whose browser was fine behind
+a button with nothing to do. Hence the exclusions: iOS Chrome/Firefox/Edge/Opera
+by token, desktop never by heuristic, and **an installed PWA is checked for
+explicitly** (`navigator.standalone` / `display-mode: standalone`) because an iOS
+home-screen app has no `Safari/` either — without that, installing BrachNha would
+permanently replace it with a screen telling the student to open it in a browser.
+
+**A CHROME CUSTOM TAB IS CORRECTLY NOT FLAGGED.** Several Android apps open links
+that way instead of in a WebView, and a Custom Tab *is* Chrome with Chrome's
+Google session — sign-in works, so the student must not be interrupted.
+
+**NO PAGE CAN FORCE AN EXTERNAL BROWSER, and both mechanisms fail SILENTLY.**
+Android gets an `intent:` URL (the platform's documented hand-off, with
+`S.browser_fallback_url`, and deliberately **no `package=`** so the student's own
+default browser wins rather than Chrome being forced); iOS gets
+`x-safari-https://`, which reaches Safari and nothing else — there is no
+equivalent for a non-Safari default. Both schemes are *requests* the host app may
+drop, with no event either way, which is why `openInExternalBrowser` returns
+nothing and the screen reveals its manual instructions **from a timer** rather
+than from a result it will never receive. Don't add a success/failure return: it
+would be a lie. Both branches preserve the URL's own scheme, so a `localhost` dev
+build is not silently upgraded to https.
+
+`externalUrl()` keeps the path and query — a link to a lesson must reopen on that
+lesson — and drops two things on purpose: the **OAuth parameters** (an
+authorization `code` is single-use and bound to a PKCE verifier in *this*
+webview's storage, so carrying it over can only produce a failed exchange) and
+the **hash** (Android's `intent:` URLs need the fragment for their own payload,
+and nothing here routes on it).
+
+**ONE BUTTON, and the rest of the screen is not a control.** No "continue here",
+no guest, no Google — every one of those leads back into the webview, which is
+the thing that does not work. The link sits in a `select-all` box rather than
+behind a copy button, the shape `features/game`'s invite panel already uses.
+**The known cost, weighed and accepted:** a first-time visitor arriving from
+Telegram cannot reach guest mode either, since guest is chosen on the screen this
+one replaces. Guest mode itself is untouched and works normally in a real
+browser, and localStorage is per-browser so nothing is lost or duplicated.
+
+**Verified against 26 real user-agent strings** (both directions, plus the PWA,
+the Telegram JS bridge and iPadOS-reporting-as-Mac) and then in real Chrome under
+spoofed UAs: Telegram/Messenger see the screen and exactly two buttons, Chrome
+and Safari still get the ordinary entry screen with Google and guest intact, an
+existing guest inside Telegram is not interrupted, the intent URL carries the
+path and query, and 320px Khmer in both themes has no sideways scroll.
+**Scanning the real thing still needs two phones** — a spoofed UA proves the
+detection, not that Telegram honours the intent.
+
 ## Bugs found and fixed during the build (know these patterns)
 
 **StrictMode double-mounted the sync effect into two anonymous users.**

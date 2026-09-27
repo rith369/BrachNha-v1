@@ -203,6 +203,27 @@ export const T = {
     guest: "Guest",
     privacyPolicy: "Privacy policy",
 
+    // ── in-app browser ──
+    // Shown in place of the entry screen when BrachNha was opened inside
+    // Telegram's or Messenger's own browser. "Browser", "Chrome" and "Safari"
+    // stay in Latin script in both columns: they are the words printed on the
+    // menus the student is being sent to look for, so translating them would
+    // describe a button that does not exist. Same call as KruAI and Streak.
+    inAppTagline:
+      "For the best sign-in experience, please open BrachNha in your browser.",
+    openInBrowser: "Open in Browser",
+    // Revealed only after the button has been pressed and the page is still
+    // here — i.e. the host app refused. Each names the control that app
+    // actually shows, so the wording is a claim about their UI, not ours.
+    inAppStillHere: "Still here? Open it by hand:",
+    inAppHelpAndroid:
+      "Tap the ⋮ menu at the top of this screen, then choose \"Open in browser\".",
+    inAppHelpIOS:
+      "Tap the share or ⋯ button on this screen, then choose \"Open in Safari\".",
+    inAppHelpGeneric:
+      "Open Chrome or Safari and paste this link into the address bar.",
+    inAppCopyLink: "Or copy this link:",
+
     loginRequired: "Login required",
     loginRequiredRoadmap:
       "Your AI study roadmap is built from your own answers, so it needs an account to save them to.",
@@ -436,6 +457,20 @@ export const T = {
     signInFailed: "មិនអាចចាប់ផ្តើមការចូលបានទេ។ សូមពិនិត្យអ៊ីនធឺណិត រួចព្យាយាមម្ដងទៀត។",
     guest: "ភ្ញៀវ",
     privacyPolicy: "គោលការណ៍ឯកជនភាព",
+
+    // ── in-app browser ── see the en column for why Browser/Chrome/Safari and
+    // the menu labels quoted below stay in Latin script.
+    inAppTagline:
+      "ដើម្បីចូលគណនីបានរលូនបំផុត សូមបើក BrachNha ក្នុង Browser របស់អ្នក។",
+    openInBrowser: "បើកក្នុង Browser",
+    inAppStillHere: "នៅតែស្ថិតនៅទីនេះ? សូមបើកដោយដៃ៖",
+    inAppHelpAndroid:
+      "ចុចម៉ឺនុយ ⋮ នៅផ្នែកខាងលើអេក្រង់នេះ រួចជ្រើសរើស «Open in browser»។",
+    inAppHelpIOS:
+      "ចុចប៊ូតុងចែករំលែក ឬ ⋯ នៅលើអេក្រង់នេះ រួចជ្រើសរើស «Open in Safari»។",
+    inAppHelpGeneric:
+      "សូមបើក Chrome ឬ Safari រួចដាក់តំណនេះក្នុងរបារអាសយដ្ឋាន។",
+    inAppCopyLink: "ឬចម្លងតំណនេះ៖",
 
     loginRequired: "ត្រូវការចូលគណនី",
     loginRequiredRoadmap:

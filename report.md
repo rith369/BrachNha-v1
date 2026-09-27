@@ -17,6 +17,52 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ---
 
+## 27 Sep 2026 — "Open in Browser" screen for links opened from Telegram and Messenger
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Most students meet a BrachNha link inside a chat app, and those apps open
+it in their own built-in browser instead of Chrome or Safari. That built-in browser
+does not have the student's Google account signed in, so "Continue with Google" asked
+them to type their Google email and password instead of just picking their account —
+and Google increasingly refuses to sign anyone in from a built-in browser at all.
+Nothing we can do inside that browser fixes it, so the app now notices and asks to be
+reopened properly.
+
+**What changed.**
+
+- **A new screen, shown only inside a chat app's browser.** It says "For the best
+  sign-in experience, please open BrachNha in your browser" and has a single
+  **Open in Browser** button. No Google button, no guest option, nothing else to tap —
+  every other option would lead back into the browser that does not work.
+- **The button reopens the exact page they were on**, not the home page, so a link to a
+  particular lesson still lands on that lesson.
+- **If the chat app refuses to hand over** — which it is allowed to do, and no website
+  can force it — the screen then shows step-by-step instructions for that phone
+  ("tap the ⋮ menu…" on Android, "tap share → Open in Safari" on iPhone) plus the link
+  itself to copy. It does not pretend the button always works.
+- **Khmer and English**, following the language switch already on the screen.
+
+**What to re-test.**
+
+- **Normal Chrome or Safari, phone and laptop:** you should never see this screen. The
+  usual welcome screen with **Continue with Google** and **Continue as Guest** is
+  unchanged.
+- **Already signed in:** you should never see it either, in any browser.
+- **Open a BrachNha link from a Telegram or Messenger chat:** you should see the new
+  screen. Tap **Open in Browser** — on most Android phones the page reopens in your
+  normal browser; if nothing happens, the instructions appear underneath.
+- **Sign in after it reopens:** Google should now offer your account to pick, rather
+  than asking for your password.
+
+**Worth knowing.** Someone opening a link from Telegram for the very first time can no
+longer choose "Continue as Guest" from that screen — there is deliberately only one
+button. Guest mode still works normally once they are in their real browser.
+
+**Still needs a real check on real phones.** The detection and the screen were tested
+thoroughly, but whether Telegram and Messenger actually honour the "open in browser"
+request can only be confirmed on an actual phone with the site deployed.
+
 ## 23 Sep 2026 — 2-Day Bac II Simulation Overview Page
 
 *Not committed yet.* **No database step needed.**

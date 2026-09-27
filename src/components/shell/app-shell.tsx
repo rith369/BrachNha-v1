@@ -8,6 +8,7 @@ import { LoginView } from "@/features/login/components/login-view";
 import { SurveyView } from "@/features/survey/components/survey-view";
 import { CommitmentOverlay } from "@/features/commitment/components/commitment-overlay";
 import { EntryView } from "@/features/auth/components/entry-view";
+import { InAppBrowserView } from "@/features/auth/components/in-app-browser-view";
 import { AuthSplash } from "@/features/auth/components/auth-splash";
 import { AuthPromptOverlay } from "@/features/auth/components/auth-prompt-overlay";
 import { AccountConflictView } from "@/features/auth/components/account-conflict-view";
@@ -16,6 +17,7 @@ import { useSupabaseSync } from "@/hooks/use-supabase-sync";
 import { useStudyTimer } from "@/hooks/use-study-timer";
 import { useAuthSession } from "@/hooks/use-auth-session";
 import { useAuth } from "@/hooks/use-auth";
+import { isInAppBrowser } from "@/utils/in-app-browser";
 
 // The mentor pulls in KaTeX and its web fonts for typesetting replies. It is
 // only mounted when chatOpen is true, but a static import would still ship all
@@ -27,6 +29,12 @@ import { useAuth } from "@/hooks/use-auth";
 const ChatOverlay = lazy(() =>
   import("./chat-overlay").then((m) => ({ default: m.ChatOverlay }))
 );
+
+// Read ONCE, at module scope, because the answer cannot change while the page
+// is open — a user agent does not change mid-session. It is also what keeps the
+// check out of the render path entirely, so the gate below stays a plain
+// boolean compare and the React Compiler has no impure call to reason about.
+const IN_APP_BROWSER = isInAppBrowser();
 
 // Not a phone mockup — no frame, notch, or status bar. This is just the app's
 // outer container: full-bleed on a phone, then widening in steps so a laptop
@@ -163,7 +171,28 @@ export function AppShell({
              is the whole point of not gating first paint on auth: the only
              thing that arrives late is whether the locked features unlock. */
       status === "ready" && !isAuthenticated && !guestMode && !hasFullAccess ? (
-        <EntryView />
+        /* ── The in-app browser detour ──────────────────────────────────
+           Exactly where the entry screen would be, and nowhere else. That
+           placement is the whole rule, and it is what makes every "must not"
+           in this feature true without a second condition to keep in step:
+
+            - a student in Chrome or Safari never reaches it, because
+              isInAppBrowser() is false for them;
+            - a signed-in student never reaches it, in any browser, because
+              `!isAuthenticated` already failed — the OAuth callback resolves
+              into a session and the chain moves past this branch on its own,
+              so nothing here can interrupt a callback or touch a session;
+            - a guest who already chose guest mode never reaches it either;
+            - and an unconfigured Supabase makes `hasFullAccess` true, so a
+              fresh fork and scripts/shots.mjs behave exactly as before.
+
+           The one thing it does cost is the guest option for a first-time
+           visitor arriving from Telegram — see the component's own header. */
+        IN_APP_BROWSER ? (
+          <InAppBrowserView />
+        ) : (
+          <EntryView />
+        )
       ) : hasFullAccess && !userName ? (
         <LoginView />
       ) : hasFullAccess && !surveyed ? (
