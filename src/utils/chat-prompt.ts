@@ -511,7 +511,7 @@ interface CatalogEntry {
  * looking at. That is the moment an embedding index earns its place; see the
  * header of this file and the RAG note in CLAUDE.md.
  */
-const CATALOG_BUDGET_CHARS = 11_000;
+const CATALOG_BUDGET_CHARS = 3_500;
 
 /**
  * Flattens every piece of study content the app ships into a labelled text
