@@ -15,6 +15,29 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 28 Sep 2026 — Game Mode: Chemistry Hard Questions Added (Complete 30-Question Chemistry Pool)
+
+Commit `pending`. **No database step needed.**
+
+**Why.** To complete the full three difficulty tiers (Basic, Medium, Hard) for Chemistry in Game mode (`/game`), 10 advanced Grade 12 Bac II Chemistry calculation questions were authored for the **Hard** difficulty, bringing the authored Chemistry question pool to 30 questions.
+
+**What changed.**
+- **Authored 10 Chemistry Hard Competition Questions ([`src/data/game-questions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/game-questions.ts)):**
+  - Covers advanced and quantitative Bac II Grade 12 Chemistry curriculum:
+    - **Chemical Kinetics (សំណួរទី 1–2):** Determining rate law and reaction orders from initial rate data ($2A + B \rightarrow C \implies v = k[A]^2[B]$); and calculating instantaneous rate of disappearance from tangent slopes on $[H_2O_2]$ decomposition concentration-time graphs ($v = 2.0 \times 10^{-4}\text{ mol}\cdot\text{L}^{-1}\cdot\text{s}^{-1}$).
+    - **Acids, Bases & Titrations (សំណួរទី 3–5):** $pH$ calculation of weak acid $HCOOH$ via $[H_3O^+] = \sqrt{K_a \cdot C} \approx 4.24 \times 10^{-3}\text{ M} \implies pH = 2.37$; degree of ionization $\alpha = \frac{[H_3O^+]}{C} \times 100\% = 2\%$; and weak acid-strong base titration equivalence point characterization ($CH_3COO^-$ hydrolysis producing basic solution with $pH > 7$).
+    - **Chemical Equilibria (សំណួរទី 6–7):** Ideal gas equilibrium relation $K_p = K_c(RT)^{\Delta n}$ for $N_2O_4(g) \rightleftharpoons 2NO_2(g) \implies K_p = K_c(RT)$; and ICE table equilibrium calculation for $2HI(g) \rightleftharpoons H_2(g) + I_2(g) \implies K_c = \frac{1}{36}$.
+    - **Organic Chemistry & Biochemistry (សំណួរទី 8–10):** Le Chatelier shift and quadratic solving for ester equilibrium yield under excess alcohol ($x \approx 0.90\text{ mol}$); molar mass deduction of fatty acid from triglyceride saponification soap yield ($M(R-COOH) = 284\text{ g/mol}$ corresponding to stearic acid $C_{17}H_{35}COOH$); and amino acid isoelectric point calculation ($pI = \frac{2.34 + 9.69}{2} \approx 6.02$) with zwitterion dipole form.
+  - **Balanced Option Distribution:** Correct answers distributed evenly across positions (`ក`: 3, `ខ`: 2, `គ`: 3, `ឃ`: 2), avoiding clustering on option 1.
+  - **Latin Digits Enforced:** Strict Latin digits (0-9) used across all questions, options, formulas, and explanations in compliance with `npm run check:digits`.
+  - **Comprehensive Explanations:** Detailed worked mathematical steps and chemical rationales provided for student review.
+
+**What to re-test.**
+- Navigate to `/game/create`.
+- Select Chemistry ("គីមីវិទ្យា") and the **Hard** ("ពិបាក") or **Mix** ("ចម្រុះ") difficulty chip.
+- Start a competition and play through the 10 questions.
+- Verify options, rate laws, ICE tables, answer review, and explanations display correctly.
+
 ## 28 Sep 2026 — Biology Curriculum: MoEYS Summary PDF Chapter 4 Extracted, KruAI Grounding & Flashcards Added
 
 Commit `pending`. **No database step needed.**
