@@ -24,6 +24,7 @@ interface PledgeCopy {
   draw: string;
   type: string;
   drawHint: string;
+  signHere: string;
   clear: string;
   typePlaceholder: string;
   commit: string;
@@ -49,6 +50,7 @@ export const PLEDGE_COPY: Record<Lang, PledgeCopy> = {
     draw: "Draw",
     type: "Type",
     drawHint: "Sign with your finger",
+    signHere: "Sign here",
     clear: "Clear",
     typePlaceholder: "Type your name",
     commit: "I Commit",
@@ -71,6 +73,7 @@ export const PLEDGE_COPY: Record<Lang, PledgeCopy> = {
     draw: "គូរ",
     type: "វាយបញ្ចូល",
     drawHint: "ចុះហត្ថលេខាដោយម្រាមដៃ",
+    signHere: "សូមចុះហត្ថលេខា",
     clear: "សម្អាត",
     typePlaceholder: "វាយឈ្មោះរបស់អ្នក",
     commit: "ខ្ញុំសន្យា",

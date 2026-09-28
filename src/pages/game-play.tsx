@@ -169,6 +169,8 @@ export default function GamePlayPage() {
       opponentAnswers: competition.creatorAnswers,
     };
     addCompetitionAttempt(attempt, run.score * GAME_XP_PER_CORRECT);
+    // The daily challenge — see pages/game-create.tsx.
+    useBrachNhaStore.getState().completeTask("challenge");
 
     // Read the row back so the server gets the same id and timestamp the device
     // has, rather than a second set minted here.

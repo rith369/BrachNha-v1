@@ -55,6 +55,9 @@ export function PaperScreen({ paper }: { paper: PastPaper }) {
     addXp(attempt.score * 20);
     recordQuestions(paper.subject.id, attempt.total, attempt.score);
     recordSession(paper.subject.id);
+    // A finished paper counts as the daily challenge, beside a Game battle —
+    // see pages/game-create.tsx.
+    useBrachNhaStore.getState().completeTask("challenge");
     addPaperResult({
       paperKey: paper.key,
       score: attempt.score,

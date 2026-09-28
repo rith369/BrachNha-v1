@@ -95,6 +95,10 @@ export default function GameCreatePage() {
     // One call so the post and its reward cannot land separately — the same
     // reason award() is the single place XP, level and coins are granted.
     addCompetition(draftRow, result.score * GAME_XP_PER_CORRECT);
+    // Finishing a battle IS the daily challenge — one of the real completions
+    // behind that mission (Home's row is a link, not a checkbox). getState()
+    // because it is an event-time write, not something this screen renders.
+    useBrachNhaStore.getState().completeTask("challenge");
 
     // Read the row back rather than rebuilding it, so the server gets the SAME
     // id the device has. Minting a second one here would give the two copies

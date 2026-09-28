@@ -36,6 +36,9 @@ export function SignaturePad({
   const theme = useBrachNhaStore((s) => s.theme);
   const [tab, setTab] = useState<"draw" | "typed">("draw");
   const [typedName, setTypedName] = useState(defaultName);
+  // Drives only the centred "Sign here" label. The strokes themselves live in a
+  // ref (they change per pointermove); this flips at most once per stroke.
+  const [hasInk, setHasInk] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const strokesRef = useRef<Stroke[]>([]);
@@ -121,6 +124,7 @@ export function SignaturePad({
     e.currentTarget.setPointerCapture(e.pointerId);
     drawingRef.current = true;
     strokesRef.current.push([pointFromEvent(e)]);
+    setHasInk(true);
     redraw();
   }
 
@@ -142,6 +146,7 @@ export function SignaturePad({
 
   function clearDrawing() {
     strokesRef.current = [];
+    setHasInk(false);
     redraw();
     onChange({ kind: "drawn", signature: "" });
   }
@@ -183,17 +188,28 @@ export function SignaturePad({
 
       {tab === "draw" ? (
         <>
-          <canvas
-            ref={canvasRef}
-            // touchAction: none is what stops a finger from scrolling the page
-            // instead of drawing — without it the pad is unusable on a phone.
-            style={{ touchAction: "none" }}
-            className="aspect-[3/1] w-full cursor-crosshair rounded-xl bg-purple/[0.03]"
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={endStroke}
-            onPointerCancel={endStroke}
-          />
+          <div className="relative">
+            <canvas
+              ref={canvasRef}
+              // touchAction: none is what stops a finger from scrolling the page
+              // instead of drawing — without it the pad is unusable on a phone.
+              style={{ touchAction: "none" }}
+              className="aspect-[3/1] w-full cursor-crosshair rounded-xl bg-purple/[0.03]"
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={endStroke}
+              onPointerCancel={endStroke}
+            />
+            {/* An empty box reads as nothing to do, so name the task in the
+                middle of it. pointer-events-none keeps it from swallowing the
+                first touch; it goes the moment ink lands and returns on Clear. */}
+            {!hasInk && (
+              <span className="pointer-events-none absolute inset-0 flex items-center justify-center gap-2 text-base font-extrabold text-muted">
+                <Pencil className="size-4" strokeWidth={2.75} />
+                {c.signHere}
+              </span>
+            )}
+          </div>
           <div className="mt-1 flex items-center justify-between border-t border-dashed border-purple/20 pt-2">
             <span className="text-[11px] font-bold text-muted">
               {c.drawHint}

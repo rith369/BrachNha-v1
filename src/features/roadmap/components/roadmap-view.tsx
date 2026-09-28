@@ -92,7 +92,6 @@ export function RoadmapView() {
     lang,
     userData,
     tasks,
-    completeTask,
     pendingPlacementTests,
     commitment,
     setPledgeOpen,
@@ -101,7 +100,6 @@ export function RoadmapView() {
       lang: s.lang,
       userData: s.userData,
       tasks: s.tasks,
-      completeTask: s.completeTask,
       pendingPlacementTests: s.pendingPlacementTests,
       commitment: s.commitment,
       setPledgeOpen: s.setPledgeOpen,
@@ -149,14 +147,14 @@ export function RoadmapView() {
       icon: "✏️",
       label: lang === "en" ? "Practice" : "អនុវត្ត",
       count: mission.practice,
-      href: "/exam",
+      href: "/practice",
     },
     {
       key: "flashcards",
       icon: "🗂️",
       label: lang === "en" ? "Flashcards" : "កាតទន្លាប់",
       count: mission.flashcards,
-      href: "/lessons",
+      href: "/practice",
     },
   ];
   const allMissionsDone = missionRows.every((row) => tasks[row.key]);
@@ -285,21 +283,16 @@ export function RoadmapView() {
                         : `${row.count} ${lang === "en" ? "today" : "ថ្ងៃនេះ"}`}
                     </div>
                   </div>
+                  {/* No "Done" button: a mission ticks only when the work is
+                      actually finished (a lesson, a quiz, a flashcard review),
+                      never on a tap. The same `tasks` field Home reads. */}
                   {!done && (
-                    <>
-                      <Link
-                        to={row.href}
-                        className="shrink-0 rounded-full bg-purple/10 px-2.5 py-1 text-[11px] font-extrabold text-purple"
-                      >
-                        {lang === "en" ? "Go →" : "ទៅ →"}
-                      </Link>
-                      <button
-                        onClick={() => completeTask(row.key)}
-                        className="shrink-0 rounded-full bg-brand px-2.5 py-1 text-[11px] font-extrabold text-white"
-                      >
-                        {lang === "en" ? "Done" : "ចប់"}
-                      </button>
-                    </>
+                    <Link
+                      to={row.href}
+                      className="shrink-0 rounded-full bg-purple/10 px-2.5 py-1 text-[11px] font-extrabold text-purple"
+                    >
+                      {lang === "en" ? "Go →" : "ទៅ →"}
+                    </Link>
                   )}
                 </div>
               );

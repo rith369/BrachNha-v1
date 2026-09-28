@@ -86,6 +86,9 @@ export function ExamView() {
     // `paperResults` instead — the separate persisted field this comment used
     // to ask for. See features/exam/components/paper-screen.tsx.
     addExamResult(result);
+    // A finished exam counts as the daily challenge, beside a Game battle —
+    // see pages/game-create.tsx.
+    useBrachNhaStore.getState().completeTask("challenge");
 
     if (run) setFinished({ run, result });
     setRun(null);
