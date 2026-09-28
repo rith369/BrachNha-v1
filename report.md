@@ -15,6 +15,125 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 28 Sep 2026 — Home: "Continue Learning" and Missions You Have to Earn
+
+Commit `53eb58f`. **No database step needed.**
+
+**Why.** Home's Study list still showed the old lessons from the first version of the app,
+none of the new content (biology sections, flashcard decks, the math quiz, past papers). And a
+mission could be ticked just by tapping it, so the XP and the streak didn't mean anything.
+
+**What changed.**
+- **The Study card is now "Continue learning".** It shows up to 5 things to do next, built from
+  the content that really exists: lessons, flashcard decks, quizzes and past papers. It puts
+  first the flashcard decks you started, then decks that are due for review, then the next
+  unfinished thing in each subject you've been studying. Adding new content makes it show up
+  here automatically.
+- **A new student sees "Recommended for you"** instead: the first lesson, deck and quiz of each
+  subject, starting with the subjects they marked as weak in the survey.
+- **Missions only tick when the work is done.** Tapping a mission now opens where to do it:
+  - Complete a lesson → finish a lesson.
+  - Practice quiz → finish a quiz.
+  - Study flashcards → finish a flashcard review.
+  - Daily challenge → finish a Game battle or an exam.
+
+  The Roadmap's "Done" button was removed for the same reason.
+
+**What to re-test.**
+- A brand-new account: Home should say "Recommended for you".
+- After finishing a section: it should say "Continue learning", and "Complete a lesson" should
+  be ticked.
+- Tapping a mission should never tick it.
+
+## 28 Sep 2026 — The Signature Box Now Says "Sign Here"
+
+Commit `53eb58f`. **No database step needed.**
+
+**Why.** On the commitment screen, the signature box was an empty dark rectangle. Most students
+did not know they were meant to draw their signature in it.
+
+**What changed.** The empty box now shows **"សូមចុះហត្ថលេខា"** (English: "Sign here") in the
+middle, with a small pen icon. The text disappears as soon as the student starts drawing, and
+comes back if they tap **Clear**.
+
+**What to re-test.** Open the commitment pledge and check the text is in the middle of the box.
+Draw in it (the text should disappear), then tap Clear (it should come back).
+
+## 28 Sep 2026 — BrachNha Can Be Installed on the Home Screen
+
+Commit `c3c8f6e`. **No database step needed.**
+
+**Why.** Students open BrachNha from a link every time. Installing it puts the BrachNha icon on
+their phone's home screen, like a normal app. It opens full screen, with no browser bar.
+
+**What changed.**
+- **A pop-up offers to install the app** at two moments:
+  - **When the app opens.** If the student taps "Not now", it stays away for 3 days, so it
+    doesn't appear on every visit.
+  - **After they finish their first lesson.** This one appears once per phone. It waits until
+    they leave the lesson screen. It never appears in the middle of a lesson or an exam.
+- **Android (Chrome):** the pop-up has an **Install** button. Tapping it opens the phone's own
+  install screen.
+- **iPhone:** Apple doesn't let websites show an install button, so the pop-up shows the two
+  steps instead: tap **Share**, then **Add to Home Screen**.
+- **Inside Telegram or Messenger** nothing appears. Installing isn't possible there.
+- **New home-screen icon**, made from the BrachNha logo.
+- **If the installed app is opened with no internet**, it shows a short "You're offline, try
+  again" page instead of the browser's error page.
+
+**This is not connected to Google sign-in** and doesn't go through any Google review.
+
+**Please re-test on a real phone after this is deployed** (it can't be tested on localhost):
+1. Android Chrome: open the site and wait about 2 seconds. The pop-up should appear. Tap
+   **Install**. The BrachNha icon should appear on the home screen and open full screen.
+2. iPhone Safari: the pop-up should show the Share → Add to Home Screen steps. Follow them and
+   check the icon.
+3. Finish a lesson and leave the lesson screen. The "Nice work — lesson done!" pop-up should
+   appear once. It should not appear again after the next lesson.
+4. Open the installed app with Wi-Fi and mobile data off. You should see the offline page.
+
+## 28 Sep 2026 — KruAI: Privacy Fix, Faster Fallback Between Keys, Cleaner Textbook Lookup
+
+Commit `c3c8f6e`. **No database step needed.** No change to how the chat looks.
+
+**Why.** A review of the KruAI chatbot after the switch to several free API keys found:
+- **A privacy problem.** KruAI remembered its answers and handed the same answer to the next
+  student who typed the same words. But every answer is written for one student: it can use
+  their name, their weak subjects and their exam average. So student B could get an answer
+  addressed to student A. Short follow-ups like "why?" were also replayed into other people's
+  conversations, where they made no sense.
+- **Slow answers when a key ran out.** When one of the free keys has used up its daily limit,
+  Google sometimes waits about 30 seconds before saying so. Every few questions a student was
+  left staring at an empty bubble for half a minute.
+- **Wrong ready-made answers.** Some prepared answers were triggered too easily. For example,
+  "which part of the brain stem controls breathing" got the general "three parts of the brain"
+  answer.
+- **Unrelated textbook pages in the background.** Even "hi" pulled textbook pages into what
+  KruAI reads before answering, which slows it down and can pull the answer off topic.
+
+**What changed.**
+- The memory of past answers is **removed**. Each student gets an answer written for them.
+  The hand-written answers (for example mitosis vs meiosis, or Mendel's laws) are kept. They
+  are only used for the first question in a chat, only when the question is really that
+  question, and only for signed-in students.
+- When a key is out of quota or slow, KruAI now gives up on it after 10 seconds, tries the
+  next key, and skips the tired key for the next few minutes. In testing, the worst wait went
+  from about 33 seconds to about 13, and every question after that answered in about 2 seconds.
+- A broken key is skipped straight away instead of being tried again with every model.
+- If a student closes the chat mid-answer, KruAI stops generating it (this saves quota).
+- The textbook lookup now only pulls a page when the question actually names its topic.
+
+**Worth deciding (not a code change).** On Google's free tier, what students type may be
+used by Google to improve its products and may be read by reviewers. KruAI's instructions
+include the student's name and study profile. Also, spreading use across several free
+accounts to get more free quota may go against Google's usage terms. Worth reading Google's
+current Gemini API terms before using KruAI in a real classroom.
+
+**What to re-test.**
+1. Sign in, open KruAI and ask "compare mitosis and meiosis". A table answer appears instantly.
+2. Ask the same thing again as a follow-up in the same chat. KruAI writes a fresh answer.
+3. Ask a few normal questions. Answers should start within a couple of seconds.
+
 ## 28 Sep 2026 — Fix Chemistry KaTeX Formula Formatting & Expand check:quiz Verification to Game Questions
 
 Commit `pending`. **No database step needed.**

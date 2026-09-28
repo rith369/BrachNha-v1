@@ -304,7 +304,9 @@ than relying on that.
 
 ### Model and prompt
 
-Model selection uses a multi-model fallback chain (`["gemini-3.5-flash", "gemini-flash-latest", "gemini-3.6-flash"]`)
+There is no single model: `GEMINI_MODELS` in `chat-handler.ts` (currently
+`gemini-3.6-flash` → `gemini-3.5-flash` → `gemini-flash-latest` →
+`gemini-3-flash-preview`) × a POOL of API keys is a list of candidates, called
 through the official `@google/genai` SDK's **Interactions API** (`ai.interactions.create`), NOT the
 older `models/*:generateContent` endpoint the original Netlify function used.
 Replies stream as plain UTF-8 text (not SSE — there's one stream of text, so the
@@ -312,20 +314,101 @@ client just reads `response.body.getReader()`).
 
 `store: false` is passed deliberately so Google doesn't retain student
 conversations server-side; we replay history ourselves from the Zustand store.
+**It does not change what the FREE tier's terms allow Google to do with the
+content** — on unpaid use, prompts and replies may be used to improve Google's
+products and reviewed by people, and the prompt carries a student's name and
+study profile. That is a product/legal decision for before a real classroom,
+not something a flag here settles.
 `thinking_level` is `"minimal"` on purpose: measured ~2.7s to first character vs
 ~11.2s on `"low"`, and accuracy held on multi-step Bac II math (conjugate
 limits, conditional probability). `max_output_tokens` is set to 3000 (bumped from 1200)
 to ensure complete rendering of detailed Bac II comparison tables without mid-stream truncation.
 
-Free-tier quota and server demand spikes are handled by the fallback loop and
-resilient error catching: `isQuotaError()` detects rate limits (429), quota exhaustion,
-and high demand (503 / `service_unavailable`) both on initialization and in-stream,
-returning a polite temporary-busy notice. Crucially, vendor names ("Gemini" / "Google")
-are kept strictly out of student-visible copy to preserve product identity and secrecy.
+### The key pool and the fallback loop
 
-`server/rate-limit.ts` adds our own per-IP cap (30/min) before any upstream
-call, so a flood costs nothing. In dev there's no proxy and everything keys to
-`"local"`, which is fine — it exists to protect a deployment.
+Keys come from `GEMINI_API_KEYS` (comma-separated), `GEMINI_API_KEY`, and
+`GEMINI_API_KEY_1`..`_5`, de-duplicated. `server/vite-chat-plugin.ts` bridges
+every one of those names in dev; on Vercel they are ordinary env vars.
+
+Candidates are **model-major**: the preferred model on every key before a lesser
+model on any, because quotas are per project per model and a second key usually
+has the fast model's quota left. Key order starts at a round-robin pointer.
+
+Four rules in the loop, each from a measured failure:
+
+- **Fall back until the FIRST CHARACTER, not until `create()` succeeds.** An
+  overloaded model often accepts the request and then sends an `error` event;
+  the old loop only caught a throw, so that went to the student as an apology.
+  After the first character there is no switching.
+- **Classify before retrying** (`classifyFailure`): 429/5xx/connection → next
+  candidate; a bad key (Gemini says 400 "API key not valid", not 401) → skip
+  that key for every model; 404 → skip that model on every key; any other 400
+  → stop, the request itself is the problem. It used to retry everything, up
+  to keys × models times.
+- **Race each attempt against `ATTEMPT_TIMEOUT_MS` (10s), under a 25s
+  first-text deadline.** Measured: an exhausted key was held for **29.9s**
+  before Google answered 429. The attempt RACES a timer rather than trusting
+  the abort signal, because the SDK outlived an aborted signal by 7s. The
+  deadline exists because `vercel.json` caps the function at 60s, answer
+  streaming included.
+- **Cooldowns** (module-level, per instance, like the rate limiter): a 429
+  benches that key+model for 60s (30 min if the quota named is per-day), a
+  timeout for 5 min, a broken key or unknown model for 30 min. A cooldown sorts
+  a candidate to the back, never removes it. Measured after: every request
+  that followed a failure reached first text in ~2.3s.
+
+Logs name the key's POSITION (`key #2`), never the key. A student closing the
+chat aborts the upstream request (`cancel()` on the response stream), so an
+unread answer stops costing quota.
+
+`isQuotaError()` checks the status first; it used to substring-match "429" and
+"503" anywhere in the serialised error, request ids included. Busy and quota
+cases return the polite temporary-busy notice. Vendor names ("Gemini" /
+"Google") are kept strictly out of student-visible copy.
+
+### The curated-answer cache — and why there is no answer cache
+
+`server/chat-cache.ts` holds hand-written Bac II answers (comparison tables,
+Mendel, RNA types) served as a simulated stream with zero API calls. Three
+rules:
+
+- **After the auth gate.** It used to run before it.
+- **First turn only.** Mid-conversation the same words usually mean something
+  narrower, and a canned reply would ignore what the student already said.
+- **The question must be the pattern plus FILLER words** ("what is the
+  difference between", "សូម", "មានអ្វីខ្លះ"), not merely contain it. With a
+  bare `includes`, "which part of the brain stem controls breathing" got the
+  canned "parts of the brain" answer.
+
+**There was also a cache of MODEL answers, keyed on the question text alone,
+and it was a privacy leak.** Every reply is written with that student's name,
+weak subjects and exam average in the system prompt, plus their history and
+open screen — so the next student to type the same words got a reply addressed
+to someone else, a follow-up like "why?" was replayed into unrelated chats,
+and since it ran before the gate an unauthenticated `curl` could read it.
+Deleted. Don't bring it back without keying on everything that went into the
+prompt, at which point it would never hit.
+
+### Textbook retrieval must be ANCHORED
+
+`searchBiologyTextbook` / `searchMathTextbook` share one scorer
+(`searchSections`). A section is returned only with a TITLE or KEYWORD hit;
+word overlap breaks ties and never qualifies a section alone. Previously "the",
+"what" and "and" matched nearly every section, so a greeting pulled ~9,000
+characters of textbook into the prompt. Latin terms match on word boundaries
+("stem" is inside "system", "pine" inside "spine", "gh" inside "high"); Khmer
+terms stay substring matches, since Khmer has no spaces. The math scorer also
+split on `/\\s+/` (in source) — a literal backslash then "s" — so it never
+split at all.
+
+Textbook text is plain template literals, so LaTeX there needs `\\` — two
+`$\rightarrow$` in the enzyme section were written with one backslash and
+reached the model as a carriage return + "ightarrow".
+
+`server/rate-limit.ts` caps requests per IP (240/min, anti-flood) and per
+verified user (20/min) before any upstream call, so a flood costs nothing. In
+dev there's no proxy and everything keys to `"local"`, which is fine — it
+exists to protect a deployment.
 
 Chat answer quality is **prompt engineering, plus curriculum grounding** —
 the whole content corpus fits in one system prompt, supplemented by
@@ -1515,22 +1598,75 @@ set-up above the prompt in muted text. `correct` is compared by string equality,
 so the ក./ខ./គ./ឃ. prefix has to be repeated there — a mismatch silently marks
 every answer wrong.
 
-**`SectionVideoPlayer` is a player for a video that does not exist.** The design
-calls for one at the top of a section; none are recorded, so `SectionContent.video`
-carries a poster and a duration and the component draws the chrome — poster, play
-button, 0:00 / duration, fullscreen glyph, scrub bar. Same idea as the mascot slot
-and the empty past papers: build the shape now, drop the real thing in later.
+**`SectionVideoPlayer` IS A CLICK-TO-LOAD FACADE.** The design calls for a video
+at the top of a section; `SectionContent.video` carries a poster, a duration and
+— once a recording exists — a `youtubeId`, and the component draws the chrome
+around it: poster, play button, 0:00 / duration, fullscreen glyph, scrub bar.
 
-**NOTHING IN IT IS INTERACTIVE.** It first shipped with a real `<button>` under
-the play glyph plus a ឆាប់ៗនេះ chip and a "video is being prepared" notice; the
-chip and notice were removed at the user's request, so the button went with them.
-A `<button>` that answers a tap with silence is the broken-app pattern
-`sidebar-nav.tsx` and the survey's `StudiedStep` both exist to avoid — with the
-explanation gone, plain spans are the only honest form. Identical on screen, no
-pointer cursor, no focus ring, nothing announced as pressable. **Don't reinstate
-the `<button>` without reinstating something for it to say.** Elapsed reads 0:00
-and the scrub sits at zero because both are true — a pre-filled bar would invent a
-state the app cannot know. Posters live in `public/sections/` named by section id, 16:9
+**It has two states, and the poster-only one is still the normal one.** Most
+sections have no recording, exactly like the mascot slot and the empty past
+papers: build the shape now, drop the real thing in later.
+
+**WITHOUT a `youtubeId`, NOTHING IN IT IS INTERACTIVE.** It first shipped with a
+real `<button>` under the play glyph plus a ឆាប់ៗនេះ chip and a "video is being
+prepared" notice; the chip and notice were removed at the user's request, so the
+button went with them. A `<button>` that answers a tap with silence is the
+broken-app pattern `sidebar-nav.tsx` and the survey's `StudiedStep` both exist to
+avoid — with the explanation gone, plain spans are the only honest form.
+Identical on screen, no pointer cursor, no focus ring, nothing announced as
+pressable. **Don't reinstate the `<button>` without reinstating something for it
+to say** — and `youtubeId` is exactly that something, which is why it is the only
+condition under which the button appears. The rule is SATISFIED here, not
+repealed. Elapsed reads 0:00 and the scrub sits at zero because both are true — a
+pre-filled bar would invent a state the app cannot know.
+
+**WITH a `youtubeId`, the tap mounts a YouTube iframe and nothing before it.**
+Hosting is an UNLISTED YouTube video — $0, and automatic adaptive bitrate, which
+is what a self-hosted mp4 cannot do: one fixed bitrate either buffers on 3G or
+looks soft on wifi, and bills Vercel egress per view. The cost is a third-party
+frame, and **the facade is what makes that cost conditional on the student asking
+for it**: until the tap, not one byte leaves this origin. The poster is always our
+own `/sections/{id}.webp` — never `i.ytimg.com`, which would contact Google on
+every section view and defeat the whole thing. The thumbnail is downloaded ONCE
+at authoring time and converted by `scripts/webp.mjs`.
+
+Four things in it that a later edit could undo:
+
+- **NO `React.lazy`, and none is needed.** `brain-model-viewer.tsx` is a lazy
+  boundary because three.js is a large MODULE the bundler can see. An `<iframe>`
+  is MARKUP: zero bytes in any chunk, and the player's own JS is fetched by the
+  iframe's browsing context, a separate document no bundler could reach. A lazy
+  boundary here would buy a Suspense frame, a chunk round trip and a layout-shift
+  risk for nothing. `app.tsx`'s `routeModules` needs no entry — the feature is
+  invisible to the code-splitting story. Verified: `youtube-nocookie` appears in
+  exactly one built chunk (`section-detail-*.js`), zero in the entry chunk, and
+  no dependency was added.
+- **`youtubeId` is the 11-char id, never a URL.** A URL field accepts five
+  spellings of one video (`watch?v=`, `youtu.be/`, `/embed/`, `/shorts/`, plus
+  the `?si=` the share sheet appends); all five typecheck and one embeds. A
+  malformed id reads as NO id and falls back to the poster, rather than rendering
+  a YouTube error page behind a button.
+- **Four player params, and four deliberately omitted.** `autoplay=1` (needs
+  `autoplay` in `allow=` too — the cross-origin Permissions-Policy default is
+  `self`, and omitting it is the usual reason a facade needs two taps),
+  `playsinline=1` (without it iOS hijacks to native fullscreen, out of
+  `FocusLayout`), `rel=0`, `hl=km`. NOT set: `modestbranding` (ignored since
+  2023), `iv_load_policy` (annotations died in 2019), `mute=1` (a silent lesson
+  is worse than one more tap), `enablejsapi` (invites watch-progress tracking).
+  `cc_lang_pref=km` does nothing without `cc_load_policy=1`, and that with no real
+  Khmer track forces garbage auto-captions — **add both the day a Khmer caption
+  track is uploaded**.
+- **The preconnect is rendered from the component, only when there is a video,
+  and NOT in `index.html`.** That file's link already blocks first paint, and
+  warming a host reachable from one section on every screen would slow first
+  paint for everyone. No `crossorigin` — the iframe is a navigation, not a CORS
+  fetch, so an anonymous preconnect opens a second unused connection (the
+  opposite of `fonts.gstatic.com`, where fonts ARE CORS fetches).
+
+**NOTHING ASSUMES PLAYBACK STARTED** — no timer, no progress, no auto-advance.
+Telegram's and Messenger's webviews may refuse `autoplay` whatever the gesture,
+and that has to stay a legible second tap on YouTube's own button rather than a
+stuck screen. Posters live in `public/sections/` named by section id, 16:9
 at 800px (not the cards' 4:3 at 600px — the player is ~720px wide at `max-w-3xl`);
 see `design/subjects.md`.
 
@@ -2164,7 +2300,7 @@ dollar-free English sentence untouched. The explanation block carries
 `whitespace-pre-line`, which is what keeps a worked solution's steps on their own
 lines. **KHMER NEVER GOES INSIDE `$…$`** (KaTeX has no Khmer glyphs and
 `splitMath` refuses such a span), and every LaTeX string in the data file is a
-`String.raw` template — a plain template literal turns `	`, `` and `` into
+`String.raw` template — a plain template literal turns `\t`, `\f` and `\b` into
 control characters, which is exactly the bug `data/bac2-format.ts` warns about.
 
 **KaTeX moved into a SHARED chunk** (`math-text-*.js`, 255KB raw) the moment the
@@ -5173,14 +5309,35 @@ before.
 fresh pull (the pull runs only into an empty store), and the last push wins
 `profiles.streak`. Same local-wins rule as the rest of sync.
 
-**⚠ TODAY THE GOAL CAN ONLY BE FINISHED BY TICKING "PRACTICE" BY HAND.**
-`PRACTICE_QUIZZES` in `data/practice.ts` is empty, so `quiz-runner.tsx` — the
-only real completion of the practice task — is unreachable. Lessons and
-flashcards complete for real; practice only through Home's checklist or
-Roadmap's mission rows, which tick on tap. That is why those rows were NOT made
-completion-only: doing so would make the goal, and therefore every streak,
-impossible. It also means three taps on Home can count as a streak day. Revisit
-the moment practice quizzes exist.
+**MISSIONS ARE COMPLETION-ONLY NOW (28 Sep 2026) — NOTHING TICKS ON A TAP.**
+This used to say the goal could only be finished by ticking "practice" by hand,
+because `PRACTICE_QUIZZES` was empty and nothing real could complete it. Math
+1.1's quiz ended that, so Home's checklist rows became LINKS and Roadmap's Done
+button was deleted. Every task has a real completion:
+
+| task | completed by |
+| --- | --- |
+| lesson | finishing a section (`section-detail`) or a legacy lesson |
+| practice | finishing a practice quiz (`quiz-screen`) |
+| flashcards | finishing a flashcard review (`review-session`) |
+| challenge | finishing a Game battle (`game-create`/`game-play`) or an exam (`exam-view`, `paper-screen`) |
+
+`challenge` had NO completion at all before this — only the tap. It is not part
+of the streak goal. **If a subject's quizzes are ever all removed, "practice"
+becomes impossible again, and with it every streak** — don't bring the tap back;
+fix the content.
+
+**Home's Study card is `features/home/study-feed.ts`**, a derived "continue
+learning" feed replacing a hand-written list of the legacy lessons. Its catalog
+is every item that HAS content — sections with a `/sections/` href, decks with
+cards, quiz-path nodes with a quiz, past papers — so new content appears on Home
+with no edit there. Order: half-finished decks, decks due again, then the next
+unfinished item per subject (subjects most recently worked in first, by
+`contentLog` day), then untouched subjects. A student who has touched nothing
+gets a RECOMMENDATION instead — each subject's opening item per kind, weak
+subjects from the survey first, interleaved across subjects. Home shows
+`STUDY_FEED_SIZE` (5). The Missions card links into the same feed, so a mission
+and the card beside it point at the same next thing.
 
 **The calendar** (`features/profile/components/study-calendar.tsx`, maths in
 `utils/study-calendar.ts`) — a month grid, Sunday first to match
@@ -5261,6 +5418,90 @@ changing yet. When they come back: edit in place on Profile rather than a "Redo
 survey" button (the survey restarts all four steps blank, takes over the screen
 and has no cancel), and move `GRADES` / `FIXED_SUBJECTS` out of `survey-view.tsx`
 into a `.ts` so both screens share one list.
+
+## Installable app: "add to home screen" and the two pop-ups
+
+BrachNha is an installable web app (PWA). None of this touches Google sign-in:
+the OAuth consent screen's brand review covers what is uploaded to Google Cloud
+Console, and a manifest is just a file on our own site. There is no store
+review unless the app is ever wrapped for the Play Store.
+
+| file | role |
+| --- | --- |
+| `public/manifest.webmanifest` | name, colours, icons; what makes the site installable |
+| `public/icons/*` | 192/512 `any`, 512 `maskable`, 180 `apple-touch-icon`, rendered by `scripts/app-icons.mjs` |
+| `public/sw.js` | the service worker browsers require before offering install |
+| `public/offline.html` | what an installed app shows when opened with no signal |
+| `src/lib/install-prompt.ts` | catches the install event and decides when the pop-up may show |
+| `features/install/components/install-prompt.tsx` | the pop-up; mounted in `AppShell` |
+
+**THE SERVICE WORKER CACHES NOTHING BUT `offline.html`, on purpose.** Every JS,
+CSS, `/api/chat` and Supabase request passes through untouched: the handler
+returns without `respondWith` for anything that is not a page navigation.
+Caching the app shell would serve yesterday's build after a deploy, and this
+app has no reason to take on that class of bug. Navigations are network-first
+with navigation preload (so the worker adds no load time) and fall back to the
+offline page only when the fetch throws. An OAuth callback is a navigation and
+goes to the network like any other. Bump `CACHE` when `offline.html` changes.
+The worker is registered in PRODUCTION ONLY (`registerServiceWorker()`, called
+from `main.tsx` on `load`), so `vite dev` never has one in front of it. Test
+install with `npm run build && npx vite preview`.
+
+**What a page can and cannot do.** On Android Chromium we keep
+`beforeinstallprompt` and call `.prompt()` from our own button, and the browser
+shows its real dialog, but only on a tap. There is no way to install
+automatically. iOS has no API at all, so the pop-up shows the two manual steps,
+with Apple's menu names kept in English because iOS has no Khmer UI and that is
+what the student actually sees. In-app browsers (`isInAppBrowser()`) and an
+already-installed app (`isInstalledApp()`, now exported from
+`utils/in-app-browser.ts`) get nothing.
+
+**Two moments, both requested by the user:**
+
+- **`"open"`**: 1.5s after the app opens (`OPEN_DELAY_MS`). Once per page load.
+  "Not now"/"Got it" snoozes it for `OPEN_SNOOZE_DAYS` (3) so a student is not
+  greeted by the same pop-up on every visit.
+- **`"lesson"`**: after finishing a lesson or a section. `markLessonFinished()`
+  is called beside `completeSession` in `lesson-detail.tsx` and
+  `section-detail.tsx`; practice quizzes are deliberately left out. Once per
+  device, ever. It outranks the open pop-up, and closing either one consumes the
+  other for that page load, so two never arrive back to back.
+
+**It never interrupts a task.** `AppShell` passes `suppressed = hideChrome ||
+chatOpen || pledgeOpen || authPrompt`, and `hideChrome` already covers lessons,
+exams and the roadmap lock. A suppressed pop-up is HELD, not dropped: the
+lesson one waits through the completion screen (which is focus mode) and
+appears once the student leaves it. It is mounted only in the ordinary-app
+branch of the gate, so the entry, login and survey screens never show it.
+
+**The state is a MODULE, not store fields.** `beforeinstallprompt` can fire
+before React mounts, so the listener has to exist from the moment the entry
+chunk evaluates, which is why `main.tsx` imports the module. And "snoozed" and
+"lesson pop-up seen" are device facts, not account data: as store fields they
+would sync to Supabase and lengthen the `partializeState` ↔
+`syncRelevantChange` list for nothing. They live in
+`localStorage["brachnha-install"]`, with every access wrapped. The component
+reads the module through `useSyncExternalStore`, whose snapshot is rebuilt only
+in `emit()`; returning a fresh object on every read would loop forever.
+
+**The icons remove the artwork's own tile.** The master SVG is an app-icon tile
+with rounded corners and a grey shadow baked in. Launchers round icons
+themselves, so shipping it would draw a tile inside a tile.
+`scripts/app-icons.mjs` whitens every low-chroma pixel (the drawing is all
+saturated colour and the tile edge is grey), and shrinks the maskable icon to
+0.8 so it survives any launcher mask. Re-run it if the artwork changes.
+`public/favicon.ico` is still the old icon and was left alone.
+
+**Verified** against the production build in real Chrome. The manifest reports
+no errors, and the only installability error was `in-incognito`, which comes
+from the automation context. The offline page is served for a navigation with
+the network off. A synthetic `beforeinstallprompt` shows the open pop-up after
+the delay, Install calls `.prompt()`, and the snooze holds across a reload. An
+iPhone UA shows the steps at 320px light and 390px dark with no sideways
+scroll. A Telegram-shaped webview UA shows nothing. The lesson pop-up is held
+inside `/sections/...` and appears once, after leaving. **Not verified: a real
+install on a real phone.** That needs the deployed site, because the install
+event only fires over https.
 
 ## Performance — the four rules, and why each one exists
 
