@@ -552,6 +552,409 @@ export const SECTION_CONTENT: Record<string, SectionContent> = {
       },
     ],
   },
+
+  /**
+   * MATH · មូលដ្ឋានគ្រឹះ · ជំពូក 1 មេរៀនទី 1 ផ្នែកទី 1 — វិន័យនៃសញ្ញា.
+   *
+   * The first math section in the app, and the first one with a REAL VIDEO
+   * behind its player. Authoring this key is what unlocks node 1.1.1 on
+   * /subjects/math: sessionsFor() derives `href` from hasSectionContent(), so
+   * nothing in features/lessons/sessions.ts changed.
+   *
+   * ── PROVENANCE ────────────────────────────────────────────────────────────
+   * Supplied by the user, in LaTeX, and TRANSCRIBED rather than paraphrased.
+   * Three mechanical changes were unavoidable and nothing else was touched:
+   *
+   *  1. SECTION NUMBERS ARE LATIN. The source numbered its parts in Khmer
+   *     numerals; `npm run check:digits` fails on any of those (U+17E0-17E9),
+   *     so they read 1.1 1.2 1.3 1.4 here. The rule is app-wide — see "Digits
+   *     are Latin everywhere" in AGENTS.md — not a judgement about this
+   *     content. (The originals are deliberately not quoted above: that check
+   *     scans comments too, precisely because a comment showing the old
+   *     spelling is how the convention creeps back.)
+   *  2. NO EMOJI. The source used ⭐ 💡 🧠 ⚠️ 🎯 ❌ ✅ as section markers. Callout
+   *     takes a LucideIcon and the blocks already carry those icons, so the
+   *     markers are the renderer's job rather than the data's. ❌/✅ map exactly
+   *     onto a Misconception's wrong/right pair, which renders with CircleX and
+   *     CircleCheck.
+   *  3. `$…$` RATHER THAN `\(…\)` AND `$$…$$`. splitMath (utils/math-render.ts)
+   *     recognises dollar delimiters; it does not recognise \( \). The maths is
+   *     the source's, character for character.
+   *
+   * ── LATEX ─────────────────────────────────────────────────────────────────
+   * Backslashes are DOUBLED (`\\times`, `\\dots`) because these are ordinary
+   * double-quoted strings, matching data/quizzes/math-1-1-1.ts. Written singly
+   * in a plain string, `\t` is a TAB and `\b` a BACKSPACE — so `\times` would
+   * silently become a tab followed by "imes", which is the exact bug
+   * data/bac2-format.ts warns about and which renders without throwing.
+   *
+   * KHMER NEVER GOES INSIDE `$…$`: KaTeX substitutes maths fonts with no Khmer
+   * coverage and draws a row of empty boxes. Every span here is digits, signs
+   * and Latin letters only.
+   *
+   * ── THE QUIZ ──────────────────────────────────────────────
+   * 15 exercises supplied by the user in four parts, kept in their order and
+   * carried in `scenario` so the parts survive. Three things were changed, and
+   * each was CHECKED rather than assumed:
+   *
+   *  a. THE ANSWER KEY HAD TWO ERRORS, both verified by recomputing every
+   *     question. Q13 `-5+8-(-3)` is 6, and the key said option C — but C was
+   *     10 and 6 was B, the right value under the wrong letter (the same class
+   *     of slip as the 2025 English paper's `5. a- would buy`). Q15
+   *     `(-24)/(-6)-5` is 4-5 = -1, and the key said "B. 1" — wrong letter AND
+   *     wrong value. Both now carry the computed answer.
+   *  b. THE OPTIONS WERE REORDERED. Kept in the supplied order, the correct
+   *     answers landed A:2 B:8 C:4 D:1 — 8 of 15 on the second option, which a
+   *     student spots in a week. They are now 4/4/4/3 across
+   *     ក./ខ./គ./ឃ. per the distribution rule. Only the ORDER moved; every
+   *     option value is the user's.
+   *  c. ក./ខ./គ./ឃ. rather than the source's A/B/C/D, matching every other
+   *     quiz in the app. The reorder invalidated the source lettering anyway.
+   *
+   * GENERATED, NOT TYPED. Each `correct` is copied from the option it points
+   * at, every answer was recomputed from its own expression, and the positions
+   * were assigned by construction — the three things that go wrong by hand in a
+   * 15-question set. `npm run check:quiz` re-verifies correct-is-an-option and
+   * typesets every string.
+   */
+  "math-1-1-1": {
+    title: "វិន័យនៃសញ្ញា",
+    video: {
+      poster: "/sections/math-1-1-1.webp",
+      // Measured from the upload itself rather than guessed: the embed was
+      // loaded in a real browser and the player's own duration read back.
+      durationSec: 367,
+      youtubeId: "vap8eSyQ7bE",
+    },
+    intro: {
+      intro:
+        "វិន័យនៃសញ្ញា គឺជាច្បាប់សម្រាប់កំណត់សញ្ញា វិជ្ជមាន (+) និង អវិជ្ជមាន (−) នៅពេលធ្វើប្រតិបត្តិការបូក ដក គុណ និងចែក។",
+      items: [
+        { label: "លេខវិជ្ជមាន", body: "$+1, +2, +3, \\dots$" },
+        { label: "លេខអវិជ្ជមាន", body: "$-1, -2, -3, \\dots$" },
+        {
+          label: "សូន្យ",
+          body: "$0$ មិនមែនជាលេខវិជ្ជមាន ឬអវិជ្ជមានទេ។",
+        },
+      ],
+    },
+    examples: {
+      intro: "បច្ចេកទេសសាមញ្ញៗ ដើម្បីកុំឱ្យច្រឡំសញ្ញា។",
+      items: [
+        {
+          label: "Tip 1 — ប្រើបន្ទាត់លេខ",
+          body: "បើសិស្សច្រឡំថា $-5+3$ បានប៉ុន្មាន អាចគិតតាមបន្ទាត់លេខ៖",
+          items: [
+            "ចាប់ផ្តើមពី $-5$",
+            "បូក $3$ មានន័យថា ផ្លាស់ទីទៅស្តាំ 3 ជំហាន",
+            "ទទួលបាន $-2$ ដូច្នេះ $-5+3=-2$",
+          ],
+        },
+        {
+          label: "Tip 2 — ចងចាំច្បាប់គុណ/ចែកជាគូ",
+          body: "$++=+$ · $--=+$ · $+-=-$ · $-+=-$",
+        },
+        {
+          label: "Tip 3 — ពេលឃើញការដកលេខអវិជ្ជមាន",
+          body: "កុំប្រញាប់គណនា។ ប្តូរទម្រង់ជាមុន៖ $8-(-3)$ ក្លាយជា $8+3=11$",
+        },
+        {
+          label: "តិចនិចក្នុងការធ្វើលំហាត់",
+          body: "នៅពេលឃើញលំហាត់ដែលមានសញ្ញាច្រើន៖",
+          items: [
+            "ជំហានទី 1៖ កំណត់ថា ប្រតិបត្តិការនោះជា បូក ដក គុណ ឬចែក។",
+            "ជំហានទី 2៖ សម្គាល់សញ្ញារបស់លេខនីមួយៗ។",
+            "ជំហានទី 3៖ បើជាការដក → ប្តូរទៅជាការបូកលេខផ្ទុយ។",
+            "ជំហានទី 4៖ បើជាគុណ ឬចែក → កំណត់សញ្ញាលទ្ធផលជាមុន។",
+            "ជំហានទី 5៖ គណនាតម្លៃលេខ ហើយបញ្ចូលសញ្ញាចុងក្រោយ។",
+          ],
+        },
+      ],
+      outro:
+        "ឧទាហរណ៍៖ $(-6)\\times(-4)$\nសញ្ញា៖ $-\\times-=+$\nតម្លៃ៖ $6\\times4=24$\nដូច្នេះ៖ $+24$",
+    },
+    lesson: {
+      items: [
+        {
+          label: "1.2 ការបូក · សញ្ញាដូចគ្នា",
+          body: "បូកតម្លៃដាច់ខាត ហើយរក្សាសញ្ញាដដែល។",
+          items: ["$(+3)+(+5)=+8$", "$(-3)+(-5)=-8$"],
+        },
+        {
+          label: "1.2 ការបូក · សញ្ញាខុសគ្នា",
+          body: "ដកតម្លៃដាច់ខាត ហើយយកសញ្ញារបស់លេខដែលមានតម្លៃដាច់ខាតធំជាង។",
+          items: ["$(+8)+(-3)=+5$", "$(-8)+(+3)=-5$"],
+        },
+        {
+          label: "1.3 វិន័យសញ្ញាក្នុងការដក",
+          body: "ការដកអាចបម្លែងទៅជាការបូកលេខផ្ទុយ៖ $a-b=a+(-b)$",
+          items: [
+            "$5-3=5+(-3)=2$",
+            "$5-(-3)=5+(+3)=8$",
+            "ចំណាំ៖ ពេលដកលេខអវិជ្ជមាន គឺប្រែក្លាយទៅជាបូកលេខវិជ្ជមាន។",
+          ],
+        },
+        {
+          label: "1.4 វិន័យសញ្ញាក្នុងការគុណ និងចែក",
+          body: "ច្បាប់ដូចគ្នានេះអនុវត្តចំពោះការចែក។",
+          items: [
+            "សញ្ញាដូចគ្នា → វិជ្ជមាន (+)",
+            "សញ្ញាខុសគ្នា → អវិជ្ជមាន (−)",
+          ],
+        },
+      ],
+      // A Markdown table, rendered by math-text.tsx's block table parser — the
+      // same one the mentor's comparison matrices use. It sits in `outro`
+      // rather than inside an item because a table nested in a bullet reads as
+      // a mistake.
+      outro:
+        "| សញ្ញា | លទ្ធផល |\n| --- | --- |\n| $+\\times+$ | $+$ |\n| $+\\times-$ | $-$ |\n| $-\\times+$ | $-$ |\n| $-\\times-$ | $+$ |",
+    },
+    notes: {
+      items: [
+        {
+          label: "មើលសញ្ញា",
+          body: "កុំមើលតែលេខ ត្រូវមើលសញ្ញារបស់លេខផង។",
+        },
+        {
+          label: "បូកសញ្ញាខុសគ្នា",
+          body: "ត្រូវប្រៀបធៀបតម្លៃដាច់ខាតមុន។",
+        },
+        { label: "ការដក", body: "ដកលេខ = បូកលេខផ្ទុយ។" },
+        {
+          label: "គុណ និងចែក",
+          body: "ដូចគ្នា → $+$ , ខុសគ្នា → $-$។",
+        },
+        {
+          label: "វង់ក្រចក",
+          body: "សញ្ញា $-$ នៅមុខវង់ក្រចកអាចធ្វើឱ្យសញ្ញាខាងក្នុងប្តូរ។",
+        },
+      ],
+      outro:
+        "បន្ទាប់ពីរៀនផ្នែកនេះ សិស្សគួរអាច៖\n• សម្គាល់លេខវិជ្ជមាន និងអវិជ្ជមាន\n• បូក និងដកលេខដែលមានសញ្ញាផ្សេងៗគ្នា\n• ប្រើច្បាប់សញ្ញាក្នុងគុណ និងចែក\n• ប្រើតម្លៃដាច់ខាតដើម្បីដោះស្រាយការបូកសញ្ញាខុសគ្នា\n• ដោះស្រាយសញ្ញានៅមុខវង់ក្រចក\n• ជៀសវាងកំហុសសញ្ញាដែលអាចប៉ះពាល់ដល់ការគណនា Algebra និង Limit",
+    },
+    mistakes: [
+      {
+        wrong: "ច្រឡំថា $-\\times-=-$ ដូច្នេះ $(-3)(-2)=-6$",
+        right: "សញ្ញាដូចគ្នាផ្តល់លទ្ធផលវិជ្ជមាន៖ $-\\times-=+$ ដូច្នេះ $(-3)(-2)=+6$",
+      },
+      {
+        wrong: "ច្រឡំថា $5-(-3)=2$",
+        right:
+          "ដកលេខអវិជ្ជមាន គឺប្រែក្លាយទៅជាបូកលេខវិជ្ជមាន៖ $5-(-3)=5+3=8$",
+      },
+      {
+        wrong:
+          "មិនមើលតម្លៃដាច់ខាត៖ សិស្សខ្លះគិតថា $-9+4$ គឺ $9+4=13$ ហើយដាក់សញ្ញា $-$ ទទួលបាន $-13$",
+        right:
+          "សញ្ញាខុសគ្នា ត្រូវដកតម្លៃដាច់ខាត៖ $9-4=5$។ ព្រោះ $9>4$ ដូច្នេះយកសញ្ញា $-$៖ $-5$",
+      },
+      {
+        wrong: "ប្តូរសញ្ញាខុសពេលដកវង់ក្រចក៖ $-(x+3)=-x+3$",
+        right:
+          "សញ្ញា $-$ ប្តូរគ្រប់តួទាំងអស់ក្នុងវង់ក្រចក៖ $-(x+3)=-x-3$",
+      },
+    ],
+    quiz: [
+      {
+        scenario: "ផ្នែក A · បូកលេខដែលមានសញ្ញា",
+        q: "$+7 + (+5) = ?$",
+        options: [
+          "ក. $+12$",
+          "ខ. $+2$",
+          "គ. $-12$",
+          "ឃ. $-2$",
+        ],
+        correct: "ក. $+12$",
+        explanation:
+          "សញ្ញាដូចគ្នា៖ បូកតម្លៃដាច់ខាត ហើយរក្សាសញ្ញាដដែល។ $7+5=12$ ដូច្នេះ $+7+(+5)=+12$",
+      },
+      {
+        scenario: "ផ្នែក A · បូកលេខដែលមានសញ្ញា",
+        q: "$-6 + (-4) = ?$",
+        options: [
+          "ក. $+10$",
+          "ខ. $-10$",
+          "គ. $+2$",
+          "ឃ. $-2$",
+        ],
+        correct: "ខ. $-10$",
+        explanation:
+          "អវិជ្ជមានទាំងពីរ — សញ្ញាដូចគ្នា៖ $6+4=10$ ហើយរក្សាសញ្ញា $-$។ ដូច្នេះ $-6+(-4)=-10$",
+      },
+      {
+        scenario: "ផ្នែក A · បូកលេខដែលមានសញ្ញា",
+        q: "$+9 + (-4) = ?$",
+        options: [
+          "ក. $+13$",
+          "ខ. $-13$",
+          "គ. $+5$",
+          "ឃ. $-5$",
+        ],
+        correct: "គ. $+5$",
+        explanation:
+          "សញ្ញាខុសគ្នា៖ ដកតម្លៃដាច់ខាត $9-4=5$។ ព្រោះ $9>4$ យកសញ្ញារបស់ $+9$។ ដូច្នេះ $+9+(-4)=+5$",
+      },
+      {
+        scenario: "ផ្នែក A · បូកលេខដែលមានសញ្ញា",
+        q: "$-12 + (+7) = ?$",
+        options: [
+          "ក. $+5$",
+          "ខ. $+19$",
+          "គ. $-19$",
+          "ឃ. $-5$",
+        ],
+        correct: "ឃ. $-5$",
+        explanation:
+          "សញ្ញាខុសគ្នា៖ $12-7=5$។ ព្រោះ $12>7$ យកសញ្ញារបស់ $-12$។ ដូច្នេះ $-12+(+7)=-5$",
+      },
+      {
+        scenario: "ផ្នែក B · ដកលេខដែលមានសញ្ញា",
+        q: "$8 - 3 = ?$",
+        options: [
+          "ក. $11$",
+          "ខ. $5$",
+          "គ. $-5$",
+          "ឃ. $-11$",
+        ],
+        correct: "ខ. $5$",
+        explanation:
+          "ការដកធម្មតា៖ $8-3=5$",
+      },
+      {
+        scenario: "ផ្នែក B · ដកលេខដែលមានសញ្ញា",
+        q: "$8 - (-3) = ?$",
+        options: [
+          "ក. $5$",
+          "ខ. $-5$",
+          "គ. $11$",
+          "ឃ. $-11$",
+        ],
+        correct: "គ. $11$",
+        explanation:
+          "ចាំថា៖ $-(-3)=+3$។ ដូច្នេះ $8-(-3)=8+3=11$",
+      },
+      {
+        scenario: "ផ្នែក B · ដកលេខដែលមានសញ្ញា",
+        q: "$-8 - 3 = ?$",
+        options: [
+          "ក. $-11$",
+          "ខ. $11$",
+          "គ. $5$",
+          "ឃ. $-5$",
+        ],
+        correct: "ក. $-11$",
+        explanation:
+          "$-8-3=-8+(-3)$។ សញ្ញាដូចគ្នា៖ $8+3=11$ រក្សាសញ្ញា $-$។ ដូច្នេះ $-11$",
+      },
+      {
+        scenario: "ផ្នែក B · ដកលេខដែលមានសញ្ញា",
+        q: "$-8 - (-3) = ?$",
+        options: [
+          "ក. $+11$",
+          "ខ. $+5$",
+          "គ. $-11$",
+          "ឃ. $-5$",
+        ],
+        correct: "ឃ. $-5$",
+        explanation:
+          "ចាំថា៖ $-(-3)=+3$។ ដូច្នេះ $-8-(-3)=-8+3=-5$",
+      },
+    ],
+    quizHarder: [
+      {
+        scenario: "ផ្នែក C · គុណ និងចែក",
+        q: "$(-5)\\times (+4) = ?$",
+        options: [
+          "ក. $+20$",
+          "ខ. $+9$",
+          "គ. $-20$",
+          "ឃ. $-9$",
+        ],
+        correct: "គ. $-20$",
+        explanation:
+          "សញ្ញាខុសគ្នា → អវិជ្ជមាន។ $5\\times 4=20$ ដូច្នេះ $(-5)\\times (+4)=-20$",
+      },
+      {
+        scenario: "ផ្នែក C · គុណ និងចែក",
+        q: "$(-6)\\times (-3) = ?$",
+        options: [
+          "ក. $+18$",
+          "ខ. $-18$",
+          "គ. $+9$",
+          "ឃ. $-9$",
+        ],
+        correct: "ក. $+18$",
+        explanation:
+          "សញ្ញាដូចគ្នា → វិជ្ជមាន។ $6\\times 3=18$ ដូច្នេះ $(-6)\\times (-3)=+18$",
+      },
+      {
+        scenario: "ផ្នែក C · គុណ និងចែក",
+        q: "$24\\div (-6) = ?$",
+        options: [
+          "ក. $+4$",
+          "ខ. $+18$",
+          "គ. $-18$",
+          "ឃ. $-4$",
+        ],
+        correct: "ឃ. $-4$",
+        explanation:
+          "សញ្ញាខុសគ្នា → អវិជ្ជមាន។ $24\\div 6=4$ ដូច្នេះ $24\\div (-6)=-4$",
+      },
+      {
+        scenario: "ផ្នែក C · គុណ និងចែក",
+        q: "$(-35)\\div (-5) = ?$",
+        options: [
+          "ក. $-7$",
+          "ខ. $+7$",
+          "គ. $-30$",
+          "ឃ. $+30$",
+        ],
+        correct: "ខ. $+7$",
+        explanation:
+          "សញ្ញាដូចគ្នា → វិជ្ជមាន។ $35\\div 5=7$ ដូច្នេះ $(-35)\\div (-5)=+7$",
+      },
+      {
+        scenario: "ផ្នែក D · អនុវត្តច្បាប់សញ្ញា",
+        q: "$-5+8-(-3) = ?$",
+        options: [
+          "ក. $0$",
+          "ខ. $10$",
+          "គ. $6$",
+          "ឃ. $-6$",
+        ],
+        correct: "គ. $6$",
+        explanation:
+          "ប្តូរការដកជាការបូកជាមុន៖ $-5+8-(-3)=-5+8+3$។ $-5+8=3$ ហើយ $3+3=6$",
+      },
+      {
+        scenario: "ផ្នែក D · អនុវត្តច្បាប់សញ្ញា",
+        q: "$(-2)\\times (-5)+(-4) = ?$",
+        options: [
+          "ក. $6$",
+          "ខ. $14$",
+          "គ. $-6$",
+          "ឃ. $-14$",
+        ],
+        correct: "ក. $6$",
+        explanation:
+          "គុណមុន៖ $(-2)\\times (-5)=+10$ (សញ្ញាដូចគ្នា)។ បន្ទាប់មក $10+(-4)=6$",
+      },
+      {
+        scenario: "ផ្នែក D · អនុវត្តច្បាប់សញ្ញា",
+        q: "$(-24)\\div (-6)-5 = ?$",
+        options: [
+          "ក. $9$",
+          "ខ. $-1$",
+          "គ. $1$",
+          "ឃ. $-9$",
+        ],
+        correct: "ខ. $-1$",
+        explanation:
+          "ចែកមុន៖ $(-24)\\div (-6)=+4$ (សញ្ញាដូចគ្នា)។ បន្ទាប់មក $4-5=-1$",
+      },
+    ],
+  },
 };
 
 /** The content for a section id, or null when nothing is written for it yet. */

@@ -16,6 +16,7 @@ import type { PaperQuestion, PaperSection, PastPaperContent } from "@/types";
 import { clockLabel, scorePaper, type PaperAnswers } from "../paper-scoring";
 import { PaperGapFillStep } from "./paper-gap-fill";
 import { PaperWritingStep } from "./paper-writing-step";
+import { useFocusScrollTop } from "@/hooks/use-focus-scroll-top";
 
 /** What a finished attempt reports. The parent decides what it counts as. */
 export interface PaperAttempt {
@@ -86,11 +87,14 @@ export function PastPaperRunner({
   onSubmit: (attempt: PaperAttempt) => void;
 }) {
   const setFocusMode = useBrachNhaStore((s) => s.setFocusMode);
-  const stepRef = useRef<HTMLDivElement>(null);
 
   const [startedAt] = useState(() => Date.now());
   const [now, setNow] = useState(() => Date.now());
   const [index, setIndex] = useState(0);
+  // This screen is where the scroll-to-top pattern started — its reading
+  // passage is several screens tall. It now shares the hook with the other
+  // multi-step focus screens rather than keeping its own copy.
+  useFocusScrollTop(index);
   const [answers, setAnswers] = useState<PaperAnswers>({});
   const [submitted, setSubmitted] = useState(false);
   // Fires onSubmit exactly once: pressing ដាក់ស្នើ, the clock expiring and the
@@ -119,14 +123,6 @@ export function PastPaperRunner({
     return () => clearInterval(id);
   }, []);
 
-  // Back to the top of the task's scroller on every step change. The reading
-  // passage is several screens tall, so without this the next question opens
-  // wherever the passage was left — which reads as a step that failed to load.
-  // Instant, never smooth: an animated scroll on arrival reads as a glitch,
-  // the same call subject-path-view.tsx makes.
-  useEffect(() => {
-    stepRef.current?.closest("[data-focus-body]")?.scrollTo({ top: 0 });
-  }, [index]);
 
   const deadline = startedAt + content.minutes * 60_000;
   const expired = now >= deadline;
@@ -220,7 +216,7 @@ export function PastPaperRunner({
       {/* Hidden rather than unmounted while the warning is up: unmounting would
           throw away the gap-fill step's own selection state, so a student who
           took a call would come back to the passage with no gap chosen. */}
-      <div ref={stepRef} className={cn(guard.warning && "hidden")}>
+      <div className={cn(guard.warning && "hidden")}>
         {/* The rule, where it is unavoidable: on the very first screen of the
             paper. It also sits in the detail screen's "before you begin" list,
             because by here the clock is already running. */}

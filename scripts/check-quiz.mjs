@@ -239,6 +239,63 @@ try {
     });
   }
 
+  // ── authored section content ──────────────────────────────────
+  //
+  // Added the day a section first carried LaTeX (math-1-1-1). Until then
+  // SECTION_CONTENT was prose, and tsc, oxlint and check:digits between them saw
+  // everything that could go wrong in it. None of the three can see an unclosed
+  // `$`, a mistyped command, or Khmer inside a math span where KaTeX has no
+  // glyphs and draws a row of empty boxes — and KaTeX renders broken TeX in red
+  // rather than throwing, so it does not show up by eye either.
+  //
+  // Every block's intro and outro, every item label, body and nested item, both
+  // halves of every misconception, and the quiz once one is authored.
+  const { SECTION_CONTENT } = await server.ssrLoadModule("/src/data/sections.ts");
+  const sectionKeys = Object.keys(SECTION_CONTENT);
+  let sectionQuestions = 0;
+
+  const checkBlock = (where, block) => {
+    if (!block) return;
+    if (block.intro) checkMath(splitMath, `${where} intro`, block.intro);
+    if (block.outro) checkMath(splitMath, `${where} outro`, block.outro);
+    (block.items ?? []).forEach((item, i) => {
+      if (item.label) checkMath(splitMath, `${where} item ${i + 1} label`, item.label);
+      if (item.body) checkMath(splitMath, `${where} item ${i + 1} body`, item.body);
+      for (const sub of item.items ?? [])
+        checkMath(splitMath, `${where} item ${i + 1} sub`, sub);
+    });
+  };
+
+  for (const key of sectionKeys) {
+    const section = SECTION_CONTENT[key];
+    checkMath(splitMath, `${key} title`, section.title);
+    for (const name of ["intro", "lesson", "examples", "notes"])
+      checkBlock(`${key} · ${name}`, section[name]);
+
+    (section.mistakes ?? []).forEach((m, mi) => {
+      checkMath(splitMath, `${key} · mistake ${mi + 1} wrong`, m.wrong);
+      checkMath(splitMath, `${key} · mistake ${mi + 1} right`, m.right);
+    });
+
+    // BOTH quizzes. `quizHarder` renders on step 1 and is authored exactly like
+    // `quiz`, so leaving it out would mean the checker silently covered half a
+    // section — the same "the check and the screen disagree" gap that let raw
+    // LaTeX ship on the misconception cards.
+    const allQuestions = [
+      ...(section.quiz ?? []).map((q, i) => [`quiz ${i + 1}`, q]),
+      ...(section.quizHarder ?? []).map((q, i) => [`quizHarder ${i + 1}`, q]),
+    ];
+    allQuestions.forEach(([label, question]) => {
+      sectionQuestions += 1;
+      const where = `${key} · ${label}`;
+      checkMath(splitMath, `${where} q`, question.q);
+      checkMath(splitMath, `${where} explanation`, question.explanation);
+      if (question.scenario) checkMath(splitMath, `${where} scenario`, question.scenario);
+      for (const opt of question.options ?? []) checkMath(splitMath, `${where} option`, opt);
+      checkChoices(where, question.options, question.correct);
+    });
+  }
+
   if (problems.length) {
     console.error(`\ncheck:quiz — ${problems.length} problem(s):\n`);
     for (const p of problems) console.error("  " + p + "\n");
@@ -248,7 +305,8 @@ try {
     console.log(
       `check:quiz — ok. ${n} question(s) across ${keys.length} quiz(zes), ` +
         `${paperQuestions} across ${paperKeys.length} past paper(s), ` +
-        `${gameQuestions} across ${gameKeys.length} game subject(s); ` +
+        `${gameQuestions} across ${gameKeys.length} game subject(s), ` +
+        `${sectionQuestions} across ${sectionKeys.length} section(s); ` +
         `${checked} string(s) with math typeset cleanly.`
     );
   }

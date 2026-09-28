@@ -374,9 +374,26 @@ export interface SectionContent {
    *  viewer the Human Brain lesson uses — absent on every section without one,
    *  so no other section pays for the three.js chunk. */
   model3d?: Model3DRef;
-  /** Absent until questions are written; the block simply doesn't render. An
-   *  ARRAY because a section can ask several — the first one authored has two. */
+  /** Practice shown on STEP 0, under the examples. Absent until questions are
+   *  written; the block simply doesn't render. An ARRAY because a section can
+   *  ask several.
+   *
+   *  This is the EASIER half. Step 0 is orientation — the video, why the topic
+   *  matters, worked examples — so its questions may only use what the student
+   *  has been shown by then. `math-1-1-1` puts adding and subtracting signed
+   *  numbers here and holds multiplication back, because the sign table that
+   *  answers it is on step 1. */
   quiz?: SectionQuestion[];
+  /** Practice shown on STEP 1, after the rules, the notes and the mistakes.
+   *
+   *  A SECOND ARRAY rather than a `step` flag on each question: the split is a
+   *  property of the section's teaching order, it is what an author decides
+   *  when writing the section, and two named lists say that at a glance where a
+   *  per-question flag would have to be read fifteen times to see the shape.
+   *
+   *  Optional and separate, so the four biology sections — which put everything
+   *  on step 0 — need no edit and keep behaving exactly as before. */
+  quizHarder?: SectionQuestion[];
 }
 
 /** Who authored a flashcard — see PracticeCard. */

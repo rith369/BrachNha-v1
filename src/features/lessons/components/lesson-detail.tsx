@@ -14,6 +14,7 @@ import {
 import { FLASHCARDS, PRACTICE } from "@/data/lessons";
 import type { Lesson } from "@/types";
 import { markLessonFinished } from "@/lib/install-prompt";
+import { useFocusScrollTop } from "@/hooks/use-focus-scroll-top";
 
 // Three.js + react-three-fiber + drei together are a meaningfully large
 // dependency, only needed for the one lesson with a 3D model. Split off
@@ -59,6 +60,9 @@ export function LessonDetail({
   const t = useT(lang);
 
   const [step, setStep] = useState(0);
+  // Back to the top of the task's scroller on every step change; without
+  // it a long step leaves the next one opening at the bottom. See the hook.
+  useFocusScrollTop(step);
   const [flipped, setFlipped] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
 

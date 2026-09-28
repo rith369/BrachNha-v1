@@ -1239,6 +1239,32 @@ handlers skip steps a lesson has no content for, so a naive `step - 1` would lan
 on a step that lesson never renders. Adding it there means mirroring the skip
 logic, not passing the prop.
 
+**A MULTI-STEP FOCUS SCREEN MUST SCROLL ITSELF BACK TO THE TOP** —
+`hooks/use-focus-scroll-top.ts`, called with the step. One scroll container
+serves a whole task (`FocusLayout`'s body, marked `data-focus-body`) and React
+swapping the children does not touch its `scrollTop`, so a student who reaches
+the bottom of a long step and presses Continue lands at the BOTTOM of the next
+one, looking at a footer with the question off-screen above. It reads as a step
+that failed to load, and it was reported exactly that way.
+
+The attribute and the technique existed from the start — for the past-paper
+runner, whose reading passage is several screens tall — and **every other
+multi-step screen simply never called it**: the lesson flow, the section flow,
+the practice quiz, the game run and the flashcard review were all left wherever
+the previous step ended. They share the hook now; that runner's private copy is
+gone so there is one mechanism rather than two that can drift.
+
+Three things in it are decisions. It queries the DOCUMENT rather than taking a
+ref, because exactly one `FocusLayout` is mounted at a time and two of the five
+callers had no ref to hang `closest()` on. It is a `useLayoutEffect`, so the
+correction lands before paint — with `useEffect` the wrong offset is painted
+first and then jumps, which on a phone reads as a flicker. And the scroll is
+instant, never smooth, the same call `subject-path-view.tsx` makes.
+
+**Verify it by MEASURING, not by looking**: scroll a step to the bottom, press
+Continue, and read `scrollTop` on `[data-focus-body]`. A screenshot of the next
+step looks plausible at any offset, which is how this shipped broken.
+
 **Every focus screen must have a working exit.** The exam's answering screen had
 none before this — survivable only because the nav was still there to escape
 through. It now passes `confirmExit`, which shows a two-tap confirm first,
@@ -1590,13 +1616,43 @@ optional 3D model → សំណួរ (orientation: why this matters, what it lo
 life, then "now you try"); step 1 is មេរៀន then ចំណាំសំខាន់ៗ then កំហុស (the
 substance).
 
-**The quiz is INSIDE step 0, not a step of its own**, and step 0 will not advance
-until every question is answered — `quizDone`. `SectionContent.quiz` is an ARRAY
-(the first authored section has two questions), answers are held in a
-`Record<index, string>`, and `SectionQuestion.scenario` carries the ស្ថានភាព
-set-up above the prompt in muted text. `correct` is compared by string equality,
-so the ក./ខ./គ./ឃ. prefix has to be repeated there — a mismatch silently marks
-every answer wrong.
+**A QUIZ IS INSIDE A STEP, never a step of its own, and there are TWO of them.**
+`SectionContent.quiz` renders on step 0 and `quizHarder` on step 1, each after
+that step's teaching, and **neither step will advance until its own questions
+are all answered** — `quizDone` and `quizHarderDone`. A quiz that can be walked
+past is not a quiz.
+
+**The split is the section's TEACHING ORDER, not a difficulty badge** — nothing
+on screen says "hard". Step 0 may only ask what the video and the examples have
+covered; anything that needs the RULES belongs in `quizHarder`, or the question
+is asked before it is taught. `math-1-1-1` is the worked case: its 15 exercises
+split 8/7 at exactly the point multiplication starts, because **the ×/÷ sign
+table is on step 1**. Asking Part C on step 0 would have asked before teaching.
+Both halves stay independently spread across ក./ខ./គ./ឃ. — splitting a balanced
+set can leave one half clustered, so re-check the spread per HALF.
+
+**A SECOND ARRAY, not a `step` flag per question.** The split is what an author
+decides when writing the section, and two named lists show that shape at a
+glance where fifteen flags would have to be read one by one. Both are optional,
+so the four biology sections — everything on step 0 — needed no edit.
+
+**ANSWERS ARE KEYED `"{step}-{index}"`, AND A BARE INDEX IS A BUG.** With two
+lists, question 0 of one would otherwise share a key with question 0 of the
+other, so answering either would mark a question the student has never seen.
+`answerQuestion` also takes the QUESTION rather than an index, which keeps its
+closure from reading into a possibly-undefined array element — the property path
+the React Compiler narrows a memo dependency onto.
+
+**`scripts/check-quiz.mjs` must walk BOTH.** It covered `quiz` only for one
+revision and the section count silently dropped from 24 to 17 — half a section
+unchecked, the same "the checker and the screen disagree" gap that let raw LaTeX
+ship on the misconception cards.
+
+`SectionQuestion.scenario` carries the ស្ថានភាព set-up above the prompt in
+muted text; `math-1-1-1` uses it for the part label so the source's four parts
+survive the split. `correct` is compared by string equality, so the ក./ខ./គ./ឃ.
+prefix has to be repeated there — a mismatch silently marks every answer wrong,
+which is what `check:quiz` exists to catch.
 
 **`SectionVideoPlayer` IS A CLICK-TO-LOAD FACADE.** The design calls for a video
 at the top of a section; `SectionContent.video` carries a poster, a duration and
@@ -1693,8 +1749,36 @@ breaking them up. `list-outside` keeps wrapped lines aligned under the text
 rather than under the bullet, which matters here because Khmer lines wrap often.
 `data/sections.ts` holds `SECTION_CONTENT` keyed by the id `sectionsFor()`
 generates (`"biology-3-1-1"`); the types live in `types/index.ts` beside `Lesson`.
-**One entry today** — 3.1.1 សេចក្ដីផ្ដើម — and nearly-empty is the normal state,
-same as `PAST_PAPERS`.
+Five entries today — four biology, plus **`math-1-1-1`**, the first math section
+and the first with a REAL VIDEO behind its player — and nearly-empty is still the
+normal state, same as `PAST_PAPERS`.
+
+**EVERY STRING IN A SECTION NOW RENDERS THROUGH `MathText`** — `Block`'s intro,
+outro, item labels, bodies and nested items, and `QuizQuestion`'s prompt, options
+and explanation. It went in with `math-1-1-1`, whose content was supplied in
+LaTeX; without it the student reads the raw source. Hand-converting to Unicode
+instead was rejected for the reason recorded for the 2025 maths paper — a
+transcription risk with no upper bound on how quietly it fails — and the content
+arrives in LaTeX anyway.
+
+Three consequences worth knowing:
+
+- **It is free for the sections that do not use it.** `splitMath` leaves a
+  dollar-free string untouched and `MathText` short-circuits it to one inline
+  node, so the four biology sections — which contain zero `$`, checked — render
+  exactly as before. It costs no BYTES either: `math-text-*.js` is already a
+  shared chunk warmed at idle for every student, because `quiz-runner.tsx`
+  imports it and `practice-run` is in `app.tsx`'s `routeModules`. Measured after
+  the change: the entry chunk contains zero katex.
+- **`Block`'s lead and trailing paragraphs are `<div>`, not `<p>`.** `MathText`
+  emits a block `<table>` for a Markdown table — `math-1-1-1`'s sign table is one
+  — and a table inside a `<p>` is invalid HTML that the parser silently unnests.
+- **Backslashes are DOUBLED in the data**, matching `data/quizzes/math-1-1-1.ts`.
+  Written singly in a plain string a backslash-t is a TAB and a backslash-b a
+  BACKSPACE, so the times command becomes a tab followed by "imes" — the exact
+  bug `data/bac2-format.ts` warns about, and one that renders without throwing.
+  **Khmer must never go inside a math span**: KaTeX substitutes maths fonts with
+  no Khmer coverage and draws a row of empty boxes.
 
 **This is deliberately NOT `Lesson`, and `SectionDetail` is deliberately not a
 branch inside `lesson-detail.tsx`.** That component runs the older
@@ -6527,8 +6611,11 @@ The third is there because the first two cannot see it: to `tsc` and to oxlint,
 so there is no reason to skip it on a change that "obviously" touches no copy.
 
 **`check:quiz` is the same argument for authored QUIZ AND PAST-PAPER content**
-(`scripts/check-quiz.mjs`). It covers `PRACTICE_QUIZZES` and `PAST_PAPERS`
-both — the papers were added the day the maths paper shipped a wrong Khmer term
+(`scripts/check-quiz.mjs`). It covers `PRACTICE_QUIZZES`, `PAST_PAPERS`,
+`GAME_QUESTIONS` and — since a section first carried LaTeX (`math-1-1-1`) —
+`SECTION_CONTENT`, walking every block's intro and outro, every item label, body
+and nested item, both halves of every misconception, and the quiz when one is
+authored — the papers were added the day the maths paper shipped a wrong Khmer term
 and Unicode standing in for notation, neither of which any other check can see.
 For a paper it also walks each part's `statement` and `instruction`, and checks
 a gap-fill answer really is in its own word bank. Every field in those records

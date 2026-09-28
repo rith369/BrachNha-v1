@@ -6,6 +6,7 @@ import { clockLabel, gameCopy } from "../copy";
 import { cn } from "@/utils/cn";
 import { GameQuestion } from "./game-question";
 import type { ExamQuestion } from "@/types";
+import { useFocusScrollTop } from "@/hooks/use-focus-scroll-top";
 
 /** What a finished run reports. `ms` is the tie-break — see outcomeOf(). */
 export interface RunResult {
@@ -74,6 +75,9 @@ export function CompetitionRun({
   const [startedAt] = useState(() => Date.now());
   const [now, setNow] = useState(() => Date.now());
   const [index, setIndex] = useState(0);
+  // Back to the top of the task's scroller on every step change; without
+  // it a long step leaves the next one opening at the bottom. See the hook.
+  useFocusScrollTop(index);
   const [score, setScore] = useState(0);
   // Appended one per answered question, so its length is always `index` and it
   // is naturally short when the clock ends the run — padded to `total` at the

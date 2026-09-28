@@ -17,6 +17,7 @@ import { MathText } from "@/components/shell/math-text";
 import type { SectionQuestion } from "@/types";
 import type { PracticeMode } from "../practice";
 import { lessonKeyOf } from "@/features/progress/content-keys";
+import { useFocusScrollTop } from "@/hooks/use-focus-scroll-top";
 
 /**
  * A lesson's quiz, one question at a time.
@@ -100,6 +101,9 @@ export function QuizRunner({
   );
 
   const [index, setIndex] = useState(0);
+  // Back to the top of the task's scroller on every step change; without
+  // it a long step leaves the next one opening at the bottom. See the hook.
+  useFocusScrollTop(index);
   // Keyed by question index rather than a single value, so stepping back shows
   // the locked previous answer. An index is safe as the key: the questions come
   // from static data and the array never reorders while this is mounted.

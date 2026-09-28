@@ -7,6 +7,7 @@ import type { ReviewGrade, ReviewResult } from "@/utils/spaced-repetition";
 import type { DeckProgress, QueueCard } from "../review";
 import { SwipeableFlashcard } from "./swipeable-flashcard";
 import { FlashcardSummary } from "./flashcard-summary";
+import { useFocusScrollTop } from "@/hooks/use-focus-scroll-top";
 
 /**
  * An EMPTY queue reaching ReviewSession means there is truly no card anywhere
@@ -118,6 +119,9 @@ export function ReviewSession({
 
   const [liveQueue] = useState(queue);
   const [index, setIndex] = useState(0);
+  // Back to the top of the task's scroller on every step change; without
+  // it a long step leaves the next one opening at the bottom. See the hook.
+  useFocusScrollTop(index);
   const [flipped, setFlipped] = useState(false);
   const [results, setResults] = useState<ReviewResult[]>([]);
 
