@@ -4313,6 +4313,24 @@ off: readable if it is yours, or if you created the competition. That is the
 product rule in SQL — every joiner competes against the creator, so a joiner sees
 only their own result and the creator sees everyone. Joiners never see each other.
 
+**`questions` IS UNTRUSTED INPUT FROM ANOTHER STUDENT, and it was once an XSS
+hole.** Nothing on the server checks it — the creator's device writes it — and
+joiners render it through `MathText`, which used to pass any `<svg>…</svg>` to
+`dangerouslySetInnerHTML` with only `<script>` stripped. An `onload` needs no
+script tag, and the session sits in localStorage, so one posted competition
+could have acted as every student who played it. Two layers now (28 Sep 2026):
+`utils/sanitize-svg.ts` ALLOWLISTS what a diagram needs (tags, attributes,
+`url(#local)` only) and drops everything else, for every `MathText` caller; and
+`toQuestions()` in `lib/competitions.ts` checks each question's shape and
+refuses any containing SVG — the app's own pool has none. `game-play.tsx`
+refuses a competition that lost a question in that check rather than playing it
+short. Verified in real Chrome: both `math-2025.ts` graphs come out
+element-for-element and attribute-for-attribute identical, and 14 payloads
+(onload, image onerror, `javascript:` hrefs, `<animate>`, `<set>`,
+`<foreignObject>`, `<use>`, remote `url()`…) are all neutralised. **Never
+render another student's text through `dangerouslySetInnerHTML` without that
+sanitiser in the path.**
+
 **Neither table has an UPDATE policy, and that is not an omission.** A
 competition is a fixed challenge and an attempt is a result; both being editable
 after the fact would silently rewrite outcomes already shown to other people.

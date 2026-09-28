@@ -252,6 +252,28 @@ export default function GamePlayPage() {
     );
   }
 
+  // A question that failed lib/competitions.ts's check was dropped on load. A
+  // competition missing any of its questions cannot be scored against the
+  // creator's run, so it is refused rather than played short.
+  if (
+    competition.questions.length === 0 ||
+    competition.questions.length !== competition.total
+  ) {
+    return (
+      <FocusLayout
+        progressPct={0}
+        onExit={exit}
+        footer={<FocusButton onClick={exit}>{t.back}</FocusButton>}
+      >
+        <div className="text-center">
+          <p className="mx-auto max-w-xs text-sm font-bold text-muted">
+            {t.competitionGone}
+          </p>
+        </div>
+      </FocusLayout>
+    );
+  }
+
   const subject = findSubject(competition.subject);
 
   return (

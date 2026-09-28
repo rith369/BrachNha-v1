@@ -69,6 +69,55 @@ function toAnswers(value: unknown): (string | null)[] {
   return value.map((v) => (typeof v === "string" ? v : null));
 }
 
+const MAX_QUESTIONS = 50;
+const MAX_TEXT = 2000;
+
+function isText(v: unknown): v is string {
+  return typeof v === "string" && v.length <= MAX_TEXT && !v.includes("<svg");
+}
+
+/**
+ * Checks the frozen question set a competition arrives with. It was written by
+ * the CREATOR'S DEVICE and nothing on the server checks it, so it is untrusted
+ * input from another student, not app content. A malformed question is
+ * dropped rather than crashing the joiner's screen, and SVG is refused
+ * outright: the app's own question pool never contains any, so a question
+ * carrying one was not made by the app. (MathText sanitises SVG anyway — see
+ * utils/sanitize-svg.ts — this is the second layer.)
+ */
+function toQuestions(value: unknown): ExamQuestion[] {
+  if (!Array.isArray(value)) return [];
+  const out: ExamQuestion[] = [];
+  for (const raw of value.slice(0, MAX_QUESTIONS)) {
+    if (typeof raw !== "object" || raw === null) continue;
+    const q = raw as Record<string, unknown>;
+    const text = q.q as Record<string, unknown> | null | undefined;
+    const options = q.options;
+    if (
+      typeof text !== "object" ||
+      text === null ||
+      !isText(text.en) ||
+      !isText(text.km) ||
+      !Array.isArray(options) ||
+      options.length < 2 ||
+      options.length > 6 ||
+      !options.every(isText) ||
+      !isText(q.correct) ||
+      !options.includes(q.correct) ||
+      (q.explanation !== undefined && !isText(q.explanation))
+    ) {
+      continue;
+    }
+    out.push({
+      q: { en: text.en, km: text.km },
+      options: [...options],
+      correct: q.correct,
+      ...(typeof q.explanation === "string" ? { explanation: q.explanation } : {}),
+    });
+  }
+  return out;
+}
+
 /** A competition as it arrives from the server, plus whether it is the reader's
  *  own — the browse list hides those, and the UI labels them either way. */
 export interface RemoteCompetition extends Competition {
@@ -105,11 +154,9 @@ function toCompetition(
       ? (row.difficulty as GameDifficulty)
       : "mix",
     minutes: row.minutes,
-    // jsonb comes back as `Json`. The shape is asserted once, here — see the
-    // note on the column in types/database.ts.
-    questions: Array.isArray(row.questions)
-      ? (row.questions as unknown as ExamQuestion[])
-      : [],
+    // jsonb comes back as `Json`, written by another student's device. It is
+    // CHECKED here, not asserted — see toQuestions.
+    questions: toQuestions(row.questions),
     creatorAnswers: toAnswers(row.creator_answers),
     creatorScore: row.creator_score,
     creatorMs: row.creator_ms,
