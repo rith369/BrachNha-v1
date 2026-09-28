@@ -15,6 +15,35 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 29 Sep 2026 — Three welcome screens before sign-in
+
+Commit `74c4fb4`. **No database step needed.**
+
+**Why.** A new student's first sight of the app was the sign-in screen. Before we ask them
+for anything, we now show three short screens about why science is a good choice.
+
+**What changed.**
+
+- **Three screens, in Khmer:** more opportunities (university and scholarships), more paths
+  after grade 12 (IT, engineering, AI and data, health and medicine), and science as more
+  than formulas. Each one has its own picture and colour.
+- **Move through them** with the big button, by swiping left and right, with the arrow keys
+  on a laptop, or by tapping the dots. There is a back button from screen 2, and a
+  **រំលង (skip)** link at the top for anyone who wants to go straight in.
+- **Shown once per phone or computer.** After the last button it goes to the usual sign-in
+  screen and does not come back, not even after logging out.
+- **Who does NOT see it:** anyone already using the app (signed in, a guest, or with a name
+  saved), and anyone who opened the link inside Telegram or Messenger. They still get the
+  "open in your browser" screen first, and see the welcome screens there instead.
+
+**What to re-test.**
+
+- In a fresh browser or a private window, open the site: the three screens come first, then
+  sign-in. Reload, and they should not show again.
+- On a phone, swipe between the screens, and try the smallest phone you have. A long screen
+  should scroll, with the text fading at the bottom rather than being cut off.
+- Try both light and dark mode.
+
 ## 29 Sep 2026 — KruAI says hello
 
 Commit `5e3f6be`. **No database step needed.**

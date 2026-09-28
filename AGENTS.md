@@ -1377,6 +1377,51 @@ Duolingo's flat no-card look, split SKIP/CHECK footer and option number badges
 were considered and **declined** — the card-and-shadow style is the app's
 identity everywhere else.
 
+### The intro: three "why science" screens before the entry screen
+
+`features/intro` (the user's brief, 28 Sep 2026): ឱកាសកាន់តែទូលាយ → វិថីកាន់តែច្រើន
+ក្រោយចប់ថ្នាក់ទី 12 → វិទ្យាសាស្ត្រគឺលើសពីរូបមន្ត, then the entry screen. Its job is
+to make a student feel that choosing science was right before asking them for
+anything. Khmer-only, like the Study/Exam/Practice pages; the copy is the user's,
+with the one change that "grade 12" is written with Latin digits.
+
+- **One branch in `AppShell`'s gate, after the conflict screen**: `!introSeen &&
+  !userName && !guestMode && !isAuthenticated && !IN_APP_BROWSER`. Only someone
+  who has not started yet sees it, which keeps every existing student, a signed-in
+  student during the session-loading window, an OAuth callback and
+  `scripts/shots.mjs`' seeded profile clear of it with no extra condition. With
+  Supabase unconfigured it shows before `LoginView` instead. Not in an in-app
+  browser: that student is sent to their real browser, which has its own storage
+  and would show it again.
+- **Seen-ness is a DEVICE fact in its own key** (`lib/intro-seen.ts`,
+  `localStorage["brachnha-intro"]`), the install prompt's reasoning: as a store
+  field it would sync for nothing and be wiped by `logout()`, replaying the intro
+  to someone only switching accounts.
+- **LAZY** (`React.lazy` in `app-shell.tsx`): measured +8KB gzipped on the entry
+  chunk inline, for a screen each device sees once. Now its own
+  `intro-view-*.js` (~7KB gzip) and the entry chunk moved by 0.4KB.
+- **The artwork is CSS + Lucide, no image**: a filled disc on the path nodes'
+  black-mixed lip, a slowly turning dashed orbit and four floating tiles.
+  `animate-intro-spin` / `animate-intro-float` are transform-only and in the
+  reduced-motion block; `MotionConfig reducedMotion="user"` covers the slide
+  transitions. Background glows are radial gradients, not blur filters. The
+  flame screen's main glow is pink, not yellow: yellow over the dark background
+  turns olive-brown.
+- **The title gradient uses `--color-*`, not `bg-brand-tri`**: it is text, and
+  brand purple is ~2.7:1 on the dark background.
+- **Forward: button, swipe, arrow keys, dots. Only the button finishes** (and
+  រំលង, which skips; not in the brief, added so nobody is forced through three
+  screens). A swipe or key past the last screen does nothing.
+- **Phone is one column; from `lg` the picture sits beside the text** and the
+  footer sits under the text column. Single-column at 1280×800 pushed screen 3
+  below the fold. Below that the body scrolls, with a 28px mask fade at its
+  bottom edge so it reads as "more below".
+
+Verified in real Chrome at 320×568, 390×844 (both themes) and 1280×800: no
+sideways scroll, no page error, finishing writes the flag and lands on the entry
+screen, a reload does not bring it back, and touch swipe / arrow keys / back /
+skip all work.
+
 **Login** (`features/login`) — name + language choice (both required) plus
 email/age/location (all optional), shown before the survey; `AppShell` renders
 this whenever `userName` is empty, then falls through to the survey. Language
