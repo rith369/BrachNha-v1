@@ -440,7 +440,7 @@ its wording and its terms, and prefer it over your own recollection of the topic
 
 THEIR ABSENCE PROVES NOTHING. These excerpts are the only BrachNha text you have
 been shown this turn, and they are a sample rather than an inventory. A lesson
-named in the catalog above exists even if no excerpt from it appears here — the
+named in the catalog above exists even if no excerpt from it appears here. The
 catalog is the complete list. Never tell a student the app lacks something
 merely because it is not quoted below.
 
@@ -476,7 +476,7 @@ function sectionLine(id: string, section: (typeof SECTION_CONTENT)[string]): str
     .filter(Boolean);
 
   const wrongRight = section.mistakes
-    .map((m) => `students think "${m.wrong}" — actually "${m.right}"`)
+    .map((m) => `students think "${m.wrong}", actually "${m.right}"`)
     .join("; ");
 
   const bits = [`[section:${id}] ${section.title}`];

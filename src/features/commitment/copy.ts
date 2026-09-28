@@ -2,7 +2,7 @@ import type { Lang } from "@/types";
 
 // Kept here rather than in data/translations.ts: that table is flat strings,
 // and the pledge sentence has to interpolate the student's real numbers.
-// `**…**` marks the words that render bold — see renderEmphasis below.
+// `**…**` marks the words that render bold, see renderEmphasis below.
 
 export interface PledgeValues {
   name: string;
@@ -43,7 +43,7 @@ export const PLEDGE_COPY: Record<Lang, PledgeCopy> = {
     title: "My Commitment",
     subtitle: "Sign your plan to make it real",
     pledge: (v) =>
-      `I, **${v.name}**, commit to my Bac II goal. For the next **${v.months} months** I will study about **${v.hours} hours a day** — ${v.lessons} lessons, ${v.practice} practice questions and ${v.flashcards} flashcards — and aim for grade **${v.grade}**. When it gets hard, I keep going.`,
+      `I, **${v.name}**, commit to my Bac II goal. For the next **${v.months} months** I will study about **${v.hours} hours a day**, ${v.lessons} lessons, ${v.practice} practice questions and ${v.flashcards} flashcards, and aim for grade **${v.grade}**. When it gets hard, I keep going.`,
     targetGrade: "Target grade",
     hoursADay: "Hours a day",
     monthsLeft: "Months left",
@@ -66,7 +66,7 @@ export const PLEDGE_COPY: Record<Lang, PledgeCopy> = {
     title: "ការសន្យារបស់ខ្ញុំ",
     subtitle: "ចុះហត្ថលេខាលើផែនការរបស់អ្នក",
     pledge: (v) =>
-      `ខ្ញុំ **${v.name}** សន្យាថានឹងខិតខំដើម្បីគោលដៅបាក់ឌុបរបស់ខ្ញុំ។ ក្នុងរយៈពេល **${v.months} ខែ** ខាងមុខ ខ្ញុំនឹងរៀនប្រហែល **${v.hours} ម៉ោងក្នុងមួយថ្ងៃ** — មេរៀន ${v.lessons} លំហាត់ ${v.practice} និងកាតទន្លាប់ ${v.flashcards} — ហើយតម្រង់ទៅរកនិទ្ទេស **${v.grade}**។ ពេលណាមានការលំបាក ខ្ញុំនឹងមិនបោះបង់ឡើយ។`,
+      `ខ្ញុំ **${v.name}** សន្យាថានឹងខិតខំដើម្បីគោលដៅបាក់ឌុបរបស់ខ្ញុំ។ ក្នុងរយៈពេល **${v.months} ខែ** ខាងមុខ ខ្ញុំនឹងរៀនប្រហែល **${v.hours} ម៉ោងក្នុងមួយថ្ងៃ**, មេរៀន ${v.lessons} លំហាត់ ${v.practice} និងកាតទន្លាប់ ${v.flashcards}, ហើយតម្រង់ទៅរកនិទ្ទេស **${v.grade}**។ ពេលណាមានការលំបាក ខ្ញុំនឹងមិនបោះបង់ឡើយ។`,
     targetGrade: "និទ្ទេសគោលដៅ",
     hoursADay: "ម៉ោង/ថ្ងៃ",
     monthsLeft: "ខែនៅសល់",

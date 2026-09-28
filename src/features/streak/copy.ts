@@ -285,7 +285,7 @@ export function sharedDayAriaLabel(
       : lang === "km"
         ? "មិនទាន់បញ្ចប់"
         : "not completed";
-  return `${dayLabel} — ${youName}: ${mark(you)}, ${friendName}: ${mark(friend)}`;
+  return `${dayLabel}។ ${youName}: ${mark(you)}, ${friendName}: ${mark(friend)}`;
 }
 
 /** "12 days" — used in screen-reader text beside a bare number. */

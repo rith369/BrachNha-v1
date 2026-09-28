@@ -598,7 +598,7 @@ export async function handleChat(req: Request): Promise<Response> {
       );
     }
     console.warn(
-      "[api/chat] no SUPABASE_URL — skipping token verification. " +
+      "[api/chat] no SUPABASE_URL, skipping token verification. " +
         "This is allowed in dev only; production fails closed."
     );
   } else {

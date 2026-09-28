@@ -134,6 +134,18 @@ export function SessionNode({
       >
         {session.title}
       </span>
+
+        {locked && (
+          // The node keeps its colour and its glyph (see the header): what it
+          // gains is a LABEL, so a student learns the section is not written
+          // yet without tapping to find out. Same chip as subject-card.tsx and
+          // the video player's placeholder. Below the title, never beside it:
+          // CENTRES bounds the node on its WIDTH, and extra height only pushes
+          // the next connector down.
+          <span className="mt-1 rounded-full bg-purple/10 px-2 py-0.5 text-[9px] font-extrabold text-muted">
+            ឆាប់ៗនេះ
+          </span>
+        )}
     </>
   );
 
@@ -144,7 +156,10 @@ export function SessionNode({
       <div
         className={wrap}
         aria-disabled="true"
-        aria-label={`${session.label} ${session.title}`}
+        // The status belongs in the name too: the chip tells a sighted student
+        // the section is not written yet, and without this a screen reader
+        // announces it exactly like a playable node.
+        aria-label={`${session.label} ${session.title}។ ឆាប់ៗនេះ`}
       >
         {body}
       </div>

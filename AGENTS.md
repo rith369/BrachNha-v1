@@ -107,9 +107,18 @@ BAD   "ករណីទី 1 — ភាគបែងដូចគ្នា៖ …"
 GOOD  "ករណីទី 1 (ភាគបែងដូចគ្នា)៖ …"
 ```
 
-**Scope, decided deliberately:** strings only. 55 were rewritten by hand when the
+**Scope, decided deliberately:** strings only. 61 were rewritten by hand when the
 rule landed, each with the punctuation that fitted rather than one blind
-substitution. **Code comments and the two markdown files were left alone** (about
+substitution.
+
+**SEARCH ALL THREE QUOTE STYLES.** The first sweep only scanned `"double
+quotes"` and declared itself done; six survived in `` `template literals` ``,
+which is exactly where an interpolated string hides — two `aria-label`s built
+from a status word, the signed pledge in both languages, and **two inside
+KruAI's own system prompt**, which is the worst of them: the model copies the
+prompt's punctuation into answers students read, so an em dash there reproduces
+itself at runtime. (`data/bac2-format.ts` now also TELLS the model not to use
+one, in both languages; those two are the rule quoting the character it bans.) **Code comments and the two markdown files were left alone** (about
 3,100 of them) because nobody outside the repo reads those, and a mechanical
 swap across them would mangle sentences that an em dash is genuinely holding
 together. New comments need not follow the rule; **new strings must**.
@@ -1963,6 +1972,13 @@ position and nothing more.
 written yet", NOT "not earned"**: gating a session on finishing the previous one
 needs the real chapter structure first, or it would lock content that exists.
 
+**A locked node carries a ឆាប់ៗនេះ chip, and its `aria-label` says the same.**
+Without it the node is full colour with a play glyph and answers a tap with
+nothing, which is exactly what was reported. The chip does NOT make it
+pressable — it stays a `<div>` — it only stops the state being a surprise. The
+label matters as much as the chip: a screen reader previously announced a locked
+node identically to a playable one.
+
 **`completedSessions` holds LESSON ids, not a separate session id.** That is what
 lets `LessonDetail`'s `finishQuiz` mark the path node done with the id it already
 has, with nothing to keep in step. `completeSession` is idempotent so re-finishing
@@ -3650,14 +3666,27 @@ exactly like a persistence bug and was not one. Test a second visit by NAVIGATIN
 INSIDE the app — which is what a student does anyway — or seed after the first
 load instead.
 
-**A LOCKED NODE NOW LOOKS IDENTICAL TO A PLAYABLE ONE** — full colour, same lip,
-same glyph, no padlock. It used to be a dashed grey outline, which was right for
-six sample nodes and wrong for a 48-node curriculum: a whole path of dashed grey
-squares reads as "you can't have this", where a path that already looks finished
-reads as "this is coming". That is the user's explicit call on the Study path,
-argued at length in `session-node.tsx`, and it applies here for the same reason.
-The one thing that still separates them: a locked node is a `<div>`, never a
-`<Link>`, and it does not press.
+**A LOCKED NODE KEEPS ITS COLOUR AND SAYS SO** — full colour, same lip, same
+glyph, no padlock, plus a ឆាប់ៗនេះ chip under it. It used to be a dashed grey
+outline, which was right for six sample nodes and wrong for a 48-node curriculum:
+a whole path of dashed grey squares reads as "you can't have this", where a path
+that already looks finished reads as "this is coming". That is the user's
+explicit call on the Study path, argued at length in `session-node.tsx`, and it
+applies here for the same reason.
+
+**The chip is a later correction to that same call (28 Sep 2026), and the two do
+not conflict.** Identical colour was right; identical with NOTHING SAID was not,
+because a node that looks finished and does nothing when tapped is the
+broken-app pattern this file rejects everywhere else. The user reported it
+against the Study path (`1.1.4`, `1.1.5`) and it was fixed on both. The chip is
+the same one `subject-card.tsx`, `exam-paper-card.tsx` and the video placeholder
+already use, so a student learns the state WITHOUT tapping — the `studiedNote`
+principle.
+
+Two things that still separate locked from playable: a locked node is a `<div>`,
+never a `<Link>`, and it does not press. And the chip goes BELOW the node, never
+beside it: `CENTRES` bounds a node on its WIDTH, so extra height only pushes the
+next connector down while extra width would clip at the 320px floor.
 
 **`nextQuizSectionId()` is DELIBERATELY NOT the Study path's bubble rule.** That
 one points at the first PLAYABLE unfinished section and therefore returns nothing

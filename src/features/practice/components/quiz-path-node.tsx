@@ -101,7 +101,7 @@ export function QuizPathNode({
     </span>
   );
 
-  const label = `${session.label}${session.title ? ` · ${session.title}` : ""} — ${STATUS_LABEL[status]}`;
+  const label = `${session.label}${session.title ? ` · ${session.title}` : ""}។ ${STATUS_LABEL[status]}`;
 
   return (
     // relative: the START bubble below is absolutely positioned against THIS
@@ -129,8 +129,14 @@ export function QuizPathNode({
           {badge}
         </Link>
       ) : (
-        <div role="img" aria-label={label}>
+        <div role="img" aria-label={label} className="flex flex-col items-center">
           {badge}
+          {/* The badge keeps its colour and its glyph; what it gains is a LABEL,
+              so a student learns the quiz is not written yet without tapping.
+              Same chip as session-node.tsx and the video placeholder. */}
+          <span className="mt-1 rounded-full bg-purple/10 px-2 py-0.5 text-[9px] font-extrabold whitespace-nowrap text-muted">
+            ឆាប់ៗនេះ
+          </span>
         </div>
       )}
     </div>
