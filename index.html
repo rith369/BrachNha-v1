@@ -3,6 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
+    <!-- Installable web app: the manifest names the app and its home-screen
+         icons (rendered by scripts/app-icons.mjs), and iOS, which ignores the
+         manifest's icons, reads apple-touch-icon instead. The install pop-up
+         itself is src/lib/install-prompt.ts. -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="BrachNha" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>BrachNha — Bac II AI Mentor</title>
     <meta

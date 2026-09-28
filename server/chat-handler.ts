@@ -14,11 +14,7 @@ import type { ScreenRef } from "../src/utils/chat-screen.js";
 import { checkRateLimit } from "./rate-limit.js";
 import { isVerificationConfigured, verifyRequestUser } from "./verify-user.js";
 import { searchBiologyTextbook, searchMathTextbook } from "./textbook-search.js";
-import {
-  getCachedAnswer,
-  recordCachedAnswer,
-  createCachedStreamResponse,
-} from "./chat-cache.js";
+import { getCachedAnswer, createCachedStreamResponse } from "./chat-cache.js";
 
 /**
  * KruAI endpoint. Started life as a Netlify function, then a Next.js route
@@ -31,11 +27,10 @@ import {
  * a Vercel or Netlify function, a Cloudflare Worker, a small Express app —
  * since it only speaks the web Request/Response types those all provide.
  *
- * Two things changed on the way over:
- *   • Model is now Gemini 3 Flash.
- *   • Google's recommended surface is the Interactions API (`interactions.create`)
- *     rather than `generateContent`. We use the official @google/genai SDK for it,
- *     which also gives us typed streaming.
+ * Upstream is Gemini through the Interactions API (`interactions.create`), not
+ * `generateContent`, via the official @google/genai SDK. There is no single
+ * model: GEMINI_MODELS × the key pool is a list of candidates, tried until one
+ * produces the first character of an answer — see the fallback loop below.
  *
  * The response is a plain UTF-8 text stream, not SSE — there is only one stream
  * of text to send, so the client can just read it with `body.getReader()`.
@@ -84,6 +79,167 @@ function getApiKeys(): string[] {
 
 /** Round-robin pointer across available API keys in the pool. */
 let keyRotationIndex = 0;
+
+/**
+ * Most upstream calls one question may make before giving up. The pool is keys
+ * × models — five keys and four models is twenty candidates — and trying all of
+ * them one after another on a bad day would leave a student staring at an empty
+ * bubble for most of a minute. Six is enough to get past one exhausted key and
+ * one overloaded model.
+ */
+const MAX_ATTEMPTS = 6;
+
+/**
+ * How long ONE attempt may take to produce its first character before we give
+ * up on it and try the next candidate.
+ *
+ * Measured, not guessed: a healthy candidate reaches first text in ~2–3s, but a
+ * key whose quota is gone does not always refuse at once — Google held one for
+ * 29.9s before answering 429, and the student watched an empty bubble for all
+ * of it. Ten seconds is ~4× a normal first character.
+ */
+const ATTEMPT_TIMEOUT_MS = 10_000;
+
+/**
+ * Deadline for the first character across ALL attempts. vercel.json caps the
+ * function at 60s, and that has to cover the whole answer streaming out after
+ * the first character too, so the search for a working candidate may not eat
+ * more than this.
+ */
+const FIRST_TEXT_DEADLINE_MS = 25_000;
+
+/** How long a key+model that answered 429 is skipped by LATER requests. */
+const QUOTA_COOLDOWN_MS = 60_000;
+/** The same, when the quota that ran out is a daily one — retrying it every
+ *  minute until midnight Pacific only adds a failed round trip to questions. */
+const DAILY_COOLDOWN_MS = 30 * 60_000;
+/** A key the API rejected (revoked, mistyped) or a model it does not know. */
+const BROKEN_COOLDOWN_MS = 30 * 60_000;
+/** A candidate we gave up on for being too slow — usually an exhausted key
+ *  that had not got round to saying so. */
+const TIMEOUT_COOLDOWN_MS = 5 * 60_000;
+
+/**
+ * `${keyIndex}|${model}` → the time it may be tried again. `*` in either slot
+ * covers every key or every model.
+ *
+ * Without this, round-robin sent every Nth question to a key whose daily quota
+ * was already gone, and each of those questions paid a failed round trip before
+ * reaching one that worked — all day. Per serverless instance, like the hit map
+ * in rate-limit.ts: a cold instance relearns it with one failed call, which is
+ * the cost this saves being paid on every request instead.
+ *
+ * A cooldown is a PREFERENCE, never a ban: cooled candidates are sorted to the
+ * back, not removed, so when everything is cooling down they are still tried.
+ */
+const cooldowns = new Map<string, number>();
+
+function coolingUntil(keyIndex: number, model: string): number {
+  return Math.max(
+    cooldowns.get(`${keyIndex}|${model}`) ?? 0,
+    cooldowns.get(`${keyIndex}|*`) ?? 0,
+    cooldowns.get(`*|${model}`) ?? 0
+  );
+}
+
+/**
+ * What a failed attempt means for the attempts after it.
+ *
+ *   retry      busy or out of quota — the next key or model may well work
+ *   skip-key   this key is refused outright, so every model on it will be too
+ *   skip-model this model does not exist (renamed, retired), on any key
+ *   fatal      the REQUEST is the problem; sending it again cannot help
+ */
+type Failure = "retry" | "skip-key" | "skip-model" | "fatal";
+
+function errorStatus(err: unknown): number | undefined {
+  if (err && typeof err === "object" && "status" in err) {
+    const status = (err as { status: unknown }).status;
+    if (typeof status === "number") return status;
+  }
+  return undefined;
+}
+
+function errorText(err: unknown): string {
+  try {
+    return JSON.stringify(err, Object.getOwnPropertyNames(Object(err))).toLowerCase();
+  } catch {
+    return String(err).toLowerCase();
+  }
+}
+
+function classifyFailure(err: unknown): Failure {
+  const status = errorStatus(err);
+  const text = errorText(err);
+  // Gemini reports a bad key as 400 INVALID_ARGUMENT "API key not valid", not
+  // as 401, so the key check has to read the message before the status.
+  if (
+    status === 401 ||
+    status === 403 ||
+    text.includes("api key not valid") ||
+    text.includes("api_key_invalid")
+  ) {
+    return "skip-key";
+  }
+  if (status === 404) return "skip-model";
+  if (status === 400 || status === 422) return "fatal";
+  // 429, 5xx, a dropped connection (no status at all), anything unrecognised.
+  return "retry";
+}
+
+/**
+ * Called with the error from the attempt that just failed, so the NEXT request
+ * does not repeat it. Only quota and broken-key/model failures cool down; a
+ * one-off 503 says nothing about the next minute.
+ */
+function recordFailure(keyIndex: number, model: string, err: unknown, kind: Failure) {
+  const now = Date.now();
+  if (kind === "skip-key") {
+    cooldowns.set(`${keyIndex}|*`, now + BROKEN_COOLDOWN_MS);
+  } else if (kind === "skip-model") {
+    cooldowns.set(`*|${model}`, now + BROKEN_COOLDOWN_MS);
+  } else if (isQuotaError(err)) {
+    const text = errorText(err);
+    const daily = text.includes("perday") || text.includes("per day");
+    cooldowns.set(
+      `${keyIndex}|${model}`,
+      now + (daily ? DAILY_COOLDOWN_MS : QUOTA_COOLDOWN_MS)
+    );
+  }
+}
+
+interface Candidate {
+  keyIndex: number;
+  model: string;
+}
+
+/**
+ * Every key × model pair, best first.
+ *
+ * MODEL-major: the preferred model is tried on every key before a lesser model
+ * is tried on any. Quotas are per project per model, so a second key usually has
+ * the fast model's quota left, and falling to a slower model while a fresh key
+ * sits unused trades answer speed for nothing. The key order starts at the
+ * round-robin pointer so load still spreads across the pool.
+ */
+function orderedCandidates(keyCount: number): Candidate[] {
+  const start = keyRotationIndex % keyCount;
+  keyRotationIndex = (keyRotationIndex + 1) % keyCount;
+
+  const all: Candidate[] = [];
+  for (const model of GEMINI_MODELS) {
+    for (let i = 0; i < keyCount; i++) {
+      all.push({ keyIndex: (start + i) % keyCount, model });
+    }
+  }
+  const now = Date.now();
+  // Stable sort: order within each group is preserved.
+  return all.sort(
+    (a, b) =>
+      Number(coolingUntil(a.keyIndex, a.model) > now) -
+      Number(coolingUntil(b.keyIndex, b.model) > now)
+  );
+}
 
 /** How many past bubbles to replay as context. Bounds cost and latency; the
  *  store keeps more than this for display purposes. */
@@ -230,19 +386,18 @@ function cleanScreen(value: unknown): ScreenRef {
  * which would send students off debugging a question that was fine.
  */
 function isQuotaError(err: unknown): boolean {
-  const text = JSON.stringify(
-    err,
-    Object.getOwnPropertyNames(Object(err))
-  ).toLowerCase();
+  // The status first. Matching "429" or "503" anywhere in the serialised error
+  // also matched request ids and timestamps that happened to contain them.
+  const status = errorStatus(err);
+  if (status === 429 || status === 503) return true;
+  const text = errorText(err);
   return (
     text.includes("quota") ||
     text.includes("rate limit") ||
     text.includes("resource_exhausted") ||
-    text.includes("429") ||
-    text.includes("service_unavailable") ||
+    text.includes("unavailable") ||
     text.includes("high demand") ||
-    text.includes("overloaded") ||
-    text.includes("503")
+    text.includes("overloaded")
   );
 }
 
@@ -283,6 +438,71 @@ function textResponse(
       ...extraHeaders,
     },
   });
+}
+
+/**
+ * One upstream call. Its own function so the stream's type is INFERRED from the
+ * SDK: the interactions event union is not exported by @google/genai, and the
+ * old code papered over that with `any`.
+ */
+function openStream(
+  apiKey: string,
+  model: string,
+  system_instruction: string,
+  input: InteractionStep[],
+  signal: AbortSignal
+) {
+  const ai = new GoogleGenAI({ apiKey });
+  return ai.interactions.create(
+    {
+      model,
+      stream: true,
+      store: false,
+      system_instruction,
+      generation_config: {
+        // "minimal" measured ~2.7s to first character against ~11.2s on "low",
+        // with accuracy holding on multi-step Bac II maths. The -latest alias
+        // is the exception and keeps "low".
+        thinking_level: model === "gemini-flash-latest" ? "low" : "minimal",
+        max_output_tokens: 3000,
+      },
+      input,
+    },
+    // Aborts the request itself, response body included — so a timed-out
+    // attempt and a student who closed the chat both stop costing quota.
+    { fetchOptions: { signal } }
+  );
+}
+
+type UpstreamStream = Awaited<ReturnType<typeof openStream>>;
+type UpstreamEvent = UpstreamStream extends AsyncIterable<infer E> ? E : never;
+type UpstreamIterator = AsyncIterator<UpstreamEvent>;
+
+/** The answer text in an event, or "". `type: "text"` is unique to a text
+ *  delta, so this also drops the model's internal thought summaries. */
+function deltaText(event: UpstreamEvent): string {
+  if (event.event_type !== "step.delta") return "";
+  const delta = event.delta;
+  return delta.type === "text" ? delta.text : "";
+}
+
+type FirstRead =
+  | { kind: "text"; text: string }
+  | { kind: "error"; error: unknown }
+  | { kind: "empty" };
+
+/** Reads until the first character of the answer, an error event, or the end. */
+async function readUntilText(it: UpstreamIterator): Promise<FirstRead> {
+  for (;;) {
+    const next = await it.next();
+    if (next.done) return { kind: "empty" };
+    const event = next.value;
+    if (event.event_type === "error") {
+      return { kind: "error", error: event.error ?? event };
+    }
+    const text = deltaText(event);
+    if (text) return { kind: "text", text };
+  }
 }
 
 export async function handleChat(req: Request): Promise<Response> {
@@ -355,14 +575,6 @@ export async function handleChat(req: Request): Promise<Response> {
       ?.content.map((c) => c.text)
       .join(" ") ?? "";
 
-  // ── 0-token cache check ──────────────────────────────────────────────────
-  // Check if we have a pre-computed Bac II curriculum answer or dynamic cache hit.
-  // Returns instant simulated stream with 0 API tokens and 0 delay, even for guest testers.
-  const cachedAnswer = getCachedAnswer(lastUserText);
-  if (cachedAnswer) {
-    return createCachedStreamResponse(cachedAnswer);
-  }
-
   // ── who is asking ─────────────────────────────────────────────────────────
   //
   // Hiding the button in the UI is not a gate; this is. Without it a guest can
@@ -408,6 +620,18 @@ export async function handleChat(req: Request): Promise<Response> {
         "Retry-After": String(userRate.retryAfterSec),
       });
     }
+  }
+
+  // ── 0-token curated answers ──────────────────────────────────────────────
+  // AFTER the gate, not before it: the endpoint has one door. (It used to sit
+  // above, which also served a cache of other students' personalised replies to
+  // an unauthenticated curl — see getCachedAnswer for why that cache is gone.)
+  const isFirstTurn = !messages.some(
+    (m) => m?.role === "bot" && typeof m.text === "string" && m.text.trim()
+  );
+  const cachedAnswer = getCachedAnswer(lastUserText, isFirstTurn);
+  if (cachedAnswer) {
+    return createCachedStreamResponse(cachedAnswer);
   }
 
   // ── API Key Pool & Rotation ──────────────────────────────────────────────
@@ -470,132 +694,126 @@ export async function handleChat(req: Request): Promise<Response> {
   const textbook = [...bioChunks, ...mathChunks].slice(0, 3);
   const context = [...pinned, ...textbook];
 
-  try {
-    const system_instruction = buildSystemPrompt({
-      profile,
-      context,
-      focusSubject: screen.subjectId,
+  const system_instruction = buildSystemPrompt({
+    profile,
+    context,
+    focusSubject: screen.subjectId,
+  });
+
+  // ── upstream, with fallback ───────────────────────────────────────────────
+  //
+  // Tried in order until one produces its FIRST CHARACTER, not merely until one
+  // accepts the request: an overloaded model often takes the request and then
+  // sends an error event instead of text, which the old loop — falling back only
+  // when create() threw — handed straight to the student as an apology. Once
+  // text has been sent there is no switching; a mid-answer failure still ends in
+  // the apology below, because the student has half an answer on screen.
+  let served: { it: UpstreamIterator; first: string; candidate: Candidate } | null =
+    null;
+  let lastErr: unknown = null;
+  let lastWasBusy = false;
+  let emptyAnswer = false;
+  let attempts = 0;
+  const requestStart = Date.now();
+  const skippedKeys = new Set<number>();
+  const skippedModels = new Set<string>();
+
+  let upstream: AbortController | undefined;
+
+  for (const candidate of orderedCandidates(apiKeys.length)) {
+    if (attempts >= MAX_ATTEMPTS) break;
+    const { keyIndex, model } = candidate;
+    if (skippedKeys.has(keyIndex) || skippedModels.has(model)) continue;
+    const timeLeft = FIRST_TEXT_DEADLINE_MS - (Date.now() - requestStart);
+    if (timeLeft < 1_000) break;
+    attempts++;
+
+    let it: UpstreamIterator | undefined;
+    const attemptStart = Date.now();
+    const abort = new AbortController();
+    let timedOut = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    // The attempt RACES a timer rather than relying on the abort signal alone:
+    // measured, a stalled attempt outlived its aborted signal by seven seconds,
+    // so the SDK does not release on abort promptly. Racing guarantees the loop
+    // moves on on time; the abort still runs, as cleanup.
+    const attempt = (async () => {
+      const stream = await openStream(
+        apiKeys[keyIndex],
+        model,
+        system_instruction,
+        input,
+        abort.signal
+      );
+      it = stream[Symbol.asyncIterator]();
+      return { first: await readUntilText(it), iter: it };
+    })();
+    const deadline = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => {
+        timedOut = true;
+        abort.abort();
+        reject(new Error("attempt timeout"));
+      }, Math.min(ATTEMPT_TIMEOUT_MS, timeLeft));
     });
 
-    // Build ordered list of keys starting from current rotation index
-    const keysInOrder: string[] = [];
-    const startIdx = keyRotationIndex % apiKeys.length;
-    keyRotationIndex = (keyRotationIndex + 1) % apiKeys.length;
-    for (let i = 0; i < apiKeys.length; i++) {
-      keysInOrder.push(apiKeys[(startIdx + i) % apiKeys.length]);
-    }
-
-    // Try candidate models & keys in priority order so free-tier quota limits (429)
-    // or temporary spikes (503) automatically fall back across the model chain and key pool.
-    let stream: any = null;
-    let lastErr: unknown = null;
-
-    outerLoop:
-    for (let k = 0; k < keysInOrder.length; k++) {
-      const currentKey = keysInOrder[k];
-      const ai = new GoogleGenAI({ apiKey: currentKey });
-
-      for (const model of GEMINI_MODELS) {
-        try {
-          const thinking_level =
-            model === "gemini-flash-latest" || model === "gemini-3.7-flash"
-              ? ("low" as const)
-              : ("minimal" as const);
-
-          const generation_config = {
-            thinking_level,
-            max_output_tokens: 3000,
-          };
-
-          stream = await ai.interactions.create({
-            model,
-            stream: true,
-            store: false,
-            system_instruction,
-            generation_config,
-            input,
-          });
-          break outerLoop;
-        } catch (err) {
-          console.warn(
-            `[api/chat] Key #${k + 1} (${model}) failed, trying fallback:`,
-            err instanceof Error ? err.message : err
-          );
-          lastErr = err;
-        }
+    try {
+      const { first, iter } = await Promise.race([attempt, deadline]);
+      clearTimeout(timer);
+      if (first.kind === "text") {
+        served = { it: iter, first: first.text, candidate };
+        upstream = abort;
+        break;
       }
+      if (first.kind === "empty") {
+        // Finished without a word — a safety block, usually. That is about the
+        // question, not about capacity, so another key would only repeat it.
+        emptyAnswer = true;
+        break;
+      }
+      throw first.error;
+    } catch (err) {
+      clearTimeout(timer);
+      abort.abort();
+      // A late-arriving loser: swallow its result or error, and close its
+      // stream if it opened one after we stopped waiting.
+      attempt.then(
+        () => void it?.return?.(),
+        () => {}
+      );
+      void it?.return?.();
+      const kind = timedOut ? "retry" : classifyFailure(err);
+      if (timedOut) {
+        cooldowns.set(`${keyIndex}|${model}`, Date.now() + TIMEOUT_COOLDOWN_MS);
+      } else {
+        recordFailure(keyIndex, model, err, kind);
+      }
+      // The key's POSITION, never the key.
+      console.warn(
+        `[api/chat] key #${keyIndex + 1} ${model} failed (${kind}) after ` +
+          `${Date.now() - attemptStart}ms:`,
+        timedOut
+          ? "no text before the attempt timeout"
+          : err instanceof Error
+            ? err.message
+            : err
+      );
+      lastErr = err;
+      lastWasBusy = timedOut || isQuotaError(err);
+      if (kind === "fatal") break;
+      if (kind === "skip-key") skippedKeys.add(keyIndex);
+      if (kind === "skip-model") skippedModels.add(model);
     }
+  }
 
-    if (!stream) {
-      throw lastErr ?? new Error("Failed to initialize chat stream with any key or model");
-    }
-
-    const encoder = new TextEncoder();
-    let accumulatedText = "";
-    let streamHasError = false;
-
-    const out = new ReadableStream<Uint8Array>({
-      async start(controller) {
-        try {
-          for await (const event of stream) {
-            if (event.event_type === "error") {
-              streamHasError = true;
-              // Log it: the student only sees a short apology, so without this
-              // an upstream failure mid-stream is undiagnosable.
-              console.error("[api/chat] upstream error event:", event.error);
-              controller.enqueue(
-                encoder.encode(
-                  isQuotaError(event.error)
-                    ? `\n${busyMessage(lang)}`
-                    : lang === "km"
-                      ? "\n⚠️ មានបញ្ហាពេលឆ្លើយ។ សូមព្យាយាមម្ដងទៀត។"
-                      : "\n⚠️ Something went wrong mid-answer. Please try again."
-                )
-              );
-              break;
-            }
-            // `type: "text"` is unique to TextDelta, so this also filters out
-            // the model's internal thought summaries.
-            if (event.event_type === "step.delta" && event.delta.type === "text") {
-              accumulatedText += event.delta.text;
-              controller.enqueue(encoder.encode(event.delta.text));
-            }
-          }
-        } catch (err) {
-          streamHasError = true;
-          console.error("[api/chat] stream failed:", err);
-          controller.enqueue(
-            encoder.encode(
-              lang === "km"
-                ? "\n⚠️ ការតភ្ជាប់ដាច់។ សូមព្យាយាមម្ដងទៀត។"
-                : "\n⚠️ The connection dropped. Please try again."
-            )
-          );
-        } finally {
-          // Record successful full response in dynamic cache to serve next students with 0 tokens
-          if (
-            !streamHasError &&
-            accumulatedText.length >= 30 &&
-            !accumulatedText.includes("⚠️") &&
-            !accumulatedText.includes("🔒")
-          ) {
-            recordCachedAnswer(lastUserText, accumulatedText);
-          }
-          controller.close();
-        }
-      },
-    });
-
-    return new Response(out, {
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Cache-Control": "no-store",
-      },
-    });
-  } catch (err) {
-    console.error("[api/chat] request failed:", err);
+  if (!served) {
+    if (!emptyAnswer) console.error("[api/chat] every attempt failed:", lastErr);
     // 429 is a normal operating condition on the free tier, not a server fault.
-    if (isQuotaError(err)) return textResponse(busyMessage(lang), 429);
+    // A timeout is the same situation to a student as a 429: busy, try again
+    // in a moment. A request the API rejected as malformed is not.
+    if (!emptyAnswer && lastWasBusy) {
+      return textResponse(busyMessage(lang), 429);
+    }
     return textResponse(
       lang === "km"
         ? "⚠️ សុំទោស ខ្ញុំមិនអាចឆ្លើយបានទេ។ សូមព្យាយាមម្ដងទៀត។"
@@ -603,4 +821,81 @@ export async function handleChat(req: Request): Promise<Response> {
       500
     );
   }
+
+  if (attempts > 1) {
+    console.info(
+      `[api/chat] served by key #${served.candidate.keyIndex + 1} ` +
+        `${served.candidate.model} after ${attempts - 1} failed attempt(s); ` +
+        `first text at ${Date.now() - requestStart}ms`
+    );
+  }
+
+  const { it, first } = served;
+  const encoder = new TextEncoder();
+  // Set when the student closes the chat or loses the connection. Reading on
+  // after that would spend quota generating an answer nobody will receive.
+  let cancelled = false;
+
+  const out = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      try {
+        controller.enqueue(encoder.encode(first));
+        for (;;) {
+          const next = await it.next();
+          if (next.done || cancelled) break;
+          const event = next.value;
+          if (event.event_type === "error") {
+            // Log it: the student only sees a short apology, so without this
+            // an upstream failure mid-stream is undiagnosable.
+            console.error("[api/chat] upstream error event:", event.error);
+            controller.enqueue(
+              encoder.encode(
+                isQuotaError(event.error)
+                  ? `\n${busyMessage(lang)}`
+                  : lang === "km"
+                    ? "\n⚠️ មានបញ្ហាពេលឆ្លើយ។ សូមព្យាយាមម្ដងទៀត។"
+                    : "\n⚠️ Something went wrong mid-answer. Please try again."
+              )
+            );
+            break;
+          }
+          const text = deltaText(event);
+          if (text) controller.enqueue(encoder.encode(text));
+        }
+      } catch (err) {
+        if (cancelled) return;
+        console.error("[api/chat] stream failed:", err);
+        try {
+          controller.enqueue(
+            encoder.encode(
+              lang === "km"
+                ? "\n⚠️ ការតភ្ជាប់ដាច់។ សូមព្យាយាមម្ដងទៀត។"
+                : "\n⚠️ The connection dropped. Please try again."
+            )
+          );
+        } catch {
+          // The reader went away between the failure and this line.
+        }
+      }
+      if (!cancelled) {
+        try {
+          controller.close();
+        } catch {
+          // Already closed by a cancel racing the last chunk.
+        }
+      }
+    },
+    cancel() {
+      cancelled = true;
+      upstream?.abort();
+      void it.return?.();
+    },
+  });
+
+  return new Response(out, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "no-store",
+    },
+  });
 }

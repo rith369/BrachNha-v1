@@ -1,9 +1,10 @@
 // In-memory query cache and Bac II pre-computed answers for KruAI.
 //
 // Zero-token, zero-latency instant response layer:
-//   1. Checks verified Bac II worked curriculum answers (e.g. comparison matrices).
-//   2. Checks previously answered questions in memory.
-//   3. Emits a smooth simulated text stream so the frontend UI renders the exact
+//   1. Checks hand-written Bac II curriculum answers (e.g. comparison matrices)
+//      against a student's FIRST question — see getCachedAnswer for why only
+//      then, and why nothing the model writes is ever cached.
+//   2. Emits a smooth simulated text stream so the frontend UI renders the exact
 //      same typed streaming animation without any Gemini API call or token cost.
 
 /** Normalize text for fuzzy matching (case, punctuation, whitespace). */
@@ -122,6 +123,8 @@ const CURRICULUM_ENTRIES: CachedEntry[] = [
       "three main parts of the human brain",
       "parts of the brain",
       "parts of brain",
+      "parts of the human brain",
+      "main parts of the brain",
       "3 parts of brain",
       "main parts of brain",
     ],
@@ -287,41 +290,80 @@ const CURRICULUM_ENTRIES: CachedEntry[] = [
   },
 ];
 
-/** Dynamic LRU response cache for answered student queries (max 200 items). */
-const MAX_CACHE_SIZE = 200;
-const DYNAMIC_CACHE = new Map<string, string>();
+/**
+ * Words a question may carry AROUND a curated pattern and still be that
+ * question: "what are the parts of the brain?", "សូមពន្យល់ … មានអ្វីខ្លះ".
+ *
+ * Matching used to be a bare `includes`, so a pattern matched any question that
+ * merely CONTAINED it: "which part of the brain stem controls breathing" got the
+ * canned "parts of the brain" answer, and "what errors happen in dna
+ * replication" got the canned replication walkthrough. Now everything outside
+ * the pattern has to be filler, so a question that adds any real content goes
+ * to the model.
+ *
+ * English is checked per whole word. Khmer has no spaces, so a Khmer filler is
+ * stripped as a substring (longest first) and the token must be empty after.
+ */
+const EN_FILLER = new Set([
+  "what", "are", "is", "the", "a", "an", "of", "please", "can", "you", "could",
+  "explain", "tell", "me", "about", "describe", "list", "give", "show", "how",
+  "do", "does", "i", "kruai", "hi", "hello", "between", "difference",
+  "differences", "in", "compare", "vs",
+]);
+const KM_FILLER = [
+  "យ៉ាងដូចម្តេច", "ដូចម្តេច", "មានអ្វីខ្លះ", "អ្វីខ្លះ", "ជាអ្វី", "ពន្យល់",
+  "រៀបរាប់", "បង្ហាញ", "ប្រាប់", "ខ្ញុំ", "ជួយ", "សូម", "តើ", "មាន", "បាទ", "ចាស",
+  "ប្រៀបធៀប", "ភាពខុសគ្នា", "រវាង",
+].sort((a, b) => b.length - a.length);
 
-/** Find cached response if query matches curriculum or previous turns. */
-export function getCachedAnswer(userText: string): string | null {
-  if (!userText || typeof userText !== "string") return null;
+function isFiller(token: string): boolean {
+  if (EN_FILLER.has(token)) return true;
+  let rest = token;
+  for (const f of KM_FILLER) rest = rest.split(f).join("");
+  return rest.length === 0;
+}
+
+function matchesPattern(query: string, pattern: string): boolean {
+  if (query === pattern) return true;
+  const at = query.indexOf(pattern);
+  if (at < 0) return false;
+  const leftover = query.slice(0, at) + " " + query.slice(at + pattern.length);
+  return leftover.split(" ").filter(Boolean).every(isFiller);
+}
+
+/**
+ * A curated answer for this question, or null.
+ *
+ * FIRST TURN ONLY. A curated answer is a standalone explanation; mid-conversation
+ * the same words usually mean something narrower ("compare mitosis and meiosis"
+ * after three turns about crossing-over), and replacing a follow-up with a
+ * canned reply ignores everything the student already said.
+ *
+ * There is deliberately NO cache of model answers any more. There was one, keyed
+ * on the question text alone, and it was a privacy leak: every reply is written
+ * with that student's name, weak subjects and exam average in the system prompt
+ * (see buildSystemPrompt), plus their history and the screen they had open — so
+ * the next student to type the same words received a reply addressed to someone
+ * else, and a follow-up like "why?" was replayed into unrelated conversations.
+ * Personalised output cannot be shared by keying on the input alone. Don't bring
+ * it back without keying on everything that went into the prompt, at which point
+ * it would never hit.
+ */
+export function getCachedAnswer(
+  userText: string,
+  isFirstTurn: boolean
+): string | null {
+  if (!isFirstTurn || !userText || typeof userText !== "string") return null;
   const normalized = normalizeQuery(userText);
   if (!normalized || normalized.length < 3) return null;
 
-  // 1. Check curated Bac II curriculum answers
   for (const entry of CURRICULUM_ENTRIES) {
     for (const pat of entry.patterns) {
       const normPat = normalizeQuery(pat);
-      if (normalized === normPat || normalized.includes(normPat)) {
-        return entry.answer;
-      }
+      if (normPat && matchesPattern(normalized, normPat)) return entry.answer;
     }
   }
-
-  // 2. Check dynamic cache
-  return DYNAMIC_CACHE.get(normalized) ?? null;
-}
-
-/** Store successful model response in dynamic cache. */
-export function recordCachedAnswer(userText: string, botAnswer: string): void {
-  if (!userText || !botAnswer || botAnswer.length < 20) return;
-  const normalized = normalizeQuery(userText);
-  if (!normalized) return;
-
-  if (DYNAMIC_CACHE.size >= MAX_CACHE_SIZE) {
-    const firstKey = DYNAMIC_CACHE.keys().next().value;
-    if (firstKey) DYNAMIC_CACHE.delete(firstKey);
-  }
-  DYNAMIC_CACHE.set(normalized, botAnswer);
+  return null;
 }
 
 /**

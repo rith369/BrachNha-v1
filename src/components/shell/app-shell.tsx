@@ -12,6 +12,7 @@ import { InAppBrowserView } from "@/features/auth/components/in-app-browser-view
 import { AuthSplash } from "@/features/auth/components/auth-splash";
 import { AuthPromptOverlay } from "@/features/auth/components/auth-prompt-overlay";
 import { AccountConflictView } from "@/features/auth/components/account-conflict-view";
+import { InstallPrompt } from "@/features/install/components/install-prompt";
 import { useBrachNhaStore } from "@/lib/store";
 import { useSupabaseSync } from "@/hooks/use-supabase-sync";
 import { useStudyTimer } from "@/hooks/use-study-timer";
@@ -274,6 +275,14 @@ export function AppShell({
               never sees a null feature and needs no internal guard — which
               keeps the React Compiler's early-return hazard out of it. */}
           {authPrompt && <AuthPromptOverlay />}
+          {/* "Add to home screen". Shell-root level for the same scrim reason
+              as the login prompt above, and held back while anything else owns
+              the screen — hideChrome covers a lesson, an exam and the roadmap
+              lock, so it never interrupts a task. When and how often it shows
+              lives in lib/install-prompt.ts. */}
+          <InstallPrompt
+            suppressed={hideChrome || chatOpen || pledgeOpen || !!authPrompt}
+          />
         </>
       )}
     </div>

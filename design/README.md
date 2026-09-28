@@ -31,5 +31,13 @@ rasterise the SVG and encode WebP through `canvas.toDataURL`. If the artwork
 changes, re-render at 96×96 with `object-cover` framing and quality ~0.92, and
 keep both output formats — `wordmark.tsx` uses a `<picture>`.
 
+### Home-screen icons
+
+`public/icons/` (the web app manifest's 192/512/maskable icons and iOS's
+`apple-touch-icon.png`) are rendered from this same file by
+`node scripts/app-icons.mjs`, through the same Chrome route. It removes the
+tile's baked-in grey edge and shadow, because phones round the icon themselves;
+see the script's header. Re-run it whenever the artwork changes.
+
 `public/favicon.ico` is a **different, older** icon that does not come from this
 file, and was left alone.

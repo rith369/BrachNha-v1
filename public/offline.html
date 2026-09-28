@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="km">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#faf5ff" />
+    <title>BrachNha</title>
+    <!-- Served by public/sw.js when a page load fails with no network. Fully
+         self-contained on purpose: nothing it links to could load either.
+         No web fonts — Android and iOS both ship a Khmer system font — and no
+         image, since the worker caches only this one file. -->
+    <style>
+      html, body { height: 100%; margin: 0; }
+      body {
+        display: flex; align-items: center; justify-content: center;
+        padding: 24px; box-sizing: border-box;
+        background: #faf5ff; color: #1e1033;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        text-align: center;
+      }
+      main { max-width: 360px; }
+      h1 { font-size: 20px; margin: 0 0 8px; }
+      p { font-size: 15px; line-height: 1.6; margin: 0 0 6px; color: #5b5470; }
+      button {
+        margin-top: 20px; border: 0; border-radius: 999px; padding: 12px 28px;
+        font: inherit; font-weight: 700; font-size: 15px; color: #fff;
+        background: linear-gradient(90deg, #e91e8c, #8b2be2);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>គ្មានអ៊ីនធឺណិត</h1>
+      <p>សូមភ្ជាប់អ៊ីនធឺណិត រួចព្យាយាមម្តងទៀត។</p>
+      <p>You're offline. Connect to the internet and try again.</p>
+      <button type="button" onclick="location.reload()">ព្យាយាមម្តងទៀត · Try again</button>
+    </main>
+  </body>
+</html>

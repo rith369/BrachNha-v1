@@ -381,6 +381,7 @@ export const BIOLOGY_CH3_SECTIONS: TextbookSection[] = [
       "បរិមណ្ឌលប្រសាទ",
       "cns",
       "pns",
+      "nervous system",
       "ខួរក្បាល",
       "ខួរឆ្អឹងខ្នង",
       "សរសៃប្រសាទ",
@@ -1002,8 +1003,8 @@ export const BIOLOGY_CH4_SECTIONS: TextbookSection[] = [
      + ទ្រីបស៊ីន (Trypsin ក្នុងពោះវៀនតូច)៖ pH = 8 - 8.5 (បាសខ្សោយ)
    - pH ប្រែប្រួលហួសប្រមាណធ្វើឱ្យអង់ស៊ីមបាត់បង់គុណភាព។
 3. ឥទ្ធិពលកំហាប់អង់ស៊ីម និងស៊ុបស្ត្រាត៖
-   - កំហាប់អង់ស៊ីមកើន $\rightarrow$ ល្បឿនប្រតិកម្មកើនឡើងសមាមាត្រត្រង់។
-   - កំហាប់ស៊ុបស្ត្រាតកើន $\rightarrow$ ល្បឿនកើនឡើងរហូតដល់ចំណុចអតិបរមាថេរមួយ ($V_{max}$) ដោយសារមជ្ឈមណ្ឌលសកម្មទាំងអស់របស់អង់ស៊ីមត្រូវបានឆ្អែត (Saturation)។
+   - កំហាប់អង់ស៊ីមកើន $\\rightarrow$ ល្បឿនប្រតិកម្មកើនឡើងសមាមាត្រត្រង់។
+   - កំហាប់ស៊ុបស្ត្រាតកើន $\\rightarrow$ ល្បឿនកើនឡើងរហូតដល់ចំណុចអតិបរមាថេរមួយ ($V_{max}$) ដោយសារមជ្ឈមណ្ឌលសកម្មទាំងអស់របស់អង់ស៊ីមត្រូវបានឆ្អែត (Saturation)។
 4. កូអង់ស៊ីម និងកូហ្វាក់ទ័រ (Coenzymes & Cofactors)៖
    - សមាសធាតុមិនមែនប្រូតេអ៊ីនដែលជំនួយអង់ស៊ីម៖ កូអង់ស៊ីមសរីរាង្គ (វីតាមីន B, NAD+, FAD) និង កូហ្វាក់ទ័រអសរីរាង្គ (អ៊ីយ៉ុងលោហៈ $Fe^{2+}$, $Mg^{2+}$, $Zn^{2+}$, $Cu^{2+}$)។`,
   },
@@ -1017,6 +1018,83 @@ export const ALL_BIOLOGY_SECTIONS: TextbookSection[] = [
 ];
 
 /**
+ * English words that say nothing about WHICH section a question is about. Word
+ * overlap used to count every query word of 3+ characters that appeared in a
+ * section, so "what", "the" and "and" matched nearly every section and a
+ * greeting pulled two textbook chunks into the prompt.
+ */
+const STOPWORDS = new Set([
+  "the", "and", "what", "why", "how", "when", "where", "which", "who", "does",
+  "this", "that", "with", "from", "for", "are", "was", "were", "can", "you",
+  "your", "about", "please", "explain", "tell", "give", "show", "have", "has",
+  "not", "but", "its", "into", "than", "then", "them", "they", "there", "their",
+  "will", "would", "should", "could", "also", "more", "most", "some", "any",
+  "all", "one", "two", "use", "used", "like", "just", "only", "each", "other",
+  "kruai", "hello", "help", "question", "answer", "example",
+]);
+
+/**
+ * A section is returned only with at least this much evidence from its TITLE
+ * or KEYWORDS. Word overlap breaks ties between qualifying sections and never
+ * qualifies one alone: a chunk that only shares common words with a question
+ * costs up to ~4,500 characters of prompt and pulls the answer off topic.
+ */
+const MIN_ANCHOR_SCORE = 3;
+
+/**
+ * Whether `term` occurs in `q` (both lower-cased).
+ *
+ * Latin terms need word boundaries — "stem" is inside "system", "pine" inside
+ * "spine", "ear" inside "year", "gh" inside "high", and each of those pulled a
+ * plant or hormone section into unrelated questions. Khmer is written without
+ * spaces, so a Khmer term can only be matched as a substring.
+ */
+function hasTerm(q: string, term: string): boolean {
+  if (!term) return false;
+  if (!/^[\x20-\x7e]+$/.test(term)) return q.includes(term);
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(?<![a-z0-9])${escaped}(?![a-z0-9])`).test(q);
+}
+
+function searchSections(
+  query: string,
+  sections: TextbookSection[],
+  where: string,
+  maxResults: number
+): RetrievedChunk[] {
+  if (!query || typeof query !== "string") return [];
+  const q = query.toLowerCase().trim();
+  if (q.length < 2) return [];
+
+  const words = (q.match(/[a-z][a-z0-9]{3,}/g) ?? []).filter(
+    (w) => !STOPWORDS.has(w)
+  );
+
+  const scored: { section: TextbookSection; score: number }[] = [];
+  for (const sec of sections) {
+    let anchor = 0;
+    if (hasTerm(q, sec.title.toLowerCase())) anchor += 10;
+    for (const kw of sec.keywords) {
+      const kwLower = kw.toLowerCase();
+      if (hasTerm(q, kwLower)) anchor += kwLower.length >= 6 ? 5 : 3;
+    }
+    if (anchor < MIN_ANCHOR_SCORE) continue;
+
+    const text = sec.text.toLowerCase();
+    const overlap = words.filter((w) => text.includes(w)).length;
+    scored.push({ section: sec, score: anchor + overlap });
+  }
+
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, maxResults).map(({ section }) => ({
+    id: section.id,
+    where: `${where} · ${section.title}`,
+    text: section.text,
+    pinned: false,
+  }));
+}
+
+/**
  * Searches Biology textbook chunks (Chapters 1, 2, 3, and 4) for matches against a student query.
  * Returns up to maxResults retrieved chunks formatted for KruAI's system prompt.
  */
@@ -1024,48 +1102,12 @@ export function searchBiologyTextbook(
   query: string,
   maxResults = 2
 ): RetrievedChunk[] {
-  if (!query || typeof query !== "string") return [];
-  const q = query.toLowerCase().trim();
-  if (q.length < 2) return [];
-
-  const scored: { section: TextbookSection; score: number }[] = [];
-
-  for (const sec of ALL_BIOLOGY_SECTIONS) {
-    let score = 0;
-
-    // Check title match (high weight)
-    if (q.includes(sec.title.toLowerCase())) score += 10;
-
-    // Check keyword matches
-    for (const kw of sec.keywords) {
-      const kwLower = kw.toLowerCase();
-      if (q.includes(kwLower)) {
-        score += kwLower.length >= 6 ? 5 : 3;
-      }
-    }
-
-    // Check query words against section text
-    const words = q.split(/\s+/).filter((w) => w.length >= 3);
-    for (const w of words) {
-      if (sec.text.toLowerCase().includes(w)) {
-        score += 1;
-      }
-    }
-
-    if (score > 0) {
-      scored.push({ section: sec, score });
-    }
-  }
-
-  // Sort descending by score
-  scored.sort((a, b) => b.score - a.score);
-
-  return scored.slice(0, maxResults).map(({ section }) => ({
-    id: section.id,
-    where: `សៀវភៅជីវវិទ្យាថ្នាក់ទី 12 (ក្រសួងអប់រំ) · ${section.title}`,
-    text: section.text,
-    pinned: false,
-  }));
+  return searchSections(
+    query,
+    ALL_BIOLOGY_SECTIONS,
+    "សៀវភៅជីវវិទ្យាថ្នាក់ទី 12 (ក្រសួងអប់រំ)",
+    maxResults
+  );
 }
 
 /** Backward compatibility alias for Chapter 1 search */
@@ -1357,47 +1399,11 @@ export function searchMathTextbook(
   query: string,
   maxResults = 2
 ): RetrievedChunk[] {
-  if (!query || typeof query !== "string") return [];
-  const q = query.toLowerCase().trim();
-  if (q.length < 2) return [];
-
-  const scored: { section: TextbookSection; score: number }[] = [];
-
-  for (const sec of ALL_MATH_SECTIONS) {
-    let score = 0;
-
-    // Check title match (high weight)
-    if (q.includes(sec.title.toLowerCase())) score += 10;
-
-    // Check keyword matches
-    for (const kw of sec.keywords) {
-      const kwLower = kw.toLowerCase();
-      if (q.includes(kwLower)) {
-        score += kwLower.length >= 6 ? 5 : 3;
-      }
-    }
-
-    // Check query words against section text
-    const words = q.split(/\\s+/).filter((w) => w.length >= 3);
-    for (const w of words) {
-      if (sec.text.toLowerCase().includes(w)) {
-        score += 1;
-      }
-    }
-
-    if (score > 0) {
-      scored.push({ section: sec, score });
-    }
-  }
-
-  // Sort descending by score
-  scored.sort((a, b) => b.score - a.score);
-
-  return scored.slice(0, maxResults).map(({ section }) => ({
-    id: section.id,
-    where: `សៀវភៅសង្ខេបគណិតវិទ្យាថ្នាក់ទី 12 (ក្រសួងអប់រំ) · ${section.title}`,
-    text: section.text,
-    pinned: false,
-  }));
+  return searchSections(
+    query,
+    ALL_MATH_SECTIONS,
+    "សៀវភៅសង្ខេបគណិតវិទ្យាថ្នាក់ទី 12 (ក្រសួងអប់រំ)",
+    maxResults
+  );
 }
 

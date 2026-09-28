@@ -127,7 +127,7 @@ function readUserAgent(): string {
  * `navigator.standalone` is the iOS-specific flag; the media query is the
  * standard one and covers an installed Android PWA too.
  */
-function isInstalledApp(): boolean {
+export function isInstalledApp(): boolean {
   try {
     const iosStandalone = (navigator as { standalone?: boolean }).standalone;
     if (iosStandalone === true) return true;

@@ -25,6 +25,7 @@ import { QUIZ_COINS, QUIZ_XP } from "@/utils/rewards";
 import { Callout } from "./callout";
 import { SectionVideoPlayer } from "./section-video";
 import type { SectionBlock, SectionContent, SectionQuestion } from "@/types";
+import { markLessonFinished } from "@/lib/install-prompt";
 
 // three.js + react-three-fiber + drei is a large dependency needed only by the
 // sections that carry a model. Behind React.lazy so it downloads on opening one
@@ -267,6 +268,9 @@ export function SectionDetail({
     // completedSessions matches on the SECTION id, which is the same string the
     // path node carries — there is no second id to keep in step.
     completeSession(sectionId);
+    // Queues the "add to home screen" pop-up for when the student leaves the
+    // completion screen — once per device. See lib/install-prompt.ts.
+    markLessonFinished();
     setStep(total);
   }
 
@@ -305,7 +309,9 @@ export function SectionDetail({
             <div className="text-xl font-extrabold md:text-3xl">
               {section.title}
             </div>
-            {section.video && <SectionVideoPlayer video={section.video} />}
+            {section.video && (
+              <SectionVideoPlayer video={section.video} title={section.title} />
+            )}
             <Callout tone="mint">
               <Block block={section.intro} />
             </Callout>

@@ -311,14 +311,51 @@ export interface SectionQuestion {
   help?: SkillHelp;
 }
 
-/** Poster + duration for a section's video. There is no video file yet; see
- *  SectionVideoPlayer for why the player is built anyway. */
+/** Poster, duration, and — once a recording exists — the YouTube id behind the
+ *  play button. See SectionVideoPlayer for why the player is a click-to-load
+ *  facade rather than an eagerly-mounted embed. */
 export interface SectionVideo {
-  /** public/-relative poster image, e.g. "/sections/biology-3-1-1.webp". */
+  /** public/-relative poster image, e.g. "/sections/biology-3-1-1.webp".
+   *
+   *  ALWAYS LOCAL. The facade must never point this at i.ytimg.com: the whole
+   *  claim of click-to-load is that no third party is contacted until the
+   *  student asks for the video, and a remote poster contacts one on every
+   *  section view. The thumbnail is downloaded once at authoring time and
+   *  converted by scripts/webp.mjs — see design/subjects.md. */
   poster: string;
   /** Run time in seconds, formatted for display. A number rather than a string
-   *  so a malformed "3:9" cannot be typed in. */
+   *  so a malformed "3:9" cannot be typed in.
+   *
+   *  Still authored once `youtubeId` is set: it is drawn on the POSTER, before
+   *  any YouTube code exists on the page, and the real duration is only
+   *  readable after the player loads. Nothing checks it against the upload, so
+   *  keep it in step by hand. */
   durationSec: number;
+  /** The 11-character YouTube video id — "dQw4w9WgXcQ", NOT a URL.
+   *
+   *  ONE CANONICAL FORM, on purpose. A URL field would accept five spellings of
+   *  the same video (watch?v=, youtu.be/, /embed/, /shorts/, plus the `?si=`
+   *  tracking parameter the YouTube app's own share sheet appends); all five
+   *  typecheck and only one embeds. The component BUILDS the embed URL from the
+   *  id, which also keeps the host (youtube-nocookie.com) and every player
+   *  parameter a code decision in one place rather than a content decision
+   *  repeated per section.
+   *
+   *  The video must be UNLISTED with embedding allowed. A PRIVATE video is not
+   *  embeddable at all, and a video or channel flagged "Made for Kids" has
+   *  embedding restricted — both render as "Video unavailable" inside a frame
+   *  that otherwise looks perfectly healthy.
+   *
+   *  OPTIONAL because a poster with no recording is the normal state, the same
+   *  reasoning as `quiz` and `model3d` below. Absent means the player draws the
+   *  non-interactive poster it has drawn since it shipped.
+   *
+   *  CONVERT THIS TO A DISCRIMINATED UNION the day a second hosting backend
+   *  appears — a self-hosted mp4 `src`, say. Two optionals that can both be set
+   *  is the illegal state a union exists to forbid; until then there is no
+   *  second state to discriminate, and optionality is how this repo already
+   *  spells "not yet". */
+  youtubeId?: string;
 }
 
 export interface SectionContent {

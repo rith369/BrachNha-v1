@@ -13,6 +13,7 @@ import {
 } from "@/utils/focus-styles";
 import { FLASHCARDS, PRACTICE } from "@/data/lessons";
 import type { Lesson } from "@/types";
+import { markLessonFinished } from "@/lib/install-prompt";
 
 // Three.js + react-three-fiber + drei together are a meaningfully large
 // dependency, only needed for the one lesson with a 3D model. Split off
@@ -78,6 +79,9 @@ export function LessonDetail({
     // is no separate session id to keep in step. Idempotent in the store, so
     // re-finishing a lesson does not stack anything.
     completeSession(lessonId);
+    // Queues the "add to home screen" pop-up for when the student leaves the
+    // completion screen — once per device. See lib/install-prompt.ts.
+    markLessonFinished();
     setStep(6);
   }
 
