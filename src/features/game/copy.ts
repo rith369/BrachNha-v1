@@ -64,7 +64,7 @@ export const GAME_COPY = {
     postedBlurb:
       "Waiting for a friend to join. You will see the result once someone plays.",
     postedOffline:
-      "Saved on this device, but it could not be shared yet — check your connection and your sign-in. Other students cannot see it until it is.",
+      "Saved on this device, but it could not be shared yet. Check your connection and your sign-in. Other students cannot see it until it is.",
     done: "Done",
     // Result
     win: "You win!",
@@ -112,7 +112,7 @@ export const GAME_COPY = {
     qrHint: "Let your friend scan this, or send them the link.",
     copyLink: "Copy link",
     copied: "Copied!",
-    copyFailed: "Could not copy — select the link above instead.",
+    copyFailed: "Could not copy. Select the link above instead.",
     shareLink: "Share",
     // ── The review: what each side answered, and the working they showed ──
     //
@@ -131,8 +131,8 @@ export const GAME_COPY = {
     theirWorking: "Their working ✍️",
     photoStepTitle: "Photograph your working",
     photoPrompt:
-      "Add photos for each question — as many pages as you used. Skip the ones you did in your head. The answers come next.",
-    photoWhy: "Take them before you look — that is what makes the swap worth something.",
+      "Add photos for each question, as many pages as you used. Skip the ones you did in your head. The answers come next.",
+    photoWhy: "Take them before you look. That is what makes the swap worth something.",
     skipHint: "No photos? You will still see the answers, but not their working.",
     addPhoto: "Add photo",
     /** Alt text for one thumbnail: "Page 2". */
@@ -147,7 +147,7 @@ export const GAME_COPY = {
     deletePhoto: "Delete",
     deleteConfirmShort: "Delete?",
     deleteWarns:
-      "This is your last photo — deleting it hides their working again.",
+      "This is your last photo. Deleting it hides their working again.",
     deleteFailed: "Could not delete. Check your connection and try again.",
     photoLocked: "Add your own working to see theirs.",
     loadingPhoto: "Opening…",
@@ -225,7 +225,7 @@ export const GAME_COPY = {
     qrHint: "ឱ្យមិត្តភក្តិស្កេនកូដនេះ ឬផ្ញើតំណទៅគេ។",
     copyLink: "ចម្លងតំណ",
     copied: "បានចម្លង!",
-    copyFailed: "មិនអាចចម្លងបានទេ — សូមជ្រើសរើសតំណខាងលើជំនួសវិញ។",
+    copyFailed: "មិនអាចចម្លងបានទេ។ សូមជ្រើសរើសតំណខាងលើជំនួសវិញ។",
     shareLink: "ចែករំលែក",
     reviewTitle: "ចម្លើយ 📝",
     seeAnswers: "មើលចម្លើយ",
@@ -239,7 +239,7 @@ export const GAME_COPY = {
     theirWorking: "សន្លឹកចម្លើយរបស់គេ ✍️",
     photoStepTitle: "ថតរូបការគណនារបស់អ្នក",
     photoPrompt:
-      "បន្ថែមរូបសម្រាប់សំណួរនីមួយៗ — ប៉ុន្មានសន្លឹកក៏បាន។ រំលងសំណួរដែលអ្នកគិតក្នុងចិត្ត។ បន្ទាប់មកអ្នកនឹងឃើញចម្លើយ។",
+      "បន្ថែមរូបសម្រាប់សំណួរនីមួយៗ។ ប៉ុន្មានសន្លឹកក៏បាន។ រំលងសំណួរដែលអ្នកគិតក្នុងចិត្ត។ បន្ទាប់មកអ្នកនឹងឃើញចម្លើយ។",
     photoWhy: "ថតមុនពេលមើលចម្លើយ ទើបការផ្លាស់ប្តូរគំនិតមានតម្លៃ។",
     skipHint: "គ្មានរូប? អ្នកនៅតែឃើញចម្លើយ ប៉ុន្តែមិនឃើញការគណនារបស់គេទេ។",
     addPhoto: "បន្ថែមរូប",
@@ -251,7 +251,7 @@ export const GAME_COPY = {
     noPhotoForQuestion: "គ្មានរូបសម្រាប់សំណួរនេះទេ។",
     deletePhoto: "លុប",
     deleteConfirmShort: "លុប?",
-    deleteWarns: "នេះជារូបចុងក្រោយរបស់អ្នក — លុបវា នឹងលាក់ការគណនារបស់គេវិញ។",
+    deleteWarns: "នេះជារូបចុងក្រោយរបស់អ្នក។ លុបវា នឹងលាក់ការគណនារបស់គេវិញ។",
     deleteFailed: "មិនអាចលុបបានទេ។ សូមពិនិត្យអ៊ីនធឺណិត រួចព្យាយាមម្តងទៀត។",
     photoLocked: "ដាក់សន្លឹកចម្លើយរបស់អ្នកជាមុនសិន ទើបមើលរបស់គេបាន។",
     loadingPhoto: "កំពុងបើក…",

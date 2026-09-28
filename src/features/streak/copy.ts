@@ -77,7 +77,7 @@ export const STREAK_COPY = {
     // Marked as a demo control in the UI too — it is the one button on either
     // streak page that stands in for another human being.
     simulateFriend: "Simulate friend completion",
-    simulateNote: "Prototype only — stands in for Dara finishing on her own device.",
+    simulateNote: "Prototype only. Stands in for Dara finishing on her own device.",
 
     sharedWeek: "This Week Together",
     legendKept: "Both done",
@@ -130,7 +130,7 @@ export const STREAK_COPY = {
     remind: "រំលឹក",
     reminded: "បានផ្ញើការរំលឹក",
     simulateFriend: "សាកល្បងឲ្យមិត្តបញ្ចប់",
-    simulateNote: "សម្រាប់សាកល្បងតែប៉ុណ្ណោះ — តំណាងឲ្យ Dara បញ្ចប់នៅលើទូរស័ព្ទរបស់គេ។",
+    simulateNote: "សម្រាប់សាកល្បងតែប៉ុណ្ណោះ។ តំណាងឲ្យ Dara បញ្ចប់នៅលើទូរស័ព្ទរបស់គេ។",
 
     sharedWeek: "សប្តាហ៍នេះជាមួយគ្នា",
     legendKept: "បញ្ចប់ទាំងពីរ",

@@ -89,6 +89,72 @@ A narrowed **range** (`400..800`), not a discrete weight list (`400;600;700;800`
 — Google serves one variable file for a range and four static instances for a
 list, and the variable file is the smaller of the two here.
 
+### NO EM DASHES in anything a student reads
+
+**Never write `—` (U+2014) in a user-visible string.** Use a comma, a full stop, a
+colon, or parentheses. In Khmer that usually means the khan `។` between two
+sentences or `៖` before an explanation; in English a comma or a full stop.
+
+The user's instruction (28 Sep 2026), and it is about the app's voice rather
+than about typography: an em dash reads as an aside in English and has no
+settled role in Khmer prose at all, so it makes a sentence harder to parse for
+the audience that matters.
+
+```
+BAD   "មិនត្រឹមត្រូវ — ហេតុអ្វី?"        "Could not copy — select the link above."
+GOOD  "មិនត្រឹមត្រូវ។ ហេតុអ្វី?"         "Could not copy. Select the link above."
+BAD   "ករណីទី 1 — ភាគបែងដូចគ្នា៖ …"
+GOOD  "ករណីទី 1 (ភាគបែងដូចគ្នា)៖ …"
+```
+
+**Scope, decided deliberately:** strings only. 55 were rewritten by hand when the
+rule landed, each with the punctuation that fitted rather than one blind
+substitution. **Code comments and the two markdown files were left alone** (about
+3,100 of them) because nobody outside the repo reads those, and a mechanical
+swap across them would mangle sentences that an em dash is genuinely holding
+together. New comments need not follow the rule; **new strings must**.
+
+**Nine are left on purpose, and they are not prose.** A bare `"—"` is the "no
+value yet" glyph on an empty score, an unset grade, a blank prediction
+(`score-hero.tsx`, `prediction-hero.tsx`, `quiz-detail.tsx`, `profile-view.tsx`,
+`roadmap-view.tsx`, `exam-hub.tsx`, `commitment-overlay.tsx`,
+`grade-prediction-view.tsx`). A comma cannot stand in for a placeholder. If those
+should change too it is a design decision about what "no value" looks like, not
+this rule.
+
+### Student-visible Khmer stays Khmer, with three exceptions
+
+**Casual English does not belong in a Khmer string.** `Tip 1` is `គន្លឹះទី 1`,
+`GCD` is `កត្តារួមធំបំផុត`, `vs` is `ធៀបនឹង`, `Keep, Change, Flip` is
+`រក្សា ប្តូរ បញ្ច្រាស`, `Algebra` is `ពិជគណិត` and `Limit` is `លីមីត`. The
+user's instruction (28 Sep 2026), swept across every user-visible string when it
+landed.
+
+**Three things stay in Latin, and each for its own reason:**
+
+- **Scientific and technical terms a student meets on the exam paper**, written
+  as a Khmer term with the Latin in parentheses on first use: `ខួរធំ (Cerebrum)`,
+  `សកម្មភាពផ្លាត (Reflex action)`, `កត្តារួមធំបំផុត (GCD)`, plus units and
+  notation (`pH`, `m/s`, `lim`, `∫`). This is the same rule `chat-prompt.ts`
+  already gives KruAI: do not invent a Khmer coinage for something the student
+  will meet in Latin on the paper. **An established term NAME keeps its English
+  words too** — `(Fight or Flight)`, `(Treaty of Versailles)`, `(Rest and
+  digest)`. The `of`/`and` inside those is part of the name, not loose English.
+- **Product terms**, on the user's earlier instruction: `KruAI`, `BrachNha`,
+  `XP`, `Streak`, `Flashcard`, `Quiz`, `Bac II`. `translations.ts`'s own `km`
+  column already spells these in Latin.
+- **The English exam paper and its drills** (`data/papers/english-2025.ts`,
+  `english-drills.ts`). Its content is English by definition; only the Khmer
+  EXPLANATIONS around it follow these rules. The same goes for text quoting a
+  phone's own UI, such as `«Add to Home Screen»` in `features/install/copy.ts`,
+  which has to match what the student actually sees on their device.
+
+**Neither rule is machine-checked.** `check:digits` catches Khmer numerals and
+`check:quiz` catches broken TeX; nothing catches an em dash or a stray English
+word, so both are a matter of writing them correctly the first time. To audit by
+hand: search user-visible strings for `—`, and for Latin words inside strings
+containing Khmer.
+
 ### Digits are Latin everywhere — the rule, and how it is enforced
 
 **EVERY number this app shows a student is written with Latin digits (0-9), in
@@ -1663,10 +1729,19 @@ around it: poster, play button, 0:00 / duration, fullscreen glyph, scrub bar.
 sections have no recording, exactly like the mascot slot and the empty past
 papers: build the shape now, drop the real thing in later.
 
-**WITHOUT a `youtubeId`, NOTHING IN IT IS INTERACTIVE.** It first shipped with a
-real `<button>` under the play glyph plus a ឆាប់ៗនេះ chip and a "video is being
-prepared" notice; the chip and notice were removed at the user's request, so the
-button went with them. A `<button>` that answers a tap with silence is the
+**WITHOUT a `youtubeId`, NOTHING IN IT IS INTERACTIVE — but it SAYS SO.** A
+ឆាប់ៗនេះ chip sits in the frame's top-right whenever there is nothing behind
+the play glyph, which is what makes the state legible WITHOUT tapping — the same
+principle as `exam-paper-card.tsx`'s chip and the survey's `studiedNote`.
+
+That chip is a REVERSAL, and the history matters because this file used to argue
+the other way. The player first shipped with a real `<button>` plus the chip and
+a "video is being prepared" notice; the chip and notice were removed at the
+user's request, so the button went with them — an unexplained control that
+answers a tap with silence is the broken-app pattern. The chip is back by
+request (28 Sep 2026); **the button is not, and must not follow it back.** The
+rule is unchanged: the chip EXPLAINS the state, only a `youtubeId` makes it
+pressable. A `<button>` that answers a tap with silence is the
 broken-app pattern `sidebar-nav.tsx` and the survey's `StudiedStep` both exist to
 avoid — with the explanation gone, plain spans are the only honest form.
 Identical on screen, no pointer cursor, no focus ring, nothing announced as
@@ -1749,9 +1824,41 @@ breaking them up. `list-outside` keeps wrapped lines aligned under the text
 rather than under the bullet, which matters here because Khmer lines wrap often.
 `data/sections.ts` holds `SECTION_CONTENT` keyed by the id `sectionsFor()`
 generates (`"biology-3-1-1"`); the types live in `types/index.ts` beside `Lesson`.
-Five entries today — four biology, plus **`math-1-1-1`**, the first math section
-and the first with a REAL VIDEO behind its player — and nearly-empty is still the
-normal state, same as `PAST_PAPERS`.
+Seven entries today: four biology, plus **`math-1-1-1`** (the first math section
+and the first with a REAL VIDEO behind its player), **`math-1-1-2`** and
+**`math-1-1-3`**. Nearly-empty is still the normal state, same as `PAST_PAPERS`.
+
+**`math-1-1-2` is the one to copy for a maths section.** It carries a `video`
+with a POSTER AND NO `youtubeId` — the placeholder state, drawn with the
+ឆាប់ៗនេះ chip — and **no `durationSec` at all**, because a run time printed
+beside that chip would claim a video that has not been made. `durationSec` is
+optional for exactly this; `biology-3-1-1` keeps the one it was authored with.
+Its poster is the subject illustration recropped to the section spec (16:9,
+800px) rather than new artwork, so it needs no new licence. `math-1-1-3` reuses
+the same crop: there is no per-section artwork, and one honest placeholder beats
+a different invented image per section.
+
+**`math-1-1-3` is where the Khmer rule bit hardest, and it is the example to
+follow.** Its source arrived with the headings, the steps and even the question
+stems in English ("Decimal to Fraction", "Step 1", "Shortcut", "Convert 0.5 to a
+fraction"). None of that is a term of art, so all of it is Khmer in the file, and
+the mapping used is written into that entry's own header so the next maths
+section translates the same words the same way.
+
+**Its column addition is a KaTeX `array`, not spaces.** The renderer uses
+`whitespace-pre-line`, which keeps newlines but COLLAPSES runs of spaces, so a
+preformatted sum loses exactly the alignment it exists to show. Note the row
+separator is four backslashes in the source (two in the string).
+It is also the densest LaTeX in the repo (101 `rac` alone), and therefore the
+clearest case of the doubled-backslash rule — ``, `
+`, ``, `	` and `
+`
+are all C escapes, so `rac`, `
+eq`, `oxed`, `	imes` and `
+ightarrow`
+written with ONE backslash silently become a form feed, a newline, a backspace,
+a tab and a carriage return. They still render, just wrongly, which is why
+`check:quiz` typesets every string rather than trusting the eye.
 
 **EVERY STRING IN A SECTION NOW RENDERS THROUGH `MathText`** — `Block`'s intro,
 outro, item labels, bodies and nested items, and `QuizQuestion`'s prompt, options

@@ -89,7 +89,7 @@ export const SECTION_CONTENT: Record<string, SectionContent> = {
     notes: {
       items: [
         {
-          label: "រំញោច (Stimulus) vs ការឆ្លើយតប (Response)",
+          label: "រំញោច (Stimulus) ធៀបនឹង ការឆ្លើយតប (Response)",
           body: "",
           items: [
             "រំញោច៖ គឺជារាល់ការប្រែប្រួលនានានៅក្នុងខ្លួន ឬក្រៅខ្លួន (ដូចជា កម្តៅ ពន្លឺ សំឡេង សារធាតុគីមី)។",
@@ -220,7 +220,7 @@ export const SECTION_CONTENT: Record<string, SectionContent> = {
     notes: {
       items: [
         {
-          label: "បណ្ដាញប្រសាទ (Nerve Net) vs ប្រព័ន្ធប្រសាទពោះ (Ventral Nerve Cord)",
+          label: "បណ្ដាញប្រសាទ (Nerve Net) ធៀបនឹង ប្រព័ន្ធប្រសាទពោះ (Ventral Nerve Cord)",
           body: "",
           items: [
             "បណ្ដាញប្រសាទ (អ៊ីដ្រា)៖ គ្មានខួរក្បាល អាំងភ្លុចប្រសាទសាយភាយយឺតៗគ្រប់ទិសដៅ។",
@@ -345,7 +345,7 @@ export const SECTION_CONTENT: Record<string, SectionContent> = {
     notes: {
       items: [
         {
-          label: "ណ្វៃយ៉ូ (Nuclei) vs កង់គ្លីយ៉ុង (Ganglia)",
+          label: "ណ្វៃយ៉ូ (Nuclei) ធៀបនឹង កង់គ្លីយ៉ុង (Ganglia)",
           body: "",
           items: [
             "ណ្វៃយ៉ូ (Nucleus)៖ ជាបណ្ដុំនៃតួកោសិកាប្រសាទដែលស្ថិតនៅក្នុង «ប្រព័ន្ធប្រសាទមជ្ឈិម» (ខួរក្បាល ឬខួរឆ្អឹងខ្នង)។",
@@ -450,7 +450,7 @@ export const SECTION_CONTENT: Record<string, SectionContent> = {
           body: "ខួរឆ្អឹងខ្នងមានប្រវែងប្រហែល 42-45 cm ការពារដោយឆ្អឹងកង ស្រោមខួរ 3 ស្រទាប់ និងទឹកខួរ។ ធ្នូរ៉េផ្លិចមាន 5 ផ្នែក៖ ទួលវិញ្ញាណ -> ណឺរ៉ូនវិញ្ញាណនាំ -> អន្តរណឺរ៉ូន (ក្នុងខួរឆ្អឹងខ្នង) -> ណឺរ៉ូនចលករ -> សរីរាង្គប្រតិកម្ម (សាច់ដុំដកដៃចេញភ្លាមៗ)។",
         },
         {
-          label: "5. ប្រព័ន្ធប្រសាទស្វ័យប្រវត្តិ (សាំប៉ាទិច vs ប៉ារ៉ាសាំប៉ាទិច)",
+          label: "5. ប្រព័ន្ធប្រសាទស្វ័យប្រវត្តិ (សាំប៉ាទិច ធៀបនឹង ប៉ារ៉ាសាំប៉ាទិច)",
           body: "សាំប៉ាទិច (Sympathetic - ពេលភ័យ តានតឹង ឬសកម្មភាពខ្លាំង): ពង្រីកប្រស្រីភ្នែក បង្កើនចង្វាក់បេះដូង ពង្រីកទងសួត បន្ថយការរំលាយអាហារ បញ្ចេញ adrenaline។ ប៉ារ៉ាសាំប៉ាទិច (Parasympathetic - ពេលសម្រាក និងស្ងប់ចិត្ត): បង្រួមប្រស្រីភ្នែក បន្ថយចង្វាក់បេះដូង បង្រួមទងសួត ជំរុញការរំលាយអាហារ។",
         },
       ],
@@ -472,7 +472,7 @@ export const SECTION_CONTENT: Record<string, SectionContent> = {
     notes: {
       items: [
         {
-          label: "ខួរក្បាល និងខួរឆ្អឹងខ្នង (សារធាតុប្រផេះ vs សារធាតុស)",
+          label: "ខួរក្បាល និងខួរឆ្អឹងខ្នង (សារធាតុប្រផេះ ធៀបនឹង សារធាតុស)",
           body: "",
           items: [
             "ខួរក្បាល៖ សារធាតុប្រផេះ (តួកោសិកា) នៅ «ខាងក្រៅ» (សំបកខួរ), សារធាតុស (អាក់សូនមានមីយេលីន) នៅ «ខាងក្នុង»។",
@@ -642,7 +642,7 @@ export const SECTION_CONTENT: Record<string, SectionContent> = {
       intro: "បច្ចេកទេសសាមញ្ញៗ ដើម្បីកុំឱ្យច្រឡំសញ្ញា។",
       items: [
         {
-          label: "Tip 1 — ប្រើបន្ទាត់លេខ",
+          label: "គន្លឹះទី 1 ប្រើបន្ទាត់លេខ",
           body: "បើសិស្សច្រឡំថា $-5+3$ បានប៉ុន្មាន អាចគិតតាមបន្ទាត់លេខ៖",
           items: [
             "ចាប់ផ្តើមពី $-5$",
@@ -651,11 +651,11 @@ export const SECTION_CONTENT: Record<string, SectionContent> = {
           ],
         },
         {
-          label: "Tip 2 — ចងចាំច្បាប់គុណ/ចែកជាគូ",
+          label: "គន្លឹះទី 2 ចងចាំច្បាប់គុណ/ចែកជាគូ",
           body: "$++=+$ · $--=+$ · $+-=-$ · $-+=-$",
         },
         {
-          label: "Tip 3 — ពេលឃើញការដកលេខអវិជ្ជមាន",
+          label: "គន្លឹះទី 3 ពេលឃើញការដកលេខអវិជ្ជមាន",
           body: "កុំប្រញាប់គណនា។ ប្តូរទម្រង់ជាមុន៖ $8-(-3)$ ក្លាយជា $8+3=11$",
         },
         {
@@ -731,7 +731,7 @@ export const SECTION_CONTENT: Record<string, SectionContent> = {
         },
       ],
       outro:
-        "បន្ទាប់ពីរៀនផ្នែកនេះ សិស្សគួរអាច៖\n• សម្គាល់លេខវិជ្ជមាន និងអវិជ្ជមាន\n• បូក និងដកលេខដែលមានសញ្ញាផ្សេងៗគ្នា\n• ប្រើច្បាប់សញ្ញាក្នុងគុណ និងចែក\n• ប្រើតម្លៃដាច់ខាតដើម្បីដោះស្រាយការបូកសញ្ញាខុសគ្នា\n• ដោះស្រាយសញ្ញានៅមុខវង់ក្រចក\n• ជៀសវាងកំហុសសញ្ញាដែលអាចប៉ះពាល់ដល់ការគណនា Algebra និង Limit",
+        "បន្ទាប់ពីរៀនផ្នែកនេះ សិស្សគួរអាច៖\n• សម្គាល់លេខវិជ្ជមាន និងអវិជ្ជមាន\n• បូក និងដកលេខដែលមានសញ្ញាផ្សេងៗគ្នា\n• ប្រើច្បាប់សញ្ញាក្នុងគុណ និងចែក\n• ប្រើតម្លៃដាច់ខាតដើម្បីដោះស្រាយការបូកសញ្ញាខុសគ្នា\n• ដោះស្រាយសញ្ញានៅមុខវង់ក្រចក\n• ជៀសវាងកំហុសសញ្ញាដែលអាចប៉ះពាល់ដល់ការគណនាពិជគណិត និងលីមីត",
     },
     mistakes: [
       {
@@ -780,7 +780,7 @@ export const SECTION_CONTENT: Record<string, SectionContent> = {
         ],
         correct: "ខ. $-10$",
         explanation:
-          "អវិជ្ជមានទាំងពីរ — សញ្ញាដូចគ្នា៖ $6+4=10$ ហើយរក្សាសញ្ញា $-$។ ដូច្នេះ $-6+(-4)=-10$",
+          "អវិជ្ជមានទាំងពីរ (សញ្ញាដូចគ្នា)៖ $6+4=10$ ហើយរក្សាសញ្ញា $-$។ ដូច្នេះ $-6+(-4)=-10$",
       },
       {
         scenario: "ផ្នែក A · បូកលេខដែលមានសញ្ញា",
@@ -952,6 +952,761 @@ export const SECTION_CONTENT: Record<string, SectionContent> = {
         correct: "ខ. $-1$",
         explanation:
           "ចែកមុន៖ $(-24)\\div (-6)=+4$ (សញ្ញាដូចគ្នា)។ បន្ទាប់មក $4-5=-1$",
+      },
+    ],
+  },
+
+  /**
+   * MATH · មូលដ្ឋានគ្រឹះ · ជំពូក 1 មេរៀនទី 1 ផ្នែកទី 2 — ប្រភាគ និងការសម្រួលប្រភាគ.
+   *
+   * The second math section. Authoring this key unlocks node 1.1.2 on
+   * /subjects/math on its own — sessionsFor() derives `href` from
+   * hasSectionContent(), so features/lessons/sessions.ts is untouched.
+   *
+   * ── PROVENANCE ────────────────────────────────────────────────────────────
+   * Supplied by the user in LaTeX and TRANSCRIBED, not paraphrased. Four
+   * mechanical changes, each forced by a rule that applies app-wide rather than
+   * by a judgement about this content:
+   *
+   *  1. SECTION NUMBERS ARE LATIN. The source numbered its parts in Khmer
+   *     numerals; `npm run check:digits` fails on any of those (U+17E0-17E9),
+   *     so they read 2.1 … 2.7 here. (The originals are not quoted anywhere in
+   *     this file: that check scans comments too, precisely because a comment
+   *     showing the old spelling is how the convention creeps back.)
+   *  2. NO EMOJI. The source marked its parts with stars, bulbs, brains and
+   *     warning signs. Callout takes a LucideIcon and the blocks already carry
+   *     those icons. The source's cross/tick pairs map exactly onto a
+   *     Misconception's wrong/right, which renders with CircleX and CircleCheck.
+   *  3. `$…$` RATHER THAN `\(…\)` AND `$$…$$`. splitMath (utils/math-render.ts)
+   *     recognises dollar delimiters and does not recognise \( \). Inline
+   *     throughout rather than display blocks, because nearly every formula
+   *     here sits inside a sentence or a bullet.
+   *  4. FRACTIONS ARE BRACED. The source mixes `\frac12`, `\frac9{10}` and
+   *     `\frac{2}{3}`; all three render identically, and the braced form is the
+   *     one canonical spelling data/quizzes/math-1-1-1.ts already fixes. It
+   *     matters most in a future quiz, where two spellings of one value is the
+   *     collision that rule exists to make unwriteable.
+   *
+   * ── EVERY BACKSLASH IS DOUBLED, AND THIS SECTION IS WHERE THAT BITES ──────
+   * These are ordinary double-quoted strings, so a single backslash is an
+   * ESCAPE. This content is built almost entirely from the commands that are
+   * also C escapes, and each one fails SILENTLY — it renders, just wrongly:
+   *
+   *     \f -> form feed    so  \frac        becomes  <FF>rac
+   *     \n -> newline      so  \neq         becomes  <LF>eq
+   *     \b -> backspace    so  \boxed       becomes  <BS>oxed
+   *     \t -> tab          so  \times       becomes  <TAB>imes
+   *     \r -> carriage ret so  \rightarrow  becomes  <CR>ightarrow
+   *
+   * That is the bug data/bac2-format.ts warns about, and it is why
+   * `npm run check:quiz` typesets every string in this record with
+   * throwOnError: eyeballing does not catch it.
+   *
+   * ── NO VIDEO AND NO QUIZ YET ──────────────────────────────────────────────
+   * Both fields are optional and both are deliberately absent. No recording has
+   * been supplied for this section, so the player draws nothing rather than a
+   * poster for a video that does not exist; and the exercises are still to
+   * come. Adding `video` turns the player on and adding `quiz`/`quizHarder`
+   * gates the steps, neither needing a code change.
+   */
+  "math-1-1-2": {
+    title: "ប្រភាគ និងការសម្រួលប្រភាគ",
+    // Poster only — no recording exists yet, so there is no `youtubeId` and the
+    // player draws its non-interactive state with a ឆាប់ៗនេះ chip. No
+    // `durationSec` either: a run time beside that chip would claim a video
+    // that has not been made. The art is the subject illustration recropped to
+    // the section-poster spec (16:9, 800px), same Freepik licence and the same
+    // credit line on the Profile page.
+    video: {
+      poster: "/sections/math-1-1-2.webp",
+    },
+    intro: {
+      intro:
+        "ប្រភាគ គឺជាវិធីសរសេរផ្នែកមួយនៃចំនួនទាំងមូល។ ប្រភាគមានទម្រង់ $\\frac{a}{b}$",
+      items: [
+        {
+          label: "ភាគយក (Numerator)",
+          body: "$a$ គឺចំនួនផ្នែកដែលយក",
+        },
+        {
+          label: "ភាគបែង (Denominator)",
+          body: "$b$ គឺចំនួនផ្នែកស្មើគ្នាទាំងអស់ ហើយ $b \\neq 0$",
+        },
+      ],
+      outro:
+        "ឧទាហរណ៍៖ $\\frac{3}{5}$ មានន័យថា យើងយក 3 ផ្នែក ក្នុងចំណោម 5 ផ្នែកស្មើគ្នា។",
+    },
+    examples: {
+      intro: "បច្ចេកទេសសាមញ្ញៗ ដើម្បីធ្វើលំហាត់ប្រភាគឱ្យលឿន និងតិចកំហុស។",
+      items: [
+        {
+          label: "គន្លឹះទី 1 បូក/ដក ត្រូវមើលភាគបែងមុន",
+          body: "ឃើញ $\\frac{a}{b}+\\frac{c}{d}$ កុំប្រញាប់បូក។ សួរខ្លួនឯងជាមុន៖ ភាគបែងដូចគ្នាឬនៅ? បើមិនដូចគ្នា ត្រូវរកភាគបែងរួមសិន។",
+        },
+        {
+          label: "គន្លឹះទី 2 គុណ ត្រូវកាត់មុន",
+          body: "មុនគុណ ស្វែងរកលេខដែលអាចកាត់គ្នាបាន។ ឧទាហរណ៍ $\\frac{2}{3}\\times\\frac{9}{10}$ អាចកាត់ $3$ ជាមួយ $9$ ទទួលបាន $\\frac{2}{1}\\times\\frac{3}{10}=\\frac{6}{10}=\\frac{3}{5}$។ នេះជួយឱ្យគណនាងាយ និងកាត់បន្ថយកំហុស។",
+        },
+        {
+          label: "គន្លឹះទី 3 ចែក ត្រូវចាំ រក្សា ប្តូរ បញ្ច្រាស",
+          body: "ឧទាហរណ៍ $\\frac{2}{3}\\div\\frac{4}{5}$",
+          items: [
+            "រក្សាប្រភាគទី 1៖ $\\frac{2}{3}$",
+            "ប្តូរ $\\div$ ទៅជា $\\times$",
+            "បញ្ច្រាសប្រភាគទី 2៖ $\\frac{4}{5}\\rightarrow\\frac{5}{4}$",
+          ],
+        },
+        {
+          label: "តិចនិចក្នុងការធ្វើលំហាត់",
+          body: "ពេលឃើញប្រភាគ សិស្សអាចធ្វើតាម 4 ជំហាន៖",
+          items: [
+            "ជំហានទី 1៖ កំណត់ប្រភេទប្រតិបត្តិការ (បូក ដក គុណ ឬចែក)",
+            "ជំហានទី 2៖ សម្រួលប្រភាគ ប្រសិនបើអាចធ្វើបាន",
+            "ជំហានទី 3៖ គណនាតាមច្បាប់របស់ប្រតិបត្តិការ",
+            "ជំហានទី 4៖ ពិនិត្យ និងសម្រួលចម្លើយចុងក្រោយ",
+          ],
+        },
+      ],
+    },
+    lesson: {
+      items: [
+        {
+          label: "2.1 ប្រភាគស្មើគ្នា",
+          body: "ប្រភាគពីរអាចមានតម្លៃដូចគ្នា ទោះបីលេខខុសគ្នាក៏ដោយ៖ $\\frac{1}{2}=\\frac{2}{4}=\\frac{3}{6}$។ យើងអាចគុណ ឬចែកភាគយក និងភាគបែងដោយលេខដូចគ្នា ដោយមិនប្តូរតម្លៃប្រភាគ។",
+          items: [
+            "$\\frac{2}{3}\\times\\frac{2}{2}=\\frac{4}{6}$ ដូច្នេះ $\\frac{2}{3}=\\frac{4}{6}$",
+          ],
+        },
+        {
+          label: "2.2 ការសម្រួលប្រភាគ",
+          body: "ការសម្រួលប្រភាគ គឺការធ្វើឱ្យប្រភាគទៅជាទម្រង់សាមញ្ញបំផុត ដោយចែកភាគយក និងភាគបែងដោយកត្តារួមធំបំផុត (GCD)។",
+          items: [
+            "$\\frac{12}{18}$៖ កត្តារួមធំបំផុតរបស់ 12 និង 18 គឺ 6",
+            "$\\frac{12\\div 6}{18\\div 6}=\\frac{2}{3}$ ដូច្នេះ $\\boxed{\\frac{12}{18}=\\frac{2}{3}}$",
+          ],
+        },
+        {
+          label: "2.3 បូកប្រភាគ",
+          body: "ករណីទី 1 (ភាគបែងដូចគ្នា)៖ បូកភាគយក ហើយរក្សាភាគបែងដដែល។ ករណីទី 2 (ភាគបែងខុសគ្នា)៖ ត្រូវរកភាគបែងរួមជាមុន។",
+          items: [
+            "ភាគបែងដូចគ្នា៖ $\\frac{2}{5}+\\frac{1}{5}=\\frac{2+1}{5}=\\frac{3}{5}$",
+            "ភាគបែងខុសគ្នា៖ $\\frac{1}{2}+\\frac{1}{3}$។ ភាគបែងរួមតូចបំផុតគឺ 6",
+            "$\\frac{1}{2}=\\frac{3}{6}$ និង $\\frac{1}{3}=\\frac{2}{6}$ ដូច្នេះ $\\frac{3}{6}+\\frac{2}{6}=\\frac{5}{6}$",
+          ],
+        },
+        {
+          label: "2.4 ដកប្រភាគ",
+          body: "វិធីធ្វើដូចការបូកប្រភាគ។",
+          items: [
+            "ភាគបែងដូចគ្នា៖ $\\frac{5}{6}-\\frac{2}{6}=\\frac{5-2}{6}=\\frac{3}{6}=\\frac{1}{2}$",
+            "ភាគបែងខុសគ្នា៖ $\\frac{3}{4}-\\frac{1}{2}$។ បម្លែងទៅភាគបែងរួម 4 គឺ $\\frac{1}{2}=\\frac{2}{4}$",
+            "ដូច្នេះ $\\frac{3}{4}-\\frac{2}{4}=\\frac{1}{4}$",
+          ],
+        },
+        {
+          label: "2.5 គុណប្រភាគ",
+          body: "គុណភាគយកជាមួយភាគយក និងភាគបែងជាមួយភាគបែង។",
+          items: [
+            "$\\frac{2}{3}\\times\\frac{4}{5}=\\frac{2\\times 4}{3\\times 5}=\\frac{8}{15}$",
+          ],
+        },
+        {
+          label: "2.6 ចែកប្រភាគ",
+          body: "រក្សាប្រភាគទី 1 → ប្តូរ $\\div$ ទៅ $\\times$ → បញ្ច្រាសប្រភាគទី 2។",
+          items: [
+            "$\\frac{2}{3}\\div\\frac{4}{5}$ ប្តូរទៅ $\\frac{2}{3}\\times\\frac{5}{4}$",
+            "ដូច្នេះ $\\frac{10}{12}=\\frac{5}{6}$",
+          ],
+        },
+        {
+          label: "2.7 ចំនួនចម្រុះ និងប្រភាគមិនត្រឹមត្រូវ",
+          body: "ចំនួនចម្រុះ $2\\frac{1}{3}$ មានន័យថា $2+\\frac{1}{3}$។",
+          items: [
+            "បម្លែងទៅប្រភាគមិនត្រឹមត្រូវ៖ $(2\\times 3)+1=7$ ដូច្នេះ $2\\frac{1}{3}=\\frac{7}{3}$",
+            "បម្លែងត្រឡប់វិញ៖ $7\\div 3=2$ សល់ 1 ដូច្នេះ $\\frac{7}{3}=2\\frac{1}{3}$",
+          ],
+        },
+      ],
+    },
+    notes: {
+      items: [
+        {
+          label: "បូក និងដក",
+          body: "ត្រូវធ្វើឱ្យភាគបែងដូចគ្នាជាមុន។",
+        },
+        {
+          label: "គុណ",
+          body: "គុណភាគយក និងភាគបែង។",
+        },
+        {
+          label: "ចែក",
+          body: "បញ្ច្រាសប្រភាគទី 2 រួចប្តូរទៅជាគុណ។",
+        },
+        {
+          label: "កុំបូកដោយផ្ទាល់",
+          body: "មិនអាចបូកភាគយក និងភាគបែងដោយផ្ទាល់បានទេ៖ $\\frac{2}{3}+\\frac{1}{4}\\neq\\frac{5}{7}$",
+        },
+        {
+          label: "ពិនិត្យចុងក្រោយ",
+          body: "បន្ទាប់ពីគណនា ត្រូវពិនិត្យថាអាចសម្រួលបានទៀតឬអត់។ ហើយភាគបែងមិនអាចស្មើ 0 បានទេ។",
+        },
+      ],
+      outro:
+        "បន្ទាប់ពីរៀនផ្នែកនេះ សិស្សគួរអាច៖\n• ស្គាល់ភាគយក និងភាគបែង\n• ស្គាល់ប្រភាគស្មើគ្នា\n• សម្រួលប្រភាគទៅទម្រង់សាមញ្ញបំផុត\n• បូក និងដកប្រភាគ\n• គុណ និងចែកប្រភាគ\n• បម្លែងចំនួនចម្រុះទៅជាប្រភាគមិនត្រឹមត្រូវ និងត្រឡប់វិញ\n• ប្រើប្រភាគក្នុងពិជគណិត និងលីមីត\n\nសម្រាប់លីមីត៖ ផ្នែកដែលគួរផ្តោតខ្លាំងជាងគេគឺ ការសម្រួលប្រភាគ ការកាត់តួ និងប្រភាគពិជគណិត ព្រោះវានឹងត្រូវប្រើញឹកញាប់ពេលដោះស្រាយទម្រង់ $\\frac{0}{0}$។",
+    },
+    mistakes: [
+      {
+        wrong: "បូកភាគយក និងភាគបែងដោយផ្ទាល់៖ $\\frac{1}{2}+\\frac{1}{3}=\\frac{2}{5}$",
+        right:
+          "ត្រូវធ្វើភាគបែងឱ្យដូចគ្នាជាមុន៖ $\\frac{1}{2}+\\frac{1}{3}=\\frac{3}{6}+\\frac{2}{6}=\\frac{5}{6}$",
+      },
+      {
+        wrong:
+          "ភ្លេចបញ្ច្រាសពេលចែក៖ $\\frac{2}{3}\\div\\frac{4}{5}=\\frac{2}{3}\\times\\frac{4}{5}$",
+        right:
+          "ត្រូវបញ្ច្រាសប្រភាគទី 2៖ $\\frac{2}{3}\\div\\frac{4}{5}=\\frac{2}{3}\\times\\frac{5}{4}$",
+      },
+      {
+        wrong: "មិនសម្រួលចម្លើយ៖ ទុកចម្លើយជា $\\frac{6}{10}$",
+        right:
+          "$\\frac{6}{10}$ មិនទាន់ជាទម្រង់សាមញ្ញបំផុតទេ៖ $\\frac{6}{10}=\\frac{3}{5}$",
+      },
+      {
+        wrong:
+          "បូកប្រភាគដោយមិនធ្វើភាគបែងឱ្យដូចគ្នា៖ $\\frac{1}{4}+\\frac{1}{2}=\\frac{2}{6}$",
+        right:
+          "ត្រូវបម្លែងជាមុន៖ $\\frac{1}{2}=\\frac{2}{4}$ ដូច្នេះ $\\frac{1}{4}+\\frac{2}{4}=\\frac{3}{4}$",
+      },
+    ],
+    quiz: [
+      {
+        scenario: "ផ្នែក A · សម្រួលប្រភាគ",
+        q: "សម្រួល $\\frac{6}{12}$",
+        options: [
+          "ក. $\\frac{1}{2}$",
+          "ខ. $\\frac{2}{3}$",
+          "គ. $\\frac{1}{3}$",
+          "ឃ. $\\frac{3}{4}$",
+        ],
+        correct: "ក. $\\frac{1}{2}$",
+        explanation:
+          "កត្តារួមធំបំផុតរបស់ 6 និង 12 គឺ 6៖ $\\frac{6\\div 6}{12\\div 6}=\\frac{1}{2}$",
+      },
+      {
+        scenario: "ផ្នែក A · សម្រួលប្រភាគ",
+        q: "សម្រួល $\\frac{15}{20}$",
+        options: [
+          "ក. $\\frac{2}{5}$",
+          "ខ. $\\frac{3}{4}$",
+          "គ. $\\frac{4}{5}$",
+          "ឃ. $\\frac{3}{5}$",
+        ],
+        correct: "ខ. $\\frac{3}{4}$",
+        explanation:
+          "កត្តារួមធំបំផុតរបស់ 15 និង 20 គឺ 5៖ $\\frac{15\\div 5}{20\\div 5}=\\frac{3}{4}$",
+      },
+      {
+        scenario: "ផ្នែក A · សម្រួលប្រភាគ",
+        q: "សម្រួល $\\frac{18}{24}$",
+        options: [
+          "ក. $\\frac{2}{3}$",
+          "ខ. $\\frac{4}{5}$",
+          "គ. $\\frac{3}{4}$",
+          "ឃ. $\\frac{5}{6}$",
+        ],
+        correct: "គ. $\\frac{3}{4}$",
+        explanation:
+          "កត្តារួមធំបំផុតរបស់ 18 និង 24 គឺ 6៖ $\\frac{18\\div 6}{24\\div 6}=\\frac{3}{4}$",
+      },
+      {
+        scenario: "ផ្នែក C · គុណប្រភាគ",
+        q: "$\\frac{2}{3}\\times \\frac{3}{4} = ?$",
+        options: [
+          "ក. $\\frac{6}{7}$",
+          "ខ. $\\frac{2}{3}$",
+          "គ. $\\frac{5}{6}$",
+          "ឃ. $\\frac{1}{2}$",
+        ],
+        correct: "ឃ. $\\frac{1}{2}$",
+        explanation:
+          "គុណភាគយកនឹងភាគយក និងភាគបែងនឹងភាគបែង៖ $\\frac{2\\times 3}{3\\times 4}=\\frac{6}{12}=\\frac{1}{2}$",
+      },
+      {
+        scenario: "ផ្នែក C · គុណប្រភាគ",
+        q: "$\\frac{4}{5}\\times \\frac{10}{12} = ?$",
+        options: [
+          "ក. $\\frac{2}{3}$",
+          "ខ. $\\frac{4}{5}$",
+          "គ. $\\frac{5}{6}$",
+          "ឃ. $\\frac{3}{4}$",
+        ],
+        correct: "ក. $\\frac{2}{3}$",
+        explanation:
+          "$\\frac{4\\times 10}{5\\times 12}=\\frac{40}{60}=\\frac{2}{3}$។ កាត់មុនគុណក៏បានដែរ",
+      },
+      {
+        scenario: "ផ្នែក D · ចែកប្រភាគ",
+        q: "$\\frac{1}{2}\\div \\frac{1}{4} = ?$",
+        options: [
+          "ក. $\\frac{1}{8}$",
+          "ខ. $2$",
+          "គ. $\\frac{1}{2}$",
+          "ឃ. $4$",
+        ],
+        correct: "ខ. $2$",
+        explanation:
+          "រក្សា ប្តូរ បញ្ច្រាស៖ $\\frac{1}{2}\\div \\frac{1}{4}=\\frac{1}{2}\\times \\frac{4}{1}=\\frac{4}{2}=2$",
+      },
+      {
+        scenario: "ផ្នែក D · ចែកប្រភាគ",
+        q: "$\\frac{2}{3}\\div \\frac{4}{5} = ?$",
+        options: [
+          "ក. $\\frac{8}{15}$",
+          "ខ. $\\frac{6}{5}$",
+          "គ. $\\frac{5}{6}$",
+          "ឃ. $\\frac{6}{10}$",
+        ],
+        correct: "គ. $\\frac{5}{6}$",
+        explanation:
+          "រក្សា ប្តូរ បញ្ច្រាស៖ $\\frac{2}{3}\\div \\frac{4}{5}=\\frac{2}{3}\\times \\frac{5}{4}=\\frac{10}{12}=\\frac{5}{6}$",
+      },
+    ],
+    quizHarder: [
+      {
+        scenario: "ផ្នែក B · បូក និងដកប្រភាគ",
+        q: "$\\frac{2}{7}+\\frac{3}{7} = ?$",
+        options: [
+          "ក. $\\frac{5}{7}$",
+          "ខ. $\\frac{6}{14}$",
+          "គ. $\\frac{5}{9}$",
+          "ឃ. $\\frac{1}{7}$",
+        ],
+        correct: "ក. $\\frac{5}{7}$",
+        explanation:
+          "ភាគបែងដូចគ្នា៖ បូកតែភាគយក ហើយរក្សាភាគបែង៖ $\\frac{2+3}{7}=\\frac{5}{7}$",
+      },
+      {
+        scenario: "ផ្នែក B · បូក និងដកប្រភាគ",
+        q: "$\\frac{1}{2}+\\frac{1}{4} = ?$",
+        options: [
+          "ក. $\\frac{2}{6}$",
+          "ខ. $\\frac{3}{4}$",
+          "គ. $\\frac{1}{2}$",
+          "ឃ. $\\frac{1}{4}$",
+        ],
+        correct: "ខ. $\\frac{3}{4}$",
+        explanation:
+          "ភាគបែងរួមគឺ 4៖ $\\frac{1}{2}=\\frac{2}{4}$ ដូច្នេះ $\\frac{2}{4}+\\frac{1}{4}=\\frac{3}{4}$",
+      },
+      {
+        scenario: "ផ្នែក B · បូក និងដកប្រភាគ",
+        q: "$\\frac{3}{4}-\\frac{1}{4} = ?$",
+        options: [
+          "ក. $1$",
+          "ខ. $\\frac{1}{4}$",
+          "គ. $\\frac{1}{2}$",
+          "ឃ. $\\frac{5}{8}$",
+        ],
+        correct: "គ. $\\frac{1}{2}$",
+        explanation:
+          "ភាគបែងដូចគ្នា៖ $\\frac{3-1}{4}=\\frac{2}{4}$ ហើយសម្រួល៖ $\\frac{2}{4}=\\frac{1}{2}$",
+      },
+      {
+        scenario: "ផ្នែក B · បូក និងដកប្រភាគ",
+        q: "$\\frac{2}{3}-\\frac{1}{4} = ?$",
+        options: [
+          "ក. $\\frac{2}{5}$",
+          "ខ. $\\frac{1}{6}$",
+          "គ. $\\frac{7}{12}$",
+          "ឃ. $\\frac{5}{12}$",
+        ],
+        correct: "ឃ. $\\frac{5}{12}$",
+        explanation:
+          "ភាគបែងរួមតូចបំផុតគឺ 12៖ $\\frac{2}{3}=\\frac{8}{12}$ និង $\\frac{1}{4}=\\frac{3}{12}$ ដូច្នេះ $\\frac{8}{12}-\\frac{3}{12}=\\frac{5}{12}$",
+      },
+      {
+        scenario: "ផ្នែក E · ចំនួនចម្រុះ",
+        q: "បម្លែង $2\\frac{1}{3}$ ទៅជាប្រភាគមិនត្រឹមត្រូវ",
+        options: [
+          "ក. $\\frac{7}{3}$",
+          "ខ. $\\frac{5}{3}$",
+          "គ. $\\frac{6}{3}$",
+          "ឃ. $\\frac{8}{3}$",
+        ],
+        correct: "ក. $\\frac{7}{3}$",
+        explanation:
+          "$(2\\times 3)+1=7$ ដូច្នេះ $2\\frac{1}{3}=\\frac{7}{3}$",
+      },
+      {
+        scenario: "ផ្នែក E · ចំនួនចម្រុះ",
+        q: "បម្លែង $\\frac{11}{4}$ ទៅជាចំនួនចម្រុះ",
+        options: [
+          "ក. $2\\frac{1}{4}$",
+          "ខ. $2\\frac{3}{4}$",
+          "គ. $3\\frac{1}{4}$",
+          "ឃ. $3\\frac{3}{4}$",
+        ],
+        correct: "ខ. $2\\frac{3}{4}$",
+        explanation:
+          "$11\\div 4=2$ សល់ 3 ដូច្នេះ $\\frac{11}{4}=2\\frac{3}{4}$",
+      },
+      {
+        scenario: "ផ្នែក F · អនុវត្តក្នុងពិជគណិត",
+        q: "សម្រួល $\\frac{6x}{9}$",
+        options: [
+          "ក. $\\frac{3x}{2}$",
+          "ខ. $\\frac{x}{3}$",
+          "គ. $\\frac{2x}{3}$",
+          "ឃ. $\\frac{2x}{9}$",
+        ],
+        correct: "គ. $\\frac{2x}{3}$",
+        explanation:
+          "កត្តារួមធំបំផុតរបស់ 6 និង 9 គឺ 3៖ $\\frac{6x\\div 3}{9\\div 3}=\\frac{2x}{3}$",
+      },
+      {
+        scenario: "ផ្នែក F · អនុវត្តក្នុងពិជគណិត",
+        q: "សម្រួល $\\frac{x^{2}-9}{x-3}$",
+        options: [
+          "ក. $x-3$",
+          "ខ. $x^{2}+3$",
+          "គ. $3x$",
+          "ឃ. $x+3$",
+        ],
+        correct: "ឃ. $x+3$",
+        explanation:
+          "$x^{2}-9=(x-3)(x+3)$ ដូច្នេះ $\\frac{(x-3)(x+3)}{x-3}=x+3$ (ពេល $x\\neq 3$)",
+      },
+    ],
+  },
+
+  /**
+   * MATH · មូលដ្ឋានគ្រឹះ · ជំពូក 1 មេរៀនទី 1 ផ្នែកទី 3 — ទសភាគ និងការបម្លែង.
+   *
+   * Third math section. Authoring this key unlocks node 1.1.3 on its own;
+   * features/lessons/sessions.ts is untouched.
+   *
+   * ── PROVENANCE ────────────────────────────────────────────────────────────
+   * Supplied by the user and transcribed, not paraphrased. This one needed the
+   * heaviest TRANSLATION of the three, because the source was written with its
+   * headings, steps and question stems in English: "Decimal → Fraction",
+   * "Step 1", "Example", "Shortcut", "Convert 0.5 to a fraction", "Addition",
+   * "Multiplication", "Tips", "Easy / Medium / Limit Preparation". Under the
+   * student-visible-Khmer rule near the top of AGENTS.md those are ordinary
+   * English rather than terms of art, so they are Khmer here:
+   *
+   *     Decimal      -> ទសភាគ          Fraction    -> ប្រភាគ
+   *     Percentage   -> ភាគរយ           Step        -> ជំហានទី
+   *     Shortcut     -> ផ្លូវកាត់        Convert     -> បម្លែង
+   *     Tip          -> គន្លឹះទី         numerator   -> ភាគយក
+   *     Algebra      -> ពិជគណិត         Limits      -> លីមីត
+   *
+   * The maths itself, every worked example and every answer are the user's.
+   * Section numbers are Latin (check:digits), and the emoji markers the source
+   * used are dropped because Callout draws those icons itself.
+   *
+   * ── THE COLUMN ADDITION IS A KaTeX ARRAY, NOT SPACES ─────────────────────
+   * The source shows aligned column addition as a preformatted block. That
+   * cannot survive here: the renderer uses `whitespace-pre-line`, which keeps
+   * newlines but COLLAPSES runs of spaces, so the alignment the example exists
+   * to demonstrate would be the first thing lost. `\begin{array}{r}` keeps it,
+   * and note the row separator is FOUR backslashes in this source (two in the
+   * string, which is what LaTeX needs).
+   *
+   * ── NO VIDEO YET ──────────────────────────────────────────────────────────
+   * Poster and the ឆាប់ៗនេះ chip, no `youtubeId` and no `durationSec`. The
+   * poster is the same subject illustration math-1-1-2 uses: there is no
+   * per-section artwork, and one honest placeholder is better than a different
+   * invented image per section.
+   */
+  "math-1-1-3": {
+    title: "ទសភាគ និងការបម្លែង",
+    video: {
+      poster: "/sections/math-1-1-3.webp",
+    },
+    intro: {
+      intro:
+        "ទសភាគ គឺជាវិធីមួយក្នុងការសរសេរផ្នែកមួយនៃចំនួនគត់។ វាជាមូលដ្ឋានសំខាន់សម្រាប់ពិជគណិត និងលីមីត ព្រោះសិស្សត្រូវចេះបម្លែងរវាងទសភាគ ប្រភាគ និងភាគរយ ហើយគណនាជាមួយទសភាគបានត្រឹមត្រូវ។",
+      items: [
+        { label: "$0.5$", body: "ប្រាំភាគដប់" },
+        { label: "$0.25$", body: "ម្ភៃប្រាំភាគរយ" },
+        { label: "$1.75$", body: "មួយ និង ចិតសិបប្រាំភាគរយ" },
+      ],
+      outro:
+        "តម្លៃតាមទីតាំង៖\n\n| តម្លៃ | ទីតាំង |\n| --- | --- |\n| $0.1$ | ភាគដប់ |\n| $0.01$ | ភាគរយ |\n| $0.001$ | ភាគពាន់ |\n\nឧទាហរណ៍៖ $0.347 = 3\\times\\frac{1}{10}+4\\times\\frac{1}{100}+7\\times\\frac{1}{1000}$",
+    },
+    examples: {
+      intro: "គន្លឹះខ្លីៗ ដែលធ្វើឱ្យការបម្លែងលឿន និងតិចកំហុស។",
+      items: [
+        {
+          label: "គន្លឹះទី 1 ចងចាំគូដែលប្រើញឹកញាប់",
+          body: "$\\frac{1}{2}=0.5$ · $\\frac{1}{4}=0.25$ · $\\frac{3}{4}=0.75$ · $\\frac{1}{8}=0.125$។ ចាំបានហើយ នឹងធ្វើលំហាត់លឿនជាងគេ។",
+        },
+        {
+          label: "គន្លឹះទី 2 ទសភាគទៅភាគរយ",
+          body: "គុណនឹង 100។ ផ្លូវកាត់៖ ផ្លាស់ចំណុចទសភាគ 2 ខ្ទង់ទៅស្តាំ។ ឧទាហរណ៍ $0.42$ ក្លាយជា $42\\%$",
+        },
+        {
+          label: "គន្លឹះទី 3 ភាគរយទៅទសភាគ",
+          body: "ចែកនឹង 100។ ផ្លូវកាត់៖ ផ្លាស់ចំណុចទសភាគ 2 ខ្ទង់ទៅឆ្វេង។ ឧទាហរណ៍ $65\\%$ ក្លាយជា $0.65$",
+        },
+        {
+          label: "តិចនិចក្នុងការធ្វើលំហាត់",
+          body: "ពេលឃើញសំណួរឱ្យបម្លែង កុំគណនាភ្លាម។ សួរខ្លួនឯងជាមុនថា បម្លែងពីអ្វីទៅអ្វី?",
+          items: [
+            "ទសភាគទៅប្រភាគ៖ រាប់ខ្ទង់ក្រោយចំណុច ដាក់ភាគបែង រួចសម្រួល",
+            "ប្រភាគទៅទសភាគ៖ ចែកភាគយកនឹងភាគបែង",
+            "ទសភាគទៅភាគរយ៖ គុណនឹង 100",
+            "ភាគរយទៅទសភាគ៖ ចែកនឹង 100",
+            "បូក និងដក៖ តម្រឹមចំណុចទសភាគជាមុន",
+            "គុណ៖ គុណជាមុន រាប់ខ្ទង់ក្រោយចំណុច រួចដាក់ចំណុចវិញ",
+          ],
+        },
+      ],
+    },
+    lesson: {
+      items: [
+        {
+          label: "1.1 ទសភាគទៅប្រភាគ",
+          body: "មើលចំនួនខ្ទង់ក្រោយចំណុចទសភាគ ដាក់លេខទាំងមូលលើ $10$, $100$, $1000$ រួចសម្រួលប្រភាគ។",
+          items: [
+            "$0.5=\\frac{5}{10}=\\frac{1}{2}$",
+            "$0.25=\\frac{25}{100}=\\frac{1}{4}$",
+            "$0.125=\\frac{125}{1000}=\\frac{1}{8}$",
+          ],
+        },
+        {
+          label: "1.2 ប្រភាគទៅទសភាគ",
+          body: "ចែកភាគយកនឹងភាគបែង។",
+          items: [
+            "$\\frac{1}{2}=1\\div 2=0.5$",
+            "$\\frac{3}{4}=3\\div 4=0.75$",
+            "$\\frac{1}{8}=1\\div 8=0.125$",
+          ],
+        },
+        {
+          label: "1.3 ទសភាគទៅភាគរយ",
+          body: "គុណនឹង 100។ ផ្លូវកាត់៖ ផ្លាស់ចំណុចទសភាគ 2 ខ្ទង់ទៅស្តាំ។",
+          items: [
+            "$0.5\\times 100=50\\%$ និង $0.25\\times 100=25\\%$",
+            "$0.35$ ក្លាយជា $35\\%$ ហើយ $0.08$ ក្លាយជា $8\\%$",
+          ],
+        },
+        {
+          label: "1.4 ភាគរយទៅទសភាគ",
+          body: "ចែកនឹង 100។ ផ្លូវកាត់៖ ផ្លាស់ចំណុចទសភាគ 2 ខ្ទង់ទៅឆ្វេង។",
+          items: [
+            "$50\\%\\div 100=0.5$ និង $25\\%\\div 100=0.25$",
+            "$35\\%$ ក្លាយជា $0.35$ ហើយ $8\\%$ ក្លាយជា $0.08$",
+          ],
+        },
+        {
+          label: "1.5 បូក និងដកទសភាគ",
+          body: "ត្រូវតម្រឹមចំណុចទសភាគឱ្យត្រង់គ្នាជាមុន។ បំពេញសូន្យខាងចុងបើចាំបាច់។",
+          items: [
+            "$\\begin{array}{r} 2.35 \\\\ +\\ 1.40 \\\\ \\hline 3.75 \\end{array}$",
+            "$5.20-2.35=2.85$",
+          ],
+        },
+        {
+          label: "1.6 គុណទសភាគ",
+          body: "គុណលេខដូចជាចំនួនគត់សិន រាប់ចំនួនខ្ទង់ក្រោយចំណុចទាំងអស់ រួចដាក់ចំណុចត្រឡប់ទៅទីតាំងត្រឹមត្រូវ។",
+          items: [
+            "$0.2\\times 0.3$ ដំបូង $2\\times 3=6$",
+            "មានខ្ទង់ក្រោយចំណុចសរុប 2 ដូច្នេះ $\\boxed{0.06}$",
+          ],
+        },
+        {
+          label: "1.7 ចែកទសភាគ",
+          body: "អាចផ្លាស់ចំណុចទសភាគទាំងចំនួនត្រូវចែក និងតួចែក ចំនួនខ្ទង់ដូចគ្នា។",
+          items: [
+            "$0.6\\div 0.2$ ផ្លាស់ចំណុចទាំងពីរ 1 ខ្ទង់ទៅស្តាំ",
+            "$6\\div 2=3$ ដូច្នេះ $\\boxed{0.6\\div 0.2=3}$",
+          ],
+        },
+      ],
+      outro:
+        "តារាងដែលគួរចងចាំ៖\n\n| ប្រភាគ | ទសភាគ |\n| --- | --- |\n| $\\frac{1}{2}$ | $0.5$ |\n| $\\frac{1}{4}$ | $0.25$ |\n| $\\frac{3}{4}$ | $0.75$ |\n| $\\frac{1}{5}$ | $0.2$ |\n| $\\frac{1}{10}$ | $0.1$ |\n| $\\frac{1}{8}$ | $0.125$ |",
+    },
+    notes: {
+      items: [
+        {
+          label: "គូដែលត្រូវចាំ",
+          body: "$0.5=\\frac{1}{2}=50\\%$ · $0.25=\\frac{1}{4}=25\\%$ · $0.75=\\frac{3}{4}=75\\%$",
+        },
+        {
+          label: "ទិសដៅបម្លែង",
+          body: "ទសភាគទៅប្រភាគ ដាក់លើ $10$, $100$, $1000$។ ប្រភាគទៅទសភាគ ចែកភាគយកនឹងភាគបែង។",
+        },
+        {
+          label: "ភាគរយ",
+          body: "ទសភាគទៅភាគរយ គុណនឹង 100។ ភាគរយទៅទសភាគ ចែកនឹង 100។",
+        },
+        {
+          label: "បូក និងដក",
+          body: "តម្រឹមចំណុចទសភាគជានិច្ច។",
+        },
+        {
+          label: "គុណ និងចែក",
+          body: "គុណ រាប់ខ្ទង់ក្រោយចំណុច។ ចែក អាចផ្លាស់ចំណុចទាំងពីរចំនួនខ្ទង់ដូចគ្នា។",
+        },
+      ],
+      outro:
+        "សម្រាប់លីមីត៖ ចំណុចដែលគួរផ្តោតជាពិសេសគឺ ការបម្លែងប្រភាគនិងទសភាគ ការគណនាជាមួយទសភាគ និងការសម្រួលប្រភាគ។ វានឹងត្រូវប្រើពេលចូលដល់ការសម្រួលពិជគណិត និងការដាក់ជាកត្តា។",
+    },
+    mistakes: [
+      {
+        wrong: "គិតថា $0.5=5\\%$",
+        right: "$0.5$ គឺប្រាំភាគដប់ ដូច្នេះ $0.5=50\\%$",
+      },
+      {
+        wrong: "សរសេរ $0.25=25$ ដោយភ្លេចសញ្ញាភាគរយ",
+        right: "$0.25=25\\%$ ហើយ $25$ ជាចំនួនគត់ខុសគ្នាឆ្ងាយ",
+      },
+      {
+        wrong: "បូកទសភាគដោយមិនតម្រឹមចំណុច ដូចជាសរសេរ $2.35$ លើ $1.4$ ត្រង់គ្នាខាងស្តាំ",
+        right: "បំពេញសូន្យរួចតម្រឹមចំណុច៖ $2.35+1.40=3.75$",
+      },
+      {
+        wrong: "គិតថា $0.2\\times 0.3=0.6$",
+        right: "រាប់ខ្ទង់ក្រោយចំណុចទាំងអស់៖ មាន 2 ខ្ទង់ ដូច្នេះ $0.2\\times 0.3=0.06$",
+      },
+      {
+        wrong: "បម្លែងភាគរយខុសទិស ដូចជា $25\\%=2.5$",
+        right: "ចែកនឹង 100 មិនមែនចែកនឹង 10 ទេ៖ $25\\%=0.25$",
+      },
+    ],
+    quiz: [
+      {
+        scenario: "ផ្នែក ក · ការបម្លែង",
+        q: "បម្លែង $0.5$ ទៅជាប្រភាគ",
+        options: [
+          "ក. $\\frac{1}{2}$",
+          "ខ. $\\frac{1}{5}$",
+          "គ. $\\frac{2}{5}$",
+          "ឃ. $\\frac{3}{2}$",
+        ],
+        correct: "ក. $\\frac{1}{2}$",
+        explanation:
+          "$0.5=\\frac{5}{10}=\\frac{1}{2}$",
+      },
+      {
+        scenario: "ផ្នែក ក · ការបម្លែង",
+        q: "បម្លែង $0.75$ ទៅជាភាគរយ",
+        options: [
+          "ក. $7.5\\%$",
+          "ខ. $75\\%$",
+          "គ. $0.75\\%$",
+          "ឃ. $750\\%$",
+        ],
+        correct: "ខ. $75\\%$",
+        explanation:
+          "ទសភាគទៅភាគរយ គឺគុណនឹង 100៖ $0.75\\times 100=75$ ដូច្នេះ $75\\%$",
+      },
+      {
+        scenario: "ផ្នែក ក · ការបម្លែង",
+        q: "បម្លែង $25\\%$ ទៅជាទសភាគ",
+        options: [
+          "ក. $2.5$",
+          "ខ. $0.025$",
+          "គ. $0.25$",
+          "ឃ. $25$",
+        ],
+        correct: "គ. $0.25$",
+        explanation:
+          "ភាគរយទៅទសភាគ គឺចែកនឹង 100៖ $25\\div 100=0.25$",
+      },
+      {
+        scenario: "ផ្នែក ក · ការបម្លែង",
+        q: "បម្លែង $0.125$ ទៅជាប្រភាគ",
+        options: [
+          "ក. $\\frac{1}{4}$",
+          "ខ. $\\frac{1}{12}$",
+          "គ. $\\frac{5}{8}$",
+          "ឃ. $\\frac{1}{8}$",
+        ],
+        correct: "ឃ. $\\frac{1}{8}$",
+        explanation:
+          "$0.125=\\frac{125}{1000}=\\frac{1}{8}$",
+      },
+      {
+        scenario: "ផ្នែក ក · ការបម្លែង",
+        q: "បម្លែង $\\frac{3}{4}$ ទៅជាទសភាគ",
+        options: [
+          "ក. $0.75$",
+          "ខ. $0.34$",
+          "គ. $0.43$",
+          "ឃ. $0.25$",
+        ],
+        correct: "ក. $0.75$",
+        explanation:
+          "ចែកភាគយកនឹងភាគបែង៖ $3\\div 4=0.75$",
+      },
+    ],
+    quizHarder: [
+      {
+        scenario: "ផ្នែក ខ · គណនាជាមួយទសភាគ",
+        q: "$2.35+1.4$",
+        options: [
+          "ក. $3.39$",
+          "ខ. $3.75$",
+          "គ. $3.85$",
+          "ឃ. $4.75$",
+        ],
+        correct: "ខ. $3.75$",
+        explanation:
+          "តម្រឹមចំណុចទសភាគជាមុន៖ $1.4=1.40$ ដូច្នេះ $2.35+1.40=3.75$",
+      },
+      {
+        scenario: "ផ្នែក ខ · គណនាជាមួយទសភាគ",
+        q: "$5.2-2.35$",
+        options: [
+          "ក. $2.75$",
+          "ខ. $3.15$",
+          "គ. $2.85$",
+          "ឃ. $3.85$",
+        ],
+        correct: "គ. $2.85$",
+        explanation:
+          "តម្រឹមចំណុចទសភាគជាមុន៖ $5.2=5.20$ ដូច្នេះ $5.20-2.35=2.85$",
+      },
+      {
+        scenario: "ផ្នែក ខ · គណនាជាមួយទសភាគ",
+        q: "$0.2\\times 0.3$",
+        options: [
+          "ក. $0.6$",
+          "ខ. $0.006$",
+          "គ. $6$",
+          "ឃ. $0.06$",
+        ],
+        correct: "ឃ. $0.06$",
+        explanation:
+          "គុណជាចំនួនគត់សិន៖ $2\\times 3=6$។ មានខ្ទងក្រោយចំណុចសរុប 2 ដូច្នេះ $0.06$",
+      },
+      {
+        scenario: "ផ្នែក ខ · គណនាជាមួយទសភាគ",
+        q: "$0.5+\\frac{1}{4}$",
+        options: [
+          "ក. $0.75$",
+          "ខ. $0.55$",
+          "គ. $0.65$",
+          "ឃ. $1.25$",
+        ],
+        correct: "ក. $0.75$",
+        explanation:
+          "បម្លែងជាទសភាគជាមុន៖ $\\frac{1}{4}=0.25$ ដូច្នេះ $0.5+0.25=0.75$",
+      },
+      {
+        scenario: "ផ្នែក ខ · គណនាជាមួយទសភាគ",
+        q: "$\\frac{0.6}{0.2}$",
+        options: [
+          "ក. $0.3$",
+          "ខ. $3$",
+          "គ. $30$",
+          "ឃ. $0.03$",
+        ],
+        correct: "ខ. $3$",
+        explanation:
+          "ផ្លាស់ចំណុចទសភាគទាំងពីរ 1 ខ្ទងទៅស្តាំ៖ $6\\div 2=3$",
       },
     ],
   },

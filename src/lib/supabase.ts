@@ -94,7 +94,7 @@ export function getSupabase(): Promise<SupabaseClient<Database> | null> {
 
 if (!isSupabaseConfigured && import.meta.env.DEV) {
   console.info(
-    "[supabase] VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY not set — " +
+    "[supabase] VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY not set: " +
       "running local-only. Study data stays in localStorage and syncs nowhere."
   );
 }

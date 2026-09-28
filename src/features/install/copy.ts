@@ -9,7 +9,7 @@
 const en = {
   openTitle: "Put BrachNha on your home screen",
   openBody: "Open it in one tap, full screen, like any other app. No app store needed.",
-  lessonTitle: "Nice work — lesson done!",
+  lessonTitle: "Nice work, lesson done!",
   lessonBody: "Add BrachNha to your home screen so your next lesson is one tap away.",
   install: "Install",
   notNow: "Not now",
@@ -23,7 +23,7 @@ const en = {
 const km: typeof en = {
   openTitle: "ដាក់ BrachNha នៅលើអេក្រង់ដើម",
   openBody: "ចុចតែម្តងក៏បើកបាន ពេញអេក្រង់ ដូចកម្មវិធីធម្មតា។ មិនចាំបាច់ទាញយកពីហាងកម្មវិធីទេ។",
-  lessonTitle: "ពូកែណាស់ — រៀនចប់មួយមេរៀនហើយ!",
+  lessonTitle: "ពូកែណាស់។ រៀនចប់មួយមេរៀនហើយ!",
   lessonBody: "ដាក់ BrachNha នៅលើអេក្រង់ដើម ដើម្បីចុចតែម្តងក៏រៀនមេរៀនបន្ទាប់បាន។",
   install: "ដំឡើង",
   notNow: "ពេលក្រោយ",

@@ -140,7 +140,7 @@ export function QuizFeedback({
       {/* Row 1: Why? */}
       <AccordionRow
         icon={isCorrect ? CircleCheck : CircleX}
-        label={isCorrect ? "ត្រឹមត្រូវ! — ហេតុអ្វី?" : "មិនត្រឹមត្រូវ — ហេតុអ្វី?"}
+        label={isCorrect ? "ត្រឹមត្រូវ! ហេតុអ្វី?" : "មិនត្រឹមត្រូវ។ ហេតុអ្វី?"}
         tone={isCorrect ? "mint" : "pink"}
         open={whyOpen}
         onToggle={() => setWhyOpen((v) => !v)}

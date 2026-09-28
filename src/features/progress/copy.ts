@@ -36,7 +36,7 @@ const en = {
   overallReadiness: "Overall Readiness",
   readinessAbout: "What is Overall Readiness?",
   readinessTip:
-    "Your average score on the mock exams you took this month — the វិញ្ញាសារបង្កើតថ្មី papers. Past papers don't count here. The line underneath compares it with last month: 70% → 76% shows as +6 pts.",
+    "Your average score on the mock exams you took this month: the វិញ្ញាសារបង្កើតថ្មី papers. Past papers don't count here. The line underneath compares it with last month: 70% → 76% shows as +6 pts.",
   avgExamThisMonth: "Average exam score this month",
   noMockExams: "No mock exams yet",
   noChangeMonth: "No change vs last month",

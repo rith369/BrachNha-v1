@@ -22,8 +22,8 @@ export function PagePlaceholder({
         </div>
         <Card className="mt-2 text-xs font-semibold text-muted">
           {lang === "en"
-            ? "This page is scaffolded and routed — content migration from the current prototype comes next."
-            : "ទំព័រនេះត្រូវបានរៀបចំរួចហើយ — ខ្លឹមសារនឹងបន្តបន្ទាប់។"}
+            ? "This page is scaffolded and routed. Content migration from the current prototype comes next."
+            : "ទំព័រនេះត្រូវបានរៀបចំរួចហើយ។ ខ្លឹមសារនឹងបន្តបន្ទាប់។"}
         </Card>
       </div>
       <BottomNav />

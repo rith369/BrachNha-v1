@@ -250,7 +250,7 @@ export const T = {
     guestModeNote: "Your progress is saved on this device only.",
     exitGuestMode: "Exit guest mode",
     exitGuestConfirm:
-      "This clears everything saved on this device — XP, streak, lessons and exam history. Continue?",
+      "This clears everything saved on this device: XP, streak, lessons and exam history. Continue?",
     exitGuestKeepHint:
       "Want to keep your progress? Tap “Continue with Google” above instead.",
     studyCalendar: "Study calendar",
@@ -498,7 +498,7 @@ export const T = {
     guestModeNote: "វឌ្ឍនភាពរបស់អ្នករក្សាទុកតែក្នុងឧបករណ៍នេះប៉ុណ្ណោះ។",
     exitGuestMode: "ចាកចេញពីរបៀបភ្ញៀវ",
     exitGuestConfirm:
-      "សកម្មភាពនេះនឹងលុបទាំងអស់ក្នុងឧបករណ៍នេះ — XP ជួរ មេរៀន និងប្រវត្តិប្រឡង។ បន្ត?",
+      "សកម្មភាពនេះនឹងលុបទាំងអស់ក្នុងឧបករណ៍នេះ៖ XP ជួរ មេរៀន និងប្រវត្តិប្រឡង។ បន្ត?",
     exitGuestKeepHint:
       "ចង់រក្សាវឌ្ឍនភាពរបស់អ្នកទុកទេ? សូមចុច «បន្តជាមួយ Google» នៅខាងលើជំនួសវិញ។",
     // "Streak" stays in Latin script, as in features/streak/copy.ts — a product

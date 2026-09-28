@@ -435,8 +435,8 @@ export function gapLine(
 ): string {
   if (gap <= 0) {
     return lang === "en"
-      ? "You're #1 — nobody above you 🎉"
-      : "អ្នកនៅលេខ 1 — គ្មាននរណាខ្ពស់ជាងអ្នកទេ 🎉";
+      ? "You're #1, nobody above you 🎉"
+      : "អ្នកនៅលេខ 1។ គ្មាននរណាខ្ពស់ជាងអ្នកទេ 🎉";
   }
   if (metric === "xp") {
     return lang === "en"

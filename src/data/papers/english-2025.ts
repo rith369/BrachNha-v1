@@ -202,7 +202,7 @@ After a few days I realised that I wasn't very good at dancing. But then I never
           correct: "will be completed",
           skill: "future-passive",
           explanation:
-            "ស្ពានមិនសាងសង់ខ្លួនឯងទេ — គេសាងសង់វា។ អនាគតកាលអកម្ម: will be + past participle → will be completed។",
+            "ស្ពានមិនសាងសង់ខ្លួនឯងទេ។ គេសាងសង់វា។ អនាគតកាលអកម្ម: will be + past participle → will be completed។",
         },
         {
           id: "g4",
@@ -249,7 +249,7 @@ After a few days I realised that I wasn't very good at dancing. But then I never
           correct: "forecast",
           skill: "collocation",
           explanation:
-            "weather forecast = ការព្យាករណ៍អាកាសធាតុ។ ជាពាក្យផ្គូផ្គងថេរ — គេមិននិយាយ weather survey ឬ weather programme ក្នុងន័យនេះទេ។",
+            "weather forecast = ការព្យាករណ៍អាកាសធាតុ។ ជាពាក្យផ្គូផ្គងថេរ។ គេមិននិយាយ weather survey ឬ weather programme ក្នុងន័យនេះទេ។",
         },
         {
           id: "v2",
@@ -285,7 +285,7 @@ After a few days I realised that I wasn't very good at dancing. But then I never
           correct: "support",
           skill: "word-choice",
           explanation:
-            "support + នាម ដោយផ្ទាល់ = គាំទ្រ។ agree ត្រូវការ with, approve ត្រូវការ of, ហើយ believe in — មានតែ support ទេដែលអាចភ្ជាប់នាមផ្ទាល់។",
+            "support + នាម ដោយផ្ទាល់ = គាំទ្រ។ agree ត្រូវការ with, approve ត្រូវការ of, ហើយ believe in។ មានតែ support ទេដែលអាចភ្ជាប់នាមផ្ទាល់។",
         },
         {
           id: "v5",
@@ -297,7 +297,7 @@ After a few days I realised that I wasn't very good at dancing. But then I never
           correct: "writing",
           skill: "collocation",
           explanation:
-            "in writing = ជាលាយលក្ខណ៍អក្សរ។ ឃ្លាថេរ — ប្រើនៅពេលបញ្ជាក់ផ្លូវការ។",
+            "in writing = ជាលាយលក្ខណ៍អក្សរ។ ឃ្លាថេរ។ ប្រើនៅពេលបញ្ជាក់ផ្លូវការ។",
         },
       ],
     },

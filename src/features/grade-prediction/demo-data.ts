@@ -168,8 +168,8 @@ export const recommendations: RecommendedAction[] = [
   {
     titleEn: "Review Physics fundamentals",
     titleKm: "review រូបវិទ្យាមូលដ្ឋាន",
-    descriptionEn: "Your weakest subject — start with the topics behind your last 3 quiz dips.",
-    descriptionKm: "មុខវិជ្ជាខ្សោយបំផុតរបស់អ្នក — ចាប់ផ្ដើមពីប្រធានបទដែលធ្លាក់ពិន្ទុថ្មីៗ។",
+    descriptionEn: "Your weakest subject: start with the topics behind your last 3 quiz dips.",
+    descriptionKm: "មុខវិជ្ជាខ្សោយបំផុតរបស់អ្នក៖ ចាប់ផ្ដើមពីប្រធានបទដែលធ្លាក់ពិន្ទុថ្មីៗ។",
     duration: "40 min",
     href: "/lessons",
   },

@@ -267,6 +267,20 @@ export function SectionVideoPlayer({
               advance, and browsers cap how many preconnects they honour. */}
           {youtubeId && <link rel="preconnect" href={EMBED_ORIGIN} />}
 
+          {/* ឆាប់ៗនេះ whenever there is nothing behind the play glyph, which is
+              what makes the poster-only state LEGIBLE WITHOUT TAPPING — the same
+              principle as exam-paper-card.tsx's chip and the survey's
+              studiedNote. This file's header records that an earlier version had
+              this chip and that it was removed at the user's request, taking the
+              <button> with it; the chip is back by request, the button is NOT.
+              The rule stands either way: the chip explains the state, it does
+              not make it pressable, and only a youtubeId does that. */}
+          {!youtubeId && (
+            <span className="absolute top-2 right-2 z-10 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-extrabold text-white">
+              ឆាប់ៗនេះ
+            </span>
+          )}
+
           {/* onError hides the poster rather than letting the browser paint its
               broken-image glyph over the chrome — same guard as SubjectArt. */}
           <img
@@ -318,9 +332,17 @@ export function SectionVideoPlayer({
 
           <div className="pointer-events-none absolute inset-x-0 bottom-0 px-3 pb-2">
             <div className="mb-1.5 flex items-center justify-between">
-              <span className="rounded bg-black/45 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                0:00 / {clock(video.durationSec)}
-              </span>
+              {/* Only when a run time is actually known. A section whose
+                  recording has not been made has none, and "0:00 / 5:00" beside
+                  a ឆាប់ៗនេះ chip would claim a video that does not exist. The
+                  Maximize glyph stays on its own so the row keeps its shape. */}
+              {video.durationSec !== undefined ? (
+                <span className="rounded bg-black/45 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                  0:00 / {clock(video.durationSec)}
+                </span>
+              ) : (
+                <span />
+              )}
               <Maximize2 className="size-4 text-white/85" strokeWidth={2.5} />
             </div>
             <div className="h-1 w-full overflow-hidden rounded-full bg-white/35">

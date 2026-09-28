@@ -329,8 +329,13 @@ export interface SectionVideo {
    *  Still authored once `youtubeId` is set: it is drawn on the POSTER, before
    *  any YouTube code exists on the page, and the real duration is only
    *  readable after the player loads. Nothing checks it against the upload, so
-   *  keep it in step by hand. */
-  durationSec: number;
+   *  keep it in step by hand.
+   *
+   *  OPTIONAL, and absent is the right answer for a section whose recording has
+   *  not been made: there is no run time to state, and printing one beside a
+   *  “coming soon” chip claims a video that does not exist. The player simply
+   *  omits the time chip. */
+  durationSec?: number;
   /** The 11-character YouTube video id — "dQw4w9WgXcQ", NOT a URL.
    *
    *  ONE CANONICAL FORM, on purpose. A URL field would accept five spellings of
