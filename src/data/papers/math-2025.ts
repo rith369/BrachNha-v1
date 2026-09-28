@@ -1029,7 +1029,7 @@ $$T: y = \frac{2}{3}(x - 0) + 0 \quad\Rightarrow\quad T: y = \frac{2}{3}x$$
           correct: String.raw`$h'(x) = \ln\left(\dfrac{-x-3}{x-3}\right) + \dfrac{6x}{9-x^2}$`,
           explanation: String.raw`ប្រើរូបមន្តដេរីវេផលគុណ $(uv)' = u'v + uv'$ ជាមួយ $u=x$ និង $v=g(x)$៖
 $$h'(x) = (x)' \cdot g(x) + x \cdot g'(x) = 1 \cdot g(x) + x \cdot \frac{6}{9-x^2}$$
-$$= \ln\left(\frac{-x-3}{x-3}\right) + \frac{6x}{9-x^2} \quad\text{ឬ}\quad \ln\left(\frac{-x-3}{x-3}\right) - \frac{6x}{x^2-9}$$`,
+$$= \ln\left(\frac{-x-3}{x-3}\right) + \frac{6x}{9-x^2} \quad\text{or}\quad \ln\left(\frac{-x-3}{x-3}\right) - \frac{6x}{x^2-9}$$`,
         },
         {
           id: "g11",
@@ -1039,19 +1039,19 @@ $$= \ln\left(\frac{-x-3}{x-3}\right) + \frac{6x}{9-x^2} \quad\text{ឬ}\quad \ln
             km: String.raw`4. b. គណនាផ្ទៃក្រឡា $S$ នៃផ្នែកប្លង់ខណ្ឌដោយក្រាប $C$, អ័ក្សអាប់ស៊ីស និងបន្ទាត់ $x=0$, $x=1$`,
           },
           options: [
-            String.raw`$S = 6\ln 2 - 10\ln 3\text{ ឯកតាផ្ទៃ}$`,
-            String.raw`$S = 10\ln 3 - 6\ln 2\text{ ឯកតាផ្ទៃ}$`,
-            String.raw`$S = 8\ln 2 - 3\ln 3\text{ ឯកតាផ្ទៃ}$`,
-            String.raw`$S = 10\ln 2 - 6\ln 3\text{ ឯកតាផ្ទៃ}$`,
+            String.raw`$S = 6\ln 2 - 10\ln 3$ ឯកតាផ្ទៃ`,
+            String.raw`$S = 10\ln 3 - 6\ln 2$ ឯកតាផ្ទៃ`,
+            String.raw`$S = 8\ln 2 - 3\ln 3$ ឯកតាផ្ទៃ`,
+            String.raw`$S = 10\ln 2 - 6\ln 3$ ឯកតាផ្ទៃ`,
           ],
-          correct: String.raw`$S = 10\ln 2 - 6\ln 3\text{ ឯកតាផ្ទៃ}$`,
+          correct: String.raw`$S = 10\ln 2 - 6\ln 3$ ឯកតាផ្ទៃ`,
           explanation: String.raw`ចំពោះ $x \in [0, 1]$ គេបាន $g(x) \ge 0$ ដូច្នេះរូបមន្តផ្ទៃក្រឡាគឺ $S = \int_{0}^{1} g(x) dx$។
 ពីសំណួរ 4.a៖ $h'(x) = g(x) - \dfrac{6x}{x^2-9} \Rightarrow g(x) = h'(x) + \dfrac{6x}{x^2-9}$
 $$S = \int_{0}^{1}\left[h'(x) + \frac{3 \cdot 2x}{x^2-9}\right]dx = \left[h(x) + 3\ln|x^2-9|\right]_{0}^{1}$$
 $$= \left[x \ln\left(\frac{-x-3}{x-3}\right) + 3\ln|x^2-9|\right]_{0}^{1}$$
 ជំនួស $x=1$៖ $1 \cdot \ln\left(\frac{-4}{-2}\right) + 3\ln|1-9| = \ln 2 + 3\ln 8 = \ln 2 + 3\ln(2^3) = \ln 2 + 9\ln 2 = 10\ln 2$
 ជំនួស $x=0$៖ $0 \cdot \ln 1 + 3\ln|-9| = 0 + 3\ln 9 = 3\ln(3^2) = 6\ln 3$
-$$S = 10\ln 2 - 6\ln 3\text{ (ឯកតាផ្ទៃ)}$$
+$$S = 10\ln 2 - 6\ln 3$$ (ឯកតាផ្ទៃ)
 
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 320" width="100%" height="auto" style="max-width:360px">
   <defs>

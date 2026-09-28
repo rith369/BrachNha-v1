@@ -1,4 +1,4 @@
-# BrachNha — Change Report
+﻿# BrachNha — Change Report
 
 A plain-language log of what changed in the app, written for the team rather than for
 developers. Newest entries first.
@@ -14,6 +14,114 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > commit, `2d20f12`. The codes shown on entries below that date (`1e4916b`, `8469c05`,
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
+
+## 28 Sep 2026 — Fix Chemistry KaTeX Formula Formatting & Expand check:quiz Verification to Game Questions
+
+Commit `pending`. **No database step needed.**
+
+**Why.** When reviewing Chemistry questions in Game Mode (e.g. Question 6 on buffer solutions), formulas were rendering as broken raw LaTeX code (such as `$pH = pK_a + \log\frac{[\text{បាស}]}{[\text{អាស៊ីត}]}$`) rather than typeset math. KaTeX fonts lack Khmer glyph coverage, so `src/utils/math-render.ts` deliberately skips rendering any `$…$` math segment containing Khmer characters to prevent rendering tofu boxes. Additionally, `scripts/check-quiz.mjs` was only checking practice quizzes and past papers, allowing broken math formulas in `GAME_QUESTIONS` to slip past automated checks.
+
+**What changed.**
+- **Chemistry Formula Normalization (`src/data/game-questions.ts`):**
+  - **Henderson-Hasselbalch Buffer Equation (Medium Q4):** Replaced Khmer terms inside LaTeX math delimiters with standard chemical notation `$pH = pK_a + \log\frac{[\text{Base}]}{[\text{Acid}]}$` and $\frac{[\text{Base}]}{[\text{Acid}]} = 1$, keeping the Khmer explanation cleanly in adjacent prose so KaTeX typesets the fractions, logs, and subscripts properly.
+  - **Chemical Equilibrium & Heat (Basic Q5):** Fixed `$A_{(g)} + B_{(g)} \rightleftharpoons C_{(g)} + \text{កម្តៅ}$` by placing `+ កម្តៅ` outside math delimiters (`$A_{(g)} + B_{(g)} \rightleftharpoons C_{(g)}$ + កម្តៅ`), preventing split math segments with dangling operators.
+  - **Reaction Rate & Equilibrium (Hard Q2, Q6, Q9):** Removed Khmer subscripts inside LaTeX (`v_{\text{បំបាត់}}`, `n_{\text{ឧស្ម័នផល}}`, `n_{\text{សាប៊ូ}}`) and replaced them with standard symbols (`$v$`, `$n_{\text{products}} - n_{\text{reactants}}$`, `$n = 3 \times n_{\text{triglyceride}}$`) while providing the Khmer definitions directly in the explanation sentences.
+- **Mathematics Past Papers Formula Fix (`src/data/papers/math-2025.ts`):**
+  - Moved Khmer terms out of math delimiters in `g11` options and explanation (`$S = 10\ln 2 - 6\ln 3$ ឯកតាផ្ទៃ`).
+- **Expanded Verification Harness (`scripts/check-quiz.mjs`):**
+  - Added full test coverage for all 120 questions across all 4 subjects in `src/data/game-questions.ts` (Mathematics, Biology, History, Chemistry).
+  - `npm run check:quiz` now verifies every question stem (`q.en`, `q.km`), explanation, option text, option uniqueness, and correct option key across both quizzes, past papers, and game matches.
+
+**What to re-test.**
+1. Open Game mode and play or review Chemistry match questions (e.g. buffer solution question, equilibrium questions).
+2. Verify that the Henderson-Hasselbalch equation and all reaction rate / equilibrium formulas render crisply with proper mathematical formatting (fractions, logarithmic bases, subscripts) rather than raw LaTeX syntax.
+
+## 28 Sep 2026 — Grade 12 Mathematics: Chapter 1 (Limits) OCR & KruAI RAG Grounding
+
+Commit `pending`. **No database step needed.**
+
+**Why.** Grade 12 Mathematics carries the highest weight in the Bac II National Examination. To equip KruAI with authoritative textbook explanations and worked problem solutions for **Chapter 1: Limits of Functions**, we transcribed the official MoEYS Grade 12 Mathematics summary textbook (`Math summary.pdf`, Book pp. 3–18) and connected it to KruAI's real-time retrieval grounding (RAG).
+
+**What changed.**
+- **High-Fidelity MoEYS Mathematics Transcription (`sources/ocr/math-summary/chapter1-limits.md`):**
+  - Rendered high-resolution pages locally (PDF pp. 6–21) without consuming AI API quota.
+  - Transcribed all foundational definitions, operation limit rules, indeterminate form removal techniques, composite function limits, squeeze theorem, trigonometric limits, exponential limits, and natural logarithm limits.
+  - Transcribed all 19 model Bac II exercise solutions with step-by-step LaTeX formulas, conjugate multiplier expansions, and factorization methods.
+- **KruAI Math RAG Knowledge Grounding (`server/textbook-search.ts`, `server/chat-handler.ts`):**
+  - Created 10 structured textbook knowledge modules covering operational rules, indeterminate forms, trigonometric limits, exponential/logarithmic limits, and worked Bac II exercises.
+  - Implemented `searchMathTextbook()` with multi-keyword matching for Khmer and English mathematical terms.
+  - Wired KruAI's streaming chat endpoint to automatically retrieve up to 3 relevant MoEYS textbook excerpts when students ask math questions, ensuring responses adhere strictly to the MoEYS exam criteria and step-by-step layout.
+
+**How to test.**
+1. Open KruAI mentor chat and ask a question about limits in Khmer or English, e.g., "របៀបគណនាលីមីតរាង 0/0 ដែលមានរ៉ាឌីកាល់" or "How to solve limit (sqrt(x+1)-2)/(x-3) as x approaches 3". Verify that KruAI replies with the MoEYS step-by-step structure and cites the textbook method.
+
+
+## 28 Sep 2026 — Game Mode: Biology Hard Questions Added (Complete 30-Question Biology Pool)
+
+Commit `pending`. **No database step needed.**
+
+**Why.** To complete the full three difficulty tiers (Basic, Medium, Hard) for Biology in Game mode (`/game`), 10 advanced Grade 12 Bac II calculation and mechanism questions were authored for the **Hard** difficulty tier. The authored Biology pool now reaches a full 30 questions (10 Basic, 10 Medium, 10 Hard), joining Mathematics, History, and Chemistry with complete competition pools.
+
+**What changed.**
+- **Authored 10 Biology Hard Competition Questions ([`src/data/game-questions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/game-questions.ts)):**
+  - Covers quantitative calculations, molecular genetics, and complex physiological mechanisms:
+    - **DNA Quantitative Calculations (សំណួរទី 1):** Calculating total nucleotides ($N = \frac{2L}{3.4} = 3000$) and hydrogen bonds ($H = 2A + 3G = 3900$) using Chargaff's rules from DNA length $L = 5100\text{ Å}$ and $A = 600$.
+    - **Translation & Polypeptide Assembly (សំណួរទី 2):** Calculating amino acid count ($298$) and peptide bonds ($297$) from a 900-nucleotide mRNA chain accounting for stop codon elimination and N-terminal methionine excision.
+    - **Semi-Conservative DNA Replication (សំណួរទី 3):** Meselson-Stahl $^{15}\text{N}/^{14}\text{N}$ isotope ratio calculation yielding a $1:3$ ratio of hybrid to light DNA molecules after 3 replication generations.
+    - **Action Potential Ion Fluxes (សំណួរទី 4):** Voltage-gated $Na^+$ channel opening triggering depolarization ($+30\text{ mV}$) followed by $Na^+$ channel inactivation and voltage-gated $K^+$ efflux driving repolarization.
+    - **Resting Potential & Ion Pump (សំណួរទី 5):** Maintenance of $-70\text{ mV}$ resting membrane potential via electrogenic $Na^+/K^+$ ATPase pump exporting $3\text{ Na}^+$ and importing $2\text{ K}^+$ per ATP consumed.
+    - **Angiosperm Double Fertilization (សំណួរទី 6):** Ploidy deductions for the two simultaneous fertilizations: first sperm ($n$) fusing with egg ($n$) to form diploid zygote ($2n$); second sperm ($n$) fusing with central polar nuclei ($2n$) to form triploid endosperm ($3n$).
+    - **Endocrine Axis & Negative Feedback (សំណួរទី 7):** Elevated thyroxine ($T_3, T_4$) acting on the hypothalamus (reducing TRH) and anterior pituitary (inhibiting TSH) to restore homeostatic levels.
+    - **Enzyme Inhibition Mechanisms (សំណួរទី 8):** Distinguishing competitive inhibitors (binding active site, reversible with excess substrate) from non-competitive inhibitors (binding allosteric site, altering active site conformation).
+    - **Mendelian Blood Group Inheritance (សំណួរទី 9):** Cross between heterozygous type A ($I^A i$) and type B ($I^B i$) parents yielding a $25\%$ ($1/4$) probability of having a type O ($ii$) child.
+    - **Sex-Linked Inheritance (សំណួរទី 10):** Hemophilia carrier mother ($X^H X^h$) and normal father ($X^H Y$) offspring probability, yielding a $50\%$ chance that a male child inherits the disease ($X^h Y$).
+- **Strict Compliance:**
+  - **Authentic Khmer Curriculum:** Questions written in natural Khmer without English translations, keeping `en` and `km` aligned.
+  - **Latin Digits Only (0-9):** Strict compliance with `scripts/check-digits.mjs` (0 Khmer numerals across all 270 files).
+  - **Balanced Option Distribution:** Correct answers distributed evenly (3 `ក`, 2 `ខ`, 3 `គ`, 2 `ឃ`), avoiding clustering on option 1.
+
+## 28 Sep 2026 — Game Mode: Biology Medium Questions Added (20 Biology Questions Authored)
+
+Commit `pending`. **No database step needed.**
+
+**Why.** To expand the Biology competition pool in Game mode (`/game`), 10 Grade 12 Bac II competition questions were authored for the **Medium** difficulty tier. Combined with the 10 Basic questions, the Biology pool now stands at 20 authentic curriculum questions.
+
+**What changed.**
+- **Authored 10 Biology Medium Competition Questions ([`src/data/game-questions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/game-questions.ts)):**
+  - Covers conceptual mechanisms, comparisons, and physiological processes from MoEYS Chapters 1–4:
+    - **Plant Anatomy & Monocots vs Dicots (សំណួរទី 1):** Ring vascular bundle arrangement, net-like venation, 2 cotyledons, and taproot system distinguishing dicotyledons.
+    - **Stomatal Mechanisms (សំណួរទី 2):** Osmotic opening of stomata powered by active $K^+$ ion influx into guard cells making them turgid.
+    - **Tropisms & Auxin Distribution (សំណួរទី 3):** Unilateral light causing auxin relocation to the shaded side, promoting faster cell elongation and positive phototropic curvature.
+    - **Spinal Reflex Arc (សំណួរទី 4):** 5-step sequence of neural transmission (Receptor $\rightarrow$ Sensory neuron $\rightarrow$ Spinal cord interneuron $\rightarrow$ Motor neuron $\rightarrow$ Effector muscle).
+    - **Autonomic Nervous System (សំណួរទី 5):** Sympathetic "fight-or-flight" physiological shifts (pupil dilation, elevated heart rate, bronchial dilation, inhibited digestion).
+    - **Sensory Accommodation (សំណួរទី 6):** Ciliary muscle contraction and ligament relaxation causing the lens to thicken for near focus.
+    - **Endocrine Calcium Homeostasis (សំណួរទី 7):** Antagonistic actions of Calcitonin (lowers blood $Ca^{2+}$) and Parathyroid Hormone / PTH (elevates blood $Ca^{2+}$).
+    - **Hormone Signaling Mechanisms (សំណួរទី 8):** Lipid-soluble steroid hormones directly diffusing across the plasma membrane to intracellular receptors vs. water-soluble peptide hormones requiring cell-surface receptors.
+    - **Protein Higher-Order Structures (សំណួរទី 9):** Hydrogen bonds between $>\text{C}=\text{O}$ and $-\text{NH}-$ of the polypeptide backbone stabilizing $\alpha$-helices and $\beta$-pleated sheets in secondary structure.
+    - **Enzyme Kinetics & Denaturation (សំណួរទី 10):** Thermal disruption of hydrogen bonds above optimum temperature causing active site loss (denaturation).
+- **Strict Compliance:**
+  - **Authentic Khmer Curriculum:** Natural Khmer phrasing without artificial English translations, keeping `en` and `km` aligned.
+  - **Latin Digits Only (0-9):** Strict compliance with `scripts/check-digits.mjs` (0 Khmer numerals across all 270 files).
+  - **Balanced Option Distribution:** Correct answers distributed evenly (3 `ក`, 2 `ខ`, 3 `គ`, 2 `ឃ`), avoiding clustering on option 1.
+
+## 28 Sep 2026 — Game Mode: Biology Basic Questions Added (Subject Unlocked on /game)
+
+Commit `pending`. **No database step needed.**
+
+**Why.** To unlock the **Biology** subject card in 1v1 Game match mode (`/game`), 10 authentic Grade 12 Bac II competition questions were authored for the **Basic** (`easy`) difficulty tier based on official MoEYS curriculum summaries (Chapters 1, 3, and 4). With content in `GAME_QUESTIONS`, the Biology card automatically transitions from "ឆាប់ៗនេះ" to active and selectable on `/game/create`.
+
+**What changed.**
+- **Authored 10 Biology Basic Competition Questions ([`src/data/game-questions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/game-questions.ts)):**
+  - Covers fundamental MoEYS Grade 12 Biology concepts:
+    - **Gymnosperms (សំណួរទី 1):** Defining characteristic of Gymnosperms (naked seeds on cone scales without fruit/ovary protection).
+    - **Nervous System & Neurons (សំណួរទី 2–3):** Three core structural components of a neuron (cell body / soma, dendrites, axon); and the synaptic junction transmitting action potentials via neurotransmitters.
+    - **Receptor Organs (សំណួរទី 4–5):** Retina photoreceptors (cones for daytime color vision vs. rods for dim light); and the semicircular canals of the inner ear maintaining dynamic balance during head rotations.
+    - **Endocrine System (សំណួរទី 6–7):** The pituitary gland as the "master gland" directing other endocrine organs; and insulin secretion by pancreatic $\beta$-cells lowering blood glucose toward normal homeostatic levels (~1 g/L).
+    - **Proteins & Enzymes (សំណួរទី 8–10):** The 20 fundamental amino acid monomers of proteins; covalent peptide bonds linking amino acids into primary structure; and the biological catalytic function of enzymes accelerating cellular metabolic reactions by lowering activation energy.
+- **Strict Compliance:**
+  - **Latin Digits Only:** Zero Khmer numerals across all options, questions, and explanations. Verified via `npm run check:digits`.
+  - **Balanced Option Distribution:** Correct answers distributed evenly across options (3 `ក`, 2 `ខ`, 3 `គ`, 2 `ឃ`), preventing answer clustering.
+  - **Bilingual Support:** Full English and Khmer prompts `{ en, km }` for every question.
 
 ## 28 Sep 2026 — Game Mode: Chemistry Hard Questions Added (Complete 30-Question Chemistry Pool)
 

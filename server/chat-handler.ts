@@ -13,7 +13,7 @@ import {
 import type { ScreenRef } from "../src/utils/chat-screen.js";
 import { checkRateLimit } from "./rate-limit.js";
 import { isVerificationConfigured, verifyRequestUser } from "./verify-user.js";
-import { searchBiologyTextbook } from "./textbook-search.js";
+import { searchBiologyTextbook, searchMathTextbook } from "./textbook-search.js";
 import {
   getCachedAnswer,
   recordCachedAnswer,
@@ -453,8 +453,21 @@ export async function handleChat(req: Request): Promise<Response> {
   const screen = cleanScreen(body.screen);
   const pinned = pinnedContextFor(screen);
 
-  // Ground KruAI in official MoEYS textbook text (Biology Chapter 1)
-  const textbook = searchBiologyTextbook(lastUserText);
+  // Ground KruAI in official MoEYS textbook text (Biology and Math)
+  const isMathQuery =
+    screen.subjectId === "math" ||
+    /គណិត|លីមីត|limit|ដេរីវេ|អាំងតេក្រាល|កុំផ្លិច|កោនិក|សមីការ|ប្រូបាប|វ៉ិចទ័រ|matrix|integral|derivative|\b0\/0\b|\b\+?\\infty\b/i.test(
+      lastUserText
+    );
+  const isBioQuery =
+    screen.subjectId === "biology" ||
+    /ជីវ|កោសិកា|ប្រសាទ|អង់ស៊ីម|ប្រូតេអ៊ីន|adn|arn|ស៊ីណាប់|ណឺរ៉ូន|ស៊ីមណូ|អង់ស្យូ|មេយ៉ូស|មីតូស/i.test(
+      lastUserText
+    );
+
+  const bioChunks = isBioQuery || !isMathQuery ? searchBiologyTextbook(lastUserText) : [];
+  const mathChunks = isMathQuery || !isBioQuery ? searchMathTextbook(lastUserText) : [];
+  const textbook = [...bioChunks, ...mathChunks].slice(0, 3);
   const context = [...pinned, ...textbook];
 
   try {

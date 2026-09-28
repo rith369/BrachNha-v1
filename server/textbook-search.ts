@@ -1071,3 +1071,333 @@ export function searchBiologyTextbook(
 /** Backward compatibility alias for Chapter 1 search */
 export const searchBiologyChapter1 = searchBiologyTextbook;
 
+/* ==========================================================================
+ * GRADE 12 MATHEMATICS · CHAPTER 1: LIMITS OF FUNCTIONS (លីមីតនៃអនុគមន៍)
+ * Official MoEYS Grade 12 Mathematics Summary (pp. 3–18)
+ * ========================================================================== */
+
+export const MATH_LIMITS_SECTIONS: TextbookSection[] = [
+  {
+    id: "tb:math:limits:ch1:operations-indeterminate",
+    title: "ប្រមាណវិធីលើលីមីត និងរាងមិនកំណត់ទាំង 4",
+    keywords: [
+      "លីមីត",
+      "limit",
+      "ប្រមាណវិធី",
+      "រាងមិនកំណត់",
+      "indeterminate",
+      "0/0",
+      "infinity",
+      "អនន្ត",
+      "សូន្យលើសូន្យ",
+      "អនន្តដកអនន្ត",
+      "ផលបូកលីមីត",
+      "ផលចែកលីមីត",
+    ],
+    text: `ប្រមាណវិធីលើលីមីត និងរាងមិនកំណត់៖
+1. ប្រមាណវិធីលើលីមីត (បើ $\\lim_{x \\to a} f(x) = L$ និង $\\lim_{x \\to a} g(x) = M$)៖
+   - ផលបូក៖ $\\lim_{x \\to a} [f(x) + g(x)] = L + M$
+   - ផលដក៖ $\\lim_{x \\to a} [f(x) - g(x)] = L - M$
+   - ផលគុណ៖ $\\lim_{x \\to a} [f(x) \\cdot g(x)] = L \\cdot M$
+   - ផលចែក៖ $\\lim_{x \\to a} \\frac{f(x)}{g(x)} = \\frac{L}{M}$ (ចំពោះ $M \\neq 0$)
+   - ករណីភាគបែង $g(x) \\to 0$ និងភាគយក $L \\neq 0$ នាំឲ្យលីមីតស្មើ $\\pm\\infty$
+2. រាងមិនកំណត់ទាំង 4 (Indeterminate Forms) ដែលត្រូវបំប្លែងមុននឹងគណនា៖
+   - $\\frac{0}{0}$ (សូន្យលើសូន្យ)៖ ប្រើវិធីដាក់ជាផលគុណកត្តាសម្រួល ឬគុណកន្សោមឆ្លាស់ (Conjugate)។
+   - $\\frac{\\infty}{\\infty}$ (អនន្តលើអនន្ត)៖ ដាក់អថេរដឺក្រេខ្ពស់បំផុតជាកត្តារួមនៅភាគយកនិងភាគបែង រួចសម្រួល។
+   - $\\infty - \\infty$ (អនន្តដកអនន្ត)៖ បើមានរ៉ាឌីកាល់ គុណកន្សោមឆ្លាស់ ឬដាក់ $x$ ឬ $x^n$ ជាកត្តារួម។
+   - $0 \\times \\infty$ (សូន្យគុណអនន្ត)៖ បំប្លែងទៅជារាង $\\frac{0}{0}$ ឬ $\\frac{\\infty}{\\infty}$។`,
+  },
+  {
+    id: "tb:math:limits:ch1:composite-functions",
+    title: "លីមីតនៃអនុគមន៍បណ្តាក់ (Composite Function Limits)",
+    keywords: [
+      "អនុគមន៍បណ្តាក់",
+      "composite function",
+      "g o u",
+      "បណ្តាក់",
+      "លីមីតបណ្តាក់",
+      "ប្តូរអថេរ",
+    ],
+    text: `លីមីតនៃអនុគមន៍បណ្តាក់ $(g \\circ u)(x) = g(u(x))$៖
+- ទ្រឹស្តីបទ៖ បើ $u$ និង $g$ ជាអនុគមន៍ដែលមាន $\\lim_{x \\to \\alpha} u(x) = \\beta$ និង $\\lim_{u \\to \\beta} g(u) = \\gamma$ នោះ៖
+  $$\\lim_{x \\to \\alpha} (g \\circ u)(x) = \\gamma$$
+- វិធីដោះស្រាយ៖
+  1. គណនាលីមីតខាងក្នុង៖ $U = \\lim_{x \\to \\alpha} u(x)$
+  2. ជំនួស $U$ ចូលអនុគមន៍ខាងក្រៅ៖ $\\lim_{U \\to \\beta} g(U) = \\gamma$
+- ឧទាហរណ៍ជាក់ស្តែង៖
+  + $f(x) = \\ln\\left(\\frac{3x+1}{x-1}\\right)$ កាលណា $x \\to 1^+$, $u(x) = \\frac{3x+1}{x-1} \\to +\\infty$ នាំឲ្យ $\\lim_{x \\to 1^+} f(x) = \\lim_{u \\to +\\infty} \\ln u = +\\infty$
+  + $f(x) = e^{\\frac{1}{x}}$ កាលណា $x \\to 0^-$, $u = \\frac{1}{x} \\to -\\infty$ នាំឲ្យ $\\lim_{x \\to 0^-} e^{\\frac{1}{x}} = 0$
+  + $f(x) = \\ln(1 + e^x)$ កាលណា $x \\to -\\infty$, $1+e^x \\to 1$ នាំឲ្យ $\\lim_{x \\to -\\infty} \\ln(1+e^x) = \\ln 1 = 0$`,
+  },
+  {
+    id: "tb:math:limits:ch1:comparison-squeeze",
+    title: "លីមីតតាមការប្រៀបធៀប និងទ្រឹស្តីបទញៀប (Squeeze Theorem)",
+    keywords: [
+      "ប្រៀបធៀប",
+      "ទ្រឹស្តីបទញៀប",
+      "squeeze theorem",
+      "sandwich theorem",
+      "វិសមភាព",
+      "កៀប",
+      "សង្កត់",
+    ],
+    text: `លីមីតតាមការប្រៀបធៀប និងទ្រឹស្តីបទញៀប (Squeeze Theorem)៖
+1. លីមីតប្រៀបធៀបឆ្ពោះទៅអនន្ត៖
+   - បើ $f(x) \\ge g(x)$ និង $\\lim_{x \\to +\\infty} g(x) = +\\infty$ នោះ $\\lim_{x \\to +\\infty} f(x) = +\\infty$
+   - បើ $f(x) \\le g(x)$ និង $\\lim_{x \\to +\\infty} g(x) = -\\infty$ នោះ $\\lim_{x \\to +\\infty} f(x) = -\\infty$
+2. ទ្រឹស្តីបទញៀប (Squeeze Theorem)៖
+   - បើ $h(x) \\le f(x) \\le g(x)$ ហើយ $\\lim_{x \\to +\\infty} h(x) = L$ និង $\\lim_{x \\to +\\infty} g(x) = L$ នោះ $\\lim_{x \\to +\\infty} f(x) = L$
+   - លក្ខណៈពិសេស៖ បើ $|f(x) - L| \\le g(x)$ និង $\\lim_{x \\to +\\infty} g(x) = 0$ នោះ $\\lim_{x \\to +\\infty} f(x) = L$
+3. ឧទាហរណ៍គំរូ MoEYS៖
+   - គណនា $\\lim_{x \\to 0} x^2 \\sin\\left(\\frac{1}{x}\\right)$៖
+     ដោយគ្រប់ $x \\neq 0$, $|\\sin(1/x)| \\le 1 \\Rightarrow |x^2 \\sin(1/x)| \\le x^2$
+     ដោយ $\\lim_{x \\to 0} x^2 = 0$ នាំឲ្យ $\\lim_{x \\to 0} x^2 \\sin\\left(\\frac{1}{x}\\right) = 0$
+   - គណនា $\\lim_{x \\to +\\infty} (2x - x\\sin x)$៖
+     ដោយ $-1 \\le \\sin x \\le 1 \\Rightarrow x \\le 2x - x\\sin x \\le 3x$ (ចំពោះ $x \\ge 0$)
+     ដោយ $\\lim_{x \\to +\\infty} x = +\\infty$ នាំឲ្យ $\\lim_{x \\to +\\infty} (2x - x\\sin x) = +\\infty$`,
+  },
+  {
+    id: "tb:math:limits:ch1:powers-roots-rational",
+    title: "លីមីតអនុគមន៍ស្វ័យគុណ ឫស និងអនុគមន៍សនិទានត្រង់អនន្ត",
+    keywords: [
+      "ស្វ័យគុណ",
+      "ឫស",
+      "powers",
+      "roots",
+      "សនិទាន",
+      "rational",
+      "ភាគយក",
+      "ភាគបែង",
+      "ដឺក្រេ",
+    ],
+    text: `លីមីតនៃអនុគមន៍ស្វ័យគុណ ឫស និងសនិទានត្រង់អនន្ត៖
+1. លីមីតគ្រឹះ៖
+   - $\\lim_{x \\to +\\infty} x^n = +\\infty$ ($n > 0$)
+   - $\\lim_{x \\to +\\infty} \\sqrt{x} = +\\infty$
+   - $\\lim_{x \\to +\\infty} \\frac{1}{x^n} = 0$ ($n > 0$)
+2. លីមីតត្រង់ $0$ នៃ $\\frac{1}{x^n}$ ($n$ ជាចំនួនគត់វិជ្ជមាន)៖
+   - $n$ ជាចំនួនគូ៖ $\\lim_{x \\to 0^-} \\frac{1}{x^n} = +\\infty$ និង $\\lim_{x \\to 0^+} \\frac{1}{x^n} = +\\infty$
+   - $n$ ជាចំនួនសេស៖ $\\lim_{x \\to 0^-} \\frac{1}{x^n} = -\\infty$ និង $\\lim_{x \\to 0^+} \\frac{1}{x^n} = +\\infty$
+3. លីមីតអនុគមន៍សនិទាន $f(x) = \\frac{P(x)}{Q(x)}$ ត្រង់ $\\pm\\infty$៖
+   - ស្មើនឹងលីមីតនៃផលធៀបតួដែលមានដឺក្រេខ្ពស់ជាងគេបំផុត៖ $\\lim_{x \\to \\pm\\infty} \\frac{a_n x^n + \\dots}{b_m x^m + \\dots} = \\lim_{x \\to \\pm\\infty} \\frac{a_n x^n}{b_m x^m}$
+   - ឧទាហរណ៍៖ $\\lim_{x \\to -\\infty} \\frac{2x^2 - x + 3}{x^2 + 1} = \\lim_{x \\to -\\infty} \\frac{2x^2}{x^2} = 2$
+   - ឧទាហរណ៍៖ $\\lim_{x \\to +\\infty} \\frac{1 - x}{(1 + x)^2} = \\lim_{x \\to +\\infty} \\frac{-x}{x^2} = \\lim_{x \\to +\\infty} \\frac{-1}{x} = 0$`,
+  },
+  {
+    id: "tb:math:limits:ch1:conjugates-0-over-0",
+    title: "លីមីតរាងមិនកំណត់ 0/0 និងវិធីគុណកន្សោមឆ្លាស់ (Conjugates)",
+    keywords: [
+      "កន្សោមឆ្លាស់",
+      "រ៉ាឌីកាល់",
+      "conjugate",
+      "0/0",
+      "ឫសការ៉េ",
+      "ឫសគូប",
+      "សម្រួលកត្តា",
+    ],
+    text: `លីមីតរាងមិនកំណត់ $\\frac{0}{0}$ និងវិធីគុណកន្សោមឆ្លាស់ (Conjugate)៖
+1. រូបមន្តកន្សោមឆ្លាស់សំខាន់ៗ៖
+   - ឫសការ៉េ៖ $(\\sqrt{A} - \\sqrt{B})(\\sqrt{A} + \\sqrt{B}) = A - B$
+     $\\Rightarrow \\sqrt{A} - \\sqrt{B} = \\frac{A - B}{\\sqrt{A} + \\sqrt{B}}$
+   - ឫសគូប៖ $(a - b)(a^2 + ab + b^2) = a^3 - b^3$
+     $\\Rightarrow \\sqrt[3]{A} - \\sqrt[3]{B} = \\frac{A - B}{\\sqrt[3]{A^2} + \\sqrt[3]{AB} + \\sqrt[3]{B^2}}$
+2. ឧទាហរណ៍គំរូ MoEYS៖
+   - គណនា $\\lim_{x \\to 1} \\frac{\\sqrt{x} - 1}{x - 1}$៖
+     គុណកន្សោមឆ្លាស់ $(\\sqrt{x} + 1)$ នៅភាគយកនិងភាគបែង៖
+     $$= \\lim_{x \\to 1} \\frac{(\\sqrt{x} - 1)(\\sqrt{x} + 1)}{(x - 1)(\\sqrt{x} + 1)} = \\lim_{x \\to 1} \\frac{x - 1}{(x - 1)(\\sqrt{x} + 1)} = \\lim_{x \\to 1} \\frac{1}{\\sqrt{x} + 1} = \\frac{1}{2}$$
+   - គណនា $\\lim_{x \\to 2} \\frac{\\sqrt{x + 2} - 2}{x^3 - 8}$៖
+     គុណឆ្លាស់ $(\\sqrt{x+2} + 2)$ និងបំបែក $x^3 - 8 = (x - 2)(x^2 + 2x + 4)$៖
+     $$= \\lim_{x \\to 2} \\frac{(x + 2 - 4)}{(x - 2)(x^2 + 2x + 4)(\\sqrt{x + 2} + 2)} = \\lim_{x \\to 2} \\frac{1}{(x^2 + 2x + 4)(\\sqrt{x + 2} + 2)} = \\frac{1}{12 \\times 4} = \\frac{1}{48}$$
+   - គណនា $\\lim_{x \\to 0} \\frac{\\sqrt{1+x} - \\sqrt{1-x}}{\\sin x}$៖
+     គុណឆ្លាស់ $(\\sqrt{1+x} + \\sqrt{1-x})$៖ ភាគយកបាន $(1+x)-(1-x) = 2x$
+     $$= \\lim_{x \\to 0} \\left(\\frac{x}{\\sin x}\\right) \\cdot \\frac{2}{\\sqrt{1+x} + \\sqrt{1-x}} = 1 \\cdot \\frac{2}{2} = 1$$`,
+  },
+  {
+    id: "tb:math:limits:ch1:infinity-minus-infinity",
+    title: "លីមីតរាងមិនកំណត់ $\\infty - \\infty$ ជាមួយកន្សោមរ៉ាឌីកាល់",
+    keywords: [
+      "អនន្តដកអនន្ត",
+      "infinity minus infinity",
+      "រ៉ាឌីកាល់",
+      "កន្សោមឆ្លាស់",
+      "ទាញជាកត្តា",
+      "ឫស",
+    ],
+    text: `លីមីតរាងមិនកំណត់ $\\infty - \\infty$ ជាមួយកន្សោមរ៉ាឌីកាល់៖
+1. វិធានពិនិត្យមេគុណនៃតួដឺក្រេខ្ពស់បំផុតក្រោមរ៉ាឌីកាល់៖
+   - ករណីមេគុណខុសគ្នា (ឧ. $\\sqrt{4x^2} - \\sqrt{x^2} = 2|x| - |x| = x \\neq 0$)៖
+     ដាក់ $x$ ឬ $|x|$ ជាកត្តារួម មិនបាច់គុណកន្សោមឆ្លាស់ទេ!
+     ឧទាហរណ៍៖ $\\lim_{x \\to +\\infty} (\\sqrt{4x^2 - 1} - \\sqrt{x^2 - 1})$
+     $= \\lim_{x \\to +\\infty} x\\left(\\sqrt{4 - \\frac{1}{x^2}} - \\sqrt{1 - \\frac{1}{x^2}}\\right) = +\\infty \\cdot (2 - 1) = +\\infty$
+   - ករណីមេគុណស្មើគ្នា (ឧ. $\\sqrt{x^2 + ax} - \\sqrt{x^2 + bx}$)៖
+     ការដាក់ $x$ ជាកត្តានាំឲ្យជួបរាង $x(1 - 1) = \\infty \\times 0$។ ត្រូវតែគុណកន្សោមឆ្លាស់៖
+     $$\\sqrt{A} - \\sqrt{B} = \\frac{A - B}{\\sqrt{A} + \\sqrt{B}}$$
+2. កំណត់សម្គាល់សំខាន់អំពីសញ្ញានៃ $\\sqrt{x^2} = |x|$៖
+   - កាលណា $x \\to +\\infty$ នោះ $\\sqrt{x^2} = x$
+   - កាលណា $x \\to -\\infty$ នោះ $\\sqrt{x^2} = -x$ (ប្រយ័ត្នសញ្ញាដក!)`,
+  },
+  {
+    id: "tb:math:limits:ch1:trig-limits",
+    title: "លីមីតនៃអនុគមន៍ត្រីកោណមាត្រ (Trigonometric Limits)",
+    keywords: [
+      "ត្រីកោណមាត្រ",
+      "trigonometric limit",
+      "sin",
+      "cos",
+      "tan",
+      "sin x / x",
+      "1 - cos x",
+      "ប្តូរអថេរ",
+    ],
+    text: `លីមីតនៃអនុគមន៍ត្រីកោណមាត្រ៖
+1. រូបមន្តគ្រឹះ MoEYS៖
+   - $\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1$ និងជាទូទៅ $\\lim_{u(x) \\to 0} \\frac{\\sin u(x)}{u(x)} = 1$
+   - $\\lim_{x \\to 0} \\frac{1 - \\cos x}{x} = 0$
+   - $\\lim_{x \\to 0} \\frac{1 - \\cos x}{x^2} = \\frac{1}{2}$
+   - $\\lim_{x \\to 0} \\frac{\\tan x}{x} = 1$
+2. វិធីប្តូរអថេរ (Variable substitution $X = x - a \\to 0$)៖
+   - $\\lim_{x \\to \\frac{\\pi}{4}} \\frac{2\\sin(x - \\pi/4)}{\\pi/4 - x}$៖ តាង $X = x - \\frac{\\pi}{4} \\to 0$
+     $= \\lim_{X \\to 0} \\frac{2\\sin X}{-X} = -2(1) = -2$
+   - $\\lim_{x \\to \\frac{\\pi}{3}} \\frac{\\sqrt{3}\\cos x - \\sin x}{x - \\pi/3}$៖
+     បំប្លែង $\\sqrt{3}\\cos x - \\sin x = 2\\left(\\frac{\\sqrt{3}}{2}\\cos x - \\frac{1}{2}\\sin x\\right) = -2\\sin\\left(x - \\frac{\\pi}{3}\\right)$
+     នាំឲ្យលីមីតស្មើ $-2 \\lim_{X \\to 0} \\frac{\\sin X}{X} = -2$
+3. រូបមន្តត្រីកោណមាត្រជំនួយ៖
+   - $1 - \\cos 2a = 2\\sin^2 a$
+   - $\\sin^2 x - 1 = -\\cos^2 x = (\\sin x - 1)(\\sin x + 1)$`,
+  },
+  {
+    id: "tb:math:limits:ch1:exponential-limits",
+    title: "លីមីតនៃអនុគមន៍អិចស្ប៉ូណង់ស្យែល (Exponential Limits)",
+    keywords: [
+      "អិចស្ប៉ូណង់ស្យែល",
+      "exponential",
+      "e^x",
+      "e^x / x",
+      "e^(1/x)",
+      "អនន្ត",
+    ],
+    text: `លីមីតនៃអនុគមន៍អិចស្ប៉ូណង់ស្យែល $e^x$៖
+1. រូបមន្តគ្រឹះ MoEYS៖
+   - $\\lim_{x \\to +\\infty} e^x = +\\infty$
+   - $\\lim_{x \\to -\\infty} e^x = 0$
+   - $\\lim_{x \\to +\\infty} \\frac{e^x}{x} = +\\infty$ និងជាទូទៅ $\\lim_{x \\to +\\infty} \\frac{e^x}{x^n} = +\\infty$ ($n > 0$)
+   - $\\lim_{x \\to +\\infty} \\frac{x^n}{e^x} = 0$ ($n > 0$)
+   - $\\lim_{x \\to 0} \\frac{e^x - 1}{x} = 1$
+2. ឧទាហរណ៍គំរូ MoEYS៖
+   - $\\lim_{x \\to +\\infty} (e^x - x + 1)$ (រាង $\\infty - \\infty$)៖
+     ដាក់ $e^x$ ជាកត្តារួម៖ $= \\lim_{x \\to +\\infty} e^x\\left(1 - \\frac{x}{e^x} + \\frac{1}{e^x}\\right) = +\\infty(1 - 0 + 0) = +\\infty$
+   - $\\lim_{x \\to -\\infty} \\frac{e^x}{x^2} = \\lim_{x \\to -\\infty} e^x \\cdot \\frac{1}{x^2} = 0 \\times 0 = 0$
+   - $\\lim_{x \\to 0} e^{\\frac{1}{x}}$៖
+     + កាលណា $x \\to 0^-$, $\\frac{1}{x} \\to -\\infty \\Rightarrow \\lim_{x \\to 0^-} e^{\\frac{1}{x}} = 0$
+     + កាលណា $x \\to 0^+$, $\\frac{1}{x} \\to +\\infty \\Rightarrow \\lim_{x \\to 0^+} e^{\\frac{1}{x}} = +\\infty$
+   - $\\lim_{x \\to +\\infty} (xe^x - x^3) = \\lim_{x \\to +\\infty} x^3\\left(\\frac{e^x}{x^2} - 1\\right) = +\\infty(+\\infty - 1) = +\\infty$`,
+  },
+  {
+    id: "tb:math:limits:ch1:logarithmic-limits",
+    title: "លីមីតនៃអនុគមន៍លោការីតនេពែ (Natural Logarithm Limits)",
+    keywords: [
+      "លោការីត",
+      "លោការីតនេពែ",
+      "ln",
+      "ln x / x",
+      "x ln x",
+      "logarithm",
+    ],
+    text: `លីមីតនៃអនុគមន៍លោការីតនេពែ $\\ln x$៖
+1. រូបមន្តគ្រឹះ MoEYS៖
+   - $\\lim_{x \\to +\\infty} \\ln x = +\\infty$
+   - $\\lim_{x \\to 0^+} \\ln x = -\\infty$
+   - $\\lim_{x \\to +\\infty} \\frac{\\ln x}{x} = 0$ និងជាទូទៅ $\\lim_{x \\to +\\infty} \\frac{\\ln x}{x^n} = 0$ ($n > 0$)
+   - $\\lim_{x \\to 0^+} x \\ln x = 0$ និងជាទូទៅ $\\lim_{x \\to 0^+} x^n \\ln x = 0$ ($n > 0$)
+   - $\\lim_{x \\to 0^+} \\frac{\\ln x}{x} = (-\\infty) \\times (+\\infty) = -\\infty$
+   - $\\lim_{x \\to 0} \\frac{\\ln(1 + x)}{x} = 1$
+2. ឧទាហរណ៍គំរូ MoEYS៖
+   - $\\lim_{x \\to +\\infty} (x^2 - \\ln x)$ (រាង $\\infty - \\infty$)៖
+     ដាក់ $x^2$ ជាកត្តា៖ $= \\lim_{x \\to +\\infty} x^2\\left(1 - \\frac{\\ln x}{x^2}\\right) = +\\infty(1 - 0) = +\\infty$
+   - $\\lim_{x \\to +\\infty} \\frac{(\\ln x)^3}{x^2}$ (រាង $\\frac{+\\infty}{+\\infty}$)៖
+     តាង $x = X^{3/2} \\Rightarrow \\frac{(\\ln X^{3/2})^3}{X^3} = \\frac{27}{8}\\left(\\frac{\\ln X}{X}\\right)^3 \\to \\frac{27}{8}(0)^3 = 0$
+   - $\\lim_{x \\to 0^+} (x - 1)\\ln x = (-1)(-\\infty) = +\\infty$`,
+  },
+  {
+    id: "tb:math:limits:ch1:one-sided-sign-chart",
+    title: "លីមីតឆ្វេង-ស្តាំ និងការសិក្សាសញ្ញាភាគបែង (One-sided Limits & Sign Chart)",
+    keywords: [
+      "លីមីតឆ្វេង",
+      "លីមីតស្តាំ",
+      "one sided",
+      "តារាងសញ្ញា",
+      "sign chart",
+      "0+",
+      "0-",
+      "អាស៊ីមតូតឈរ",
+    ],
+    text: `លីមីតឆ្វេង-ស្តាំ និងការសិក្សាសញ្ញាភាគបែង៖
+1. ក្បួនគណនាលីមីតផលចែក $\\lim_{x \\to x_0} \\frac{N(x)}{D(x)}$ កាលណា $N(x_0) = c \\neq 0$ និង $D(x_0) = 0$៖
+   - លីមីតនឹងចេញ $\\pm\\infty$ ដោយអាស្រ័យលើសញ្ញានៃ $c$ និងសញ្ញានៃ $D(x)$ កាលណា $x \\to x_0^+$ ឬ $x \\to x_0^-$។
+   - ត្រូវសង់តារាងសញ្ញានៃភាគបែង $D(x)$ ដើម្បីដឹងច្បាស់ថាភាគបែងខិតជិត $0^+$ (វិជ្ជមាន) ឬ $0^-$ (អវិជ្ជមាន)។
+2. ឧទាហរណ៍គំរូ MoEYS៖
+   $f(x) = \\frac{3x - 1}{x^2 - 1}$ កំណត់លើ $\\mathbb{R} \\setminus \\{-1, 1\\}$ ត្រង់ $x \\to -1$៖
+   - ភាគយក៖ $\\lim_{x \\to -1} (3x - 1) = -4$
+   - ភាគបែង៖ $x^2 - 1 = (x - 1)(x + 1)$ មានសញ្ញាវិជ្ជមានលើ $(-\\infty, -1) \\cup (1, +\\infty)$ និងអវិជ្ជមានលើ $(-1, 1)$។
+   - ដូច្នេះ៖
+     + កាលណា $x \\to -1^-$ ($x < -1$)៖ ភាគបែង $> 0 \\Rightarrow \\lim_{x \\to -1^-} (x^2 - 1) = 0^+$ នាំឲ្យ $\\lim_{x \\to -1^-} f(x) = \\frac{-4}{0^+} = -\\infty$
+     + កាលណា $x \\to -1^+$ ($x > -1$)៖ ភាគបែង $< 0 \\Rightarrow \\lim_{x \\to -1^+} (x^2 - 1) = 0^-$ នាំឲ្យ $\\lim_{x \\to -1^+} f(x) = \\frac{-4}{0^-} = +\\infty$`,
+  },
+];
+
+export const ALL_MATH_SECTIONS: TextbookSection[] = [
+  ...MATH_LIMITS_SECTIONS,
+];
+
+/**
+ * Searches Mathematics textbook chunks (Chapter 1: Limits) for matches against a student query.
+ * Returns up to maxResults retrieved chunks formatted for KruAI's system prompt.
+ */
+export function searchMathTextbook(
+  query: string,
+  maxResults = 2
+): RetrievedChunk[] {
+  if (!query || typeof query !== "string") return [];
+  const q = query.toLowerCase().trim();
+  if (q.length < 2) return [];
+
+  const scored: { section: TextbookSection; score: number }[] = [];
+
+  for (const sec of ALL_MATH_SECTIONS) {
+    let score = 0;
+
+    // Check title match (high weight)
+    if (q.includes(sec.title.toLowerCase())) score += 10;
+
+    // Check keyword matches
+    for (const kw of sec.keywords) {
+      const kwLower = kw.toLowerCase();
+      if (q.includes(kwLower)) {
+        score += kwLower.length >= 6 ? 5 : 3;
+      }
+    }
+
+    // Check query words against section text
+    const words = q.split(/\\s+/).filter((w) => w.length >= 3);
+    for (const w of words) {
+      if (sec.text.toLowerCase().includes(w)) {
+        score += 1;
+      }
+    }
+
+    if (score > 0) {
+      scored.push({ section: sec, score });
+    }
+  }
+
+  // Sort descending by score
+  scored.sort((a, b) => b.score - a.score);
+
+  return scored.slice(0, maxResults).map(({ section }) => ({
+    id: section.id,
+    where: `សៀវភៅសង្ខេបគណិតវិទ្យាថ្នាក់ទី 12 (ក្រសួងអប់រំ) · ${section.title}`,
+    text: section.text,
+    pinned: false,
+  }));
+}
+

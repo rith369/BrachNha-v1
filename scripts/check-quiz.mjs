@@ -221,6 +221,24 @@ try {
     }
   }
 
+  // ── game match questions ────────────────────────────────────────────────
+  const { GAME_QUESTIONS } = await server.ssrLoadModule("/src/data/game-questions.ts");
+  const gameKeys = Object.keys(GAME_QUESTIONS);
+  let gameQuestions = 0;
+
+  for (const subj of gameKeys) {
+    GAME_QUESTIONS[subj].forEach((question, qi) => {
+      gameQuestions += 1;
+      const where = `game · ${subj} · question ${qi + 1}`;
+      checkMath(splitMath, `${where} q.en`, question.q.en);
+      checkMath(splitMath, `${where} q.km`, question.q.km);
+      checkMath(splitMath, `${where} explanation`, question.explanation);
+      for (const opt of question.options ?? [])
+        checkMath(splitMath, `${where} option`, opt);
+      checkChoices(where, question.options, question.correct);
+    });
+  }
+
   if (problems.length) {
     console.error(`\ncheck:quiz — ${problems.length} problem(s):\n`);
     for (const p of problems) console.error("  " + p + "\n");
@@ -229,7 +247,8 @@ try {
     const n = keys.reduce((s, k) => s + PRACTICE_QUIZZES[k].length, 0);
     console.log(
       `check:quiz — ok. ${n} question(s) across ${keys.length} quiz(zes), ` +
-        `${paperQuestions} across ${paperKeys.length} past paper(s); ` +
+        `${paperQuestions} across ${paperKeys.length} past paper(s), ` +
+        `${gameQuestions} across ${gameKeys.length} game subject(s); ` +
         `${checked} string(s) with math typeset cleanly.`
     );
   }
