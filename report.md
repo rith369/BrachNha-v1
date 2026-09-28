@@ -15,6 +15,86 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 28 Sep 2026 — Biology Curriculum: MoEYS Summary PDF Chapter 3 Extracted, KruAI Grounding & Flashcards Added
+
+Commit `pending`. **No database step needed.**
+
+**Why.** To provide authentic, high-yield Grade 12 Bac II exam preparation for Biology Chapter 3 ("តម្រូវផ្សេងៗរបស់សារពាង្គកាយ" / Various Regulations of the Organism), the official MoEYS Biology Summary PDF was transcribed and integrated across the study path, KruAI AI search grounding, and flashcard practice.
+
+**What changed.**
+- **Transcribed Official MoEYS Chapter 3 Summary Material (Pages 6–24):**
+  - **Lesson 1: ប្រព័ន្ធប្រសាទ (Nervous System, Pages 6–11):** Invertebrate vs vertebrate nerve organization, neuron structure, nerve impulse conduction, synapses & neurotransmitters, central vs peripheral nervous system, and somatic vs autonomic nervous systems.
+  - **Lesson 2: សរីរាង្គវិញ្ញាណ (Sense Organs, Pages 11–17):** Eye anatomy (sclera, choroid, retina, cones/rods, blind spot, fovea, accommodation, 3D vision); ear anatomy (outer, middle with ossicles & Eustachian tube, inner with cochlea & semicircular canals, hearing pathway & cerebellar balance); tongue & 4 primary tastes; olfactory receptors (10,000 scents); and skin (9 functions, epidermis/dermis, thermoregulation & melanin).
+  - **Lesson 3: ប្រព័ន្ធអង់ដូគ្រីន (Endocrine System, Pages 18–24):** Homeostasis; exocrine vs endocrine glands; peptide vs steroid hormone action mechanisms; negative feedback control; hypothalamus & pituitary hormones (ADH, Oxytocin, GH, PRL, MSH, TSH, ACTH, FSH/LH); thyroid (thyroxine, calcitonin, goiter) & parathyroid (PTH, tetany); adrenal medulla (epinephrine/fight-or-flight) vs adrenal cortex (cortisol, aldosterone); pancreas (islets of Langerhans, beta/insulin, alpha/glucagon, diabetes mellitus); and gonads (estrogen, progesterone, testosterone).
+- **Enriched KruAI Search Grounding ([`server/textbook-search.ts`](file:///e:/Kru%20AI/Brachnha-v2/server/textbook-search.ts)):**
+  - Added 6 rich textbook search chunks (`BIOLOGY_CH3_SECTIONS`) for KruAI:
+    - `tb:bio:ch3:eye-anatomy-retina`
+    - `tb:bio:ch3:eye-accommodation-vision`
+    - `tb:bio:ch3:ear-hearing-balance`
+    - `tb:bio:ch3:taste-smell-skin`
+    - `tb:bio:ch3:homeostasis-hormones`
+    - `tb:bio:ch3:pituitary-thyroid-parathyroid`
+    - `tb:bio:ch3:adrenal-pancreas-gonads`
+  - Integrated into `searchBiologyTextbook()` so student questions about sensory organs or hormone regulations receive exact MoEYS curriculum-grounded answers.
+- **Added 26 Official Flashcards ([`src/data/practice.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/practice.ts)):**
+  - Authored complete practice decks for Chapter 3:
+    - `biology-3-1`: 8 cards covering nervous regulation, reflex arc, and autonomic pathways.
+    - `biology-3-2`: 8 cards covering eye layers, photoreceptors, accommodation, ear ossicles, hearing mechanism, and skin functions.
+    - `biology-3-3`: 10 cards covering endocrine mechanisms, negative feedback, pituitary hormones, calcium regulation, adrenal glands, blood glucose regulation, and diabetes.
+- **Updated Section Titles on Study Path ([`src/features/lessons/sessions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/features/lessons/sessions.ts)):**
+  - Replaced generic placeholder titles with authentic MoEYS section titles for Lesson 3.2 ("ចក្ខុវិញ្ញាណ (ភ្នែក)", "សោតវិញ្ញាណ និងតុល្យភាព", "ជីវ្ហាវិញ្ញាណ និងឃានវិញ្ញាណ", "កាយវិញ្ញាណ (ស្បែក)") and Lesson 3.3 ("ក្រពេញ អរម៉ូន និងថេរលំនឹង", "ក្រពេញអ៊ីប៉ូតាឡាមុស អ៊ីប៉ូភីស និងទីរ៉ូអ៊ីត", "ក្រពេញលើតម្រងនោម លំពែង និងក្រពេញភេទ").
+- **Terminology Cleanliness:** Corrected OCR artifact `ក vỏ លើតម្រងនោម` to standard MoEYS terminology `សំបកលើតម្រងនោម` (Adrenal Cortex).
+- **Latin Digits Enforced:** Ran `npm run check:digits` verifying 100% compliance across all new Khmer content.
+
+**What to re-test.**
+- Navigate to `/practice`. Select Biology and check that Flashcard decks for Lessons 3.1, 3.2, and 3.3 are available and interactive.
+- Open KruAI chat (`/chat`) and test asking questions about sense organs or hormones (e.g. "តើកែវភ្នែកសម្របតម្រូវយ៉ាងដូចម្តេច?", "ចូរប្រៀបធៀបនាទីរវាងកាល់ស៊ីតូនីន និង PTH").
+- Navigate to `/subjects/biology` and verify the path displays real section titles for Chapter 3 Lessons 2 and 3.
+
+## 28 Sep 2026 — Game Mode: History Hard Questions Added (Complete 30-Question History Pool)
+
+Commit `pending`. **No database step needed.**
+
+**Why.** To complete the full three difficulty tiers (Basic, Medium, Hard) for History in Game mode (`/game`), 10 advanced Grade 12 Bac II History questions were added for the **Hard** difficulty, bringing the authored History question pool to 30 questions.
+
+**What changed.**
+- **Authored 10 History Hard Competition Questions ([`src/data/game-questions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/game-questions.ts)):**
+  - Covers advanced and analytical Bac II Grade 12 modern Cambodian history:
+    - **French Protectorate & Early Resistance (សំណួរទី 1–3):** Convention of 17 June 1884 stripping King Norodom of internal administrative, judicial, fiscal, and land powers leading to the Prince Si Votha revolt (1885–1886); the 20 July 1942 Umbrella Demonstration protesting the arrest of Achar Hem Chieu and Nuon Duong; and King Norodom Sihanouk's 1953 diplomatic leverage tactics in Siem Reap and the New York Times interview warning of communist expansion.
+    - **Sangkum & Civil War Eras (សំណួរទី 4–5):** The direct democracy mechanism of the Sangkum National Congress at Veal Menh; and how the US secret carpet bombings (Operations Menu and Freedom Deal, 1969–1973) devastated rural communities and catalyzed mass peasant recruitment into the Khmer Rouge.
+    - **Democratic Kampuchea & 1980s PRK (សំណួរទី 6–8):** The 7 administrative zones and numbered regional sectors replacing traditional provinces; Pol Pot's paranoid 1978 purges of So Phim's Eastern Zone ("Vietnamese mind in Khmer body"); and the K-5 Plan (1984–1989) conscripting civilian labor to trench, clear forest, and mine the Thai border.
+    - **Peace & Reconciliation (សំណួរទី 9–10):** The role of the Supreme National Council (SNC) embodying Cambodian sovereignty under Prince Sihanouk prior to the 1993 UNTAC elections; and the 29 December 1998 surrender of final Khmer Rouge leaders under Samdech Techo Hun Sen's Win-Win Policy achieving total territorial unity for the first time in over 500 years.
+  - **Balanced Option Distribution:** Correct answers distributed evenly across positions (`ក`: 3, `ខ`: 2, `គ`: 3, `ឃ`: 2), avoiding clustering on option 1.
+  - **Latin Digits Enforced:** Strict Latin digits (0-9) used across all questions, options, and explanations in compliance with `scripts/check-digits.mjs`.
+  - **Comprehensive Explanations:** In-depth historical commentary accompanying every question.
+
+**What to re-test.**
+- Navigate to `/game/create`.
+- Select History ("ប្រវត្តិវិទ្យា") and the **Hard** ("ពិបាក") or **Mix** ("ចម្រុះ") difficulty chip.
+- Start a competition and play through the 10 questions.
+- Verify answer selections, review step, and historical explanations.
+
+## 28 Sep 2026 — Game Mode: History Medium Questions Added
+
+Commit `pending`. **No database step needed.**
+
+**Why.** Following the Basic tier, 10 intermediate Grade 12 Bac II History questions were authored for the **Medium** difficulty tier in Game mode (`/game`), deepening coverage across Cambodian modern history and 20th-century world geopolitics.
+
+**What changed.**
+- **Authored 10 History Medium Competition Questions ([`src/data/game-questions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/game-questions.ts)):**
+  - Covers critical Grade 12 Bac II History topics:
+    - **Cambodian History (សំណួរទី 1–5):** Sangkum Reastr Niyum's foreign policy of neutrality and non-alignment (Bandung Conference 1955); economic nationalization and border Viet Cong presence leading to the 18 March 1970 coup; Democratic Kampuchea's social stratification ("Base People" vs "New/17 April People"); the Khmer Rouge's 4-Year Plan (1977–1980) targeting 3 to 7 tons/hectare of rice; and the multi-party democratic election and national reconciliation principles of the 23 October 1991 Paris Peace Agreements.
+    - **World History (សំណួរទី 6–10):** The severe economic and territorial repercussions of the 1919 Treaty of Versailles fueling German revanchism; the Allied Appeasement Policy emboldening Hitler's expansion into Poland (1939); Eisenhower's Domino Theory justifying US intervention in Indochina; the resolution of the 1962 Cuban Missile Crisis; and Mikhail Gorbachev's Glasnost (openness) and Perestroika (restructuring) reforms leading up to 1991.
+  - **Balanced Option Distribution:** Correct answers distributed evenly across positions (`ក`: 3, `ខ`: 2, `គ`: 3, `ឃ`: 2), avoiding clustering on option 1.
+  - **Latin Digits Enforced:** Fully converted all dates, years, and quantities to standard Latin digits (0-9) ensuring zero Khmer numerals across questions, choices, and explanations.
+  - **Rich Explanations:** Deep contextual explanations provided for student review.
+
+**What to re-test.**
+- Navigate to `/game/create`.
+- Select History ("ប្រវត្តិវិទ្យា") and the **Medium** ("មធ្យម") difficulty chip.
+- Start a competition and play through the 10 questions.
+- Verify options, answer review, and explanations display correctly.
+
 ## 28 Sep 2026 — Game Mode: History Basic Questions Added & Subject Enabled
 
 Commit `pending`. **No database step needed.**

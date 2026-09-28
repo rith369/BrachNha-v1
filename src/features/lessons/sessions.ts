@@ -258,12 +258,21 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
         {
           number: 2,
           title: "សរីរាង្គវិញ្ញាណ",
-          sessions: sectionsFor("biology", 3, 2),
+          sessions: sectionsFor("biology", 3, 2, [
+            "ចក្ខុវិញ្ញាណ (ភ្នែក)",
+            "សោតវិញ្ញាណ និងតុល្យភាព",
+            "ជីវ្ហាវិញ្ញាណ និងឃានវិញ្ញាណ",
+            "កាយវិញ្ញាណ (ស្បែក)",
+          ]),
         },
         {
           number: 3,
           title: "ប្រព័ន្ធអង់ដូគ្រីន",
-          sessions: sectionsFor("biology", 3, 3),
+          sessions: sectionsFor("biology", 3, 3, [
+            "ក្រពេញ អរម៉ូន និងថេរលំនឹង",
+            "ក្រពេញអ៊ីប៉ូតាឡាមុស អ៊ីប៉ូភីស និងទីរ៉ូអ៊ីត",
+            "ក្រពេញលើតម្រងនោម លំពែង និងក្រពេញភេទ",
+          ]),
         },
       ],
     },
