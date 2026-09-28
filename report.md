@@ -15,6 +15,83 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 28 Sep 2026 — The lesson videos play, and Math lesson 1.1 is live
+
+Commit `698aad7`. **No database step needed.**
+
+**Why.** The video box at the top of a section was a picture of a player — your illustration
+with a play button drawn on it, and nothing happened when you tapped it, because there was no
+recording yet. There is one now. Separately, the whole Math foundation path was locked, so a
+student who tapped Math found six greyed-out circles and nothing to do.
+
+**What changed.**
+
+- **The play button really plays.** Tapping it starts the video, in one tap, inside the lesson
+  screen. The videos are hosted on YouTube as **unlisted** — not searchable, not public, only
+  reachable from inside the app.
+- **Nothing is downloaded from YouTube until you tap play.** This matters more than it sounds:
+  a normal YouTube embed starts downloading roughly a megabyte the moment the page opens, for
+  every student, whether or not they watch. Here the page opens with just our own small picture,
+  and YouTube is contacted only when a student actually asks for the video. Checked and
+  confirmed: zero contact with Google before the tap.
+- **The video picks its own quality.** A student on a slow connection gets a smaller version
+  automatically instead of waiting for it to buffer. That was the main reason for using YouTube
+  rather than putting video files on our own server.
+- **Math · ជំពូក 1 · មេរៀនទី 1 · ផ្នែកទី 1 — វិន័យនៃសញ្ញា is written and open.** The first circle
+  on the Math path is now tappable. It has the video, the lesson in two screens, worked
+  examples, tips, the key points, and the four mistakes students usually make with signs.
+- **Formulas and tables now display properly inside lesson content.** They used to come out as
+  raw code (`$$ (+3)+(+5)=+8 $$`). Maths lessons need this; it changes nothing for the biology
+  sections, which have no formulas.
+
+**What to re-test.**
+
+1. Study → Math → មូលដ្ឋានគ្រឹះ → tap the first circle (1.1.1).
+2. Tap the video. It should start playing on **one** tap, and stay inside the lesson screen
+   rather than jumping to full screen.
+3. Check the formulas and the plus/minus table on screen 2 look right, at phone size and in
+   dark mode.
+4. Read the Khmer. **It was transcribed from what you supplied, not rewritten** — but the
+   section numbers were changed from Khmer numerals to 1.1, 1.2, 1.3, 1.4, because the whole app
+   uses Latin digits for every number a student sees.
+
+**The exercises.**
+
+- **All 15 are in, split across the two screens.** Screen 1 gets Parts A and B (adding and
+  subtracting signed numbers, 8 questions). Screen 2 gets Parts C and D (multiply/divide and
+  the mixed ones, 7 questions). **The split is not arbitrary** — the plus/minus times table is
+  printed on screen 2, so asking multiplication on screen 1 would be asking before teaching.
+  Each screen needs its own questions answered before it will move on.
+- **Every answer explains itself immediately** — the wrong one in pink, the right one in green,
+  and the rule underneath, exactly the "show them where they went wrong" shape you asked for.
+- **I found two mistakes in your answer key and fixed them.** Q13 `-5+8-(-3)` is 6 and the key
+  said option C, but C was 10 — 6 was option B. Q15 `(-24)÷(-6)-5` is **-1**, not 1: that one
+  had the letter AND the value wrong. All 15 were recomputed, not trusted.
+- **I also reshuffled the options.** In the order you sent them the right answer was option B
+  on 8 of the 15 — students spot that in a week and start guessing B. They are now spread
+  evenly across ក./ខ./គ./ឃ., and each screen is balanced on its own. Only the ORDER changed;
+  every option value is yours.
+
+**Also fixed, and it affected every lesson, not just math.** Moving to the next screen used to
+leave you scrolled at the BOTTOM of the new screen — so after a long screen you would press
+Continue and see a footer, with the new content off-screen above you. It looked like the screen
+had failed to load. Every screen now opens at the top: the section flow, the lesson flow, the
+practice quiz, the Game battle and the flashcard review. (The past-paper exam already did this;
+the other five were simply never given it.)
+
+**Known and expected.**
+
+- **Inside Telegram or Messenger's built-in browser the video may need a second tap.** Those
+  apps can refuse to auto-start a video and there is nothing any website can do about it. The
+  student just taps YouTube's own play button; nothing is stuck.
+- **Worth checking on a real phone**, in Telegram, on a real mobile connection. Everything above
+  was verified on a computer, which cannot prove how Telegram's browser behaves.
+
+**One thing to look at separately, not caused by this change.** Home now loads all written
+lesson content on first open — 60 KB today — because the new "Continue learning" list reads the
+content catalogue to build itself. It grows with every lesson we write, so it is worth fixing
+before there are many. Nothing is broken; the app just starts a little heavier than it needs to.
+
 ## 28 Sep 2026 — Home: "Continue Learning" and Missions You Have to Earn
 
 Commit `53eb58f`. **No database step needed.**
