@@ -27,9 +27,7 @@ function lessonsOnTab(id: SubjectId, tab: SubjectTab): number {
   const path = SUBJECT_SESSIONS[id];
   if (path) {
     if (PATH_TAB[id] !== tab) return 0;
-    return tab === "foundation"
-      ? path.flatMap((c) => c.lessons).length
-      : lessonCountFor(id);
+    return path.flatMap((c) => c.lessons).length;
   }
   return tab === "all" ? lessonCountFor(id) : 0;
 }

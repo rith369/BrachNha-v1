@@ -406,6 +406,8 @@ export interface ExamQuestion {
    * no code change, exactly as adding a GAME_QUESTIONS entry turns a subject on.
    */
   difficulty?: GameDifficulty;
+  /** Optional step-by-step mathematical or conceptual explanation for why the correct answer is right. */
+  explanation?: string;
 }
 
 /** A question in the generated mock exam, where the subject is always known. */

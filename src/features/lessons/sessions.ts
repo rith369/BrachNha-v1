@@ -229,10 +229,14 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
     },
     {
       number: 2,
-      title: "",
+      title: "ការលូតលាស់ និងតំណបបំពេញរុក្ខជាតិ",
       lessons: [
-        { number: 1, title: "", sessions: sectionsFor("biology", 2, 1) },
-        { number: 2, title: "", sessions: sectionsFor("biology", 2, 2) },
+        {
+          number: 1,
+          title: "ដំណឹកនាំ និងការលូតលាស់នៅក្នុងរុក្ខជាតិ",
+          sessions: sectionsFor("biology", 2, 1),
+        },
+        { number: 2, title: "តំណបបំពេញ", sessions: sectionsFor("biology", 2, 2) },
       ],
     },
     {
@@ -242,9 +246,7 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
         {
           number: 1,
           title: "តម្រូវប្រសាទ",
-          // The lesson being authored right now. Nothing on this path is
-          // playable, so without this the page opens on ជំពូក 1 and every
-          // visit starts with a scroll past 20 locked nodes.
+          // The lesson currently authored. Open path directly here.
           openHere: true,
           sessions: sectionsFor("biology", 3, 1, [
             "សេចក្ដីផ្ដើម",
@@ -263,6 +265,81 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
           title: "ប្រព័ន្ធអង់ដូគ្រីន",
           sessions: sectionsFor("biology", 3, 3),
         },
+      ],
+    },
+    {
+      number: 4,
+      title: "នាទីរបស់ប្រូតេអ៊ីនក្នុងសារពាង្គកាយ",
+      lessons: [
+        { number: 1, title: "អាស៊ីតអាមីណេ", sessions: sectionsFor("biology", 4, 1) },
+        { number: 2, title: "ប្រូតេអ៊ីន", sessions: sectionsFor("biology", 4, 2) },
+        { number: 3, title: "អង់ស៊ីម", sessions: sectionsFor("biology", 4, 3) },
+      ],
+    },
+    {
+      number: 5,
+      title: "ព័ត៌មានសេនេទិច និងការសំដែងនៃសែន",
+      lessons: [
+        {
+          number: 1,
+          title: "ADN ជាព័ត៌មានសេនេទិច",
+          sessions: sectionsFor("biology", 5, 1),
+        },
+        {
+          number: 2,
+          title: "ការសំដែងចេញនៃសែន",
+          sessions: sectionsFor("biology", 5, 2),
+        },
+        {
+          number: 3,
+          title: "បច្ចេកវិទ្យាជីវៈ",
+          sessions: sectionsFor("biology", 5, 3),
+        },
+      ],
+    },
+    {
+      number: 6,
+      title: "ការវិវត្តនៃការរស់",
+      lessons: [
+        {
+          number: 1,
+          title: "ទ្រឹស្ដីរបស់លោកដាវិន",
+          sessions: sectionsFor("biology", 6, 1),
+        },
+        {
+          number: 2,
+          title: "ភស្តុតាងនៃការវិវត្ត",
+          sessions: sectionsFor("biology", 6, 2),
+        },
+        {
+          number: 3,
+          title: "កំណត់ត្រាផូស៊ីល",
+          sessions: sectionsFor("biology", 6, 3),
+        },
+      ],
+    },
+    {
+      number: 7,
+      title: "ពពួក និងសហគមន៍",
+      lessons: [
+        { number: 1, title: "ពពួក", sessions: sectionsFor("biology", 7, 1) },
+        {
+          number: 2,
+          title: "អន្តរអំពើក្នុងចំណោមការរស់",
+          sessions: sectionsFor("biology", 7, 2),
+        },
+      ],
+    },
+    {
+      number: 8,
+      title: "អេកូឡូស៊ី",
+      lessons: [
+        {
+          number: 1,
+          title: "បង្វែរថាមពលក្នុងស្ថានប្រព័ន្ធ",
+          sessions: sectionsFor("biology", 8, 1),
+        },
+        { number: 2, title: "វដ្តរូបធាតុ", sessions: sectionsFor("biology", 8, 2) },
       ],
     },
   ],

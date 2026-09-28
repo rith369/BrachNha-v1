@@ -1,6 +1,7 @@
 import { Check, Minus } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
+import { MathText } from "@/components/shell/math-text";
 import { gameCopy } from "../copy";
 import type { ExamQuestion } from "@/types";
 
@@ -74,7 +75,7 @@ export function AnswerReview({
               {t.questionLabel} {i + 1}
             </div>
             <div className="mb-3 text-sm font-extrabold md:text-base">
-              {question.q[lang]}
+              <MathText text={question.q[lang]} />
             </div>
 
             <div className="flex flex-col gap-1.5">
@@ -102,7 +103,9 @@ export function AnswerReview({
                         aria-hidden
                       />
                     )}
-                    <span className="min-w-0 flex-1">{opt}</span>
+                    <span className="min-w-0 flex-1">
+                      <MathText text={opt} />
+                    </span>
                     <span className="flex shrink-0 flex-wrap justify-end gap-1">
                       {isMine && <PickChip>{t.you}</PickChip>}
                       {isTheirs && theirsLabel && (
@@ -113,6 +116,15 @@ export function AnswerReview({
                 );
               })}
             </div>
+
+            {question.explanation && (
+              <div className="mt-3 rounded-xl border border-purple/10 bg-purple/5 p-3 text-xs text-muted md:text-sm">
+                <div className="mb-1 font-extrabold text-text">
+                  {lang === "km" ? "ការពន្យល់៖" : "Explanation:"}
+                </div>
+                <MathText text={question.explanation} />
+              </div>
+            )}
 
             {/* An unanswered question is stated rather than left as an option
                 row with no chip on it — silence there looks like a bug, and the

@@ -1,5 +1,6 @@
 import { Camera } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
+import { MathText } from "@/components/shell/math-text";
 import { gameCopy } from "../copy";
 import { QuestionPhotos } from "./question-photos";
 import type { MyWorkPhotos } from "../use-work-photos";
@@ -74,11 +75,10 @@ export function WorkPhotoStep({
           <div className="mb-1 text-[10px] font-extrabold text-muted">
             {t.questionLabel} {i + 1}
           </div>
-          {/* Two lines, clamped: enough to recognise which question this is on
-              the paper in front of you. The full text and its options belong to
-              the answers screen, which this deliberately does not preview. */}
-          <div className="mb-3 line-clamp-2 text-sm font-extrabold">
-            {q.q[lang]}
+          {/* Enough to recognise which question this is on the paper in front of you.
+              The full options belong to the answers screen, which this deliberately does not preview. */}
+          <div className="mb-3 text-sm font-extrabold">
+            <MathText text={q.q[lang]} />
           </div>
           <QuestionPhotos question={i} mine={mine} />
         </div>

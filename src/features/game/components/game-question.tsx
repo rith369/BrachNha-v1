@@ -4,6 +4,7 @@ import { useBrachNhaStore } from "@/lib/store";
 import { clockLabel, gameCopy } from "../copy";
 import { focusCard, focusOption, focusPrompt } from "@/utils/focus-styles";
 import { cn } from "@/utils/cn";
+import { MathText } from "@/components/shell/math-text";
 import type { ExamQuestion } from "@/types";
 
 /** How long the chosen option stays highlighted before the run advances. Long
@@ -93,7 +94,9 @@ export function GameQuestion({
         <Timer className="size-3 shrink-0" strokeWidth={2.5} aria-hidden />
         {t.thisQuestion} {clockLabel(spent)}
       </div>
-      <div className={cn("mb-4 md:mb-6", focusPrompt)}>{question.q[lang]}</div>
+      <div className={cn("mb-4 md:mb-6", focusPrompt)}>
+        <MathText text={question.q[lang]} />
+      </div>
       <div className="flex flex-col gap-2 md:gap-3">
         {question.options.map((opt) => (
           <button
@@ -113,7 +116,7 @@ export function GameQuestion({
                 : "border-purple/10 bg-surface text-text hover:bg-purple/5"
             )}
           >
-            {opt}
+            <MathText text={opt} />
           </button>
         ))}
       </div>

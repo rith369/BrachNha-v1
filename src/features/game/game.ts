@@ -51,7 +51,7 @@ export const DIFFICULTIES: {
   id: GameDifficulty;
   label: { en: string; km: string };
 }[] = [
-  { id: "easy", label: { en: "Easy", km: "ងាយ" } },
+  { id: "easy", label: { en: "Basic", km: "ងាយ" } },
   { id: "medium", label: { en: "Medium", km: "មធ្យម" } },
   { id: "hard", label: { en: "Hard", km: "ពិបាក" } },
   { id: "mix", label: { en: "Mix", km: "ចម្រុះ" } },
@@ -61,22 +61,17 @@ export const DIFFICULTIES: {
  * A subject's match questions.
  *
  * THE FALLBACK IS THE ONE JUDGEMENT CALL IN THIS FILE, and deleting one `??`
- * clause reverses it. GAME_QUESTIONS is empty today, so without it every card on
- * /game would be dimmed and nothing would be playable at all — which is a state
- * /practice deliberately shipped in, so it would be defensible. Against that:
- * MOCK_QS already holds 5 real math and 5 real biology questions that students
- * are shown elsewhere in the app, and this is the same argument
- * data/generated-exams.ts makes for deriving from them ("retiring the old UI
- * must not also retire the only way a student could take any exam here"). It is
- * also what gives scripts/shots.mjs a real match to photograph.
+ * clause reverses it. If GAME_QUESTIONS has questions for the subject, return
+ * the full pool so pickQuestions() can filter by difficulty. Otherwise fallback
+ * to GENERATED_EXAM_QUESTIONS.
  *
  * An authored GAME_QUESTIONS entry replaces the fallback for that subject
  * wholesale — it is not merged with it.
  */
 export function gameQuestionsFor(id: SubjectId): ExamQuestion[] {
-  return (GAME_QUESTIONS[id] ?? GENERATED_EXAM_QUESTIONS[id] ?? []).slice(
-    0,
-    MATCH_QUESTIONS
+  return (
+    GAME_QUESTIONS[id] ??
+    (GENERATED_EXAM_QUESTIONS[id] ?? []).slice(0, MATCH_QUESTIONS)
   );
 }
 

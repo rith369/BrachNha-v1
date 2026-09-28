@@ -15,6 +15,58 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 28 Sep 2026 — Grade 12 Biology: Complete 8 Chapters and 20 Lessons Added to Study & Flashcard Pages
+
+Commit `16a1a9a`. **No database step needed.**
+
+**Why.** Students studying Grade 12 Biology need to see the complete curriculum roadmaps across both the Study path (`/subjects/biology`) and the Flashcards/Practice hub (`/practice/biology`). Previously, only Chapters 1, 2 (untitled), and 3 were registered in `sessions.ts`. All 8 chapters and 20 lessons from the official MoEYS Grade 12 Biology textbook table of contents were added without authored section bodies so they appear as structured placeholders.
+
+**What changed.**
+- **Complete Biology Curriculum Structure ([`src/features/lessons/sessions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/features/lessons/sessions.ts)):**
+  - Populated all 8 chapters and 20 lessons according to the official MoEYS Grade 12 Biology textbook:
+    - ជំពូក 1 : ស៊ីមណូស្ពែម និងអង់ស្យូស្ពែម (2 lessons)
+    - ជំពូក 2 : ការលូតលាស់ និងតំណបបំពេញរុក្ខជាតិ (2 lessons: ដំណឹកនាំ និងការលូតលាស់នៅក្នុងរុក្ខជាតិ, តំណបបំពេញ)
+    - ជំពូក 3 : តម្រូវផ្សេងៗរបស់សារពាង្គកាយ (3 lessons: តម្រូវប្រសាទ [playable], សរីរាង្គវិញ្ញាណ, ប្រព័ន្ធអង់ដូគ្រីន)
+    - ជំពូក 4 : នាទីរបស់ប្រូតេអ៊ីនក្នុងសារពាង្គកាយ (3 lessons: អាស៊ីតអាមីណេ, ប្រូតេអ៊ីន, អង់ស៊ីម)
+    - ជំពូក 5 : ព័ត៌មានសេនេទិច និងការសំដែងនៃសែន (3 lessons: ADN ជាព័ត៌មានសេនេទិច, ការសំដែងចេញនៃសែន, បច្ចេកវិទ្យាជីវៈ)
+    - ជំពូក 6 : ការវិវត្តនៃការរស់ (3 lessons: ទ្រឹស្ដីរបស់លោកដាវិន, ភស្តុតាងនៃការវិវត្ត, កំណត់ត្រាផូស៊ីល)
+    - ជំពូក 7 : ពពួក និងសហគមន៍ (2 lessons: ពពួក, អន្តរអំពើក្នុងចំណោមការរស់)
+    - ជំពូក 8 : អេកូឡូស៊ី (2 lessons: បង្វែរថាមពលក្នុងស្ថានប្រព័ន្ធ, វដ្តរូបធាតុ)
+- **Automatic Sync with Study & Flashcard Pages:**
+  - On the **Study path** (`/subjects/biology`): displays all 8 chapter banners, lesson headers, and locked placeholder nodes, with the Jump menu listing all 20 lessons.
+  - On the **Flashcards list** (`/practice/biology`): lists all 8 chapters and 20 lessons with chapter kickers; non-authored decks cleanly display the `ឆាប់ៗនេះ` ("Coming soon") chip.
+  - Updated `lessonsOnTab` in [`src/features/lessons/components/subject-card.tsx`](file:///e:/Kru%20AI/Brachnha-v2/src/features/lessons/components/subject-card.tsx) so the Study tab card accurately reports `20 មេរៀន`.
+
+**What to re-test.**
+- Open `/subjects/biology`: verify all 8 chapters and 20 lessons appear on the Study path, and open the Jump drawer to see all 20 lessons.
+- Open `/practice/biology` under the Flashcard tab: verify all 8 chapters and 20 lessons are listed with chapter kickers and coming-soon chips.
+
+## 28 Sep 2026 — Game Mode: Math Basic Questions & KaTeX Formula Rendering
+
+Commit `pending`. **No database step needed.**
+
+**Why.** Students competing in the Game feature (/game) need real, curriculum-aligned questions for Mathematics. Previously `GAME_QUESTIONS` had no authored questions, so competitions fell back to generic mock items. The Game create flow offers Basic (Easy), Medium, and Hard difficulties; 10 foundational Grade 12 Math questions were added for the Basic level.
+
+**What changed.**
+- **Authored 10 Math Basic Competition Questions ([`src/data/game-questions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/game-questions.ts)):**
+  - Covers key Bac II topics: Limits (factorization & limits at infinity), Derivatives (polynomial, exponential, logarithm), Integrals (antiderivatives and definite integration), Complex Numbers (modulus and conjugates), and Probability (fair die with prime numbers).
+  - Balanced multiple-choice options distributed evenly across all positions (`ក`: 3, `ខ`: 2, `គ`: 3, `ឃ`: 2).
+  - Detailed step-by-step explanations included for every question.
+  - Strict Latin digit enforcement (`0-9`) passing `npm run check:digits`.
+- **KaTeX Typesetting & Explanations in Game ([`src/features/game/components/game-question.tsx`](file:///e:/Kru%20AI/Brachnha-v2/src/features/game/components/game-question.tsx), [`src/features/game/components/answer-review.tsx`](file:///e:/Kru%20AI/Brachnha-v2/src/features/game/components/answer-review.tsx), [`src/features/game/components/work-photo-step.tsx`](file:///e:/Kru%20AI/Brachnha-v2/src/features/game/components/work-photo-step.tsx)):**
+  - Added `MathText` rendering to `GameQuestion` prompts and options, beautifully typesetting fractions, limits, integrals, and formulas during gameplay.
+  - Added `MathText` rendering to the photo working step (`WorkPhotoStep`) between the competition result and the answers.
+  - Added `MathText` rendering and step-by-step mathematical explanations to the post-game `AnswerReview` screen.
+- **Difficulty Selection & Question Pool ([`src/features/game/game.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/features/game/game.ts)):**
+  - Updated the English label for `easy` to "Basic" to match the Basic / Medium / Hard terminology.
+  - Ensured `gameQuestionsFor()` returns full authored question sets so `pickQuestions()` properly filters by selected difficulty without premature truncation.
+
+**What to re-test.**
+- Navigate to `/game` and click "Create Game Now" (`/game/create`).
+- Select Mathematics and Basic (ងាយ) difficulty.
+- Start the competition and play through the 10 questions, verifying mathematical formulas render clearly.
+- Submit the competition and review questions on the review screen, verifying the option markers, correct answers, and mathematical explanations.
+
 ## 28 Sep 2026 — Grade 12 Biology Chapter 3 Lesson 1 ("តម្រូវប្រសាទ"): Sections 2, 3, and 4 Authored & Playable
 
 Commit `1936bd3`. **No database step needed.**
