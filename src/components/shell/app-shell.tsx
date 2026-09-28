@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { TopBar } from "./top-bar";
 import { Drawer } from "./drawer";
 import { Sidebar } from "./sidebar-nav";
@@ -13,6 +13,7 @@ import { AuthSplash } from "@/features/auth/components/auth-splash";
 import { AuthPromptOverlay } from "@/features/auth/components/auth-prompt-overlay";
 import { AccountConflictView } from "@/features/auth/components/account-conflict-view";
 import { InstallPrompt } from "@/features/install/components/install-prompt";
+import { hasSeenIntro, markIntroSeen } from "@/lib/intro-seen";
 import { useBrachNhaStore } from "@/lib/store";
 import { useSupabaseSync } from "@/hooks/use-supabase-sync";
 import { useStudyTimer } from "@/hooks/use-study-timer";
@@ -29,6 +30,17 @@ import { isInAppBrowser } from "@/utils/in-app-browser";
 // The app is client-rendered, so the ssr flag has nothing left to turn off.
 const ChatOverlay = lazy(() =>
   import("./chat-overlay").then((m) => ({ default: m.ChatOverlay }))
+);
+
+// The three "why science" screens. A new device sees them once and nobody
+// sees them again, so they are split out rather than paid for by every
+// student on every load: measured at +8KB gzipped on the entry chunk inline.
+// The cost moves to one small fetch on a first visit, behind the same null
+// fallback as the mentor.
+const IntroView = lazy(() =>
+  import("@/features/intro/components/intro-view").then((m) => ({
+    default: m.IntroView,
+  }))
 );
 
 // Read ONCE, at module scope, because the answer cannot change while the page
@@ -77,6 +89,14 @@ export function AppShell({
   // identity it publishes.
   useAuthSession();
   const { status, isAuthenticated, hasFullAccess } = useAuth();
+
+  // The three "why science" screens. Read once from this device's own key (see
+  // lib/intro-seen.ts), then held in state so finishing moves on at once.
+  const [introSeen, setIntroSeen] = useState(hasSeenIntro);
+  const finishIntro = () => {
+    markIntroSeen();
+    setIntroSeen(true);
+  };
 
   // Keeps a signed-in student's store backed up to Supabase. Renders nothing
   // and returns nothing — mounted here rather than in a page because it has to
@@ -163,6 +183,23 @@ export function AppShell({
         <AuthSplash />
       ) : accountConflict ? (
         <AccountConflictView />
+      ) : /* ── The intro ─────────────────────────────────────────────────────
+             Before the entry screen (and before LoginView when Supabase is
+             unconfigured), once per device. Only someone who has not started
+             yet sees it: no name, not a guest, not signed in. That is what
+             keeps every existing student, a returning signed-in student during
+             the session-loading window, an OAuth callback and the screenshot
+             harness's seeded profile all clear of it with no extra condition.
+             Not in an in-app browser: that student is sent to their real
+             browser, which has its own storage and would show it again. */
+      !introSeen &&
+        !userName &&
+        !guestMode &&
+        !isAuthenticated &&
+        !IN_APP_BROWSER ? (
+        <Suspense fallback={null}>
+          <IntroView onDone={finishIntro} />
+        </Suspense>
       ) : /* `status === "ready"` is load-bearing here, not belt-and-braces.
              A returning student HAS a name and a session, but the session takes
              a dynamic import to resolve — so during that window they are

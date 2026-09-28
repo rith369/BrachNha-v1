@@ -501,6 +501,24 @@ h1, h2, h3, h4, .font-heading {
   animation: streakConfetti 1.1s cubic-bezier(0.18, 0.8, 0.32, 1) both;
 }
 
+/* ── The intro screens' artwork (features/intro/components/intro-art.tsx) ──
+   Transform only, like every loop here. The orbit turns slowly enough to read
+   as ambient rather than as a spinner; the four tiles bob out of phase (each
+   carries its own negative animation-delay) so they never move in unison. */
+@keyframes introSpin {
+  to { transform: rotate(360deg); }
+}
+.animate-intro-spin {
+  animation: introSpin 40s linear infinite;
+}
+@keyframes introFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+.animate-intro-float {
+  animation: introFloat 3.6s ease-in-out infinite;
+}
+
 /* Both loops above run forever. Someone who has asked their device for less
    motion should get the finished state, not an endless animation — and on a
    low-end phone that is a real amount of work saved as well.
@@ -515,7 +533,9 @@ h1, h2, h3, h4, .font-heading {
   .animate-shimmer,
   .animate-start-bob,
   .animate-streak-breathe,
-  .animate-streak-pop {
+  .animate-streak-pop,
+  .animate-intro-spin,
+  .animate-intro-float {
     animation: none;
   }
 
