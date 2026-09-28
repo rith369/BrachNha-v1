@@ -15,6 +15,30 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 29 Sep 2026 — KruAI says hello
+
+Commit `5e3f6be`. **No database step needed.**
+
+**Why.** New students did not know that the round bot button in the corner is KruAI, the
+study helper they can ask questions.
+
+**What changed.**
+
+- About a second after the app opens, a small bubble pops out beside the KruAI button:
+  **"សួស្តី! តើមានអ្វីអាចឱ្យខ្ញុំជួយបាន?"** (or "Hi! What can I help you with?" in English).
+- Tapping the bubble opens KruAI, just like tapping the button. Guests get the sign-in
+  prompt, as before.
+- It disappears by itself after 10 seconds, or straight away with the small ×.
+- Once a student has found KruAI (tapped it, or closed the bubble), it never shows again on
+  that phone or computer. If they just ignore it, it shows on up to 3 visits and then stops.
+- It never appears on the welcome, sign-in or survey screens, or during exams.
+
+**What to re-test.**
+
+- Open the app fresh on a phone: the bubble appears next to the bot button and is readable.
+- Tap ×, reload: it does not come back.
+- On Home, the bot button looks fully bright while the bubble is showing.
+
 ## 28 Sep 2026 — The Math path is four lessons now
 
 Commit `1e423d5`. **No database step needed.**

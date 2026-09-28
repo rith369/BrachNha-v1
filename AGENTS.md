@@ -5684,6 +5684,23 @@ survey" button (the survey restarts all four steps blank, takes over the screen
 and has no cancel), and move `GRADES` / `FIXED_SUBJECTS` out of `survey-view.tsx`
 into a `.ts` so both screens share one list.
 
+### The KruAI greeting bubble (`fab-chat.tsx` + `lib/kruai-hint.ts`)
+
+Asked for (29 Sep 2026) because new students could not tell what the FAB was.
+The bubble renders beside the FAB, sharing its `offset` classes, and uses the
+user's own wording in Khmer. Three decisions:
+
+- **Stops once found, else after `MAX_SHOWS` (3) visits.** "Found" is tapping
+  the FAB or the bubble, or the ×. Ignoring it for 10s (`HINT_VISIBLE_MS`) is
+  not "found", so it returns next visit, but never more than three times.
+- **A device fact in `localStorage["brachnha-kruai-hint"]`, not a store field**,
+  for the reasons `lib/intro-seen.ts` gives. A module-level `shownThisLoad`
+  stops a FabChat remount (chat open/close, an assessment) greeting twice.
+- **The FAB is NOT faded while the bubble is up.** On Home it lands over a
+  lesson row at first paint, where `findControlUnder` fades it; the bubble
+  would then point at a see-through button on the exact screen new students
+  arrive at. The fade returns when the bubble goes.
+
 ## Installable app: "add to home screen" and the two pop-ups
 
 BrachNha is an installable web app (PWA). None of this touches Google sign-in:
