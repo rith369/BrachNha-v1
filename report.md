@@ -15,6 +15,39 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 28 Sep 2026 — "Coming soon" on every circle that is not written yet
+
+Commit `57e0167`. **No database step needed.**
+
+**Why.** You pointed at circles 1.1.4 and 1.1.5 on the Math path: full colour, a play
+symbol, and nothing at all when you tap them. Nothing on screen said the lesson was not
+written yet, so the only way to find out was to tap and get silence.
+
+**What changed.**
+
+- **Every circle with no lesson behind it now carries a “ឆាប់ៗនេះ” label.** Both kinds of
+  path: the round circles on Study (Math, Biology and the rest) and the square badges on the
+  Bac II quiz paths. The circle keeps its colour on purpose, because a whole path of greyed-out
+  shapes reads as “you cannot have this” rather than “this is coming”. It still does nothing
+  when tapped, which is correct: the label is there so you know that before tapping.
+- **Screen readers are told too.** A locked circle used to be announced exactly like a playable
+  one.
+
+**I checked the rest of the app for the same problem and found none.** Subject tiles, practice
+subject tiles, practice lesson rows, exam paper cards, the side menu rows and the video
+placeholder all already say it. The Bac II simulation card is no longer a placeholder at all,
+so it correctly says nothing.
+
+**Also fixed: six more of the dashes.** Yesterday's sweep only searched one of the three ways
+text is written in the code, so six were missed, including **two inside KruAI's instructions**.
+That last one matters more than it sounds: the AI copies the punctuation style of its own
+instructions into the answers students read, so a dash there reproduces itself every time it
+replies.
+
+**What to re-test.** Study → any subject → scroll down the path. Circles with no lesson yet
+should be labelled. Then Practice → Quiz → Math, where every square except the first is not
+written yet.
+
 ## 28 Sep 2026 — Math lesson 1.3 (Decimals), and two writing rules
 
 Commit `dab914e`. **No database step needed.**
