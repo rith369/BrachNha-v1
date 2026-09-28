@@ -1621,10 +1621,22 @@ chapter whose real title hasn't been supplied carries `title: ""` and the banner
 shows `ជំពូក 1` alone — an empty string is the "pending" marker, deliberately,
 because a made-up Khmer title is worse than none.
 
-**Node labels are `{chapter}.{lesson}.{section}` in Arabic digits** (`3.1.1`),
+**Node labels are `{chapter}.{lesson}.{section}` in Latin digits** (`3.1.1`),
 matching the numbering printed in the textbook, and are GENERATED from position by
-`sectionsFor()` so a label cannot drift from where the node sits. Prose on the
-page keeps Khmer numerals via `utils/khmer-num.ts` — that split is intentional.
+`sectionsFor()` so a label cannot drift from where the node sits.
+
+**A `flat` chapter drops the chapter from the label** (`2.1`, not `1.2.1`), because
+there is no chapter on screen for that number to refer to — `Chapter.flat` already
+suppresses the banner's kicker, and printing a "1." that groups nothing told a
+student about a level the page deliberately never draws. `quizSections()` in
+`features/practice/quiz-path.ts` has always done this; `sectionsFor()` was the one
+out of step and now takes the same flag. Math's foundation path is the only
+`flat` Study path today, so this moved its existing labels from `1.1.1` to `1.1`.
+
+**THE ID KEEPS THE CHAPTER EITHER WAY** — `math-1-2-1`, never `math-2-1`. It is
+persisted in `completedSessions` and it is the key into `SECTION_CONTENT`, so only
+the visible label may move. A change that renumbered ids would silently orphan
+every finished node and every authored section.
 
 **The section TITLE renders under the node, not just in the `aria-label`.**
 Duolingo gets away with bare numbers because its content is known; here the
@@ -1641,6 +1653,21 @@ subjects are absent, which is the normal state. `chaptersFor()` falls back to on
 session per lesson that genuinely exists in `data/lessons.ts` plus
 `PLACEHOLDER_SESSIONS` locked nodes, wrapped in one chapter and one lesson so the
 shape matches, so a node can never claim content the app lacks.
+
+**Math's foundation path is FOUR lessons, and three of them are structure.**
+មេរៀនទី 1 · ប្រមាណវិធីបូក ដក គុណ ចែក has six named sections (three written);
+lessons 2 to 4 have five each, all `title: ""`, all locked. 21 nodes, 3 playable.
+
+The user asked for them (28 Sep 2026) because a one-lesson path claimed the whole
+foundation review was one lesson. **Reserving structure is allowed; inventing
+names is not** — the same line `PLACEHOLDER_SECTIONS`, biology's untitled chapter 2
+and the Bac II quiz path's unnamed sections already draw. `lessonHeading()` reads
+an empty title back as `មេរៀនទី N` alone, so the banner needs no placeholder
+string, and naming a lesson later is ONE string here with no other edit.
+
+`UNNAMED_SECTIONS` is five empty strings rather than `PLACEHOLDER_SECTIONS`
+(three, and it names them `ផ្នែកទី N`): the node already prints its number, so a
+title repeating the number is the duplicate `lessonHeading()` exists to avoid.
 
 **Biology is the first real curriculum**, entered from the Grade 12 table of
 contents: 3 chapters, 7 lessons, 6 sections each = 42 nodes, **every one locked**,

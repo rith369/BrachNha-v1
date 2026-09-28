@@ -125,6 +125,17 @@ export function lessonHeading(number: number, title: string): string {
 const LESSON_TAIL = ["កំហុស", "សេចក្តីសង្ខេប", "តេស្ត"] as const;
 
 /** Placeholder names for a lesson whose real section titles haven't arrived. */
+/**
+ * Five unnamed sections, for a lesson whose own section titles have not been
+ * supplied. "" rather than "ផ្នែកទី N": the node already prints its number, so a
+ * title saying the number again is the duplicate lessonHeading() avoids.
+ */
+const UNNAMED_SECTIONS: readonly string[] = ["", "", "", "", ""];
+
+/** Passed to sectionsFor for a chapter marked `flat`. Named so the call sites
+ *  read as the flag they are setting rather than a bare `true`. */
+const FLAT = true;
+
 const PLACEHOLDER_SECTIONS = ["ផ្នែកទី 1", "ផ្នែកទី 2", "ផ្នែកទី 3"];
 
 /**
@@ -144,13 +155,25 @@ function sectionsFor(
   chapter: number,
   lesson: number,
   titles: readonly string[] = PLACEHOLDER_SECTIONS,
-  tail: readonly string[] = LESSON_TAIL
+  tail: readonly string[] = LESSON_TAIL,
+  // A flat subject has no chapter to name, so its labels drop the chapter
+  // number rather than printing a "1." that groups nothing. quiz-path.ts's
+  // quizSections() has always done this; the Study path was the one out of
+  // step, and a student reading "1.2.1" on a path with no chapters was told
+  // about a level that is deliberately never drawn.
+  //
+  // THE ID IS UNCHANGED and still carries the chapter
+  // (`math-1-2-1`), because `completedSessions` persists it and
+  // SECTION_CONTENT is keyed by it. Only the visible label moves.
+  flat = false
 ): Session[] {
   return [...titles, ...tail].map((title, i) => {
     const id = `${subjectId}-${chapter}-${lesson}-${i + 1}`;
     return {
       id,
-      label: `${chapter}.${lesson}.${i + 1}`,
+      label: flat
+        ? `${lesson}.${i + 1}`
+        : `${chapter}.${lesson}.${i + 1}`,
       title,
       // DERIVED, never authored: a node is playable if and only if content
       // exists for its id. Writing "this one is unlocked" by hand beside the
@@ -212,9 +235,37 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
               "មេរៀនសង្ខេប",
               "តេស្ដ",
             ],
-            []
+            [],
+            FLAT
           ),
         },
+
+        // LESSONS 2 TO 4 ARE STRUCTURE, NOT CONTENT. The foundation review is
+        // more than one lesson long and the path said otherwise, so their
+        // positions are reserved the way biology's chapter 2 and the Bac II
+        // quiz path already reserve theirs.
+        //
+        // `title: ""` is the app's existing marker for "no name supplied", read
+        // back by lessonHeading() as មេរៀនទី N alone. A made-up Khmer lesson
+        // name is worse than none: a student would read it as the curriculum.
+        //
+        // `PLACEHOLDER_SECTIONS` is three, so the count is passed explicitly.
+        // Each section carries `title: ""` too, so a node shows its number and
+        // nothing else, and every one is locked because hasSectionContent() is
+        // false for all of them. Naming a lesson later is one string here; the
+        // nodes need no other edit.
+        ...[2, 3, 4].map((lesson) => ({
+          number: lesson,
+          title: "",
+          sessions: sectionsFor(
+            "math",
+            1,
+            lesson,
+            UNNAMED_SECTIONS,
+            [],
+            FLAT
+          ),
+        })),
       ],
     },
   ],
