@@ -15,6 +15,64 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 28 Sep 2026 — Game Mode: History Basic Questions Added & Subject Enabled
+
+Commit `pending`. **No database step needed.**
+
+**Why.** To expand the Game feature (`/game`) beyond Mathematics and support Grade 12 Bac II History preparation, 10 foundational Cambodian and World History questions were authored for the **Basic** difficulty tier. Adding these questions automatically unlocks History as a playable subject on the Game setup screen (`/game/create`).
+
+**What changed.**
+- **Authored 10 History Basic Competition Questions ([`src/data/game-questions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/game-questions.ts)):**
+  - Covers key Grade 12 Bac II History curriculum milestones:
+    - **Cambodian History (សំណួរទី 1–5):** Full independence from France on 09 November 1953; 1954 Geneva Conference on Indochina; 18 March 1970 coup led by Lon Nol; 1975–1979 Democratic Kampuchea (Khmer Rouge) regime; and 23 October 1991 Paris Peace Agreements.
+    - **World History (សំណួរទី 6–10):** 1914–1918 World War I; 01 September 1939 invasion of Poland starting World War II in Europe; 1945 establishment of the United Nations; Cold War standoff between the United States and the Soviet Union; and 1989 fall of the Berlin Wall.
+  - **Balanced Option Distribution:** Correct answers distributed evenly across all positions (`ក`: 3, `ខ`: 2, `គ`: 3, `ឃ`: 2), avoiding clustering on option 1.
+  - **Latin Digits Enforced:** Converted all Khmer numerals to standard Latin digits (0-9) across questions, choices, and explanations in compliance with `npm run check:digits`.
+  - **Comprehensive Explanations:** Detailed historical context provided for every answer.
+  - **Subject Unlocking:** History is now automatically active in `gameSubjects()` and selectable on `/game/create`.
+
+**What to re-test.**
+- Navigate to `/game/create`.
+- Verify History ("ប្រវត្តិវិទ្យា") is active and selectable alongside Mathematics.
+- Start a competition with **Basic** ("មូលដ្ឋាន") difficulty and play through the 10 questions.
+- Verify answer selections, review step, and explanation displays.
+
+## 28 Sep 2026 — Game Mode: Math Hard Questions Added (Complete 30-Question Math Pool)
+
+Commit `pending`. **No database step needed.**
+
+**Why.** To complete the three difficulty tiers (Basic, Medium, Hard) for Mathematics in the Game feature (`/game`), 10 advanced Grade 12 Math questions were added for the **Hard** difficulty, bringing the authored Math question pool to 30 questions.
+
+**What changed.**
+- **Authored 10 Math Hard Competition Questions ([`src/data/game-questions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/game-questions.ts)):**
+  - Covers advanced Bac II topics: Limits of form $1^\infty$ ($\lim_{x \to 0} (1+2x)^{3/x} = e^6$), Oblique asymptotes of irrational functions ($f(x) = \sqrt{x^2 - 4x + 5} \implies y = x - 2$), Derivative of inverse functions ($(f^{-1})'(2) = \frac{1}{6}$), Looping integration by parts ($\int_0^\pi e^x \cos x\,dx = -\frac{e^\pi + 1}{2}$), Area between two intersecting curves ($y = x^2$ and $y = 2x \implies S = \frac{4}{3}$), High powers via De Moivre's theorem ($(1 + i\sqrt{3})^{12} = 4096$), Complex geometric locus ($|z - 3 + 4i| = 2$ circle with center $(3, -4)$ and radius 2), Second-order linear differential equations with constant coefficients ($y'' + 4y = 0 \implies y = C_1\cos 2x + C_2\sin 2x$), Bayes' theorem conditional probability ($P(A \mid D) = \frac{3}{8}$), and Binomial distribution ($X \sim B(5, 2/3)$ for at least 4 hits $\implies P = \frac{112}{243}$).
+  - Balanced multiple-choice options distributed evenly across all positions (`ក`: 3, `ខ`: 3, `គ`: 2, `ឃ`: 2).
+  - Detailed step-by-step mathematical explanations included for every question.
+  - Strict Latin digit enforcement (`0-9`) passing `npm run check:digits`.
+
+**What to re-test.**
+- Navigate to `/game/create`.
+- Select Mathematics and the **Hard** ("ពិបាក") or **Mix** ("ចម្រុះ") difficulty chip.
+- Start the competition and play through the questions, verifying mathematical formulas, options, photo working step, and review screens.
+
+## 28 Sep 2026 — Game Mode: Math Medium Questions Added
+
+Commit `pending`. **No database step needed.**
+
+**Why.** Students competing in the Game feature (`/game`) need multiple difficulty levels for Mathematics. Following the Basic tier, 10 intermediate Grade 12 Math questions were added for the **Medium** difficulty.
+
+**What changed.**
+- **Authored 10 Math Medium Competition Questions ([`src/data/game-questions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/game-questions.ts)):**
+  - Covers key intermediate Bac II topics: Limits (conjugates for $0/0$ and trigonometric limits $\lim_{x \to 0} \frac{1 - \cos 2x}{x^2}$), Tangent line equation ($y = f'(x_0)(x - x_0) + f(x_0)$), Local extrema / relative minimum ($f'(x) = 0$), Substitution integrals ($\int 2x(x^2+1)^3\,dx$), Integration by parts ($\int x\ln x\,dx$), Complex Numbers (trigonometric polar form $r(\cos\theta + i\sin\theta)$ and quadratic equations $z^2 - 2z + 5 = 0$ in $\mathbb{C}$), Probability combinations ($C(n, k)$ marble draws), and First-order linear differential equations ($y' - 2y = 0, y(0) = 3$).
+  - Balanced multiple-choice options distributed evenly across all positions (`ក`: 3, `ខ`: 2, `គ`: 3, `ឃ`: 2) with no option-1 clustering.
+  - Detailed step-by-step mathematical explanations included for every question.
+  - Strict Latin digit enforcement (`0-9`) passing `npm run check:digits`.
+
+**What to re-test.**
+- Navigate to `/game/create`.
+- Select Mathematics and the **Medium** ("មធ្យម") difficulty chip.
+- Start the competition and play through the 10 Medium questions, verifying KaTeX math formulas render properly on prompts, options, photo working, and review screens.
+
 ## 28 Sep 2026 — Grade 12 Biology: Complete 8 Chapters and 20 Lessons Added to Study & Flashcard Pages
 
 Commit `16a1a9a`. **No database step needed.**
