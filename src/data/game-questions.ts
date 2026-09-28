@@ -924,4 +924,467 @@ export const GAME_QUESTIONS: Record<string, ExamQuestion[]> = {
         "ថ្ងៃទី 29 ខែធ្នូ ឆ្នាំ 1998 ត្រូវបានចាត់ទុកជា «ទិវាសន្តិភាពនៅកម្ពុជា» ព្រោះជាថ្ងៃដែលមេដឹកនាំនយោបាយកំពូលៗរបស់ខ្មែរក្រហមបានស្ម័គ្រចិត្តមកចុះចូលដល់គេហដ្ឋានសម្តេចតេជោនៅតាខ្មៅ តាមរយៈ «នយោបាយ ឈ្នះ-ឈ្នះ» ដែលនាំមកនូវសន្តិភាពពេញលេញ និងការឯកភាពទឹកដីទាំងស្រុងជាលើកដំបូងក្នុងរយៈពេលជាង 500 ឆ្នាំនៃប្រវត្តិសាស្ត្រកម្ពុជា។",
     },
   ],
+
+  // ── CHEMISTRY ──
+  chemistry: [
+    // ── BASIC DIFFICULTY ──
+    {
+      q: {
+        en: "Which factors increase the rate of a chemical reaction?",
+        km: "តើកត្តាណាខ្លះដែលធ្វើឱ្យល្បឿននៃប្រតិកម្មគីមីកើនឡើង?",
+      },
+      options: [
+        "ក. ការបន្ថយសីតុណ្ហភាព និងការបន្ថយកំហាប់អង្គធាតុប្រតិករ",
+        "ខ. ការបន្ថយផ្ទៃប៉ះនៃអង្គធាតុរឹង",
+        "គ. ការបង្កើនសីតុណ្ហភាព និងការបង្កើនកំហាប់អង្គធាតុប្រតិករ",
+        "ឃ. ការដកកាតាលីករចេញពីប្រតិកម្ម",
+      ],
+      correct: "គ. ការបង្កើនសីតុណ្ហភាព និងការបង្កើនកំហាប់អង្គធាតុប្រតិករ",
+      difficulty: "easy",
+      explanation:
+        "កាលណាសីតុណ្ហភាព ឬកំហាប់អង្គធាតុប្រតិករកើនឡើង ចំនួនទង្គិចប្រសិទ្ធរវាងភាគល្អិតកើនឡើង ដែលធ្វើឱ្យប្រតិកម្មប្រព្រឹត្តទៅកាន់តែលឿន។",
+    },
+    {
+      q: {
+        en: "What is the role of a catalyst in a chemical reaction?",
+        km: "តើកាតាលីករមានតួនាទីអ្វីខ្លះនៅក្នុងប្រតិកម្មគីមី?",
+      },
+      options: [
+        "ក. ធ្វើឱ្យល្បឿនប្រតិកម្មកើនឡើង ដោយមិនប្រែប្រួលទម្រង់គីមីនៅពេលចប់ប្រតិកម្ម",
+        "ខ. បង្កើនបរិមាណផលនៃអង្គធាតុកើត",
+        "គ. ធ្វើឱ្យប្រតិកម្មបញ្ឈប់លឿនដោយបន្ថយល្បឿន",
+        "ឃ. ផ្លាស់ប្តូរលំនឹងគីមីឱ្យងាកទៅឆ្វេង",
+      ],
+      correct:
+        "ក. ធ្វើឱ្យល្បឿនប្រតិកម្មកើនឡើង ដោយមិនប្រែប្រួលទម្រង់គីមីនៅពេលចប់ប្រតិកម្ម",
+      difficulty: "easy",
+      explanation:
+        "កាតាលីករជួយបន្ថយថាមពលសកម្មកម្ម (Activation Energy) នៃប្រតិកម្ម ធ្វើឱ្យប្រតិកម្មកើតឡើងលឿនជាងមុន ហើយវាមិនត្រូវបានបំផ្លាញ ឬប្រែប្រួលជាតិគីមីនៅចុងបញ្ចប់នៃប្រតិកម្មនោះឡើយ។",
+    },
+    {
+      q: {
+        en: "According to the Brønsted-Lowry theory, what is an acid?",
+        km: "យោងតាមទ្រឹស្តីប្រុងស្តែត-ឡូរី (Brønsted-Lowry) តើអាស៊ីតជាអ្វី?",
+      },
+      options: [
+        "ក. ប្រភេទគីមីដែលចាប់យកប្រូតុង ($H^+$)",
+        "ខ. ប្រភេទគីមីដែលបោះបង់អេឡិចត្រុង",
+        "គ. ប្រភេទគីមីដែលបង្កើនអ៊ីយ៉ុង $OH^-$ ក្នុងទឹក",
+        "ឃ. ប្រភេទគីមីដែលបោះបង់ប្រូតុង ($H^+$)",
+      ],
+      correct: "ឃ. ប្រភេទគីមីដែលបោះបង់ប្រូតុង ($H^+$)",
+      difficulty: "easy",
+      explanation:
+        "តាមប្រុងស្តែត អាស៊ីតគឺជាប្រភេទគីមី (ម៉ូលេគុល ឬអ៊ីយ៉ុង) ទាំងឡាយណាដែលអាចបោះបង់ ឬផ្តល់ប្រូតុង $H^+$។ រីឯបាសជាប្រភេទគីមីដែលចាប់យកប្រូតុង $H^+$។",
+    },
+    {
+      q: {
+        en: "A hydrochloric acid ($HCl$) solution has $[H_3O^+] = 10^{-3} \\text{ M}$. What is the $pH$ of this solution?",
+        km: "សូលុយស្យុងអាស៊ីតក្លរីឌ្រិច ($HCl$) មួយមានកំហាប់ $[H_3O^+] = 10^{-3} \\text{ M}$។ តើសូលុយស្យុងនេះមាន $pH$ ស្មើនឹងប៉ុន្មាន?",
+      },
+      options: ["ក. $1$", "ខ. $3$", "គ. $7$", "ឃ. $11$"],
+      correct: "ខ. $3$",
+      difficulty: "easy",
+      explanation:
+        "តាមរូបមន្ត $pH = -\\log[H_3O^+] = -\\log(10^{-3}) = 3$។",
+    },
+    {
+      q: {
+        en: "For the exothermic equilibrium: $A_{(g)} + B_{(g)} \\rightleftharpoons C_{(g)} + \\text{Heat}$, how does increasing temperature affect equilibrium?",
+        km: "គេមានប្រតិកម្មលំនឹងគីមីបញ្ចេញកម្តៅ៖ $A_{(g)} + B_{(g)} \\rightleftharpoons C_{(g)} + \\text{កម្តៅ}$ តើការដំឡើងសីតុណ្ហភាពនឹងធ្វើឱ្យលំនឹងងាកទៅទិសដៅណា?",
+      },
+      options: [
+        "ក. ងាកទៅទិសដៅច្រាស (ពីស្តាំទៅឆ្វេង)",
+        "ខ. ងាកទៅទិសដៅស្រប (ពីឆ្វេងទៅស្តាំ)",
+        "គ. មិនមានការប្រែប្រួលលំនឹងទេ",
+        "ឃ. ធ្វើឱ្យល្បឿនប្រតិកម្មធ្លាក់ចុះដល់សូន្យ",
+      ],
+      correct: "ក. ងាកទៅទិសដៅច្រាស (ពីស្តាំទៅឆ្វេង)",
+      difficulty: "easy",
+      explanation:
+        "តាមគោលការណ៍ឡឺសាតឺលីយេ កាលណាយើងបន្ថែមសីតុណ្ហភាព ប្រព័ន្ធលំនឹងនឹងរំកិលទៅទិសដៅស្រូបកម្តៅ (ទិសដៅច្រាស) ដើម្បីកាត់បន្ថយកម្តៅដែលបានបន្ថែម។",
+    },
+    {
+      q: {
+        en: "What is the functional group of an ester?",
+        km: "តើបង្គុំនាទីរបស់អេស្ទែ (Ester) មានទម្រង់យ៉ាងដូចម្តេច?",
+      },
+      options: ["ក. $-\\text{OH}$", "ខ. $-\\text{CHO}$", "គ. $-\\text{COOH}$", "ឃ. $-\\text{COO}-$"],
+      correct: "ឃ. $-\\text{COO}-$",
+      difficulty: "easy",
+      explanation:
+        "$-\\text{OH}$ ជាបង្គុំអ៊ីដ្រុកស៊ីល (អាល់កុល), $-\\text{CHO}$ ជាបង្គុំកាបូនីល (អាល់ដេអ៊ីត), $-\\text{COOH}$ ជាបង្គុំកាបុកស៊ីល (អាស៊ីតកាបុកស៊ីលិក), $-\\text{COO}-$ ឬ $-\\text{COOR}$ ជាបង្គុំនាទីរបស់អេស្ទែ។",
+    },
+    {
+      q: {
+        en: "What substances react together in an esterification reaction?",
+        km: "ប្រតិកម្មអេស្ទែកម្ម (Esterification) គឺជាប្រតិកម្មរវាងសារធាតុណាខ្លះ?",
+      },
+      options: [
+        "ក. អាស៊ីតកាបុកស៊ីលិក ជាមួយ អាល់សែន",
+        "ខ. អាស៊ីតកាបុកស៊ីលិក ជាមួយ អាល់កុល",
+        "គ. អាល់កុល ជាមួយ ទឹក",
+        "ឃ. អាល់ដេអ៊ីត ជាមួយ កេតូន",
+      ],
+      correct: "ខ. អាស៊ីតកាបុកស៊ីលិក ជាមួយ អាល់កុល",
+      difficulty: "easy",
+      explanation:
+        "ប្រតិកម្មរវាងអាស៊ីតកាបុកស៊ីលិក និងអាល់កុល បង្កើតបានជា អេស្ទែ និងទឹក ($\\text{R-COOH} + \\text{R'-OH} \\rightleftharpoons \\text{R-COO-R'} + \\text{H}_2\\text{O}$) ដោយប្រើកាតាលីករ $\\text{H}_2\\text{SO}_4$ ខាប់។",
+    },
+    {
+      q: {
+        en: "What are the key characteristics of the direct esterification reaction?",
+        km: "តើប្រតិកម្មអេស្ទែកម្មផ្ទាល់រវាងអាស៊ីតកាបុកស៊ីលិក និងអាល់កុល មានលក្ខណៈសម្បត្តិយ៉ាងដូចម្តេច?",
+      },
+      options: [
+        "ក. លឿន បញ្ចេញកម្តៅ និងចប់សព្វគ្រប់",
+        "ខ. ផ្ទុះខ្លាំង និងមិនអាចត្រឡប់វិញបាន",
+        "គ. យឺត មិនបញ្ចេញកម្តៅ (អាទែម) និងជាប្រតិកម្មទ្វេទិស (មានលំនឹង)",
+        "ឃ. កើតឡើងតែនៅសីតុណ្ហភាពក្រោម $0^\\circ\\text{C}$ ប៉ុណ្ណោះ",
+      ],
+      correct: "គ. យឺត មិនបញ្ចេញកម្តៅ (អាទែម) និងជាប្រតិកម្មទ្វេទិស (មានលំនឹង)",
+      difficulty: "easy",
+      explanation:
+        "ប្រតិកម្មអេស្ទែកម្មជាប្រតិកម្មកម្រិតលំនឹង ដែលមានលក្ខណៈពិសេសបីគឺ៖ យឺត, អាទែម (កម្តៅប្រតិកម្មស្មើនឹងសូន្យ), និង ទ្វេទិស/កំណត់ (មិនចប់សព្វគ្រប់)។",
+    },
+    {
+      q: {
+        en: "What is the IUPAC name of $\\text{CH}_3-\\text{CH}_2-\\text{COOH}$?",
+        km: "តើសមាសធាតុដែលមានរូបមន្តទូទៅ $\\text{CH}_3-\\text{CH}_2-\\text{COOH}$ មានឈ្មោះជាអន្តរជាតិ (IUPAC) ដូចម្តេច?",
+      },
+      options: [
+        "ក. អាស៊ីតមេតាណូអ៊ិច",
+        "ខ. អាស៊ីតអេតាណូអ៊ិច",
+        "គ. អាស៊ីតប្រូប៉ាណូអ៊ិច",
+        "ឃ. អាស៊ីតប៊ុយតាណូអ៊ិច",
+      ],
+      correct: "គ. អាស៊ីតប្រូប៉ាណូអ៊ិច",
+      difficulty: "easy",
+      explanation:
+        "សមាសធាតុនេះមានអាតូមកាបូនចំនួន 3 ($C = 3$ សំដៅលើ «ប្រូប៉ាន») និងមានបង្គុំនាទី $-\\text{COOH}$ ដូច្នេះឈ្មោះរបស់វាគឺ «អាស៊ីតប្រូប៉ាណូអ៊ិច» (Propanoic acid)។",
+    },
+    {
+      q: {
+        en: "What classification of amine is $\\text{CH}_3-\\text{NH}_2$?",
+        km: "តើសមាសធាតុ $\\text{CH}_3-\\text{NH}_2$ ជាអាមីនថ្នាក់ទីប៉ុន្មាន?",
+      },
+      options: [
+        "ក. អាមីនថ្នាក់ទី 1",
+        "ខ. អាមីនថ្នាក់ទី 2",
+        "គ. អាមីនថ្នាក់ទី 3",
+        "ឃ. អាមីនថ្នាក់ទី 4",
+      ],
+      correct: "ក. អាមីនថ្នាក់ទី 1",
+      difficulty: "easy",
+      explanation:
+        "ថ្នាក់នៃអាមីនត្រូវបានកំណត់ដោយចំនួនរ៉ាឌីកាល់អ៊ីដ្រូកាបួរដែលភ្ជាប់ទៅនឹងអាតូមអាសូត ($N$)៖ ភ្ជាប់រ៉ាឌីកាល់ 1 ($-\\text{NH}_2$) ជាអាមីនថ្នាក់ទី 1 (មេទីលអាមីន), ភ្ជាប់រ៉ាឌីកាល់ 2 ($-\\text{NH}-$) ជាអាមីនថ្នាក់ទី 2, ភ្ជាប់រ៉ាឌីកាល់ 3 ($-\\text{N}<$) ជាអាមីនថ្នាក់ទី 3។",
+    },
+
+    // ── MEDIUM DIFFICULTY ──
+    {
+      q: {
+        en: "In the time interval from $t_1 = 10\\text{ s}$ to $t_2 = 30\\text{ s}$, the concentration of product $C$ increases from $0.02\\text{ mol/L}$ to $0.08\\text{ mol/L}$. Calculate the average rate of formation of $C$:",
+        km: "ក្នុងចន្លោះពេលពី $t_1 = 10\\text{ s}$ ទៅ $t_2 = 30\\text{ s}$ កំហាប់នៃអង្គធាតុកើត $C$ កើនឡើងពី $0.02\\text{ mol/L}$ ទៅដល់ $0.08\\text{ mol/L}$។ គណនាល្បឿនមធ្យមកំណកើននៃ $C$ ក្នុងចន្លោះពេលនោះ៖",
+      },
+      options: [
+        "ក. $2.0 \\times 10^{-3}\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$",
+        "ខ. $4.0 \\times 10^{-3}\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$",
+        "គ. $1.5 \\times 10^{-3}\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$",
+        "ឃ. $3.0 \\times 10^{-3}\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$",
+      ],
+      correct: "ឃ. $3.0 \\times 10^{-3}\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$",
+      difficulty: "medium",
+      explanation:
+        "រូបមន្តល្បឿនមធ្យមកំណកើន៖ $V_m(C) = \\frac{\\Delta [C]}{\\Delta t} = \\frac{[C]_2 - [C]_1}{t_2 - t_1} = \\frac{0.08 - 0.02}{30 - 10} = \\frac{0.06}{20} = 3.0 \\times 10^{-3}\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$។",
+    },
+    {
+      q: {
+        en: "For the reaction: $2A + 3B \\rightarrow 4C$, if the rate of disappearance of $A$ at a given moment is $V(A) = 0.04\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$, what is the rate of formation of $C$?",
+        km: "គេមានសមីការប្រតិកម្មតាងដោយ៖ $2A + 3B \\rightarrow 4C$ បើនៅខណៈពេលមួយ ល្បឿនបំបាត់នៃ $A$ គឺ $V(A) = 0.04\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$ តើល្បឿនកំណកើននៃ $C$ ស្មើនឹងប៉ុន្មាន?",
+      },
+      options: [
+        "ក. $0.02\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$",
+        "ខ. $0.04\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$",
+        "គ. $0.08\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$",
+        "ឃ. $0.16\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$",
+      ],
+      correct: "គ. $0.08\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$",
+      difficulty: "medium",
+      explanation:
+        "តាមទំនាក់ទំនងមេគុណស្ដូគ្យូមែត្រនៃប្រតិកម្ម៖ $\\frac{V(A)}{2} = \\frac{V(C)}{4} \\implies V(C) = 2 \\cdot V(A) = 2 \\times 0.04 = 0.08\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$។",
+    },
+    {
+      q: {
+        en: "Sodium hydroxide ($NaOH$) is dissolved in water to yield $[OH^-] = 1.0 \\times 10^{-4}\\text{ M}$ at $25^\\circ\\text{C}$. Find the $pH$ of this solution:",
+        km: "គេរំលាយសូដ្យូមអ៊ីដ្រុកស៊ីត ($NaOH$) ក្នុងទឹក បានសូលុយស្យុងដែលមានកំហាប់អ៊ីយ៉ុងអ៊ីដ្រុកស៊ីត $[OH^-] = 1.0 \\times 10^{-4}\\text{ M}$ នៅ $25^\\circ\\text{C}$។ រកតម្លៃ $pH$ នៃសូលុយស្យុងនេះ៖",
+      },
+      options: ["ក. $10$", "ខ. $4$", "គ. $8$", "ឃ. $12$"],
+      correct: "ក. $10$",
+      difficulty: "medium",
+      explanation:
+        "វិធីទី 1៖ $pOH = -\\log[OH^-] = -\\log(10^{-4}) = 4 \\implies pH = 14 - pOH = 14 - 4 = 10$។ វិធីទី 2៖ តាមផលគុណអ៊ីយ៉ុងនៃទឹក $K_w = [H_3O^+][OH^-] = 10^{-14} \\implies [H_3O^+] = \\frac{10^{-14}}{10^{-4}} = 10^{-10}\\text{ M} \\implies pH = 10$។",
+    },
+    {
+      q: {
+        en: "A buffer solution is prepared with equal concentrations of ethanoic acid $CH_3COOH$ and sodium ethanoate $CH_3COONa$. Given $pK_a = 4.75$, what is the $pH$ of this buffer?",
+        km: "សូលុយស្យុងតំបុង (Buffer solution) មួយផ្សំឡើងពីអាស៊ីតអេតាណូអ៊ិច $CH_3COOH$ និងសូដ្យូមអេតាណូអាត $CH_3COONa$ ដែលមានកំហាប់ស្មើគ្នា។ គេឱ្យ $pK_a(CH_3COOH/CH_3COO^-) = 4.75$។ តម្លៃ $pH$ នៃសូលុយស្យុងតំបុងនេះគឺ៖",
+      },
+      options: ["ក. $7.00$", "ខ. $4.75$", "គ. $9.25$", "ឃ. $2.38$"],
+      correct: "ខ. $4.75$",
+      difficulty: "medium",
+      explanation:
+        "តាមរូបមន្តហង់ឌឺសិន-ហាសែលបាល (Henderson-Hasselbalch)៖ $pH = pK_a + \\log\\frac{[\\text{បាស}]}{[\\text{អាស៊ីត}]}$។ ដោយសារកំហាប់ស្មើគ្នា នោះ $\\frac{[\\text{បាស}]}{[\\text{អាស៊ីត}]} = 1 \\implies \\log(1) = 0$ នាំឱ្យ $pH = pK_a = 4.75$។",
+    },
+    {
+      q: {
+        en: "For the equilibrium reaction in a closed vessel: $2SO_2(g) + O_2(g) \\rightleftharpoons 2SO_3(g)$, what is the correct expression for the equilibrium constant $K_c$?",
+        km: "ចំពោះប្រតិកម្មលំនឹងក្នុងប្រព័ន្ធបិទ៖ $2SO_2(g) + O_2(g) \\rightleftharpoons 2SO_3(g)$ តើកន្សោមថេរលំនឹង $K_c$ ត្រូវសរសេរយ៉ាងដូចម្តេច?",
+      },
+      options: [
+        "ក. $K_c = \\frac{[SO_2]^2 [O_2]}{[SO_3]^2}$",
+        "ខ. $K_c = \\frac{2[SO_3]}{2[SO_2][O_2]}$",
+        "គ. $K_c = \\frac{[SO_3]}{[SO_2][O_2]}$",
+        "ឃ. $K_c = \\frac{[SO_3]^2}{[SO_2]^2 [O_2]}$",
+      ],
+      correct: "ឃ. $K_c = \\frac{[SO_3]^2}{[SO_2]^2 [O_2]}$",
+      difficulty: "medium",
+      explanation:
+        "ថេរលំនឹង $K_c$ គឺជាផលធៀបរវាងផលគុណកំហាប់អង្គធាតុកើតលើផលគុណកំហាប់អង្គធាតុប្រតិករនៅពេលលំនឹង ដោយលើកជាស្វ័យគុណតាមមេគុណស្ដូគ្យូមែត្ររៀងៗខ្លួន៖ $K_c = \\frac{[SO_3]^2}{[SO_2]^2 [O_2]}$។",
+    },
+    {
+      q: {
+        en: "For the gaseous equilibrium: $N_2(g) + 3H_2(g) \\rightleftharpoons 2NH_3(g)$, how does increasing pressure (by reducing volume) affect equilibrium?",
+        km: "គេមានលំនឹងឧស្ម័ន៖ $N_2(g) + 3H_2(g) \\rightleftharpoons 2NH_3(g)$ កាលណាយើងបង្កើនសម្ពាធលើប្រព័ន្ធ (ដោយបន្ថយមាឌ) តើលំនឹងនឹងមានបម្លាស់ប្តូរយ៉ាងដូចម្តេច?",
+      },
+      options: [
+        "ក. ងាកទៅទិសដៅស្រប (ពីឆ្វេងទៅស្តាំ)",
+        "ខ. ងាកទៅទិសដៅច្រាស (ពីស្តាំទៅឆ្វេង)",
+        "គ. មិនមានការប្រែប្រួលទេ ព្រោះជាឧស្ម័នដូចគ្នា",
+        "ឃ. ថេរលំនឹង $K_c$ នឹងកើនឡើងទ្វេដង",
+      ],
+      correct: "ក. ងាកទៅទិសដៅស្រប (ពីឆ្វេងទៅស្តាំ)",
+      difficulty: "medium",
+      explanation:
+        "តាមគោលការណ៍ឡឺសាតឺលីយេ ការបង្កើនសម្ពាធនឹងធ្វើឱ្យលំនឹងរំកិលទៅទិសដៅណាដែលមានចំនួនម៉ូលឧស្ម័នតិចជាង។ អង្គធាតុប្រតិករមាន $1 + 3 = 4\\text{ mol}$ ឧស្ម័ន រីឯអង្គធាតុកើតមានតែ $2\\text{ mol}$ ឧស្ម័ន ដូច្នេះលំនឹងរំកិលទៅស្តាំ (ទិសដៅស្រប)។",
+    },
+    {
+      q: {
+        en: "What are the products of the saponification reaction between an ester and hot sodium hydroxide ($NaOH$)?",
+        km: "ប្រតិកម្មរវាងអេស្ទែជាមួយសូលុយស្យុងបាសខ្លាំង $NaOH$ ក្តៅ ហៅថាប្រតិកម្មសាពូនកម្ម (Saponification)។ តើប្រតិកម្មនេះផ្តល់ផលជាអ្វីខ្លះ?",
+      },
+      options: [
+        "ក. អាស៊ីតកាបុកស៊ីលិក និង អាល់កុល",
+        "ខ. អំបិលការបុកស៊ីឡាត (សាប៊ូ) និង អាល់កុល",
+        "គ. អាល់កាន និង ទឹក",
+        "ឃ. អេទែ និង អំបិល",
+      ],
+      correct: "ខ. អំបិលការបុកស៊ីឡាត (សាប៊ូ) និង អាល់កុល",
+      difficulty: "medium",
+      explanation:
+        "សមីការទូទៅ៖ $\\text{R-COO-R'} + NaOH \\xrightarrow{t^\\circ} \\text{R-COONa} + \\text{R'-OH}$។ អំបិលការបុកស៊ីឡាត ($\\text{R-COONa}$) គឺជាសមាសភាគស្នូលនៃសាប៊ូ។",
+    },
+    {
+      q: {
+        en: "Acid hydrolysis of a triglyceride yields fatty acids and which specific alcohol?",
+        km: "ការធ្វើអ៊ីដ្រូលីសទ្រីគ្លីសេរីត (ខ្លាញ់ ឬប្រេង) ក្នុងមជ្ឈដ្ឋានអាស៊ីត តែងតែផ្តល់ផលជាអាស៊ីតខ្លាញ់ និងសមាសធាតុអាល់កុលមួយប្រភេទ។ តើអាល់កុលនោះមានឈ្មោះអ្វី?",
+      },
+      options: [
+        "ក. អេតាណុល",
+        "ខ. មេតាណុល",
+        "គ. គ្លីសេរ៉ូល (Glycerol / Propan-1,2,3-triol)",
+        "ឃ. អេទីឡែនគ្លីកុល",
+      ],
+      correct: "គ. គ្លីសេរ៉ូល (Glycerol / Propan-1,2,3-triol)",
+      difficulty: "medium",
+      explanation:
+        "ទ្រីគ្លីសេរីតគឺជាទ្រីអេស្ទែនៃគ្លីសេរ៉ូលជាមួយអាស៊ីតខ្លាញ់។ ដូច្នេះនៅពេលរងអ៊ីដ្រូលីស វានឹងបង្កើតឡើងវិញនូវអាស៊ីតខ្លាញ់ចំនួន 3 ម៉ូលេគុល និង គ្លីសេរ៉ូល (គ្លីសេរីន) ចំនួន 1 ម៉ូលេគុល។",
+    },
+    {
+      q: {
+        en: "Are amines (such as $\\text{CH}_3\\text{NH}_2$) acidic or basic, and why?",
+        km: "តើអាមីន (ដូចជា $\\text{CH}_3\\text{NH}_2$) មានលក្ខណៈសម្បត្តិជាអាស៊ីត ឬបាស ហើយព្រោះអ្វី?",
+      },
+      options: [
+        "ក. ជាបាស ព្រោះអាតូមអាសូត ($N$) មានទ្វេអេឡិចត្រុងសេរី (Lone pair) អាចចាប់យកប្រូតុង $H^+$",
+        "ខ. ជាអាស៊ីត ព្រោះវាអាចបោះបង់ប្រូតុង $H^+$ យ៉ាងងាយ",
+        "គ. ជាសារធាតុអព្យាក្រឹត មិនមានប្រតិកម្មជាមួយអាស៊ីតឡើយ",
+        "ឃ. ជាអុកស៊ីតករខ្លាំង",
+      ],
+      correct:
+        "ក. ជាបាស ព្រោះអាតូមអាសូត ($N$) មានទ្វេអេឡិចត្រុងសេរី (Lone pair) អាចចាប់យកប្រូតុង $H^+$",
+      difficulty: "medium",
+      explanation:
+        "អាតូមអាសូតក្នុងម៉ូលេគុលអាមីនមានគូអេឡិចត្រុងសេរីមួយគូ ដែលអាចទទួលប្រូតុង $H^+$ ពីទឹក ឬអាស៊ីតបាន តាមសមីការ៖ $\\text{R-NH}_2 + H_2O \\rightleftharpoons \\text{R-NH}_3^+ + OH^-$ ធ្វើឱ្យសូលុយស្យុងមានលក្ខណៈជាបាសខ្សោយ ($pH > 7$)។",
+    },
+    {
+      q: {
+        en: "When two amino acids undergo a condensation reaction, what is the resulting linkage connecting them called?",
+        km: "នៅពេលអាស៊ីតអាមីណេពីរម៉ូលេគុលធ្វើប្រតិកម្មបញ្ចូលគ្នា (Condensation) តើចំណងដែលភ្ជាប់រវាងម៉ូលេគុលទាំងពីរត្រូវបានហៅថាអ្វី?",
+      },
+      options: [
+        "ក. ចំណងអេស្ទែ ($-\\text{COO}-$)",
+        "ខ. ចំណងអ៊ីដ្រូសែន",
+        "គ. ចំណងប៉ិបទីត ($-\\text{CO}-\\text{NH}-$)",
+        "ឃ. ចំណងគ្លីកូស៊ីឌីក",
+      ],
+      correct: "គ. ចំណងប៉ិបទីត ($-\\text{CO}-\\text{NH}-$)",
+      difficulty: "medium",
+      explanation:
+        "បង្គុំកាបុកស៊ីល ($-\\text{COOH}$) នៃអាស៊ីតអាមីណេទីមួយ ភ្ជាប់ជាមួយបង្គុំអាមីន ($-\\text{NH}_2$) នៃអាស៊ីតអាមីណេទីពីរ ដោយបាត់បង់ម៉ូលេគុលទឹកមួយ បង្កើតបានជាចំណងប៉ិបទីត ឬចំណងអាមីត ($-\\text{CO}-\\text{NH}-$)។",
+    },
+
+    // ── HARD DIFFICULTY ──
+    {
+      q: {
+        en: "For the reaction $2A + B \\rightarrow C$, initial rate experiments yield:\n• Exp 1: $[A]_0 = 0.1\\text{ M}, [B]_0 = 0.1\\text{ M} \\implies v_0 = 2.0 \\times 10^{-3}\\text{ M}\\cdot\\text{s}^{-1}$\n• Exp 2: $[A]_0 = 0.2\\text{ M}, [B]_0 = 0.1\\text{ M} \\implies v_0 = 8.0 \\times 10^{-3}\\text{ M}\\cdot\\text{s}^{-1}$\n• Exp 3: $[A]_0 = 0.1\\text{ M}, [B]_0 = 0.2\\text{ M} \\implies v_0 = 4.0 \\times 10^{-3}\\text{ M}\\cdot\\text{s}^{-1}$\nWhat is the rate law equation for this reaction?",
+        km: "ចំពោះប្រតិកម្ម $2A + B \\rightarrow C$ គេធ្វើពិសោធន៍វាស់ល្បឿនដើម $v_0$ ទទួលបានលទ្ធផលដូចខាងក្រោម៖\n• ពិសោធន៍ទី 1៖ $[A]_0 = 0.1\\text{ M}, [B]_0 = 0.1\\text{ M} \\implies v_0 = 2.0 \\times 10^{-3}\\text{ M}\\cdot\\text{s}^{-1}$\n• ពិសោធន៍ទី 2៖ $[A]_0 = 0.2\\text{ M}, [B]_0 = 0.1\\text{ M} \\implies v_0 = 8.0 \\times 10^{-3}\\text{ M}\\cdot\\text{s}^{-1}$\n• ពិសោធន៍ទី 3៖ $[A]_0 = 0.1\\text{ M}, [B]_0 = 0.2\\text{ M} \\implies v_0 = 4.0 \\times 10^{-3}\\text{ M}\\cdot\\text{s}^{-1}$\nតើសមីការច្បាប់ល្បឿននៃប្រតិកម្មនេះមានទម្រង់ដូចម្តេច?",
+      },
+      options: [
+        "ក. $v = k[A][B]$",
+        "ខ. $v = k[A][B]^2$",
+        "គ. $v = k[A]^2[B]^2$",
+        "ឃ. $v = k[A]^2[B]$",
+      ],
+      correct: "ឃ. $v = k[A]^2[B]$",
+      difficulty: "hard",
+      explanation:
+        "តាមទម្រង់ទូទៅ $v = k[A]^x[B]^y$។ ប្រៀបធៀបពិសោធន៍ទី 1 និងទី 2 ($[B]$ ថេរ)៖ $\\frac{v_2}{v_1} = \\left(\\frac{0.2}{0.1}\\right)^x \\implies \\frac{8.0 \\times 10^{-3}}{2.0 \\times 10^{-3}} = 2^x \\implies 4 = 2^x \\implies x = 2$។ ប្រៀបធៀបពិសោធន៍ទី 1 និងទី 3 ($[A]$ ថេរ)៖ $\\frac{v_3}{v_1} = \\left(\\frac{0.2}{0.1}\\right)^y \\implies \\frac{4.0 \\times 10^{-3}}{2.0 \\times 10^{-3}} = 2^y \\implies 2 = 2^y \\implies y = 1$។ នាំឱ្យសមីការច្បាប់ល្បឿនគឺ $v = k[A]^2[B]$។",
+    },
+    {
+      q: {
+        en: "For the decomposition $2H_2O_2(aq) \\rightarrow 2H_2O(l) + O_2(g)$, the tangent to the $[H_2O_2]$ vs $t$ curve at $t = 100\\text{ s}$ intersects the concentration axis at $0.08\\text{ mol/L}$ and the time axis at $400\\text{ s}$. What is the instantaneous rate of disappearance of $H_2O_2$ at $t = 100\\text{ s}$?",
+        km: "គេមានប្រតិកម្មបំបែកអ៊ីដ្រូសែនពែអុកស៊ីត៖ $2H_2O_2(aq) \\rightarrow 2H_2O(l) + O_2(g)$។ តាមរយៈក្រាបបំរែបំរួលកំហាប់ $[H_2O_2]$ ធៀបនឹងពេល $t$ បន្ទាត់ប៉ះនឹងក្រាបត្រង់ខណៈ $t = 100\\text{ s}$ កាត់អ័ក្សកំហាប់ត្រង់ $0.08\\text{ mol/L}$ និងកាត់អ័ក្សពេលត្រង់ $400\\text{ s}$។ តើល្បឿនខណៈនៃការបំបាត់ $H_2O_2$ ត្រង់ខណៈ $t = 100\\text{ s}$ មានតម្លៃប៉ុន្មាន?",
+      },
+      options: [
+        "ក. $4.0 \\times 10^{-4}\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$",
+        "ខ. $8.0 \\times 10^{-4}\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$",
+        "គ. $2.0 \\times 10^{-4}\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$",
+        "ឃ. $1.0 \\times 10^{-4}\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$",
+      ],
+      correct: "គ. $2.0 \\times 10^{-4}\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$",
+      difficulty: "hard",
+      explanation:
+        "ល្បឿនខណៈនៃការបំបាត់អង្គធាតុប្រតិករស្មើនឹងតម្លៃដាច់ខាតនៃមេគុណប្រាប់ទិសបន្ទាត់ប៉ះក្រាប៖ $v_{\\text{បំបាត់}} = -\\left(\\frac{d[H_2O_2]}{dt}\\right)_{t=100} = -\\left(\\frac{0 - 0.08}{400 - 0}\\right) = \\frac{0.08}{400} = 2.0 \\times 10^{-4}\\text{ mol}\\cdot\\text{L}^{-1}\\cdot\\text{s}^{-1}$។",
+    },
+    {
+      q: {
+        en: "Calculate the $pH$ of a methanoic acid ($HCOOH$) solution of concentration $C = 0.1\\text{ M}$ at $25^\\circ\\text{C}$, given $K_a = 1.8 \\times 10^{-4}$ and $\\log(4.24) \\approx 0.63$:",
+        km: "គណនាតម្លៃ $pH$ នៃសូលុយស្យុងអាស៊ីតមេតាណូអ៊ិច ($HCOOH$) កំហាប់ $C = 0.1\\text{ M}$ នៅ $25^\\circ\\text{C}$ ដោយស្គាល់ថេរកម្រិតអាស៊ីត $K_a = 1.8 \\times 10^{-4}$ (គេឱ្យ $\\log(4.24) \\approx 0.63$)៖",
+      },
+      options: ["ក. $2.37$", "ខ. $1.00$", "គ. $2.87$", "ឃ. $3.74$"],
+      correct: "ក. $2.37$",
+      difficulty: "hard",
+      explanation:
+        "ដោយសារ $\\frac{C}{K_a} = \\frac{0.1}{1.8 \\times 10^{-4}} \\approx 555 > 100$ យើងអាចចាត់ទុកការបែកជាអ៊ីយ៉ុងមានកម្រិតតិចតួច ($C - [H_3O^+] \\approx C$)។ រូបមន្ត៖ $[H_3O^+] = \\sqrt{K_a \\cdot C} = \\sqrt{1.8 \\times 10^{-4} \\times 0.1} = \\sqrt{18 \\times 10^{-6}} \\approx 4.24 \\times 10^{-3}\\text{ M}$។ នាំឱ្យ $pH = -\\log(4.24 \\times 10^{-3}) = 3 - \\log(4.24) = 3 - 0.63 = 2.37$។",
+    },
+    {
+      q: {
+        en: "A monoprotic weak acid $HA$ solution of concentration $0.05\\text{ M}$ has $pH = 3.0$. What is the degree of ionization (ionization percentage $\\alpha$) of this acid?",
+        km: "សូលុយស្យុងអាស៊ីតខ្សោយម៉ូណូប្រូទិច $HA$ មួយមានកំហាប់ $0.05\\text{ M}$ និងមាន $pH = 3.0$។ តើអាស៊ីតនេះមានអត្រាបំបែកជាអ៊ីយ៉ុង (កម្រិតអ៊ីយ៉ូដកម្ម $\\alpha$) ស្មើនឹងប៉ុន្មានភាគរយ?",
+      },
+      options: ["ក. $1\\%$", "ខ. $2\\%$", "គ. $5\\%$", "ឃ. $10\\%$"],
+      correct: "ខ. $2\\%$",
+      difficulty: "hard",
+      explanation:
+        "តាម $pH = 3.0 \\implies [H_3O^+] = 10^{-3}\\text{ M}$។ អត្រាបំបែកជាអ៊ីយ៉ុង៖ $\\alpha = \\frac{[H_3O^+]}{C} \\times 100\\% = \\frac{10^{-3}}{0.05} \\times 100\\% = \\frac{0.001}{0.05} \\times 100\\% = 2\\%$។",
+    },
+    {
+      q: {
+        en: "Titrating $20\\text{ mL}$ of weak acid $CH_3COOH$ ($0.1\\text{ M}$) with strong base $NaOH$ ($0.1\\text{ M}$): at the equivalence point, what is the nature and approximate $pH$ of the solution?",
+        km: "គេធ្វើការក្រិតសូលុយស្យុងអាស៊ីតខ្សោយ $CH_3COOH$ ចំណុះ $20\\text{ mL}$ កំហាប់ $0.1\\text{ M}$ ដោយសូលុយស្យុងបាសខ្លាំង $NaOH$ កំហាប់ $0.1\\text{ M}$។ នៅត្រង់ចំណុចសមមូល (Equivalence point) តើសូលុយស្យុងមានលក្ខណៈបែបណា និងមានតម្លៃ $pH$ ប្រហាក់ប្រហែលប៉ុន្មាន?",
+      },
+      options: [
+        "ក. $pH = 7$ (អព្យាក្រឹត) ព្រោះអាស៊ីតនិងបាសមានចំនួនម៉ូលស្មើគ្នា",
+        "ខ. $pH < 7$ (អាស៊ីត) ព្រោះអាស៊ីតខ្សោយមានឥទ្ធិពលខ្លាំងជាង",
+        "គ. $pH > 7$ (បាស) ព្រោះកើតមានអ៊ីយ៉ុង $CH_3COO^-$ ដែលរងអ៊ីដ្រូលីសផ្តល់ $OH^-$",
+        "ឃ. $pH = 13$ ព្រោះលើសកំហាប់ $NaOH$ ខ្លាំង",
+      ],
+      correct:
+        "គ. $pH > 7$ (បាស) ព្រោះកើតមានអ៊ីយ៉ុង $CH_3COO^-$ ដែលរងអ៊ីដ្រូលីសផ្តល់ $OH^-$",
+      difficulty: "hard",
+      explanation:
+        "នៅចំណុចសមមូល អាស៊ីតនិងបាសប្រតិកម្មអស់ទាំងស្រុង ក្លាយជាអំបិល $CH_3COONa$។ អ៊ីយ៉ុងអេតាណូអាត $CH_3COO^-$ ជាបាសឆ្លាស់នៃអាស៊ីតខ្សោយ វារងអ៊ីដ្រូលីសក្នុងទឹកតាមសមីការ៖ $CH_3COO^- + H_2O \\rightleftharpoons CH_3COOH + OH^-$ ធ្វើឱ្យសូលុយស្យុងនៅចំណុចសមមូលមានលក្ខណៈជាបាស ($pH \\approx 8.7$ ទៅ $9.0$)។",
+    },
+    {
+      q: {
+        en: "For the gas equilibrium $N_2O_4(g) \\rightleftharpoons 2NO_2(g)$ at $T = 300\\text{ K}$, what is the relationship between $K_p$ and $K_c$? (where $R$ is the ideal gas constant)",
+        km: "ចំពោះប្រតិកម្មលំនឹងឧស្ម័ន៖ $N_2O_4(g) \\rightleftharpoons 2NO_2(g)$ នៅសីតុណ្ហភាព $T = 300\\text{ K}$។ តើទំនាក់ទំនងត្រឹមត្រូវរវាង $K_p$ និង $K_c$ គឺជាអ្វី? (ដែល $R$ ជាថេរឧស្ម័នបរិសុទ្ធ)",
+      },
+      options: [
+        "ក. $K_p = K_c(RT)$",
+        "ខ. $K_p = K_c$",
+        "គ. $K_p = K_c(RT)^{-1}$",
+        "ឃ. $K_p = K_c(RT)^2$",
+      ],
+      correct: "ក. $K_p = K_c(RT)$",
+      difficulty: "hard",
+      explanation:
+        "រូបមន្តទំនាក់ទំនងទូទៅ៖ $K_p = K_c(RT)^{\\Delta n}$ ដែល $\\Delta n = n_{\\text{ឧស្ម័នផល}} - n_{\\text{ឧស្ម័នប្រតិករ}}$។ នៅទីនេះ $\\Delta n = 2 - 1 = 1$ នាំឱ្យ $K_p = K_c(RT)^1 = K_c(RT)$។",
+    },
+    {
+      q: {
+        en: "In a $1\\text{ L}$ closed vessel, $0.4\\text{ mol}$ of $HI$ gas is placed at constant temperature. Equilibrium forms via: $2HI(g) \\rightleftharpoons H_2(g) + I_2(g)$. At equilibrium, $0.05\\text{ mol}$ of $I_2$ is present. Calculate the equilibrium constant $K_c$:",
+        km: "ក្នុងធុងបិទជិតមាឌ $1\\text{ L}$ មួយ គេដាក់ឧស្ម័ន $HI$ ចំនួន $0.4\\text{ mol}$ នៅសីតុណ្ហភាពថេរមួយ។ លំនឹងកើតមានឡើងតាមសមីការ៖ $2HI(g) \\rightleftharpoons H_2(g) + I_2(g)$។ នៅពេលប្រព័ន្ធឈានដល់លំនឹង គេឃើញមានឧស្ម័ន $I_2$ កើតឡើងចំនួន $0.05\\text{ mol}$។ គណនាតម្លៃថេរលំនឹង $K_c$ នៃប្រតិកម្មនេះ៖",
+      },
+      options: [
+        "ក. $\\frac{1}{16}$",
+        "ខ. $\\frac{1}{64}$",
+        "គ. $0.25$",
+        "ឃ. $\\frac{1}{36}$",
+      ],
+      correct: "ឃ. $\\frac{1}{36}$",
+      difficulty: "hard",
+      explanation:
+        "តារាងបំរែបំរួលម៉ូលក្នុងមាឌ $1\\text{ L}$ ($[ ] = n$)៖ ពេលដើម៖ $[HI]_0 = 0.4\\text{ M}, [H_2]_0 = 0, [I_2]_0 = 0$។ ពេលប្រតិកម្ម៖ បង្កើតបាន $[I_2] = 0.05\\text{ M} \\implies [H_2] = 0.05\\text{ M}$ និងបាត់បង់ $[HI] = 2 \\times 0.05 = 0.1\\text{ M}$។ ពេលលំនឹង៖ $[HI]_{eq} = 0.4 - 0.1 = 0.3\\text{ M}$, $[H_2]_{eq} = 0.05\\text{ M}$, $[I_2]_{eq} = 0.05\\text{ M}$។ $K_c = \\frac{[H_2][I_2]}{[HI]^2} = \\frac{0.05 \\times 0.05}{(0.3)^2} = \\frac{0.0025}{0.09} = \\frac{25}{900} = \\frac{1}{36}$។",
+    },
+    {
+      q: {
+        en: "Reaction between $1\\text{ mol}$ of $CH_3COOH$ and $1\\text{ mol}$ of $C_2H_5OH$ reaches equilibrium producing $\\frac{2}{3}\\text{ mol}$ of ester. If initial ethanol is increased to $3\\text{ mol}$ with $1\\text{ mol}$ acid, what is the new equilibrium ester yield?",
+        km: "គេឱ្យអាស៊ីតអេតាណូអ៊ិច ($CH_3COOH$) ចំនួន $1\\text{ mol}$ ធ្វើប្រតិកម្មជាមួយអេតាណុល ($C_2H_5OH$) ចំនួន $1\\text{ mol}$ ដោយមានកាតាលីករអាស៊ីត។ នៅពេលលំនឹង គេទទួលបានអេស្ទែចំនួន $\\frac{2}{3}\\text{ mol}$។ ប្រសិនបើគេបង្កើនបរិមាណអេតាណុលដើមរហូតដល់ $3\\text{ mol}$ (ដោយរក្សាអាស៊ីត $1\\text{ mol}$ ដដែល) តើចំនួនម៉ូលអេស្ទែកើតឡើងនៅពេលលំនឹងថ្មីមានតម្លៃប្រហែលប៉ុន្មាន?",
+      },
+      options: [
+        "ក. $0.67\\text{ mol}$",
+        "ខ. $0.90\\text{ mol}$",
+        "គ. $1.00\\text{ mol}$",
+        "ឃ. $1.50\\text{ mol}$",
+      ],
+      correct: "ខ. $0.90\\text{ mol}$",
+      difficulty: "hard",
+      explanation:
+        "ជំហានទី 1 (រក $K$ នៃអេស្ទែកម្ម)៖ $CH_3COOH + C_2H_5OH \\rightleftharpoons CH_3COOC_2H_5 + H_2O$។ នៅលំនឹងដើម៖ $n_{\\text{ester}} = n_{\\text{water}} = \\frac{2}{3}\\text{ mol}$, $n_{\\text{acid}} = n_{\\text{alc}} = 1 - \\frac{2}{3} = \\frac{1}{3}\\text{ mol} \\implies K = \\frac{(\\frac{2}{3})(\\frac{2}{3})}{(\\frac{1}{3})(\\frac{1}{3})} = 4$។ ជំហានទី 2 (លំនឹងថ្មីដែលមាន $1\\text{ mol}$ អាស៊ីត និង $3\\text{ mol}$ អាល់កុល)៖ តាង $x$ ជាចំនួនម៉ូលអេស្ទែកើតឡើង៖ $K = \\frac{x^2}{(1 - x)(3 - x)} = 4 \\implies x^2 = 4(x^2 - 4x + 3) \\implies 3x^2 - 16x + 12 = 0$។ ដោះស្រាយសមីការដឺក្រេទី 2 (យក $x < 1$) នាំឱ្យបាន $x \\approx 0.90\\text{ mol}$។",
+    },
+    {
+      q: {
+        en: "Saponification of $0.02\\text{ mol}$ of a simple triglyceride with excess $NaOH$ yields $18.36\\text{ g}$ of sodium carboxylate soap. Calculate the molar mass of the constituent fatty acid ($Na = 23, O = 16, C = 12, H = 1$):",
+        km: "គេធ្វើសាពូនកម្មលើទ្រីគ្លីសេរីតសាមញ្ញមួយប្រភេទ (បង្កើតឡើងពីគ្លីសេរ៉ូល និងអាស៊ីតខ្លាញ់តែមួយប្រភេទ) ចំនួន $0.02\\text{ mol}$ ដោយប្រើសូលុយស្យុង $NaOH$ លើស។ បន្ទាប់ពីប្រតិកម្មចប់សព្វគ្រប់ គេទទួលបានអំបិលសូដ្យូមការបុកស៊ីឡាត (សាប៊ូ) ទម្ងន់សរុប $18.36\\text{ g}$។ គណនាម៉ាសម៉ូលនៃអាស៊ីតខ្លាញ់ដែលបង្កើតទ្រីគ្លីសេរីតនោះ (គេឱ្យ $Na = 23, O = 16, C = 12, H = 1$)៖",
+      },
+      options: [
+        "ក. $256\\text{ g/mol}$",
+        "ខ. $282\\text{ g/mol}$",
+        "គ. $284\\text{ g/mol}$",
+        "ឃ. $304\\text{ g/mol}$",
+      ],
+      correct: "គ. $284\\text{ g/mol}$",
+      difficulty: "hard",
+      explanation:
+        "ទ្រីគ្លីសេរីត 1 ម៉ូល ផ្តល់អំបិលសាប៊ូ $R-COONa$ ចំនួន 3 ម៉ូល៖ $n_{\\text{សាប៊ូ}} = 3 \\times n_{\\text{triglyceride}} = 3 \\times 0.02 = 0.06\\text{ mol}$។ ម៉ាសម៉ូលនៃអំបិលសាប៊ូ៖ $M(R-COONa) = \\frac{m}{n} = \\frac{18.36}{0.06} = 306\\text{ g/mol}$។ ទំនាក់ទំនងរវាងម៉ាសម៉ូលអាស៊ីតខ្លាញ់ ($R-COOH$) និងអំបិល ($R-COONa$)៖ $M(R-COOH) = M(R-COONa) - M(Na) + M(H) = 306 - 23 + 1 = 284\\text{ g/mol}$ (ត្រូវនឹងអាស៊ីតស្តេអារិច $C_{17}H_{35}COOH$)។",
+    },
+    {
+      q: {
+        en: "Alanine has two acid-base equilibrium stages with $pK_{a1} = 2.34$ ($-\\text{COOH}$) and $pK_{a2} = 9.69$ ($-\\text{NH}_3^+$). What is its isoelectric point ($pI$), and what ionic form dominates at that $pH$?",
+        km: "អាស៊ីតអាមីណេ អាឡានីន (Alanine) មានសមីការលំនឹងនៃការបែកជាអ៊ីយ៉ុងពីរដំណាក់កាលជាមួយតម្លៃ $pK_{a1} = 2.34$ (នៃបង្គុំ $-\\text{COOH}$) និង $pK_{a2} = 9.69$ (នៃបង្គុំ $-\\text{NH}_3^+$)។ តើតម្លៃចំណុចអ៊ីសូអគ្គិសនី (Isoelectric point, $pI$) របស់អាឡានីនស្មើនឹងប៉ុន្មាន ហើយនៅកម្រិត $pH$ នោះ អាឡានីនស្ថិតក្នុងទម្រង់ជាអ៊ីយ៉ុងបែបណា?",
+      },
+      options: [
+        "ក. $pI = 6.02$ និងស្ថិតក្នុងទម្រង់ជាស្វ៊ីទែរីយ៉ុង (Zwitterion / អ៊ីយ៉ុងឌីប៉ូល)",
+        "ខ. $pI = 7.00$ និងស្ថិតក្នុងទម្រង់ជាកាចុងសុទ្ធ ($+$)",
+        "គ. $pI = 6.02$ និងស្ថិតក្នុងទម្រង់ជាអានីយ៉ុងសុទ្ធ ($-$)",
+        "ឃ. $pI = 12.03$ និងគ្មានបន្ទុកអគ្គិសនីទាំងស្រុង",
+      ],
+      correct:
+        "ក. $pI = 6.02$ និងស្ថិតក្នុងទម្រង់ជាស្វ៊ីទែរីយ៉ុង (Zwitterion / អ៊ីយ៉ុងឌីប៉ូល)",
+      difficulty: "hard",
+      explanation:
+        "ចំពោះអាស៊ីតអាមីណេធម្មតា (គ្មានបង្គុំអ៊ីយ៉ូដកម្មនៅលើខ្សែខ្នែង)៖ $pI = \\frac{pK_{a1} + pK_{a2}}{2} = \\frac{2.34 + 9.69}{2} = \\frac{12.03}{2} = 6.015 \\approx 6.02$។ ត្រង់ចំណុច $pI$ ម៉ូលេគុលអាស៊ីតអាមីណេមានបន្ទុកបូកសរុបស្មើនឹងសូន្យ ដោយសារវាស្ថិតក្នុងទម្រង់ជា «ស្វ៊ីទែរីយ៉ុង» ($H_3N^+-CH(R)-COO^-$) ដែលមានបន្ទុកវិជ្ជមានលើ $-NH_3^+$ និងបន្ទុកអវិជ្ជមានលើ $-COO^-$ ក្នុងពេលតែមួយ។",
+    },
+  ],
 };

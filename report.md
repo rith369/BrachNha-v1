@@ -15,6 +15,85 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 28 Sep 2026 — Biology Curriculum: MoEYS Summary PDF Chapter 4 Extracted, KruAI Grounding & Flashcards Added
+
+Commit `pending`. **No database step needed.**
+
+**Why.** To provide authentic, high-yield Grade 12 Bac II exam preparation for Biology Chapter 4 ("នាទីរបស់ប្រូតេអ៊ីនក្នុងសារពាង្គកាយ" / Role of Proteins in Organisms), the official MoEYS Biology Summary PDF (Pages 24–31) was extracted, transcribed, and integrated across the study path, KruAI AI search grounding, and flashcard practice.
+
+**What changed.**
+- **Transcribed Official MoEYS Chapter 4 Summary Material (Pages 24–31):**
+  - **Lesson 1: អាស៊ីតអាមីណេ (Amino Acids, Pages 24–27):** General structure of amino acids (central carbon, amino group $-\mathrm{NH_2}$, carboxyl group $-\mathrm{COOH}$, hydrogen $-\mathrm{H}$, variable radical $-\mathrm{R}$); amphoteric nature and zwitterion form at $\mathrm{pH = 7}$; the 20 standard amino acids; neurotransmitter and metabolic roles (Gly, Glu, Ser, Tyr, Arg, Citrulline, Ornithine); peptide bond formation ($-\mathrm{CO-NH}-$) via condensation; and dipeptides, tripeptides, polypeptides, and proteins.
+  - **Lesson 2: ប្រូតេអ៊ីន (Proteins, Pages 27–29):** The 4 structural levels of proteins: Primary (amino acid sequence linked by peptide bonds), Secondary ($\alpha$-helix and $\beta$-pleated sheet stabilized by hydrogen bonds), Tertiary (3D globular folding stabilized by hydrogen bonds, ionic bonds, hydrophobic interactions, and disulfide $-\mathrm{S-S}-$ bridges; protein domains), and Quaternary (multi-subunit assemblies like hemoglobin with 4 chains and heme-$Fe^{2+}$); 6 essential protein functions (catalytic, structural, contractile/movement, defensive, regulatory/hormonal, and transport); fibrous vs. globular proteins; simple vs. conjugated proteins; and denaturation factors (heat $>45\text{--}60^\circ\text{C}$, extreme $\mathrm{pH}$, heavy metals $\mathrm{Hg/Pb}$, detergents, salt concentration, mechanical agitation).
+  - **Lesson 3: អង់ស៊ីម (Enzymes, Pages 29–31):** Biological catalysis mechanism and activation energy reduction; high catalytic efficiency (catalase decomposes $5\text{ million}$ $\mathrm{H_2O_2}$ molecules/min); lock-and-key / induced fit specificity; suffix "-ase"; 6 major enzyme classes (Oxidoreductases, Transferases, Hydrolases, Lyases, Isomerases, Ligases/Synthetases); and factors influencing enzyme activity (optimum temperature $40\text{--}45^\circ\text{C}$, reversible low-temperature inactivation at $0^\circ\text{C}$, thermal denaturation, optimum $\mathrm{pH}$ curves for pepsin, amylase, and trypsin, substrate/enzyme concentration saturation $V_{\max}$, and organic coenzymes / inorganic metal cofactors).
+- **Enriched KruAI Search Grounding ([`server/textbook-search.ts`](file:///e:/Kru%20AI/Brachnha-v2/server/textbook-search.ts)):**
+  - Added 5 rich textbook search chunks (`BIOLOGY_CH4_SECTIONS`):
+    - `tb:bio:ch4:amino-acid-structure-peptides`
+    - `tb:bio:ch4:protein-structures-four-levels`
+    - `tb:bio:ch4:protein-functions-denaturation`
+    - `tb:bio:ch4:enzyme-catalysis-classification`
+    - `tb:bio:ch4:enzyme-activity-factors`
+  - Integrated into `searchBiologyTextbook()` so student questions about protein folding, peptide bonds, denaturation, or enzyme kinetics receive exact MoEYS curriculum-grounded answers.
+- **Added 24 Official Flashcards ([`src/data/practice.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/practice.ts)):**
+  - Authored complete practice decks for Chapter 4:
+    - `biology-4-1`: 8 cards covering amino acid structure, amphoteric zwitterion, 20 amino acids, peptide bonds, condensation, and hydrolysis.
+    - `biology-4-2`: 8 cards covering 4 protein structural levels, domains, 6 protein functions, fibrous vs globular, simple vs conjugated, and denaturation mechanisms.
+    - `biology-4-3`: 8 cards covering enzyme catalysis, lock & key specificity, 6 enzyme classes, hydrolase substrates, temperature curves, optimum pH, saturation kinetics, and cofactors.
+- **Updated Section Titles on Study Path ([`src/features/lessons/sessions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/features/lessons/sessions.ts)):**
+  - Replaced generic placeholder labels with authentic MoEYS section titles for Lesson 4.1 ("ទម្រង់អាស៊ីតអាមីណេ", "ប្រភេទនៃអាស៊ីតអាមីណេ", "ចំណងប៉ិបទីត"), Lesson 4.2 ("រូបផ្គុំ និងទម្រង់ទាំង 4 របស់ប្រូតេអ៊ីន", "នាទីទាំង 6 របស់ប្រូតេអ៊ីន", "ចំណាត់ថ្នាក់ និងការបាត់បង់គុណភាព"), and Lesson 4.3 ("លក្ខណៈទូទៅនៃអង់ស៊ីម", "ចំណាត់ថ្នាក់អង់ស៊ីមទាំង 6 ក្រុម", "កត្តាមានឥទ្ធិពលលើអង់ស៊ីម").
+- **Latin Digits Enforced:** Ran `npm run check:digits` verifying 100% compliance across all new Khmer content.
+
+**What to re-test.**
+- Navigate to `/practice`. Select Biology and check that Flashcard decks for Lessons 4.1, 4.2, and 4.3 are available and interactive.
+- Open KruAI chat (`/chat`) and test asking questions about proteins or enzymes (e.g. "តើប្រូតេអ៊ីនមានទម្រង់ប៉ុន្មានកម្រិត?", "តើសីតុណ្ហភាពមានឥទ្ធិពលយ៉ាងដូចម្តេចលើអង់ស៊ីម?").
+- Navigate to `/subjects/biology` and verify the path displays real section titles for Chapter 4 Lessons 1, 2, and 3.
+
+## 28 Sep 2026 — Game Mode: Chemistry Medium Questions Added
+
+Commit `pending`. **No database step needed.**
+
+**Why.** Following the Basic tier, 10 intermediate Grade 12 Bac II Chemistry questions were authored for the **Medium** difficulty tier in Game mode (`/game`), adding calculations and deeper chemical principles across chemical kinetics, acid-base equilibria, and organic chemistry.
+
+**What changed.**
+- **Authored 10 Chemistry Medium Competition Questions ([`src/data/game-questions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/game-questions.ts)):**
+  - Covers key Grade 12 Bac II Chemistry topics:
+    - **Chemical Kinetics (សំណួរទី 1–2):** Calculating average rate of product formation from concentration changes ($V_m(C) = \frac{\Delta [C]}{\Delta t} = 3.0 \times 10^{-3}\text{ mol}\cdot\text{L}^{-1}\cdot\text{s}^{-1}$); relating reaction rates using stoichiometric coefficients ($2A + 3B \rightarrow 4C \implies V(C) = 2 \cdot V(A) = 0.08\text{ mol}\cdot\text{L}^{-1}\cdot\text{s}^{-1}$).
+    - **Acids and Bases (សំណួរទី 3–4):** $pH$ calculation of strong base $NaOH$ from $[OH^-] = 1.0 \times 10^{-4}\text{ M} \implies pOH = 4 \implies pH = 10$; Henderson-Hasselbalch equation for equimolar buffer solution ($CH_3COOH/CH_3COONa \implies pH = pK_a = 4.75$).
+    - **Chemical Equilibrium (សំណួរទី 5–6):** Equilibrium constant expression $K_c = \frac{[SO_3]^2}{[SO_2]^2 [O_2]}$ for $2SO_2 + O_2 \rightleftharpoons 2SO_3$; Le Chatelier's principle with pressure increase on $N_2(g) + 3H_2(g) \rightleftharpoons 2NH_3(g)$ shifting towards fewer gas moles (forward reaction).
+    - **Organic Chemistry (សំណួរទី 7–10):** Saponification of esters with hot $NaOH$ producing carboxylate salts (soap) and alcohols; acid hydrolysis of triglycerides yielding glycerol (propan-1,2,3-triol) and 3 fatty acid molecules; basicity of amines due to nitrogen's lone electron pair accepting a proton $H^+$; and peptide bond ($-\text{CO}-\text{NH}-$) condensation between amino acids.
+  - **Balanced Option Distribution:** Correct answers distributed evenly across positions (`ក`: 3, `ខ`: 2, `គ`: 3, `ឃ`: 2), avoiding clustering on option 1.
+  - **Latin Digits Enforced:** Strict Latin digits (0-9) used in all concentrations, scientific notation, steps, and formulas in compliance with `npm run check:digits`.
+  - **Comprehensive Explanations:** Step-by-step mathematical calculations and chemical explanations provided for student review.
+
+**What to re-test.**
+- Navigate to `/game/create`.
+- Select Chemistry ("គីមីវិទ្យា") and the **Medium** ("មធ្យម") difficulty chip.
+- Start a competition and play through the 10 questions.
+- Verify KaTeX chemical formulas, rate calculations, answer review, and explanations display correctly.
+
+## 28 Sep 2026 — Game Mode: Chemistry Basic Questions Added & Subject Enabled
+
+Commit `pending`. **No database step needed.**
+
+**Why.** To expand the Game feature (`/game`) with authentic Grade 12 Bac II Chemistry preparation, 10 foundational Chemistry questions were authored for the **Basic** difficulty tier. Adding these questions automatically unlocks Chemistry as a playable subject on the Game setup screen (`/game/create`).
+
+**What changed.**
+- **Authored 10 Chemistry Basic Competition Questions ([`src/data/game-questions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/game-questions.ts)):**
+  - Covers core Grade 12 Bac II Chemistry concepts:
+    - **Chemical Kinetics (សំណួរទី 1–2):** Reaction rate factors (temperature, reactant concentration, effective collisions); catalyst mechanisms (reducing activation energy, remaining chemically unchanged).
+    - **Acids and Bases (សំណួរទី 3–4):** Brønsted-Lowry acid definition (proton $H^+$ donor); pH calculation of hydrochloric acid ($[H_3O^+] = 10^{-3}\text{ M} \implies pH = 3$).
+    - **Chemical Equilibrium (សំណួរទី 5):** Le Chatelier's principle applied to an exothermic reaction ($A_{(g)} + B_{(g)} \rightleftharpoons C_{(g)} + \text{Heat}$) shifting reverse upon temperature increase.
+    - **Organic Chemistry (សំណួរទី 6–10):** Ester functional group ($-\text{COO}-$); direct esterification reactants ($\text{R-COOH} + \text{R'-OH} \rightleftharpoons \text{R-COOR'} + \text{H}_2\text{O}$ with concentrated $\text{H}_2\text{SO}_4$); esterification characteristics (slow, athermic, reversible/equilibrium); IUPAC nomenclature for propanoic acid ($\text{CH}_3-\text{CH}_2-\text{COOH}$); and amine classification (primary amine $\text{CH}_3-\text{NH}_2$).
+  - **Balanced Option Distribution:** Correct answers distributed evenly across positions (`ក`: 3, `ខ`: 2, `គ`: 3, `ឃ`: 2), avoiding clustering on option 1.
+  - **Latin Digits Enforced:** Strict Latin digits (0-9) used in all formulas, concentrations, classifications, and explanations in compliance with `npm run check:digits`.
+  - **Subject Unlocking:** Chemistry is now automatically active in `gameSubjects()` and selectable on `/game/create`.
+
+**What to re-test.**
+- Navigate to `/game/create`.
+- Verify Chemistry ("គីមីវិទ្យា") is active and selectable alongside Mathematics and History.
+- Start a competition with **Basic** ("មូលដ្ឋាន") difficulty and play through the 10 questions.
+- Verify KaTeX chemical formulas, answer review, and explanations display correctly.
+
 ## 28 Sep 2026 — Biology Curriculum: MoEYS Summary PDF Chapter 3 Extracted, KruAI Grounding & Flashcards Added
 
 Commit `pending`. **No database step needed.**

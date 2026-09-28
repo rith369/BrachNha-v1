@@ -280,9 +280,33 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
       number: 4,
       title: "នាទីរបស់ប្រូតេអ៊ីនក្នុងសារពាង្គកាយ",
       lessons: [
-        { number: 1, title: "អាស៊ីតអាមីណេ", sessions: sectionsFor("biology", 4, 1) },
-        { number: 2, title: "ប្រូតេអ៊ីន", sessions: sectionsFor("biology", 4, 2) },
-        { number: 3, title: "អង់ស៊ីម", sessions: sectionsFor("biology", 4, 3) },
+        {
+          number: 1,
+          title: "អាស៊ីតអាមីណេ",
+          sessions: sectionsFor("biology", 4, 1, [
+            "ទម្រង់អាស៊ីតអាមីណេ",
+            "ប្រភេទនៃអាស៊ីតអាមីណេ",
+            "ចំណងប៉ិបទីត",
+          ]),
+        },
+        {
+          number: 2,
+          title: "ប្រូតេអ៊ីន",
+          sessions: sectionsFor("biology", 4, 2, [
+            "រូបផ្គុំ និងទម្រង់ទាំង 4 របស់ប្រូតេអ៊ីន",
+            "នាទីទាំង 6 របស់ប្រូតេអ៊ីន",
+            "ចំណាត់ថ្នាក់ និងការបាត់បង់គុណភាព",
+          ]),
+        },
+        {
+          number: 3,
+          title: "អង់ស៊ីម",
+          sessions: sectionsFor("biology", 4, 3, [
+            "លក្ខណៈទូទៅនៃអង់ស៊ីម",
+            "ចំណាត់ថ្នាក់អង់ស៊ីមទាំង 6 ក្រុម",
+            "កត្តាមានឥទ្ធិពលលើអង់ស៊ីម",
+          ]),
+        },
       ],
     },
     {
