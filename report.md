@@ -15,6 +15,33 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 28 Sep 2026 — The Math path is four lessons now
+
+Commit `1e423d5`. **No database step needed.**
+
+**Why.** The Math foundation path showed a single lesson, which said the whole foundation
+review is one lesson long. It is not.
+
+**What changed.**
+
+- **Four lessons instead of one.** មេរៀនទី 1 keeps its six named sections (three of them
+  written so far). មេរៀនទី 2, 3 and 4 have five sections each. The path is 21 circles now
+  instead of 6, and the counter at the top reads 0/21.
+- **The new lessons and their sections have NO names, on purpose.** The banner just reads
+  "មេរៀនទី 2" and each circle shows only its number. Making up Khmer lesson names would put
+  invented curriculum in front of a student, which is the one thing the app does not do.
+  **Send me the real names whenever you have them** and they drop straight in.
+- **The section numbers lost their leading "1.".** They read 1.1, 1.2 … 2.1, 2.2 … 4.5 rather
+  than 1.1.1, 1.2.1 and so on. That first number was a chapter number, and this path has no
+  chapters, so it referred to something the student never sees. The Bac II quiz paths already
+  did it this way; the Study path was the odd one out.
+
+**Nothing was lost.** Only the number shown on screen changed. Each section's internal id is
+untouched, so finished work stays finished and the three written lessons still open normally.
+
+**What to re-test.** Study → Math → មូលដ្ឋានគ្រឹះ. Scroll the whole path: four lesson
+banners, the first three circles open, everything else labelled "coming soon".
+
 ## 28 Sep 2026 — "Coming soon" on every circle that is not written yet
 
 Commit `57e0167`. **No database step needed.**
