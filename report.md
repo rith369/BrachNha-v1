@@ -15,6 +15,98 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 28 Sep 2026 — Math lesson 1.3 (Decimals), and two writing rules
+
+Commit `dab914e`. **No database step needed.**
+
+**Why.** Third section of the Math foundation lesson, plus two rules you asked for about how
+every piece of text in the app is written.
+
+**Math 1.3: ទសភាគ និងការបម្លែង is live** at circle 1.1.3. What a decimal is and place
+value, converting between decimals, fractions and percentages both ways, adding, subtracting,
+multiplying and dividing decimals, your three tips, the method, the key points and the five
+common mistakes. Your ten exercises are in, split 5 on screen 1 (the conversions, which your
+tips teach) and 5 on screen 2 (the arithmetic, which needs the rules on that screen). **All ten
+of your answers were correct and no two options clashed**, unlike the fractions set. It has the
+same video placeholder as 1.2, with no recording behind it yet.
+
+**Your content arrived mostly in English this time**, so it was translated: the headings, the
+steps, the shortcuts and the question stems (“Convert 0.5 to a fraction” and so on) are all
+Khmer now. The maths, the examples and the answers are exactly yours. The column addition
+showing how to line up the decimal point survived as a proper aligned sum, which took a little
+care because the app collapses plain spaces.
+
+**Rule 1: no dashes like this one in anything a student reads.** 55 were rewritten across the
+app, each with whatever fitted: a full stop between two sentences, a Khmer colon before an
+explanation, or brackets around an aside. Nine are left and they are not sentences at all: they
+are the dash shown where a score or a grade does not exist yet. Tell me what you want in that
+spot (a hyphen, a zero, or nothing) and I will change those too.
+
+**Rule 2: student-visible Khmer stays Khmer.** “Tip 1”, “GCD”, “vs”, “Keep Change Flip”,
+“Algebra” and “Limit” are Khmer now. Three things deliberately stay in English: science terms
+a student meets on the exam paper, written Khmer-first with the English in brackets, like
+ខួរធំ (Cerebrum) and pH; product words you chose earlier, like XP, Streak and KruAI; and the
+English exam paper itself, plus the words a phone shows, like “Add to Home Screen”.
+
+**Both rules are written into the developer notes**, so anything written from now on follows
+them. Note that nothing checks them automatically, unlike the Latin-digits rule, so they depend
+on being written correctly the first time.
+
+**What to re-test.** Study → Math → មូលដ្ឋានគ្រឹះ → third circle, both screens. And read a few
+screens elsewhere in the app (Home, Progress, the Game) to check nothing reads oddly after the
+punctuation change.
+
+## 28 Sep 2026 — Math lesson 1.2: Fractions
+
+Commit `dab914e`. **No database step needed.**
+
+**Why.** Second section of the Math foundation lesson. The first circle on the Math path was
+the only one open; the second one is now written too.
+
+**What changed.**
+
+- **ប្រភាគ និងការសម្រួលប្រភាគ is live** at circle 1.1.2, written from the content you sent:
+  what a fraction is, equivalent fractions, simplifying with the GCD, adding, subtracting,
+  multiplying, dividing, and mixed numbers — plus your three tips, the four-step method, the
+  key points and the four common mistakes.
+- **All the fraction notation displays properly** — over a hundred fractions, the boxed answer,
+  the "not equal" sign and the arrows. Checked at phone and laptop size, light and dark.
+- **A video placeholder**, like Biology's: the poster, the play symbol and the player frame,
+  with nothing behind it yet. It shows no running time, because stating one for a video that
+  has not been recorded would be claiming something untrue.
+- **"ឆាប់ៗនេះ" now appears on any video placeholder** — this section AND Biology. A student
+  can now see there is no video yet without tapping to find out. The placeholder still does
+  nothing when tapped, on purpose: it says what it is instead of pretending to be a button.
+- **Your 15 exercises are in**, split 7 on screen 1 and 8 on screen 2. Screen 1 gets
+  simplifying, multiplying and dividing — the three your Tips demonstrate. Screen 2 gets
+  adding/subtracting with unlike denominators, mixed numbers and the algebra ones, because
+  those need the written rules that are on screen 2.
+
+**I found five questions with two options that are the same answer — you spotted two.**
+
+- **Q5 and Q11** had the same option printed twice, which you flagged.
+- **Q14** had the same one twice too (A and D were both the same expression).
+- **Q8** offered `6/9` and `2/3`, which are the same number written two ways.
+- **Q6 was the dangerous one.** It offered `1/2` and `2/4` — the same number, and `1/2` was the
+  correct answer. A student choosing `2/4` would have been **right and marked wrong**.
+
+Each duplicate was replaced with a wrong answer that comes from a real mistake, so the question
+still teaches something. All 15 of your answers were correct. I also spread the correct answers
+evenly across the four positions — in the order you sent them, 14 of 15 sat on A or B and none
+on D.
+
+**What to re-test.** Study → Math → មូលដ្ឋានគ្រឹះ → second circle. Read the Khmer: it was
+transcribed from what you sent, not rewritten, but the section numbers were changed from Khmer
+numerals to 2.1, 2.2 … because the whole app uses Latin digits for numbers a student sees, and
+the fractions were all written in one consistent style.
+
+**Still to come.** No video for this section — send a link and the placeholder becomes a real
+player.
+
+**Getting heavier, and worth acting on before long.** The file Home loads on first open (all
+written lesson content) went from 60 KB to 75 KB with just this one section added — the growth
+predicted in the previous entry, now measurable. It is not slow yet. It will be.
+
 ## 28 Sep 2026 — The lesson videos play, and Math lesson 1.1 is live
 
 Commit `698aad7`. **No database step needed.**
