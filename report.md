@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 29 Sep 2026 — Leaderboard: No "Sample" Label, Smaller Demo Numbers
 
-Not committed yet.
+Commit `ff7465b`.
 
 **What changed.** The leaderboard's 29 made-up students used to carry a small "Sample"
 pill next to their name, on the podium and in the list. That pill has been removed on
