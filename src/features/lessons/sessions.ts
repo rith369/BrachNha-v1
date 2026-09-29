@@ -494,7 +494,13 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
         {
           number: 4,
           title: "កម្ពុជាប្រជាធិបតេយ្យ (1975-1979)",
-          sessions: sectionsFor("history", 1, 4),
+          sessions: sectionsFor("history", 1, 4, [
+            "ការចូលកាន់អំណាច និងរចនាសម្ព័ន្ធដឹកនាំ",
+            "នយោបាយមហាលោតផ្លោះ និងសហករណ៍",
+            "សោកនាដកម្ម មន្ទីរស-21 និងការកាប់សម្លាប់",
+            "ការដួលរលំនៃរបប និងជ័យជម្នះ 7 មករា 1979",
+            "សាលាក្តីខ្មែរក្រហម (អវតក / ECCC)",
+          ]),
         },
         {
           number: 5,

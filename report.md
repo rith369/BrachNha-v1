@@ -15,6 +15,26 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 29 Sep 2026 — Grade 12 History Lesson 4 (Democratic Kampuchea 1975-1979) OCR, KruAI RAG Grounding & High-Yield Flashcards
+
+Landed in commit `PENDING`. **No database step needed.**
+
+**Why.** Process Lesson 4 ("កម្ពុជាប្រជាធិបតេយ្យ (1975-1979)" / Democratic Kampuchea) from the official MoEYS Grade 12 History Summary textbook (Book pp. 39–47). Ground KruAI's retrieval-augmented generation (RAG) system with authentic MoEYS facts on the April 17, 1975 forced evacuation of Phnom Penh, the 8-point urgent CPK directives, the totalitarian structure under "Angkar", the January 5, 1976 Constitution and 250-seat Assembly, the 7 administrative zones, the "Super Great Leap Forward" Four-Year Plan (1977-1980) and 3 tons/ha paddy target, 3 stages of cooperatives, social class division (base people vs. new/17 April people), forced collective marriages, destruction of education, S-21 (Tuol Sleng) and internal purges (1978 Eastern Zone massacre), the rise of the Kampuchean United Front for National Salvation (KUFNS) led by Samdech Techo Hun Sen and comrades, the historic January 7, 1979 victory, and the Extraordinary Chambers in the Courts of Cambodia (ECCC) trials. Author 16 official high-yield flashcards in `src/data/practice.ts` (`history-1-4`). Wire authentic section titles into the History study path in `src/features/lessons/sessions.ts`. No quiz was created (quiz tab remains gated to Math only).
+
+**What changed.**
+
+- **Transcribed Textbook OCR.** Rendered pages from the MoEYS Grade 12 History Summary textbook into `sources/ocr/history/chapter4-democratic-kampuchea.md` across all 5 major sections of Lesson 4.
+- **Grounded KruAI in `server/textbook-search.ts`.** Added 6 detailed RAG chunks under `HISTORY_CH4_SECTIONS` and included them in `ALL_HISTORY_SECTIONS` and `searchHistoryTextbook`:
+  - `tb:hist:dk:ch4:takeover-and-angkar-structure` (April 17, 1975 forced evacuation, 8-point directive, Angkar concept, Pol Pot and CPK Standing Committee).
+  - `tb:hist:dk:ch4:constitution-and-administrative-zones` (Jan 5, 1976 Constitution, 16 chapters, 21 articles, 250-seat Assembly, 7 zones plus Phnom Penh special zone).
+  - `tb:hist:dk:ch4:super-great-leap-forward-and-cooperatives` (Four-Year Plan 1977-1980, 3-7 tons/ha rice goal, 4 rice shares, 3 cooperative phases, base vs 17 April people, collective marriage, child labor).
+  - `tb:hist:dk:ch4:tragedy-purges-and-s21` (Excessive labor, starvation rations, Tuol Sleng S-21 under Kaing Guek Eav/Duch, 14,000 victims, 1978 Eastern Zone massacre).
+  - `tb:hist:dk:ch4:fall-and-7-january-1979` (Failure of 3-ton plan, border clashes with Vietnam, June 20, 1977 journey of Samdech Hun Sen, Unit 125, Dec 2, 1978 KUFNS founding, Jan 7, 1979 liberation of Phnom Penh).
+  - `tb:hist:dk:ch4:eccc-khmer-rouge-tribunal` (ECCC establishment under UN-Cambodia agreement, Aug 10, 2001 law, Feb 2006 trials, life sentences for Duch, Nuon Chea, and Khieu Samphan).
+- **Authored 16 High-Yield Flashcards (`src/data/practice.ts`).** Added helper `hist14Card` and deck `"history-1-4"` containing 16 comprehensive flashcards testing high-frequency MoEYS Bac II historical facts.
+- **Updated History Study Path (`src/features/lessons/sessions.ts`).** Authored 5 authentic section titles for `SUBJECT_SESSIONS.history[0].lessons[3]`.
+- **Verification.** Passed `npm run check:digits` (0 Khmer numerals across all 289 files), `npm run lint` (0 errors), `npx tsc --noEmit` (0 errors), and `npm run build`.
+
 ## 29 Sep 2026 — Grade 12 History Lesson 3 (Khmer Republic 1970-1975) OCR, KruAI RAG Grounding & High-Yield Flashcards
 
 Landed in commit `201a701`. **No database step needed.**
