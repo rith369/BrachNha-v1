@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 29 Sep 2026 — Practice Quiz Tab Gated to Math Only, Non-Math Subjects Set to "Coming Soon"
 
-*Not committed yet.* **No database step needed.**
+Landed in commit `da2c88a`. **No database step needed.**
 
 **Why.** Restrict the Practice Quiz mode to active quiz subjects (Math only) as requested by the user, while preserving all existing quiz content in `data/` and `features/practice/quiz-path.ts` without deletion for future release. Moving forward, newly processed textbook lessons will focus solely on flashcard decks. All other subjects on the Practice Quiz tab (Physics, History, Biology, Chemistry, Khmer, Foreign Language) now display "ឆាប់ៗនេះ" (Coming soon) and cannot be opened or touched by students.
 
@@ -32,7 +32,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 29 Sep 2026 — Grade 12 History Lesson 2 (Sangkum Reastr Niyum 1955-1970) OCR, KruAI RAG Grounding & Practice Quiz/Flashcards
 
-*Not committed yet.* **No database step needed.**
+Landed in commit `da2c88a`. **No database step needed.**
 
 **Why.** Process Lesson 2 ("របបសង្គមរាស្ត្រនិយម (1955-1970)" / Sangkum Reastr Niyum) from the official MoEYS Grade 12 History Summary textbook (Book pp. 25–31, PDF pp. 31–38). Ground KruAI's retrieval-augmented generation (RAG) system with authentic MoEYS facts on King Norodom Sihanouk's abdication, the creation of Sangkum Reastr Niyum, the National Congress (សមាជជាតិ), neutrality foreign policy, the 1960 Head of State status, infrastructure/education achievements, and factors leading to the regime's fall. Author 16 official practice flashcards and a 12-question Bac II multiple-choice quiz with balanced answer distribution, and wire the authentic section titles into the History study path.
 
@@ -59,7 +59,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 29 Sep 2026 — Grade 12 History Lesson 1 (French Protectorate 1863-1953) OCR, KruAI RAG Grounding & Practice Quiz/Flashcards
 
-*Not committed yet.* **No database step needed.**
+Landed in commit `da2c88a`. **No database step needed.**
 
 **Why.** Launch the Grade 12 History curriculum for BrachNha starting from Lesson 1 ("ប្រទេសកម្ពុជាក្រោមអាណាព្យាបាលបារាំង (1863-1953)" / Cambodia under the French Protectorate) in the official MoEYS Grade 12 History Summary textbook (Book pp. 5–23, PDF pp. 11–29). Ground KruAI's retrieval-augmented generation (RAG) system with authentic MoEYS historical facts, treaties, dates, and royal campaigns, author 16 official practice flashcards and a 12-question Bac II multiple-choice quiz with balanced answer distribution, and wire the History path into the lessons hub.
 
