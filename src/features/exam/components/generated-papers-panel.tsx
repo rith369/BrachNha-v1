@@ -8,9 +8,8 @@ import { generatedPapers, type ExamPaper } from "../papers";
  * so this is PastPapersPanel with the year chips and the "ជ្រើសរើសសម័យប្រឡង"
  * heading removed and nothing else changed. Same card, same tap-anywhere
  * behaviour; the user asked for the identical style minus the year selector
- * specifically. Math and biology start LIVE (GENERATED_EXAM_QUESTIONS derives
- * from the old MOCK_QS test), every other subject starts ឆាប់ៗនេះ same as a
- * real past paper does until it has its own content.
+ * specifically. All subjects currently start ឆាប់ៗនេះ (Coming Soon) until
+ * newly authored curriculum-aligned generated papers land.
  *
  * papers re-derives every render, same reasoning as PastPapersPanel: free at
  * seven items, and it's what stops the list from ever disagreeing with the

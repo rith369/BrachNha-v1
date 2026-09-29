@@ -66,6 +66,19 @@ export const FLASHCARD_SUBJECTS: readonly SubjectId[] = [
   "history",
 ];
 
+/**
+ * Which subjects currently have active, student-facing quizzes.
+ *
+ * Authored quizzes for other subjects (such as history) are retained in `data/`
+ * for future activation, but in the practice UI only math is active today.
+ * All other subjects display "ឆាប់ៗនេះ" (Coming soon) and cannot be opened.
+ */
+export const ACTIVE_QUIZ_SUBJECTS: readonly SubjectId[] = ["math"];
+
+export function isQuizSubjectActive(subjectId: SubjectId): boolean {
+  return ACTIVE_QUIZ_SUBJECTS.includes(subjectId);
+}
+
 /** The flashcard tab's subjects, in catalog order. */
 export function flashcardSubjects(): SubjectMeta[] {
   return SUBJECTS.filter((s) => FLASHCARD_SUBJECTS.includes(s.id));
@@ -144,7 +157,12 @@ export function practiceLessonsFor(
   return chaptersFor(subjectId).flatMap((chapter) =>
     chapter.lessons.map((lesson) => {
       const key = practiceKey(subjectId, chapter.number, lesson.number);
-      const content = mode === "flashcards" ? deckFor(key) : quizFor(key);
+      const content =
+        mode === "flashcards"
+          ? deckFor(key)
+          : isQuizSubjectActive(subjectId)
+            ? quizFor(key)
+            : [];
       return {
         key,
         ref: lessonRef(chapter.number, lesson.number),
@@ -181,6 +199,7 @@ export function readyLessonCount(
  * fact, not two that agree today.
  */
 export function readyQuizSectionCount(subjectId: SubjectId): number {
+  if (!isQuizSubjectActive(subjectId)) return 0;
   return (quizPathFor(subjectId) ?? [])
     .flatMap((chapter) => chapter.lessons)
     .flatMap((lesson) => lesson.sessions)

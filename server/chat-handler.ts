@@ -13,7 +13,7 @@ import {
 import type { ScreenRef } from "../src/utils/chat-screen.js";
 import { checkRateLimit } from "./rate-limit.js";
 import { isVerificationConfigured, verifyRequestUser } from "./verify-user.js";
-import { searchBiologyTextbook, searchMathTextbook } from "./textbook-search.js";
+import { searchBiologyTextbook, searchHistoryTextbook, searchMathTextbook } from "./textbook-search.js";
 import { getCachedAnswer, createCachedStreamResponse } from "./chat-cache.js";
 
 /**
@@ -677,7 +677,7 @@ export async function handleChat(req: Request): Promise<Response> {
   const screen = cleanScreen(body.screen);
   const pinned = pinnedContextFor(screen);
 
-  // Ground KruAI in official MoEYS textbook text (Biology and Math)
+  // Ground KruAI in official MoEYS textbook text (Biology, Math, and History)
   const isMathQuery =
     screen.subjectId === "math" ||
     /គណិត|លីមីត|limit|ដេរីវេ|អាំងតេក្រាល|កុំផ្លិច|កោនិក|សមីការ|ប្រូបាប|វ៉ិចទ័រ|matrix|integral|derivative|\b0\/0\b|\b\+?\\infty\b/i.test(
@@ -688,10 +688,17 @@ export async function handleChat(req: Request): Promise<Response> {
     /ជីវ|កោសិកា|ប្រសាទ|អង់ស៊ីម|ប្រូតេអ៊ីន|adn|arn|ស៊ីណាប់|ណឺរ៉ូន|ស៊ីមណូ|អង់ស្យូ|មេយ៉ូស|មីតូស/i.test(
       lastUserText
     );
+  const isHistoryQuery =
+    screen.subjectId === "history" ||
+    /ប្រវត្តិ|អាណាព្យាបាល|បារាំង|សន្ធិសញ្ញា|អង្គឌួង|នរោត្តម|ស៊ីសុវត្ថិ|មុនីវង្ស|សីហនុ|សៀម|កូសាំងស៊ីន|កម្ពុជាក្រោម|កោះត្រល់|ហ្សឺណែវ|ឯករាជ្យ|បាដេស|ក្រាំងលាវ|ឥស្សរៈ|ចលនាតស៊ូ|សង្គ្រាមលោក/i.test(
+      lastUserText
+    );
 
-  const bioChunks = isBioQuery || !isMathQuery ? searchBiologyTextbook(lastUserText) : [];
-  const mathChunks = isMathQuery || !isBioQuery ? searchMathTextbook(lastUserText) : [];
-  const textbook = [...bioChunks, ...mathChunks].slice(0, 3);
+  const isSpecificSubject = isMathQuery || isBioQuery || isHistoryQuery;
+  const bioChunks = isBioQuery || !isSpecificSubject ? searchBiologyTextbook(lastUserText) : [];
+  const mathChunks = isMathQuery || !isSpecificSubject ? searchMathTextbook(lastUserText) : [];
+  const historyChunks = isHistoryQuery || !isSpecificSubject ? searchHistoryTextbook(lastUserText) : [];
+  const textbook = [...bioChunks, ...mathChunks, ...historyChunks].slice(0, 3);
   const context = [...pinned, ...textbook];
 
   const system_instruction = buildSystemPrompt({

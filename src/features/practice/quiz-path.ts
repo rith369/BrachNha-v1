@@ -114,7 +114,7 @@ export function quizSessionId(contentKey: string): string {
   return `quiz-${contentKey}`;
 }
 
-/** A lesson of `SECTIONS_PER_LESSON` sections, named as far as the names go. */
+/** A lesson of `SECTIONS_PER_LESSON` sections, or its supplied section count when real sections exist. */
 function quizLesson(
   subjectId: SubjectId,
   chapter: number,
@@ -123,6 +123,7 @@ function quizLesson(
   flat: boolean,
   sectionTitles: readonly string[] = []
 ): PathLesson {
+  const count = sectionTitles.length > 0 ? sectionTitles.length : SECTIONS_PER_LESSON;
   return {
     number,
     title,
@@ -130,7 +131,7 @@ function quizLesson(
       subjectId,
       chapter,
       number,
-      SECTIONS_PER_LESSON,
+      count,
       flat,
       sectionTitles
     ),
@@ -152,8 +153,21 @@ const MATH_LESSONS: readonly {
    *  nodes stay untitled until their content is supplied. */
   sections?: readonly string[];
 }[] = [
-  { title: "លីមីតនៃអនុគមន៍", sections: ["ប្រមាណវិធីលើលីមីត"] },
-  { title: "ដេរីវេ និងព្រីមីទីវនៃអនុគមន៍" },
+  {
+    title: "លីមីតនៃអនុគមន៍",
+    sections: [
+      "ប្រមាណវិធីលើលីមីត",
+      "លីមីតត្រីកោណមាត្រ និងអិចស្ប៉ូណង់ស្យែល",
+      "អាស៊ឹមតូត និងភាពជាប់",
+    ],
+  },
+  {
+    title: "ដេរីវេ និងព្រីមីទីវនៃអនុគមន៍",
+    sections: [
+      "ដេរីវេនៃអនុគមន៍",
+      "ព្រីមីទីវនៃអនុគមន៍",
+    ],
+  },
   { title: "ចំនួនកុំផ្លិច" },
   { title: "កោនិក" },
   { title: "អាំងតេក្រាលកំណត់" },

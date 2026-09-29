@@ -275,7 +275,16 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
       title: "ស៊ីមណូស្ពែម និងអង់ស្យូស្ពែម",
       lessons: [
         { number: 1, title: "ស៊ីមណូស្ពែម", sessions: sectionsFor("biology", 1, 1) },
-        { number: 2, title: "អង់ស្យូស្ពែម", sessions: sectionsFor("biology", 1, 2) },
+        {
+          number: 2,
+          title: "អង់ស្យូស្ពែម",
+          sessions: sectionsFor("biology", 1, 2, [
+            "លក្ខណៈពិសេសនៃអង់ស្យូស្ពែម",
+            "សរីរាង្គបន្តពូជ និងផ្កា",
+            "ការបន្តពូជ និងការបង្កកំណើតទ្វេ",
+            "ម៉ូណូកូទីលេដូន និងឌីកូទីលេដូន",
+          ]),
+        },
       ],
     },
     {
@@ -367,17 +376,33 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
         {
           number: 1,
           title: "ADN ជាព័ត៌មានសេនេទិច",
-          sessions: sectionsFor("biology", 5, 1),
+          sessions: sectionsFor("biology", 5, 1, [
+            "សមាសធាតុគីមីនៃព័ត៌មានសេនេទិច",
+            "ទម្រង់ម៉ូលេគុល ADN",
+            "ស្វ័យតំឡើងទ្វេ ADN",
+            "គន្លឹះដោះស្រាយលំហាត់ ADN",
+          ]),
         },
         {
           number: 2,
           title: "ការសំដែងចេញនៃសែន",
-          sessions: sectionsFor("biology", 5, 2),
+          sessions: sectionsFor("biology", 5, 2, [
+            "សកម្មភាពនៃសែន",
+            "ការចម្លងព័ត៌មានសេនេទិច",
+            "ក្រមសេនេទិច",
+            "ការបកប្រែក្រម",
+            "តម្រូវការនៃការសំដែងចេញនៃសែន",
+          ]),
         },
         {
           number: 3,
           title: "បច្ចេកវិទ្យាជីវៈ",
-          sessions: sectionsFor("biology", 5, 3),
+          sessions: sectionsFor("biology", 5, 3, [
+            "ការបង្កាត់ជ្រើស និងអឺតេរ៉ូស៊ីស",
+            "ក្លូនរុក្ខជាតិ និងសត្វ",
+            "ប៉ូលីប្លូអ៊ីឌី",
+            "វិស្វកម្មសេនេទិច និងការផលិត",
+          ]),
         },
       ],
     },
@@ -427,6 +452,57 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
       ],
     },
   ],
+  history: [
+    {
+      number: 1,
+      title: "ប្រវត្តិសាស្រ្តនៃប្រទេសកម្ពុជា",
+      lessons: [
+        {
+          number: 1,
+          title: "ប្រទេសកម្ពុជាក្រោមអាណាព្យាបាលបារាំង (1863-1953)",
+          openHere: true,
+          sessions: sectionsFor("history", 1, 1, [
+            "ការស្វែងរកការគាំពារពីបារាំង",
+            "ការបង្កើតអាណាព្យាបាល និងសន្ធិសញ្ញា 1863-1884",
+            "ការវិវត្តនៃរបបអាណាព្យាបាល (1900-1945)",
+            "ដំណាក់កាលចុងក្រោយ និងការទាមទារឯករាជ្យ 1953",
+            "ផលវិជ្ជមាន និងផលអវិជ្ជមាននៃរបបអាណាព្យាបាល",
+          ]),
+        },
+        {
+          number: 2,
+          title: "របបសង្គមរាស្ត្រនិយម (1955-1970)",
+          sessions: sectionsFor("history", 1, 2, [
+            "ការបង្កើតរបបសង្គមរាស្ត្រនិយម",
+            "សមាជជាតិ និងលទ្ធិប្រជាធិបតេយ្យផ្ទាល់",
+            "នយោបាយការបរទេសអព្យាក្រឹត",
+            "ការឡើងកាន់តំណែងជាប្រមុខរដ្ឋ 1960",
+            "សមិទ្ធផលសំខាន់ៗ និងការដួលរលំនៃរបប",
+          ]),
+        },
+        {
+          number: 3,
+          title: "សាធារណរដ្ឋខ្មែរ (1970-1975)",
+          sessions: sectionsFor("history", 1, 3),
+        },
+        {
+          number: 4,
+          title: "កម្ពុជាប្រជាធិបតេយ្យ (1975-1979)",
+          sessions: sectionsFor("history", 1, 4),
+        },
+        {
+          number: 5,
+          title: "សាធារណរដ្ឋប្រជាមានិតកម្ពុជា និងរដ្ឋកម្ពុជា (1979-1993)",
+          sessions: sectionsFor("history", 1, 5),
+        },
+        {
+          number: 6,
+          title: "ព្រះរាជាណាចក្រកម្ពុជា ទី 2 (1993-បច្ចុប្បន្ន)",
+          sessions: sectionsFor("history", 1, 6),
+        },
+      ],
+    },
+  ],
 };
 
 /**
@@ -450,6 +526,7 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
 export const PATH_TAB: Partial<Record<SubjectId, SubjectTab>> = {
   math: "foundation",
   biology: "all",
+  history: "all",
 };
 
 /** How many locked placeholders to show after the real content runs out, so the

@@ -3,7 +3,7 @@ import type { ReviewState } from "@/utils/spaced-repetition";
 import { allSubjects, type SubjectId } from "@/features/lessons/subjects";
 import { chaptersFor, lessonHeading } from "@/features/lessons/sessions";
 import { quizPathFor } from "@/features/practice/quiz-path";
-import { practiceKey, lessonRef } from "@/features/practice/practice";
+import { isQuizSubjectActive, practiceKey, lessonRef } from "@/features/practice/practice";
 import { cardsFor, deckProgress } from "@/features/practice/review";
 import { isDue } from "@/utils/spaced-repetition";
 import { lessonKeyOf } from "@/features/progress/content-keys";
@@ -130,7 +130,8 @@ function catalogFor(subject: SubjectId, input: StudyFeedInput): StudyItem[] {
     }
   }
 
-  for (const chapter of quizPathFor(subject) ?? []) {
+  if (isQuizSubjectActive(subject)) {
+    for (const chapter of quizPathFor(subject) ?? []) {
     for (const lesson of chapter.lessons) {
       for (const s of lesson.sessions) {
         if (!s.href) continue;
@@ -149,6 +150,7 @@ function catalogFor(subject: SubjectId, input: StudyFeedInput): StudyItem[] {
           progress: null,
         });
       }
+    }
     }
   }
 

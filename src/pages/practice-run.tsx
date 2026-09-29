@@ -2,7 +2,7 @@ import { Navigate, useParams } from "react-router";
 import { deckFor, quizFor } from "@/data/practice";
 import { findSubject } from "@/features/lessons/subjects";
 import { chaptersFor, lessonHeading } from "@/features/lessons/sessions";
-import { keyFromRef, parseMode } from "@/features/practice/practice";
+import { isQuizSubjectActive, keyFromRef, parseMode } from "@/features/practice/practice";
 import { findQuizSection } from "@/features/practice/quiz-path";
 import { FlashcardRunner } from "@/features/practice/components/flashcard-runner";
 import { QuizScreen } from "@/features/practice/components/quiz-screen";
@@ -40,6 +40,11 @@ export default function PracticeRunPage() {
   const parsed = parseMode(mode);
   const subject = findSubject(subjectId);
   if (!parsed || !subject) return <Navigate to="/practice" replace />;
+
+  // Only active quiz subjects (math) are accessible in Quiz mode.
+  if (parsed === "quiz" && !isQuizSubjectActive(subject.id)) {
+    return <Navigate to="/practice" replace />;
+  }
 
   const key = keyFromRef(subject.id, lessonRef);
   if (!key) return <Navigate to={`/practice/${parsed}/${subject.id}`} replace />;

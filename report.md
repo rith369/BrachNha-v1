@@ -1,4 +1,4 @@
-﻿# BrachNha — Change Report
+# BrachNha — Change Report
 
 A plain-language log of what changed in the app, written for the team rather than for
 developers. Newest entries first.
@@ -14,6 +14,198 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > commit, `2d20f12`. The codes shown on entries below that date (`1e4916b`, `8469c05`,
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
+
+## 29 Sep 2026 — Practice Quiz Tab Gated to Math Only, Non-Math Subjects Set to "Coming Soon"
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Restrict the Practice Quiz mode to active quiz subjects (Math only) as requested by the user, while preserving all existing quiz content in `data/` and `features/practice/quiz-path.ts` without deletion for future release. Moving forward, newly processed textbook lessons will focus solely on flashcard decks. All other subjects on the Practice Quiz tab (Physics, History, Biology, Chemistry, Khmer, Foreign Language) now display "ឆាប់ៗនេះ" (Coming soon) and cannot be opened or touched by students.
+
+**What changed.**
+
+- **Introduced `ACTIVE_QUIZ_SUBJECTS` Policy in `features/practice/practice.ts`.** Defined `ACTIVE_QUIZ_SUBJECTS = ["math"]` and exported `isQuizSubjectActive(subjectId)`. Updated `practiceLessonsFor` and `readyQuizSectionCount` to return zero counts when a subject's quizzes are not in the active set.
+- **Updated `PracticeSubjectCard` (`features/practice/components/practice-subject-card.tsx`).** Non-active quiz subjects (including Physics and History) display the dimmed "ឆាប់ៗនេះ" (Coming soon) badge and are completely non-interactive (no link, no touch action). Only Math shows its active section count ("5 ផ្នែក") and remains interactive.
+- **Enforced Route Guards (`pages/practice-subject.tsx` & `pages/practice-run.tsx`).** Any direct URL navigation to `/practice/quiz/:subjectId` or `/practice/quiz/:subjectId/:lessonRef` for non-active quiz subjects immediately redirects to `/practice`.
+- **Filtered Study Feed (`features/home/study-feed.ts`).** Quizzes from non-active subjects are excluded from Home's "continue where you left off" study feed.
+- **Preserved Existing Quiz Assets.** All authored quizzes (History Lessons 1 & 2, Physics path template) remain intact in `src/data/quizzes/` and `src/data/practice.ts` for future activation.
+- **Verification.** Passed `npm run check:digits` (0 Khmer numerals across all 289 files), `npm run lint` (0 errors), `npx tsc --noEmit` (0 errors), and `npm run build` (clean 12.87s production build).
+
+## 29 Sep 2026 — Grade 12 History Lesson 2 (Sangkum Reastr Niyum 1955-1970) OCR, KruAI RAG Grounding & Practice Quiz/Flashcards
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Process Lesson 2 ("របបសង្គមរាស្ត្រនិយម (1955-1970)" / Sangkum Reastr Niyum) from the official MoEYS Grade 12 History Summary textbook (Book pp. 25–31, PDF pp. 31–38). Ground KruAI's retrieval-augmented generation (RAG) system with authentic MoEYS facts on King Norodom Sihanouk's abdication, the creation of Sangkum Reastr Niyum, the National Congress (សមាជជាតិ), neutrality foreign policy, the 1960 Head of State status, infrastructure/education achievements, and factors leading to the regime's fall. Author 16 official practice flashcards and a 12-question Bac II multiple-choice quiz with balanced answer distribution, and wire the authentic section titles into the History study path.
+
+**What changed.**
+
+- **Rendered and Transcribed Lesson 2 (Book pp. 25–31).** Rendered 9 high-resolution page scans (`p31.png` to `p39.png`) with zero external OCR API costs using `scripts/pdf-to-png.mjs`. Transcribed complete, structured notes into `sources/ocr/history/chapter2-sangkum-reastr-niyum.md`:
+  - Part I: Creation of Sangkum Reastr Niyum (1947 constitutional context, King Sihanouk's abdication on March 3, 1955 to father Norodom Suramarit, creation of Sangkum on March 23, 1955, landslide Sept 11, 1955 election >83% & 91 seats, transition to single-party system).
+  - Part II: Factors of public trust (Sihanouk's popularity as Father of Independence, grassroots organization at village/commune/district/province levels, prominent figures Sim Var, Son Sann, Norindeth, Yem Sambaur, solid domestic financial support).
+  - Part III: National Congress (សមាជជាតិ direct democracy 2x/year at Veal Mean, constitutional status, anti-corruption, Khmer as official language, national assembly oversight, women's full voting rights on Jan 6, 1958).
+  - Part IV: Neutrality foreign policy (1954 Geneva foundation, March 18, 1955 Nehru declaration on peaceful coexistence, April 18–24, 1955 Bandung Conference with Zhou Enlai & Pham Van Dong, UN entry Dec 14, 1955, SEATO rejection, 15 years of peace vs Cold War deterioration with US rightists, Thai support for Khmer Serei, South Vietnam border incursions, North Vietnam/Viet Cong sanctuaries, March 18, 1970 coup by Lon Nol & Sirik Matak).
+  - Part V: Prince Sihanouk as Head of State (April 3, 1960 death of King Suramarit, Regency Council under Sisowath Monireth, June 5, 1960 referendum 99.8%, Kep speech, special constitutional amendment creating "Head of State" without being King, Queen Kossamak as throne symbol).
+  - Part VI: Sangkum achievements (Agriculture/irrigation; Sihanoukville port & NR4 & railway line 2 & Chroy Changvar Bridge & Pochentong/Siem Reap airports; Nov 1963 nationalization with SONEXIM, SORAPHA, SONACRIM, Crédit National bank; state factories; Olympic Stadium by Vann Molyvann; education, healthcare with Kantha Bopha, Preah Kossamak; reasons for economic/political decline).
+- **Grounded KruAI RAG Retrieval.** Integrated 6 comprehensive knowledge sections into `server/textbook-search.ts` under `HISTORY_CH2_SECTIONS` and combined into `ALL_HISTORY_SECTIONS`:
+  - `tb:hist:sangkum:ch2:creation-and-election`: Creation of Sangkum, abdication, and 1955 elections.
+  - `tb:hist:sangkum:ch2:national-congress`: National Congress direct democracy, achievements, and women's voting rights.
+  - `tb:hist:sangkum:ch2:neutrality-foreign-policy`: Neutrality foreign policy, Nehru pact, Bandung conference, and UN membership.
+  - `tb:hist:sangkum:ch2:head-of-state-1960`: 1960 succession crisis, referendum, and constitutional amendment.
+  - `tb:hist:sangkum:ch2:achievements-infrastructure-economy`: Economic policies, nationalization, infrastructure, industries, and education.
+  - `tb:hist:sangkum:ch2:decline-and-1970-coup`: Cold War pressures, Viet Cong presence, economic issues, and March 18, 1970 coup.
+- **Updated History Subject Path.** In `src/features/lessons/sessions.ts`, updated `SUBJECT_SESSIONS.history[0].lessons[1]` with 5 authentic section titles: `"ការបង្កើតរបបសង្គមរាស្ត្រនិយម"`, `"សមាជជាតិ និងលទ្ធិប្រជាធិបតេយ្យផ្ទាល់"`, `"នយោបាយការបរទេសអព្យាក្រឹត"`, `"ការឡើងកាន់តំណែងជាប្រមុខរដ្ឋ 1960"`, `"សមិទ្ធផលសំខាន់ៗ និងការដួលរលំនៃរបប"`.
+- **Authored 16 High-Yield Flashcards.** In `src/data/practice.ts`, created the `history-1-2` flashcard deck covering all key milestones, dates, policies, and concepts.
+- **Authored 12-Question Bac II Practice Quiz.** Created `src/data/quizzes/history-1-2.ts` and registered it under `PRACTICE_QUIZZES["history-1-2"]` and `PRACTICE_QUIZZES["history-1-2-1"]`. Correct answer choices are evenly distributed at 25% each across all 4 positions (options 0, 1, 2, 3 / ក, ខ, គ, ឃ).
+- **Verification.** Passed `npm run check:digits` (0 Khmer numerals across all 289 files), zero em dashes in student-facing strings, `npm run lint` (0 errors), `npx tsc --noEmit` (0 errors), and `npm run build` (clean 12.04s production build).
+
+## 29 Sep 2026 — Grade 12 History Lesson 1 (French Protectorate 1863-1953) OCR, KruAI RAG Grounding & Practice Quiz/Flashcards
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Launch the Grade 12 History curriculum for BrachNha starting from Lesson 1 ("ប្រទេសកម្ពុជាក្រោមអាណាព្យាបាលបារាំង (1863-1953)" / Cambodia under the French Protectorate) in the official MoEYS Grade 12 History Summary textbook (Book pp. 5–23, PDF pp. 11–29). Ground KruAI's retrieval-augmented generation (RAG) system with authentic MoEYS historical facts, treaties, dates, and royal campaigns, author 16 official practice flashcards and a 12-question Bac II multiple-choice quiz with balanced answer distribution, and wire the History path into the lessons hub.
+
+**What changed.**
+
+- **Rendered and Transcribed Lesson 1 (Book pp. 5–23).** Rendered 27 high-resolution page scans (`p05.png` to `p31.png`) with zero external OCR API costs using the local renderer `scripts/pdf-to-png.mjs`. Transcribed complete, structured notes into `sources/ocr/history/chapter1-french-protectorate.md`:
+  - 4 Kings of the Protectorate period (Norodom, Sisowath, Sisowath Monivong, Norodom Sihanouk).
+  - Part I: Quest for French Protection (King Ang Duong letters of 1853/1856 to Napoleon III, Montigny mission, French strategic and commercial motives in Indochina).
+  - Part II: Foundation of Protectorate (Treaty of Aug 11, 1863, Franco-Siamese Treaty of July 15, 1867 ceding Battambang/Siem Reap, Convention of June 17, 1884 forced by Gov Thomson, 1884–1887 Insurrection led by Prince Sivotha, Kralahom Kong & Pisnouk Lauk Chhouk, 1886 Compromise, Royal Ordinance of July 11, 1897 putting Ducos as head of Council of Ministers, early Franco-Cambodian schools, police, Ket Mealea hospital).
+  - Part III: Evolution of the Protectorate 1900–1945 (1904 & 1907 Franco-Siamese treaties restoring Koh Kong, Melouprey, Battambang, Siem Reap & Sisophon, EFEO Angkor temple conservation, 1911 administrative & education reforms, pagoda schools, Pali High School, April 18, 1925 Bardez assassination at Krang Leav, 1930 Buddhist Institute, 1942 Umbrella Demonstration).
+  - Part IV: Final Phase & Independence 1945–1953 (March 9, 1945 Japanese coup & March 13 first independence proclamation, 1946 Modus Vivendi, 1947 Constitution, armed Khmer Issarak movements, King Norodom Sihanouk's 1953 Royal Crusade for Independence, Nov 9, 1953 power transfer, July 21, 1954 Geneva Conference).
+  - Part V: Positive vs Negative Impacts of the French Protectorate (territorial integrity saved from Siam/Annam, temple conservation, Preah Vihear 1908 map, modern education/health vs loss of Kampuchea Krom June 4, 1949 and Koh Tral Jan 31, 1939, heavy tax burden, forced labor and WWI conscription).
+- **Grounded KruAI RAG Retrieval.** Integrated 7 comprehensive knowledge chunks in `server/textbook-search.ts` under `HISTORY_CH1_SECTIONS` and exported `searchHistoryTextbook()`:
+  - `tb:hist:protectorate:ch1:kings-timeline`: The 4 Kings, key milestones, and timeline.
+  - `tb:hist:protectorate:ch1:ang-duong-search`: King Ang Duong letters (1853, 1856) and French motives.
+  - `tb:hist:protectorate:ch1:treaties-1863-1884`: Treaties of 1863, 1867, and 1884.
+  - `tb:hist:protectorate:ch1:rebellion-and-1897`: 1884–1887 Insurrection, 1886 compromise, and 1897 Ducos ordinance.
+  - `tb:hist:protectorate:ch1:territory-bardez-nationalism`: 1904 & 1907 territorial recovery, 1925 Bardez incident, and 1930 Buddhist Institute.
+  - `tb:hist:protectorate:ch1:independence-crusade-1953`: 1945 Japanese coup, Khmer Issarak, 1953 Royal Crusade, and 1954 Geneva Conference.
+  - `tb:hist:protectorate:ch1:positive-negative-impacts`: Detailed positive vs negative outcomes of French rule.
+  - Connected `searchHistoryTextbook()` into `server/chat-handler.ts` with subject query routing.
+- **Configured History Subject Path & Curriculum Syllabus.** In `src/features/lessons/sessions.ts`, registered History under `PATH_TAB` (`"all"`) and configured `SUBJECT_SESSIONS.history` with Chapter 1 ("ប្រវត្តិសាស្រ្តនៃប្រទេសកម្ពុជា") containing Lesson 1 and reserved nodes for Lessons 2 through 6.
+- **Authored 16 High-Yield Flashcards.** In `src/data/practice.ts`, created the `history-1-1` flashcard deck covering all core definitions, treaties, dates, key historical figures, and exam questions.
+- **Authored 12-Question Bac II Practice Quiz.** Created `src/data/quizzes/history-1-1.ts` and registered it under `PRACTICE_QUIZZES["history-1-1"]` and `PRACTICE_QUIZZES["history-1-1-1"]`. Correct answer choices are evenly distributed at 25% each across all 4 positions (options 0, 1, 2, 3 / ក, ខ, គ, ឃ).
+- **Verification.** Passed `npm run check:digits` (0 Khmer numerals across all 288 files), zero em dashes in student-facing strings, `npm run lint` (0 errors), `npx tsc --noEmit` (0 errors), and `npm run build` (clean 8.11s production build).
+
+## 29 Sep 2026 — Biology Chapter 5 (ADN, Gene Expression & Biotechnology) OCR, KruAI RAG Grounding & 24 Flashcards
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Transcribe the complete Chapter 5 ("ព័ត៌មានសេនេទិច និងការសំដែងនៃសែន" / Genetic Information and Gene Expression) from the official MoEYS Grade 12 Biology textbook summary (Book pp. 31–50, PDF pp. 31–50) encompassing all 3 lessons. Expand KruAI's retrieval-augmented generation (RAG) knowledge base to answer student questions on DNA structure, replication, transcription, translation, and genetic engineering, and author 24 official bilingual practice flashcards with updated curriculum syllabus nodes.
+
+**What changed.**
+
+- **Rendered and Transcribed Chapter 5 (Book pp. 31–50).** Rendered 20 high-resolution page scans (`p31.png` through `p50.png`) and authored 3 comprehensive Markdown transcriptions in `sources/ocr/biology-summary/chapter5/`:
+  - `lesson1-dna-genetic-info.md` (pp. 31–39): Chemical nature of genetic info, Griffith (1928), Avery (1944), Hershey & Chase (1952) experiments, nucleotide structure & Chargaff rules ($A=T, G=C$), Watson & Crick (1953) double helix model, semi-conservative replication mechanism (Meselson & Stahl 1958), S phase cell cycle role, comprehensive formulas ($L, N, M, H, C$), and 5 fully worked practice problems.
+  - `lesson2-gene-expression.md` (pp. 40–46): Beadle & Tatum (1941) "one gene one enzyme" hypothesis, structural comparison between DNA and RNA, 3 functional RNA types (ARNm, ARNt, ARNr), RNA polymerase transcription stages (initiation, elongation, termination), the 64-codon genetic code dictionary, translation steps, polysomes, and gene expression regulation.
+  - `lesson3-biotechnology.md` (pp. 47–50): Selection & hybridization, heterosis (hybrid vigor), inbreeding vs outbreeding, micropropagation of plant tissue cultures (4 steps), identical twins & nuclear transfer cloning (Dolly), polyploidy induction with colchicine, recombinant DNA technology (restriction enzymes, ligase, vectors), 5-step human insulin production in *E. coli*, and agricultural/medical applications.
+- **Grounded KruAI RAG Retrieval.** Integrated 5 high-density knowledge sections into `server/textbook-search.ts` under `BIOLOGY_CH5_SECTIONS`:
+  - `tb:bio:ch5:dna-structure-chargaff`: Griffith/Hershey-Chase experiments, nucleotide structure, Chargaff rules, and Watson-Crick double helix.
+  - `tb:bio:ch5:dna-replication-cell-cycle`: Semi-conservative replication mechanism, replication fork enzymes, and S phase DNA doubling.
+  - `tb:bio:ch5:transcription-arn-types`: DNA vs RNA table, ARNm/ARNt/ARNr roles, and RNA polymerase transcription.
+  - `tb:bio:ch5:genetic-code-translation`: 64 codons (AUG start, UAA/UAG/UGA stop), ribosome A/P sites, 3-step translation, and polysomes.
+  - `tb:bio:ch5:biotechnology-cloning-gmo`: Heterosis, plant micropropagation, animal cloning, polyploidy/colchicine, and recombinant DNA insulin production.
+- **Authored 24 Practice Flashcards (3 Decks).** Added official curriculum flashcard decks in `src/data/practice.ts`:
+  - `biology-5-1` (8 cards): DNA genetic nature, Griffith transformation, Hershey-Chase bacteriophage proof, nucleotide anatomy, Chargaff base pairing, double helix geometry, semi-conservative replication, and S-phase cell cycle role.
+  - `biology-5-2` (8 cards): Beadle-Tatum hypothesis, DNA vs RNA differences, 3 RNA types, transcription stages, triplet codon rules, 64-codon genetic dictionary, translation initiation/elongation/termination, and polysomes.
+  - `biology-5-3` (8 cards): Artificial hybridization and heterosis, inbreeding vs outbreeding, cloning definition, plant tissue micropropagation steps, identical twins, polyploidy and colchicine, recombinant DNA technology steps, and human insulin production in *E. coli*.
+- **Updated Curriculum Lesson Sessions.** In `src/features/lessons/sessions.ts`, configured authentic lesson syllabus titles for Chapter 5 Lesson 1, Lesson 2, and Lesson 3.
+- **Verification.** Passed `npm run check:digits` (0 Khmer numerals across 287 files), zero em dashes in student-facing strings, `npm run lint` (0 errors), `npx tsc --noEmit` (0 errors), and `npm run build` (clean 12.91s build).
+
+## 29 Sep 2026 — Mathematics Chapter 1 & 2 Practice Quizzes (50 Questions) & Quiz Path Integration
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Following OCR digitization of Mathematics Chapter 1 (Limits) and Chapter 2 (Derivatives & Primitives), author and wire complete practice quizzes into the Mimo-style Quiz Path so students can immediately practice and test their mastery of both chapters. Also conduct a comprehensive orthography and terminology audit across recently added decks and quizzes.
+
+**What changed.**
+
+- **Audited and Fixed Khmer Orthography in Biology Flashcards.** Corrected multiple spelling inconsistencies in `src/data/practice.ts` (`biology-1-2`):
+  - Standardized "លំអង" to official MoEYS "លម្អង" ("ដំណើរលម្អង", "ប្លោកលម្អង", "គ្រាប់លម្អង", "បំពង់លម្អង").
+  - Fixed French loanword for nucleus from phonetic "ញ៉្វៃយ៉ូ" to standard MoEYS Biology "ណ្វៃយ៉ូ" across cards 11, 12, 13, and 14.
+  - Aligned Cotyledon spelling to MoEYS textbook "កូទីលេដូន" in card 15.
+- **Authored 4 New Mathematics Quizzes (40 Questions + 160 Drill/Foundation Items).** Built complete curriculum-aligned quizzes covering all key MoEYS Bac II techniques with step-by-step solutions, common misconception notes, similar drills, and foundation exercises:
+  - `math-1-1-2` (10 questions): លីមីតនៃអនុគមន៍ត្រីកោណមាត្រ និងអិចស្ប៉ូណង់ស្យែល (Trigonometric, Exponential & Logarithmic limits).
+  - `math-1-1-3` (10 questions): អាស៊ឹមតូត និងភាពជាប់នៃអនុគមន៍ (Vertical, horizontal, and oblique asymptotes, and continuity).
+  - `math-1-2-1` (10 questions): ដេរីវេនៃអនុគមន៍ (Polynomial, power, radical, product, quotient, trig, exp, ln derivatives and kinematics).
+  - `math-1-2-2` (10 questions): ព្រីមីទីវនៃអនុគមន៍ (Power, sqrt, inverse square, trig, exp, log primitives, initial conditions, and partial fractions).
+- **Wired Quizzes into Practice Hub & Quiz Path.**
+  - Added all 4 new quizzes to `PRACTICE_QUIZZES` in `src/data/practice.ts`.
+  - Updated `MATH_LESSONS` in `src/features/practice/quiz-path.ts` with real section titles for Lesson 1 and Lesson 2.
+  - Upgraded `quizLesson()` so that lessons with defined curriculum sections render only their authentic sections, bringing Math ready quiz sections from 1 to 5.
+- **Verification.** Passed `npm run check:digits` (0 Khmer numerals across 287 files), `npm run check:quiz` (50 questions across 5 quizzes, 2627 typeset math strings, 0 errors), `npx tsc --noEmit` (clean), and `npm run lint` (0 errors).
+
+## 29 Sep 2026 — Mathematics Chapter 2 (Derivatives & Primitives) OCR, KruAI RAG Grounding & Flashcard Typo Fixes
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Continue digitizing the official MoEYS Grade 12 Mathematics Summary textbook, expand KruAI's math retrieval grounding beyond Chapter 1 (Limits) into Chapter 2 (Derivatives & Primitives), and fix OCR transcription errors across Biology flashcards.
+
+**What changed.**
+
+- **Audited and Fixed Khmer Terminology Errors in Flashcards.** Corrected multiple OCR-introduced transcription errors in `src/data/practice.ts` (`biology-1-1`):
+  - Fixed misread words: "កោនញញោល" → "កោនឈ្មោល" (male cone), "ផលិតលង" / "គ្រាប់លងផ្កា" → "ផលិតគ្រាប់លម្អង" / "គ្រាប់លម្អង" (pollen grains), "ជាស្រុក" → "ជាស្រកា" (scale-like leaves), "សត្វកកេវ" → "សត្វកកេរ" (rodents), "ក្សេត្រូពិច" → "ក្បែរត្រូពិច" (subtropics), "ដើមឆ្កាត" → "ដើមត្នោត" (palm-like tree), "ស្លឹកទុំ" → "ស្លឹកដុំ" (terminal cluster of leaves), and "ប្រង់" / "ស៊ីណេគូតី" → "ប្រដឺ ឬស៊ីកាដ" / "ស៊ីណេតូភីត".
+  - Cleaned up arrow symbols in `biology-1-2` double fertilization reactions from ASCII `->` to `→`.
+- **Rendered and Transcribed Chapter 2 (Derivatives & Primitives).** Rendered PDF pages 22 to 33 (Book pages 19 to 30) of `Math summary.pdf` to high-resolution PNGs and transcribed the entire chapter into `sources/ocr/math-summary/chapter2-derivatives-primitives.md`. Contains all derivative and primitive rules plus 13 authentic worked exercises with full steps.
+- **KruAI Math RAG Knowledge Expanded.** In `server/textbook-search.ts`, integrated 6 new structured knowledge modules into `ALL_MATH_SECTIONS`:
+  - `tb:math:derivatives:ch2:basic-rules`: Basic rules, product, quotient, composite, roots, and powers.
+  - `tb:math:derivatives:ch2:trig-derivatives`: Trigonometric derivatives, higher-order derivatives, and $n$-th derivative formulas.
+  - `tb:math:derivatives:ch2:exp-log-derivatives`: Exponential and natural logarithmic derivatives.
+  - `tb:math:derivatives:ch2:kinematics-applications`: Physical motion applications (velocity $v(t) = s'(t)$ and acceleration $a(t) = v'(t)$).
+  - `tb:math:primitives:ch2:elementary-forms`: Elementary primitives and power forms ($u^n u'$, $u'/\sqrt{u}$).
+  - `tb:math:primitives:ch2:log-exp-forms`: Logarithmic and exponential primitive forms ($u'/u$ and $u' e^u$).
+- **Verified Retrieval & Formatting Standards.** Total math textbook chunks increased to 16. Verified query matching for trigonometric derivatives, exponential derivatives, and primitives. Passed `npm run check:digits` (all Latin digits 0-9), `npm run check:quiz`, and `npx tsc -b`.
+
+## 29 Sep 2026 — Generated Mock Exams: Math and Biology retired to Coming Soon
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Retire the old prototype Math and Biology questions from the "វិញ្ញាសារបង្កើតថ្មី" (Newly Generated Papers) tab, setting all subjects into a consistent "ឆាប់ៗនេះ" (Coming Soon) state pending authentic newly-generated exam papers.
+
+**What changed.**
+
+- **Emptied `GENERATED_EXAM_QUESTIONS`.** In `src/data/generated-exams.ts`, removed the fallback derivation from the old `MOCK_QS` set. Math and Biology now display the "ឆាប់ៗនេះ" badge and inline preparation notice identical to all other subjects.
+- **Audited Game & Practice fallbacks.** Verified that `src/data/game-questions.ts` maintains its full standalone questions for math, history, chemistry, and biology, so multiplayer and single-player games remain unaffected.
+- **Verification standard.** `npm run check:digits`, `npm run lint`, and `npx tsc -b` all passed with 0 errors.
+
+## 29 Sep 2026 — Biology: Chapter 1 Lesson 2 (Angiosperms) Q&A OCR, KruAI RAG Grounding & Flashcards
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Digitize and ground the complete official Grade 12 Biology Q&A curriculum for Chapter 1, Lesson 2 (អង់ស្យូស្ពែម / Angiosperms) into KruAI's textbook knowledge retrieval base and author an interactive 16-card practice deck directly aligned with official Bac II exam questions.
+
+**What changed.**
+
+- **OCR & Transcription of Chapter 1 Lesson 2.** Extracted Book pages 6 to 17 (12 pages) from the official `ជីវវិទ្យា - ធូ ភន biology qna.pdf` textbook, capturing the full theoretical summary and all 44 authentic exam Q&As into `sources/ocr/biology-qna/chapter1-lesson2-angiosperms.md`.
+- **KruAI RAG Grounding Added.** In `server/textbook-search.ts`, integrated 3 rich knowledge chunks into `BIOLOGY_CH1_SECTIONS`:
+  - `tb:bio:ch1:micro-mega-sporogenesis`: Microsporogenesis, megasporogenesis, pollen grain vs male gamete, and ovule vs female gamete distinctions.
+  - `tb:bio:ch1:lifecycle-alternation`: Alternation of generations, diploid sporophyte (2n) vs haploid gametophyte (n), meiosis and fertilization transitions, and embryo/endosperm roles.
+  - `tb:bio:ch1:angiosperm-high-yield-qna`: Real Bac II questions including palm/maize cross-pollination, 6-petal monocot flower anatomy, dicot leaf 3-tissue layer cross section, cambium growth tissue function, and artificial pollination methods.
+- **16-Card Biology Practice Deck.** In `src/data/practice.ts`, added a dedicated 16-flashcard deck for `biology-1-2` covering flower organ structure, male/female sporogenesis, double fertilization products ($2n$ zygote and $3n$ endosperm), fruit/seed development, and monocot vs dicot anatomical contrasts.
+- **Curriculum Catalog Updated.** In `src/features/lessons/sessions.ts`, added the 4 core section titles under Biology Chapter 1 Lesson 2 so students can browse syllabus topics clearly.
+- **Strict Latin Digits & Style Rules.** Verified all numbers are in Latin digits (0-9) and no em dashes exist in student-facing prose (`npm run check:digits` passed).
+
+## 29 Sep 2026 — 2-Day Bac II Simulation corrected to official 7-subject MoEYS Science Track schedule and score matrix
+
+*Not committed yet.* **No database step needed.**
+
+**Why.** Ensure the 2-Day Bac II Simulation accurately mirrors the official Ministry of Education, Youth and Sport (MoEYS) Grade 12 Science Track examination timetable and grading scale from `score.jpg`.
+
+**What changed.**
+
+- **Updated from 6 to 7 subjects.** The exam simulation now includes all 7 official Science Track subjects: History, Biology, Chemistry, Foreign Language (Day 1), and Khmer Literature, Physics, Mathematics (Day 2).
+- **Official 2-Day Timetable Schedule.**
+  - **Day 1 (4 subjects · 250 pts):**
+    - Morning 1: History (ប្រវត្តិវិទ្យា) 07:30 - 08:30 (60 min) · 50 pts
+    - Morning 2: Biology (ជីវវិទ្យា) 09:00 - 10:30 (90 min) · 75 pts
+    - Afternoon 1: Chemistry (គីមីវិទ្យា) 14:00 - 15:30 (90 min) · 75 pts
+    - Afternoon 2: Foreign Language (ភាសាបរទេស) 16:00 - 17:00 (60 min) · 50 pts
+  - **Day 2 (3 subjects · 275 pts):**
+    - Morning 1: Khmer Literature (អក្សរសាស្ត្រខ្មែរ) 07:30 - 09:00 (90 min) · 75 pts
+    - Morning 2: Physics (រូបវិទ្យា) 09:30 - 11:00 (90 min) · 75 pts
+    - Afternoon: Mathematics (គណិតវិទ្យា) 14:00 - 16:30 (150 min) · 125 pts
+- **Official MoEYS Grade Scale Matrix.** Added a dedicated scoring matrix card derived directly from `score.jpg` displaying the 475 base points breakdown for Grade determination: Grade A (≥ 427 pts / 90%), Grade B (≥ 380 pts / 80%), Grade C (≥ 332 pts / 70%), Grade D (≥ 285 pts / 60%), and Grade E (≥ 237 pts / 50% passing threshold), with Foreign Language (50 pts) documented as an additional subject.
+- **Updated Hub Card & Readiness Dialog.** `/exam` now highlights "2 ថ្ងៃពេញ 7 មុខវិជ្ជា", and the pre-exam readiness modal begins on Day 1 Session 1 with History (ប្រវត្តិវិទ្យា).
+- **Latin Digits Standard.** All 283 files verified with `npm run check:digits`.
 
 ## 29 Sep 2026 — Three welcome screens before sign-in
 

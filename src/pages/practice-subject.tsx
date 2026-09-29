@@ -2,7 +2,7 @@ import { Navigate, useParams } from "react-router";
 import { PracticeLessonList } from "@/features/practice/components/practice-lesson-list";
 import { QuizPathView } from "@/features/practice/components/quiz-path-view";
 import { findSubject } from "@/features/lessons/subjects";
-import { parseMode } from "@/features/practice/practice";
+import { isQuizSubjectActive, parseMode } from "@/features/practice/practice";
 import { quizPathFor } from "@/features/practice/quiz-path";
 import { BottomNav } from "@/components/shell/bottom-nav";
 
@@ -30,6 +30,11 @@ export default function PracticeSubjectPage() {
   const subject = findSubject(subjectId);
 
   if (!parsed || !subject) return <Navigate to="/practice" replace />;
+
+  // Only active quiz subjects (math) are accessible in Quiz mode.
+  if (parsed === "quiz" && !isQuizSubjectActive(subject.id)) {
+    return <Navigate to="/practice" replace />;
+  }
 
   const showPath = parsed === "quiz" && quizPathFor(subject.id) !== null;
 

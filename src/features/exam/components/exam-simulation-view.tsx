@@ -16,6 +16,7 @@ import {
   GraduationCap,
   Hourglass,
   Info,
+  Landmark,
   Languages,
   Layers,
   Play,
@@ -30,10 +31,12 @@ import {
 interface SubjectScheduleItem {
   id: string;
   name: string;
-  nameKm?: string;
+  nameKm: string;
+  sessionSlot: string;
   timeSlot: string;
   duration: string;
   weight: string;
+  sessionLabel: string;
   icon: typeof Sigma;
   colorScheme: {
     badge: string;
@@ -45,60 +48,31 @@ interface SubjectScheduleItem {
 
 const DAY_1_SUBJECTS: SubjectScheduleItem[] = [
   {
-    id: "math",
-    name: "Mathematics",
-    nameKm: "គណិតវិទ្យា",
-    timeSlot: "07:30 - 10:00",
-    duration: "150 min",
-    weight: "125 pts",
-    icon: Sigma,
+    id: "history",
+    name: "History",
+    nameKm: "ប្រវត្តិវិទ្យា",
+    sessionSlot: "ពេលព្រឹក (Morning)",
+    timeSlot: "07:30 - 08:30",
+    duration: "60 min",
+    weight: "50 pts",
+    sessionLabel: "Morning Session 1",
+    icon: Landmark,
     colorScheme: {
-      badge: "bg-blue-500/15 text-blue-400 border-blue-500/25",
-      iconBg: "bg-blue-500/15 text-blue-400 border border-blue-500/30",
-      border: "border-blue-500/20 hover:border-blue-500/40",
-      accent: "text-blue-400",
+      badge: "bg-amber-500/15 text-amber-400 border-amber-500/25",
+      iconBg: "bg-amber-500/15 text-amber-400 border border-amber-500/30",
+      border: "border-amber-500/20 hover:border-amber-500/40",
+      accent: "text-amber-400",
     },
   },
-  {
-    id: "physics",
-    name: "Physics",
-    nameKm: "រូបវិទ្យា",
-    timeSlot: "14:00 - 15:30",
-    duration: "90 min",
-    weight: "75 pts",
-    icon: Atom,
-    colorScheme: {
-      badge: "bg-indigo-500/15 text-indigo-400 border-indigo-500/25",
-      iconBg: "bg-indigo-500/15 text-indigo-400 border border-indigo-500/30",
-      border: "border-indigo-500/20 hover:border-indigo-500/40",
-      accent: "text-indigo-400",
-    },
-  },
-  {
-    id: "chemistry",
-    name: "Chemistry",
-    nameKm: "គីមីវិទ្យា",
-    timeSlot: "15:45 - 17:15",
-    duration: "90 min",
-    weight: "75 pts",
-    icon: FlaskConical,
-    colorScheme: {
-      badge: "bg-teal-500/15 text-teal-400 border-teal-500/25",
-      iconBg: "bg-teal-500/15 text-teal-400 border border-teal-500/30",
-      border: "border-teal-500/20 hover:border-teal-500/40",
-      accent: "text-teal-400",
-    },
-  },
-];
-
-const DAY_2_SUBJECTS: SubjectScheduleItem[] = [
   {
     id: "biology",
     name: "Biology",
     nameKm: "ជីវវិទ្យា",
-    timeSlot: "07:30 - 09:00",
+    sessionSlot: "ពេលព្រឹក (Morning)",
+    timeSlot: "09:00 - 10:30",
     duration: "90 min",
     weight: "75 pts",
+    sessionLabel: "Morning Session 2",
     icon: Dna,
     colorScheme: {
       badge: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
@@ -108,27 +82,31 @@ const DAY_2_SUBJECTS: SubjectScheduleItem[] = [
     },
   },
   {
-    id: "khmer",
-    name: "Khmer Literature",
-    nameKm: "ភាសាខ្មែរ",
-    timeSlot: "09:15 - 10:45",
+    id: "chemistry",
+    name: "Chemistry",
+    nameKm: "គីមីវិទ្យា",
+    sessionSlot: "ពេលរសៀល (Afternoon)",
+    timeSlot: "14:00 - 15:30",
     duration: "90 min",
     weight: "75 pts",
-    icon: BookOpenText,
+    sessionLabel: "Afternoon Session 1",
+    icon: FlaskConical,
     colorScheme: {
-      badge: "bg-amber-500/15 text-amber-400 border-amber-500/25",
-      iconBg: "bg-amber-500/15 text-amber-400 border border-amber-500/30",
-      border: "border-amber-500/20 hover:border-amber-500/40",
-      accent: "text-amber-400",
+      badge: "bg-teal-500/15 text-teal-400 border-teal-500/25",
+      iconBg: "bg-teal-500/15 text-teal-400 border border-teal-500/30",
+      border: "border-teal-500/20 hover:border-teal-500/40",
+      accent: "text-teal-400",
     },
   },
   {
     id: "language",
     name: "Foreign Language",
     nameKm: "ភាសាបរទេស (English / French)",
-    timeSlot: "14:00 - 15:00",
+    sessionSlot: "ពេលរសៀល (Afternoon)",
+    timeSlot: "16:00 - 17:00",
     duration: "60 min",
     weight: "50 pts",
+    sessionLabel: "Afternoon Session 2",
     icon: Languages,
     colorScheme: {
       badge: "bg-rose-500/15 text-rose-400 border-rose-500/25",
@@ -139,17 +117,79 @@ const DAY_2_SUBJECTS: SubjectScheduleItem[] = [
   },
 ];
 
+const DAY_2_SUBJECTS: SubjectScheduleItem[] = [
+  {
+    id: "khmer",
+    name: "Khmer Literature",
+    nameKm: "អក្សរសាស្ត្រខ្មែរ",
+    sessionSlot: "ពេលព្រឹក (Morning)",
+    timeSlot: "07:30 - 09:00",
+    duration: "90 min",
+    weight: "75 pts",
+    sessionLabel: "Morning Session 1",
+    icon: BookOpenText,
+    colorScheme: {
+      badge: "bg-purple-500/15 text-purple-400 border-purple-500/25",
+      iconBg: "bg-purple-500/15 text-purple-400 border border-purple-500/30",
+      border: "border-purple-500/20 hover:border-purple-500/40",
+      accent: "text-purple-400",
+    },
+  },
+  {
+    id: "physics",
+    name: "Physics",
+    nameKm: "រូបវិទ្យា",
+    sessionSlot: "ពេលព្រឹក (Morning)",
+    timeSlot: "09:30 - 11:00",
+    duration: "90 min",
+    weight: "75 pts",
+    sessionLabel: "Morning Session 2",
+    icon: Atom,
+    colorScheme: {
+      badge: "bg-indigo-500/15 text-indigo-400 border-indigo-500/25",
+      iconBg: "bg-indigo-500/15 text-indigo-400 border border-indigo-500/30",
+      border: "border-indigo-500/20 hover:border-indigo-500/40",
+      accent: "text-indigo-400",
+    },
+  },
+  {
+    id: "math",
+    name: "Mathematics",
+    nameKm: "គណិតវិទ្យា",
+    sessionSlot: "ពេលរសៀល (Afternoon)",
+    timeSlot: "14:00 - 16:30",
+    duration: "150 min",
+    weight: "125 pts",
+    sessionLabel: "Afternoon Major Session",
+    icon: Sigma,
+    colorScheme: {
+      badge: "bg-blue-500/15 text-blue-400 border-blue-500/25",
+      iconBg: "bg-blue-500/15 text-blue-400 border border-blue-500/30",
+      border: "border-blue-500/20 hover:border-blue-500/40",
+      accent: "text-blue-400",
+    },
+  },
+];
+
+const GRADE_SCALE = [
+  { grade: "A", label: "និទ្ទេស A", minPct: "90%", minScore: "427 pts", color: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10" },
+  { grade: "B", label: "និទ្ទេស B", minPct: "80%", minScore: "380 pts", color: "text-blue-400 border-blue-500/30 bg-blue-500/10" },
+  { grade: "C", label: "និទ្ទេស C", minPct: "70%", minScore: "332 pts", color: "text-purple-400 border-purple-500/30 bg-purple-500/10" },
+  { grade: "D", label: "និទ្ទេស D", minPct: "60%", minScore: "285 pts", color: "text-amber-400 border-amber-500/30 bg-amber-500/10" },
+  { grade: "E", label: "និទ្ទេស E", minPct: "50%", minScore: "237 pts", color: "text-rose-400 border-rose-500/30 bg-rose-500/10" },
+];
+
 const RULES = [
   {
     icon: Timer,
     title: "Timed Sessions",
-    description: "Each subject has its own countdown timer.",
+    description: "Each subject has its own countdown timer matching official MoEYS regulations.",
     accent: "from-blue-500/20 to-purple-500/10 text-blue-400 border-blue-500/30",
   },
   {
     icon: Hourglass,
     title: "Continuous Timer",
-    description: "Leaving the exam does not pause the session.",
+    description: "Leaving the exam does not pause the session clock.",
     accent: "from-amber-500/20 to-rose-500/10 text-amber-400 border-amber-500/30",
   },
   {
@@ -190,7 +230,7 @@ export function ExamSimulationView() {
       <div className="pointer-events-none absolute top-48 -right-24 size-80 rounded-full bg-indigo-600/15 blur-[100px]" />
       <div className="pointer-events-none absolute bottom-40 -left-20 size-72 rounded-full bg-blue-600/10 blur-[90px]" />
 
-      {/* Main Content Wrapper — pb-36 ensures clear clearance above KruAI FAB and BottomNav */}
+      {/* Main Content Wrapper: pb-36 ensures clear clearance above KruAI FAB and BottomNav */}
       <div className="relative mx-auto w-full max-w-5xl px-3.5 pt-3 pb-36 sm:px-5 sm:pt-5 sm:pb-32 md:px-6 lg:pb-16">
         {/* ── Page Header: Breadcrumb & Title ── */}
         <header className="mb-4 sm:mb-6">
@@ -205,7 +245,7 @@ export function ExamSimulationView() {
             </Link>
 
             <span className="text-[10px] font-extrabold tracking-wider uppercase text-purple-300/60 hidden sm:inline">
-              Bac II Simulator
+              Bac II Simulator · Science Track
             </span>
           </div>
 
@@ -234,7 +274,7 @@ export function ExamSimulationView() {
             <div className="flex flex-col lg:col-span-7">
               <div className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[var(--brand-yellow)]">
                 <GraduationCap className="size-4 shrink-0" strokeWidth={2.5} />
-                <span>MoEYS Standard · Science Track Simulation</span>
+                <span>MoEYS Standard · Science Track (ថ្នាក់វិទ្យាសាស្ត្រ)</span>
               </div>
 
               <h2 className="font-heading mt-1.5 text-lg font-extrabold text-white sm:text-xl md:text-2xl">
@@ -243,10 +283,10 @@ export function ExamSimulationView() {
 
               <p className="mt-2 text-xs leading-relaxed text-white/80 sm:text-sm md:text-base">
                 Test your knowledge, time management, and exam readiness in a
-                realistic two-day examination experience.
+                realistic two-day examination experience across all 7 subjects.
               </p>
 
-              {/* Three Compact Statistics — Designed for phone screens */}
+              {/* Three Compact Statistics: 2 Days, 7 Subjects, Timed Sessions */}
               <div className="mt-4 sm:mt-6 grid grid-cols-3 gap-2 sm:gap-3">
                 <div className="flex flex-col items-center rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.04] p-2 sm:p-3 text-center transition hover:border-white/20">
                   <div className="flex size-7 sm:size-8 items-center justify-center rounded-lg sm:rounded-xl bg-purple-500/20 text-purple-300">
@@ -265,10 +305,10 @@ export function ExamSimulationView() {
                     <Layers className="size-3.5 sm:size-4" strokeWidth={2.25} />
                   </div>
                   <span className="font-heading mt-1.5 text-xs sm:text-base md:text-lg font-extrabold text-white whitespace-nowrap">
-                    6 Subjects
+                    7 Subjects
                   </span>
                   <span className="text-[9px] sm:text-[10px] md:text-xs font-bold text-white/60 truncate max-w-full">
-                    Science
+                    Science Track
                   </span>
                 </div>
 
@@ -285,7 +325,7 @@ export function ExamSimulationView() {
                 </div>
               </div>
 
-              {/* Primary CTA Button — Full width on mobile for thumb accessibility */}
+              {/* Primary CTA Button: Full width on mobile for thumb accessibility */}
               <div className="mt-5 sm:mt-7 flex flex-col gap-2.5 sm:flex-row sm:items-center">
                 <button
                   type="button"
@@ -323,13 +363,13 @@ export function ExamSimulationView() {
                         BAC II TIMETABLE
                       </div>
                       <div className="text-[9px] sm:text-[10px] font-semibold text-white/50">
-                        Official Exam Session
+                        7 Subjects · Science Track
                       </div>
                     </div>
                   </div>
 
                   <span className="rounded-md border border-white/10 bg-white/5 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-white/80">
-                    475 TOTAL PTS
+                    525 PTS (475 BASE)
                   </span>
                 </div>
 
@@ -351,7 +391,7 @@ export function ExamSimulationView() {
                       DAY 1
                     </span>
                     <span className="text-[9px] font-semibold opacity-75">
-                      3 Subjects
+                      4 Subjects
                     </span>
                   </button>
 
@@ -415,7 +455,7 @@ export function ExamSimulationView() {
 
                 {/* Subtle seal watermark */}
                 <div className="mt-2.5 flex items-center justify-between border-t border-white/10 pt-2 text-[9px] sm:text-[10px] text-white/40">
-                  <span>CAMBODIAN BAC II</span>
+                  <span>CAMBODIAN BAC II · SCIENCE</span>
                   <span className="font-mono text-[9px]">EN / KM</span>
                 </div>
               </div>
@@ -423,7 +463,7 @@ export function ExamSimulationView() {
           </div>
         </section>
 
-        {/* ── Exam Schedule Section ── */}
+        {/* ── Official Examination Schedule (Day 1 & Day 2) ── */}
         <section className="mb-8 sm:mb-12">
           <div className="mb-3.5 sm:mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -432,16 +472,16 @@ export function ExamSimulationView() {
                 <span>EXAM PROTOCOL</span>
               </div>
               <h3 className="font-heading text-lg sm:text-xl md:text-2xl font-extrabold text-white">
-                Simulation Schedule
+                Simulation Schedule (កាលវិភាគប្រឡង)
               </h3>
             </div>
             <p className="text-xs font-semibold text-white/60">
-              Standard 2-day science timetable with official subject durations
+              Official 2-day science track timetable with Ministry durations and points
             </p>
           </div>
 
           <div className="grid grid-cols-1 items-stretch gap-4 sm:gap-6 md:grid-cols-2">
-            {/* ── DAY 01 CARD ── */}
+            {/* ── DAY 01 CARD: History, Biology, Chemistry, Foreign Language (4 Subjects, 250 pts) ── */}
             <div className="relative flex flex-col overflow-hidden rounded-2xl sm:rounded-3xl border border-indigo-500/25 bg-gradient-to-b from-[#13172e] via-[#101326] to-[#0d0f1f] p-4 sm:p-5 md:p-6 shadow-xl transition-all hover:border-indigo-500/40">
               {/* Day header banner */}
               <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-3">
@@ -450,19 +490,19 @@ export function ExamSimulationView() {
                     DAY 01
                   </span>
                   <h4 className="font-heading mt-1 text-lg sm:text-xl font-extrabold text-white">
-                    Day 1
+                    Day 1 (ថ្ងៃទី 1)
                   </h4>
                   <p className="text-[11px] font-semibold text-white/60">
-                    Morning & Afternoon Examination
+                    ពេលព្រឹក & ពេលរសៀល · 4 មុខវិជ្ជា
                   </p>
                 </div>
 
                 <div className="flex flex-col items-end">
                   <span className="rounded-lg border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] font-bold text-white/90">
-                    3 Subjects
+                    4 Subjects
                   </span>
                   <span className="mt-0.5 text-[10px] font-semibold text-indigo-300/80">
-                    275 Total Pts
+                    250 Total Pts
                   </span>
                 </div>
               </div>
@@ -487,11 +527,9 @@ export function ExamSimulationView() {
                             <div className="font-heading truncate text-xs sm:text-sm font-extrabold text-white">
                               {subject.name}
                             </div>
-                            {subject.nameKm && (
-                              <div className="truncate text-[10px] sm:text-xs font-bold text-white/60">
-                                {subject.nameKm}
-                              </div>
-                            )}
+                            <div className="truncate text-[10px] sm:text-xs font-bold text-white/60">
+                              {subject.nameKm}
+                            </div>
                           </div>
                         </div>
 
@@ -512,12 +550,10 @@ export function ExamSimulationView() {
                       <div className="flex items-center justify-between border-t border-white/5 pt-1.5 text-[10px] sm:text-[11px] font-semibold text-white/60">
                         <span className="inline-flex items-center gap-1.5">
                           <span className="size-1.5 rounded-full bg-indigo-400" />
-                          Session: {subject.timeSlot}
+                          {subject.sessionSlot}: {subject.timeSlot}
                         </span>
                         <span className="text-[9px] sm:text-[10px] font-extrabold tracking-wide uppercase text-indigo-300/80">
-                          {subject.id === "math"
-                            ? "Major Session"
-                            : "Standard Session"}
+                          {subject.sessionLabel}
                         </span>
                       </div>
                     </div>
@@ -526,7 +562,7 @@ export function ExamSimulationView() {
               </div>
             </div>
 
-            {/* ── DAY 02 CARD ── */}
+            {/* ── DAY 02 CARD: Khmer Literature, Physics, Mathematics (3 Subjects, 275 pts) ── */}
             <div className="relative flex flex-col overflow-hidden rounded-2xl sm:rounded-3xl border border-emerald-500/25 bg-gradient-to-b from-[#0f1f1e] via-[#0d171a] to-[#0c1214] p-4 sm:p-5 md:p-6 shadow-xl transition-all hover:border-emerald-500/40">
               {/* Day header banner */}
               <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-3">
@@ -535,10 +571,10 @@ export function ExamSimulationView() {
                     DAY 02
                   </span>
                   <h4 className="font-heading mt-1 text-lg sm:text-xl font-extrabold text-white">
-                    Day 2
+                    Day 2 (ថ្ងៃទី 2)
                   </h4>
                   <p className="text-[11px] font-semibold text-white/60">
-                    Morning & Afternoon Examination
+                    ពេលព្រឹក & ពេលរសៀល · 3 មុខវិជ្ជា
                   </p>
                 </div>
 
@@ -547,7 +583,7 @@ export function ExamSimulationView() {
                     3 Subjects
                   </span>
                   <span className="mt-0.5 text-[10px] font-semibold text-emerald-300/80">
-                    200 Total Pts
+                    275 Total Pts
                   </span>
                 </div>
               </div>
@@ -572,11 +608,9 @@ export function ExamSimulationView() {
                             <div className="font-heading truncate text-xs sm:text-sm font-extrabold text-white">
                               {subject.name}
                             </div>
-                            {subject.nameKm && (
-                              <div className="truncate text-[10px] sm:text-xs font-bold text-white/60">
-                                {subject.nameKm}
-                              </div>
-                            )}
+                            <div className="truncate text-[10px] sm:text-xs font-bold text-white/60">
+                              {subject.nameKm}
+                            </div>
                           </div>
                         </div>
 
@@ -597,12 +631,10 @@ export function ExamSimulationView() {
                       <div className="flex items-center justify-between border-t border-white/5 pt-1.5 text-[10px] sm:text-[11px] font-semibold text-white/60">
                         <span className="inline-flex items-center gap-1.5">
                           <span className="size-1.5 rounded-full bg-emerald-400" />
-                          Session: {subject.timeSlot}
+                          {subject.sessionSlot}: {subject.timeSlot}
                         </span>
                         <span className="text-[9px] sm:text-[10px] font-extrabold tracking-wide uppercase text-emerald-300/80">
-                          {subject.id === "language"
-                            ? "Final Exam"
-                            : "Standard Session"}
+                          {subject.sessionLabel}
                         </span>
                       </div>
                     </div>
@@ -613,7 +645,51 @@ export function ExamSimulationView() {
           </div>
         </section>
 
-        {/* ── Simulation Rules Section — 2x2 grid on mobile for compact scanability ── */}
+        {/* ── Official MoEYS Grade Scale Section (From Ministry Standards) ── */}
+        <section className="mb-8 sm:mb-12">
+          <div className="mb-3.5 sm:mb-4">
+            <div className="flex items-center gap-1.5 text-[11px] font-extrabold tracking-wider text-purple-400 uppercase">
+              <Award className="size-3.5 text-[var(--brand-yellow)]" />
+              <span>OFFICIAL SCORING MATRIX</span>
+            </div>
+            <h3 className="font-heading text-lg sm:text-xl md:text-2xl font-extrabold text-white">
+              តារាងអត្រាពិន្ទុសម្រាប់កំណត់និទ្ទេស ថ្នាក់វិទ្យាសាស្ត្រ
+            </h3>
+            <p className="text-xs font-semibold text-white/60">
+              Grade Determination Benchmark (Total 475 Base Points, Excluding Foreign Language)
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5 backdrop-blur-md">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+              {GRADE_SCALE.map((item) => (
+                <div
+                  key={item.grade}
+                  className={`flex flex-col items-center rounded-xl border p-2.5 sm:p-3 text-center transition ${item.color}`}
+                >
+                  <span className="font-heading text-xl sm:text-2xl font-black">
+                    {item.grade}
+                  </span>
+                  <span className="text-[11px] font-extrabold text-white mt-0.5">
+                    {item.label}
+                  </span>
+                  <span className="text-[10px] font-semibold text-white/70 mt-1">
+                    {item.minPct} · {item.minScore}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 flex items-start gap-2 border-t border-white/10 pt-3 text-[11px] font-semibold text-white/70">
+              <Info className="size-4 shrink-0 text-purple-400 mt-0.5" />
+              <span>
+                យោងតាមក្រសួងអប់រំ យុវជន និងកីឡា៖ ពិន្ទុសរុបគ្រប់មុខ (ដកភាសាបរទេស) គឺ 475 ពិន្ទុ សម្រាប់កំណត់និទ្ទេស A ដល់ E (និទ្ទេស E ចាប់ពី 237 ពិន្ទុឡើងទៅគឺបំពេញលក្ខខណ្ឌជាប់)។ ភាសាបរទេស (50 ពិន្ទុ) ជាមុខវិជ្ជាបន្ថែម។
+              </span>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Simulation Rules Section: 2x2 grid on mobile for compact scanability ── */}
         <section className="mb-8 sm:mb-12">
           <div className="mb-3 sm:mb-4">
             <div className="flex items-center gap-1.5 text-[11px] font-extrabold tracking-wider text-purple-400 uppercase">
@@ -665,7 +741,7 @@ export function ExamSimulationView() {
             <div className="max-w-xl">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[10px] sm:text-xs font-extrabold text-purple-300">
                 <Award className="size-3 text-[var(--brand-yellow)]" />
-                <span>Bac II Benchmark Assessment</span>
+                <span>Bac II Benchmark Assessment · 7 Subjects</span>
               </div>
 
               <h3 className="font-heading mt-1.5 text-xl sm:text-2xl md:text-3xl font-extrabold text-white">
@@ -674,7 +750,7 @@ export function ExamSimulationView() {
 
               <p className="mt-1 text-xs sm:text-sm font-semibold text-white/80 md:text-base">
                 Start the full 2-day Bac II simulation and discover how prepared
-                you really are.
+                you really are across all 7 subjects.
               </p>
             </div>
 
@@ -717,7 +793,7 @@ export function ExamSimulationView() {
                     Start Bac II Simulation
                   </h4>
                   <p className="text-[11px] sm:text-xs font-semibold text-white/60">
-                    Day 1 Session 1 · Mathematics
+                    Day 1 Session 1: ប្រវត្តិវិទ្យា (History · 07:30 - 08:30)
                   </p>
                 </div>
               </div>
@@ -737,9 +813,7 @@ export function ExamSimulationView() {
                 <div className="flex items-start gap-2">
                   <Info className="size-4 shrink-0 text-purple-400 mt-0.5" />
                   <div className="text-xs font-semibold leading-relaxed text-purple-100">
-                    You are about to start the official 2-day simulation. Once
-                    you initiate Day 1, the timer begins for Mathematics (150
-                    minutes).
+                    You are starting the official 2-day simulation. Day 1 Session 1 begins with History (ប្រវត្តិវិទ្យា, 60 minutes, 50 points).
                   </div>
                 </div>
               </div>
@@ -747,11 +821,11 @@ export function ExamSimulationView() {
               <div className="space-y-2 pt-1">
                 <div className="flex items-center gap-2 text-xs font-semibold text-white/80">
                   <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
-                  <span>Prepare scrap paper, pen, and a quiet desk</span>
+                  <span>Prepare scrap paper, blue/black pen, and a quiet room</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-semibold text-white/80">
                   <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
-                  <span>Timer does not pause if you close the browser</span>
+                  <span>Timer continues running if you leave the browser</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-semibold text-white/80">
                   <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
@@ -771,7 +845,7 @@ export function ExamSimulationView() {
               </button>
 
               <Link
-                to="/exam/subjects/math-2024"
+                to="/exam/subjects"
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-5 py-2.5 text-xs font-extrabold text-white shadow-cta hover:brightness-110 transition active:scale-[0.98] order-1 sm:order-2"
               >
                 <span>Enter Day 1 Exam</span>

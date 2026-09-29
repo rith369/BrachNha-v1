@@ -218,7 +218,7 @@ export function ExamHub() {
               ប្រឡងបាក់ឌុបសាកល្បង
             </div>
             <div className="relative mt-1 text-xs font-semibold text-white/85 md:text-sm">
-              សាកល្បងប្រឡងបាក់ឌុបពេញលេញ រយៈពេល 2 ថ្ងៃ 6 មុខវិជ្ជា។
+              សាកល្បងប្រឡងបាក់ឌុបពេញលេញ រយៈពេល 2 ថ្ងៃ 7 មុខវិជ្ជា។
             </div>
 
             <div className="relative mt-auto flex items-center justify-between gap-2 pt-5">

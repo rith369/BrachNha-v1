@@ -5,6 +5,7 @@ import { SUBJECT_STYLE } from "@/features/lessons/subject-styles";
 import { SubjectArt } from "@/features/lessons/components/subject-art";
 import type { SubjectMeta } from "@/features/lessons/subjects";
 import {
+  isQuizSubjectActive,
   readyLessonCount,
   readyQuizSectionCount,
   type PracticeMode,
@@ -36,15 +37,8 @@ import { quizPathFor } from "../quiz-path";
  * exception. Don't "restore" it for the plain lesson list.
  *
  * ONE DELIBERATE EXCEPTION: a subject with a `quizPathFor()` entry stays
- * tappable on Quiz even at zero real lesson content, because unlike the plain
- * list it does NOT land on a screen of rows that are themselves all pending —
- * it lands on the Mimo-style path (see quiz-path-view.tsx), which is a finished
- * screen with real content to look at (colour, progress, a trail of nodes), even
- * though the nodes on it are still a design sample. The tap is not silent, so
- * the "nothing empty is tappable" rule does not apply to it — the same logic
- * that keeps PastPaperCard tappable on an empty paper. Math and physics are
- * the subjects in this state today; a tile opens up automatically for any
- * subject added to QUIZ_PATHS in ../quiz-path, no second flag to set here.
+ * tappable on Quiz even at zero real lesson content, provided that subject is
+ * active in ACTIVE_QUIZ_SUBJECTS.
  *
  * The count is lessons with content IN THIS MODE, so switching tabs can change
  * both the number and whether the tile is tappable — a subject may have a quiz
@@ -58,19 +52,18 @@ export function PracticeSubjectCard({
   mode: PracticeMode;
 }) {
   const style = SUBJECT_STYLE[subject.id];
-  // A quiz-path subject is counted in SECTIONS, because that is what its nodes
-  // are; every other tile counts lessons. Two units, so the chip names the one
-  // it is showing rather than saying "មេរៀន" over a number of sections.
-  const onPath = mode === "quiz" && quizPathFor(subject.id) !== null;
+  // Quiz mode is strictly restricted to active quiz subjects (currently only math).
+  // Other subjects (such as physics and preserved history quizzes) display "ឆាប់ៗនេះ"
+  // and cannot be opened.
+  const isQuiz = mode === "quiz";
+  const quizActive = !isQuiz || isQuizSubjectActive(subject.id);
+  const onPath = isQuiz && quizActive && quizPathFor(subject.id) !== null;
   const ready = onPath
     ? readyQuizSectionCount(subject.id)
     : readyLessonCount(subject.id, mode);
   const unit = onPath ? "ផ្នែក" : "មេរៀន";
-  // The "design sample" chip retires ITSELF the moment a path has real content —
-  // it says what is behind the tile is a look rather than a finished lesson set,
-  // and that stops being true at the first authored quiz.
   const preview = onPath && ready === 0;
-  const openable = ready > 0 || preview;
+  const openable = quizActive && (ready > 0 || preview);
   const Icon = mode === "flashcards" ? Layers : ListChecks;
 
   const body = (
