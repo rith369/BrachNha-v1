@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 29 Sep 2026 — Paying for KruAI Safely: Daily Question Limits
 
-Commit `pending`. **Database step needed:** run
+Commit `0b88c48`. **Database step needed:** run
 `supabase/migrations/20260929000001_kruai_usage.sql` in the Supabase SQL editor **before**
 deploying. Without it, the live KruAI refuses every question, on purpose (see below).
 
@@ -55,7 +55,7 @@ questions, a bug, or someone misusing an account.
 
 ## 29 Sep 2026 — KruAI Can Read a Photo of an Exercise
 
-Commit `pending`. **No database step needed.**
+Commit `0b88c48`. **No database step needed.**
 
 **Why.** Students wanted to photograph an exercise (from the textbook, a past paper or their
 notebook) and ask KruAI about it, instead of typing out a long formula.
