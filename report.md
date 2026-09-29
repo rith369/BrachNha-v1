@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 29 Sep 2026 — KruAI Now Teaches Step by Step (Socratic Method)
 
-Commit `pending`. **No database step needed.**
+Commit `056b8d0`. **No database step needed.**
 
 **Why.** KruAI used to give the whole solution the moment a student sent an exercise. Students
 learn more when they work it out themselves, with a teacher asking the right questions. That is
