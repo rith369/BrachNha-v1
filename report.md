@@ -15,6 +15,27 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 29 Sep 2026 — Grade 12 History Lesson 3 (Khmer Republic 1970-1975) OCR, KruAI RAG Grounding & High-Yield Flashcards
+
+Landed in commit `201a701`. **No database step needed.**
+
+**Why.** Process Lesson 3 ("របបសាធារណរដ្ឋខ្មែរ (1970-1975)" / Khmer Republic) from the official MoEYS Grade 12 History Summary textbook (Book pp. 33–38, PDF pp. 39–44). Ground KruAI's retrieval-augmented generation (RAG) system with authentic MoEYS facts on the economic and political pre-coup context, the March 18, 1970 coup d'état against Prince Norodom Sihanouk, the 5-year civil war (1970-1975), US B-52 bombing (>2 million tons), hyperinflation and refugee crisis in Phnom Penh, internal corruption and weakening of Lon Nol's regime, the April 17, 1975 fall of Phnom Penh to the Khmer Rouge, and the devastating social and economic consequences. Author 16 official high-yield flashcards in `src/data/practice.ts` (`history-1-3`). Per user directive, no multiple-choice quiz was created (practice quiz mode remains gated to Math only). Wire authentic section titles into the History study path in `src/features/lessons/sessions.ts`.
+
+**What changed.**
+
+- **Transcribed Textbook OCR.** Rendered pages 39–44 locally without external OCR API calls, creating `sources/ocr/history/chapter3-khmer-republic.md` covering all 5 core sections of Lesson 3.
+- **Grounded KruAI in `server/textbook-search.ts`.** Added 6 detailed RAG chunks under `HISTORY_CH3_SECTIONS` and included them in `ALL_HISTORY_SECTIONS` and `searchHistoryTextbook`:
+  - `tb:hist:republic:ch3:pre-coup-context` (Pre-1970 agricultural crisis, nationalization effects, 25% rice smuggling to Viet Cong, rejection of US military aid, Saloth Sar's trip to China and CPK expansion).
+  - `tb:hist:republic:ch3:coup-18-march-1970` (March 8–12 demonstrations, 86/89 Assembly vote to depose Sihanouk, Cheng Heng as acting Head of State, creation of FUNK on March 23, proclamation of Khmer Republic on Oct 9, 1970).
+  - `tb:hist:republic:ch3:bombing-and-refugees` (US B-52 bombings >2 million tons, Phnom Penh refugee surge from 600,000 to >2 million, besieged city conditions).
+  - `tb:hist:republic:ch3:civil-war-and-corruption` (Lon Nol stroke in 1971, Lon Non and officer corruption, phantom soldiers, weapons sales to insurgents, cutting of Mekong supply route in Jan 1975).
+  - `tb:hist:republic:ch3:fall-of-phnom-penh-17-april-1975` (Lon Nol flight to US in early April 1975, Saloth Sar's unilateral offensive, entry of black-uniformed Khmer Rouge into Phnom Penh on April 17, 1975 at 9:30 AM).
+  - `tb:hist:republic:ch3:war-damages-and-consequences` (>1 million dead, war orphans and widows, 55% of factories destroyed, 70–80% of roads/bridges wrecked, minefields and craters).
+- **Authored 16 High-Yield Flashcards (`src/data/practice.ts`).** Added helper `hist13Card` and deck `"history-1-3"` containing 16 comprehensive flashcards testing high-frequency MoEYS Bac II historical facts.
+- **Strict Quiz Restriction Respected.** No quiz authored for Lesson 3 in accordance with the user's directive.
+- **Updated History Study Path (`src/features/lessons/sessions.ts`).** Authored 5 authentic section titles for `SUBJECT_SESSIONS.history[0].lessons[2]`.
+- **Verification.** Passed `npm run check:digits` (0 Khmer numerals across all 289 files), `npm run lint` (0 errors), `npx tsc --noEmit` (0 errors), and `npm run build` (clean 10.85s production build).
+
 ## 29 Sep 2026 — Practice Quiz Tab Gated to Math Only, Non-Math Subjects Set to "Coming Soon"
 
 Landed in commit `da2c88a`. **No database step needed.**
