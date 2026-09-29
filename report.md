@@ -15,6 +15,26 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 29 Sep 2026 — Grade 12 History Lesson 5 (People's Republic and State of Cambodia 1979-1993) OCR, KruAI RAG Grounding & High-Yield Flashcards
+
+Landed in commit `PENDING`. **No database step needed.**
+
+**Why.** Process Lesson 5 ("សាធារណរដ្ឋប្រជាមានិតកម្ពុជា និងរដ្ឋកម្ពុជា (1979-1993)" / People's Republic of Kampuchea and State of Cambodia) from the official MoEYS Grade 12 History Summary textbook (Book pp. 49–58). Ground KruAI's retrieval-augmented generation (RAG) system with authentic MoEYS facts on the December 2, 1978 founding of the Kampuchean United Front for National Salvation (KUFNS) in Snuol, Kratie, the January 7, 1979 liberation of Phnom Penh, the four governing organs (CPK/KPRP, Council of Ministers, Council of State, National Assembly), the four conflicting factions (PRK, Khmer Rouge/DK, KPNLF under Son Sann, FUNCINPEC under Prince Norodom Sihanouk), the 1982 Coalition Government of Democratic Kampuchea (CGDK), the July 12, 1984 "K-5 Plan" border defense, the 5-year military service law of 1985, post-liberation social restoration and "solidarity groups for production" (ក្រុមសាមគ្គីបង្កបង្កើនផល 10–30 families), re-introduction of the Riel currency in 1980, education literacy slogan ("អ្នកចេះច្រើនបង្រៀនអ្នកចេះតិច ឯអ្នកចេះតិចបង្រៀនអ្នកមិនចេះ"), reopening of the School of Fine Arts (1981) and Faculty of Medicine (1980), the historic Sihanouk-Hun Sen summit at Fère-en-Tardenois (Dec 2, 1987), full withdrawal of Vietnamese troops in September 1989, the April 1989 constitutional amendments (transitioning to "State of Cambodia", restoring Buddhism as state religion, market economy, abolishing capital punishment), the Supreme National Council (SNC, Sept 10, 1990), and the landmark Paris Peace Agreements of October 23, 1991 with the UNTAC mandate and repatriation of 350,000 refugees. Author 16 official high-yield flashcards in `src/data/practice.ts` (`history-1-5`). Wire authentic section titles into `src/features/lessons/sessions.ts`. Practice quiz mode remains gated to Math only.
+
+**What changed.**
+
+- **Transcribed Textbook OCR.** Rendered pages 49–58 from the MoEYS Grade 12 History Summary textbook into `sources/ocr/history/chapter5-peoples-republic-and-state-of-cambodia.md` covering all 5 core sections.
+- **Grounded KruAI in `server/textbook-search.ts`.** Added 6 detailed RAG chunks under `HISTORY_CH5_SECTIONS` and included them in `ALL_HISTORY_SECTIONS` and `searchHistoryTextbook`:
+  - `tb:hist:prk:ch5:liberation-and-government-structure` (Dec 2, 1978 KUFNS, Jan 7, 1979 liberation, 4 governing bodies, leadership groups from Eastern Zone and Hanoi).
+  - `tb:hist:prk:ch5:four-factions-and-cgdk` (PRK, Khmer Rouge UN seat, KPNLF Son Sann, FUNCINPEC Sihanouk, and 1982 CGDK coalition).
+  - `tb:hist:prk:ch5:k5-plan-and-economic-reconstruction` (July 12, 1984 K-5 Plan border fortifications, 1985 military service, solidarity groups 10–30 families, 1980 Riel currency, shift to private property).
+  - `tb:hist:prk:ch5:social-education-and-health-restoration` (Literacy slogan, reopening of schools, Fine Arts school Jan 1981, 6,000 orphans, Faculty of Medicine Jan 1980).
+  - `tb:hist:prk:ch5:peace-negotiations-and-1989-reforms` (Perestroika context, Dec 2, 1987 Sihanouk-Hun Sen summit, Jakarta JIM, Sept 1989 Vietnamese troop withdrawal, April 1989 State of Cambodia reforms).
+  - `tb:hist:prk:ch5:snc-and-paris-peace-agreements-1991` (Sept 10, 1990 SNC 12 members, Oct 23, 1991 Paris Peace Agreements, UNTAC $2–3 billion mandate, 350,000 refugee repatriation, Sihanouk return).
+- **Authored 16 High-Yield Flashcards (`src/data/practice.ts`).** Added helper `hist15Card` and deck `"history-1-5"` containing 16 comprehensive Q&A cards testing high-frequency MoEYS Bac II historical facts.
+- **Updated History Study Path (`src/features/lessons/sessions.ts`).** Authored 5 authentic section titles for `SUBJECT_SESSIONS.history[0].lessons[4]`.
+- **Verification.** Passed `npm run check:digits` (0 Khmer numerals across all 289 files), `npm run lint` (0 errors), `npx tsc --noEmit` (0 errors), and `npm run build`.
+
 ## 29 Sep 2026 — Grade 12 History Lesson 4 (Democratic Kampuchea 1975-1979) OCR, KruAI RAG Grounding & High-Yield Flashcards
 
 Landed in commit `4487967`. **No database step needed.**
