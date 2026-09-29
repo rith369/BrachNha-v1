@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 29 Sep 2026 — Grade 12 History Lesson 4 (Democratic Kampuchea 1975-1979) OCR, KruAI RAG Grounding & High-Yield Flashcards
 
-Landed in commit `PENDING`. **No database step needed.**
+Landed in commit `4487967`. **No database step needed.**
 
 **Why.** Process Lesson 4 ("កម្ពុជាប្រជាធិបតេយ្យ (1975-1979)" / Democratic Kampuchea) from the official MoEYS Grade 12 History Summary textbook (Book pp. 39–47). Ground KruAI's retrieval-augmented generation (RAG) system with authentic MoEYS facts on the April 17, 1975 forced evacuation of Phnom Penh, the 8-point urgent CPK directives, the totalitarian structure under "Angkar", the January 5, 1976 Constitution and 250-seat Assembly, the 7 administrative zones, the "Super Great Leap Forward" Four-Year Plan (1977-1980) and 3 tons/ha paddy target, 3 stages of cooperatives, social class division (base people vs. new/17 April people), forced collective marriages, destruction of education, S-21 (Tuol Sleng) and internal purges (1978 Eastern Zone massacre), the rise of the Kampuchean United Front for National Salvation (KUFNS) led by Samdech Techo Hun Sen and comrades, the historic January 7, 1979 victory, and the Extraordinary Chambers in the Courts of Cambodia (ECCC) trials. Author 16 official high-yield flashcards in `src/data/practice.ts` (`history-1-4`). Wire authentic section titles into the History study path in `src/features/lessons/sessions.ts`. No quiz was created (quiz tab remains gated to Math only).
 
