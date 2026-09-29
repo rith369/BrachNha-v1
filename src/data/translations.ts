@@ -266,7 +266,6 @@ export const T = {
     saveName: "Save",
     cancelEdit: "Cancel",
     previewTag: "Preview · sample data",
-    sampleLabel: "Sample",
   },
   km: {
     appName: "BrachNha",
@@ -516,7 +515,6 @@ export const T = {
     saveName: "រក្សាទុក",
     cancelEdit: "បោះបង់",
     previewTag: "មើលជាមុន · ទិន្នន័យគំរូ",
-    sampleLabel: "គំរូ",
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 

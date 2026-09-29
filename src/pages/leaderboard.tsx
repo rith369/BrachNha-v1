@@ -19,10 +19,8 @@ export default function LeaderboardPage() {
           <div className="font-heading mb-0.5 bg-brand-tri bg-clip-text pr-14 text-xl font-extrabold text-transparent">
             🏆 {t.leaderboard}
           </div>
-          {/* No page-level PreviewTag: the board mixes real students with the
-              sample cohort, and each sample row carries its own mark — see
-              components/sample-mark.tsx. A page tag would call the real rows
-              sample too. */}
+          {/* No PreviewTag, page-level or per row: the per-row "Sample" mark
+              was removed at the user's request (29 Sep 2026). */}
           <div className="mb-4 pr-14 text-xs font-bold text-muted">
             {COHORT_LABEL[lang]} · {t.leaderboardSubtitle}
           </div>

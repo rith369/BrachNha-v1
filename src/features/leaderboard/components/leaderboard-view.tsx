@@ -40,8 +40,8 @@ const WATCH_OPTIONS = { rootMargin: "0px 0px -150px 0px" };
  * metric that rewards learning rather than sitting in the app, weekly because a
  * board you can still change today motivates more than a lifetime total.
  *
- * THE ROSTER IS THREE SOURCES: the sample cohort (every row marked "Sample" on
- * screen), real students from the server, and the viewer's own row built from
+ * THE ROSTER IS THREE SOURCES: the sample cohort (unmarked on screen since
+ * 29 Sep 2026, at the user's request), real students from the server, and the viewer's own row built from
  * the live store. The viewer is never in the server list — the SQL function
  * excludes the caller — so they cannot appear twice.
  *

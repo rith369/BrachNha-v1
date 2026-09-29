@@ -4,7 +4,7 @@
  * importing it. It is assembled from THREE sources, all normalised to one
  * LeaderboardStudent shape before ranking:
  *   • the fixed sample cohort in features/leaderboard/demo-data.ts (fromDemo),
- *     every row flagged `isSample` and visibly marked on screen;
+ *     every row flagged `isSample` (no longer marked on screen);
  *   • real students from the leaderboard() SQL function (lib/leaderboard.ts);
  *   • the viewer's own row, from the live store (localStudentStats).
  *
@@ -73,8 +73,8 @@ export interface LeaderboardStudent {
   avatarSeed: string;
   /** The signed-in student. Exactly one row in the roster carries this. */
   isCurrentUser?: boolean;
-  /** A made-up student from the sample cohort. Rendered with a visible mark —
-   *  that mark is the condition the sample rows are kept on. */
+  /** A made-up student from the sample cohort. Not read by any component since
+   *  the on-screen "Sample" mark was removed; kept so the mark can come back. */
   isSample?: boolean;
   stats: Record<LeaderboardPeriod, MetricStats>;
   /** Weekly positions moved. All zero for real rows: nothing records where a

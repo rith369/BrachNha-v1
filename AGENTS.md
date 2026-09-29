@@ -4503,7 +4503,7 @@ plus a Home widget, both fed by one source: `demo-data.ts`. Nine components plus
 the rule-based model in `use-grade-prediction.ts`. Fake/demo data on purpose.
 
 **Leaderboard** (`features/leaderboard`) — `/leaderboard`, a MIXED board: a
-29-student sample cohort (`demo-data.ts`, every row marked "Sample"), real
+25-student sample cohort (`demo-data.ts`, unmarked since 29 Sep 2026), real
 students from the `leaderboard()` SQL function, and the viewer's own live row,
 ranked together by `utils/leaderboard.ts`. Its own section follows.
 
@@ -5386,26 +5386,30 @@ imports from `features/`). Six components:
 `leaderboard-controls`, `podium`, `ranking-list`, `sticky-user-card`, plus
 `sample-mark`.
 
-#### The roster is SAMPLE + REAL + YOU, and every sample row is marked
+#### The roster is SAMPLE + REAL + YOU, and the sample rows are NOT marked
 
-The user's call (16 Sep 2026): keep the 29 invented students so the board looks
-full, add real students beside them, and **put a visible "Sample" mark on every
-invented row** so no student mistakes one for a classmate. That mark is the
-condition the sample rows are kept on — `SampleMark` renders on the podium's
-title line and beside the name in the list, and a `fromDemo()` row must never be
-rendered without it. Three sources, normalised to one `LeaderboardStudent`
+The user's call (16 Sep 2026): keep the 29 invented students (25 since four were removed on 29 Sep 2026) so the board looks
+full, and add real students beside them. Every invented row carried a visible
+"Sample" pill (`SampleMark`) until **29 Sep 2026, when the user had it removed**;
+the component and its `sampleLabel` key are deleted. So nothing on screen now
+tells a sample row from a real classmate. `fromDemo()` still sets `isSample`,
+which no component reads; it is what a mark would key on if it comes back.
+Three sources, normalised to one `LeaderboardStudent`
 (`stats: Record<period, MetricStats>`) before `rankBoard()`:
 
 | source | built by | marked |
 | --- | --- | --- |
-| sample cohort, `features/leaderboard/demo-data.ts` | `fromDemo()` | **Sample** |
+| sample cohort, `features/leaderboard/demo-data.ts` | `fromDemo()` | no (was **Sample** until 29 Sep 2026) |
 | other real students, `lib/leaderboard.ts` → `use-real-students.ts` | `fromReal()` | no |
 | the viewer, from the live store | `localStudentStats()` | "You" chip |
 
 - **The fake "You" row is DELETED.** The viewer's row is their real XP, streak
-  and minutes now. The known consequence, weighed and accepted: against a
-  cohort authored at 1,300–3,400 XP a WEEK, a real student sits at or near the
-  bottom. The sample numbers were not rescaled.
+  and minutes now. The cohort was first authored at 1,300–3,400 XP a WEEK,
+  which put every real student at the bottom; it was **rescaled on 29 Sep 2026**
+  (the user's call) so that on EVERY tab it stays under 5 days of streak, 2,000
+  XP and 2h of study (weekly 385–975 XP, month factor 1.2–1.8, all-time factor
+  1.4–2.0). Titles come from all-time XP, so every sample row is now "Beginner".
+  Keep new or edited sample rows inside those limits on all three tabs.
 - **The viewer is never in the server list** — the SQL function excludes
   `auth.uid()` — so they cannot appear twice, and their own row is always the
   fresher local copy rather than the one trailing it on the server.
@@ -6347,8 +6351,8 @@ got built.
 
 **THE LEADERBOARD HAS LEFT IT TOO — by mixing, not replacing.** Its blockers
 (cross-student reads, a daily log, active minutes) all exist now, and the user
-chose to keep the sample cohort beside real students with a "Sample" mark on
-every invented row, rather than drop it. The viewer's own row is real. See its
+chose to keep the sample cohort beside real students rather than drop it (the
+per-row "Sample" mark it shipped with was removed on 29 Sep 2026). The viewer's own row is real. See its
 own section.
 
 **"Demo data" means demo NUMBERS. It never licensed inventing a CURRICULUM.**
@@ -6384,9 +6388,9 @@ kept for the three cards still demo until the user had it removed (17 Sep 2026).
 
 **The Leaderboard LOST its page tag (16 Sep 2026)** when real students joined the
 sample cohort: a page-level tag would call the real rows sample too. It carries a
-per-ROW "Sample" mark instead (`features/leaderboard/components/sample-mark.tsx`),
-same dashed look — the one place in the app where real and invented rows share a
-list, and so the one place the label has to be per row.
+per-ROW "Sample" mark instead, and that mark was removed too (29 Sep 2026, at
+the user's request), so the board is now the third recorded exception beside
+Game and Progress: invented rows, no label.
 
 **The tags ARE the list of what is still fake** — a new
 demo screen gets one, and a screen that switches to real data loses it. `/streak`

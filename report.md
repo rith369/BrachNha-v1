@@ -15,6 +15,32 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 29 Sep 2026 — Leaderboard: No "Sample" Label, Smaller Demo Numbers
+
+Not committed yet.
+
+**What changed.** The leaderboard's 29 made-up students used to carry a small "Sample"
+pill next to their name, on the podium and in the list. That pill has been removed on
+request.
+
+Their numbers were also lowered, because next to the real students' small totals they
+looked unbelievable (thousands of XP and month-long streaks). On every tab (Weekly,
+Monthly, All-time) they now stay under a 5-day streak, 2,000 XP and 2 hours of study, and
+they all show the title "Beginner". Real students' numbers are not touched.
+
+Four of them were also removed on request (Malis Chan, Sokha Tith, Sothea Vann, Nita Pen),
+so there are 25 made-up students now instead of 29.
+
+**What to know.** Nothing on the screen now tells a made-up student from a real one. They
+are still made up: every name above you that is not a real classmate comes from the demo
+list. If anyone asks, the honest answer is that the board is filled with sample students
+until the app has enough real ones.
+
+**Re-test.** Open Leaderboard in both languages: no "Sample" / "គំរូ" pill on the top
+three or in the list, and the "You" chip and your own sticky card still show as before.
+Switch between XP, Streak and Study time, and Weekly, Monthly and All-time: no made-up
+student should reach 2,000 XP, 5 days or 2 hours.
+
 ## 29 Sep 2026 — KruAI Now Teaches Step by Step (Socratic Method)
 
 Commit `056b8d0`. **No database step needed.**
