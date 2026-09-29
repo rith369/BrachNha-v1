@@ -15,6 +15,7 @@ import { checkRateLimit } from "./rate-limit.js";
 import { isVerificationConfigured, verifyRequestUser } from "./verify-user.js";
 import { searchBiologyTextbook, searchHistoryTextbook, searchMathTextbook } from "./textbook-search.js";
 import { getCachedAnswer, createCachedStreamResponse } from "./chat-cache.js";
+import { takeQuota } from "./kruai-quota.js";
 
 /**
  * KruAI endpoint. Started life as a Netlify function, then a Next.js route
@@ -107,6 +108,15 @@ const ATTEMPT_TIMEOUT_MS = 10_000;
  * more than this.
  */
 const FIRST_TEXT_DEADLINE_MS = 25_000;
+
+/**
+ * The same two numbers for a request carrying a photo. Reading an image before
+ * answering takes longer to the first character, and cutting a healthy attempt
+ * off at 10s would turn every photo question into a busy notice. Still under
+ * vercel.json's 60s with room for the answer to stream.
+ */
+const IMAGE_ATTEMPT_TIMEOUT_MS = 18_000;
+const IMAGE_FIRST_TEXT_DEADLINE_MS = 35_000;
 
 /** How long a key+model that answered 429 is skipped by LATER requests. */
 const QUOTA_COOLDOWN_MS = 60_000;
@@ -269,16 +279,67 @@ const USER_RATE_LIMIT = 20;
 const RATE_WINDOW_MS = 60_000;
 
 /**
- * Largest request body we will read. The whole history the client can legally
- * send is 40 messages that the composer itself caps well under this, so 64KB is
- * far above any real question and far below anything worth allocating for.
+ * A third cap, on requests carrying a PHOTO, counted on top of USER_RATE_LIMIT.
+ * A photo costs the model far more than a sentence, and re-sending it with each
+ * follow-up multiplies that — so the cheap case keeps its generous limit and
+ * only the expensive one gets a tighter one.
+ */
+const IMAGE_RATE_LIMIT = 6;
+
+/**
+ * What one question costs against the DAILY limits in kruai-quota.ts. A photo
+ * is charged 3 because reading an image costs the model several times a text
+ * question. The limits themselves (per student and for the whole app) live in
+ * the kruai_take SQL function, so a student cannot choose them.
+ */
+const TEXT_UNITS = 1;
+const PHOTO_UNITS = 3;
+
+function quotaMessage(reason: "user" | "app", lang: Lang): string {
+  if (reason === "user") {
+    return lang === "km"
+      ? "📚 អ្នកបានសួរ KruAI គ្រប់ចំនួនសម្រាប់ថ្ងៃនេះហើយ។ សូមត្រឡប់មកសួរម្ដងទៀតនៅថ្ងៃស្អែក! សំណួរដែលមានរូបភាព រាប់ជា 3 សំណួរ។"
+      : "📚 You have reached today's question limit for KruAI. Come back tomorrow! A question with a photo counts as 3.";
+  }
+  return lang === "km"
+    ? "😴 KruAI បានឆ្លើយសំណួរច្រើនណាស់ថ្ងៃនេះ ហើយកំពុងសម្រាករហូតដល់ថ្ងៃស្អែក។ សូមត្រឡប់មកវិញនៅថ្ងៃស្អែក!"
+    : "😴 KruAI has answered a lot of questions today and is resting until tomorrow. Please come back tomorrow!";
+}
+
+/**
+ * Photos a single request may carry. The client sends the photo on the current
+ * question plus, at most, one earlier photo still held in memory, so a
+ * follow-up about the same exercise can still see it. More is refused rather
+ * than trimmed: the app's own client never sends more.
+ */
+const MAX_IMAGES_PER_REQUEST = 2;
+
+/**
+ * Largest single photo, in base64 characters (≈1.1MB of JPEG). The client
+ * re-encodes to 1400px at quality 0.72 (utils/image-compress.ts), which lands at
+ * 200–450KB of base64 — this is ~3× that, room for a detailed page, and far
+ * below anything worth parsing.
+ */
+const MAX_IMAGE_B64_CHARS = 1_500_000;
+
+/**
+ * How finely the model reads a photo. "high" because reading small print,
+ * pencil and Khmer script correctly is the entire point of the feature — a
+ * misread number is a wrong answer delivered with confidence.
+ */
+const IMAGE_RESOLUTION = "high";
+
+/**
+ * Largest request body we will read — text history (well under 64KB: 40
+ * messages the composer itself caps) plus up to MAX_IMAGES_PER_REQUEST photos.
  *
  * It matters because `req.json()` parses the ENTIRE body before any of the
  * limits below apply: MAX_HISTORY and MAX_MESSAGE_CHARS bound what reaches the
  * MODEL, not what reaches memory. A megabyte of JSON was fully parsed and
- * array-allocated first, on a public endpoint, before being thrown away.
+ * array-allocated first, on a public endpoint, before being thrown away. It was
+ * 64KB until photos; server/vite-chat-plugin.ts mirrors the number.
  */
-const MAX_BODY_BYTES = 64 * 1024;
+const MAX_BODY_BYTES = 64 * 1024 + MAX_IMAGES_PER_REQUEST * MAX_IMAGE_B64_CHARS;
 
 /** Messages accepted before the request is rejected outright, as opposed to
  *  MAX_HISTORY, which is how many of them are forwarded. The client's own cap
@@ -314,11 +375,73 @@ function clientIp(req: Request): string {
 /** One turn in the Interactions API's stateless `input` array. */
 type InteractionStep = {
   type: "user_input" | "model_output";
-  content: { type: "text"; text: string }[];
+  content: (
+    | { type: "text"; text: string }
+    | { type: "image"; data: string; mime_type: string; resolution: string }
+  )[];
 };
 
+/**
+ * A message as it arrives on the wire: a ChatMsg plus what only the transport
+ * carries. `image` is the full photo (lib/chat-images.ts holds it client-side);
+ * `hadImage` marks a message that HAD one the client no longer holds — after a
+ * reload — so the model is told a photo was there rather than left to pretend
+ * it can see one. Both are `unknown` until cleanImage has looked at them.
+ */
+type WireMsg = Omit<ChatMsg, "image"> & { image?: unknown; hadImage?: unknown };
+
+interface CleanImage {
+  data: string;
+  mimeType: string;
+}
+
+/** Base64 alphabet with optional padding, and nothing else. */
+const BASE64 = /^[A-Za-z0-9+/]+={0,2}$/;
+
+/**
+ * A photo from the request, or null if there is none — or throws "bad image"
+ * for one that is present and wrong, which the caller turns into a 400.
+ *
+ * STRICT, because this is bytes forwarded to a paid model on a student's
+ * behalf. The app's client always re-encodes to JPEG (utils/image-compress.ts),
+ * so JPEG is the only type accepted, and the declared type is not trusted on
+ * its own: `/9j/` is the base64 of JPEG's FF D8 FF signature, so a PNG or a
+ * text file labelled image/jpeg is refused here rather than billed upstream.
+ * Length is checked BEFORE the regex, so a huge string is never scanned.
+ */
+function cleanImage(value: unknown): CleanImage | null {
+  if (value === undefined || value === null) return null;
+  if (typeof value !== "object" || Array.isArray(value)) throw new Error("bad image");
+  const { data, mimeType } = value as Record<string, unknown>;
+  if (
+    mimeType !== "image/jpeg" ||
+    typeof data !== "string" ||
+    data.length === 0 ||
+    data.length > MAX_IMAGE_B64_CHARS ||
+    !data.startsWith("/9j/") ||
+    !BASE64.test(data)
+  ) {
+    throw new Error("bad image");
+  }
+  return { data, mimeType };
+}
+
+function badImageMessage(lang: Lang): string {
+  return lang === "km"
+    ? "⚠️ មិនអាចអានរូបភាពនេះបានទេ។ សូមថតរូប ឬជ្រើសរូបភាពម្ដងទៀត។"
+    : "⚠️ Could not read that photo. Please take or choose it again.";
+}
+
+/**
+ * Appended to a turn whose photo the client no longer holds (see WireMsg). In
+ * English on purpose: it is an instruction to the model, like the rest of the
+ * system prompt's framing, never shown to the student.
+ */
+const PHOTO_GONE_NOTE =
+  "\n\n[The student attached a photo to this message earlier. It is no longer available, so do not describe or rely on it; ask them to send it again if it is needed.]";
+
 interface ChatRequestBody {
-  messages?: ChatMsg[];
+  messages?: WireMsg[];
   lang?: Lang;
   profile?: ChatProfile;
   /** `unknown`, not `ScreenRef`: this is whatever JSON.parse produced. See
@@ -556,13 +679,62 @@ export async function handleChat(req: Request): Promise<Response> {
     });
   }
 
-  const input: InteractionStep[] = messages
-    .slice(-MAX_HISTORY)
-    .filter((m) => typeof m?.text === "string" && m.text.trim())
-    .map((m) => ({
-      type: m.role === "bot" ? "model_output" : "user_input",
-      content: [{ type: "text", text: m.text.slice(0, MAX_MESSAGE_CHARS) }],
-    }));
+  // Every photo in the body is checked, not only the ones inside the forwarded
+  // window: a malformed one is a malformed request wherever it sits. A photo on
+  // a BOT message is ignored rather than refused — nothing the app sends puts
+  // one there, and the model only accepts images from the user side.
+  let images: (CleanImage | null)[];
+  try {
+    images = messages.map((m) =>
+      m?.role === "bot" ? null : cleanImage(m?.image)
+    );
+  } catch {
+    return textResponse(badImageMessage(lang), 400);
+  }
+  const imageCount = images.filter(Boolean).length;
+  if (imageCount > MAX_IMAGES_PER_REQUEST) {
+    return textResponse(badImageMessage(lang), 400);
+  }
+
+  const windowStart = Math.max(0, messages.length - MAX_HISTORY);
+  const input: InteractionStep[] = [];
+  for (let i = windowStart; i < messages.length; i++) {
+    const m = messages[i];
+    const text = typeof m?.text === "string" ? m.text.trim() : "";
+    const image = images[i];
+    // A photo turn with no words still counts: the photo IS the question.
+    if (!text && !image) continue;
+
+    if (m.role === "bot") {
+      input.push({
+        type: "model_output",
+        content: [{ type: "text", text: text.slice(0, MAX_MESSAGE_CHARS) }],
+      });
+      continue;
+    }
+
+    const words =
+      text.slice(0, MAX_MESSAGE_CHARS) +
+      (!image && m.hadImage === true ? PHOTO_GONE_NOTE : "");
+    input.push({
+      type: "user_input",
+      // Image first, then the words about it: the order the model's own
+      // guidance gives for a single-image prompt.
+      content: [
+        ...(image
+          ? [
+              {
+                type: "image" as const,
+                data: image.data,
+                mime_type: image.mimeType,
+                resolution: IMAGE_RESOLUTION,
+              },
+            ]
+          : []),
+        ...(words ? [{ type: "text" as const, text: words }] : []),
+      ],
+    });
+  }
 
   if (!input.length || input[input.length - 1].type !== "user_input") {
     return textResponse("No message.", 400);
@@ -572,8 +744,10 @@ export async function handleChat(req: Request): Promise<Response> {
     input
       .filter((step) => step.type === "user_input")
       .at(-1)
-      ?.content.map((c) => c.text)
-      .join(" ") ?? "";
+      ?.content.map((c) => (c.type === "text" ? c.text : ""))
+      .join(" ")
+      .trim() ?? "";
+  const hasImage = imageCount > 0;
 
   // ── who is asking ─────────────────────────────────────────────────────────
   //
@@ -620,6 +794,19 @@ export async function handleChat(req: Request): Promise<Response> {
         "Retry-After": String(userRate.retryAfterSec),
       });
     }
+
+    if (hasImage) {
+      const imageRate = checkRateLimit(
+        `img:${auth.userId}`,
+        IMAGE_RATE_LIMIT,
+        RATE_WINDOW_MS
+      );
+      if (!imageRate.ok) {
+        return textResponse(busyMessage(lang), 429, {
+          "Retry-After": String(imageRate.retryAfterSec),
+        });
+      }
+    }
   }
 
   // ── 0-token curated answers ──────────────────────────────────────────────
@@ -629,7 +816,9 @@ export async function handleChat(req: Request): Promise<Response> {
   const isFirstTurn = !messages.some(
     (m) => m?.role === "bot" && typeof m.text === "string" && m.text.trim()
   );
-  const cachedAnswer = getCachedAnswer(lastUserText, isFirstTurn);
+  // Never with a photo: the typed words may match a canned answer while the
+  // photo asks something else entirely.
+  const cachedAnswer = getCachedAnswer(lastUserText, isFirstTurn && !hasImage);
   if (cachedAnswer) {
     return createCachedStreamResponse(cachedAnswer);
   }
@@ -649,6 +838,37 @@ export async function handleChat(req: Request): Promise<Response> {
           : "🔑 KruAI is temporarily unavailable. Please try again shortly.",
       503
     );
+  }
+
+  // ── daily limits (the money guard) ───────────────────────────────────────
+  //
+  // Charged HERE: after a curated answer (free) and after the key check (no
+  // point spending a student's quota on a question that cannot be answered),
+  // and before the first upstream call. See kruai-quota.ts.
+  //
+  // Only when verification is configured — the quota counts against the
+  // verified student, and in dev without Supabase there is no student.
+  if (isVerificationConfigured()) {
+    const quota = await takeQuota(req, hasImage ? PHOTO_UNITS : TEXT_UNITS);
+    if (!quota.ok && quota.reason !== "error") {
+      return textResponse(quotaMessage(quota.reason, lang), 429);
+    }
+    if (!quota.ok) {
+      // FAILS CLOSED in production, like the auth gate above: the one job of
+      // this check is that paid usage cannot run away, and "we could not
+      // check" is not a reason to spend. The usual cause is the migration not
+      // having been applied (PGRST202 in the detail).
+      console.error(`[api/chat] daily quota check failed: ${quota.detail}`);
+      if (process.env.NODE_ENV === "production") {
+        return textResponse(
+          lang === "km"
+            ? "🔒 KruAI មិនអាចប្រើបានបណ្តោះអាសន្ន។ សូមព្យាយាមម្ដងទៀតនៅពេលបន្តិចទៀត។"
+            : "🔒 KruAI is temporarily unavailable. Please try again shortly.",
+          503
+        );
+      }
+      console.warn("[api/chat] continuing without a daily limit (dev only)");
+    }
   }
 
   const profile: ChatProfile = {
@@ -726,12 +946,16 @@ export async function handleChat(req: Request): Promise<Response> {
   const skippedModels = new Set<string>();
 
   let upstream: AbortController | undefined;
+  const attemptTimeout = hasImage ? IMAGE_ATTEMPT_TIMEOUT_MS : ATTEMPT_TIMEOUT_MS;
+  const firstTextDeadline = hasImage
+    ? IMAGE_FIRST_TEXT_DEADLINE_MS
+    : FIRST_TEXT_DEADLINE_MS;
 
   for (const candidate of orderedCandidates(apiKeys.length)) {
     if (attempts >= MAX_ATTEMPTS) break;
     const { keyIndex, model } = candidate;
     if (skippedKeys.has(keyIndex) || skippedModels.has(model)) continue;
-    const timeLeft = FIRST_TEXT_DEADLINE_MS - (Date.now() - requestStart);
+    const timeLeft = firstTextDeadline - (Date.now() - requestStart);
     if (timeLeft < 1_000) break;
     attempts++;
 
@@ -761,7 +985,7 @@ export async function handleChat(req: Request): Promise<Response> {
         timedOut = true;
         abort.abort();
         reject(new Error("attempt timeout"));
-      }, Math.min(ATTEMPT_TIMEOUT_MS, timeLeft));
+      }, Math.min(attemptTimeout, timeLeft));
     });
 
     try {
@@ -865,6 +1089,20 @@ export async function handleChat(req: Request): Promise<Response> {
               )
             );
             break;
+          }
+          if (event.event_type === "interaction.completed") {
+            // What this answer actually cost, in tokens. This line is how the
+            // price of one question is MEASURED rather than guessed when the
+            // daily limits in kruai_take are tuned. Numbers only, never text.
+            const u = event.interaction?.usage;
+            if (u) {
+              console.info(
+                `[api/chat] tokens in=${u.total_input_tokens ?? "?"} ` +
+                  `out=${u.total_output_tokens ?? "?"} ` +
+                  `thought=${u.total_thought_tokens ?? 0} ` +
+                  `photo=${hasImage ? "yes" : "no"} model=${served.candidate.model}`
+              );
+            }
           }
           const text = deltaText(event);
           if (text) controller.enqueue(encoder.encode(text));

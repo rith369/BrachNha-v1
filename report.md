@@ -15,6 +15,81 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 29 Sep 2026 — Paying for KruAI Safely: Daily Question Limits
+
+Commit `pending`. **Database step needed:** run
+`supabase/migrations/20260929000001_kruai_usage.sql` in the Supabase SQL editor **before**
+deploying. Without it, the live KruAI refuses every question, on purpose (see below).
+
+**Why.** KruAI is moving from free AI keys to one paid key, loaded with $30 of prepaid
+credit. The team wanted to be sure that $30 cannot all be spent in one day, by many
+questions, a bug, or someone misusing an account.
+
+**What changed.**
+- **Each student can ask KruAI 30 questions a day.** A question with a photo counts as 3,
+  because photos cost more. After that, KruAI says "come back tomorrow".
+- **The whole app has a daily limit too** (starting at 300). When it is reached, KruAI
+  says it is resting until tomorrow. This number will be adjusted once we see what one
+  question really costs.
+- The ready-made answers (for example mitosis vs meiosis) are free, so they don't count.
+- If the app cannot check the limit (for example the database is down), KruAI stops
+  answering rather than risk spending without a limit.
+- The server now records how much each answer cost (numbers only, no student text), so
+  the daily limit can be set from real prices.
+
+**Settings to do in Google and Vercel (not code).**
+1. When buying the $30 credit, make sure **auto top-up / auto reload is OFF**. Then Google
+   can never charge more than the $30.
+2. In Google Cloud Billing, add a budget alert at 25%, 50% and 90% of $30. It only sends
+   an email; it does not stop anything.
+3. Create the API key inside the paid project, and restrict it to the Generative Language
+   API.
+4. In Vercel, keep only `GEMINI_API_KEY` = the paid key. Delete `GEMINI_API_KEYS` and
+   `GEMINI_API_KEY_1` to `_5`. Then redeploy.
+
+**What to re-test.**
+1. After running the migration, ask KruAI a question on the live site. It should answer
+   normally.
+2. Ask with a photo; it counts as 3.
+3. In Google Cloud Billing, check that the charge appears after a few questions.
+
+## 29 Sep 2026 — KruAI Can Read a Photo of an Exercise
+
+Commit `pending`. **No database step needed.**
+
+**Why.** Students wanted to photograph an exercise (from the textbook, a past paper or their
+notebook) and ask KruAI about it, instead of typing out a long formula.
+
+**What changed.**
+- In the KruAI chat there is a new **camera button** beside Σ. Tapping it offers two choices:
+  **ថតរូប** (take a photo with the camera) or **ជ្រើសរូបភាព** (choose a photo from the phone).
+- The student can add a question, or just press Send. With no question, KruAI is asked to
+  explain and solve the exercise in the photo.
+- KruAI first writes out the exercise as it read it, so the student can check it read correctly.
+  If part of the photo is blurry or cut off, it says which part and asks for a clearer photo
+  instead of guessing.
+- Follow-up questions ("explain step 3") still see the photo, as long as the app has not been
+  closed.
+- Photos are made smaller on the phone before sending (about 300KB), to save mobile data.
+- The chat history keeps a small preview of the photo. Only the 30 newest photos keep a
+  preview, so the phone's storage stays safe; older ones show a small "រូបភាព" label.
+- One photo per message.
+
+**Not tested yet, and worth knowing.**
+- On the day this was built, every free AI key was out of quota, so KruAI's real answers to
+  photos have not been seen yet. Everything else was tested (sending, the preview, the limits,
+  errors, small screens), using a stand-in for the AI.
+- The camera and gallery have not been tried on a real phone yet.
+- Photos of students' notebooks are sent to the AI provider, like any other question.
+
+**What to re-test.**
+1. On a phone, open KruAI, tap the camera button and choose ថតរូប. The camera should open.
+   Photograph an exercise and press Send. KruAI should write the exercise out, then solve it.
+2. Try ជ្រើសរូបភាព with a photo already on the phone, including one taken on an iPhone.
+3. Send a blurry photo. KruAI should ask for a clearer one.
+4. Ask a follow-up about the same photo, then close the app, reopen it, and check that the
+   photo preview is still in the chat.
+
 ## 29 Sep 2026 — Grade 12 History Lesson 6 (Kingdom of Cambodia II 1993-Present) OCR, KruAI RAG Grounding & High-Yield Flashcards
 
 Landed in commit `1082909`. **No database step needed.**

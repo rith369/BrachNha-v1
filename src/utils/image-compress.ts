@@ -50,14 +50,23 @@ export interface CompressedImage {
  * photo uploads sideways instead of failing — degraded, not broken, and the
  * student can rotate and retake.
  */
-export async function compressImage(file: Blob): Promise<CompressedImage> {
+export async function compressImage(
+  file: Blob,
+  opts: { maxEdge?: number; quality?: number } = {}
+): Promise<CompressedImage> {
+  // The defaults are the legibility numbers above. Only a caller that wants a
+  // small DISPLAY copy (KruAI's history thumbnail) overrides them — never a copy
+  // someone has to read.
+  const maxEdge = opts.maxEdge ?? MAX_EDGE;
+  const quality = opts.quality ?? QUALITY;
+
   const bitmap = await createImageBitmap(file, {
     imageOrientation: "from-image",
   });
 
   // Never scale UP. A photo already smaller than the cap is re-encoded at its
   // own size — enlarging it would spend bytes inventing detail that is not there.
-  const scale = Math.min(1, MAX_EDGE / Math.max(bitmap.width, bitmap.height));
+  const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
   const width = Math.max(1, Math.round(bitmap.width * scale));
   const height = Math.max(1, Math.round(bitmap.height * scale));
 
@@ -81,9 +90,25 @@ export async function compressImage(file: Blob): Promise<CompressedImage> {
   bitmap.close();
 
   const blob = await new Promise<Blob | null>((resolve) =>
-    canvas.toBlob(resolve, "image/jpeg", QUALITY)
+    canvas.toBlob(resolve, "image/jpeg", quality)
   );
   if (!blob) throw new Error("could not encode image");
 
   return { blob, contentType: "image/jpeg" };
+}
+
+/** A blob as a `data:` URL, for an `<img src>` that must survive a reload. */
+export function blobToDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error ?? new Error("read failed"));
+    reader.readAsDataURL(blob);
+  });
+}
+
+/** A blob as bare base64 (no `data:` prefix), the shape a JSON body carries. */
+export async function blobToBase64(blob: Blob): Promise<string> {
+  const url = await blobToDataUrl(blob);
+  return url.slice(url.indexOf(",") + 1);
 }

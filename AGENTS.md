@@ -480,6 +480,181 @@ Textbook text is plain template literals, so LaTeX there needs `\\` — two
 `$\rightarrow$` in the enzyme section were written with one backslash and
 reached the model as a carriage return + "ightarrow".
 
+### KruAI reads photos (29 Sep 2026)
+
+A student can attach ONE photo per message, from the camera or the gallery, and
+KruAI answers about it. The user's three calls: **one camera button that opens a
+two-item menu** (ថតរូប / ជ្រើសរូបភាព, `components/shell/chat-attach.tsx`), **a
+small preview kept in the history**, **one photo per message**.
+
+**Two copies of every photo, and only the small one is persisted.**
+
+| copy | size | lives in | used for |
+| --- | --- | --- | --- |
+| full | 1400px, JPEG 0.72, ~200–450KB base64 | `lib/chat-images.ts`, a module `Map`, this page load only (6 held) | what the model reads |
+| thumb | 320px, JPEG 0.6, ~5–20KB data URL | `ChatMsg.image.thumb`, persisted | the bubble after a reload |
+
+localStorage is ~5MB for the whole store, so a full photo there would fill it in
+weeks. `MAX_CHAT_THUMBS` (30) in `lib/store.ts` strips `thumb` from older photo
+messages, newest kept; the stripped message keeps `image: {}` so its bubble still
+shows a "រូបភាព" chip. `chat_messages` syncs text only, so another device sees the
+question without its photo. That is accepted, and it needs no migration.
+
+**A photo sent with no words gets a real text** (`PHOTO_QUESTION` in
+`chat-overlay.tsx`), stored as the message's text. That keeps the conversation
+title, the sync row and history replay free of empty-text cases.
+
+**The wire.** `wireMessages()` sends `{ role, text }` per message, plus the full
+photo for at most `MAX_PHOTOS_SENT` (2) of the newest photo messages still held in
+memory, inside the last 12 messages (the handler's `MAX_HISTORY`). So "explain
+step 3" still reaches the model with its photo. A message whose photo is no longer
+held (after a reload) is sent with `hadImage: true`, and the handler appends
+`PHOTO_GONE_NOTE` so the model says it cannot see it rather than pretending. Thumbs
+and ids are never sent.
+
+**The server is strict** (`cleanImage` in `chat-handler.ts`): `image/jpeg` only
+(the client always re-encodes, which also converts an iPhone's HEIC), the base64
+alphabet only, at most `MAX_IMAGE_B64_CHARS` (checked before the regex runs), and
+it must start with `/9j/`, the base64 of JPEG's FF D8 FF signature. More than
+`MAX_IMAGES_PER_REQUEST` (2) is refused, not trimmed. `MAX_BODY_BYTES` grew from
+64KB to 64KB + 2 photos. `server/vite-chat-plugin.ts` mirrors that number and
+**both must change together**. A photo turn is sent to the model image first,
+then text, at `resolution: "high"` (`IMAGE_RESOLUTION`), because a misread digit
+gives a confident wrong answer. A photo request never gets a curated answer, and
+it counts against an extra per-user `IMAGE_RATE_LIMIT` (6/min).
+
+**Timeouts: provisional, not yet measured.** A photo request uses
+`IMAGE_ATTEMPT_TIMEOUT_MS` (18s) and `IMAGE_FIRST_TEXT_DEADLINE_MS` (35s) in place
+of 10s/25s, since reading an image delays the first character. When this shipped,
+every free key was out of quota (429) or overloaded (503), and Google held some
+requests 35–155s before refusing them. So no real model answer to a photo could be
+timed. **Measure first-text time on a real photo once a key works, then set these
+two numbers from it.** Also try `"medium"` resolution against the same photos and
+keep it if it reads them as well.
+
+**The prompt** carries a PHOTO block in `BAC2_ANSWER_RULES` (both languages; `km`
+is what is sent):
+- transcribe the exercise first as the Given, so the student can check it was read right;
+- name any unreadable part and ask for a clearer photo, never guess a number;
+- with several exercises in one photo, solve the first and offer the rest;
+- if the photo is not schoolwork, say so in one line.
+
+**How it was verified without quota**, which is repeatable: the SDK honours
+`GOOGLE_GEMINI_BASE_URL`, so a dev server started with
+`GOOGLE_GEMINI_BASE_URL=http://localhost:5190 GEMINI_API_KEYS=fake` talks to a
+20-line Node server that records each request body and streams back an SSE
+answer (`event: step.delta` / `data: {...}`). That proved:
+- the upstream body is image first, byte-identical data, `mime_type` JPEG, `resolution: "high"`,
+  `store: false`, with the PHOTO rule in the system prompt;
+- a follow-up re-sends the photo, and `hadImage` becomes the note;
+- a PNG type, non-base64 data, wrong magic bytes, 3 photos and a 4MB body are refused (400/413).
+
+Then real Chrome at 390 light, 320 dark and 1280, 26 checks:
+- the menu with `capture="environment"` only on the camera input;
+- a photo-only send, the bubble photo, and the viewer (`absolute inset-0`, not portalled);
+- the thumb and `hadImage` after a reload;
+- an undecodable file shows the error chip and Send stays disabled;
+- the 31st photo strips the oldest thumb;
+- no sideways scroll or page error, and the text field is still 152px wide at 320.
+
+**Not verified: a real phone** (camera opening, the gallery, HEIC) or a real model
+reading a photo. Both need a working key or the deployed site.
+
+Photos of students' notebooks go to the model provider like any other message.
+The free-tier data note above applies to them too.
+
+### Paying for the model: prepaid credit plus daily limits (29 Sep 2026)
+
+The user is moving production to ONE paid key: Google's minimum $30 prepaid
+top-up. There are two layers, and they do different jobs.
+
+1. **Google side: caps the TOTAL.** Prepaid credit with **auto top-up OFF** means
+   the most that can ever be charged is what was loaded. Budgets in Cloud Billing
+   only ALERT; they never stop spending, so they are an early warning and nothing
+   more. The key is restricted to the Generative Language API.
+2. **App side: caps the DAY**, so $30 cannot all go in one day through heavy use,
+   a bug, or an abused account. `supabase/migrations/20260929000001_kruai_usage.sql`
+   adds `kruai_usage` and `public.kruai_take(p_units)`, and `server/kruai-quota.ts`
+   calls it. Per student it is **30 units a day** (the user's number); for the
+   whole app it is **300 units a day**, a starting guess to be retuned (below). A
+   text question costs 1 unit and a photo costs 3 (`TEXT_UNITS`/`PHOTO_UNITS` in
+   the handler). A curated answer is free and is charged nothing. At a limit,
+   KruAI answers with a readable 429 ("come back tomorrow" or "KruAI is resting
+   until tomorrow").
+
+**Why the database and not `rate-limit.ts`.** That limiter is in memory and per
+serverless instance, and its own header says a daily counter held that way resets
+on every cold start. A money limit must be one number shared by every instance.
+
+**Three decisions in `kruai_take`, each closing a real hole:**
+- **The server calls it with the STUDENT'S OWN token**, so `auth.uid()` is the
+  student and no secret key is needed. The catch is that any student can also
+  call it directly. So the **limits are constants inside the function, never
+  parameters** (a parameter would let them choose the limit). `p_units` must be
+  1–10 (no negative refunds), and a refused call **changes nothing**, so a student
+  hammering at their limit cannot eat into everyone's count. The worst a student
+  can do by calling it directly is spend their own 30.
+- **The day is computed in SQL** as `now() at time zone 'Asia/Phnom_Penh'`, never
+  sent by the client.
+- **`pg_advisory_xact_lock`** serialises takes, so two questions arriving together
+  cannot both read "29 of 30" and both pass.
+
+**It FAILS CLOSED in production.** If the RPC errors (Supabase down, or
+**migration not applied**, which shows PGRST202 in the log), KruAI answers 503.
+That is the same stance as the auth gate: "we could not check" is not a reason to
+spend. Dev warns and continues. **So this migration is REQUIRED before deploying**,
+or production KruAI refuses every question.
+
+**Known cost, accepted:** the unit is charged before the model is called, so a
+question that then fails upstream (every key busy) still costs the student that
+unit. A refund RPC would be callable by students too, and is not worth it.
+
+**Tuning the whole-app number.** The handler logs one line per answer from the
+`interaction.completed` event:
+
+    [api/chat] tokens in=… out=… thought=… photo=… model=…
+
+Take the average cost per unit from those lines and Google's price page, then
+set `app_daily ≈ dollars per day accepted / cost per unit` (about $1/day for $30
+to last a month). The worst case is bounded: `max_output_tokens` is 3000 and the
+prompt budgets are fixed, so a day can never cost more than
+`app_daily × worst-case cost of one unit`. **Change a limit by editing the constant
+in the migration and re-running its `create or replace function` in the SQL
+editor.** `supabase/README.md` says the same.
+
+**Production uses ONE key.** Vercel holds only `GEMINI_API_KEY` (the paid one).
+`GEMINI_API_KEYS` and `_1..5` are deleted there, because mixing in free keys from
+other accounts would send some students' questions to the free tier, and pooling
+free accounts is the terms problem recorded earlier. `getApiKeys()` needed no
+change. Local `.env.local` keeps the free keys, so development never spends the
+credit. The server also reads `VITE_SUPABASE_ANON_KEY` at runtime now (as the RPC's
+`apikey`); Vercel already exposes it to functions, and `vite-chat-plugin.ts`
+bridges it in dev.
+
+**Verified without money or a real login**, and the script pattern is reusable.
+A Node script loads the real `handleChat` through Vite's `ssrLoadModule` and runs
+two fakes in the same process:
+- a fake Supabase that serves a JWKS and a `kruai_take` enforcing the same rules,
+  with tokens signed ES256 by `node:crypto` (`iss` = `{url}/auth/v1`,
+  `aud: authenticated`);
+- the fake Gemini from the photo work, reached through `GOOGLE_GEMINI_BASE_URL`.
+
+All 18 checks passed:
+- text costs 1 and a photo 3; the curated answer costs 0 and makes no RPC call;
+- the 31st unit and a 3-unit photo with only 2 left are refused, and neither is
+  counted;
+- the whole-app cap refuses with the resting message;
+- the token line is logged;
+- a missing RPC (404) or a database error (500) → 503 in production, answered in
+  dev;
+- no token → 401.
+
+**The SQL itself was NOT executed here** (no local Postgres). Before applying it,
+the live project answered PGRST202. After applying, check two things:
+- a publishable-key-only call to `/rest/v1/rpc/kruai_take` is refused (it is
+  granted to `authenticated` only);
+- `npm run db:check` lists `kruai_usage`.
+
 `server/rate-limit.ts` caps requests per IP (240/min, anti-flood) and per
 verified user (20/min) before any upstream call, so a flood costs nothing. In
 dev there's no proxy and everything keys to `"local"`, which is fine — it

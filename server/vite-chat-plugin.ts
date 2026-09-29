@@ -33,7 +33,7 @@ type ChatModule = { handleChat: (req: Request) => Promise<Response> };
  *  chunked request carries no length, so that lands on the parse failure and
  *  answers 400 instead. Either way nothing large is held, which is the point —
  *  this bound is about the dev server's memory, not its status codes. */
-const MAX_BODY_BYTES = 64 * 1024;
+const MAX_BODY_BYTES = 64 * 1024 + 2 * 1_500_000; // text + 2 photos, as there
 
 /** Node's IncomingMessage -> the web Request that handleChat() expects. */
 async function toWebRequest(
@@ -123,10 +123,14 @@ export function chatApi(): Plugin {
       // process.env regardless of prefix; in dev nothing puts it there, and
       // without it the handler skips verification with a warning — which would
       // make "the mentor works locally" mean nothing about production.
+      // The publishable key too: server/kruai-quota.ts calls the kruai_take
+      // RPC, and PostgREST wants it as the `apikey` header.
       for (const key of [
         "SUPABASE_URL",
         "VITE_SUPABASE_URL",
         "SUPABASE_JWT_SECRET",
+        "SUPABASE_ANON_KEY",
+        "VITE_SUPABASE_ANON_KEY",
       ]) {
         if (env[key] && !process.env[key]) process.env[key] = env[key];
       }

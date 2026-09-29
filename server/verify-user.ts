@@ -81,7 +81,7 @@ let jwksInFlight: Promise<JwkKey[] | null> | null = null;
  *  prefix, so the VITE_-prefixed values the browser build uses are readable
  *  here too — no second copy of the URL to keep in step. SUPABASE_URL is
  *  accepted first for anyone who prefers the unprefixed name. */
-function supabaseUrl(): string {
+export function supabaseUrl(): string {
   return (
     process.env.SUPABASE_URL?.trim() ||
     process.env.VITE_SUPABASE_URL?.trim() ||

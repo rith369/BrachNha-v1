@@ -11,6 +11,7 @@ import {
   Trash2,
   Sigma,
   Keyboard,
+  ImageIcon,
 } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
@@ -20,10 +21,78 @@ import { applyInsert, defaultMathLayout } from "@/utils/math-input";
 import { daysUntilExam } from "@/utils/exam-date";
 import { screenRefFor } from "@/utils/chat-screen";
 import { getAccessToken } from "@/lib/auth";
+import { imageFor, rememberImage, type ChatImage } from "@/lib/chat-images";
+import { blobToBase64, blobToDataUrl, compressImage } from "@/utils/image-compress";
 import { cn } from "@/utils/cn";
 import { MathText } from "./math-text";
+import { AttachmentChip, PhotoButton } from "./chat-attach";
 import type { ChatProfile } from "@/utils/chat-prompt";
 import type { ChatMsg, Conversation } from "@/types";
+
+/**
+ * What the composer is holding. `full` is the ~1400px copy the model reads and
+ * `thumb` the ~320px one the history keeps (see ChatMsg.image). Both are made
+ * BEFORE Send, so pressing Send never waits on a canvas.
+ */
+type Attachment =
+  | { status: "processing" }
+  | { status: "error" }
+  | { status: "ready"; full: ChatImage; thumb: string };
+
+/** A photo sent with no words gets this as its text, in the UI language. Stored
+ *  as the message's real text, so the conversation title, the sync row and the
+ *  replayed history are never empty. */
+const PHOTO_QUESTION = {
+  en: "Please explain and solve the exercise in this photo.",
+  km: "សូមជួយពន្យល់ និងដោះស្រាយលំហាត់ក្នុងរូបភាពនេះ។",
+} as const;
+
+/** Photos re-sent with a follow-up, newest first. Mirrors MAX_IMAGES_PER_REQUEST
+ *  in server/chat-handler.ts, which refuses more. */
+const MAX_PHOTOS_SENT = 2;
+
+/** Only messages this close to the end are forwarded to the model (MAX_HISTORY
+ *  in the handler), so a photo further back would be uploaded for nothing. */
+const REPLAY_WINDOW = 12;
+
+/** Past this, decoding the file alone can exhaust a cheap phone's memory. A real
+ *  camera photo is 3–5MB; 25MB is a scan or a panorama nobody meant to send. */
+const MAX_PHOTO_FILE_BYTES = 25 * 1024 * 1024;
+
+/**
+ * The request's `messages`: text for every message, the full photo for at most
+ * MAX_PHOTOS_SENT recent ones still held in memory, and `hadImage` for a photo
+ * that is gone (after a reload) so the model is told rather than left to guess.
+ * Thumbs and ids are NOT sent — the server has no use for either, and thumbs
+ * would add tens of KB per photo to every request.
+ */
+function wireMessages(history: ChatMsg[]) {
+  const firstInWindow = history.length - REPLAY_WINDOW;
+  const out: {
+    role: ChatMsg["role"];
+    text: string;
+    image?: ChatImage;
+    hadImage?: true;
+  }[] = [];
+  let sent = 0;
+  // Newest first, so the photo budget goes to the most recent photos.
+  for (let i = history.length - 1; i >= 0; i--) {
+    const m = history[i];
+    const base = { role: m.role, text: m.text };
+    if (m.role !== "user" || !m.image) {
+      out.push(base);
+      continue;
+    }
+    const full = imageFor(m.id);
+    if (full && i >= firstInWindow && sent < MAX_PHOTOS_SENT) {
+      sent++;
+      out.push({ ...base, image: full });
+    } else {
+      out.push({ ...base, hadImage: true });
+    }
+  }
+  return out.reverse();
+}
 
 // MathLive is ~840KB of JS plus its font files. Split off behind React.lazy so
 // it downloads the first time a student taps Σ, not when the mentor opens —
@@ -113,6 +182,48 @@ export function ChatOverlay() {
   const [mode, setMode] = useState<"text" | "math">("text");
   const [mathLayout] = useState(() => defaultMathLayout(pathname));
 
+  const [attachment, setAttachment] = useState<Attachment | null>(null);
+  // The photo on screen full-size, or null. A src, not a message id, so the
+  // viewer needs no lookup and cannot point at a message that has since scrolled
+  // out of the 40-message cap.
+  const [viewing, setViewing] = useState<string | null>(null);
+  // Bumped on every pick and every removal. A slow compression that finishes
+  // after the student removed it or picked another photo must not land.
+  const pickToken = useRef(0);
+
+  async function attachPhoto(file: File) {
+    const token = ++pickToken.current;
+    if (file.size > MAX_PHOTO_FILE_BYTES) {
+      setAttachment({ status: "error" });
+      return;
+    }
+    setAttachment({ status: "processing" });
+    try {
+      const full = await compressImage(file);
+      // The thumb is made from the already-shrunk copy, so the second decode is
+      // of a ~300KB JPEG rather than the original 5MB photo.
+      const thumb = await compressImage(full.blob, { maxEdge: 320, quality: 0.6 });
+      const [data, thumbUrl] = await Promise.all([
+        blobToBase64(full.blob),
+        blobToDataUrl(thumb.blob),
+      ]);
+      if (token !== pickToken.current) return;
+      setAttachment({
+        status: "ready",
+        full: { data, mimeType: full.contentType },
+        thumb: thumbUrl,
+      });
+    } catch {
+      if (token !== pickToken.current) return;
+      setAttachment({ status: "error" });
+    }
+  }
+
+  function removePhoto() {
+    pickToken.current++;
+    setAttachment(null);
+  }
+
   const active = conversations.find((c) => c.id === activeConversationId);
   const msgs = active?.msgs ?? NO_MSGS;
 
@@ -188,8 +299,14 @@ export function ChatOverlay() {
       : "👋 សួស្ដី! ខ្ញុំជា KruAI គ្រូជំនួយសិក្សា BrachNha។ សួរខ្ញុំអ្វីក៏បានអំពី Bac II!";
 
   async function send(question?: string) {
-    const text = (question ?? input).trim();
-    if (!text || loading) return;
+    const typed = (question ?? input).trim();
+    // A starter question tapped from the empty chat is its own message; only
+    // the composer's Send carries the attached photo.
+    const photo =
+      question === undefined && attachment?.status === "ready" ? attachment : null;
+    if (loading || attachment?.status === "processing") return;
+    if (!typed && !photo) return;
+    const text = typed || PHOTO_QUESTION[lang];
 
     const profile: ChatProfile = {
       name: userName,
@@ -210,11 +327,20 @@ export function ChatOverlay() {
       pendingPlacementTests: pendingPlacementTests.map((p) => p.subject),
     };
 
-    // Snapshot before the store updates — this is what gets replayed as context.
-    const history = [...msgs, { role: "user" as const, text }];
+    addChatMsg({ role: "user", text, ...(photo && { image: { thumb: photo.thumb } }) });
 
-    addChatMsg({ role: "user", text });
+    // Read the message back to get the id the store minted — the full photo is
+    // held against it (lib/chat-images.ts). Same read-back the game uses before
+    // publishing a competition, so the two copies share one identity.
+    const after = useBrachNhaStore.getState();
+    const history =
+      after.conversations.find((c) => c.id === after.activeConversationId)?.msgs ??
+      [];
+    const sentId = history.at(-1)?.id;
+    if (photo && sentId) rememberImage(sentId, photo.full);
+
     setInput("");
+    if (photo) setAttachment(null);
     setLoading(true);
 
     // Drop back to text mode so the math panel isn't covering the reply. Only
@@ -251,7 +377,7 @@ export function ChatOverlay() {
         // answer. The endpoint uses it to quote the app's own text back; see
         // pinnedContextFor in utils/chat-prompt.ts.
         body: JSON.stringify({
-          messages: history,
+          messages: wireMessages(history),
           lang,
           profile,
           screen: screenRefFor(pathname),
@@ -414,6 +540,13 @@ export function ChatOverlay() {
                     : "border border-purple/10 bg-surface text-text"
                 }`}
               >
+                {m.image && (
+                  <PhotoInBubble
+                    lang={lang}
+                    msg={m}
+                    onOpen={(src) => setViewing(src)}
+                  />
+                )}
                 {/* Both sides carry LaTeX now: the model writes it (see
                     data/bac2-format.ts) and the math panel inserts it. Khmer
                     prose around a formula is safe — splitMath refuses to
@@ -436,42 +569,71 @@ export function ChatOverlay() {
       </div>
 
       {/* Input */}
-      <div className="mx-auto flex w-full max-w-2xl shrink-0 items-center gap-2 border-t border-purple/10 p-3">
-        <button
-          onClick={toggleMode}
-          aria-label={mode === "math" ? t.textKeyboard : t.mathKeyboard}
-          className={cn(
-            iconBtn,
-            "size-10",
-            mode === "math" &&
-              "bg-[var(--brand-purple)] text-on-brand hover:bg-[var(--brand-purple)]"
-          )}
-        >
-          {mode === "math" ? (
-            <Keyboard className="size-4.5" strokeWidth={2.25} />
-          ) : (
-            <Sigma className="size-4.5" strokeWidth={2.5} />
-          )}
-        </button>
-        <input
-          ref={inputRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && send()}
-          // Typing prose and building a formula are separate acts; reaching for
-          // one puts the other keyboard away.
-          onFocus={() => setMode("text")}
-          placeholder={t.askQuestion}
-          className="min-w-0 flex-1 rounded-full border border-purple/15 bg-surface px-4 py-2.5 text-sm font-semibold outline-none focus:border-purple/40"
-        />
-        <button
-          onClick={() => send()}
-          disabled={loading || !input.trim()}
-          aria-label={t.send}
-          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand text-white disabled:opacity-40"
-        >
-          <Send className="size-4.5" />
-        </button>
+      <div className="mx-auto w-full max-w-2xl shrink-0 border-t border-purple/10 p-3">
+        {attachment && (
+          <AttachmentChip
+            lang={lang}
+            status={attachment.status}
+            thumb={attachment.status === "ready" ? attachment.thumb : undefined}
+            onRemove={removePhoto}
+          />
+        )}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={toggleMode}
+            aria-label={mode === "math" ? t.textKeyboard : t.mathKeyboard}
+            className={cn(
+              iconBtn,
+              "size-10",
+              mode === "math" &&
+                "bg-[var(--brand-purple)] text-on-brand hover:bg-[var(--brand-purple)]"
+            )}
+          >
+            {mode === "math" ? (
+              <Keyboard className="size-4.5" strokeWidth={2.25} />
+            ) : (
+              <Sigma className="size-4.5" strokeWidth={2.5} />
+            )}
+          </button>
+          <PhotoButton
+            lang={lang}
+            disabled={loading}
+            className={cn(iconBtn, "size-10")}
+            // The menu opens upward over the math keyboard's space; put that
+            // keyboard away rather than stack the two.
+            onOpen={() => setMode("text")}
+            onPick={attachPhoto}
+          />
+          <input
+            ref={inputRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && send()}
+            // Typing prose and building a formula are separate acts; reaching for
+            // one puts the other keyboard away.
+            onFocus={() => setMode("text")}
+            placeholder={
+              attachment?.status === "ready"
+                ? lang === "en"
+                  ? "Ask about this photo..."
+                  : "សួរអំពីរូបភាពនេះ..."
+                : t.askQuestion
+            }
+            className="min-w-0 flex-1 rounded-full border border-purple/15 bg-surface px-4 py-2.5 text-sm font-semibold outline-none focus:border-purple/40"
+          />
+          <button
+            onClick={() => send()}
+            disabled={
+              loading ||
+              attachment?.status === "processing" ||
+              (!input.trim() && attachment?.status !== "ready")
+            }
+            aria-label={t.send}
+            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand text-white disabled:opacity-40"
+          >
+            <Send className="size-4.5" />
+          </button>
+        </div>
       </div>
 
       {mode === "math" && (
@@ -488,6 +650,10 @@ export function ChatOverlay() {
             onInsert={insertLatex}
           />
         </Suspense>
+      )}
+
+      {viewing && (
+        <PhotoViewer lang={lang} src={viewing} onClose={() => setViewing(null)} />
       )}
 
       {view === "history" && (
@@ -507,6 +673,92 @@ export function ChatOverlay() {
         />
       )}
     </motion.div>
+  );
+}
+
+/**
+ * A photo inside the student's own bubble. The full copy while this page load
+ * still holds it (sharper, and what the model actually read); the persisted
+ * thumb after a reload; and a plain "photo" chip once even the thumb was
+ * trimmed by MAX_CHAT_THUMBS, so the bubble still says a photo was there.
+ */
+function PhotoInBubble({
+  lang,
+  msg,
+  onOpen,
+}: {
+  lang: "en" | "km";
+  msg: ChatMsg;
+  onOpen: (src: string) => void;
+}) {
+  const full = imageFor(msg.id);
+  const src = full ? `data:${full.mimeType};base64,${full.data}` : msg.image?.thumb;
+  const label = lang === "en" ? "Photo" : "រូបភាព";
+
+  if (!src) {
+    return (
+      <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-1 text-xs font-bold">
+        <ImageIcon className="size-3.5" strokeWidth={2.5} />
+        {label}
+      </div>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(src)}
+      aria-label={lang === "en" ? "Open photo" : "បើករូបភាព"}
+      className="mb-2 block overflow-hidden rounded-xl bg-white/10"
+    >
+      <img
+        src={src}
+        alt={label}
+        className="block max-h-60 w-auto max-w-full object-contain"
+      />
+    </button>
+  );
+}
+
+/**
+ * The photo full-screen, INSIDE the overlay (`absolute inset-0`), not portalled
+ * to body — the same reason HistoryPanel is not a ui/sheet: a portal escapes the
+ * shell's max-width frame. Tap anywhere or Escape to close.
+ */
+function PhotoViewer({
+  lang,
+  src,
+  onClose,
+}: {
+  lang: "en" | "km";
+  src: string;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={lang === "en" ? "Photo" : "រូបភាព"}
+      onClick={onClose}
+      className="absolute inset-0 z-30 flex items-center justify-center bg-black/90 p-4"
+    >
+      <img src={src} alt="" className="max-h-full max-w-full object-contain" />
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label={lang === "en" ? "Close" : "បិទ"}
+        className="absolute top-4 right-4 flex size-10 items-center justify-center rounded-full bg-white/15 text-white"
+      >
+        <X className="size-5" strokeWidth={2.5} />
+      </button>
+    </div>
   );
 }
 

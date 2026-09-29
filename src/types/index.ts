@@ -188,6 +188,22 @@ export interface ChatMsg {
    * that is already painted and will not move again.
    */
   id?: string;
+  /**
+   * The student attached a photo to this message. PRESENCE is the fact ("there
+   * was a photo here"); `thumb` is a small JPEG data URL (~320px) kept so the
+   * history still shows which exercise was asked about.
+   *
+   * The FULL image is never persisted — it lives in lib/chat-images.ts for this
+   * page load only. localStorage is ~5MB and a full photo is ~300KB, so keeping
+   * it would fill the store within a few weeks of normal use. `thumb` is
+   * stripped from all but the newest MAX_CHAT_THUMBS messages for the same
+   * reason; an `image: {}` left behind still tells the bubble to say a photo was
+   * there. Optional, so no persist migration — same as `id` above.
+   *
+   * Not synced: chat_messages stores text only, so another device sees the
+   * question without its photo.
+   */
+  image?: { thumb?: string };
 }
 
 // One saved conversation with KruAI. Conversations are created lazily —

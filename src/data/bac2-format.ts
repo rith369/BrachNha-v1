@@ -94,7 +94,18 @@ WRITING RULES:
      | [លក្ខណៈ 1] | [ចំណុច A] | [ចំណុច B] |
   3. "Exam tip" reminding students that Bac II examiners grade both similarities and differences.
 - For a non-academic message (a greeting, "how do I study?", motivation), drop the
-  skeleton entirely and just reply warmly in 2-4 lines.`,
+  skeleton entirely and just reply warmly in 2-4 lines.
+
+PHOTOS. The student may attach a photo of an exercise (a textbook, a past paper, their
+notebook):
+- Start the GIVEN line by writing out the exercise exactly as you read it from the photo,
+  so the student can check you read it correctly.
+- If any part is blurry, cut off, too dark or unreadable, say exactly which part and ask
+  for a clearer photo. NEVER guess a number, a sign or a word you cannot read: a wrong
+  reading gives a confident wrong answer.
+- If the photo holds several exercises and the student did not say which one, solve the
+  first one and say that you can do the others.
+- If the photo is not schoolwork, say so in one line and invite a study question.`,
 
   km: `ទម្រង់ចម្លើយ។ រាល់ចម្លើយបែបសិក្សា ត្រូវតែធ្វើតាមគ្រោងនេះ តាមលំដាប់នេះ៖
 
@@ -145,7 +156,17 @@ WRITING RULES:
      | [លក្ខណៈ 1] | [ចំណុច A] | [ចំណុច B] |
   3. "គន្លឹះប្រឡង៖" បញ្ជាក់ថាពេលប្រឡងបាក់ឌុប សំណួរប្រៀបធៀបត្រូវតែឆ្លើយទាំង «លក្ខណៈដូចគ្នា» និង «លក្ខណៈខុសគ្នា» ជាតារាងជានិច្ច ទើបបានពិន្ទុពេញ។
 - សម្រាប់សារមិនមែនសិក្សា (ការស្វាគមន៍ សំណួរអំពីរបៀបរៀន ការលើកទឹកចិត្ត) កុំប្រើគ្រោងនេះ
-  គ្រាន់តែឆ្លើយដោយរាក់ទាក់ 2-4 បន្ទាត់។`,
+  គ្រាន់តែឆ្លើយដោយរាក់ទាក់ 2-4 បន្ទាត់។
+
+រូបភាព។ សិស្សអាចផ្ញើរូបថតលំហាត់មក (សៀវភៅ វិញ្ញាសា ឬសៀវភៅកត់ត្រារបស់ខ្លួន)៖
+- ចាប់ផ្តើមបន្ទាត់ "ទិន្នន័យ៖" ដោយសរសេរលំហាត់ឡើងវិញ តាមដែលអ្នកអានឃើញក្នុងរូបភាព
+  ដើម្បីឲ្យសិស្សពិនិត្យថាអ្នកអានត្រូវ។
+- បើផ្នែកណាមួយព្រិល ដាច់ ងងឹតពេក ឬអានមិនច្បាស់ ត្រូវប្រាប់ឲ្យច្បាស់ថាផ្នែកណា ហើយសុំឲ្យ
+  ថតរូបម្ដងទៀតឲ្យច្បាស់។ កុំទាយលេខ សញ្ញា ឬពាក្យដែលអានមិនច្បាស់ជាដាច់ខាត៖ អានខុស
+  នាំឲ្យចម្លើយខុស។
+- បើរូបភាពមានលំហាត់ច្រើន ហើយសិស្សមិនបានប្រាប់ថាលំហាត់មួយណា ដោះស្រាយលំហាត់ទីមួយ
+  ហើយប្រាប់ថាអាចជួយលំហាត់ផ្សេងទៀតបាន។
+- បើរូបភាពមិនមែនជាមេរៀន ប្រាប់មួយបន្ទាត់ ហើយអញ្ជើញឲ្យសួរសំណួរសិក្សា។`,
 };
 
 export const BAC2_EXAMPLES: Bac2Example[] = [

@@ -412,9 +412,41 @@ export type Database = {
           ProfileFk<"chat_messages_user_id_fkey">,
         ];
       };
+
+      // supabase/migrations/20260929000001_kruai_usage.sql. KruAI's daily
+      // question count per student. Written ONLY by the kruai_take function
+      // (no insert/update policy); readable by its owner. Nothing in the
+      // client reads it yet. The FK is to auth.users, not profiles, so there is
+      // no ProfileFk relationship to declare.
+      kruai_usage: {
+        Row: {
+          user_id: string;
+          usage_date: string;
+          units: number;
+        };
+        Insert: {
+          user_id: string;
+          usage_date: string;
+          units?: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["kruai_usage"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {
+      // 20260929000001_kruai_usage.sql. Charges the CALLER `p_units` against
+      // today's limits and says whether it was allowed. Called by the server
+      // (server/kruai-quota.ts) with the student's own token.
+      kruai_take: {
+        Args: { p_units: number };
+        Returns: {
+          allowed: boolean;
+          user_units: number;
+          all_units: number;
+          reason: string | null;
+        }[];
+      };
       // supabase/migrations/20260916000004_leaderboard.sql. Returns real
       // students only (never the caller) with public-safe columns.
       leaderboard: {

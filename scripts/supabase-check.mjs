@@ -38,6 +38,9 @@ const TABLES = [
   // schema any signed-in student can read, not just its owner.
   "competitions",
   "competition_attempts",
+  // KruAI's daily limits (20260929000001). Missing means the paid model has no
+  // money guard, and production KruAI refuses every question (fails closed).
+  "kruai_usage",
 ];
 
 /**

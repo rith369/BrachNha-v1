@@ -21,7 +21,17 @@ supabase/migrations/
   20260916000003_competition_work_count_fix.sql
                                    fixes 000002: its photo count recursed
                                    into its own policy and refused uploads
+  20260929000001_kruai_usage.sql   KruAI's daily question limits (the money
+                                   guard for the paid model). REQUIRED in
+                                   production: without it KruAI refuses every
+                                   question, on purpose
 ```
+
+**Changing KruAI's daily limits** (`20260929000001`): they are the two
+constants at the top of `public.kruai_take` (`user_daily`, `app_daily`). Open
+that migration, change the numbers, and run its `create or replace function`
+block again in the SQL editor. They are not parameters on purpose, because a
+student can call the function directly with their own token.
 
 The SQL is the source of truth for the schema, checked into git like any other
 code. Do not create or alter tables from the dashboard's Table Editor: the

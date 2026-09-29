@@ -49,6 +49,41 @@ export type {
 // chatty student slowly fills localStorage.
 const MAX_CHAT_MSGS = 40; // per conversation
 const MAX_CONVERSATIONS = 20; // oldest-updated dropped first
+// Photo thumbnails kept in chat history, across ALL conversations. Each is a
+// ~10–20KB data URL, so this bounds them at roughly half a megabyte of the ~5MB
+// localStorage the whole store shares. Older photos keep their `image: {}`
+// marker, so the bubble still says a photo was there. See ChatMsg.image.
+const MAX_CHAT_THUMBS = 30;
+
+/**
+ * Strip `thumb` from all but the newest MAX_CHAT_THUMBS photo messages.
+ * `conversations` is newest-updated-first and each `msgs` is oldest-first, so
+ * walking conversations forward and messages backward visits photos newest
+ * first — close enough to "newest" for a storage bound, and it never needs a
+ * timestamp messages do not carry. Returns the SAME array when nothing needed
+ * trimming, so a text-only message costs no extra copy.
+ */
+function capChatThumbs(conversations: Conversation[]): Conversation[] {
+  let seen = 0;
+  let changed = false;
+  const next = conversations.map((c) => {
+    let convoChanged = false;
+    const msgs = [...c.msgs];
+    for (let i = msgs.length - 1; i >= 0; i--) {
+      const thumb = msgs[i].image?.thumb;
+      if (!thumb) continue;
+      seen++;
+      if (seen > MAX_CHAT_THUMBS) {
+        msgs[i] = { ...msgs[i], image: {} };
+        convoChanged = true;
+      }
+    }
+    if (!convoChanged) return c;
+    changed = true;
+    return { ...c, msgs };
+  });
+  return changed ? next : conversations;
+}
 // Competitions a student has posted, and their runs at other people’s. Both
 // persisted, so both need a bound like conversations and reviewHistory. 50 is
 // months of real use; oldest drop first.
@@ -1215,6 +1250,10 @@ export const useBrachNhaStore = create<BrachNhaState>()(
             (c) => c.id === state.activeConversationId
           );
 
+          // Only a new photo can push the thumbnail count over the cap.
+          const cap = (list: Conversation[]) =>
+            msg.image?.thumb ? capChatThumbs(list) : list;
+
           if (!active) {
             const created: Conversation = {
               id: newId(),
@@ -1224,9 +1263,8 @@ export const useBrachNhaStore = create<BrachNhaState>()(
               updatedAt: now,
             };
             return {
-              conversations: [created, ...state.conversations].slice(
-                0,
-                MAX_CONVERSATIONS
+              conversations: cap(
+                [created, ...state.conversations].slice(0, MAX_CONVERSATIONS)
               ),
               activeConversationId: created.id,
             };
@@ -1246,10 +1284,10 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           // Move to the front: the array is kept sorted newest-updated-first so
           // the MAX_CONVERSATIONS cap always drops the least recently used one.
           return {
-            conversations: [
+            conversations: cap([
               updated,
               ...state.conversations.filter((c) => c.id !== active.id),
-            ],
+            ]),
           };
         }),
 
