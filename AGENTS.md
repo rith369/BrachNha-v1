@@ -399,6 +399,60 @@ not something a flag here settles.
 limits, conditional probability). `max_output_tokens` is set to 3000 (bumped from 1200)
 to ensure complete rendering of detailed Bac II comparison tables without mid-stream truncation.
 
+### KruAI teaches with the Socratic method (29 Sep 2026)
+
+The user's call: **guide first, full solution on request, exercises only**, and the daily
+limit stays at 30 units, which means fewer exercises a day because guiding takes more turns.
+
+- **`SOCRATIC_RULES`** (`data/bac2-format.ts`) is sent BEFORE `BAC2_ANSWER_RULES`. For an
+  EXERCISE (calculate, solve, prove, balance, typed or photographed), KruAI does not solve it.
+  It restates what is given in one line, then gives ONE hint or asks ONE question and stops.
+  - A right answer gets brief praise and the next step.
+  - A wrong answer gets a question pointing at the mistake, never the answer.
+  - Stuck gets a bigger hint.
+  - The full solution comes only when asked, after about 3 stuck tries on a step, or to
+    confirm an answer the student reached.
+- Facts, definitions, comparisons and advice are still answered directly, so the curated
+  answers in `server/chat-cache.ts` needed no change.
+- **`BAC2_ANSWER_RULES` was reframed, not rewritten.** It opened with "Every academic answer
+  MUST follow this skeleton", which reads as "always solve". It now says the skeleton is for
+  direct answers and for a full solution when one is due.
+- **Examples outweigh rules, so the examples moved with them:**
+  - `SOCRATIC_EXAMPLE` is a short guided dialogue on a DIFFERENT limit from the full example.
+    It is placed before the full examples.
+  - The heading of the full examples changed from "Copy this structure exactly" to "When you
+    give a direct answer or a full solution".
+  - The one exercise example is now asked as an explicit request for the full solution.
+    Asked plainly, it would teach "solve on sight".
+- **🧭 is a contract with the app.** Every guided reply starts with it. `chat-overlay.tsx`
+  shows **បង្ហាញដំណោះស្រាយពេញ** under the LAST reply that starts with 🧭, once it has finished
+  streaming. The button sends `SHOW_SOLUTION_KM`, the exact words the rules name as "give the
+  full solution".
+  - The phrase lives in `data/kruai-phrases.ts`, a tiny module of its own, because importing it
+    from `bac2-format.ts` into the chat screen would ship the whole system prompt to every
+    browser. That was checked after the build: 0 client chunks contain the prompt text.
+  - The mark stays visible in the bubble (the "guided" cue), so nothing is stripped. If the
+    model forgets it, only the button is lost; the student can still type the request.
+- **Prompt size after:** 18,835 characters on Home and **23,656 on a section page**, against
+  `PROMPT_BUDGET_CHARS` 24,000. **Only ~340 characters of headroom.** The next thing added to
+  the authored prompt will trip the warning. The obvious cut is the sympathetic/parasympathetic
+  example (~2,200 characters, and identical to a curated answer), which also saves ~1,000 tokens
+  on every paid question.
+- **Verified with the real model** (local free keys, the real handler through
+  `ssrLoadModule`):
+  - a typed limit → 🧭, one question, no answer;
+  - a wrong "0" → 🧭 and a question about the denominator, still no answer;
+  - "សូមបង្ហាញដំណោះស្រាយពេញ" → the full skeleton with `ចម្លើយ៖ … = 6`, no 🧭;
+  - a photosynthesis question → a direct answer, no 🧭, ending with a check question;
+  - a photo of the exercise → 🧭, the exercise read correctly, one question.
+
+  **Not verified:** the "I don't know" turn (the key was busy) and the "3 stuck tries" rule.
+
+  Browser, with the fake Gemini at 390 light and 320 dark (14 checks):
+  - the button appears only under the last guided reply, sends the exact phrase, and is gone
+    after the full solution;
+  - no sideways scroll.
+
 ### The key pool and the fallback loop
 
 Keys come from `GEMINI_API_KEYS` (comma-separated), `GEMINI_API_KEY`, and

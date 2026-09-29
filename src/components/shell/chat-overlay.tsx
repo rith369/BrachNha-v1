@@ -12,6 +12,7 @@ import {
   Sigma,
   Keyboard,
   ImageIcon,
+  Lightbulb,
 } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
@@ -26,8 +27,23 @@ import { blobToBase64, blobToDataUrl, compressImage } from "@/utils/image-compre
 import { cn } from "@/utils/cn";
 import { MathText } from "./math-text";
 import { AttachmentChip, PhotoButton } from "./chat-attach";
+import { SHOW_SOLUTION_KM } from "@/data/kruai-phrases";
 import type { ChatProfile } from "@/utils/chat-prompt";
 import type { ChatMsg, Conversation } from "@/types";
+
+/**
+ * KruAI guides an exercise step by step (the Socratic rules in
+ * data/bac2-format.ts) and marks every guided reply by starting it with this.
+ * Under the LAST reply carrying it, the overlay offers "show full solution",
+ * which sends the exact words the prompt tells the model to answer with the
+ * full solution. The mark stays visible in the bubble as the "guided" cue, so
+ * nothing is stripped and a mark split across stream chunks cannot glitch.
+ */
+const GUIDE_MARK = "🧭";
+const SHOW_SOLUTION = {
+  en: "Please show the full solution",
+  km: SHOW_SOLUTION_KM,
+} as const;
 
 /**
  * What the composer is holding. `full` is the ~1400px copy the model reads and
@@ -102,22 +118,27 @@ const MathFieldPanel = lazy(() =>
   import("./math-field-panel").then((m) => ({ default: m.MathFieldPanel }))
 );
 
-// Tappable starter questions, restored from the original prototype. They show
-// only on an empty chat, and map onto content the app actually has.
+// Tappable starter questions. They show only on an empty chat, and each one is
+// a short tour of something KruAI does (the user's choice, 29 Sep 2026):
+//   1. an EXERCISE, so the student meets the Socratic style (🧭, one question,
+//      the "show full solution" button) on their very first tap;
+//   2. a biology COMPARISON, to show the similarities + differences table;
+//   3. getting a grade A, and 4. understanding lessons: study advice.
+// 2 and 3 are worded to hit a curated answer in server/chat-cache.ts EXACTLY,
+// so they arrive instantly and cost no daily quota. Reword them only together
+// with that file's patterns, or they silently fall through to the model.
 const QUICK_QS = {
   en: [
-    "How do I calculate limits?",
-    "Explain the human brain parts",
-    "How to improve my Bac II score?",
-    "What is photosynthesis?",
-    "Explain the probability formula",
+    "Calculate $\\lim_{x \\to 3} \\frac{x^2 - 9}{x - 3}$",
+    "Compare monocots and dicots",
+    "How to get grade A?",
+    "How can I understand lessons easily?",
   ],
   km: [
-    "តើគណនាលីមីតយ៉ាងដូចម្តេច?",
-    "ពន្យល់ផ្នែកខួរក្បាល",
-    "ធ្វើយ៉ាងណាដើម្បីកែពិន្ទុ Bac II?",
-    "តើការបំប្លែងពន្លឺជាអ្វី?",
-    "ពន្យល់រូបមន្តប្រូបាប",
+    "គណនា $\\lim_{x \\to 3} \\frac{x^2 - 9}{x - 3}$",
+    "ប្រៀបធៀបម៉ូណូកូទីលេដូន និងឌីកូទីលេដូន",
+    "ធ្វើដូចម្តេចដើម្បីបាននិទ្ទេស A?",
+    "តើធ្វើដូចម្តេចទើបយល់មេរៀនបានងាយ?",
   ],
 } as const;
 
@@ -510,7 +531,10 @@ export function ChatOverlay() {
                     onClick={() => send(q)}
                     className="rounded-full border border-purple/15 bg-surface px-3 py-1.5 text-left text-xs font-bold text-purple transition hover:bg-purple/10"
                   >
-                    {q}
+                    {/* The exercise chip is LaTeX, so it typesets here exactly as
+                        it will in the student's bubble once sent. Plain chips
+                        pass through MathText untouched. */}
+                    <MathText text={q} />
                   </button>
                 ))}
               </div>
@@ -556,6 +580,23 @@ export function ChatOverlay() {
             </div>
           );
         })}
+
+        {/* Only under the LAST reply, and only once it has finished: an older
+            guided reply is a step the student has already moved past, and a
+            button under a reply still streaming would ask before it asked. */}
+        {!loading &&
+          msgs[msgs.length - 1]?.role === "bot" &&
+          msgs[msgs.length - 1].text.trimStart().startsWith(GUIDE_MARK) && (
+            <div className="flex justify-start">
+              <button
+                onClick={() => send(SHOW_SOLUTION[lang])}
+                className="flex items-center gap-1.5 rounded-full border border-purple/20 bg-surface px-3 py-1.5 text-xs font-extrabold text-purple transition hover:bg-purple/10"
+              >
+                <Lightbulb className="size-3.5" strokeWidth={2.5} />
+                {lang === "en" ? "Show full solution" : "បង្ហាញដំណោះស្រាយពេញ"}
+              </button>
+            </div>
+          )}
 
         {loading && !msgs[msgs.length - 1]?.text && (
           <div className="flex justify-start">

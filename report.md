@@ -15,6 +15,35 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 29 Sep 2026 — KruAI Now Teaches Step by Step (Socratic Method)
+
+Commit `pending`. **No database step needed.**
+
+**Why.** KruAI used to give the whole solution the moment a student sent an exercise. Students
+learn more when they work it out themselves, with a teacher asking the right questions. That is
+the Socratic method.
+
+**What changed.**
+- When a student sends an **exercise** (a calculation or problem, typed or as a photo), KruAI
+  does not solve it straight away. It starts its reply with 🧭, says what the exercise gives,
+  and asks **one** question or gives **one** hint about the first step.
+- If the student answers correctly, KruAI praises them and asks about the next step. If the
+  answer is wrong, KruAI does not reveal the right one; it asks a question that shows where
+  the mistake is.
+- A button **បង្ហាញដំណោះស្រាយពេញ** (show full solution) appears under KruAI's guided reply. Tapping
+  it shows the complete step-by-step solution. KruAI also shows it by itself if the student is
+  stuck after about 3 tries.
+- **Fact questions** ("what is photosynthesis?") still get a direct answer, as before.
+- The daily limit stays at 30. A guided exercise uses several messages, so students can do fewer
+  exercises per day than before.
+
+**What to re-test.**
+1. Ask KruAI to calculate a limit. It should ask you a question instead of answering.
+2. Give a wrong answer. It should give a hint, not the answer.
+3. Tap បង្ហាញដំណោះស្រាយពេញ. The full solution should appear.
+4. Ask a fact question. It should answer directly.
+5. Please read KruAI's Khmer in these replies and tell us if any wording sounds wrong.
+
 ## 29 Sep 2026 — Paying for KruAI Safely: Daily Question Limits
 
 Commit `0b88c48`. **Database step needed:** run
