@@ -204,6 +204,18 @@ export interface ChatMsg {
    * question without its photo.
    */
   image?: { thumb?: string };
+  /**
+   * A bot bubble holding OUR words rather than KruAI's: an error, a refusal at
+   * the daily limit or at sign-in, or the note left when the student stopped an
+   * answer before any of it arrived. Never replayed to the model as if KruAI had
+   * said it (wireMessages in chat-overlay.tsx drops it).
+   *
+   * "retry" puts a Try again button under it; "final" does not, because trying
+   * again cannot help (the daily limit, signing in, a photo the server refused).
+   * Optional, so no persist migration. Not synced: on another device such a
+   * bubble arrives as ordinary text.
+   */
+  failed?: "retry" | "final";
 }
 
 // One saved conversation with KruAI. Conversations are created lazily —

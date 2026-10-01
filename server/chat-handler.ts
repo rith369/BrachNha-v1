@@ -16,6 +16,8 @@ import { isVerificationConfigured, verifyRequestUser } from "./verify-user.js";
 import { searchBiologyTextbook, searchHistoryTextbook, searchMathTextbook } from "./textbook-search.js";
 import { getCachedAnswer, createCachedStreamResponse } from "./chat-cache.js";
 import { takeQuota } from "./kruai-quota.js";
+import { guidedAnchorIndex } from "../src/utils/chat-anchor.js";
+import { KRUAI_LEFT_HEADER, KRUAI_LIMIT_HEADER } from "../src/data/kruai-phrases.js";
 
 /**
  * KruAI endpoint. Started life as a Netlify function, then a Next.js route
@@ -295,7 +297,23 @@ const IMAGE_RATE_LIMIT = 6;
 const TEXT_UNITS = 1;
 const PHOTO_UNITS = 3;
 
-function quotaMessage(reason: "user" | "app", lang: Lang): string {
+/**
+ * A student's daily units. MIRRORS `user_daily` in
+ * supabase/migrations/20260929000001_kruai_usage.sql, which is the one that
+ * actually enforces it: change both together. This copy only turns "used so
+ * far" (what kruai_take returns) into "left today" for the chat screen, so if
+ * the two ever drift, the count a student sees is wrong but the limit is not.
+ */
+const USER_DAILY_UNITS = 30;
+
+function quotaMessage(reason: "user" | "app", left: number, lang: Lang): string {
+  // Only a photo can be refused with units still left (it costs 3), and those
+  // still buy typed questions, so "come back tomorrow" would be wrong there.
+  if (reason === "user" && left > 0) {
+    return lang === "km"
+      ? `📷 សំណួរដែលមានរូបភាព រាប់ជា 3 សំណួរ ប៉ុន្តែថ្ងៃនេះអ្នកនៅសល់តែ ${left} សំណួរទៀតប៉ុណ្ណោះ។ សូមសរសេរសំណួរជាអក្សរជំនួសវិញ ឬត្រឡប់មកវិញនៅថ្ងៃស្អែក។`
+      : `📷 A question with a photo counts as 3, and you have only ${left} left today. Type your question instead, or come back tomorrow.`;
+  }
   if (reason === "user") {
     return lang === "km"
       ? "📚 អ្នកបានសួរ KruAI គ្រប់ចំនួនសម្រាប់ថ្ងៃនេះហើយ។ សូមត្រឡប់មកសួរម្ដងទៀតនៅថ្ងៃស្អែក! សំណួរដែលមានរូបភាព រាប់ជា 3 សំណួរ។"
@@ -439,6 +457,61 @@ function badImageMessage(lang: Lang): string {
  */
 const PHOTO_GONE_NOTE =
   "\n\n[The student attached a photo to this message earlier. It is no longer available, so do not describe or rely on it; ask them to send it again if it is needed.]";
+
+/** Put in front of the guided exercise when it is sent from outside the
+ *  MAX_HISTORY window (see utils/chat-anchor.ts). Worded as a fact about where
+ *  the guidance began, not as "the current exercise": a student who moved on
+ *  to a second exercise mid-run still has those turns in the window. */
+const ANCHOR_NOTE =
+  "[Earlier messages are left out to save space. The step-by-step guidance in this conversation started from this question:]\n\n";
+
+/**
+ * The content of one student turn, or null when it has nothing in it. Image
+ * first, then the words about it: the order the model's own guidance gives for
+ * a single-image prompt. A photo turn with no words still counts: the photo IS
+ * the question.
+ */
+function userContent(
+  m: WireMsg | undefined,
+  image: CleanImage | null,
+  prefix = ""
+): InteractionStep["content"] | null {
+  const text = typeof m?.text === "string" ? m.text.trim() : "";
+  if (!text && !image) return null;
+  const words =
+    text.slice(0, MAX_MESSAGE_CHARS) +
+    (!image && m?.hadImage === true ? PHOTO_GONE_NOTE : "");
+  return [
+    ...(image
+      ? [
+          {
+            type: "image" as const,
+            data: image.data,
+            mime_type: image.mimeType,
+            resolution: IMAGE_RESOLUTION,
+          },
+        ]
+      : []),
+    ...(words ? [{ type: "text" as const, text: prefix + words }] : []),
+  ];
+}
+
+/**
+ * Appends a turn, folding it into the previous one when both are from the same
+ * side. Turns normally alternate, but not always: a reply that never arrived is
+ * left out of the history (the chat screen drops failed bubbles), which puts
+ * two student turns next to each other, and so can the guided exercise sent
+ * ahead of the window. One turn with several parts is valid on every model; two
+ * same-side turns in a row is a shape we have no reason to depend on.
+ */
+function pushStep(input: InteractionStep[], step: InteractionStep) {
+  const prev = input.at(-1);
+  if (prev && prev.type === step.type) {
+    prev.content.push(...step.content);
+    return;
+  }
+  input.push(step);
+}
 
 interface ChatRequestBody {
   messages?: WireMsg[];
@@ -698,42 +771,30 @@ export async function handleChat(req: Request): Promise<Response> {
 
   const windowStart = Math.max(0, messages.length - MAX_HISTORY);
   const input: InteractionStep[] = [];
+
+  // The exercise being guided, when it has slid out of the window: without it a
+  // long guided chat ends with hints about a problem the model cannot see. See
+  // utils/chat-anchor.ts.
+  const anchor = guidedAnchorIndex(messages);
+  if (anchor >= 0 && anchor < windowStart) {
+    const content = userContent(messages[anchor], images[anchor], ANCHOR_NOTE);
+    if (content) pushStep(input, { type: "user_input", content });
+  }
+
   for (let i = windowStart; i < messages.length; i++) {
     const m = messages[i];
-    const text = typeof m?.text === "string" ? m.text.trim() : "";
-    const image = images[i];
-    // A photo turn with no words still counts: the photo IS the question.
-    if (!text && !image) continue;
-
-    if (m.role === "bot") {
-      input.push({
-        type: "model_output",
-        content: [{ type: "text", text: text.slice(0, MAX_MESSAGE_CHARS) }],
-      });
+    if (m?.role === "bot") {
+      const text = typeof m.text === "string" ? m.text.trim() : "";
+      if (text) {
+        pushStep(input, {
+          type: "model_output",
+          content: [{ type: "text", text: text.slice(0, MAX_MESSAGE_CHARS) }],
+        });
+      }
       continue;
     }
-
-    const words =
-      text.slice(0, MAX_MESSAGE_CHARS) +
-      (!image && m.hadImage === true ? PHOTO_GONE_NOTE : "");
-    input.push({
-      type: "user_input",
-      // Image first, then the words about it: the order the model's own
-      // guidance gives for a single-image prompt.
-      content: [
-        ...(image
-          ? [
-              {
-                type: "image" as const,
-                data: image.data,
-                mime_type: image.mimeType,
-                resolution: IMAGE_RESOLUTION,
-              },
-            ]
-          : []),
-        ...(words ? [{ type: "text" as const, text: words }] : []),
-      ],
-    });
+    const content = userContent(m, images[i]);
+    if (content) pushStep(input, { type: "user_input", content });
   }
 
   if (!input.length || input[input.length - 1].type !== "user_input") {
@@ -842,16 +903,31 @@ export async function handleChat(req: Request): Promise<Response> {
 
   // ── daily limits (the money guard) ───────────────────────────────────────
   //
+  // `unitsLeft` goes back to the chat screen in a header, so a student sees the
+  // limit coming instead of meeting it. Null when nothing was charged.
+  //
   // Charged HERE: after a curated answer (free) and after the key check (no
   // point spending a student's quota on a question that cannot be answered),
   // and before the first upstream call. See kruai-quota.ts.
   //
   // Only when verification is configured — the quota counts against the
   // verified student, and in dev without Supabase there is no student.
+  let unitsLeft: number | null = null;
   if (isVerificationConfigured()) {
     const quota = await takeQuota(req, hasImage ? PHOTO_UNITS : TEXT_UNITS);
     if (!quota.ok && quota.reason !== "error") {
-      return textResponse(quotaMessage(quota.reason, lang), 429);
+      // Usually 0 left, but not always: a photo (3 units) is refused with 2
+      // left, and those 2 still buy two typed questions. No count with the
+      // whole app's refusal: "8 left today" under "KruAI is resting until
+      // tomorrow" would contradict it.
+      const left = Math.max(0, USER_DAILY_UNITS - quota.userUnits);
+      return textResponse(quotaMessage(quota.reason, left, lang), 429, {
+        [KRUAI_LIMIT_HEADER]: quota.reason,
+        ...(quota.reason === "user" ? { [KRUAI_LEFT_HEADER]: String(left) } : {}),
+      });
+    }
+    if (quota.ok) {
+      unitsLeft = Math.max(0, USER_DAILY_UNITS - quota.userUnits);
     }
     if (!quota.ok) {
       // FAILS CLOSED in production, like the auth gate above: the one job of
@@ -1141,6 +1217,7 @@ export async function handleChat(req: Request): Promise<Response> {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "Cache-Control": "no-store",
+      ...(unitsLeft !== null ? { [KRUAI_LEFT_HEADER]: String(unitsLeft) } : {}),
     },
   });
 }

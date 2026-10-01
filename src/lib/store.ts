@@ -616,6 +616,11 @@ interface BrachNhaState {
   markPledgeSeen: () => void;
   addChatMsg: (msg: ChatMsg) => void;
   appendChatChunk: (text: string) => void;
+  /** Marks the last bot bubble as ours rather than KruAI's (see ChatMsg.failed). */
+  failLastBotMsg: (kind: "retry" | "final") => void;
+  /** Removes the last bubble if it is a failed bot bubble: "Try again" does this
+   *  before asking again, so the new answer takes its place. */
+  dropFailedBotMsg: () => void;
   startNewChat: () => void;
   openConversation: (id: string) => void;
   deleteConversation: (id: string) => void;
@@ -1312,6 +1317,36 @@ export const useBrachNhaStore = create<BrachNhaState>()(
                     ],
                   }
                 : c
+            ),
+          };
+        }),
+
+      failLastBotMsg: (kind) =>
+        set((state) => {
+          const active = state.conversations.find(
+            (c) => c.id === state.activeConversationId
+          );
+          const last = active?.msgs[active.msgs.length - 1];
+          if (!active || !last || last.role !== "bot") return state;
+          return {
+            conversations: state.conversations.map((c) =>
+              c.id === active.id
+                ? { ...c, msgs: [...c.msgs.slice(0, -1), { ...last, failed: kind }] }
+                : c
+            ),
+          };
+        }),
+
+      dropFailedBotMsg: () =>
+        set((state) => {
+          const active = state.conversations.find(
+            (c) => c.id === state.activeConversationId
+          );
+          const last = active?.msgs[active.msgs.length - 1];
+          if (!active || !last || last.role !== "bot" || !last.failed) return state;
+          return {
+            conversations: state.conversations.map((c) =>
+              c.id === active.id ? { ...c, msgs: c.msgs.slice(0, -1) } : c
             ),
           };
         }),

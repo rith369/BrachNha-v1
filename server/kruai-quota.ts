@@ -22,8 +22,9 @@ import { supabaseUrl } from "./verify-user.js";
 
 export type QuotaResult =
   | { ok: true; userUnits: number; allUnits: number }
-  /** A limit was reached. `user` is this student's own, `app` everyone's. */
-  | { ok: false; reason: "user" | "app" }
+  /** A limit was reached. `user` is this student's own, `app` everyone's.
+   *  `userUnits` is what this student had already used (nothing was added). */
+  | { ok: false; reason: "user" | "app"; userUnits: number }
   /** Could not ask at all — the caller decides whether that blocks. */
   | { ok: false; reason: "error"; detail: string };
 
@@ -86,5 +87,9 @@ export async function takeQuota(req: Request, units: number): Promise<QuotaResul
       allUnits: Number(row.all_units) || 0,
     };
   }
-  return { ok: false, reason: row.reason === "app" ? "app" : "user" };
+  return {
+    ok: false,
+    reason: row.reason === "app" ? "app" : "user",
+    userUnits: Number(row.user_units) || 0,
+  };
 }

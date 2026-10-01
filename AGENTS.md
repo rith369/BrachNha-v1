@@ -434,10 +434,9 @@ limit stays at 30 units, which means fewer exercises a day because guiding takes
   - The mark stays visible in the bubble (the "guided" cue), so nothing is stripped. If the
     model forgets it, only the button is lost; the student can still type the request.
 - **Prompt size after:** 18,835 characters on Home and **23,656 on a section page**, against
-  `PROMPT_BUDGET_CHARS` 24,000. **Only ~340 characters of headroom.** The next thing added to
-  the authored prompt will trip the warning. The obvious cut is the sympathetic/parasympathetic
-  example (~2,200 characters, and identical to a curated answer), which also saves ~1,000 tokens
-  on every paid question.
+  `PROMPT_BUDGET_CHARS` 24,000, which left ~340 characters of headroom. The
+  sympathetic/parasympathetic example was cut on 1 Oct 2026 for that reason (see the next
+  section): now **17,375 and 22,196**.
 - **Verified with the real model** (local free keys, the real handler through
   `ssrLoadModule`):
   - a typed limit → 🧭, one question, no answer;
@@ -452,6 +451,87 @@ limit stays at 30 units, which means fewer exercises a day because guiding takes
   - the button appears only under the last guided reply, sends the exact phrase, and is gone
     after the full solution;
   - no sideways scroll.
+
+### Long guided chats, Stop / Try again, questions left (1 Oct 2026)
+
+Four changes from a review of the chat, all chosen by the user.
+
+**1. The exercise no longer falls out of a long guided chat.** Only the last `MAX_HISTORY` (12)
+messages reach the model, and a guided chat is many short turns, so after about six tries the
+exercise itself was gone. Measured with the real model on a 15-message chat ending in a WRONG
+answer ("6" for a limit that is 7):
+- cut to 12 (the old behaviour): KruAI **invented a different exercise and said "6 is
+  correct"**;
+- with the fix: it named the right factors, `(x-3)(x+4)`, and asked the student to try again.
+
+How it works:
+- `guidedAnchorIndex()` in `src/utils/chat-anchor.ts` walks back over the run of 🧭 replies and
+  returns the student message that started it. -1 when the latest reply is not guided, so a
+  direct-answer chat sends nothing extra.
+- The handler sends that message AHEAD of the window, prefixed with `ANCHOR_NOTE`, which says
+  only where the guidance began. A student who started a second exercise mid-run still has those
+  turns in the window, so the note must not claim "this is the current exercise".
+- `wireMessages()` gives the anchor's photo the first of the two photo slots, because a photo
+  exercise is often nothing but the photo.
+- `pushStep()` folds two same-side turns into one. That happens only when alternation broke (a
+  dropped failed bubble, or the anchor next to a window that starts on a student turn).
+- `GUIDE_MARK` moved to `data/kruai-phrases.ts`, because the server reads it now too.
+
+**2. Our own words are never replayed as KruAI's.** Error bubbles, the daily-limit refusal and
+the sign-in message used to go back to the model as `model_output`.
+- `ChatMsg.failed` marks them: `"retry"` or `"final"`.
+- `wireMessages()` drops them before sending.
+- Not synced: on another device they arrive as ordinary text. Accepted.
+
+**3. Stop and Try again.**
+- While an answer streams, Send becomes Stop (an `AbortController` on the fetch).
+- Stop mid-answer keeps the words already shown and marks nothing.
+- Stop before the first word leaves `⏹️ បានបញ្ឈប់។` with `failed: "retry"`.
+- A dropped connection or a 5xx/busy reply gets `"retry"`. A daily limit (the
+  `X-KruAI-Limit` header), a 401 or a refused photo (4xx) get `"final"`, with no button.
+- Try again calls `dropFailedBotMsg()` and asks again with the same history, so the answer
+  replaces the failed bubble and the question is not duplicated.
+- `send()` is now `send()` (adds the question) + `ask()` (asks about the conversation as it
+  stands).
+
+Cutting the model off:
+- The handler's `cancel()` aborts upstream once the answer has started.
+- `vite-chat-plugin.ts` now cancels the reader when the browser hangs up, so dev behaves like
+  Vercel. Before this, dev read every stopped answer to the end.
+- **Known gap:** a Stop before the first word does NOT stop the model; that one answer finishes
+  generating server-side. Closing it means watching `req.signal` in the attempt loop. Not done,
+  because what Vercel does with that signal is unverified, and a false abort would fail every
+  answer.
+- The unit is still charged either way, the cost already accepted in the paying section.
+
+**4. "Questions left today".**
+- The handler turns `kruai_take`'s `user_units` into units left and sends it as `X-KruAI-Left`
+  on every charged answer, and on a refusal at the student's own limit.
+- A curated answer is free and sends none. The whole-app refusal sends none either, since a
+  count under "KruAI is resting" would contradict it.
+- **`USER_DAILY_UNITS` in the handler MIRRORS `user_daily` in the migration.** Change both
+  together. If they drift, the count shown is wrong but the limit is not.
+- The screen shows a line above the composer once `LOW_LEFT` (10) or fewer are left, with
+  "a photo counts as 3" while a photo is attached.
+- The count is kept in module scope, with the day, so it survives closing and reopening the chat
+  but not a reload.
+- A photo refused with 1 or 2 units left now says so (and that typed questions still work),
+  instead of "come back tomorrow".
+
+**5. The prompt lost the sympathetic/parasympathetic example**, which duplicated a curated answer
+in `server/chat-cache.ts`. That is −1,460 characters on every request (only the Khmer half was
+ever sent), about 650 tokens a question. The plant-hormone example still teaches the table, and
+a real-model comparison that is NOT cached (cellular respiration vs photosynthesis) still came
+back as similarities + a differences table.
+
+**Verified:**
+- 16 handler checks against fake Supabase + fake Gemini: headers, the anchor in and out of the
+  window, a photo anchor, folding;
+- the earlier 18 daily-limit checks still pass;
+- 34 browser checks at 390 light and 320 dark: Stop at both moments, Try again after a stop and
+  after a 503, failed bubbles absent from the request, the line at 25/8/0 and after reopening,
+  no Try again under a limit refusal, no sideways scroll, no page error;
+- the dev upstream really closing after Stop (the fake logged it).
 
 ### The key pool and the fallback loop
 
@@ -674,7 +754,9 @@ to last a month). The worst case is bounded: `max_output_tokens` is 3000 and the
 prompt budgets are fixed, so a day can never cost more than
 `app_daily × worst-case cost of one unit`. **Change a limit by editing the constant
 in the migration and re-running its `create or replace function` in the SQL
-editor.** `supabase/README.md` says the same.
+editor.** `supabase/README.md` says the same. For `user_daily`, also change
+`USER_DAILY_UNITS` in `server/chat-handler.ts`, which turns "used" into the "questions
+left" the chat shows.
 
 **Production uses ONE key.** Vercel holds only `GEMINI_API_KEY` (the paid one).
 `GEMINI_API_KEYS` and `_1..5` are deleted there, because mixing in free keys from
@@ -5977,88 +6059,6 @@ user's own wording in Khmer. Three decisions:
   would then point at a see-through button on the exact screen new students
   arrive at. The fade returns when the bubble goes.
 
-## Installable app: "add to home screen" and the two pop-ups
-
-BrachNha is an installable web app (PWA). None of this touches Google sign-in:
-the OAuth consent screen's brand review covers what is uploaded to Google Cloud
-Console, and a manifest is just a file on our own site. There is no store
-review unless the app is ever wrapped for the Play Store.
-
-| file | role |
-| --- | --- |
-| `public/manifest.webmanifest` | name, colours, icons; what makes the site installable |
-| `public/icons/*` | 192/512 `any`, 512 `maskable`, 180 `apple-touch-icon`, rendered by `scripts/app-icons.mjs` |
-| `public/sw.js` | the service worker browsers require before offering install |
-| `public/offline.html` | what an installed app shows when opened with no signal |
-| `src/lib/install-prompt.ts` | catches the install event and decides when the pop-up may show |
-| `features/install/components/install-prompt.tsx` | the pop-up; mounted in `AppShell` |
-
-**THE SERVICE WORKER CACHES NOTHING BUT `offline.html`, on purpose.** Every JS,
-CSS, `/api/chat` and Supabase request passes through untouched: the handler
-returns without `respondWith` for anything that is not a page navigation.
-Caching the app shell would serve yesterday's build after a deploy, and this
-app has no reason to take on that class of bug. Navigations are network-first
-with navigation preload (so the worker adds no load time) and fall back to the
-offline page only when the fetch throws. An OAuth callback is a navigation and
-goes to the network like any other. Bump `CACHE` when `offline.html` changes.
-The worker is registered in PRODUCTION ONLY (`registerServiceWorker()`, called
-from `main.tsx` on `load`), so `vite dev` never has one in front of it. Test
-install with `npm run build && npx vite preview`.
-
-**What a page can and cannot do.** On Android Chromium we keep
-`beforeinstallprompt` and call `.prompt()` from our own button, and the browser
-shows its real dialog, but only on a tap. There is no way to install
-automatically. iOS has no API at all, so the pop-up shows the two manual steps,
-with Apple's menu names kept in English because iOS has no Khmer UI and that is
-what the student actually sees. In-app browsers (`isInAppBrowser()`) and an
-already-installed app (`isInstalledApp()`, now exported from
-`utils/in-app-browser.ts`) get nothing.
-
-**Two moments, both requested by the user:**
-
-- **`"open"`**: 1.5s after the app opens (`OPEN_DELAY_MS`). Once per page load.
-  "Not now"/"Got it" snoozes it for `OPEN_SNOOZE_DAYS` (3) so a student is not
-  greeted by the same pop-up on every visit.
-- **`"lesson"`**: after finishing a lesson or a section. `markLessonFinished()`
-  is called beside `completeSession` in `lesson-detail.tsx` and
-  `section-detail.tsx`; practice quizzes are deliberately left out. Once per
-  device, ever. It outranks the open pop-up, and closing either one consumes the
-  other for that page load, so two never arrive back to back.
-
-**It never interrupts a task.** `AppShell` passes `suppressed = hideChrome ||
-chatOpen || pledgeOpen || authPrompt`, and `hideChrome` already covers lessons,
-exams and the roadmap lock. A suppressed pop-up is HELD, not dropped: the
-lesson one waits through the completion screen (which is focus mode) and
-appears once the student leaves it. It is mounted only in the ordinary-app
-branch of the gate, so the entry, login and survey screens never show it.
-
-**The state is a MODULE, not store fields.** `beforeinstallprompt` can fire
-before React mounts, so the listener has to exist from the moment the entry
-chunk evaluates, which is why `main.tsx` imports the module. And "snoozed" and
-"lesson pop-up seen" are device facts, not account data: as store fields they
-would sync to Supabase and lengthen the `partializeState` ↔
-`syncRelevantChange` list for nothing. They live in
-`localStorage["brachnha-install"]`, with every access wrapped. The component
-reads the module through `useSyncExternalStore`, whose snapshot is rebuilt only
-in `emit()`; returning a fresh object on every read would loop forever.
-
-**The icons remove the artwork's own tile.** The master SVG is an app-icon tile
-with rounded corners and a grey shadow baked in. Launchers round icons
-themselves, so shipping it would draw a tile inside a tile.
-`scripts/app-icons.mjs` whitens every low-chroma pixel (the drawing is all
-saturated colour and the tile edge is grey), and shrinks the maskable icon to
-0.8 so it survives any launcher mask. Re-run it if the artwork changes.
-`public/favicon.ico` is still the old icon and was left alone.
-
-**Verified** against the production build in real Chrome. The manifest reports
-no errors, and the only installability error was `in-incognito`, which comes
-from the automation context. The offline page is served for a navigation with
-the network off. A synthetic `beforeinstallprompt` shows the open pop-up after
-the delay, Install calls `.prompt()`, and the snooze holds across a reload. An
-iPhone UA shows the steps at 320px light and 390px dark with no sideways
-scroll. A Telegram-shaped webview UA shows nothing. The lesson pop-up is held
-inside `/sections/...` and appears once, after leaving. **Not verified: a real
-install on a real phone.** That needs the deployed site, because the install
 ## Phase 0: real data everywhere, telemetry, account deletion, photo reports (1 Oct 2026)
 
 The user asked what would make BrachNha "real" before real students. The answer
@@ -6164,6 +6164,88 @@ app. The review page reports its loaded count and every Keep/Delete back through
 user's "option 2": the ordinary student app plus an admin-only extra, so the
 same account can still be used to test the app as a student.
 
+## Installable app: "add to home screen" and the two pop-ups
+
+BrachNha is an installable web app (PWA). None of this touches Google sign-in:
+the OAuth consent screen's brand review covers what is uploaded to Google Cloud
+Console, and a manifest is just a file on our own site. There is no store
+review unless the app is ever wrapped for the Play Store.
+
+| file | role |
+| --- | --- |
+| `public/manifest.webmanifest` | name, colours, icons; what makes the site installable |
+| `public/icons/*` | 192/512 `any`, 512 `maskable`, 180 `apple-touch-icon`, rendered by `scripts/app-icons.mjs` |
+| `public/sw.js` | the service worker browsers require before offering install |
+| `public/offline.html` | what an installed app shows when opened with no signal |
+| `src/lib/install-prompt.ts` | catches the install event and decides when the pop-up may show |
+| `features/install/components/install-prompt.tsx` | the pop-up; mounted in `AppShell` |
+
+**THE SERVICE WORKER CACHES NOTHING BUT `offline.html`, on purpose.** Every JS,
+CSS, `/api/chat` and Supabase request passes through untouched: the handler
+returns without `respondWith` for anything that is not a page navigation.
+Caching the app shell would serve yesterday's build after a deploy, and this
+app has no reason to take on that class of bug. Navigations are network-first
+with navigation preload (so the worker adds no load time) and fall back to the
+offline page only when the fetch throws. An OAuth callback is a navigation and
+goes to the network like any other. Bump `CACHE` when `offline.html` changes.
+The worker is registered in PRODUCTION ONLY (`registerServiceWorker()`, called
+from `main.tsx` on `load`), so `vite dev` never has one in front of it. Test
+install with `npm run build && npx vite preview`.
+
+**What a page can and cannot do.** On Android Chromium we keep
+`beforeinstallprompt` and call `.prompt()` from our own button, and the browser
+shows its real dialog, but only on a tap. There is no way to install
+automatically. iOS has no API at all, so the pop-up shows the two manual steps,
+with Apple's menu names kept in English because iOS has no Khmer UI and that is
+what the student actually sees. In-app browsers (`isInAppBrowser()`) and an
+already-installed app (`isInstalledApp()`, now exported from
+`utils/in-app-browser.ts`) get nothing.
+
+**Two moments, both requested by the user:**
+
+- **`"open"`**: 1.5s after the app opens (`OPEN_DELAY_MS`). Once per page load.
+  "Not now"/"Got it" snoozes it for `OPEN_SNOOZE_DAYS` (3) so a student is not
+  greeted by the same pop-up on every visit.
+- **`"lesson"`**: after finishing a lesson or a section. `markLessonFinished()`
+  is called beside `completeSession` in `lesson-detail.tsx` and
+  `section-detail.tsx`; practice quizzes are deliberately left out. Once per
+  device, ever. It outranks the open pop-up, and closing either one consumes the
+  other for that page load, so two never arrive back to back.
+
+**It never interrupts a task.** `AppShell` passes `suppressed = hideChrome ||
+chatOpen || pledgeOpen || authPrompt`, and `hideChrome` already covers lessons,
+exams and the roadmap lock. A suppressed pop-up is HELD, not dropped: the
+lesson one waits through the completion screen (which is focus mode) and
+appears once the student leaves it. It is mounted only in the ordinary-app
+branch of the gate, so the entry, login and survey screens never show it.
+
+**The state is a MODULE, not store fields.** `beforeinstallprompt` can fire
+before React mounts, so the listener has to exist from the moment the entry
+chunk evaluates, which is why `main.tsx` imports the module. And "snoozed" and
+"lesson pop-up seen" are device facts, not account data: as store fields they
+would sync to Supabase and lengthen the `partializeState` ↔
+`syncRelevantChange` list for nothing. They live in
+`localStorage["brachnha-install"]`, with every access wrapped. The component
+reads the module through `useSyncExternalStore`, whose snapshot is rebuilt only
+in `emit()`; returning a fresh object on every read would loop forever.
+
+**The icons remove the artwork's own tile.** The master SVG is an app-icon tile
+with rounded corners and a grey shadow baked in. Launchers round icons
+themselves, so shipping it would draw a tile inside a tile.
+`scripts/app-icons.mjs` whitens every low-chroma pixel (the drawing is all
+saturated colour and the tile edge is grey), and shrinks the maskable icon to
+0.8 so it survives any launcher mask. Re-run it if the artwork changes.
+`public/favicon.ico` is still the old icon and was left alone.
+
+**Verified** against the production build in real Chrome. The manifest reports
+no errors, and the only installability error was `in-incognito`, which comes
+from the automation context. The offline page is served for a navigation with
+the network off. A synthetic `beforeinstallprompt` shows the open pop-up after
+the delay, Install calls `.prompt()`, and the snooze holds across a reload. An
+iPhone UA shows the steps at 320px light and 390px dark with no sideways
+scroll. A Telegram-shaped webview UA shows nothing. The lesson pop-up is held
+inside `/sections/...` and appears once, after leaving. **Not verified: a real
+install on a real phone.** That needs the deployed site, because the install
 event only fires over https.
 
 ## Performance — the four rules, and why each one exists
@@ -6438,6 +6520,10 @@ surface under the wrong tab on the same screen. XP *is* awarded for both. When
 past papers deserve a history of their own it should be a separate persisted
 field, not a widening of this one.
 
+**SUPERSEDED 1 Oct 2026: of the screens below, only the Leaderboard's sample
+cohort and Streak with Friends are still demo.** Grade Prediction, all of
+Progress, the Streak page and the Game hero run on real data now (see "Phase 0"
+near the end of this file). The original decision, kept as history:
 **Grade Prediction, Leaderboard and Streak intentionally use fake, fixed demo
 data** (`features/*/demo-data.ts`), not live store data. An explicit user
 decision to avoid edge-case bugs (e.g. a brand-new user with zero exams breaking
@@ -6520,10 +6606,6 @@ coloured square — the fixed data has a placeholder number sitting there, but i
 is deliberately ignored so a screen full of demo data still can't claim a
 student did anything on a day that hasn't happened yet. The colour level
 (0–4, feeding the `LEVELS` scale in `activity-heatmap.tsx`) is bucketed from
-**SUPERSEDED 1 Oct 2026: of the screens below, only the Leaderboard's sample
-cohort and Streak with Friends are still demo.** Grade Prediction, all of
-Progress, the Streak page and the Game hero run on real data now (see "Phase 0"
-near the end of this file). The original decision, kept as history:
 the count via `levelForCount()` rather than being its own hand-authored number,
 so the shade a cell is painted and the count its tap tooltip shows can never
 disagree with each other — they used to be two unrelated numbers.
@@ -7228,6 +7310,14 @@ the LOCAL log — which is the usual degradation here (localStorage is the live
 copy; Supabase is the durable second one), so the only visible symptom is that a
 new device pulls no per-subject history.
 
+**Phase 0 needs `20261001000001_telemetry.sql` and
+`20261001000002_account_deletion_and_reports.sql` applied**, by hand. `db:check`
+sees their three tables (`client_errors`, `app_events`, `photo_reports`) but NOT
+the functions (`log_client_error`, `log_event`, `delete_my_account`): a
+publishable-key-only call to `/rest/v1/rpc/log_event` must be refused. Until
+they are applied, error reports and events are dropped silently, Delete my
+account shows its error, and Report says it could not send.
+
 **The Game feature needs BOTH its migrations applied before db:check passes** —
 `20260913000001_competitions.sql` and
 `20260914000001_competition_answers_and_work.sql` — plus
@@ -7272,11 +7362,3 @@ FAB raises the prompt and fires no `/api/chat` request; a typed `/roadmap` shows
 the locked panel **with the navigation still on screen**; and loading with
 `?code=x` in the URL DOES pull the SDK (that last one is the callback-swallowing
 trap — see the auth section).
-**Phase 0 needs `20261001000001_telemetry.sql` and
-`20261001000002_account_deletion_and_reports.sql` applied**, by hand. `db:check`
-sees their three tables (`client_errors`, `app_events`, `photo_reports`) but NOT
-the functions (`log_client_error`, `log_event`, `delete_my_account`): a
-publishable-key-only call to `/rest/v1/rpc/log_event` must be refused. Until
-they are applied, error reports and events are dropped silently, Delete my
-account shows its error, and Report says it could not send.
-

@@ -421,50 +421,9 @@ Exam tip: Highlight the antagonistic relationship regarding lateral buds (Auxin 
 គន្លឹះប្រឡង៖ ចងចាំថាអុកស៊ីន និងស៊ីតូគីនីន មានឥទ្ធិពលប្រឆាំងគ្នាលើពន្លកចំហៀង (អុកស៊ីនទប់ស្កាត់ ស៊ីតូគីនីនជំរុញ)។ ក្នុងវិញ្ញាសាបាក់ឌុប សំណួរប្រៀបធៀបត្រូវសរសេរទាំង «លក្ខណៈដូចគ្នា» និង «លក្ខណៈខុសគ្នា» ជាតារាងជានិច្ចដើម្បីទទួលបានពិន្ទុពេញ!`,
     },
   },
-  {
-    subject: "biology",
-    verified: true,
-    question: {
-      en: "Compare the sympathetic and parasympathetic nervous systems.",
-      km: "ប្រៀបធៀបប្រព័ន្ធប្រសាទសាំប៉ាទិច និងប៉ារ៉ាសាំប៉ាទិច។",
-    },
-    answer: {
-      en: `+ Similarities
-- Both are divisions of the autonomic (involuntary) nervous system.
-- Both innervate internal visceral organs (heart, lungs, digestive tract, blood vessels, glands).
-- Both work cooperatively to maintain internal homeostasis.
-
-+ Differences
-| Feature | Sympathetic Nervous System | Parasympathetic Nervous System |
-| :--- | :--- | :--- |
-| Primary state | Active during emergencies or stress (Fight or Flight) | Active during rest and recovery (Rest and Digest) |
-| Heart rate | Increases heart rate and contraction strength | Decreases heart rate back to baseline |
-| Pupils | Dilates pupils (pupil dilation) | Constricts pupils |
-| Bronchi | Dilates bronchi (increases airflow) | Constricts bronchi to normal caliber |
-| Digestion | Inhibits salivation, gastric secretion, and peristalsis | Stimulates salivation, digestive enzymes, and motility |
-| Blood glucose | Liver converts glycogen to glucose (releases energy) | Liver converts glucose to glycogen (stores energy) |
-| Hormone secretion | Stimulates adrenal glands to secrete epinephrine | Decreases epinephrine secretion |
-| Urinary bladder | Relaxes bladder muscles | Contracts bladder muscles for urination |
-
-Exam tip: Always state both "Similarities" and a "Differences table". Highlight that they have antagonistic (opposite) actions on the same target organs to finely regulate the internal environment.`,
-      km: `+ លក្ខណៈដូចគ្នា
-- ជាផ្នែកទាំងពីរនៃប្រព័ន្ធប្រសាទស្វ័យប្រវត្តិ (អឆន្ទៈ) ដូចគ្នា
-- ត្រួតពិនិត្យ និងសម្របសម្រួលសរីរាង្គខាងក្នុង (បេះដូង សរសៃឈាម ទងសួត ក្រពះ-ពោះវៀន ក្រពេញ) ដូចគ្នា
-- ធ្វើការរួមគ្នាដើម្បីរក្សាលំនឹង (Homeostasis) ក្នុងសារពាង្គកាយដូចគ្នា។
-
-+ លក្ខណៈខុសគ្នា
-| លក្ខណៈ | ប្រព័ន្ធប្រសាទសាំប៉ាទិច (Sympathetic) | ប្រព័ន្ធប្រសាទប៉ារ៉ាសាំប៉ាទិច (Parasympathetic) |
-| :--- | :--- | :--- |
-| ស្ថានភាពសកម្មភាព | សកម្មក្នុងគ្រាអាសន្ន ឬតានតឹង (Fight or Flight) | សកម្មក្នុងពេលសម្រាក និងរំលាយអាហារ (Rest and Digest) |
-| ចង្វាក់បេះដូង | បង្កើនល្បឿន និងកម្លាំងកន្ត្រាក់បេះដូង | បន្ថយល្បឿនចង្វាក់បេះដូងមកធម្មតា |
-| ប្រស្រីភ្នែក | ពង្រីកប្រស្រីភ្នែក | បង្រួមប្រស្រីភ្នែក |
-| ទងសួត | ពង្រីកទងសួត (ស្រូប O_2 បានច្រើន) | បង្រួមទងសួតមកធម្មតា |
-| ការរំលាយអាហារ | បន្ថយការបញ្ចេញទឹកមាត់ និងការរំលាយអាហារ | ជំរុញការបញ្ចេញទឹកមាត់ និងការរំលាយអាហារ |
-| ជាតិស្ករក្នុងឈាម | ថ្លើមបំប្លែងគ្លីកូសែនជាគ្លុយកូស (បញ្ចេញថាមពល) | ថ្លើមបំប្លែងគ្លុយកូសជាគ្លីកូសែន (ស្តុកទុកជាតិស្ករ) |
-| ការបញ្ចេញអរម៉ូន | ជំរុញការបញ្ចេញអេពីណេព្រីនពីក្រពេញលើតម្រងនោម | បន្ថយការបញ្ចេញអេពីណេព្រីន |
-| ប្លោកនោម | បន្ធូរប្លោកនោម | បង្រួមប្លោកនោម |
-
-គន្លឹះប្រឡង៖ ក្នុងវិញ្ញាសាបាក់ឌុប សំណួរប្រៀបធៀបត្រូវសរសេរទាំង «លក្ខណៈដូចគ្នា» និង «លក្ខណៈខុសគ្នាជាតារាង» ជានិច្ចដើម្បីកុំឱ្យបាត់ពិន្ទុ។ សម្គាល់ថា ប្រព័ន្ធទាំងពីរមានសកម្មភាពផ្ទុយគ្នាជានិច្ចលើសរីរាង្គគោលដៅដដែល (សាំប៉ាទិចជំរុញពេលអាសន្ន ប៉ារ៉ាសាំប៉ាទិចសម្រាលពេលសម្រាក)។`,
-    },
-  },
+  // A sympathetic vs parasympathetic comparison table used to sit here. It was
+  // removed (1 Oct 2026) because server/chat-cache.ts serves that exact answer,
+  // hand-written and free, so as an example it only cost ~2,200 characters
+  // (~1,000 tokens) on EVERY paid question. The plant-hormone entry above still
+  // teaches the similarities + differences table.
 ];

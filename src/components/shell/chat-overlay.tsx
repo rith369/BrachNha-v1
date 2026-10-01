@@ -14,6 +14,8 @@ import {
   Keyboard,
   ImageIcon,
   Lightbulb,
+  RotateCcw,
+  Square,
 } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
@@ -28,19 +30,25 @@ import { blobToBase64, blobToDataUrl, compressImage } from "@/utils/image-compre
 import { cn } from "@/utils/cn";
 import { MathText } from "./math-text";
 import { AttachmentChip, PhotoButton } from "./chat-attach";
-import { SHOW_SOLUTION_KM } from "@/data/kruai-phrases";
+import {
+  GUIDE_MARK,
+  KRUAI_LEFT_HEADER,
+  KRUAI_LIMIT_HEADER,
+  SHOW_SOLUTION_KM,
+} from "@/data/kruai-phrases";
+import { guidedAnchorIndex } from "@/utils/chat-anchor";
+import { todayKey } from "@/utils/day";
 import type { ChatProfile } from "@/utils/chat-prompt";
 import type { ChatMsg, Conversation } from "@/types";
 
 /**
  * KruAI guides an exercise step by step (the Socratic rules in
- * data/bac2-format.ts) and marks every guided reply by starting it with this.
- * Under the LAST reply carrying it, the overlay offers "show full solution",
- * which sends the exact words the prompt tells the model to answer with the
- * full solution. The mark stays visible in the bubble as the "guided" cue, so
- * nothing is stripped and a mark split across stream chunks cannot glitch.
+ * data/bac2-format.ts) and starts every guided reply with GUIDE_MARK. Under the
+ * LAST reply carrying it, the overlay offers "show full solution", which sends
+ * the exact words the prompt tells the model to answer with the full solution.
+ * The mark stays visible in the bubble as the "guided" cue, so nothing is
+ * stripped and a mark split across stream chunks cannot glitch.
  */
-const GUIDE_MARK = "🧭";
 const SHOW_SOLUTION = {
   en: "Please show the full solution",
   km: SHOW_SOLUTION_KM,
@@ -72,6 +80,38 @@ const MAX_PHOTOS_SENT = 2;
  *  in the handler), so a photo further back would be uploaded for nothing. */
 const REPLAY_WINDOW = 12;
 
+/** The "questions left today" line shows from here down. Above it the number
+ *  is noise; a student with 25 left has nothing to plan around. */
+const LOW_LEFT = 10;
+
+/**
+ * The last "left today" count the server sent (KRUAI_LEFT_HEADER), and for
+ * which day. Module scope, not state: AppShell unmounts the overlay on close,
+ * and a student who reopens it should still see the count. Lost on reload until
+ * the next question brings a fresh one, which is fine: the server is the one
+ * counting, this only remembers what it said.
+ */
+let knownLeft: { n: number; day: string } | null = null;
+
+function leftToday(): number | null {
+  return knownLeft && knownLeft.day === todayKey() ? knownLeft.n : null;
+}
+
+/** The line above the composer. The photo note shows only while a photo is
+ *  attached, the one moment the 3-for-1 price changes what the student does. */
+function leftLine(n: number, photo: boolean, lang: "en" | "km"): string {
+  if (n === 0) {
+    return lang === "en"
+      ? "No questions left today. See you tomorrow!"
+      : "ថ្ងៃនេះអស់សំណួរហើយ។ ជួបគ្នាថ្ងៃស្អែក!";
+  }
+  if (lang === "en") {
+    return `${n} question${n === 1 ? "" : "s"} left today` +
+      (photo ? " · a photo counts as 3" : "");
+  }
+  return `នៅសល់ ${n} សំណួរសម្រាប់ថ្ងៃនេះ` + (photo ? " · រូបភាពមួយរាប់ជា 3" : "");
+}
+
 /** Past this, decoding the file alone can exhaust a cheap phone's memory. A real
  *  camera photo is 3–5MB; 25MB is a scan or a panorama nobody meant to send. */
 const MAX_PHOTO_FILE_BYTES = 25 * 1024 * 1024;
@@ -82,27 +122,46 @@ const MAX_PHOTO_FILE_BYTES = 25 * 1024 * 1024;
  * that is gone (after a reload) so the model is told rather than left to guess.
  * Thumbs and ids are NOT sent — the server has no use for either, and thumbs
  * would add tens of KB per photo to every request.
+ *
+ * Failed bubbles (ChatMsg.failed) are left out: they are our words, an error or
+ * a refusal, and replayed they would reach the model as if KruAI had said them.
+ *
+ * The exercise being guided keeps its photo even once it is older than the
+ * window, because the server sends that message ahead of the window (see
+ * utils/chat-anchor.ts) and the exercise is often nothing BUT the photo. It
+ * takes one of the two photo slots first; newer photos share what is left.
  */
 function wireMessages(history: ChatMsg[]) {
-  const firstInWindow = history.length - REPLAY_WINDOW;
+  const kept = history.filter((m) => !(m.role === "bot" && m.failed));
+  const firstInWindow = kept.length - REPLAY_WINDOW;
+  const anchor = guidedAnchorIndex(kept);
+  const anchorPhoto =
+    anchor >= 0 && anchor < firstInWindow && kept[anchor].image
+      ? imageFor(kept[anchor].id)
+      : undefined;
+
   const out: {
     role: ChatMsg["role"];
     text: string;
     image?: ChatImage;
     hadImage?: true;
   }[] = [];
-  let sent = 0;
+  let budget = MAX_PHOTOS_SENT - (anchorPhoto ? 1 : 0);
   // Newest first, so the photo budget goes to the most recent photos.
-  for (let i = history.length - 1; i >= 0; i--) {
-    const m = history[i];
+  for (let i = kept.length - 1; i >= 0; i--) {
+    const m = kept[i];
     const base = { role: m.role, text: m.text };
     if (m.role !== "user" || !m.image) {
       out.push(base);
       continue;
     }
+    if (i === anchor && anchorPhoto) {
+      out.push({ ...base, image: anchorPhoto });
+      continue;
+    }
     const full = imageFor(m.id);
-    if (full && i >= firstInWindow && sent < MAX_PHOTOS_SENT) {
-      sent++;
+    if (full && i >= firstInWindow && budget > 0) {
+      budget--;
       out.push({ ...base, image: full });
     } else {
       out.push({ ...base, hadImage: true });
@@ -161,6 +220,8 @@ export function ChatOverlay() {
   const {
     addChatMsg,
     appendChatChunk,
+    failLastBotMsg,
+    dropFailedBotMsg,
     startNewChat,
     openConversation,
     deleteConversation,
@@ -176,6 +237,8 @@ export function ChatOverlay() {
     useShallow((s) => ({
       addChatMsg: s.addChatMsg,
       appendChatChunk: s.appendChatChunk,
+      failLastBotMsg: s.failLastBotMsg,
+      dropFailedBotMsg: s.dropFailedBotMsg,
       startNewChat: s.startNewChat,
       openConversation: s.openConversation,
       deleteConversation: s.deleteConversation,
@@ -195,6 +258,11 @@ export function ChatOverlay() {
   const [view, setView] = useState<"chat" | "history">("chat");
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  // Read once per open; a fresh count arrives with each answer.
+  const [left, setLeft] = useState<number | null>(leftToday);
+  // The answer in flight, so Stop can cut it off. The server notices the
+  // reader going away and stops the model too (cancel() in chat-handler.ts).
+  const abortRef = useRef<AbortController | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -330,6 +398,45 @@ export function ChatOverlay() {
     if (!typed && !photo) return;
     const text = typed || PHOTO_QUESTION[lang];
 
+    addChatMsg({ role: "user", text, ...(photo && { image: { thumb: photo.thumb } }) });
+    track("kruai_question", { photo: Boolean(photo) });
+
+    // Read the message back to get the id the store minted — the full photo is
+    // held against it (lib/chat-images.ts). Same read-back the game uses before
+    // publishing a competition, so the two copies share one identity.
+    const after = useBrachNhaStore.getState();
+    const sentId = after.conversations
+      .find((c) => c.id === after.activeConversationId)
+      ?.msgs.at(-1)?.id;
+    if (photo && sentId) rememberImage(sentId, photo.full);
+
+    setInput("");
+    if (photo) setAttachment(null);
+    await ask();
+  }
+
+  /** "Try again" under a failed bubble: drop it and ask the same question, so
+   *  the new answer takes its place. A photo goes again too, while this page
+   *  load still holds it. */
+  async function retry() {
+    if (loading) return;
+    dropFailedBotMsg();
+    await ask();
+  }
+
+  function stop() {
+    abortRef.current?.abort();
+  }
+
+  /**
+   * Asks KruAI about the conversation as it stands in the store, which ends
+   * with the student's question, and streams the answer into a new bot bubble.
+   */
+  async function ask() {
+    const now = useBrachNhaStore.getState();
+    const history =
+      now.conversations.find((c) => c.id === now.activeConversationId)?.msgs ?? [];
+
     const profile: ChatProfile = {
       name: userName,
       language: userLanguage,
@@ -349,21 +456,6 @@ export function ChatOverlay() {
       pendingPlacementTests: pendingPlacementTests.map((p) => p.subject),
     };
 
-    addChatMsg({ role: "user", text, ...(photo && { image: { thumb: photo.thumb } }) });
-    track("kruai_question", { photo: Boolean(photo) });
-
-    // Read the message back to get the id the store minted — the full photo is
-    // held against it (lib/chat-images.ts). Same read-back the game uses before
-    // publishing a competition, so the two copies share one identity.
-    const after = useBrachNhaStore.getState();
-    const history =
-      after.conversations.find((c) => c.id === after.activeConversationId)?.msgs ??
-      [];
-    const sentId = history.at(-1)?.id;
-    if (photo && sentId) rememberImage(sentId, photo.full);
-
-    setInput("");
-    if (photo) setAttachment(null);
     setLoading(true);
 
     // Drop back to text mode so the math panel isn't covering the reply. Only
@@ -375,6 +467,13 @@ export function ChatOverlay() {
 
     // Empty bot bubble for the stream to fill in, chunk by chunk.
     addChatMsg({ role: "bot", text: "" });
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+    // Whether any of KruAI's own words reached the bubble, and, if the bubble
+    // ends up holding our words instead, whether trying again can help.
+    let received = false;
+    let failed: "retry" | "final" | null = null;
 
     try {
       // Read at send time, never held in state: getSession() refreshes an
@@ -405,7 +504,14 @@ export function ChatOverlay() {
           profile,
           screen: screenRefFor(pathname),
         }),
+        signal: controller.signal,
       });
+
+      const leftHeader = res.headers.get(KRUAI_LEFT_HEADER);
+      if (leftHeader !== null && Number.isFinite(Number(leftHeader))) {
+        knownLeft = { n: Number(leftHeader), day: todayKey() };
+        setLeft(knownLeft.n);
+      }
 
       if (!res.ok || !res.body) {
         // The route sends readable text for its own error cases (missing key,
@@ -417,12 +523,16 @@ export function ChatOverlay() {
               ? "⚠️ Sorry, I could not answer that. Try again!"
               : "⚠️ សុំទោស មិនអាចឆ្លើយបានទេ។ សូមព្យាយាមម្ដងទៀត!")
         );
+        // Busy (429 with no daily limit named) and server-side failures can
+        // pass on a second try. A daily limit, signing in and a refused photo
+        // (4xx) cannot.
+        const atLimit = res.headers.get(KRUAI_LIMIT_HEADER) !== null;
+        failed = res.status >= 500 || (res.status === 429 && !atLimit) ? "retry" : "final";
         return;
       }
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
-      let received = false;
 
       for (;;) {
         const { done, value } = await reader.read();
@@ -440,14 +550,34 @@ export function ChatOverlay() {
             ? "⚠️ Sorry, I could not answer that. Try again!"
             : "⚠️ សុំទោស មិនអាចឆ្លើយបានទេ។ សូមព្យាយាមម្ដងទៀត!"
         );
+        failed = "retry";
       }
     } catch {
-      appendChatChunk(
-        lang === "en"
-          ? "⚠️ No connection. Try again later."
-          : "⚠️ គ្មានការតភ្ជាប់។ សូមព្យាយាមម្តងទៀត។"
-      );
+      if (controller.signal.aborted) {
+        // Stopped by the student. Words already on screen stay as they are:
+        // they are KruAI's, if short. With nothing yet, a note says what
+        // happened, and Try again is there if it was a slip.
+        if (!received) {
+          appendChatChunk(
+            lang === "en" ? "⏹️ Stopped." : "⏹️ បានបញ្ឈប់។"
+          );
+          failed = "retry";
+        }
+      } else {
+        // The connection dropped, before or during the answer. Half an answer
+        // is not worth keeping in the history the model sees, so the whole
+        // bubble counts as failed and Try again asks afresh.
+        appendChatChunk(
+          (received ? "\n" : "") +
+            (lang === "en"
+              ? "⚠️ No connection. Try again later."
+              : "⚠️ គ្មានការតភ្ជាប់។ សូមព្យាយាមម្តងទៀត។")
+        );
+        failed = "retry";
+      }
     } finally {
+      abortRef.current = null;
+      if (failed) failLastBotMsg(failed);
       setLoading(false);
     }
   }
@@ -600,6 +730,21 @@ export function ChatOverlay() {
             </div>
           )}
 
+        {/* Only under the LAST bubble: an older failure was followed by a
+            conversation that moved on. Not under "final" ones (the daily
+            limit, signing in), where a second try cannot help. */}
+        {!loading && msgs[msgs.length - 1]?.failed === "retry" && (
+          <div className="flex justify-start">
+            <button
+              onClick={() => void retry()}
+              className="flex items-center gap-1.5 rounded-full border border-purple/20 bg-surface px-3 py-1.5 text-xs font-extrabold text-purple transition hover:bg-purple/10"
+            >
+              <RotateCcw className="size-3.5" strokeWidth={2.5} />
+              {lang === "en" ? "Try again" : "ព្យាយាមម្តងទៀត"}
+            </button>
+          </div>
+        )}
+
         {loading && !msgs[msgs.length - 1]?.text && (
           <div className="flex justify-start">
             <div className="flex items-center gap-1.5 rounded-2xl border border-purple/10 bg-surface px-4 py-2.5">
@@ -613,6 +758,16 @@ export function ChatOverlay() {
 
       {/* Input */}
       <div className="mx-auto w-full max-w-2xl shrink-0 border-t border-purple/10 p-3">
+        {left !== null && left <= LOW_LEFT && (
+          <div
+            className={cn(
+              "mb-2 px-1 text-xs font-bold",
+              left === 0 ? "text-pink" : "text-muted"
+            )}
+          >
+            {leftLine(left, attachment?.status === "ready", lang)}
+          </div>
+        )}
         {attachment && (
           <AttachmentChip
             lang={lang}
@@ -664,18 +819,29 @@ export function ChatOverlay() {
             }
             className="min-w-0 flex-1 rounded-full border border-purple/15 bg-surface px-4 py-2.5 text-sm font-semibold outline-none focus:border-purple/40"
           />
-          <button
-            onClick={() => send()}
-            disabled={
-              loading ||
-              attachment?.status === "processing" ||
-              (!input.trim() && attachment?.status !== "ready")
-            }
-            aria-label={t.send}
-            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand text-white disabled:opacity-40"
-          >
-            <Send className="size-4.5" />
-          </button>
+          {/* While an answer is coming, Send becomes Stop: a long answer to the
+              wrong question should not have to be sat through. */}
+          {loading ? (
+            <button
+              onClick={stop}
+              aria-label={lang === "en" ? "Stop" : "បញ្ឈប់"}
+              className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand text-white"
+            >
+              <Square className="size-3.5 fill-current" strokeWidth={2.5} />
+            </button>
+          ) : (
+            <button
+              onClick={() => send()}
+              disabled={
+                attachment?.status === "processing" ||
+                (!input.trim() && attachment?.status !== "ready")
+              }
+              aria-label={t.send}
+              className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand text-white disabled:opacity-40"
+            >
+              <Send className="size-4.5" />
+            </button>
+          )}
         </div>
       </div>
 

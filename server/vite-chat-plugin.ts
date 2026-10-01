@@ -85,6 +85,13 @@ async function sendWebResponse(res: ServerResponse, webRes: Response) {
   }
 
   const reader = webRes.body.getReader();
+  // The student pressed Stop or closed the chat. Cancelling the reader is what
+  // runs the handler's cancel(), which aborts the model upstream, the same as
+  // Vercel does in production when the connection goes. Without it, dev kept
+  // reading (and spending quota) to the end of an answer nobody would see.
+  res.on("close", () => {
+    if (!res.writableFinished) void reader.cancel().catch(() => {});
+  });
   try {
     for (;;) {
       const { done, value } = await reader.read();

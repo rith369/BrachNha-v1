@@ -15,6 +15,49 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 1 Oct 2026 — KruAI: Remembers the Exercise, Stop and Try Again, Questions Left
+
+Not committed yet. No database step needed.
+
+**Why.** A review of the chat found one real bug and a few things students would feel.
+
+**What changed.**
+
+- **KruAI no longer forgets the exercise in a long guided chat.** KruAI only reads the
+  last 12 messages, and guiding an exercise takes many short turns. After about six
+  tries the exercise itself had dropped out. In a test, KruAI then made up a different
+  exercise and told a student their wrong answer was correct. Now the exercise (and its
+  photo) is always sent along while KruAI is still guiding it.
+- **Stop button.** While KruAI is writing, the send button becomes a stop button. Words
+  already shown stay. If nothing had arrived yet, the bubble says "បានបញ្ឈប់" and
+  offers Try again.
+- **Try again button** (ព្យាយាមម្តងទៀត) under an answer that failed: no connection, KruAI
+  busy, or a server error. It asks the same question again, and the new answer takes the
+  failed one's place. There is no Try again under "you have reached today's limit",
+  since it cannot help until tomorrow.
+- **"Questions left today".** Once a student has 10 or fewer questions left, a small line
+  above the message box says how many (and that a photo counts as 3, while a photo is
+  attached). At 0 it says to come back tomorrow.
+- **A photo refused with 1 or 2 questions left** now explains that a photo costs 3 and
+  that typed questions still work, instead of "come back tomorrow".
+- **Error messages are no longer shown to KruAI** as if KruAI had said them.
+- **Cheaper questions.** One example answer that was also saved as a free ready-made
+  answer was removed from KruAI's instructions. Every question now costs about 650 fewer
+  tokens, and the instructions have room for new rules again. Comparison answers still
+  come back as a table.
+
+**What to re-test.**
+
+- Ask an exercise and keep answering for 7 or more turns, then give a wrong final
+  answer: KruAI should say it is not right yet.
+- Press stop in the middle of an answer, and again right after sending.
+- Turn off the internet, send a question, turn it back on, press Try again.
+- On a real account, after 20 or more questions today, the "questions left" line appears.
+
+**Known gap.** Pressing stop before the first word arrives stops the answer on screen,
+but KruAI finishes writing that one answer in the background, and the question still
+counts toward the daily limit.
+
 ## 1 Oct 2026 — Real Numbers Everywhere, Crash Reports, Delete Account, Report a Photo
 
 Commit `e6d5a10`. **Three database steps needed** (see the end of this entry).
