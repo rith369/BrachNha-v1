@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 1 Oct 2026 — Real Numbers Everywhere, Crash Reports, Delete Account, Report a Photo
 
-Not committed yet. **Two database steps needed** (see the end of this entry).
+Commit `e6d5a10`. **Three database steps needed** (see the end of this entry).
 
 **Why.** Getting the app ready for real students. Several screens still showed made-up
 numbers that a student could mistake for their own, there was no way to know when the
