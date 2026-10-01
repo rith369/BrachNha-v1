@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 1 Oct 2026 — KruAI: Remembers the Exercise, Stop and Try Again, Questions Left
 
-Not committed yet. No database step needed.
+Commit `59ae567`. No database step needed.
 
 **Why.** A review of the chat found one real bug and a few things students would feel.
 
