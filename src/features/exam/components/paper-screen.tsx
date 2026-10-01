@@ -1,3 +1,4 @@
+import { track } from "@/lib/telemetry";
 import { useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore, type PaperResult } from "@/lib/store";
@@ -58,6 +59,7 @@ export function PaperScreen({ paper }: { paper: PastPaper }) {
     // A finished paper counts as the daily challenge, beside a Game battle —
     // see pages/game-create.tsx.
     useBrachNhaStore.getState().completeTask("challenge");
+    track("exam_done", { kind: "paper", paper: paper.key, score: attempt.score, total: attempt.total });
     addPaperResult({
       paperKey: paper.key,
       score: attempt.score,

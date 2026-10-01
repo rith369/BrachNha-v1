@@ -6,7 +6,7 @@ import { useShallow } from "zustand/react/shallow";
 import { T } from "@/data/translations";
 import type { Tasks } from "@/types";
 import { useStudyFeed } from "../use-study-feed";
-import type { StudyKind } from "../study-feed";
+import { taskHref } from "../task-links";
 
 /**
  * Today's missions. A row is a LINK to where that work is done, never a
@@ -38,21 +38,6 @@ const TASK_LABEL_KEY: Record<keyof Tasks, "completeLesson" | "practice" | "revie
   challenge: "dailyChallengeTask",
 };
 
-/** Which study-feed item a task's link should open, when one exists. */
-const TASK_KIND: Partial<Record<keyof Tasks, StudyKind>> = {
-  lesson: "section",
-  practice: "quiz",
-  flashcards: "flashcards",
-};
-
-/** Where a task goes when the feed has nothing of that kind left. */
-const TASK_FALLBACK: Record<keyof Tasks, string> = {
-  lesson: "/lessons",
-  practice: "/practice",
-  flashcards: "/practice",
-  challenge: "/exam",
-};
-
 export function DailyTasks() {
   const { lang, tasks } = useBrachNhaStore(
     useShallow((s) => ({
@@ -64,13 +49,9 @@ export function DailyTasks() {
   const t = T[lang];
   const allDone = Object.values(tasks).every(Boolean);
 
-  // The same next item the Study card shows, so the mission and the card
-  // beside it never send a student to two different places.
-  function hrefFor(key: keyof Tasks): string {
-    const kind = TASK_KIND[key];
-    const item = kind ? feed.items.find((i) => i.kind === kind) : undefined;
-    return item?.href ?? TASK_FALLBACK[key];
-  }
+  // The same next item the Study card shows (task-links.ts), so the mission,
+  // the card beside it and the Streak page never disagree on where to go.
+  const hrefFor = (key: keyof Tasks) => taskHref(key, feed.items);
 
   return (
     <div>

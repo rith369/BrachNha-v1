@@ -432,9 +432,139 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["kruai_usage"]["Insert"]>;
         Relationships: [];
       };
+
+      // supabase/migrations/20261001000001_telemetry.sql. Written ONLY by
+      // log_client_error() / log_event() and readable by no client (RLS on, no
+      // policies). Declared so the types mirror the SQL; the client never
+      // queries either table directly.
+      client_errors: {
+        Row: {
+          id: number;
+          user_id: string | null;
+          message: string;
+          stack: string | null;
+          route: string | null;
+          app_version: string | null;
+          user_agent: string | null;
+          created_at: string;
+        };
+        Insert: {
+          user_id?: string | null;
+          message: string;
+          stack?: string | null;
+          route?: string | null;
+          app_version?: string | null;
+          user_agent?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["client_errors"]["Insert"]>;
+        Relationships: [];
+      };
+      app_events: {
+        Row: {
+          id: number;
+          user_id: string;
+          name: string;
+          props: Json;
+          event_date: string;
+          created_at: string;
+        };
+        Insert: {
+          user_id: string;
+          name: string;
+          props?: Json;
+          event_date: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["app_events"]["Insert"]>;
+        Relationships: [];
+      };
+
+      // supabase/migrations/20261001000002_account_deletion_and_reports.sql.
+      // Insert-own (only about a photo in a competition you took part in) and
+      // read-own; no update or delete.
+      photo_reports: {
+        Row: {
+          id: number;
+          reporter_id: string;
+          competition_id: string;
+          photo_path: string;
+          reason: "inappropriate" | "not_work" | "other";
+          created_at: string;
+          // 20261001000003_report_review.sql: the team's decision, recorded
+          // rather than the row deleted. Null while the report is open.
+          resolution: "kept" | "deleted" | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+        };
+        Insert: {
+          reporter_id: string;
+          competition_id: string;
+          photo_path: string;
+          reason?: "inappropriate" | "not_work" | "other";
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["photo_reports"]["Insert"]>;
+        Relationships: [];
+      };
+
+      // 20261001000003_report_review.sql. Who the team is. No client policies:
+      // filled by hand in the SQL editor, read only through is_app_admin().
+      app_admins: {
+        Row: { user_id: string; created_at: string };
+        Insert: { user_id: string; created_at?: string };
+        Update: Partial<Database["public"]["Tables"]["app_admins"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {
+      // 20261001000001_telemetry.sql. Anyone (guests included) may report an
+      // error; the function caps it per hour.
+      log_client_error: {
+        Args: {
+          p_message: string;
+          p_stack: string;
+          p_route: string;
+          p_version: string;
+          p_ua: string;
+        };
+        Returns: undefined;
+      };
+      // Signed-in students only; the event name must be on the allow-list.
+      log_event: {
+        Args: { p_name: string; p_props: Json };
+        Returns: undefined;
+      };
+      // 20261001000002_account_deletion_and_reports.sql. Deletes the CALLER's
+      // auth user; every table cascades. Storage is cleared by the client first.
+      delete_my_account: {
+        Args: Record<string, never>;
+        Returns: undefined;
+      };
+      // 20261001000003_report_review.sql. The /admin/reports page. Each
+      // admin_* function refuses a caller who is not in app_admins.
+      is_app_admin: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
+      admin_photo_reports: {
+        Args: Record<string, never>;
+        Returns: {
+          photo_path: string;
+          competition_id: string;
+          owner_id: string | null;
+          owner_name: string | null;
+          reports: number;
+          reasons: string[];
+          first_reported: string;
+          last_reported: string;
+        }[];
+      };
+      admin_resolve_photo: {
+        Args: { p_photo_path: string; p_resolution: "kept" | "deleted" };
+        Returns: number;
+      };
       // 20260929000001_kruai_usage.sql. Charges the CALLER `p_units` against
       // today's limits and says whether it was allowed. Called by the server
       // (server/kruai-quota.ts) with the student's own token.

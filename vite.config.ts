@@ -17,6 +17,13 @@ export default defineConfig({
     // "The AI Mentor endpoint — one handler, two mounts" in CLAUDE.md.
     chatApi(),
   ],
+  // Which build an error report came from (src/lib/telemetry.ts). Vercel sets
+  // the commit at build time; a local build says "dev".
+  define: {
+    __APP_VERSION__: JSON.stringify(
+      process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? 'dev'
+    ),
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

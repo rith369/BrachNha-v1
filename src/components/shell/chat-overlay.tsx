@@ -1,3 +1,4 @@
+import { track } from "@/lib/telemetry";
 import { useState, useRef, useEffect, lazy, Suspense } from "react";
 import { useLocation } from "react-router";
 import { motion } from "framer-motion";
@@ -349,6 +350,7 @@ export function ChatOverlay() {
     };
 
     addChatMsg({ role: "user", text, ...(photo && { image: { thumb: photo.thumb } }) });
+    track("kruai_question", { photo: Boolean(photo) });
 
     // Read the message back to get the id the store minted — the full photo is
     // held against it (lib/chat-images.ts). Same read-back the game uses before

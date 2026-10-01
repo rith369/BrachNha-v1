@@ -17,7 +17,7 @@ import { KM_WEEKDAYS } from "@/utils/khmer-dates";
 import { useBrachNhaStore } from "@/lib/store";
 import type { Lang } from "@/types";
 import { weekdayLabel } from "@/features/streak/copy";
-import type { WeekdayId } from "@/features/streak/demo-data";
+import type { WeekdayId } from "@/features/streak/types";
 import { PROGRESS_COPY } from "../copy";
 import { TitleWithTip } from "./title-with-tip";
 

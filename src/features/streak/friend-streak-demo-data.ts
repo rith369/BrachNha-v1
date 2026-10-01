@@ -39,7 +39,7 @@
 // ============================================================
 
 import type { SharedDay } from "@/utils/streak-friends";
-import type { WeekdayId } from "./demo-data";
+import type { WeekdayId } from "./types";
 
 export interface Participant {
   /** Fallback only for the student — the components read the real name off the

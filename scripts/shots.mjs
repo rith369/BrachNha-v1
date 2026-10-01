@@ -95,16 +95,7 @@ const ROUTES = [
     path: "/exam/subjects",
     clicks: ['button:has-text("វិញ្ញាសារបង្កើតថ្មី")'],
   },
-  // The streak page after its one interaction. Worth photographing separately
-  // because the celebration is the only state where the confetti layer exists,
-  // and a burst of absolutely-positioned particles is exactly the shape of
-  // thing that widens a page — the probe below is what proves it does not.
-  // Seeded lang is "en", so the English label is the right selector.
-  {
-    name: "streak-complete",
-    path: "/streak",
-    clicks: ["button:has-text(\"Complete Today's Goal\")"],
-  },
+
 
   // ── focus mode: nav must be gone on all of these ──
   // Scoped to `button:has-text`, NOT a bare `text=`: on the lesson intro the

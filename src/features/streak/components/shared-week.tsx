@@ -6,7 +6,7 @@ import { sharedDayStatus } from "@/utils/streak-friends";
 import type { SharedDayStatus } from "@/utils/streak-friends";
 import { sharedDayAriaLabel, useStreakCopy, weekdayLabel } from "../copy";
 import type { Participant, SharedWeekDay } from "../friend-streak-demo-data";
-import type { WeekdayId } from "../demo-data";
+import type { WeekdayId } from "../types";
 
 /**
  * The week as SHARED outcomes, not two rows of ticks.

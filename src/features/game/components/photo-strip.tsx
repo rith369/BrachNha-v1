@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Camera, X } from "lucide-react";
+import { Camera, Flag, X } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
 import { MAX_PHOTOS_PER_QUESTION, type WorkPhoto } from "@/lib/competition-photos";
@@ -18,16 +18,24 @@ import { gameCopy } from "../copy";
  * the photo. It takes TWO taps: the first turns the × into a red "Delete?", the
  * second deletes. Same two-tap shape as Profile's logout and FocusLayout's exit,
  * at thumbnail size.
+ *
+ * THE REPORT FLAG is the same shape for SOMEONE ELSE's photos: a sibling of the
+ * link, two taps ("Report?" first). Once sent, the photo is hidden for this
+ * visit and a "Reported" tile stands in its place, so the student does not have
+ * to keep looking at what they reported.
  */
 export function PhotoStrip({
   photos,
   onDelete,
+  onReport,
   lastPhotoOverall = false,
 }: {
   photos: WorkPhoto[];
   /** Present only for your OWN photos — nobody else's can be deleted, and the
    *  storage policy would refuse it anyway. */
   onDelete?: (photo: WorkPhoto) => void;
+  /** Present only for ANOTHER student's photos. Resolves true once sent. */
+  onReport?: (photo: WorkPhoto) => Promise<boolean>;
   /** Whether deleting from this strip would remove the student's LAST photo
    *  anywhere, which closes the reciprocity gate. Said out loud at confirm time
    *  rather than discovered afterwards. */
@@ -36,6 +44,16 @@ export function PhotoStrip({
   const lang = useBrachNhaStore((s) => s.lang);
   const t = gameCopy(lang);
   const [confirming, setConfirming] = useState<string | null>(null);
+  const [reported, setReported] = useState<ReadonlySet<string>>(new Set());
+  const [reportFailed, setReportFailed] = useState(false);
+
+  async function report(p: WorkPhoto) {
+    if (!onReport) return;
+    setReportFailed(false);
+    const ok = await onReport(p);
+    if (ok) setReported((r) => new Set(r).add(p.path));
+    else setReportFailed(true);
+  }
 
   if (photos.length === 0) return null;
 
@@ -44,6 +62,16 @@ export function PhotoStrip({
       <div className="flex flex-wrap gap-2">
         {photos.map((p, i) => {
           const armed = confirming === p.path;
+          if (reported.has(p.path)) {
+            return (
+              <div
+                key={p.path}
+                className="flex size-16 items-center justify-center rounded-xl border border-dashed border-pink/40 bg-pink/5 px-1 text-center text-[9px] font-extrabold text-pink md:size-20"
+              >
+                {t.reported}
+              </div>
+            );
+          }
           return (
             <div key={p.path} className="relative">
               <a
@@ -81,6 +109,25 @@ export function PhotoStrip({
                   {armed ? t.deleteConfirmShort : <X className="size-3.5" strokeWidth={3} />}
                 </button>
               )}
+              {onReport && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!armed) return setConfirming(p.path);
+                    setConfirming(null);
+                    void report(p);
+                  }}
+                  aria-label={armed ? t.reportConfirmShort : t.reportPhoto}
+                  className={cn(
+                    "absolute -top-1.5 -right-1.5 flex items-center justify-center rounded-full border shadow-panel-sm transition",
+                    armed
+                      ? "h-6 border-pink bg-[var(--brand-pink)] px-2 text-[9px] font-extrabold text-white"
+                      : "size-6 border-purple/20 bg-surface text-muted hover:text-pink"
+                  )}
+                >
+                  {armed ? t.reportConfirmShort : <Flag className="size-3" strokeWidth={3} />}
+                </button>
+              )}
             </div>
           );
         })}
@@ -89,8 +136,13 @@ export function PhotoStrip({
       {/* The consequence is stated WHILE the student is deciding. Deleting one of
           several pages changes nothing for the other side; deleting the last one
           hides their working again, which is worth knowing before the second tap. */}
-      {confirming && lastPhotoOverall && (
+      {confirming && lastPhotoOverall && onDelete && (
         <p className="mt-1.5 text-[10px] font-bold text-pink">{t.deleteWarns}</p>
+      )}
+      {reportFailed && (
+        <p role="alert" className="mt-1.5 text-[10px] font-bold text-pink">
+          {t.reportFailed}
+        </p>
       )}
     </div>
   );

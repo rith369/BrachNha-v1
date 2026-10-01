@@ -23,7 +23,7 @@
  * ON A PAST DAY THE SAME COMBINATION MEANS THE STREAK ACTUALLY BROKE. The demo
  * week deliberately contains no such day, so the distinction never has to be
  * drawn on screen — but a real implementation has to decide it, along with the
- * timezone and grace-day questions recorded in features/streak/demo-data.ts.
+ * timezone and grace-day questions recorded in features/streak/friend-streak-demo-data.ts.
  * Splitting `atRisk` into "at risk (today)" and "broke (past)" is the first
  * thing this type should grow when the data becomes real.
  */

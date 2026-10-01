@@ -1,3 +1,4 @@
+import { track } from "@/lib/telemetry";
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router";
 import { useBrachNhaStore } from "@/lib/store";
@@ -171,6 +172,7 @@ export default function GamePlayPage() {
     addCompetitionAttempt(attempt, run.score * GAME_XP_PER_CORRECT);
     // The daily challenge — see pages/game-create.tsx.
     useBrachNhaStore.getState().completeTask("challenge");
+    track("battle_done", { role: "joiner", score: run.score, total: competition.total });
 
     // Read the row back so the server gets the same id and timestamp the device
     // has, rather than a second set minted here.

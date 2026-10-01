@@ -3,10 +3,11 @@ import { Card } from "@/components/ui/card";
 import { useBrachNhaStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
 import { useStreakCopy, weekdayLabel } from "../copy";
-import type { DemoStreakDay, WeekdayId } from "../demo-data";
+import type { StreakDay } from "../types";
 
 /**
- * Seven cells, Monday to Sunday, one per day of the current week.
+ * Seven cells: the last seven days, today on the right, each ticked when that
+ * day's goal was met in `activityLog`.
  *
  * A GRID, NOT A FLEX ROW. `grid-cols-7` gives seven exactly-equal tracks with
  * no min-width negotiation, which is what keeps this inside a 320px phone
@@ -25,10 +26,10 @@ import type { DemoStreakDay, WeekdayId } from "../demo-data";
  */
 export function WeeklyStreak({
   week,
-  todayId,
+  todayKey,
 }: {
-  week: readonly DemoStreakDay[];
-  todayId: WeekdayId;
+  week: readonly StreakDay[];
+  todayKey: string;
 }) {
   const lang = useBrachNhaStore((s) => s.lang);
   const c = useStreakCopy(lang);
@@ -44,10 +45,10 @@ export function WeeklyStreak({
 
       <div className="grid grid-cols-7 gap-1.5 md:gap-2">
         {week.map((day) => {
-          const isToday = day.id === todayId;
+          const isToday = day.key === todayKey;
 
           return (
-            <div key={day.id} className="flex flex-col items-center gap-1.5">
+            <div key={day.key} className="flex flex-col items-center gap-1.5">
               <div
                 className={cn(
                   "text-[9px] font-extrabold tracking-wide uppercase md:text-[10px]",

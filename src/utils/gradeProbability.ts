@@ -4,16 +4,22 @@
 // without the UI changing shape. Every weight/constant below is a prototype
 // assumption, not a scientifically validated figure.
 //
-// This module is intentionally data-agnostic (no imports from demo-data) —
-// it just takes numbers and returns numbers, same convention as
-// utils/gradePrediction.ts and utils/roadmap.ts.
+// This module is intentionally data-agnostic — it just takes numbers and
+// returns numbers, same convention as utils/gradePrediction.ts and
+// utils/roadmap.ts. The real inputs are assembled in
+// features/grade-prediction/real-prediction.ts.
 
 import { GRADE_BANDS, pctToGrade } from "./gradePrediction";
 
+// The first three are NULLABLE because a real student usually has not done
+// all three kinds of work yet: someone who has answered fifty questions and
+// sat no exam has no exam average, and 0 would claim they sat one and failed
+// it. A null input is left out and the weights of the inputs that ARE present
+// are scaled back up to 1, so the composite stays on the same 0-100 scale.
 export interface PredictionInputs {
-  quizPct: number; // avg practice-quiz accuracy, 0-100
-  mockExamPct: number; // avg mock-exam score, 0-100
-  lessonCompletionPct: number; // % of assigned lessons completed
+  quizPct: number | null; // practice accuracy, 0-100
+  mockExamPct: number | null; // avg mock-exam / past-paper score, 0-100
+  lessonCompletionPct: number | null; // % of written sections completed
   consistencyPct: number; // % of recent days with study activity
   trendDeltaPct: number; // recent quiz-accuracy slope, roughly -20..+20
 }
@@ -41,14 +47,21 @@ export function trendDeltaToScore(trendDeltaPct: number): number {
 }
 
 export function computeCompositeScore(inputs: PredictionInputs): number {
-  const trendScore = trendDeltaToScore(inputs.trendDeltaPct);
-  const raw =
-    inputs.quizPct * PREDICTION_WEIGHTS.quiz +
-    inputs.mockExamPct * PREDICTION_WEIGHTS.mockExam +
-    inputs.lessonCompletionPct * PREDICTION_WEIGHTS.lessonCompletion +
-    inputs.consistencyPct * PREDICTION_WEIGHTS.consistency +
-    trendScore * PREDICTION_WEIGHTS.trend;
-  return Math.round(clamp(raw, 0, 100));
+  const parts: [number | null, number][] = [
+    [inputs.quizPct, PREDICTION_WEIGHTS.quiz],
+    [inputs.mockExamPct, PREDICTION_WEIGHTS.mockExam],
+    [inputs.lessonCompletionPct, PREDICTION_WEIGHTS.lessonCompletion],
+    [inputs.consistencyPct, PREDICTION_WEIGHTS.consistency],
+    [trendDeltaToScore(inputs.trendDeltaPct), PREDICTION_WEIGHTS.trend],
+  ];
+  let raw = 0;
+  let weight = 0;
+  for (const [value, w] of parts) {
+    if (value === null) continue;
+    raw += value * w;
+    weight += w;
+  }
+  return Math.round(clamp(weight > 0 ? raw / weight : 0, 0, 100));
 }
 
 // Distance from each grade band's midpoint, mapped to a probability weight

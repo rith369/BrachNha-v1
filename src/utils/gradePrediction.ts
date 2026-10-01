@@ -58,11 +58,19 @@ export interface GradePrediction {
   subjects: SubjectPrediction[];
 }
 
+// Only subjects PRESENT in `subjectPerformance` get a row. A real student has
+// a score only where they have answered enough questions (MIN_SAMPLE in
+// features/progress/summary.ts), and a missing subject read as 0% would
+// predict an E in a subject they have simply not started. The overall is
+// therefore weighted over the core subjects that do have a score, and is 0
+// with an empty list when none do.
 export function computeGradePrediction(
-  subjectPerformance: Record<string, number>,
+  subjectPerformance: Partial<Record<string, number>>,
   languageSubjectKey: string
 ): GradePrediction {
-  const coreSubjects = Object.keys(SUBJECT_MAX_SCORE);
+  const coreSubjects = Object.keys(SUBJECT_MAX_SCORE).filter(
+    (subject) => subjectPerformance[subject] !== undefined
+  );
 
   const subjects: SubjectPrediction[] = coreSubjects.map((subject) => {
     const pct = subjectPerformance[subject] ?? 0;
@@ -75,22 +83,24 @@ export function computeGradePrediction(
     };
   });
 
-  const languagePct = subjectPerformance.language ?? 0;
-  subjects.push({
-    subject: languageSubjectKey,
-    pct: languagePct,
-    grade: pctToGrade(languagePct),
-    maxScore: FOREIGN_LANGUAGE_MAX,
-    countsTowardOverall: false,
-  });
+  const languagePct = subjectPerformance[languageSubjectKey];
+  if (languagePct !== undefined) {
+    subjects.push({
+      subject: languageSubjectKey,
+      pct: languagePct,
+      grade: pctToGrade(languagePct),
+      maxScore: FOREIGN_LANGUAGE_MAX,
+      countsTowardOverall: false,
+    });
+  }
 
-  const rawScore = coreSubjects.reduce(
-    (sum, subject) =>
-      sum +
-      ((subjectPerformance[subject] ?? 0) / 100) * SUBJECT_MAX_SCORE[subject],
-    0
-  );
-  const overallPct = Math.round((rawScore / CORE_TOTAL_MAX) * 100);
+  let rawScore = 0;
+  let maxScore = 0;
+  for (const subject of coreSubjects) {
+    rawScore += ((subjectPerformance[subject] ?? 0) / 100) * SUBJECT_MAX_SCORE[subject];
+    maxScore += SUBJECT_MAX_SCORE[subject];
+  }
+  const overallPct = maxScore > 0 ? Math.round((rawScore / maxScore) * 100) : 0;
 
   return { overallPct, overallGrade: pctToGrade(overallPct), subjects };
 }

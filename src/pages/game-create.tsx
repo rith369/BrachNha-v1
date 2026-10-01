@@ -1,3 +1,4 @@
+import { track } from "@/lib/telemetry";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useBrachNhaStore } from "@/lib/store";
@@ -99,6 +100,7 @@ export default function GameCreatePage() {
     // behind that mission (Home's row is a link, not a checkbox). getState()
     // because it is an event-time write, not something this screen renders.
     useBrachNhaStore.getState().completeTask("challenge");
+    track("battle_done", { role: "creator", score: result.score, total: result.total });
 
     // Read the row back rather than rebuilding it, so the server gets the SAME
     // id the device has. Minting a second one here would give the two copies

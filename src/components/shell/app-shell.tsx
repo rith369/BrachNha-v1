@@ -1,3 +1,4 @@
+import { track } from "@/lib/telemetry";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { TopBar } from "./top-bar";
 import { Drawer } from "./drawer";
@@ -129,6 +130,13 @@ export function AppShell({
     document.addEventListener("visibilitychange", onVisible);
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [rolloverDailyTasks]);
+
+  // One "app_open" per signed-in student per day (log_event() drops the
+  // repeats, StrictMode's second pass included). Its daily count is the
+  // app's daily active users, and day-7 return is read from it.
+  useEffect(() => {
+    if (isAuthenticated) track("app_open");
+  }, [isAuthenticated]);
 
   // Hiding the FAB is not enough on its own. `chatOpen` is global and survives
   // navigation, so a student could open the mentor on the exam INTRO screen and

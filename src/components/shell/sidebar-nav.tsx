@@ -1,10 +1,12 @@
 import { Link, useLocation } from "react-router";
+import { ShieldAlert } from "lucide-react";
 import { LanguageSwitcher } from "./language-switcher";
 import { ThemeSwitcher } from "./theme-switcher";
 import { Wordmark } from "./wordmark";
 import { useBrachNhaStore } from "@/lib/store";
 import { mainNavItems, featureNavItems, type NavItem } from "@/lib/nav-items";
 import { cn } from "@/utils/cn";
+import { useAdminStatus } from "@/lib/admin-status";
 
 /**
  * The nav list itself, with no shell around it. Rendered in two places and it
@@ -14,11 +16,24 @@ import { cn } from "@/utils/cn";
  * once and they can never drift apart.
  */
 
+/** The team's row. Not in lib/nav-items.ts: it is not a destination every
+ *  student has, and only an admin account (decided by the database, see
+ *  lib/admin-status.ts) ever renders it. */
+const ADMIN_ITEM: NavItem = {
+  id: "admin-reports",
+  href: "/admin/reports",
+  label: { en: "Photo reports", km: "របាយការណ៍រូបថត" },
+  icon: ShieldAlert,
+};
+
 function NavRow({
   item,
   onNavigate,
+  badge,
 }: {
   item: NavItem;
+  /** A count shown at the row's end; absent or 0 shows nothing. */
+  badge?: number | null;
   /** Drawer passes a close handler; the sidebar is permanent and passes none. */
   onNavigate?: () => void;
 }) {
@@ -38,6 +53,11 @@ function NavRow({
       <span className="min-w-0 truncate text-sm font-extrabold text-text">
         {item.label[lang]}
       </span>
+      {badge ? (
+        <span className="ml-auto shrink-0 rounded-full bg-[var(--brand-pink)] px-2 py-0.5 text-[10px] font-extrabold text-white">
+          {badge}
+        </span>
+      ) : null}
       {!item.href && (
         <span className="ml-auto shrink-0 rounded-full bg-purple/8 px-2 py-0.5 text-[9px] font-extrabold text-muted">
           {lang === "en" ? "Soon" : "ឆាប់ៗ"}
@@ -69,6 +89,7 @@ function NavRow({
 
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const lang = useBrachNhaStore((s) => s.lang);
+  const admin = useAdminStatus();
 
   return (
     <>
@@ -107,6 +128,24 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             <NavRow key={item.id} item={item} onNavigate={onNavigate} />
           ))}
         </div>
+
+        {/* Admin accounts only. A student never sees this section at all, not
+            even greyed out. "Team" is English for the same reason "Main" is. */}
+        {admin.isAdmin && (
+          <>
+            <div className="my-2.5 h-px bg-purple/10" />
+            <div className="px-3 pt-1 pb-1 text-[10px] font-extrabold tracking-widest text-muted uppercase">
+              Team
+            </div>
+            <div className="flex flex-col gap-1">
+              <NavRow
+                item={ADMIN_ITEM}
+                onNavigate={onNavigate}
+                badge={admin.openReports}
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {/* Pinned below the nav rather than inside the scroll area: the list

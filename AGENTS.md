@@ -4111,8 +4111,9 @@ survey.
 
 **Progress dashboard** (`features/progress`) — score hero (SVG donut), Recharts
 trend line + bar chart, subject breakdown w/ sparklines, focus areas, activity
-heatmap, AI insights. FOUR of those seven cards run on real student data now;
-three are still invented — see the section directly below.
+heatmap, study tips. ALL SEVEN run on the student's own data since 1 Oct 2026
+— see the section directly below, and "Phase 0" near the end of this file for
+the last three.
 
 ### Progress: four cards are REAL now, three are still invented
 
@@ -4279,18 +4280,19 @@ subject that had not moved; it reads "no change", in muted.
 **Sparklines changed meaning: daily question VOLUME, not accuracy.** Real daily
 accuracy on a one-question day swings to 0 or 100 and the strip becomes noise.
 
-**The three demo cards, and why each cannot be real today:**
+**The last three cards went real on 1 Oct 2026 (the user's call),** and each
+took a different route — see "Phase 0" near the end of this file:
 
-- **Focus Areas** — per-TOPIC accuracy. Lesson grain is the finest honest grain
-  the app has; topic grain exists nowhere in it.
-- **Study Activity** — `contentLog` COULD feed this one. Kept demo at the user's
-  explicit request. **Known and accepted:** its "tap a day to see questions
-  answered" now sits beside a bar chart showing REAL per-subject counts, and the
-  two will not add up. The page tag used to cover that; it is gone, so nothing does.
-- **AI Insights** — needs an LLM pass plus a badge system. A live `/api/chat`
-  call from a bottom-nav tab would exhaust the shared Gemini quota (~20
-  requests/DAY for the whole deployment) and break KruAI, the app's actual AI
-  feature, on a screen nobody asked a question on.
+- **Focus Areas** — at SUBJECT grain (`features/progress/focus-areas.ts`).
+  Topic grain exists nowhere, and lesson grain is ambiguous for maths (the
+  Bac II quiz path and the foundation path both write `math-1-1`).
+- **Study Activity** — `heatmapCounts()` in `utils/activity-heatmap.ts`, from
+  `contentLog`: questions answered PLUS flashcards reviewed per day, so it now
+  agrees with the bar chart beside it.
+- **AI Insights → "Study tips"** — RULE-BASED (`features/progress/study-tips.ts`),
+  no model call, for the reason this card was demo: a live `/api/chat` call from
+  a bottom-nav tab would spend the daily KruAI budget on a screen nobody asked a
+  question on.
 
 #### Study minutes — `hooks/use-study-timer.ts`
 
@@ -4499,8 +4501,10 @@ and "Features" stay English in Khmer mode.
 See its own section below.
 
 **Grade Prediction** (`features/grade-prediction`) — `/grade-prediction` route
-plus a Home widget, both fed by one source: `demo-data.ts`. Nine components plus
-the rule-based model in `use-grade-prediction.ts`. Fake/demo data on purpose.
+plus a Home widget, both fed by one hook (`use-grade-prediction.ts`) over
+`real-prediction.ts`. REAL DATA since 1 Oct 2026, with an empty state until a
+student has 20 scored answers or one exam; see "Phase 0" near the end of this
+file. The rule-based model is still `utils/gradeProbability.ts`.
 
 **Leaderboard** (`features/leaderboard`) — `/leaderboard`, a MIXED board: a
 25-student sample cohort (`demo-data.ts`, unmarked since 29 Sep 2026), real
@@ -4508,8 +4512,8 @@ students from the `leaderboard()` SQL function, and the viewer's own live row,
 ranked together by `utils/leaderboard.ts`. Its own section follows.
 
 **Streak** (`features/streak`) — TWO routes measuring TWO DIFFERENT THINGS.
-`/streak` is the student's own solo streak (`demo-data.ts` + the milestone maths
-in `utils/streak.ts`); `/streak/friends` is a SHARED streak with one friend,
+`/streak` is the student's own solo streak (all store data since 1 Oct 2026 +
+the milestone maths in `utils/streak.ts`); `/streak/friends` is a SHARED streak with one friend,
 which only advances on days BOTH of them finish (`friend-streak-demo-data.ts` +
 `utils/streak-friends.ts`). Both take the COUNT itself from the store rather
 than authoring one; the surrounding state is demo data. Their own sections
@@ -4699,22 +4703,14 @@ with ranks, an Online dot and a Play button that did nothing, and a real roster
 needs cross-user reads. When stage B lands, the public list takes that slot and
 its name back.
 
-**The hero card is decoration, by request.** The opponent, both scores, the HP
-split, the subject, the question progress and the clock all come from
-`features/game/demo-data.ts`. Two things on it are real: the LEFT fighter is the
-signed-in student (display name, and their Google photo when they have one), and
-the button, which reads Create Game Now and routes to `/game/create`.
-
-That is a deliberate product decision rather than an oversight. **It is the
-app's ONE knowingly unlabelled piece of sample data**: the rule elsewhere is that
-sample data must be LABELLED, and this page carried `PreviewTag` for exactly that
-until the user asked for the pill to be removed. Don't restore it unasked. Every
-other section on the page is real and derived from the store.
-
-Don't quietly make the fake numbers real by wiring them to a competition: the
-card would then be claiming a live match, which is the one thing this feature
-cannot do. If it should stop being decorative, it becomes a "you vs your latest
-joiner" panel — a separate decision to take with the user, not a tidy-up.
+**The hero card is "your latest battle" now (1 Oct 2026, the user's call).** It
+was decoration by request until then (`features/game/demo-data.ts`, deleted).
+`new-match-card.tsx` shows the NEWER of your last attempt (you vs the creator,
+both scores and times, the outcome chip) and your last created competition
+(your run vs "waiting for a joiner"); with neither, "No battles yet". The bars
+are SCORE bars (score / total), not HP. It reads the store only, never the
+network, so it paints with the rest of the hub. Every number on the page is
+real now.
 
 **Every card below the hero is absent until it has something to say**, and the
 conditions live in `pages/game.tsx` rather than inside each card so the
@@ -5548,13 +5544,15 @@ was briefly FALSE once the count became real, because the first version counted
 any day with XP. The user settled it — the goal, not XP — so the copy needed no
 change; the code came to it.
 
-**⚠ Still demo, on the user's explicit decision (11 Sep 2026):** the goal card
-(`DEMO_DAILY_TASKS`), its "Complete Today's Goal" button (+1 and confetti, local,
-gone on reload) and the weekly tracker's ticks (`DEMO_WEEK`, `TODAY_ID = "sun"`).
-Offered the choice of making the card real, they chose to keep it a demo. So
-this page now shows a REAL count beside simulated surroundings, and its week
-disagrees with Profile's calendar. `demo-data.ts`'s header records what making
-each real involves; don't do it unasked.
+**REAL since 1 Oct 2026 (the user's call, reversing the 11 Sep one):** the goal
+card reads `tasks` (empty when `tasksDate` is not today), each open task is a
+LINK via `features/home/task-links.ts` (shared with Home's Missions card), and
+the week is the last 7 days of `activityLog[day].goal`, so it now agrees with
+Profile's calendar. The "Complete Today's Goal" button is GONE: it paid nothing
+and faked a +1. Confetti fires once per day on the first visit after the goal is
+met (`lib/streak-celebrated.ts`, a device fact). `features/streak/demo-data.ts`
+is deleted; its two types live in `features/streak/types.ts`. The paragraphs
+below describe the prototype and are kept as history.
 
 The one remaining disagreement is transient and deliberate: the celebration's
 +1 is local and unwritten, so for a few seconds the page shows 13 while the bar
@@ -6061,6 +6059,111 @@ iPhone UA shows the steps at 320px light and 390px dark with no sideways
 scroll. A Telegram-shaped webview UA shows nothing. The lesson pop-up is held
 inside `/sections/...` and appears once, after leaving. **Not verified: a real
 install on a real phone.** That needs the deployed site, because the install
+## Phase 0: real data everywhere, telemetry, account deletion, photo reports (1 Oct 2026)
+
+The user asked what would make BrachNha "real" before real students. The answer
+they approved (the leaderboard explicitly EXCLUDED, they want it kept as is):
+replace every remaining demo screen with the student's own data, add error and
+usage reporting, and add the two safety pieces an app for minors needs.
+
+### No more invented numbers (except the leaderboard and Streak with Friends)
+
+- **Grade Prediction** — `features/grade-prediction/real-prediction.ts`,
+  `buildRealPrediction(input, today)`, a TOTAL object (the React Compiler rule
+  from `summary.ts`). Per-subject scores come from `buildProgressSummary()`, so
+  Progress and Prediction cannot disagree. Inputs: all-time accuracy from
+  `contentLog`, the last 10 exam + past-paper percentages, finished playable
+  sections over playable sections (Study paths + quiz paths), days studied in
+  the last 14, mean subject trend. `utils/gradeProbability.ts` now takes NULL
+  for the first three and re-normalises the weights of what is present.
+  `computeGradePrediction` only rows subjects that HAVE a score (a missing
+  subject read as 0% predicted an E in a subject not yet started).
+  - `ready` needs 20 scored answers or 1 exam/paper; before that the page and
+    the Home widget show how many answers are left (`prediction-empty.tsx`).
+  - The trend chart is the COMPOSITE READINESS SCORE re-computed as of the end
+    of each of the last 4 weeks, from the logs, with nothing stored. It charted
+    one grade's probability first, which read backwards whenever that grade was
+    a low one (a falling E line is good news). Hidden below 2 points.
+  - The simulate buttons, `PredictionUpdatedBanner` and `PreviewTag` are gone.
+    Recommended actions are real study-feed items, weakest subject first.
+- **Progress** — Focus Areas, Study Activity and Study tips; see its section.
+- **Streak page** and **Game hero** — see their sections.
+
+### Error reports and usage events — `lib/telemetry.ts`
+
+OUR OWN SUPABASE, no vendor (the user's call). `20261001000001_telemetry.sql`:
+`client_errors` and `app_events`, RLS on with NO client policies, written only
+by two `security definer` functions. Nothing in the app reads them back; the
+owner reads them in the SQL editor (queries in `supabase/README.md`).
+
+- `reportError(err, context)` — production only, deduped by message, at most
+  10 per page load. `log_client_error` is granted to `anon` TOO (a guest's crash
+  matters) and caps 20/hour per user, 200/hour across all guests, dropping the
+  excess QUIETLY rather than raising. Wired into `ErrorBoundary` (with the
+  component stack) and `installGlobalErrorHandlers()` in `main.tsx` (window
+  `error` carrying an `error` object, and `unhandledrejection`).
+- `track(name, props)` — signed-in only. `log_event` checks an ALLOW-LIST that
+  mirrors the `AppEvent` union; change both together. `app_open` is accepted
+  once per student per Phnom Penh day, so its count IS daily active users and
+  day-7 return is a query over it. Sent from `AppShell` (app_open), login
+  (sign_up), survey (survey_done), section/lesson finish (lesson_done),
+  quiz-screen (quiz_done), review-session (flashcards_done), exam-view and
+  paper-screen (exam_done), game-create/-play (battle_done), and the chat send
+  (kruai_question).
+- **Never sent:** answers, KruAI text, email. `pages/privacy.tsx` says so and is
+  part of any change here.
+- `__APP_VERSION__` is `define`d in `vite.config.ts` from Vercel's
+  `VERCEL_GIT_COMMIT_SHA` ("dev" locally) so a report names its build.
+- The lazy SDK boundary holds: telemetry reaches the client through
+  `getSupabase()`. An error report downloads the SDK only when an error happens.
+
+### Delete my account — `lib/account-deletion.ts`
+
+Profile, signed-in only, below Logout: a quiet text button, a confirm box that
+says what is removed, and a native checkbox that must be ticked. ORDER MATTERS:
+(1) collect every competition id the student is in, from the server AND the
+store, while those rows still exist; (2) remove their folder in each through
+the Storage API (`deleteMyFolder` in `lib/competition-photos.ts`; storage has no
+FK and Supabase refuses SQL deletes on it), and STOP on any failure so no photo
+is orphaned; (3) `delete_my_account()` deletes `auth.users` where id =
+`auth.uid()`, and every table cascades. Then sign out and `logout()`. Not
+verified against a real account: try it on a TEST Google account first.
+
+### Report a photo — `lib/photo-reports.ts`
+
+A flag on each thumbnail of the OPPONENT's working (two taps, a sibling of the
+link, like delete). `photo_reports` accepts a report only from someone in that
+competition, about a photo in its folder that is not their own; a duplicate is
+success. NOTHING is hidden automatically for anyone else (one report hiding a
+photo would let any student hide a classmate's work); the reporter's own view
+hides it for that visit.
+
+**The team reviews them at `/admin/reports`** (`pages/admin-reports.tsx`,
+`lib/admin-reports.ts`, migration `20261001000003_report_review.sql`). In no
+nav list and deliberately NOT in `routeModules`, which is also the idle
+prefetch list: the page has its own lazy chunk that students never download.
+ADMIN IS DECIDED IN THE DATABASE: `app_admins` (no client policies, filled by
+hand in the SQL editor) and `is_app_admin()`, which every `admin_*` function and
+two extra Storage policies (admin read, admin delete on `competition-work`)
+check. The page is only a screen over them. Keep and Delete RECORD the decision
+on the report rows (`resolution` / `resolved_at` / `resolved_by`) rather than
+deleting them. Delete removes the file FIRST and closes the reports only if
+that worked; and because Storage answers a policy-blocked delete with success
+and nothing removed, `deletePhoto` treats "a file the list could sign, but
+nothing was removed" as a failure. `db:check` sees `app_admins` but not the
+functions or policies.
+
+**An admin account sees a "Team → Photo reports" row in the menu** (drawer and
+desktop sidebar, `components/shell/sidebar-nav.tsx`), with a badge counting
+open reports; everyone else sees nothing, not even a greyed row. The answer
+comes from `lib/admin-status.ts`, which asks `is_app_admin()` once per signed-in
+user id (a MODULE shared by both menus, not a store field: a persisted `true`
+would outlive being removed from the list) and never compares an email in the
+app. The review page reports its loaded count and every Keep/Delete back through
+`setOpenReports()`, so the badge follows without another request. This is the
+user's "option 2": the ordinary student app plus an admin-only extra, so the
+same account can still be used to test the app as a student.
+
 event only fires over https.
 
 ## Performance — the four rules, and why each one exists
@@ -6375,7 +6478,8 @@ same problem** and should read the store rather than invent one.
 
 **Every screen still on demo data carries `PreviewTag`** —
 `components/preview-tag.tsx`, a dashed "Preview · sample data" pill — on its own
-line under the title on Grade Prediction and Streak with Friends. **Game and
+line under the title on Streak with Friends. (Grade Prediction lost it on
+1 Oct 2026, when it went real.) **Game and
 Progress no longer carry it** — both removed at the user's request (17 Sep 2026)
 although Game's hero card and three Progress cards are still demo; those are the
 two recorded exceptions. Added
@@ -6406,10 +6510,9 @@ pill hanging off a small card read as clutter on the screen that should stay
 the calmest. Home's own chips and pills (`StatPills`, `MotivationHero`) link
 to tagged pages the same way and stay untagged for the same reason.
 
-**The Study Activity heatmap's dates are the exception to "fixed demo data"** —
-they're derived, not fixed, same pattern as `daysUntilExam()`. The COUNTS in
-`features/progress/demo-data.ts` are still hand-authored fixed numbers like
-everything else on this page, but `utils/activity-heatmap.ts`'s
+**The Study Activity heatmap's dates are derived** — same pattern as
+`daysUntilExam()`. Its COUNTS were hand-authored demo numbers until 1 Oct 2026
+and are now `heatmapCounts(contentLog)`, and `utils/activity-heatmap.ts`'s
 `buildHeatmapWeeks()` maps them onto real calendar dates at render time, anchored
 so the last row is always the current Sun–Sat week. A cell whose date is after
 today is `isFuture` and renders as an empty dashed outline rather than a
@@ -6417,6 +6520,10 @@ coloured square — the fixed data has a placeholder number sitting there, but i
 is deliberately ignored so a screen full of demo data still can't claim a
 student did anything on a day that hasn't happened yet. The colour level
 (0–4, feeding the `LEVELS` scale in `activity-heatmap.tsx`) is bucketed from
+**SUPERSEDED 1 Oct 2026: of the screens below, only the Leaderboard's sample
+cohort and Streak with Friends are still demo.** Grade Prediction, all of
+Progress, the Streak page and the Game hero run on real data now (see "Phase 0"
+near the end of this file). The original decision, kept as history:
 the count via `levelForCount()` rather than being its own hand-authored number,
 so the shade a cell is painted and the count its tap tooltip shows can never
 disagree with each other — they used to be two unrelated numbers.
@@ -7165,3 +7272,11 @@ FAB raises the prompt and fires no `/api/chat` request; a typed `/roadmap` shows
 the locked panel **with the navigation still on screen**; and loading with
 `?code=x` in the URL DOES pull the SDK (that last one is the callback-swallowing
 trap — see the auth section).
+**Phase 0 needs `20261001000001_telemetry.sql` and
+`20261001000002_account_deletion_and_reports.sql` applied**, by hand. `db:check`
+sees their three tables (`client_errors`, `app_events`, `photo_reports`) but NOT
+the functions (`log_client_error`, `log_event`, `delete_my_account`): a
+publishable-key-only call to `/rest/v1/rpc/log_event` must be refused. Until
+they are applied, error reports and events are dropped silently, Delete my
+account shows its error, and Report says it could not send.
+

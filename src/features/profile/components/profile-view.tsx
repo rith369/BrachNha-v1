@@ -5,6 +5,7 @@ import { StatPills } from "@/features/home/components/stat-pills";
 import { GoogleButton } from "@/features/auth/components/google-button";
 import { ProfileIdentity } from "./profile-identity";
 import { StudyCalendar } from "./study-calendar";
+import { DeleteAccount } from "./delete-account";
 import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { useAuth } from "@/hooks/use-auth";
@@ -24,7 +25,7 @@ export function ProfileView() {
       }))
     );
   const t = useT(lang);
-  const { isGuest } = useAuth();
+  const { isGuest, isAuthenticated } = useAuth();
   const [confirming, setConfirming] = useState(false);
 
   // What the app is ACTUALLY doing, not what was stored. A guest never sets
@@ -184,6 +185,10 @@ export function ProfileView() {
           </div>
         </div>
       )}
+
+      {/* Signed-in students only: a guest has no account, and Logout above
+          already resets their device. */}
+      {isAuthenticated && !confirming && <DeleteAccount lang={lang} />}
 
       {/*
         LOAD-BEARING, NOT DECORATION. The subject illustrations in

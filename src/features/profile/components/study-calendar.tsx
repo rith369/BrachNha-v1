@@ -13,7 +13,7 @@ import { Card } from "@/components/ui/card";
 import { MAX_ACTIVITY_DAYS, useBrachNhaStore } from "@/lib/store";
 import { useT } from "@/data/translations";
 import { daysLabel, weekdayLabel } from "@/features/streak/copy";
-import type { WeekdayId } from "@/features/streak/demo-data";
+import type { WeekdayId } from "@/features/streak/types";
 import type { Lang } from "@/types";
 import { addDaysKey, parseDayKey, todayKey } from "@/utils/day";
 import { BAC2_EXAM_DATE, daysUntilExam } from "@/utils/exam-date";

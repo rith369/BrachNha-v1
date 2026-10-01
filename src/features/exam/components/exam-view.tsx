@@ -1,3 +1,4 @@
+import { track } from "@/lib/telemetry";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { ChevronLeft } from "lucide-react";
@@ -89,6 +90,7 @@ export function ExamView() {
     // A finished exam counts as the daily challenge, beside a Game battle —
     // see pages/game-create.tsx.
     useBrachNhaStore.getState().completeTask("challenge");
+    track("exam_done", { kind: "generated", pct: result.pct });
 
     if (run) setFinished({ run, result });
     setRun(null);

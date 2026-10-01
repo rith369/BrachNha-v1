@@ -4,7 +4,7 @@ import { SubjectBarChart } from "@/features/progress/components/subject-bar-char
 import { SubjectBreakdown } from "@/features/progress/components/subject-breakdown";
 import { FocusAreas } from "@/features/progress/components/focus-areas";
 import { ActivityHeatmap } from "@/features/progress/components/activity-heatmap";
-import { AiInsights } from "@/features/progress/components/ai-insights";
+import { StudyTips } from "@/features/progress/components/study-tips";
 import { BottomNav } from "@/components/shell/bottom-nav";
 import { useProgressSummary } from "@/features/progress/use-progress-summary";
 import { useBrachNhaStore } from "@/lib/store";
@@ -20,13 +20,14 @@ export default function ProgressPage() {
   // The same word the drawer and bottom nav use for this page, so the title
   // cannot drift from the link that brought the student here.
   const lang = useBrachNhaStore((s) => s.lang);
+  const contentLog = useBrachNhaStore((s) => s.contentLog);
 
   return (
     <div className="flex h-full flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-20 lg:pb-8 md:px-6 lg:px-8">
-        {/* NO PreviewTag, on the user's explicit request (17 Sep 2026), although
-            Focus Areas, Study Activity and AI Insights are still demo — the
-            same call the Game page made. Don't restore it without asking. */}
+        {/* Every card on this page runs on the student's own data. The last
+            three (Focus Areas, Study Activity, Study tips) were demo until
+            1 Oct 2026. */}
         <div className="font-heading mb-4 bg-brand-tri bg-clip-text pr-14 text-xl font-extrabold text-transparent">
           📈 {T[lang].progress}
         </div>
@@ -63,10 +64,10 @@ export default function ProgressPage() {
               2x2 stat grid reads as a banner across the full width, not as a
               column item next to a variable-height list. */}
           <div className="md:col-span-2">
-            <FocusAreas />
+            <FocusAreas summary={summary} />
           </div>
-          <ActivityHeatmap />
-          <AiInsights />
+          <ActivityHeatmap contentLog={contentLog} />
+          <StudyTips summary={summary} />
         </div>
       </div>
       <BottomNav />

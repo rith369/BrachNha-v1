@@ -1,3 +1,4 @@
+import { track } from "@/lib/telemetry";
 import { lazy, Suspense, useState } from "react";
 import { useNavigate } from "react-router";
 import {
@@ -328,6 +329,7 @@ export function SectionDetail({
     // completedSessions matches on the SECTION id, which is the same string the
     // path node carries — there is no second id to keep in step.
     completeSession(sectionId);
+    track("lesson_done", { key: sectionId });
     // Queues the "add to home screen" pop-up for when the student leaves the
     // completion screen — once per device. See lib/install-prompt.ts.
     markLessonFinished();

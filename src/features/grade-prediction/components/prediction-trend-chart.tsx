@@ -10,16 +10,18 @@ import {
 import type { Lang } from "@/types";
 import { useT } from "@/data/translations";
 
+/** The composite readiness score, re-computed as of the end of each earlier
+ *  week (features/grade-prediction/real-prediction.ts). Higher is better. */
 export function PredictionTrendChart({
   lang,
   data,
 }: {
   lang: Lang;
-  data: { week: string; aProbability: number }[];
+  data: { week: string; score: number }[];
 }) {
   const t = useT(lang);
-  const first = data[0]?.aProbability ?? 0;
-  const last = data[data.length - 1]?.aProbability ?? 0;
+  const first = data[0]?.score ?? 0;
+  const last = data[data.length - 1]?.score ?? 0;
   const delta = last - first;
   const trendUp = delta >= 0;
 
@@ -31,7 +33,9 @@ export function PredictionTrendChart({
             📉 {t.predictionTrend}
           </div>
           <div className="text-[11px] font-bold text-muted">
-            {lang === "en" ? "Grade A probability, weekly" : "ប្រូបាប៊ីលីតេនិទ្ទេស A ប្រចាំសប្ដាហ៍"}
+            {lang === "en"
+              ? "Readiness score, weekly"
+              : "ពិន្ទុត្រៀមខ្លួន ប្រចាំសប្ដាហ៍"}
           </div>
         </div>
         <div
@@ -39,7 +43,7 @@ export function PredictionTrendChart({
             trendUp ? "bg-mint/10 text-mint" : "bg-pink/10 text-pink"
           }`}
         >
-          {trendUp ? "↑" : "↓"} {Math.abs(delta)}%
+          {trendUp ? "↑" : "↓"} {Math.abs(delta)}
         </div>
       </div>
 
@@ -83,7 +87,8 @@ export function PredictionTrendChart({
             />
             <Line
               type="monotone"
-              dataKey="aProbability"
+              dataKey="score"
+              name={lang === "en" ? "Readiness" : "ត្រៀមខ្លួន"}
               stroke="var(--color-purple)"
               strokeWidth={2.5}
               dot={{ r: 4, fill: "var(--color-pink)", strokeWidth: 0 }}

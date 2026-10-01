@@ -31,7 +31,9 @@ supabase/migrations/
 constants at the top of `public.kruai_take` (`user_daily`, `app_daily`). Open
 that migration, change the numbers, and run its `create or replace function`
 block again in the SQL editor. They are not parameters on purpose, because a
-student can call the function directly with their own token.
+student can call the function directly with their own token. When changing
+`user_daily`, change `USER_DAILY_UNITS` in `server/chat-handler.ts` to match:
+it is what the chat's "questions left today" line counts down from.
 
 The SQL is the source of truth for the schema, checked into git like any other
 code. Do not create or alter tables from the dashboard's Table Editor: the
@@ -272,3 +274,76 @@ six-photo count read `storage.objects` from inside a policy on that same table;
 "Could not upload"**, because the older insert policy looks for the owner in the
 filename and the new path puts it in a folder. If uploads fail on a project where
 everything else works, this is the first thing to check.
+
+## `20261001000001` and `20261001000002` — telemetry, account deletion, photo reports
+
+Both are applied by hand in the SQL editor, like every migration here. After
+them, `npm run db:check` lists `client_errors`, `app_events` and `photo_reports`.
+It cannot see the functions (`log_client_error`, `log_event`,
+`delete_my_account`), so check those directly: calling
+`/rest/v1/rpc/log_event` with only the publishable key must be **refused**
+(it is granted to `authenticated` only).
+
+**Without `000001`** error reports and usage events are dropped silently; the app
+is unaffected. **Without `000002`** "Delete my account" in Profile shows its
+error message, and the photo Report button says it could not send.
+
+Nothing in the app reads any of these tables back. You read them here, as the
+project owner, in the SQL editor:
+
+```sql
+-- Daily active students (one app_open per student per day)
+select event_date, count(*) as students
+from public.app_events where name = 'app_open'
+group by 1 order by 1 desc limit 30;
+
+-- Day-7 return: of the students first seen on day D, how many came back on D+7
+with first_seen as (
+  select user_id, min(event_date) as d0
+  from public.app_events where name = 'app_open' group by 1
+)
+select f.d0, count(*) as new_students,
+       count(e.user_id) as back_on_day_7
+from first_seen f
+left join public.app_events e
+  on e.user_id = f.user_id and e.name = 'app_open' and e.event_date = f.d0 + 7
+group by 1 order by 1 desc limit 30;
+
+-- What students actually do, last 7 days
+select name, count(*) as events, count(distinct user_id) as students
+from public.app_events
+where event_date > current_date - 7
+group by 1 order by 2 desc;
+
+-- Recent crashes, grouped
+select message, count(*) as times, max(created_at) as last_seen,
+       max(route) as a_route, max(app_version) as version
+from public.client_errors
+where created_at > now() - interval '7 days'
+group by 1 order by 2 desc limit 50;
+
+-- Photo reports waiting for review
+select r.created_at, r.reason, r.photo_path, r.competition_id
+from public.photo_reports r order by r.created_at desc;
+```
+
+**Reviewing reports: use the page, not Storage.** `20261001000003_report_review.sql`
+adds the team's review page at **`/admin/reports`** (in no menu; type the URL).
+It shows each reported photo with **Keep** and **Delete** buttons, and records
+the decision on the report rows (`resolution`, `resolved_at`, `resolved_by`)
+instead of deleting them. Only accounts in `app_admins` get anything back; add
+one by hand in the SQL editor:
+
+```sql
+insert into public.app_admins (user_id)
+select id from auth.users where email = 'someone@example.com';
+```
+
+The account must have signed in with Google at least once, or there is no
+`auth.users` row to insert. Remove someone with
+`delete from public.app_admins where user_id = '…';`.
+
+Still possible by hand: Storage → `competition-work` → open the folder named by
+the report's `photo_path` (`{competition}/{student}/…`) and delete the file.
+Reports never hide anything automatically: one report hiding a photo for
+everyone would let any student hide a classmate's work.

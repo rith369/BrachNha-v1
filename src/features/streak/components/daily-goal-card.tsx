@@ -1,15 +1,17 @@
-import { BookOpen, Check, Flame, Layers, PenLine } from "lucide-react";
+import { Link } from "react-router";
+import { BookOpen, Check, ChevronRight, Flame, Layers, PenLine } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useBrachNhaStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
 import {
+  continueTaskLabel,
   dailyTaskLabel,
   tasksCompletedLabel,
   tasksLeftLabel,
   useStreakCopy,
 } from "../copy";
-import type { DailyTaskId, DemoDailyTask } from "../demo-data";
+import type { DailyTask, DailyTaskId } from "../types";
 
 const R = 40;
 const CIRC = 2 * Math.PI * R;
@@ -27,8 +29,11 @@ const TASK_ICON: Record<DailyTaskId, LucideIcon> = {
 };
 
 /**
- * Today's goal: a ring, the three tasks behind it, and the one button on the
- * page that does anything.
+ * Today's goal: a ring, the three tasks behind it, and a link to the next one.
+ *
+ * REAL since 1 Oct 2026: the tasks are the store's own, and each one still open
+ * is a link to where that work is done. There is no button that completes the
+ * day any more; the old one was a demo that added a local +1.
  *
  * THE RING USES THE SAME SVG RECIPE as features/progress/score-hero.tsx and
  * features/practice/deck-progress-ring.tsx — a `0 0 100 100` viewBox rotated
@@ -43,17 +48,17 @@ const TASK_ICON: Record<DailyTaskId, LucideIcon> = {
  * to keep unique on a page that may render more than one ring. A single warm
  * stroke reads as the same family at this size.
  *
- * THE BUTTON KEEPS `bg-brand`, NOT `bg-flame`. Its label is normal-size white
+ * THE CONTINUE LINK KEEPS `bg-brand`, NOT `bg-flame`. Its label is normal-size white
  * text, which needs 4.5:1 — the flame ramp is 4.2:1 at the orange end and would
  * miss it. bg-brand is the app's established CTA and clears it at both ends.
  */
 export function DailyGoalCard({
   tasks,
-  onComplete,
+  links,
 }: {
-  tasks: readonly DemoDailyTask[];
-  /** Simulates finishing the day. No-op once every task is done. */
-  onComplete: () => void;
+  tasks: readonly DailyTask[];
+  /** Where each task is done (features/home/task-links.ts). */
+  links: Record<DailyTaskId, string>;
 }) {
   const lang = useBrachNhaStore((s) => s.lang);
   const c = useStreakCopy(lang);
@@ -63,6 +68,7 @@ export function DailyGoalCard({
   const complete = done === total;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
   const dash = (pct / 100) * CIRC;
+  const next = tasks.find((t) => !t.done);
 
   return (
     <Card className="gap-4">
@@ -127,17 +133,13 @@ export function DailyGoalCard({
         </div>
       </div>
 
-      {/* The three tasks themselves. Rows, not controls: the single button
-          below is what completes the day, and three separately tappable rows
-          would imply per-task completion this prototype does not simulate. */}
+      {/* The three tasks. A task still open is a LINK to where it is done;
+          a finished one is a plain row, since there is nothing left to open. */}
       <ul className="flex flex-col gap-1.5">
         {tasks.map((task) => {
           const Icon = TASK_ICON[task.id];
-          return (
-            <li
-              key={task.id}
-              className="flex items-center gap-2.5 rounded-xl bg-control px-3 py-2"
-            >
+          const body = (
+            <>
               <Icon
                 className={cn(
                   "size-4 shrink-0",
@@ -154,34 +156,46 @@ export function DailyGoalCard({
               >
                 {dailyTaskLabel(task.id, lang)}
               </span>
-              <span
-                className={cn(
-                  "flex size-4 shrink-0 items-center justify-center rounded-full",
-                  task.done
-                    ? "bg-mint text-white"
-                    : "border-2 border-dashed border-border"
-                )}
-              >
-                {task.done && <Check className="size-2.5" strokeWidth={4} aria-hidden />}
-              </span>
+              {task.done ? (
+                <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-mint text-white">
+                  <Check className="size-2.5" strokeWidth={4} aria-hidden />
+                </span>
+              ) : (
+                <ChevronRight className="size-4 shrink-0 text-muted" strokeWidth={2.5} aria-hidden />
+              )}
+            </>
+          );
+          return (
+            <li key={task.id}>
+              {task.done ? (
+                <div className="flex items-center gap-2.5 rounded-xl bg-control px-3 py-2">
+                  {body}
+                </div>
+              ) : (
+                <Link
+                  to={links[task.id]}
+                  className="flex items-center gap-2.5 rounded-xl bg-control px-3 py-2 transition-transform active:scale-[0.98]"
+                >
+                  {body}
+                </Link>
+              )}
             </li>
           );
         })}
       </ul>
 
-      <button
-        type="button"
-        onClick={onComplete}
-        disabled={complete}
-        className={cn(
-          "w-full rounded-2xl px-4 py-3 text-sm font-extrabold transition active:scale-[0.98]",
-          complete
-            ? "cursor-default border border-mint/30 bg-mint/10 text-mint"
-            : "bg-brand text-white shadow-cta hover:brightness-105"
-        )}
-      >
-        {complete ? c.goalComplete : c.completeGoal}
-      </button>
+      {next ? (
+        <Link
+          to={links[next.id]}
+          className="w-full rounded-2xl bg-brand px-4 py-3 text-center text-sm font-extrabold text-white shadow-cta transition hover:brightness-105 active:scale-[0.98]"
+        >
+          {continueTaskLabel(dailyTaskLabel(next.id, lang), lang)}
+        </Link>
+      ) : (
+        <div className="w-full rounded-2xl border border-mint/30 bg-mint/10 px-4 py-3 text-center text-sm font-extrabold text-mint">
+          {c.goalComplete}
+        </div>
+      )}
     </Card>
   );
 }

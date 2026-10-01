@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
-import { milestoneProgress, rankMilestones } from "@/utils/streak";
+import { celebratedOn, markCelebrated } from "@/lib/streak-celebrated";
+import { isGoalComplete, milestoneProgress, rankMilestones } from "@/utils/streak";
+import { addDaysKey, parseDayKey, todayKey } from "@/utils/day";
+import { useStudyFeed } from "@/features/home/use-study-feed";
+import { taskHref } from "@/features/home/task-links";
 import { useStreakCopy } from "../copy";
-import {
-  CELEBRATION_STREAK_GAIN,
-  DEMO_DAILY_TASKS,
-  DEMO_WEEK,
-  TODAY_ID,
-} from "../demo-data";
 import { STREAK_MILESTONES } from "../milestones";
+import { WEEKDAY_BY_INDEX, type DailyTask, type StreakDay } from "../types";
 import { DailyGoalCard } from "./daily-goal-card";
 import { MilestoneCard } from "./milestone-card";
 import { MilestoneProgress } from "./milestone-progress";
@@ -20,66 +20,71 @@ import { WeeklyStreak } from "./weekly-streak";
  *  off mid-flight. */
 const CELEBRATION_MS = 1400;
 
+const GOAL: DailyTask["id"][] = ["lesson", "practice", "flashcards"];
+
 /**
- * The whole page's state, which is two booleans and some derivation.
+ * The student's own streak, today's real goal and the real last seven days.
  *
- * `completed` is the ONE piece of state that matters — everything visible is
- * derived from it, so the streak count, the week's last cell, the goal ring,
- * the milestone bar and the milestone grid cannot disagree about whether today
- * is done. That is the same reason sessionStatus() on the subject path is
- * derived rather than stored.
+ * THIS WAS A PROTOTYPE until 1 Oct 2026: a fixed week, a goal card that opened
+ * at 2/3, and a "Complete Today's Goal" button that added a local +1 and threw
+ * confetti without touching the store. All of it reads the store now:
  *
- * `celebrating` is separate and short-lived: it drives the one-shot animations
- * only, and clears on a timer while `completed` stays true. Folding them into
- * one flag would either leave the confetti on the screen forever or revert the
- * streak when it finished.
+ *  - the count is the store's `streak`, which `currentStreak()` derives;
+ *  - the goal card is `tasks`, treated as empty when `tasksDate` is not today
+ *    (the same rule Profile's study calendar uses), and every task still open
+ *    links to where that work is done, via the same task-links.ts Home uses;
+ *  - the week is the last seven days of `activityLog[day].goal`.
  *
- * NOTHING HERE TOUCHES THE STORE. The brief asked for a static prototype, and
- * this is also the honest thing: `completeTask()` awards real XP and coins, so
- * wiring this button to it would pay a student for pressing a demo. See
- * ../demo-data.ts for what real tracking would need — and for the fact that the
- * global StatBar above this page shows the REAL streak, which is 3 by default
- * and will disagree with the 12 below it until that swap happens.
+ * There is no button that completes anything here any more. The goal is
+ * finished by doing a lesson, a quiz and a flashcard deck, and the confetti
+ * fires once per day on the first visit after that (lib/streak-celebrated.ts).
  */
 export function StreakView() {
-  const lang = useBrachNhaStore((s) => s.lang);
+  const { lang, streak, activityLog, tasks, tasksDate } = useBrachNhaStore(
+    useShallow((s) => ({
+      lang: s.lang,
+      streak: s.streak,
+      activityLog: s.activityLog,
+      tasks: s.tasks,
+      tasksDate: s.tasksDate,
+    }))
+  );
   const c = useStreakCopy(lang);
-  // THE STORE IS THE SOURCE. Home's stat pill, the global StatBar and this page
-  // all read the same field, which is what stops them showing different numbers
-  // for one fact — see ../demo-data.ts for the bug that caused.
-  const base = useBrachNhaStore((s) => s.streak);
+  const feed = useStudyFeed();
+  const today = todayKey();
 
-  const [completed, setCompleted] = useState(false);
-  const [celebrating, setCelebrating] = useState(false);
-  const timer = useRef<number | undefined>(undefined);
+  const todayTasks = tasksDate === today ? tasks : null;
+  const completed = todayTasks !== null && isGoalComplete(todayTasks);
 
-  // Clears a pending timer if the student navigates away mid-burst, so the
-  // callback cannot fire against an unmounted component.
-  useEffect(() => () => window.clearTimeout(timer.current), []);
+  // Lazily, so the check runs once per mount rather than on every render.
+  const [celebrating, setCelebrating] = useState(
+    () => completed && !celebratedOn(today)
+  );
+  useEffect(() => {
+    if (!celebrating) return;
+    markCelebrated(today);
+    const timer = window.setTimeout(() => setCelebrating(false), CELEBRATION_MS);
+    return () => window.clearTimeout(timer);
+  }, [celebrating, today]);
 
-  const complete = () => {
-    if (completed) return;
-    setCompleted(true);
-    setCelebrating(true);
-    window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setCelebrating(false), CELEBRATION_MS);
-  };
-
-  // The +1 is LOCAL and is not written back — the brief asked for a prototype
-  // with no persistence, so a reload returns to the store's number. For the few
-  // seconds it differs, this page and the StatBar disagree by one; that is a
-  // deliberate demo action rather than the resting state disagreeing.
-  const streak = completed ? base + CELEBRATION_STREAK_GAIN : base;
-
-  const tasks = DEMO_DAILY_TASKS.map((t) => ({
-    ...t,
-    done: completed || t.done,
+  const goal: DailyTask[] = GOAL.map((id) => ({
+    id,
+    done: todayTasks?.[id] ?? false,
   }));
+  const links = Object.fromEntries(
+    GOAL.map((id) => [id, taskHref(id, feed.items)])
+  ) as Record<DailyTask["id"], string>;
 
-  const week = DEMO_WEEK.map((d) => ({
-    ...d,
-    done: d.id === TODAY_ID ? completed || d.done : d.done,
-  }));
+  const base = parseDayKey(today);
+  const week: StreakDay[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const key = addDaysKey(base, -i);
+    week.push({
+      id: WEEKDAY_BY_INDEX[parseDayKey(key).getDay()],
+      key,
+      done: activityLog[key]?.goal === true,
+    });
+  }
 
   const milestones = rankMilestones(STREAK_MILESTONES, streak);
   const progress = milestoneProgress(STREAK_MILESTONES, streak);
@@ -92,9 +97,9 @@ export function StreakView() {
         completed={completed}
       />
 
-      <WeeklyStreak week={week} todayId={TODAY_ID} />
+      <WeeklyStreak week={week} todayKey={today} />
 
-      <DailyGoalCard tasks={tasks} onComplete={complete} />
+      <DailyGoalCard tasks={goal} links={links} />
 
       {/* Absent, not empty, once every rung is behind the student. */}
       {progress && <MilestoneProgress progress={progress} />}

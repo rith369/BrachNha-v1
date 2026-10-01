@@ -196,6 +196,45 @@ export async function deleteWorkPhoto(path: string): Promise<Result<null>> {
 }
 
 /**
+ * Remove EVERY file this student has in one competition's folder — the account
+ * deletion step (lib/account-deletion.ts).
+ *
+ * Photos have no foreign key, so deleting the account row cannot reach them,
+ * and Supabase refuses a direct SQL delete on storage tables. This goes through
+ * the Storage API under the same "delete own" policy a single delete uses, so it
+ * can only ever reach the caller's own folder.
+ *
+ * Everything listed is removed, not only names that match PHOTO_NAME, plus the
+ * old single-photo path (`{competition}/{user}.jpg`) from before photos were
+ * per question. A file that is already gone is not an error.
+ */
+export async function deleteMyFolder(
+  competitionId: string,
+  userId: string
+): Promise<Result<null>> {
+  const db = await client();
+  if (!db) return fail("unconfigured");
+  if (!userId) return fail("unauthenticated");
+
+  const folder = folderOf(competitionId, userId);
+  const listed = await db.storage.from(BUCKET).list(folder, { limit: 100 });
+  if (listed.error) {
+    devReport("list for delete", listed.error);
+    return fail("failed");
+  }
+  const paths = [
+    ...listed.data.map((f) => `${folder}/${f.name}`),
+    `${competitionId}/${userId}.jpg`,
+  ];
+  const { error } = await db.storage.from(BUCKET).remove(paths);
+  if (error) {
+    devReport("delete folder", error);
+    return fail("failed");
+  }
+  return { ok: true, data: null };
+}
+
+/**
  * Every photo one student has attached to one competition, oldest first, each
  * with a viewable link.
  *

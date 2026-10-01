@@ -1,3 +1,4 @@
+import { track } from "@/lib/telemetry";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useShallow } from "zustand/react/shallow";
@@ -91,6 +92,7 @@ export function QuizScreen({
     // Study path, whose section ids ARE the bare keys — the prefix is what keeps
     // a foundation-review section from ticking a Bac II quiz node.
     completeSession(quizSessionId(contentKey));
+    track("quiz_done", { key: contentKey, score: attempt.score, total: attempt.total });
     addQuizResult({
       quizKey: contentKey,
       score: attempt.score,

@@ -1,7 +1,10 @@
+import type { ContentLog } from "@/types";
+import { addDaysKey } from "./day";
+
 /**
- * Turns the fixed demo counts in features/progress/demo-data.ts into cells with
- * a real calendar date, a colour level, and whether that date is today or still
- * in the future.
+ * Turns per-day counts (from `heatmapCounts` below) into cells with a real
+ * calendar date, a colour level, and whether that date is today or still in
+ * the future.
  *
  * The grid used to show 28 bare 0-4 numbers with nothing behind them — no date,
  * no real count, nothing a tap could show. Counts now drive the colour instead
@@ -53,8 +56,8 @@ export function buildHeatmapWeeks(
 
       return {
         date,
-        // A future date can't have a real count yet, whatever placeholder sits
-        // in the demo array — rendered and reported as empty, not as data.
+        // A future date can't have a real count yet — rendered and reported as
+        // empty, not as data.
         count: isFuture ? 0 : count,
         level: isFuture ? 0 : levelForCount(count),
         isToday: date.getTime() === today.getTime(),
@@ -62,6 +65,37 @@ export function buildHeatmapWeeks(
       };
     })
   );
+}
+
+/**
+ * The heatmap's counts from the student's own content log: questions answered
+ * plus flashcards reviewed, per local day, `weeks` rows of Sunday-to-Saturday
+ * ending with the current week — the exact grid `buildHeatmapWeeks` lays out,
+ * so cell [w][d] and its date agree. Future days come out 0 and are masked by
+ * `buildHeatmapWeeks` anyway.
+ */
+export function heatmapCounts(
+  log: ContentLog,
+  weeks: number,
+  now: Date = new Date()
+): number[][] {
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const gridStart = new Date(today);
+  gridStart.setDate(today.getDate() - today.getDay() - (weeks - 1) * 7);
+
+  const rows: number[][] = [];
+  for (let w = 0; w < weeks; w++) {
+    const row: number[] = [];
+    for (let d = 0; d < 7; d++) {
+      let n = 0;
+      for (const c of Object.values(log[addDaysKey(gridStart, w * 7 + d)] ?? {})) {
+        n += c.answered + c.reviewed;
+      }
+      row.push(n);
+    }
+    rows.push(row);
+  }
+  return rows;
 }
 
 export function formatHeatmapCellLabel(cell: HeatmapCell): string {
@@ -73,7 +107,9 @@ export function formatHeatmapCellLabel(cell: HeatmapCell): string {
         day: "numeric",
       });
   const activity =
-    cell.count === 0 ? "No activity" : `${cell.count} question${cell.count === 1 ? "" : "s"}`;
+    cell.count === 0
+      ? "No activity"
+      : `${cell.count} ${cell.count === 1 ? "question or card" : "questions and cards"}`;
   return `${day} · ${activity}`;
 }
 

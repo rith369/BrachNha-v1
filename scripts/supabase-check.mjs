@@ -41,6 +41,16 @@ const TABLES = [
   // KruAI's daily limits (20260929000001). Missing means the paid model has no
   // money guard, and production KruAI refuses every question (fails closed).
   "kruai_usage",
+  // Error reports and usage events (20261001000001). No client can read them
+  // (RLS, no policies), but a select still answers 200 [] when they exist.
+  "client_errors",
+  "app_events",
+  // Photo reports (20261001000002), which also adds delete_my_account() — a
+  // function this check cannot see.
+  "photo_reports",
+  // The team's review page (20261001000003). Its functions and Storage
+  // policies are invisible to this check; the table is the probe.
+  "app_admins",
 ];
 
 /**

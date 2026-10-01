@@ -2,16 +2,16 @@ import { Link } from "react-router";
 import { Gauge, ChevronRight } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { useT } from "@/data/translations";
-import { computeBaselinePrediction } from "@/features/grade-prediction/demo-data";
+import { useGradePrediction } from "@/features/grade-prediction/use-grade-prediction";
 
-// Reads the exact same baseline as the full Grade Prediction page
-// (computeBaselinePrediction() in that feature's demo-data.ts) so this
-// card never shows a different number than the page it links to.
+// Reads the exact same hook as the full Grade Prediction page, so this card
+// never shows a different grade than the page it links to. Before there is
+// enough work to predict from it says how much is left instead of a grade.
 export function GradePredictionWidget() {
   const lang = useBrachNhaStore((s) => s.lang);
   const t = useT(lang);
-
-  const { mostLikely, probabilities } = computeBaselinePrediction();
+  const { ready, missing, prediction } = useGradePrediction();
+  const { mostLikely, probabilities } = prediction;
   const pct = probabilities[mostLikely] ?? 0;
 
   return (
@@ -26,21 +26,22 @@ export function GradePredictionWidget() {
         <div className="text-[11px] font-extrabold tracking-widest text-muted uppercase">
           🎯 {t.gradePrediction}
         </div>
-        <div className="flex items-baseline gap-1.5">
-          <span className="font-heading text-xl font-extrabold">
-            {mostLikely}
-          </span>
-          <span className="text-xs font-bold text-muted">
-            {t.mostLikelyGrade} · {pct}%
-          </span>
-        </div>
+        {ready ? (
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-heading text-xl font-extrabold">{mostLikely}</span>
+            <span className="text-xs font-bold text-muted">
+              {t.mostLikelyGrade} · {pct}%
+            </span>
+          </div>
+        ) : (
+          <div className="text-xs font-bold text-muted">
+            {lang === "en"
+              ? `Answer ${missing} more questions to see it`
+              : `ឆ្លើយសំណួរ ${missing} ទៀត ដើម្បីមើលការព្យាករណ៍`}
+          </div>
+        )}
       </div>
       <ChevronRight className="size-4 shrink-0 text-muted" strokeWidth={2.5} />
-      {/* NO PreviewTag here, deliberately. This card is a doorway rather than
-          the data itself, and the page it opens carries the tag at the top of
-          its own screen — a student who taps through meets it before reading
-          any number. A second pill hanging off a small card on Home read as
-          clutter on the one screen that should stay clean. */}
     </Link>
   );
 }

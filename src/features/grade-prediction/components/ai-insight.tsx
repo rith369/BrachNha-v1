@@ -5,8 +5,8 @@ import type { TranslationKey } from "@/data/translations";
 import type { SubjectPrediction } from "@/utils/gradePrediction";
 
 // Pure template-based copy, NOT a real LLM call — every number below comes
-// straight from the mock data passed in, so the text always matches what's
-// on screen. Swapping this for a real generated insight later only means
+// straight from the student's own results passed in, so the text always
+// matches what's on screen. Swapping this for a real generated insight later only means
 // replacing this function; the card below stays the same.
 function buildInsightText(
   lang: Lang,

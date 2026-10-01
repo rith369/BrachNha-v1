@@ -1,3 +1,4 @@
+import { track } from "@/lib/telemetry";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Flag } from "@/components/ui/flag";
@@ -78,6 +79,7 @@ export function SurveyView() {
       grade: form.grade,
       studied: form.studied,
     });
+    track("survey_done", { grade: form.grade });
     navigate("/roadmap");
   }
 

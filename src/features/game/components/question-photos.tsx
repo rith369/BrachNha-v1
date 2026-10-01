@@ -1,5 +1,6 @@
 import { TriangleAlert } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
+import { reportPhoto } from "@/lib/photo-reports";
 import { gameCopy } from "../copy";
 import { AddPhotosButton, PhotoStrip } from "./photo-strip";
 import type { MyWorkPhotos, PhotoList } from "../use-work-photos";
@@ -73,7 +74,10 @@ export function QuestionPhotos({
           ) : opponent.list.load === "failed" ? (
             <p className="text-[10px] font-bold text-muted">{t.photosFailed}</p>
           ) : theirs.length > 0 ? (
-            <PhotoStrip photos={theirs} />
+            <PhotoStrip
+              photos={theirs}
+              onReport={async (p) => (await reportPhoto(p.path)).ok}
+            />
           ) : (
             // Said per question, not hidden: "they skipped this one" is itself
             // useful to a student comparing, and an absent row would read as the

@@ -141,7 +141,9 @@ const en = {
   noScoreTip: (min: number) =>
     `Answer ${min} quiz or exam questions to see your score.`,
 
-  // ── The three sample cards ──────────────────────────────────────────────
+  // ── Focus Areas, Study Activity, Study tips ─────────────────────────────
+  // All three run on the student's own logs now (features/progress/
+  // focus-areas.ts, study-tips.ts, utils/activity-heatmap.ts heatmapCounts).
   focusTitle: "Focus Areas 🔍",
   focusLabel: {
     needWork: "Need Work",
@@ -149,17 +151,60 @@ const en = {
     declining: "Declining",
     improved: "Most Improved",
   },
-  /** "Chemistry · 48% avg" */
-  focusAverage: (subject: string, pct: number) => `${subject} · ${pct}% avg`,
+  /** "48% correct" */
+  focusScore: (pct: number) => `${pct}% correct`,
+  /** "+14 pts, last 30 days" */
+  focusTrend: (pts: number) =>
+    `${pts > 0 ? "▲ +" : "▼ "}${pts} pts, last 30 days`,
+  focusEmpty: (min: number) =>
+    `Answer ${min} questions in a subject to see where to focus.`,
 
   activityTitle: "Study Activity 🗓️",
-  activitySubtitle: "Tap a day to see questions answered",
+  activitySubtitle: "Questions and flashcards per day. Tap a day.",
   less: "Less",
   more: "More",
   today: "Today",
   noActivity: "No activity",
+  practisedCount: (n: number) =>
+    `${n} ${n === 1 ? "question or card" : "questions and cards"}`,
 
-  aiTitle: "AI Insights 🤖✨",
+  tipsTitle: "Study Tips 💡",
+  tipStart: {
+    title: "Start here",
+    body: "Finish your first lesson and your tips will appear here.",
+  },
+  tipGoalDone: (streak: number) => ({
+    title: "Goal done today",
+    body: `Your ${streak}-day streak is safe. Come back tomorrow to keep it going.`,
+  }),
+  tipKeepStreak: (streak: number, done: number) => ({
+    title: "Keep your streak",
+    body: `${done} of 3 daily tasks done. Finish the rest to make it ${streak + 1} days.`,
+  }),
+  tipStartStreak: (done: number) => ({
+    title: "Start a streak",
+    body: `${done} of 3 daily tasks done. Finish a lesson, a quiz and flashcards today.`,
+  }),
+  tipWeakest: (subject: string, pct: number) => ({
+    title: `Focus on ${subject}`,
+    body: `You get ${pct}% right there. A short quiz today will help most.`,
+  }),
+  tipDeclining: (subject: string, pts: number) => ({
+    title: `${subject} is slipping`,
+    body: `Down ${Math.abs(pts)} pts on the 30 days before. Go back over the lessons you missed.`,
+  }),
+  tipMoreDays: (now: number, before: number) => ({
+    title: "Great week",
+    body: `You studied on ${now} days this week, up from ${before}.`,
+  }),
+  tipFewerDays: (now: number, before: number) => ({
+    title: "Fewer study days",
+    body: `${now} days this week against ${before} last week. Even 10 minutes counts.`,
+  }),
+  tipCardsDue: (n: number) => ({
+    title: "Flashcards to review",
+    body: `${n} ${n === 1 ? "card is" : "cards are"} ready to review again.`,
+  }),
 };
 
 export type ProgressCopy = typeof en;
@@ -269,7 +314,7 @@ const km: ProgressCopy = {
   noScoreTip: (min) =>
     `ឆ្លើយសំណួរ Quiz ឬប្រឡង ${min} ដើម្បីមើលពិន្ទុរបស់អ្នក។`,
 
-  // ── The three sample cards ──────────────────────────────────────────────
+  // ── Focus Areas, Study Activity, Study tips ─────────────────────────────
   focusTitle: "ចំណុចត្រូវផ្តោត 🔍",
   focusLabel: {
     needWork: "ត្រូវខិតខំបន្ថែម",
@@ -277,16 +322,56 @@ const km: ProgressCopy = {
     declining: "កំពុងធ្លាក់ចុះ",
     improved: "រីកចម្រើនបំផុត",
   },
-  focusAverage: (subject, pct) => `${subject} · មធ្យម ${pct}%`,
+  focusScore: (pct) => `ត្រូវ ${pct}%`,
+  focusTrend: (pts) => `${pts > 0 ? "▲ +" : "▼ "}${pts} ពិន្ទុ ក្នុង 30 ថ្ងៃចុងក្រោយ`,
+  focusEmpty: (min) =>
+    `ឆ្លើយសំណួរ ${min} ក្នុងមុខវិជ្ជាមួយ ដើម្បីមើលចំណុចដែលត្រូវផ្តោត។`,
 
   activityTitle: "សកម្មភាពរៀន 🗓️",
-  activitySubtitle: "ចុចលើថ្ងៃមួយ ដើម្បីមើលចំនួនសំណួរដែលបានឆ្លើយ",
+  activitySubtitle: "សំណួរ និង Flashcard ប្រចាំថ្ងៃ។ ចុចលើថ្ងៃមួយ។",
   less: "តិច",
   more: "ច្រើន",
   today: "ថ្ងៃនេះ",
   noActivity: "គ្មានសកម្មភាព",
+  practisedCount: (n) => `សំណួរ និងកាត ${n}`,
 
-  aiTitle: "ការវិភាគ AI 🤖✨",
+  tipsTitle: "គន្លឹះរៀន 💡",
+  tipStart: {
+    title: "ចាប់ផ្តើមនៅទីនេះ",
+    body: "បញ្ចប់មេរៀនដំបូងរបស់អ្នក ហើយគន្លឹះនឹងបង្ហាញនៅទីនេះ។",
+  },
+  tipGoalDone: (streak) => ({
+    title: "បានបញ្ចប់គោលដៅថ្ងៃនេះ",
+    body: `Streak ${streak} ថ្ងៃរបស់អ្នកមានសុវត្ថិភាព។ ត្រឡប់មកវិញថ្ងៃស្អែក ដើម្បីបន្តវា។`,
+  }),
+  tipKeepStreak: (streak, done) => ({
+    title: "រក្សា Streak របស់អ្នក",
+    body: `បានធ្វើកិច្ចការប្រចាំថ្ងៃ ${done} ក្នុងចំណោម 3។ បញ្ចប់កិច្ចការដែលនៅសល់ ដើម្បីឱ្យវាក្លាយជា ${streak + 1} ថ្ងៃ។`,
+  }),
+  tipStartStreak: (done) => ({
+    title: "ចាប់ផ្តើម Streak",
+    body: `បានធ្វើកិច្ចការប្រចាំថ្ងៃ ${done} ក្នុងចំណោម 3។ បញ្ចប់មេរៀន Quiz និង Flashcard ថ្ងៃនេះ។`,
+  }),
+  tipWeakest: (subject, pct) => ({
+    title: `ផ្តោតលើ${subject}`,
+    body: `អ្នកឆ្លើយត្រូវ ${pct}% ក្នុងមុខវិជ្ជានេះ។ Quiz ខ្លីមួយថ្ងៃនេះ នឹងជួយបានច្រើនបំផុត។`,
+  }),
+  tipDeclining: (subject, pts) => ({
+    title: `${subject} កំពុងធ្លាក់ចុះ`,
+    body: `ធ្លាក់ ${Math.abs(pts)} ពិន្ទុ ធៀបនឹង 30 ថ្ងៃមុន។ សូមរំលឹកមេរៀនដែលអ្នកខុស។`,
+  }),
+  tipMoreDays: (now, before) => ({
+    title: "សប្ដាហ៍ដ៏ល្អ",
+    body: `អ្នកបានរៀន ${now} ថ្ងៃក្នុងសប្ដាហ៍នេះ កើនពី ${before} ថ្ងៃ។`,
+  }),
+  tipFewerDays: (now, before) => ({
+    title: "ថ្ងៃរៀនតិចជាងមុន",
+    body: `${now} ថ្ងៃក្នុងសប្ដាហ៍នេះ ធៀបនឹង ${before} ថ្ងៃសប្ដាហ៍មុន។ សូម្បីតែ 10 នាទីក៏រាប់ដែរ។`,
+  }),
+  tipCardsDue: (n) => ({
+    title: "Flashcard ត្រូវពិនិត្យ",
+    body: `កាត ${n} រួចរាល់សម្រាប់ពិនិត្យម្តងទៀត។`,
+  }),
 };
 
 export const PROGRESS_COPY: Record<Lang, ProgressCopy> = { en, km };

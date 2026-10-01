@@ -1,3 +1,4 @@
+import { track } from "@/lib/telemetry";
 import { useState } from "react";
 import { Flag } from "@/components/ui/flag";
 import { Wordmark } from "@/components/shell/wordmark";
@@ -98,6 +99,7 @@ export function LoginView() {
       age: age.trim() || undefined,
       location: location || undefined,
     });
+    track("sign_up", { language });
   }
 
   return (

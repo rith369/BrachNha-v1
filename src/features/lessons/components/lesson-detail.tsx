@@ -1,3 +1,4 @@
+import { track } from "@/lib/telemetry";
 import { lazy, Suspense, useState } from "react";
 import { useNavigate } from "react-router";
 import { useBrachNhaStore } from "@/lib/store";
@@ -83,6 +84,7 @@ export function LessonDetail({
     // is no separate session id to keep in step. Idempotent in the store, so
     // re-finishing a lesson does not stack anything.
     completeSession(lessonId);
+    track("lesson_done", { key: lessonId });
     // Queues the "add to home screen" pop-up for when the student leaves the
     // completion screen — once per device. See lib/install-prompt.ts.
     markLessonFinished();

@@ -73,6 +73,9 @@ const PracticeSubjectPage = lazy(routeModules.practiceSubject);
 const PracticeRunPage = lazy(routeModules.practiceRun);
 const PracticeReviewPage = lazy(routeModules.practiceReview);
 const PrivacyPage = lazy(routeModules.privacy);
+// NOT in routeModules on purpose: that map is also the idle-prefetch list, and
+// the team's review page has no business downloading on every student's phone.
+const AdminReportsPage = lazy(() => import("@/pages/admin-reports"));
 const ProfilePage = lazy(routeModules.profile);
 const ProgressPage = lazy(routeModules.progress);
 const RoadmapPage = lazy(routeModules.roadmap);
@@ -271,6 +274,9 @@ export default function App() {
           <Route path="roadmap" element={<RoadmapPage />} />
           <Route path="streak" element={<StreakPage />} />
           <Route path="streak/friends" element={<StreakFriendsPage />} />
+          {/* The team's photo-report review. In no nav list; access is decided
+              by the database (app_admins), see pages/admin-reports.tsx. */}
+          <Route path="admin/reports" element={<AdminReportsPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

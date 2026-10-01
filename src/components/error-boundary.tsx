@@ -1,3 +1,4 @@
+import { reportError } from "@/lib/telemetry";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { AlertTriangle, RotateCw, Trash2 } from "lucide-react";
 
@@ -59,10 +60,14 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    // Nothing collects these yet. Logging the component stack is what makes a
-    // student's screenshot of the console actionable, which is the only error
-    // reporting this app has.
+    // Sent to client_errors in production (lib/telemetry.ts), with the
+    // component stack appended so a report says WHICH component threw.
     console.error("[app] render failed:", error, info.componentStack);
+    const withStack = new Error(error.message);
+    withStack.name = error.name;
+    withStack.stack = `${error.stack ?? ""}
+--- components ---${info.componentStack ?? ""}`;
+    reportError(withStack, "render");
   }
 
   private reload = () => {

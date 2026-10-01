@@ -1,3 +1,4 @@
+import { track } from "@/lib/telemetry";
 import { useState } from "react";
 import { Check, X } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
@@ -175,6 +176,7 @@ export function ReviewSession({
       // from a single lesson or the Daily Review aggregate.
       completeTask("flashcards");
       recordSession(current.deckKey);
+      track("flashcards_done", { cards: liveQueue.length });
     }
 
     setIndex(nextIndex);

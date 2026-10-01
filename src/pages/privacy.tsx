@@ -31,6 +31,10 @@ import { Wordmark } from "@/components/shell/wordmark";
  *                          screenRefFor in utils/chat-screen.ts)
  *   guest behaviour     → useSupabaseSync bails without a session
  *   no AI retention     → `store: false` in server/chat-handler.ts
+ *   error logs / events → lib/telemetry.ts (+ the 20261001000001 migration)
+ *   battle photos       → lib/competition-photos.ts, lib/photo-reports.ts
+ *   leaderboard name    → the leaderboard() function, 20260916000004
+ *   account deletion    → lib/account-deletion.ts (+ 20261001000002)
  * If any of those change, this page is part of the change.
  */
 
@@ -75,7 +79,7 @@ export default function PrivacyPage() {
           គោលការណ៍ឯកជនភាព
         </p>
         <p className="mb-8 text-xs font-bold text-muted">
-          Last updated 10 September 2026 · ធ្វើបច្ចុប្បន្នភាព 10 កញ្ញា 2026
+          Last updated 1 October 2026 · ធ្វើបច្ចុប្បន្នភាព 1 តុលា 2026
         </p>
 
         <Section
@@ -132,21 +136,36 @@ export default function PrivacyPage() {
           <ul className="ml-5 list-disc space-y-1">
             <li>the name, age, province and study language you enter</li>
             <li>
-              your survey answers — subjects you find strong or weak, and your
+              your survey answers: subjects you find strong or weak, and your
               target grade
             </li>
             <li>
-              your progress — XP, level, coins, streak, lessons finished, and
+              your progress: XP, level, coins, streak, lessons finished, and
               mock exam scores
             </li>
             <li>your conversations with KruAI</li>
+            <li>
+              photos of your working that you choose to add after a Game battle
+            </li>
+            <li>
+              error reports when the app crashes (the error message, the page
+              you were on and your browser type), and simple usage events such
+              as &ldquo;finished a lesson&rdquo; or &ldquo;opened the app
+              today&rdquo;, so we can fix problems and see whether BrachNha
+              helps. These never include your answers, your KruAI messages or
+              your email.
+            </li>
           </ul>
           <p>
             ពី Google យើងទទួលបានតែអ៊ីមែល ឈ្មោះ និងរូបភាពប្រវត្តិរូបប៉ុណ្ណោះ។
             យើងមិនទទួលបានពាក្យសម្ងាត់របស់អ្នកទេ
             ហើយមិនអាចអានGmail Drive ឬទិន្នន័យផ្សេងទៀតក្នុងគណនី Google
             របស់អ្នកបានទេ។ ក្រៅពីនេះ យើងរក្សាទុកព័ត៌មានដែលអ្នកបញ្ចូល
-            ចម្លើយកម្រងសំណួរ វឌ្ឍនភាពសិក្សា និងការសន្ទនាជាមួយ KruAI។
+            ចម្លើយកម្រងសំណួរ វឌ្ឍនភាពសិក្សា ការសន្ទនាជាមួយ KruAI
+            រូបថតការគណនាដែលអ្នកជ្រើសបន្ថែមក្រោយការប្រកួត
+            និងរបាយការណ៍កំហុស និងការប្រើប្រាស់សាមញ្ញ
+            (ឧទាហរណ៍ «បានបញ្ចប់មេរៀន»)។ ទាំងនេះមិនមានចម្លើយ សារ KruAI
+            ឬអ៊ីមែលរបស់អ្នកទេ។
           </p>
         </Section>
 
@@ -158,13 +177,22 @@ export default function PrivacyPage() {
             To save your progress so it is still there tomorrow and on your
             other devices, and to build a study plan that matches the subjects
             you said you find hard. We do not sell your data, we do not use it
-            for advertising, and we do not share it with other students.
+            for advertising, and we do not share it with other students, with
+            two exceptions you can see in the app: your display name and study
+            numbers (XP, streak, study time) appear on the Leaderboard, and in a
+            Game battle the other student sees your score and any photos of
+            your working you add. You can report a photo that should not be
+            there, and we review every report.
           </p>
           <p>
             ដើម្បីរក្សាទុកវឌ្ឍនភាពរបស់អ្នក
             និងបង្កើតផែនការសិក្សាសមស្របនឹងមុខវិជ្ជាដែលអ្នកពិបាក។
             យើងមិនលក់ទិន្នន័យរបស់អ្នក មិនប្រើសម្រាប់ការផ្សាយពាណិជ្ជកម្ម
-            និងមិនចែករំលែកជាមួយសិស្សដទៃទេ។
+            និងមិនចែករំលែកជាមួយសិស្សដទៃទេ លើកលែងតែ៖
+            ឈ្មោះ និងលេខសិក្សា (XP, Streak, ពេលរៀន) របស់អ្នកបង្ហាញលើតារាងចំណាត់ថ្នាក់
+            ហើយក្នុងការប្រកួត សិស្សម្នាក់ទៀតឃើញពិន្ទុ
+            និងរូបថតការគណនាដែលអ្នកបន្ថែម។ អ្នកអាចរាយការណ៍រូបថតដែលមិនសមរម្យ
+            ហើយយើងពិនិត្យរាល់របាយការណ៍។
           </p>
         </Section>
 
@@ -175,16 +203,16 @@ export default function PrivacyPage() {
           <p>Three services, each for one specific job:</p>
           <ul className="ml-5 list-disc space-y-1">
             <li>
-              <strong>Google</strong> — sign-in only. Google tells us who you
+              <strong>Google</strong>: sign-in only. Google tells us who you
               are; we tell Google nothing about your studies.
             </li>
             <li>
-              <strong>Supabase</strong> — the database that stores your account.
+              <strong>Supabase</strong>: the database that stores your account.
               Security rules mean each student can read and write only their own
               rows.
             </li>
             <li>
-              <strong>Google Gemini</strong> — the AI behind KruAI. When you ask
+              <strong>Google Gemini</strong>: the AI behind KruAI. When you ask
               a question we send that question, the recent conversation, a short
               summary of your profile (name, target grade, subjects you find
               weak, level and streak), and <strong>which lesson page you had
@@ -230,14 +258,17 @@ export default function PrivacyPage() {
             saved in that browser.
           </p>
           <p>
-            <strong>Your account:</strong> email us at the address below and we
-            will delete your account and everything attached to it. We will not
-            ask you why.
+            <strong>Your account:</strong> Profile → Delete my account removes
+            your account and everything attached to it, including the photos
+            you added in battles, straight away. It cannot be undone. You can
+            also email us at the address below and we will do it for you. We
+            will not ask you why.
           </p>
           <p>
             <strong>ក្នុងឧបករណ៍ៈ</strong> ប្រវត្តិរូប → ចាកចេញ។{" "}
-            <strong>គណនីៈ</strong> ផ្ញើអ៊ីមែលមកយើង
-            នោះយើងនឹងលុបគណនីនិងទិន្នន័យទាំងអស់។
+            <strong>គណនីៈ</strong> ប្រវត្តិរូប → លុបគណនីរបស់ខ្ញុំ
+            លុបគណនី និងទិន្នន័យទាំងអស់ រួមទាំងរូបថតក្នុងការប្រកួតភ្លាមៗ
+            ហើយមិនអាចត្រឡប់វិញបានទេ។ ឬផ្ញើអ៊ីមែលមកយើង នោះយើងនឹងលុបជូន។
           </p>
         </Section>
 

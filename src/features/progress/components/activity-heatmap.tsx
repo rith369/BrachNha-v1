@@ -1,17 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { useBrachNhaStore } from "@/lib/store";
 import type { Lang } from "@/types";
-import { activityHeatmap } from "../demo-data";
+import type { ContentLog } from "@/types";
 import { PROGRESS_COPY, type ProgressCopy } from "../copy";
 import {
   buildHeatmapWeeks,
   formatHeatmapCellLabel,
+  heatmapCounts,
   heatmapCellKey,
   type HeatmapCell,
 } from "@/utils/activity-heatmap";
 import { KM_MONTHS, KM_WEEKDAYS } from "@/utils/khmer-dates";
 import { weekdayLabel } from "@/features/streak/copy";
-import type { WeekdayId } from "@/features/streak/demo-data";
+import type { WeekdayId } from "@/features/streak/types";
 
 /** Column headers, Sunday first. Khmer reuses the streak screens' initials. */
 const WEEK: WeekdayId[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
@@ -32,7 +33,7 @@ function cellLabel(cell: HeatmapCell, lang: Lang, c: ProgressCopy): string {
   const day = cell.isToday
     ? c.today
     : `${KM_WEEKDAYS[d.getDay()]} ${d.getDate()} ${KM_MONTHS[d.getMonth()]}`;
-  const activity = cell.count === 0 ? c.noActivity : c.questionsCount(cell.count);
+  const activity = cell.count === 0 ? c.noActivity : c.practisedCount(cell.count);
   return `${day} · ${activity}`;
 }
 
@@ -50,10 +51,16 @@ const LEVELS = [
   "bg-purple",
 ];
 
-export function ActivityHeatmap() {
+/** Rows of Sunday-to-Saturday shown, ending with the current week. */
+const HEATMAP_WEEKS = 4;
+
+export function ActivityHeatmap({ contentLog }: { contentLog: ContentLog }) {
   const lang = useBrachNhaStore((s) => s.lang);
   const c = PROGRESS_COPY[lang];
-  const weeks = buildHeatmapWeeks(activityHeatmap);
+  // `now` is read once here and handed to both, so the counts and the dates
+  // they are laid out on cannot straddle midnight.
+  const [now] = useState(() => new Date());
+  const weeks = buildHeatmapWeeks(heatmapCounts(contentLog, HEATMAP_WEEKS, now), now);
   const [openKey, setOpenKey] = useState<string | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 

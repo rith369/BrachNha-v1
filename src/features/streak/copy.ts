@@ -1,5 +1,5 @@
 import type { Lang } from "@/types";
-import type { DailyTaskId, WeekdayId } from "./demo-data";
+import type { DailyTaskId, WeekdayId } from "./types";
 
 /**
  * This page's own wording, in BOTH languages.
@@ -32,7 +32,7 @@ export const STREAK_COPY = {
     subtitle: "Keep learning every day to keep your streak alive.",
     celebrated: "You kept your streak alive!",
 
-    thisWeek: "This Week",
+    thisWeek: "Last 7 Days",
     today: "Today",
     // The one line on the page that says what a streak actually measures. The
     // brief asked for this explicitly, and it echoes the wording the
@@ -42,7 +42,6 @@ export const STREAK_COPY = {
 
     todaysGoal: "Today's Goal",
     goalComplete: "Goal complete",
-    completeGoal: "Complete Today's Goal",
     streakMaintained: "Streak maintained!",
 
     milestones: "Streak Milestones",
@@ -94,14 +93,13 @@ export const STREAK_COPY = {
     subtitle: "រៀនរាល់ថ្ងៃ ដើម្បីរក្សា Streak របស់អ្នកកុំឲ្យដាច់។",
     celebrated: "អ្នករក្សា Streak របស់អ្នកបានហើយ!",
 
-    thisWeek: "សប្តាហ៍នេះ",
+    thisWeek: "7 ថ្ងៃចុងក្រោយ",
     today: "ថ្ងៃនេះ",
     countsNote:
       "ថ្ងៃមួយត្រូវបានរាប់ លុះត្រាតែអ្នកបញ្ចប់គោលដៅប្រចាំថ្ងៃ។ ការបើកកម្មវិធីតែម្យ៉ាងមិនរាប់ទេ។",
 
     todaysGoal: "គោលដៅថ្ងៃនេះ",
     goalComplete: "បញ្ចប់គោលដៅរួចហើយ",
-    completeGoal: "បញ្ចប់គោលដៅថ្ងៃនេះ",
     streakMaintained: "រក្សា Streak បានហើយ!",
 
     milestones: "ចំណុចសំខាន់ៗនៃ Streak",
@@ -176,6 +174,11 @@ const TASK_KEYS: Record<DailyTaskId, "taskLesson" | "taskPractice" | "taskFlashc
 
 export function dailyTaskLabel(id: DailyTaskId, lang: Lang): string {
   return STREAK_COPY[lang][TASK_KEYS[id]];
+}
+
+/** The goal card's link to the next open task: "Continue: Finish a lesson". */
+export function continueTaskLabel(task: string, lang: Lang): string {
+  return lang === "km" ? `បន្ត៖ ${task}` : `Continue: ${task}`;
 }
 
 /** "2 / 3 tasks completed" — pluralised, because "1 tasks" reads as a bug. */

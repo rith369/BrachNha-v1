@@ -15,6 +15,67 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 1 Oct 2026 — Real Numbers Everywhere, Crash Reports, Delete Account, Report a Photo
+
+Not committed yet. **Two database steps needed** (see the end of this entry).
+
+**Why.** Getting the app ready for real students. Several screens still showed made-up
+numbers that a student could mistake for their own, there was no way to know when the
+app crashed or whether students come back, and two safety basics were missing.
+
+**What changed.**
+
+- **Grade Prediction now uses your own results.** The prediction comes from the
+  questions you answered, your mock exam and past-paper scores, the lessons you
+  finished and how regularly you study. Before you have answered 20 questions (or sat
+  one exam), the page and the Home card say how many more you need instead of showing a
+  grade. The chart shows your readiness score over the last 4 weeks. The two "try it
+  live" buttons are gone.
+- **Progress: the last three cards are real.** Focus Areas shows your strongest and
+  weakest subjects and which are rising or falling. Study Activity shows the questions
+  and flashcards you did each day. "AI Insights" became **Study Tips**: up to three short
+  tips from your own numbers (your streak today, your weakest subject, your week, cards
+  to review). No AI is used for these.
+- **Streak page: today's goal and the week are real.** The three tasks show what you
+  actually did today, and each one still open is a link to where you do it. The
+  "Complete Today's Goal" button is gone (it was a demo). The week row is now your last 7
+  days. Confetti plays once, the first time you open the page after finishing the goal.
+- **Game: the big card shows your latest battle**, with both scores and times, or
+  "Waiting for a joiner" for a battle you created. A new player sees "No battles yet".
+- **Crash reports and simple usage counts** are saved to our own database (no outside
+  company). They never include answers, KruAI messages or email. They tell us when the
+  app breaks and how many students use it each day.
+- **Delete my account** (Profile, under Logout, signed-in students only). It removes the
+  account, everything saved with it and the photos shared in battles. It cannot be
+  undone.
+- **Report a photo**: in a battle review, a small flag on the other student's working
+  photos. Reports come to the team to check; nothing is hidden automatically.
+- **A review page for the team** at `/admin/reports` (not in any menu): each reported
+  photo with **Keep** and **Delete** buttons. Delete removes the photo for everyone.
+  Only accounts added as admins can use it; anyone else sees "This page is for the
+  BrachNha team". Admin accounts also get a **Team → Photo reports** item in the menu, with
+  the number of reports waiting; students never see it.
+- The **Privacy page** was updated to say all of the above.
+
+**What to know.** The leaderboard was not changed, as asked. Streak with Friends is
+still a demo.
+
+**Database steps (by hand, in the Supabase SQL editor):** run
+`20261001000001_telemetry.sql`, `20261001000002_account_deletion_and_reports.sql` and
+`20261001000003_report_review.sql`, then add each team member as an admin (the
+command is in `supabase/README.md`).
+Until then the app works, but crash reports are not saved, Delete my account shows an
+error, and Report says it could not send.
+
+**Re-test.**
+- New student: Grade Prediction, Progress, Streak and Game show "not yet" messages, not
+  numbers.
+- After answering a quiz: Progress and Grade Prediction move together.
+- Streak: task rows open the right lesson, quiz or flashcards.
+- With a **test** Google account only: Profile → Delete my account removes it and returns
+  to the start screen.
+- Battle review: the flag on the other student's photo sends a report.
+
 ## 29 Sep 2026 — Leaderboard: No "Sample" Label, Smaller Demo Numbers
 
 Commit `ff7465b`.
