@@ -4,6 +4,7 @@ import { Drawer } from "./drawer";
 import { Sidebar } from "./sidebar-nav";
 import { FabChat } from "./fab-chat";
 import { AppHeader } from "./app-header";
+import { AnnouncementBanner } from "./announcement-banner";
 import { LoginView } from "@/features/login/components/login-view";
 import { SurveyView } from "@/features/survey/components/survey-view";
 import { CommitmentOverlay } from "@/features/commitment/components/commitment-overlay";
@@ -219,6 +220,10 @@ export function AppShell({
                 page content starts under it and no page reserves room for a
                 floating menu button any more. */}
             {!hideChrome && <AppHeader />}
+            {/* The team's announcement, under the bar and behind the same gate:
+                never mid-lesson, mid-exam or on the onboarding lock. Renders
+                nothing until there is a live one this device has not closed. */}
+            {!hideChrome && <AnnouncementBanner />}
             <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
               <Drawer />
               {/* overflow-HIDDEN, not auto. Every page already owns its own

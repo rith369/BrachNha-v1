@@ -37,6 +37,9 @@ import { Wordmark } from "@/components/shell/wordmark";
  *   account deletion    → lib/account-deletion.ts (+ 20261001000002)
  *   what admins see     → admin_students() in 20261002000001
  *   pausing KruAI       → admin_set_kruai_block() in 20261002000004
+ *   mistake reports     → report_content() in 20261002000005 (announcements
+ *                         store nothing about a student; the dismissed ids
+ *                         stay on the device)
  * If any of those change, this page is part of the change.
  */
 
@@ -150,6 +153,10 @@ export default function PrivacyPage() {
               photos of your working that you choose to add after a Game battle
             </li>
             <li>
+              mistakes you report in a question: which question, the kind of
+              mistake and the note you write, so the team can fix it
+            </li>
+            <li>
               error reports when the app crashes (the error message, the page
               you were on and your browser type), and simple usage events such
               as &ldquo;finished a lesson&rdquo; or &ldquo;opened the app
@@ -165,6 +172,7 @@ export default function PrivacyPage() {
             របស់អ្នកបានទេ។ ក្រៅពីនេះ យើងរក្សាទុកព័ត៌មានដែលអ្នកបញ្ចូល
             ចម្លើយកម្រងសំណួរ វឌ្ឍនភាពសិក្សា ការសន្ទនាជាមួយ KruAI
             រូបថតការគណនាដែលអ្នកជ្រើសបន្ថែមក្រោយការប្រកួត
+            កំហុសក្នុងសំណួរដែលអ្នករាយការណ៍ (សំណួរណា ប្រភេទកំហុស និងកំណត់ចំណាំរបស់អ្នក)
             និងរបាយការណ៍កំហុស និងការប្រើប្រាស់សាមញ្ញ
             (ឧទាហរណ៍ «បានបញ្ចប់មេរៀន»)។ ទាំងនេះមិនមានចម្លើយ សារ KruAI
             ឬអ៊ីមែលរបស់អ្នកទេ។

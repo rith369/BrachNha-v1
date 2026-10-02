@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { ReportMistake } from "@/components/report-mistake";
+import { quizRef } from "@/utils/content-ref";
 import { useNavigate } from "react-router";
 import { ListChecks, Timer } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
@@ -307,6 +309,15 @@ export function QuizRunner({
               correct={question.correct}
               explanation={question.explanation}
               help={question.help}
+            />
+          )}
+          {/* Keyed on the question, so the panel does not carry one
+              question's half-written report onto the next. */}
+          {answer && (
+            <ReportMistake
+              key={`report-${index}`}
+              contentRef={quizRef(contentKey, index)}
+              className="mt-3"
             />
           )}
         </div>

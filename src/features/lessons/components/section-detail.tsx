@@ -1,4 +1,6 @@
 import { track } from "@/lib/telemetry";
+import { ReportMistake } from "@/components/report-mistake";
+import { sectionRef } from "@/utils/content-ref";
 import { lazy, Suspense, useState } from "react";
 import { useNavigate } from "react-router";
 import {
@@ -171,10 +173,13 @@ function QuizQuestion({
   question,
   answer,
   onAnswer,
+  reportRef,
 }: {
   question: SectionQuestion;
   answer: string | null;
   onAnswer: (opt: string) => void;
+  /** Names this question for "report a mistake" (utils/content-ref.ts). */
+  reportRef: string;
 }) {
   return (
     <div className={focusCard}>
@@ -227,6 +232,7 @@ function QuizQuestion({
           </p>
         </Callout>
       )}
+      {answer && <ReportMistake contentRef={reportRef} className="mt-2" />}
     </div>
   );
 }
@@ -412,6 +418,7 @@ export function SectionDetail({
                     question={q}
                     answer={answers[`0-${i}`] ?? null}
                     onAnswer={(opt) => answerQuestion(`0-${i}`, q, opt)}
+                    reportRef={sectionRef(sectionId, 0, i)}
                   />
                 ))}
               </>
@@ -475,6 +482,7 @@ export function SectionDetail({
                     question={q}
                     answer={answers[`1-${i}`] ?? null}
                     onAnswer={(opt) => answerQuestion(`1-${i}`, q, opt)}
+                    reportRef={sectionRef(sectionId, 1, i)}
                   />
                 ))}
               </>

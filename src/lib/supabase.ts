@@ -51,6 +51,12 @@ const anonKey =
  *  synchronously, so an effect can bail before paying for the dynamic import. */
 export const isSupabaseConfigured = Boolean(url && anonKey);
 
+/** The project URL and publishable key, for the one caller that talks to the
+ *  REST API with a plain fetch instead of the SDK: lib/announcements.ts, so a
+ *  guest seeing a banner never downloads the client. Both public by design. */
+export const supabaseRestUrl: string = url ?? "";
+export const supabasePublishableKey: string = anonKey ?? "";
+
 let clientPromise: Promise<SupabaseClient<Database> | null> | null = null;
 
 /** Resolves to the shared client, importing the SDK on first call. Memoised on

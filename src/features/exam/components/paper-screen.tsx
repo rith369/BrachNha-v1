@@ -110,6 +110,7 @@ export function PaperScreen({ paper }: { paper: PastPaper }) {
       <div className="mx-auto w-full max-w-2xl">
         {mode.kind === "result" ? (
           <PastPaperResults
+            paperKey={paper.key}
             content={content}
             answers={mode.answers}
             ms={mode.ms}

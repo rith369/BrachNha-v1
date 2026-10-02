@@ -1,5 +1,6 @@
 import { getSupabase, isSupabaseConfigured } from "./supabase";
 import { clearPhotoFolders } from "./account-deletion";
+import type { AnnouncementTone } from "@/types/database";
 
 /**
  * The admin area's calls (/admin and /admin/students), over
@@ -22,7 +23,10 @@ export type AdminFail =
   | "owner"
   | "self"
   | "admin"
-  | "range";
+  | "range"
+  | "body"
+  | "link"
+  | "ends";
 
 export type AdminResult<T> =
   | { ok: true; data: T }
@@ -120,7 +124,16 @@ function devReport(op: string, error: DbError | null): void {
  *  no longer an admin". */
 function reasonOf(error: DbError): AdminFail {
   const h = error.hint;
-  if (h === "owner_only" || h === "owner" || h === "self" || h === "admin" || h === "range") {
+  if (
+    h === "owner_only" ||
+    h === "owner" ||
+    h === "self" ||
+    h === "admin" ||
+    h === "range" ||
+    h === "body" ||
+    h === "link" ||
+    h === "ends"
+  ) {
     return h;
   }
   if (error.code === "42501") return "denied";
@@ -314,6 +327,137 @@ export async function setKruaiBlock(
   });
   if (error) {
     devReport("admin_set_kruai_block", error);
+    return { ok: false, reason: reasonOf(error) };
+  }
+  return { ok: true, data: null };
+}
+
+// ── Announcements (/admin/announcements) ────────────────────────────────────
+
+export interface AdminAnnouncement {
+  id: number;
+  bodyKm: string;
+  bodyEn: string | null;
+  tone: AnnouncementTone;
+  link: string | null;
+  startsAt: string;
+  endsAt: string | null;
+  active: boolean;
+  /** Showing to students right now: active and inside its time window. */
+  live: boolean;
+  createdAt: string;
+  createdByName: string;
+}
+
+export async function listAnnouncements(): Promise<AdminResult<AdminAnnouncement[]>> {
+  const db = await client();
+  if (!db) return { ok: false, reason: "unconfigured" };
+  const { data, error } = await db.rpc("admin_announcements");
+  if (error) {
+    devReport("admin_announcements", error);
+    return { ok: false, reason: reasonOf(error) };
+  }
+  return {
+    ok: true,
+    data: (data ?? []).map((a) => ({
+      id: a.id,
+      bodyKm: a.body_km,
+      bodyEn: a.body_en,
+      tone: a.tone,
+      link: a.link,
+      startsAt: a.starts_at,
+      endsAt: a.ends_at,
+      active: a.active,
+      live: a.live,
+      createdAt: a.created_at,
+      createdByName: a.created_by_name,
+    })),
+  };
+}
+
+/** Live from now. The database refuses empty or long Khmer text ("body"), a
+ *  link that is not an app path ("link") and an end in the past ("ends"). */
+export async function publishAnnouncement(input: {
+  bodyKm: string;
+  bodyEn: string;
+  tone: AnnouncementTone;
+  link: string;
+  endsAt: string | null;
+}): Promise<AdminResult<number>> {
+  const db = await client();
+  if (!db) return { ok: false, reason: "unconfigured" };
+  const { data, error } = await db.rpc("admin_publish_announcement", {
+    p_body_km: input.bodyKm.trim(),
+    p_body_en: input.bodyEn.trim() || null,
+    p_tone: input.tone,
+    p_link: input.link.trim() || null,
+    p_ends_at: input.endsAt,
+  });
+  if (error) {
+    devReport("admin_publish_announcement", error);
+    return { ok: false, reason: reasonOf(error) };
+  }
+  return { ok: true, data: Number(data) };
+}
+
+export async function endAnnouncement(id: number): Promise<AdminResult<null>> {
+  const db = await client();
+  if (!db) return { ok: false, reason: "unconfigured" };
+  const { error } = await db.rpc("admin_end_announcement", { p_id: id });
+  if (error) {
+    devReport("admin_end_announcement", error);
+    return { ok: false, reason: reasonOf(error) };
+  }
+  return { ok: true, data: null };
+}
+
+// ── Mistake reports (/admin/mistakes) ───────────────────────────────────────
+
+export interface MistakeGroup {
+  /** Names the question; see utils/content-ref.ts. */
+  ref: string;
+  reports: number;
+  kinds: string[];
+  /** Up to the 5 newest notes that say something. */
+  notes: string[];
+  firstReported: string;
+  lastReported: string;
+}
+
+export async function listMistakes(): Promise<AdminResult<MistakeGroup[]>> {
+  const db = await client();
+  if (!db) return { ok: false, reason: "unconfigured" };
+  const { data, error } = await db.rpc("admin_content_reports");
+  if (error) {
+    devReport("admin_content_reports", error);
+    return { ok: false, reason: reasonOf(error) };
+  }
+  return {
+    ok: true,
+    data: (data ?? []).map((m) => ({
+      ref: m.content_ref,
+      reports: m.reports,
+      kinds: m.kinds ?? [],
+      notes: m.notes ?? [],
+      firstReported: m.first_reported,
+      lastReported: m.last_reported,
+    })),
+  };
+}
+
+/** Close every open report on one question. */
+export async function resolveMistake(
+  ref: string,
+  resolution: "fixed" | "not_mistake"
+): Promise<AdminResult<null>> {
+  const db = await client();
+  if (!db) return { ok: false, reason: "unconfigured" };
+  const { error } = await db.rpc("admin_resolve_content", {
+    p_ref: ref,
+    p_resolution: resolution,
+  });
+  if (error) {
+    devReport("admin_resolve_content", error);
     return { ok: false, reason: reasonOf(error) };
   }
   return { ok: true, data: null };

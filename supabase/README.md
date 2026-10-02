@@ -43,6 +43,9 @@ supabase/migrations/
   20261002000004_kruai_controls.sql
                                    KruAI limits set on /admin/kruai (owner
                                    only), and pausing KruAI for a student
+  20261002000005_announcements_and_content_reports.sql
+                                   the banner every student sees, and students
+                                   reporting a mistake in a question
 ```
 
 **Changing KruAI's daily limits:** since `20261002000004`, the owner changes
@@ -349,6 +352,12 @@ select message, count(*) as times, max(created_at) as last_seen,
 from public.client_errors
 where created_at > now() - interval '7 days'
 group by 1 order by 2 desc limit 50;
+
+-- Questions students reported as wrong or unclear, most reported first
+-- (the page is /admin/mistakes)
+select content_ref, count(*) as reports, array_agg(distinct kind) as kinds
+from public.content_reports where resolution is null
+group by 1 order by 2 desc;
 
 -- Photo reports waiting for review
 select r.created_at, r.reason, r.photo_path, r.competition_id

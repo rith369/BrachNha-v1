@@ -70,6 +70,19 @@ export async function countOpenReports(): Promise<number | null> {
   return error ? null : (data ?? []).length;
 }
 
+/** How many QUESTIONS have open mistake reports (20261002000005), for the
+ *  menu badge. Here rather than in admin-tools.ts because lib/admin-status.ts
+ *  reads it, and that module is in every student's bundle: admin-tools.ts pulls
+ *  in the account-deletion code. Null on failure, including before the
+ *  migration is applied, which leaves the badge at the photo count. */
+export async function countOpenMistakes(): Promise<number | null> {
+  const db = await client();
+  if (!db) return null;
+  const { data, error } = await db.rpc("admin_content_reports");
+  devReport("count mistakes", error);
+  return error ? null : (data ?? []).length;
+}
+
 /** Open reports, one entry per photo, newest report first, each with a link. */
 export async function listReportedPhotos(): Promise<Result<ReportedPhoto[]>> {
   const db = await client();

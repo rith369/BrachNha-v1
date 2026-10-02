@@ -41,6 +41,9 @@ export type Json =
  *  Teacher role later is one more member here and one wider CHECK there. */
 export type AppRole = "admin" | "owner";
 
+/** announcements.tone (20261002000005): which neo fill the banner wears. */
+export type AnnouncementTone = "info" | "success" | "warning";
+
 type ProfileFk<Name extends string> = {
   foreignKeyName: Name;
   columns: ["user_id"];
@@ -572,6 +575,65 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["kruai_blocks"]["Insert"]>;
         Relationships: [];
       };
+
+      // 20261002000005_announcements_and_content_reports.sql. Banners for every
+      // student. Anyone (guests too) may read the LIVE ones; nothing is
+      // writable from a client: admins publish through admin_publish_announcement().
+      announcements: {
+        Row: {
+          id: number;
+          body_km: string;
+          body_en: string | null;
+          tone: AnnouncementTone;
+          link: string | null;
+          starts_at: string;
+          ends_at: string | null;
+          active: boolean;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          body_km: string;
+          body_en?: string | null;
+          tone?: AnnouncementTone;
+          link?: string | null;
+          starts_at?: string;
+          ends_at?: string | null;
+          active?: boolean;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["announcements"]["Insert"]>;
+        Relationships: [];
+      };
+
+      // 20261002000005. A student's report of a mistake in one question. Read
+      // own only; written by report_content() only.
+      content_reports: {
+        Row: {
+          id: number;
+          reporter_id: string;
+          content_ref: string;
+          kind: "wrong_answer" | "typo" | "unclear" | "other";
+          note: string | null;
+          created_at: string;
+          resolution: "fixed" | "not_mistake" | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+        };
+        Insert: {
+          reporter_id: string;
+          content_ref: string;
+          kind: "wrong_answer" | "typo" | "unclear" | "other";
+          note?: string | null;
+          created_at?: string;
+          resolution?: "fixed" | "not_mistake" | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["content_reports"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {
@@ -697,6 +759,60 @@ export type Database = {
       admin_set_kruai_block: {
         Args: { p_user: string; p_blocked: boolean; p_reason: string };
         Returns: undefined;
+      };
+      // 20261002000005. Every announcement, newest first (admins only).
+      admin_announcements: {
+        Args: Record<string, never>;
+        Returns: {
+          id: number;
+          body_km: string;
+          body_en: string | null;
+          tone: AnnouncementTone;
+          link: string | null;
+          starts_at: string;
+          ends_at: string | null;
+          active: boolean;
+          live: boolean;
+          created_at: string;
+          created_by_name: string;
+        }[];
+      };
+      // Refusals carry a hint: body, link, ends.
+      admin_publish_announcement: {
+        Args: {
+          p_body_km: string;
+          p_body_en: string | null;
+          p_tone: AnnouncementTone;
+          p_link: string | null;
+          p_ends_at: string | null;
+        };
+        Returns: number;
+      };
+      admin_end_announcement: {
+        Args: { p_id: number };
+        Returns: boolean;
+      };
+      // Signed-in students. True for a new report, false when already open.
+      // At most 30 a day (hint too_many).
+      report_content: {
+        Args: { p_ref: string; p_kind: string; p_note: string };
+        Returns: boolean;
+      };
+      // Open reports grouped by question (admins only).
+      admin_content_reports: {
+        Args: Record<string, never>;
+        Returns: {
+          content_ref: string;
+          reports: number;
+          kinds: string[];
+          notes: string[] | null;
+          first_reported: string;
+          last_reported: string;
+        }[];
+      };
+      admin_resolve_content: {
+        Args: { p_ref: string; p_resolution: "fixed" | "not_mistake" };
+        Returns: number;
       };
       // supabase/migrations/20260916000004_leaderboard.sql. Returns real
       // students only (never the caller) with public-safe columns.

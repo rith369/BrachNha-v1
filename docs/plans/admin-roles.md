@@ -3,7 +3,8 @@
 > **Status: Step A DONE (2 Oct 2026, commit `4540f42`), with an OWNER role and
 > the creator photo cleanup; its three migrations are applied, and keop1484 is
 > the owner. Step B DONE (2 Oct 2026, commit `68dacec`); its migration
-> (20261002000004) is applied on the live project. Step C not started.** Written 1 Oct 2026.
+> (20261002000004) is applied on the live project. Step C BUILT (2 Oct 2026),
+> not committed yet; its migration (20261002000005) is applied on the live project.** Written 1 Oct 2026.
 > Steps A, B and C are built in order, one commit each. When a step ships, mark
 > it done here.
 
@@ -218,6 +219,17 @@ This plan grows that into a role system and a small admin area.
 ---
 
 ## C. Announcements and mistake reports
+
+> **Built 2 Oct 2026.** As planned, with these differences:
+>
+> - **Admin writes are functions, not table policies** (`admin_publish_announcement`,
+>   `admin_end_announcement`, `admin_announcements`), so the database records who
+>   published and each refusal has a reason.
+> - **Students report through `report_content()`, not a table insert**, which caps
+>   30 reports a day; a policy cannot count a student's own rows without the
+>   recursion trap. A closed report can be reopened by the same student.
+> - The publish form refuses an em dash. The preview is live rather than a button.
+> - The report button is on the practice quiz RUNNER, not also on `quiz-results.tsx`.
 
 ### Migration `20261002000005_announcements_and_content_reports.sql` (the next free number)
 

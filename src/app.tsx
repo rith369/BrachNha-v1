@@ -79,6 +79,8 @@ const PrivacyPage = lazy(routeModules.privacy);
 const AdminPage = lazy(() => import("@/pages/admin"));
 const AdminStudentsPage = lazy(() => import("@/pages/admin-students"));
 const AdminKruaiPage = lazy(() => import("@/pages/admin-kruai"));
+const AdminAnnouncementsPage = lazy(() => import("@/pages/admin-announcements"));
+const AdminMistakesPage = lazy(() => import("@/pages/admin-mistakes"));
 const AdminReportsPage = lazy(() => import("@/pages/admin-reports"));
 const ProfilePage = lazy(routeModules.profile);
 const ProgressPage = lazy(routeModules.progress);
@@ -284,6 +286,8 @@ export default function App() {
           <Route path="admin" element={<AdminPage />} />
           <Route path="admin/students" element={<AdminStudentsPage />} />
           <Route path="admin/kruai" element={<AdminKruaiPage />} />
+          <Route path="admin/announcements" element={<AdminAnnouncementsPage />} />
+          <Route path="admin/mistakes" element={<AdminMistakesPage />} />
           <Route path="admin/reports" element={<AdminReportsPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>

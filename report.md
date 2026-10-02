@@ -15,6 +15,38 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 2 Oct 2026 — Announcements, and Students Reporting a Mistake in a Question
+
+Commit `(not committed yet)`. **Database step:** `supabase/migrations/20261002000005_announcements_and_content_reports.sql`,
+run once in the Supabase SQL editor (already applied).
+
+**Why.** The team had no way to tell every student something (a mock exam on Saturday, a
+new lesson), and when a question in the app was wrong or unclear, students had no way to say so.
+
+**What changed.**
+
+- **Announcements.** On the new Admin page "Announcements", write a short message in Khmer
+  (English is optional), pick a colour, add an optional link to a page in the app, and choose
+  when it ends. A preview shows exactly what students will see. After publishing, every
+  student sees it as a banner under the top bar, guests included. They can close it. "End
+  now" takes it down for everyone.
+- **"រាយការណ៍កំហុស" (report a mistake).** After answering a question in a lesson section, a
+  practice quiz or a past paper's review, a signed-in student can report it: wrong answer,
+  typo, unclear, or other, with an optional note.
+- **Mistake reports page.** On the new Admin page "Mistake reports", each reported question
+  is shown with its options, the marked answer, the explanation and what students wrote. After
+  fixing the question in the app, press "Fixed". If it was right, press "Not a mistake".
+- **The Admin menu badge** now also counts questions waiting for review.
+- **The privacy page** now says that a mistake report stores which question, the kind of
+  mistake and the note.
+
+**What to re-test** (after running the migration):
+
+- Publish a test announcement, check it shows under the top bar (in both languages), close
+  it, then press "End now".
+- As a student, answer a quiz question, press "រាយការណ៍កំហុស", choose a kind and send.
+- As an admin, open "Mistake reports": the question should be there. Press "Not a mistake".
+
 ## 2 Oct 2026 — KruAI Limits and Pausing, From the Admin Area
 
 Commit `68dacec`. **Database step:** `supabase/migrations/20261002000004_kruai_controls.sql`, run once in the

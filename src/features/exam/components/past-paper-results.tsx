@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { ReportMistake } from "@/components/report-mistake";
+import { paperRef } from "@/utils/content-ref";
 import { Check, PenLine, ShieldAlert, Timer, X } from "lucide-react";
 import type { PastPaperContent } from "@/types";
 import { cn } from "@/utils/cn";
@@ -32,6 +34,7 @@ import { MathText } from "@/components/shell/math-text";
  * headline and the review list cannot disagree.
  */
 export function PastPaperResults({
+  paperKey,
   content,
   answers,
   ms,
@@ -40,6 +43,8 @@ export function PastPaperResults({
   onRetake,
   onBack,
 }: {
+  /** "2025-math": names each question for "report a mistake". */
+  paperKey: string;
   content: PastPaperContent;
   answers: PaperAnswers;
   ms: number;
@@ -153,7 +158,7 @@ export function PastPaperResults({
             </div>
           )}
           {section.items.map((item) => (
-            <ReviewRow key={item.id} item={item} />
+            <ReviewRow key={item.id} item={item} paperKey={paperKey} />
           ))}
         </div>
       ))}
@@ -191,7 +196,7 @@ function pctOf(score: number, total: number): number {
  * An unanswered question reads "មិនបានឆ្លើយ" rather than showing an empty chip:
  * the clock running out and a wrong guess are different things.
  */
-function ReviewRow({ item }: { item: ReviewItem }) {
+function ReviewRow({ item, paperKey }: { item: ReviewItem; paperKey: string }) {
   return (
     <div
       className={cn(
@@ -257,6 +262,7 @@ function ReviewRow({ item }: { item: ReviewItem }) {
           a component under src/components/ importing this paper's drill corpus
           would drag the whole of it into every chunk that renders a question. */}
       {!item.ok && item.skill && <SkillDrill help={SKILLS[item.skill]} />}
+      <ReportMistake contentRef={paperRef(paperKey, item.id)} className="mt-2" />
     </div>
   );
 }

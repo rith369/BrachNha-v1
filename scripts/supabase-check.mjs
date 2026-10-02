@@ -56,6 +56,11 @@ const TABLES = [
   // policies, so a select answers 200 [] when they exist.
   "app_settings",
   "kruai_blocks",
+  // Announcements and mistake reports (20261002000005). announcements answers
+  // its LIVE rows to anyone (often none); content_reports answers only a
+  // student's own rows, so a select here answers 200 [] when it exists.
+  "announcements",
+  "content_reports",
 ];
 
 /**

@@ -1,6 +1,6 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { useBrachNhaStore } from "./store";
-import { countOpenReports, isAdmin, isOwner } from "./admin-reports";
+import { countOpenMistakes, countOpenReports, isAdmin, isOwner } from "./admin-reports";
 
 /**
  * Whether the signed-in account is an admin, and how many photo reports are
@@ -25,11 +25,18 @@ interface AdminStatus {
    *  to decide which buttons to offer, and by Profile to hide "Delete my
    *  account". The database enforces both either way. */
   isOwner: boolean;
-  /** Open reports, or null before the count has arrived. */
+  /** Open photo reports, or null before the count has arrived. */
   openReports: number | null;
+  /** Questions with open mistake reports (20261002000005), or null. */
+  openMistakes: number | null;
 }
 
-const NOT_ADMIN: AdminStatus = { isAdmin: false, isOwner: false, openReports: null };
+const NOT_ADMIN: AdminStatus = {
+  isAdmin: false,
+  isOwner: false,
+  openReports: null,
+  openMistakes: null,
+};
 
 let status: AdminStatus = NOT_ADMIN;
 let askedFor: string | null = null;
@@ -58,10 +65,10 @@ function load(userId: string | null) {
     if (askedFor !== userId || !admin) return;
     const owner = await isOwner();
     if (askedFor !== userId) return;
-    emit({ isAdmin: true, isOwner: owner, openReports: null });
-    const count = await countOpenReports();
+    emit({ isAdmin: true, isOwner: owner, openReports: null, openMistakes: null });
+    const [count, mistakes] = await Promise.all([countOpenReports(), countOpenMistakes()]);
     if (askedFor !== userId) return;
-    emit({ isAdmin: true, isOwner: owner, openReports: count });
+    emit({ isAdmin: true, isOwner: owner, openReports: count, openMistakes: mistakes });
   })();
 }
 
@@ -70,6 +77,14 @@ function load(userId: string | null) {
 export function setOpenReports(count: number) {
   if (status.isAdmin && status.openReports !== count) {
     emit({ ...status, openReports: count });
+  }
+}
+
+/** The mistakes page reports the count it loaded, and every Fixed or Not a
+ *  mistake after that. */
+export function setOpenMistakes(count: number) {
+  if (status.isAdmin && status.openMistakes !== count) {
+    emit({ ...status, openMistakes: count });
   }
 }
 
