@@ -2,7 +2,7 @@
 
 > **Status: Step A DONE (2 Oct 2026, commit `4540f42`), with an OWNER role and
 > the creator photo cleanup; its three migrations are applied, and keop1484 is
-> the owner. Step B BUILT (2 Oct 2026), not committed yet; its migration
+> the owner. Step B DONE (2 Oct 2026, commit `68dacec`); its migration
 > (20261002000004) is applied on the live project. Step C not started.** Written 1 Oct 2026.
 > Steps A, B and C are built in order, one commit each. When a step ships, mark
 > it done here.

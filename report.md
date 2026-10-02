@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 2 Oct 2026 — KruAI Limits and Pausing, From the Admin Area
 
-Commit `(not committed yet)`. **Database step:** `supabase/migrations/20261002000004_kruai_controls.sql`, run once in the
+Commit `68dacec`. **Database step:** `supabase/migrations/20261002000004_kruai_controls.sql`, run once in the
 Supabase SQL editor (already applied).
 
 **Why.** Changing how many KruAI questions a student or the whole app may ask each day meant
