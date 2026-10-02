@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Hourglass, Share2 } from "lucide-react";
+import { Hourglass, Share2, Users } from "lucide-react";
 import { Link } from "react-router";
 import { useBrachNhaStore } from "@/lib/store";
 import { findSubject } from "@/features/lessons/subjects";
@@ -8,6 +8,7 @@ import { cn } from "@/utils/cn";
 import { DIFFICULTIES } from "../game";
 import { gameCopy, relativeDay } from "../copy";
 import { InvitePanel } from "./invite-panel";
+import type { JoinerAttempt } from "@/lib/competitions";
 
 /**
  * The competitions this student has POSTED, newest first.
@@ -32,13 +33,21 @@ import { InvitePanel } from "./invite-panel";
  * so the one route to the invite would have sat behind a gate that has nothing
  * to do with sending someone a link.
  *
+ * "PLAYED BY N" comes from `joiners`, the server's list of runs at this
+ * student's competitions (features/game/joiner-results.ts). Before it, a row
+ * could only ever say "Open for joiners", however many people had played.
+ *
  * The caller renders nothing when the list is empty.
  */
-export function MyCompetitions() {
+export function MyCompetitions({ joiners }: { joiners: JoinerAttempt[] }) {
   const lang = useBrachNhaStore((s) => s.lang);
   const competitions = useBrachNhaStore((s) => s.competitions);
   const t = gameCopy(lang);
   const rows = [...competitions].reverse();
+  const playedCount = new Map<string, number>();
+  for (const j of joiners) {
+    playedCount.set(j.competitionId, (playedCount.get(j.competitionId) ?? 0) + 1);
+  }
 
   // ONE id rather than a set: two QR codes open at once is two things to scan
   // and no way to tell which is which. Opening one closes the other.
@@ -57,6 +66,7 @@ export function MyCompetitions() {
           const style = subject ? SUBJECT_STYLE[subject.id] : null;
           const difficulty = DIFFICULTIES.find((d) => d.id === c.difficulty);
           const open = openId === c.id;
+          const played = playedCount.get(c.id) ?? 0;
 
           return (
             // The CARD is the outer div now, so the expanded panel sits inside
@@ -121,6 +131,12 @@ export function MyCompetitions() {
                         />
                         {c.sharedAt ? t.openForJoiners : t.notShared}
                       </span>
+                      {played > 0 && (
+                        <span className="flex items-center gap-1 text-purple">
+                          <Users className="size-3 shrink-0" strokeWidth={2.5} />
+                          {t.playedBy(played)}
+                        </span>
+                      )}
                     </div>
                   </div>
 

@@ -7,7 +7,7 @@ import { findSubject } from "@/features/lessons/subjects";
 import { avatarSeedFor } from "@/utils/avatar-seed";
 import { cn } from "@/utils/cn";
 import { clockLabel, gameCopy, OUTCOME_LABEL } from "../copy";
-import { OUTCOME_STYLE, outcomeOf, type MatchOutcome } from "../game";
+import { OUTCOME_STYLE, rowOutcome, type MatchOutcome, type MatchRow } from "../game";
 
 /**
  * The hub's hero: YOUR LATEST BATTLE.
@@ -15,13 +15,17 @@ import { OUTCOME_STYLE, outcomeOf, type MatchOutcome } from "../game";
  * Until 1 Oct 2026 this card was decoration by request: an invented opponent,
  * scoreline, HP split and clock. The user then asked for it to be real, and it
  * became the "you vs your latest" panel this comment used to say would be the
- * honest version. It shows the newest of two things, read from the store:
+ * honest version. It shows the newest of two things:
  *
- *  - an attempt you made at someone else's competition: you against its
- *    creator, both scores and both times, with the outcome chip;
- *  - a competition you created: your run on the left, "waiting for a joiner"
- *    on the right. Who has played it lives on the review screen, which fetches
- *    them; this card stays local so it never waits on the network.
+ *  - a MATCH (MatchRow, built by pages/game.tsx): you against its other
+ *    player, both scores and both times, with the outcome chip. That is either
+ *    your run at someone else's competition, or someone's run at YOURS;
+ *  - a competition you created that nobody has played since: your run on the
+ *    left, "waiting for a joiner" on the right.
+ *
+ * Runs at your competitions come from the server (features/game/joiner-results.ts),
+ * which the hub asks on arrival. Until they land, the card paints from the
+ * store as before; it never waits on the network.
  *
  * With neither it says so, and offers Create. The bars are SCORE bars now
  * (score out of total), not HP: there is no health in this game, and the old
@@ -46,49 +50,52 @@ interface Battle {
   outcome: MatchOutcome | null;
 }
 
-export function NewMatchCard() {
+export function NewMatchCard({ rows }: { rows: MatchRow[] }) {
   const navigate = useNavigate();
   const requireAuth = useRequireAuth();
   const name = useDisplayName();
-  const { lang, photo, authUserId, competitions, attempts } = useBrachNhaStore(
+  const { lang, photo, authUserId, competitions } = useBrachNhaStore(
     useShallow((s) => ({
       lang: s.lang,
       photo: s.authUser?.avatarUrl ?? "",
       authUserId: s.authUser?.id ?? "",
       competitions: s.competitions,
-      attempts: s.competitionAttempts,
     }))
   );
   const t = gameCopy(lang);
 
-  // Both lists are appended in order, so the newest of each is last.
-  const attempt = attempts.at(-1);
+  // Rows are newest first; competitions are appended, so the newest is last.
+  const match = rows.at(0);
   const created = competitions.at(-1);
-  const useAttempt =
-    attempt !== undefined &&
-    (created === undefined || attempt.playedAt >= created.createdAt);
+  const useMatch =
+    match !== undefined &&
+    (created === undefined || match.playedAt >= created.createdAt);
 
   let battle: Battle | null = null;
+  let reviewTo = "";
   let mine: Side = { name, seed: avatarSeedFor(authUserId || name), score: null, ms: null };
-  if (useAttempt && attempt) {
-    mine = { ...mine, score: attempt.score, ms: attempt.ms };
+  if (useMatch && match) {
+    mine = { ...mine, score: match.myScore, ms: match.myMs };
     const them: Side = {
-      name: attempt.opponentName,
-      seed: avatarSeedFor(attempt.opponentId || attempt.opponentName),
-      score: attempt.opponentScore,
-      ms: attempt.opponentMs,
+      name: match.opponentName,
+      seed: match.opponentSeed,
+      score: match.opponentScore,
+      ms: match.opponentMs,
     };
     battle = {
-      competitionId: attempt.competitionId,
-      subject: attempt.subject,
-      total: attempt.total,
+      competitionId: match.competitionId,
+      subject: match.subject,
+      total: match.total,
       them,
-      outcome: outcomeOf(
-        { score: attempt.score, ms: attempt.ms },
-        { score: attempt.opponentScore, ms: attempt.opponentMs }
-      ),
+      outcome: rowOutcome(match),
     };
+    // Your own competition opens on the joiner shown here, not on an empty
+    // picker.
+    reviewTo = match.joinerId
+      ? `/game/review/${match.competitionId}?joiner=${match.joinerId}`
+      : `/game/review/${match.competitionId}`;
   } else if (created) {
+    reviewTo = `/game/review/${created.id}`;
     mine = { ...mine, score: created.creatorScore, ms: created.creatorMs };
     battle = {
       competitionId: created.id,
@@ -220,7 +227,7 @@ export function NewMatchCard() {
           </div>
 
           <Link
-            to={`/game/review/${battle.competitionId}`}
+            to={reviewTo}
             className="mt-3 block text-center text-xs font-extrabold text-purple"
           >
             {t.seeAnswers} →

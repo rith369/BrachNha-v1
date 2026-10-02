@@ -15,6 +15,28 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 2 Oct 2026 — You Can See Who Played Your Battle
+
+Commit `(not committed yet)`. No database step needed.
+
+**Why.** When someone played a battle you created, your Game page never showed it. The
+"Your latest battle" card kept saying "Waiting for a joiner", and only the battle's answer
+page knew someone had played.
+
+**What changed.**
+
+- **"Your latest battle" shows the newest match, whichever side you were on.** If a
+  classmate just played your battle, it shows you against them, both scores, and whether
+  you won or lost.
+- **My Competitions says how many have played each battle** ("Played by 2").
+- **Recent Games lists their runs too,** marked "Your challenge". Tapping one opens the
+  answers straight on that classmate.
+- **My Game Stats counts those matches,** so a classmate beating your battle counts as a
+  loss for you, and you beating them as a win.
+
+**What to re-test.** Create a battle on one account, play it on another, then open Game
+on the first account: the card, My Competitions and Recent Games should all show it.
+
 ## 2 Oct 2026 — An Admin Area: Dashboard, Students, Admins and an Owner
 
 Commit `4540f42`. **Database steps needed,** each once in the Supabase SQL

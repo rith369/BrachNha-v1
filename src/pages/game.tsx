@@ -8,6 +8,8 @@ import { GameHistory } from "@/features/game/components/game-history";
 import { BottomNav } from "@/components/shell/bottom-nav";
 import { gameCopy } from "@/features/game/copy";
 import { useSharePendingCompetitions } from "@/features/game/share-pending";
+import { useJoinerResults } from "@/features/game/joiner-results";
+import { matchRows } from "@/features/game/game";
 
 /**
  * `/game` — the competition hub, in the ORIGINAL page's layout.
@@ -40,6 +42,12 @@ export default function GamePage() {
   // — see share-pending.ts. Mounted here because this is the page that lists
   // them and claims they are open for joiners.
   useSharePendingCompetitions();
+  // Who has played THIS student's competitions: the one thing on the hub that
+  // cannot come from the device (see joiner-results.ts). Merged with their own
+  // runs into one newest-first list, so the hero, the stats and the history
+  // count the same matches.
+  const joiners = useJoinerResults();
+  const rows = matchRows(attempts, competitions, joiners);
 
   return (
     <div className="flex h-full flex-col">
@@ -57,15 +65,15 @@ export default function GamePage() {
           {/* The hero is the page's call to action — full width so it stays the
               first thing read, not one of a pair. */}
           <div className="md:col-span-2">
-            <NewMatchCard />
+            <NewMatchCard rows={rows} />
           </div>
 
           {/* A grid-cols-4 stat strip, the same shape as Home's StatPills — it
               suits the full row, and spanning it is what leaves an even pair
               below instead of a half-empty last row. */}
-          {attempts.length > 0 && (
+          {rows.length > 0 && (
             <div className="md:col-span-2">
-              <GameStatsCard />
+              <GameStatsCard rows={rows} />
             </div>
           )}
 
@@ -73,8 +81,8 @@ export default function GamePage() {
               renders its own waiting states and hides itself entirely when
               Supabase is unconfigured. See open-competitions.tsx. */}
           <OpenCompetitions />
-          {competitions.length > 0 && <MyCompetitions />}
-          {attempts.length > 0 && <GameHistory />}
+          {competitions.length > 0 && <MyCompetitions joiners={joiners} />}
+          {rows.length > 0 && <GameHistory rows={rows} />}
         </div>
       </div>
       <BottomNav />

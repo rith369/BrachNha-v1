@@ -1,9 +1,10 @@
 import { useBrachNhaStore } from "@/lib/store";
-import { gameStats } from "../game";
+import { gameStats, type MatchRow } from "../game";
 import { gameCopy } from "../copy";
 
 /**
- * This student's record across the competitions they have JOINED.
+ * This student's record across every match: the competitions they joined AND
+ * other students' runs at the ones they created (see MatchRow).
  *
  * Same markup as the original card — the four-stat strip with its emoji labels
  * and the three-segment bar — but every number is now DERIVED by gameStats()
@@ -11,14 +12,13 @@ import { gameCopy } from "../copy";
  * carried seven fixed numbers that contradicted each other: `winRate: 75` beside
  * bar segments describing a 69% win share.
  *
- * The caller renders nothing when there are no attempts, so there is no
+ * The caller renders nothing when there are no matches, so there is no
  * all-zeros state to design here.
  */
-export function GameStatsCard() {
+export function GameStatsCard({ rows }: { rows: MatchRow[] }) {
   const lang = useBrachNhaStore((s) => s.lang);
-  const attempts = useBrachNhaStore((s) => s.competitionAttempts);
   const t = gameCopy(lang);
-  const stats = gameStats(attempts);
+  const stats = gameStats(rows);
 
   return (
     <div>

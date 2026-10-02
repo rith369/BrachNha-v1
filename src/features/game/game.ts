@@ -2,10 +2,13 @@ import { GAME_QUESTIONS } from "@/data/game-questions";
 import { GENERATED_EXAM_QUESTIONS } from "@/data/generated-exams";
 import { allSubjects, type SubjectId, type SubjectMeta } from "@/features/lessons/subjects";
 import type {
+  Competition,
   CompetitionAttempt,
   ExamQuestion,
   GameDifficulty,
 } from "@/types";
+import type { JoinerAttempt } from "@/lib/competitions";
+import { avatarSeedFor } from "@/utils/avatar-seed";
 
 /**
  * The most questions a match will ask. A CEILING, never a target — a subject
@@ -185,7 +188,99 @@ export interface GameStats {
 }
 
 /**
- * DERIVED from the attempts themselves, never stored.
+ * One finished match, from THIS student's side, whichever side they were on.
+ *
+ * Every match is one joiner against one creator, so a student is in a match in
+ * two ways: they JOINED someone else's competition (a CompetitionAttempt, on
+ * this device), or someone joined THEIRS (a JoinerAttempt, fetched by
+ * joiner-results.ts). The hub's history, stats and hero card all read this one
+ * shape so the two cannot be counted differently in different places.
+ */
+export interface MatchRow {
+  /** Unique per match: a student has one attempt per competition. */
+  key: string;
+  competitionId: string;
+  subject: string;
+  total: number;
+  myScore: number;
+  myMs: number;
+  opponentName: string;
+  opponentSeed: string;
+  opponentScore: number;
+  opponentMs: number;
+  /** When the match was decided: the joiner's run, whoever the joiner was. */
+  playedAt: string;
+  /** Someone else played THIS student's competition. Its review opens on them. */
+  asCreator: boolean;
+  /** The joiner's account id when asCreator, for the review's preselection. */
+  joinerId: string | null;
+}
+
+/**
+ * Every match this student has been in, NEWEST FIRST.
+ *
+ * A joiner row whose competition is no longer on this device is skipped: its
+ * subject, total and the creator's own run all live on that local row, and a
+ * half-empty match is worse than a missing one.
+ */
+export function matchRows(
+  attempts: CompetitionAttempt[],
+  competitions: Competition[],
+  joiners: JoinerAttempt[]
+): MatchRow[] {
+  const rows: MatchRow[] = attempts.map((a) => ({
+    key: `a-${a.id}`,
+    competitionId: a.competitionId,
+    subject: a.subject,
+    total: a.total,
+    myScore: a.score,
+    myMs: a.ms,
+    opponentName: a.opponentName,
+    // opponentId is optional: attempts recorded before it existed fall back to
+    // the name, which is stable enough to tell two classmates apart.
+    opponentSeed: avatarSeedFor(a.opponentId ?? a.opponentName),
+    opponentScore: a.opponentScore,
+    opponentMs: a.opponentMs,
+    playedAt: a.playedAt,
+    asCreator: false,
+    joinerId: null,
+  }));
+  const mine = new Map(competitions.map((c) => [c.id, c]));
+  for (const j of joiners) {
+    const c = mine.get(j.competitionId);
+    if (!c) continue;
+    rows.push({
+      key: `j-${j.competitionId}-${j.userId}`,
+      competitionId: c.id,
+      subject: c.subject,
+      total: c.total,
+      myScore: c.creatorScore,
+      myMs: c.creatorMs,
+      opponentName: j.userName,
+      opponentSeed: avatarSeedFor(j.userId),
+      opponentScore: j.score,
+      opponentMs: j.ms,
+      playedAt: j.playedAt,
+      asCreator: true,
+      joinerId: j.userId,
+    });
+  }
+  // ISO timestamps sort as strings.
+  return rows.sort((x, y) => (x.playedAt < y.playedAt ? 1 : x.playedAt > y.playedAt ? -1 : 0));
+}
+
+/** The outcome of one match, from this student's side. */
+export function rowOutcome(r: MatchRow): MatchOutcome {
+  return outcomeOf(
+    { score: r.myScore, ms: r.myMs },
+    { score: r.opponentScore, ms: r.opponentMs }
+  );
+}
+
+/**
+ * DERIVED from the matches themselves, never stored. Both kinds count: a joiner
+ * beating this student's competition is a loss for them exactly as losing at
+ * someone else's is.
  *
  * The card this feeds used to carry seven hand-authored numbers, and they
  * disagreed: `winRate: 75` sat beside bar segments describing a 69% win share.
@@ -200,21 +295,18 @@ export interface GameStats {
  * winRate is 0 when nothing has been played, because the alternative is a
  * division by zero rendered on screen as "NaN%".
  */
-export function gameStats(attempts: CompetitionAttempt[]): GameStats {
+export function gameStats(rows: MatchRow[]): GameStats {
   let wins = 0;
   let losses = 0;
   let draws = 0;
-  for (const a of attempts) {
-    const outcome = outcomeOf(
-      { score: a.score, ms: a.ms },
-      { score: a.opponentScore, ms: a.opponentMs }
-    );
+  for (const r of rows) {
+    const outcome = rowOutcome(r);
     if (outcome === "win") wins++;
     else if (outcome === "loss") losses++;
     else draws++;
   }
 
-  const played = attempts.length;
+  const played = rows.length;
   if (played === 0) {
     return {
       played: 0,

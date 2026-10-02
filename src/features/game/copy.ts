@@ -46,6 +46,10 @@ export const GAME_COPY = {
     seeAll: "See all →",
     openForJoiners: "Open for joiners",
     notShared: "Not shared yet",
+    // How many students have played one of YOUR competitions (My Competitions).
+    playedBy: (n: number) => `Played by ${n}`,
+    // A Recent Games row where someone played a competition you created.
+    yourChallenge: "Your challenge",
     minutes: "min",
     questions: "questions",
     // Create flow
@@ -185,6 +189,8 @@ export const GAME_COPY = {
     seeAll: "មើលទាំងអស់ →",
     openForJoiners: "បើកចំហរង់ចាំ",
     notShared: "មិនទាន់ចែករំលែក",
+    playedBy: (n: number) => `លេងដោយ ${n} នាក់`,
+    yourChallenge: "ការប្រកួតដែលអ្នកបង្កើត",
     minutes: "នាទី",
     questions: "សំណួរ",
     create: "បង្កើតការប្រកួត",

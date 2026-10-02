@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router";
+import { Navigate, useNavigate, useParams, useSearchParams } from "react-router";
 import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
 import { Avatar } from "@/components/ui/avatar";
@@ -44,6 +44,11 @@ import type { CompetitionAttempt, Lang } from "@/types";
  */
 export default function GameReviewPage() {
   const { competitionId = "" } = useParams<{ competitionId: string }>();
+  // Set by the hub when it opens one of YOUR competitions from a joiner's row
+  // ("Your challenge", or the latest-battle card), so the review starts on that
+  // joiner instead of an empty picker. Only a starting value: the picker still
+  // changes it, and an id that is not among the joiners selects nobody.
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const { lang, competitions, attempts, authUserId, authStatus } =
@@ -82,7 +87,9 @@ export default function GameReviewPage() {
   const [joiners, setJoiners] = useState<JoinerAttempt[] | "loading" | "failed">(
     mineIsCreator && isSupabaseConfigured ? "loading" : []
   );
-  const [pickedJoiner, setPickedJoiner] = useState<string | null>(null);
+  const [pickedJoiner, setPickedJoiner] = useState<string | null>(
+    () => searchParams.get("joiner")
+  );
 
   // Whose picks and photos sit beside this student's. A joiner always faces the
   // creator; a creator faces whichever joiner they have selected, and nobody

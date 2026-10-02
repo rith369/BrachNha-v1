@@ -2,9 +2,8 @@ import { Link } from "react-router";
 import { useBrachNhaStore } from "@/lib/store";
 import { Avatar } from "@/components/ui/avatar";
 import { findSubject } from "@/features/lessons/subjects";
-import { OUTCOME_STYLE, outcomeOf, type MatchOutcome } from "../game";
+import { OUTCOME_STYLE, rowOutcome, type MatchOutcome, type MatchRow } from "../game";
 import { OUTCOME_LABEL, gameCopy, relativeDay } from "../copy";
-import { avatarSeedFor } from "@/utils/avatar-seed";
 
 const SCORE_TONE: Record<MatchOutcome, string> = {
   win: "text-mint",
@@ -17,24 +16,24 @@ const SCORE_TONE: Record<MatchOutcome, string> = {
 const SHOWN = 4;
 
 /**
- * The competitions this student has joined, newest first.
+ * Every match this student has been in, newest first: the competitions they
+ * JOINED, and other students' runs at the ones they CREATED (marked "Your
+ * challenge"). Before the second kind was added, a creator never saw that
+ * anyone had played them; see features/game/joiner-results.ts.
  *
- * Same markup as the original card, with real rows behind it. Everything comes
- * off the attempt itself, which carries BOTH halves of the comparison — see
- * CompetitionAttempt's own note on why it is a complete record rather than a
- * pointer at a competition that may not be on this device.
+ * Same markup as the original card. Everything comes off MatchRow, which carries
+ * both halves of the comparison from this student's side.
  *
  * The question count is read from the attempt rather than the hardcoded "10
  * questions" the old card printed, which was wrong the moment a competition had
  * any other length.
  *
- * The caller renders nothing when there are no attempts.
+ * The caller renders nothing when there are no matches.
  */
-export function GameHistory() {
+export function GameHistory({ rows: all }: { rows: MatchRow[] }) {
   const lang = useBrachNhaStore((s) => s.lang);
-  const attempts = useBrachNhaStore((s) => s.competitionAttempts);
   const t = gameCopy(lang);
-  const rows = attempts.slice(-SHOWN).reverse();
+  const rows = all.slice(0, SHOWN);
 
   return (
     <div>
@@ -45,11 +44,7 @@ export function GameHistory() {
       </div>
       <div className="flex flex-col gap-2">
         {rows.map((a) => {
-          const outcome = outcomeOf(
-            { score: a.score, ms: a.ms },
-            { score: a.opponentScore, ms: a.opponentMs }
-          );
-
+          const outcome = rowOutcome(a);
           const subject = findSubject(a.subject);
 
           return (
@@ -57,13 +52,18 @@ export function GameHistory() {
             // PracticeLessonList already use — a <Link>, not a button, because
             // the review is a real destination with its own URL.
             //
-            // Every row here is safe to make tappable: an attempt only exists
-            // because this student played it, so there is always something
-            // behind it. That is what keeps this clear of the dim-and-don't-tap
-            // rule that governs the app's empty tiles.
+            // Every row here is safe to make tappable: a match only exists
+            // because it was played, so there is always something behind it.
+            // That is what keeps this clear of the dim-and-don't-tap rule that
+            // governs the app's empty tiles. A "Your challenge" row opens the
+            // review on that joiner (?joiner=), not on an empty picker.
             <Link
-              key={a.id}
-              to={`/game/review/${a.competitionId}`}
+              key={a.key}
+              to={
+                a.joinerId
+                  ? `/game/review/${a.competitionId}?joiner=${a.joinerId}`
+                  : `/game/review/${a.competitionId}`
+              }
               className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-3 shadow-panel-sm transition hover:bg-purple/5"
             >
               <span
@@ -72,10 +72,7 @@ export function GameHistory() {
                 {OUTCOME_LABEL[outcome][lang]}
               </span>
               <Avatar
-                // opponentId is optional: attempts recorded before it existed
-                // fall back to the name, which is stable enough to tell two
-                // classmates apart.
-                seed={avatarSeedFor(a.opponentId ?? a.opponentName)}
+                seed={a.opponentSeed}
                 name={a.opponentName}
                 className="size-9 shrink-0"
               />
@@ -85,11 +82,12 @@ export function GameHistory() {
                 </div>
                 <div className="truncate text-[10px] font-bold text-muted">
                   {subject?.name ?? ""} · {a.total} {t.questions}
+                  {a.asCreator && ` · ${t.yourChallenge}`}
                 </div>
               </div>
               <div className="shrink-0 text-right">
                 <div className={`text-sm font-extrabold ${SCORE_TONE[outcome]}`}>
-                  {a.score} – {a.opponentScore}
+                  {a.myScore} – {a.opponentScore}
                 </div>
                 <div className="text-[9px] font-bold text-muted">
                   {relativeDay(a.playedAt, lang)}

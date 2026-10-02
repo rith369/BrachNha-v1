@@ -4996,9 +4996,26 @@ was decoration by request until then (`features/game/demo-data.ts`, deleted).
 `new-match-card.tsx` shows the NEWER of your last attempt (you vs the creator,
 both scores and times, the outcome chip) and your last created competition
 (your run vs "waiting for a joiner"); with neither, "No battles yet". The bars
-are SCORE bars (score / total), not HP. It reads the store only, never the
-network, so it paints with the rest of the hub. Every number on the page is
-real now.
+are SCORE bars (score / total), not HP. Every number on the page is real now.
+
+**A CREATOR SEES WHO PLAYED THEM (2 Oct 2026, reported by the user).** The hub
+read only the store, and the store only holds a student's OWN runs, so a
+joiner's attempt (written by the joiner's device straight to the server) never
+reached the creator's hub: Jake's card said "Waiting for a joiner" after Keo
+had played, and only the competition's review page knew better.
+`features/game/joiner-results.ts` now asks once per hub visit for every
+attempt at the student's SHARED competitions (`fetchAttemptsFor`, the review
+page's call for all of them at once; the read policy already limits it to the
+creator). A module, not a store field (the server is the only source, refetched
+each visit; module scope just stops a second visit flashing "Waiting"), keyed by
+user id. `matchRows()` in `features/game/game.ts` merges those with the
+student's own attempts into ONE newest-first `MatchRow` list from the
+student's side, and the hero card, My Game Stats and Recent Games all read it,
+so they count the same matches: a joiner beating your challenge is a loss for
+you in the stats too. Recent Games marks those rows "Your challenge"; My
+Competitions adds "Played by N"; both links carry `?joiner=<id>`, which the
+review page takes as its starting pick so it opens on that joiner. Offline, a
+guest or Supabase unconfigured: an empty list, and the hub is as before.
 
 **Every card below the hero is absent until it has something to say**, and the
 conditions live in `pages/game.tsx` rather than inside each card so the
