@@ -93,7 +93,7 @@ export function SurveyView() {
         />
         <button
           onClick={() => setLang(lang === "en" ? "km" : "en")}
-          className="flex items-center gap-1.5 rounded-full border border-purple/20 bg-purple/8 px-3 py-1.5 text-xs font-extrabold text-purple"
+          className="flex items-center gap-1.5 rounded-full border border-border bg-purple/8 px-3 py-1.5 text-xs font-extrabold text-purple"
         >
           <Flag code={lang === "en" ? "kh" : "gb"} className="size-3.5" />
           {lang === "en" ? "ខ្មែរ" : "EN"}
@@ -106,7 +106,7 @@ export function SurveyView() {
         <div className="text-xs font-bold text-muted">{t.surveyIntro}</div>
       </div>
 
-      <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+      <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
         <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-purple/10">
           <div
             className="h-full rounded-full bg-brand transition-all duration-300"
@@ -142,8 +142,8 @@ export function SurveyView() {
                   className={
                     "rounded-xl border px-3 py-2.5 text-sm font-bold transition " +
                     (form.liked.includes(s)
-                      ? "border-mint/40 bg-mint/10 text-mint"
-                      : "border-purple/10 bg-surface text-text hover:bg-purple/5")
+                      ? "border-border bg-mint/30 text-text"
+                      : "border-border bg-surface text-text hover:bg-purple/5")
                   }
                 >
                   {t[s as TranslationKey]}
@@ -153,7 +153,7 @@ export function SurveyView() {
             <div className="flex gap-2.5">
               <button
                 onClick={() => setStep(1)}
-                className="flex-1 rounded-2xl border border-purple/20 bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
+                className="flex-1 rounded-2xl border border-border bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
               >
                 ← {lang === "en" ? "Back" : "ថយ"}
               </button>
@@ -188,7 +188,7 @@ export function SurveyView() {
             <div className="flex gap-2.5">
               <button
                 onClick={() => setStep(2)}
-                className="flex-1 rounded-2xl border border-purple/20 bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
+                className="flex-1 rounded-2xl border border-border bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
               >
                 ← {lang === "en" ? "Back" : "ថយ"}
               </button>
@@ -216,8 +216,8 @@ export function SurveyView() {
                   className={
                     "rounded-xl border py-3 text-sm font-extrabold transition " +
                     (form.grade === g
-                      ? "border-purple/40 bg-purple/10 text-purple"
-                      : "border-purple/10 bg-surface text-text hover:bg-purple/5")
+                      ? "border-border bg-purple/30 text-text"
+                      : "border-border bg-surface text-text hover:bg-purple/5")
                   }
                 >
                   {g}
@@ -227,7 +227,7 @@ export function SurveyView() {
             <div className="flex gap-2.5">
               <button
                 onClick={() => setStep(3)}
-                className="flex-1 rounded-2xl border border-purple/20 bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
+                className="flex-1 rounded-2xl border border-border bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
               >
                 ← {lang === "en" ? "Back" : "ថយ"}
               </button>

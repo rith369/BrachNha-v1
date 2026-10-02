@@ -36,9 +36,9 @@ import { FlashcardForm } from "./flashcard-form";
  *  a solid fill under white: these take the per-theme `--color-*` scale, so
  *  they are correct in dark with no `dark:` override. */
 const PILE_TONE = {
-  mint: "border-mint/25 bg-mint/8 text-mint",
-  pink: "border-pink/25 bg-pink/8 text-pink",
-  yellow: "border-yellow/25 bg-yellow/8 text-yellow",
+  mint: "border-border bg-mint/8 text-mint",
+  pink: "border-border bg-pink/8 text-pink",
+  yellow: "border-border bg-yellow/8 text-yellow",
 } as const;
 
 const PILE_HOVER = {
@@ -175,7 +175,7 @@ function PileList({
           an empty pile's tile is a dimmed div and cannot be tapped in the first
           place. Says so plainly rather than showing an empty screen. */}
       {cards.length === 0 && (
-        <div className="rounded-xl border border-dashed border-purple/20 p-4 text-center text-xs font-bold text-muted">
+        <div className="rounded-xl border border-dashed border-border p-4 text-center text-xs font-bold text-muted">
           គ្មានកាតនៅក្នុងផ្នែកនេះទេ
         </div>
       )}
@@ -450,7 +450,7 @@ export function FlashcardRunner({
           {editing === null && (
             <button
               onClick={() => setEditing("new")}
-              className="flex items-center gap-1 rounded-full border border-purple/20 bg-purple/8 px-2.5 py-1 text-[11px] font-extrabold text-purple"
+              className="flex items-center gap-1 rounded-full border border-border bg-purple/8 px-2.5 py-1 text-[11px] font-extrabold text-purple"
             >
               <Plus className="size-3.5" strokeWidth={2.5} />
               បន្ថែម
@@ -459,7 +459,7 @@ export function FlashcardRunner({
         </div>
 
         {mine.length === 0 && editing === null && (
-          <div className="rounded-xl border border-dashed border-purple/20 p-3 text-center text-xs font-bold text-muted">
+          <div className="rounded-xl border border-dashed border-border p-3 text-center text-xs font-bold text-muted">
             អ្នកមិនទាន់មានកាតផ្ទាល់ខ្លួននៅឡើយទេ
           </div>
         )}
@@ -468,13 +468,13 @@ export function FlashcardRunner({
           confirmDeleteId === qc.card.id ? (
             <div
               key={qc.card.id}
-              className="mb-2 flex items-center justify-between gap-2 rounded-xl border border-pink/25 bg-pink/8 p-3"
+              className="mb-2 flex items-center justify-between gap-2 rounded-xl border border-border bg-pink/8 p-3"
             >
               <div className="text-xs font-bold text-pink">លុបកាតនេះ?</div>
               <div className="flex shrink-0 gap-2">
                 <button
                   onClick={() => setConfirmDeleteId(null)}
-                  className="rounded-lg border border-purple/20 px-2.5 py-1 text-[11px] font-extrabold text-purple"
+                  className="rounded-lg border border-border px-2.5 py-1 text-[11px] font-extrabold text-purple"
                 >
                   ទេ
                 </button>
@@ -492,7 +492,7 @@ export function FlashcardRunner({
           ) : (
             <div
               key={qc.card.id}
-              className="mb-2 flex items-center gap-2 rounded-xl border border-purple/10 bg-surface p-3"
+              className="mb-2 flex items-center gap-2 rounded-xl border border-border bg-surface p-3"
             >
               <div className="min-w-0 flex-1 truncate text-left text-xs font-bold text-text">
                 {qc.card.front}

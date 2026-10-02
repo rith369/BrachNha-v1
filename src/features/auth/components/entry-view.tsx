@@ -38,7 +38,7 @@ export function EntryView() {
         />
         <button
           onClick={() => setLang(lang === "en" ? "km" : "en")}
-          className="flex items-center gap-1.5 rounded-full border border-purple/20 bg-purple/8 px-3 py-1.5 text-xs font-extrabold text-purple"
+          className="flex items-center gap-1.5 rounded-full border border-border bg-purple/8 px-3 py-1.5 text-xs font-extrabold text-purple"
         >
           <Flag code={lang === "en" ? "kh" : "gb"} className="size-3.5" />
           {lang === "en" ? "ខ្មែរ" : "EN"}
@@ -71,7 +71,7 @@ export function EntryView() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+        <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
           <GoogleButton />
           <p className="mt-2 mb-4 text-center text-xs font-bold text-muted">
             {t.googleNote}
@@ -81,7 +81,7 @@ export function EntryView() {
               button rather than the bare text link a "skip" would use. */}
           <button
             onClick={continueAsGuest}
-            className="w-full rounded-2xl border border-purple/20 bg-purple/8 px-6 py-3.5 text-sm font-extrabold text-purple transition active:scale-[0.98]"
+            className="w-full rounded-2xl border border-border bg-purple/8 px-6 py-3.5 text-sm font-extrabold text-purple transition active:scale-[0.98]"
           >
             {t.continueAsGuest}
           </button>

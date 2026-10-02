@@ -65,7 +65,7 @@ export function PastPapersPanel({
                 ? // White text on a fill takes the BRAND scale, not --color-purple.
                   // Same call as the leaderboard's "You" chip; see globals.css.
                   "bg-[var(--brand-purple)] text-white shadow-cta"
-                : "border border-purple/15 bg-purple/8 text-purple hover:bg-purple/12"
+                : "border border-border bg-purple/8 text-purple hover:bg-purple/12"
             )}
           >
             {y}

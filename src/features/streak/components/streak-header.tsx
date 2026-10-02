@@ -40,7 +40,7 @@ export function StreakHeader({
   const shown = useCountUp(streak);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-purple/10 bg-surface px-4 py-6 text-center shadow-panel md:py-8">
+    <div className="relative overflow-hidden rounded-2xl border border-border bg-surface px-4 py-6 text-center shadow-panel md:py-8">
       <CelebrationAnimation active={celebrating} />
 
       {/* Above the flame so "Streak" is named before the number is read, and

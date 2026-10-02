@@ -98,8 +98,8 @@ export function ProfileView() {
                 className={
                   "rounded-full border px-3 py-1 text-xs font-extrabold transition " +
                   (effectiveLanguage === choice
-                    ? "border-blue/40 bg-blue/10 text-blue"
-                    : "border-purple/10 bg-surface text-muted hover:bg-purple/5")
+                    ? "border-border bg-blue/30 text-text"
+                    : "border-border bg-surface text-muted hover:bg-purple/5")
                 }
               >
                 {t[choice as TranslationKey]}
@@ -129,7 +129,7 @@ export function ProfileView() {
       {!confirming ? (
         <button
           onClick={() => setConfirming(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-pink/30 bg-pink/8 px-6 py-3.5 text-sm font-extrabold text-pink"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-pink/30 px-6 py-3.5 text-sm font-extrabold text-pink"
         >
           <LogOut className="size-4" strokeWidth={2.5} />
           {isGuest
@@ -139,7 +139,7 @@ export function ProfileView() {
               : "ចាកចេញ"}
         </button>
       ) : (
-        <div className="rounded-2xl border border-pink/30 bg-pink/5 p-4 text-center">
+        <div className="rounded-2xl border border-border bg-pink/30 p-4 text-center">
           <div className="mb-3 text-sm font-bold">
             {/* The two branches are deliberately unequal. A signed-in student
                 gets a plain question: signing back in restores their progress,
@@ -168,7 +168,7 @@ export function ProfileView() {
           <div className="flex gap-2.5">
             <button
               onClick={() => setConfirming(false)}
-              className="flex-1 rounded-2xl border border-purple/20 bg-surface px-6 py-3 text-sm font-extrabold text-purple"
+              className="flex-1 rounded-2xl border border-border bg-surface px-6 py-3 text-sm font-extrabold text-purple"
             >
               {lang === "en" ? "Cancel" : "បោះបង់"}
             </button>

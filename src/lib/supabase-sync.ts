@@ -1,4 +1,5 @@
 import { getSupabase } from "@/lib/supabase";
+import { fetchMyGameHistory } from "@/lib/competitions";
 import { MAX_ACTIVITY_DAYS, useBrachNhaStore } from "@/lib/store";
 import type { ExamResult } from "@/lib/store";
 import type {
@@ -506,6 +507,7 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
     conversations,
     activity,
     contentActivity,
+    games,
   ] = await Promise.all([
       db
         .from("pending_placement_tests")
@@ -552,6 +554,12 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
         .select("activity_date, content_key, answered, correct, reviewed, sessions")
         .eq("user_id", userId)
         .gt("activity_date", addDaysKey(new Date(), -MAX_ACTIVITY_DAYS)),
+      // The Game history. logout() clears it from the device and nothing used
+      // to bring it back, so Recent Games and My Competitions came back empty
+      // after signing in again although every row was still on the server.
+      // Written once by lib/competitions.ts rather than by the snapshot push,
+      // so it is read back through that file too.
+      fetchMyGameHistory(userId),
     ]);
 
   const todayDate = today();
@@ -658,6 +666,10 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
     tasksDate: todayDate,
     activityLog,
     contentLog,
+    // A failed history read leaves both lists empty rather than failing the
+    // whole pull: the profile and the study log matter more than the battles.
+    competitions: games.ok ? games.data.competitions : [],
+    competitionAttempts: games.ok ? games.data.attempts : [],
     // Re-derived, deliberately overriding the `streak` storeFromProfile() just
     // spread in: profiles.streak is only the last value some device pushed,
     // while the rows are the history it was computed from.

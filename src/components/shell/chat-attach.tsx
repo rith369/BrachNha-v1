@@ -115,7 +115,7 @@ export function PhotoButton({
       {open && (
         <div
           role="menu"
-          className="absolute bottom-full left-0 z-20 mb-2 w-48 rounded-2xl border border-purple/15 bg-elevated p-1.5 shadow-panel"
+          className="absolute bottom-full left-0 z-20 mb-2 w-48 rounded-2xl border border-border bg-elevated p-1.5 shadow-panel"
         >
           <button
             type="button"
@@ -175,7 +175,7 @@ export function AttachmentChip({
     <div
       className={cn(
         "mb-2 flex items-center gap-2.5 rounded-2xl border bg-surface p-1.5 pr-2",
-        status === "error" ? "border-pink/30" : "border-purple/15"
+        status === "error" ? "border-border" : "border-border"
       )}
     >
       <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-control">

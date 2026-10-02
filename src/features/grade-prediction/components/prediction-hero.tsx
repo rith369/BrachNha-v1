@@ -37,7 +37,7 @@ export function PredictionHero({
           : `តាមគោលដៅ ${targetGrade} របស់អ្នក`;
 
   return (
-    <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+    <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
       <div className="mb-2 flex items-center justify-between">
         <div className="text-[11px] font-extrabold tracking-widest text-muted uppercase">
           🎯 {t.brachNhaEstimate}

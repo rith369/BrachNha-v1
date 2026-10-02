@@ -254,8 +254,8 @@ export function PastPaperRunner({
                     className={cn(
                       focusOption,
                       answers[id] === opt
-                        ? "border-purple/40 bg-purple/10 text-purple"
-                        : "border-purple/10 bg-surface text-text hover:bg-purple/5",
+                        ? "border-border bg-purple/30 text-text"
+                        : "border-border bg-surface text-text hover:bg-purple/5",
                     )}
                   >
                     <MathText text={opt} />
@@ -283,7 +283,7 @@ export function PastPaperRunner({
  */
 function LeaveRuleBanner() {
   return (
-    <div className="mb-3 flex items-start gap-2 rounded-2xl border border-pink/25 bg-pink/8 p-3.5 text-xs font-bold text-text md:text-sm">
+    <div className="mb-3 flex items-start gap-2 rounded-2xl border border-border bg-pink/8 p-3.5 text-xs font-bold text-text md:text-sm">
       <ShieldAlert className="mt-0.5 size-4 shrink-0 text-pink" strokeWidth={2.5} />
       <span>
         បម្រាម: ហាមចាកចេញពីកម្មវិធី ឬ បិទអេក្រង់។ ការចាកចេញលើសពី{" "}
@@ -304,7 +304,7 @@ function LeaveRuleBanner() {
 function LeaveWarning({ leaves }: { leaves: number }) {
   const last = leaves >= MAX_EXAM_LEAVES;
   return (
-    <div className={`${focusCard} border-pink/25 bg-pink/8`}>
+    <div className={`${focusCard} border-border bg-pink/8`}>
       <div className={`mb-2.5 flex items-center gap-1.5 text-pink ${focusKicker}`}>
         <ShieldAlert className="size-4 shrink-0" strokeWidth={2.5} />
         ការព្រមាន
@@ -360,7 +360,7 @@ function SectionIntro({ section }: { section: PaperSection }) {
       </p>
 
       {section.example && (
-        <div className="mt-4 rounded-xl border border-purple/10 bg-purple/5 p-3 md:p-4">
+        <div className="mt-4 rounded-xl border border-border bg-purple/5 p-3 md:p-4">
           <div className={`mb-1 text-purple ${focusLabel}`}>ឧទាហរណ៍</div>
           <p className="text-sm font-semibold text-text md:text-base">
             {section.example}

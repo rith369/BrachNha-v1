@@ -68,7 +68,7 @@ export function DeleteAccount({ lang }: { lang: Lang }) {
   }
 
   return (
-    <div className="mt-4 rounded-2xl border border-pink/30 bg-pink/5 p-4">
+    <div className="mt-4 rounded-2xl border border-border bg-pink/30 p-4">
       <div className="mb-1.5 text-sm font-extrabold text-pink">{c.title}</div>
       <p className="mb-3 text-xs leading-relaxed font-semibold text-text">{c.body}</p>
       <label className="mb-3 flex cursor-pointer items-start gap-2 text-xs font-bold">
@@ -95,7 +95,7 @@ export function DeleteAccount({ lang }: { lang: Lang }) {
             setAgreed(false);
             setError(false);
           }}
-          className="flex-1 rounded-2xl border border-purple/20 bg-surface px-4 py-3 text-sm font-extrabold text-purple disabled:opacity-50"
+          className="flex-1 rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-extrabold text-purple disabled:opacity-50"
         >
           {c.cancel}
         </button>

@@ -38,7 +38,7 @@ const PROVINCES = [
 const OTHER_LOCATION = "__other";
 
 const inputClasses =
-  "w-full rounded-xl border border-purple/10 bg-surface px-3.5 py-3 text-sm font-bold text-text outline-none focus:border-purple/40";
+  "w-full rounded-xl border border-border bg-surface px-3.5 py-3 text-sm font-bold text-text outline-none focus:border-purple";
 
 export function LoginView() {
   const { lang, setLang, completeLogin } = useBrachNhaStore(
@@ -112,7 +112,7 @@ export function LoginView() {
         />
         <button
           onClick={() => setLang(lang === "en" ? "km" : "en")}
-          className="flex items-center gap-1.5 rounded-full border border-purple/20 bg-purple/8 px-3 py-1.5 text-xs font-extrabold text-purple"
+          className="flex items-center gap-1.5 rounded-full border border-border bg-purple/8 px-3 py-1.5 text-xs font-extrabold text-purple"
         >
           <Flag code={lang === "en" ? "kh" : "gb"} className="size-3.5" />
           {lang === "en" ? "ខ្មែរ" : "EN"}
@@ -135,7 +135,7 @@ export function LoginView() {
         )}
       </div>
 
-      <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+      <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
         <div className="mb-3">
           <label className="mb-1.5 block text-xs font-extrabold text-muted">
             {t.enterName} *
@@ -162,8 +162,8 @@ export function LoginView() {
                 className={
                   "rounded-xl border px-3 py-2.5 text-sm font-bold transition " +
                   (language === choice
-                    ? "border-blue/40 bg-blue/10 text-blue"
-                    : "border-purple/10 bg-surface text-text hover:bg-purple/5")
+                    ? "border-border bg-blue/30 text-text"
+                    : "border-border bg-surface text-text hover:bg-purple/5")
                 }
               >
                 {t[choice as TranslationKey]}

@@ -422,7 +422,7 @@ export function QuizPathView({ subject }: { subject: SubjectMeta }) {
                     node without colliding with the banner — the same clearance
                     subject-path-view.tsx reserves for its own bubble. */}
                   <div
-                    className="relative mt-3 overflow-hidden rounded-3xl border border-purple/10 bg-surface/40 px-6 pt-10 pb-10"
+                    className="relative mt-3 overflow-hidden rounded-3xl border border-border bg-surface/40 px-6 pt-10 pb-10"
                     style={{
                       backgroundImage:
                         "radial-gradient(circle, var(--color-border) 1.5px, transparent 1.5px)",

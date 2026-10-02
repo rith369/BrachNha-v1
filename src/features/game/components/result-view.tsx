@@ -131,7 +131,7 @@ export function ResultView({
           {headline[outcome]}
         </div>
 
-        <div className="mx-auto mb-3 flex w-fit items-center gap-4 rounded-2xl border border-purple/10 bg-surface px-4 py-3 shadow-panel md:gap-6 md:px-6">
+        <div className="mx-auto mb-3 flex w-fit items-center gap-4 rounded-2xl border border-border bg-surface px-4 py-3 shadow-panel md:gap-6 md:px-6">
           <Side
             label={t.you}
             run={mine}

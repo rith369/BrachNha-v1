@@ -89,7 +89,7 @@ export function SharedGoalCard({
       {/* Only while the friend is outstanding. Once both are done the card has
           nothing to wait for and the header is already celebrating. */}
       {today.waitingOnFriend && (
-        <div className="rounded-xl border border-yellow/30 bg-yellow/8 p-3">
+        <div className="rounded-xl border border-border bg-yellow/30 p-3">
           <div className="flex items-center gap-1.5 text-xs font-extrabold text-yellow">
             <Clock className="size-3.5 shrink-0" strokeWidth={2.5} aria-hidden />
             {waitingForLabel(friend.name, lang)}
@@ -119,8 +119,8 @@ export function SharedGoalCard({
             className={cn(
               "flex w-full items-center justify-center gap-1.5 rounded-2xl px-4 py-2.5 text-sm font-extrabold transition active:scale-[0.98]",
               reminded
-                ? "cursor-default border border-mint/30 bg-mint/10 text-mint"
-                : "border border-purple/25 bg-surface text-purple hover:bg-purple/8"
+                ? "cursor-default border border-border bg-mint/30 text-text"
+                : "border border-border bg-surface text-purple hover:bg-purple/8"
             )}
           >
             {reminded ? (
@@ -134,7 +134,7 @@ export function SharedGoalCard({
       </div>
 
       {today.waitingOnFriend && (
-        <div className="border-t border-purple/8 pt-3">
+        <div className="border-t border-border pt-3">
           <button
             type="button"
             onClick={onSimulateFriend}
@@ -185,7 +185,7 @@ function GoalRow({
         // own row and the name keeps its width. No breakpoint needed — it
         // reflows on the real measurement rather than a guess about the screen.
         "flex flex-wrap items-center gap-2.5 rounded-xl border p-2.5 transition-colors",
-        done ? "border-mint/30 bg-mint/8" : "border-border bg-control"
+        done ? "border-border bg-mint/30" : "border-border bg-control"
       )}
     >
       <Avatar seed={seed} name={name} className="size-9 shrink-0 bg-surface" />

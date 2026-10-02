@@ -127,13 +127,13 @@ export function PaperDetail({
               choosing rather than by writing — a student must not discover
               either of those by starting. */}
           {content.note && (
-            <div className="mb-4 flex items-start gap-2 rounded-2xl border border-blue/25 bg-blue/5 p-3.5 text-xs font-bold text-text md:text-sm">
+            <div className="mb-4 flex items-start gap-2 rounded-2xl border border-border bg-blue/5 p-3.5 text-xs font-bold text-text md:text-sm">
               <Info className="mt-0.5 size-4 shrink-0 text-blue" strokeWidth={2.5} />
               <span>{content.note}</span>
             </div>
           )}
 
-          <div className="mb-4 grid grid-cols-2 gap-2.5 rounded-2xl border border-purple/10 bg-surface p-3.5 shadow-panel md:gap-3 md:p-4">
+          <div className="mb-4 grid grid-cols-2 gap-2.5 rounded-2xl border border-border bg-surface p-3.5 shadow-panel md:gap-3 md:p-4">
             <Stat
               icon={<FileText className="size-4" strokeWidth={2.5} />}
               value={`${questions} សំណួរ`}
@@ -166,20 +166,20 @@ export function PaperDetail({
               {content.sections.map((section) => (
                 <span
                   key={section.id}
-                  className="rounded-full border border-purple/15 bg-purple/8 px-3 py-1 text-xs font-extrabold text-purple md:text-sm"
+                  className="rounded-full border border-border bg-purple/8 px-3 py-1 text-xs font-extrabold text-purple md:text-sm"
                 >
                   {section.title}
                 </span>
               ))}
               {content.writing && (
-                <span className="rounded-full border border-purple/15 bg-purple/8 px-3 py-1 text-xs font-extrabold text-purple md:text-sm">
+                <span className="rounded-full border border-border bg-purple/8 px-3 py-1 text-xs font-extrabold text-purple md:text-sm">
                   {content.writing.title}
                 </span>
               )}
             </div>
           </div>
 
-          <div className="mb-5 rounded-2xl border border-purple/10 bg-surface p-3.5 shadow-panel md:p-4">
+          <div className="mb-5 rounded-2xl border border-border bg-surface p-3.5 shadow-panel md:p-4">
             <div className="font-heading mb-2 text-sm font-extrabold md:text-base">
               មុននឹងចាប់ផ្តើម
             </div>
@@ -203,7 +203,7 @@ export function PaperDetail({
           </div>
 
           {best && (
-            <div className="mb-4 rounded-2xl border border-mint/25 bg-mint/8 p-3.5 text-xs font-extrabold text-text md:text-sm">
+            <div className="mb-4 rounded-2xl border border-border bg-mint/8 p-3.5 text-xs font-extrabold text-text md:text-sm">
               ពិន្ទុល្អបំផុតរបស់អ្នក៖{" "}
               <span className={scoreColor(best.pct)}>{best.pct}%</span> (
               {best.score}/{best.total})
@@ -216,7 +216,7 @@ export function PaperDetail({
               the target because <label> wraps it. `accent-*` colours the tick
               with the brand fill, which is a fill under a white mark and so
               takes --brand-purple rather than the per-theme scale. */}
-          <label className="mb-3 flex cursor-pointer items-start gap-3 rounded-2xl border border-purple/15 bg-surface p-3.5 shadow-panel">
+          <label className="mb-3 flex cursor-pointer items-start gap-3 rounded-2xl border border-border bg-surface p-3.5 shadow-panel">
             <input
               type="checkbox"
               checked={agreed}
@@ -289,7 +289,7 @@ function HistoryList({
 }) {
   if (results.length === 0) {
     return (
-      <div className="rounded-2xl border border-purple/10 bg-surface p-5 text-center text-sm font-bold text-muted shadow-panel">
+      <div className="rounded-2xl border border-border bg-surface p-5 text-center text-sm font-bold text-muted shadow-panel">
         អ្នកមិនទាន់បានធ្វើវិញ្ញាសានេះនៅឡើយទេ។
       </div>
     );
@@ -301,7 +301,7 @@ function HistoryList({
         <button
           key={result.date}
           onClick={() => onOpenResult(result)}
-          className="mb-2.5 flex w-full items-center gap-3 rounded-2xl border border-purple/10 bg-surface p-3.5 text-left shadow-panel transition hover:brightness-[1.03] active:brightness-95"
+          className="mb-2.5 flex w-full items-center gap-3 rounded-2xl border border-border bg-surface p-3.5 text-left shadow-panel transition hover:brightness-[1.03] active:brightness-95"
         >
           <span
             className={`font-heading shrink-0 text-lg font-extrabold ${scoreColor(result.pct)}`}

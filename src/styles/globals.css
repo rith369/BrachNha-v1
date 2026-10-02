@@ -20,8 +20,11 @@
      buttons and the tri-colour wordmark. #8b2be2 carries white at 5.6:1; the
      lifted dark-mode purple below would drop that to 2.8:1 and fail. That
      conflict is unresolvable in one token, which is why there are two sets. */
-  --brand-pink: #e91e8c;
-  --brand-purple: #8b2be2;
+  /* NEOBRUTALISM (1 Oct 2026): purple moved to #7c3aed (white 5.7:1) and pink
+     to #db2777 (white 4.8:1), the preview's flatter brand pair. Both still
+     carry white text, which is this scale's whole job. */
+  --brand-pink: #db2777;
+  --brand-purple: #7c3aed;
   --brand-blue: #0284c7;
   --brand-mint: #10b981;
   --brand-yellow: #f59e0b;
@@ -50,12 +53,26 @@
   --brand-night-from: #1e1b4b;
   --brand-night-to: #581c87;
 
+  /* ── NEOBRUTALISM bright fills (1 Oct 2026) — IDENTICAL in both themes ──
+     The style's flat, saturated card and chip colours. They are LIGHT fills,
+     so the text on them is --color-ink (near-black) in BOTH themes, never
+     white and never --color-text (which turns cream in .dark). Contrast of ink
+     on each: yellow 13.9 · pink 8.0 · mint 10.7 · blue 10.4 · orange 8.6 ·
+     red 8.4, all far above AA. Utilities: bg-neo-yellow … and text-ink. */
+  --neo-yellow: #ffd23f;
+  --neo-pink: #ff6fb5;
+  --neo-mint: #3ddc97;
+  --neo-blue: #4cc9f0;
+  --neo-orange: #ff8a3d;
+  --neo-red: #ff8b8b;
+  --color-ink: #141414;
+
   /* ── Accent roles — text, icons, borders, tints, chart series ──
      Lifted in .dark so they stay readable ON a dark surface. Because they are
      lifted, every existing low-alpha tint (bg-purple/8, border-purple/10, …)
      turns into correct subtle elevation on dark with no per-class edits. */
   --color-pink: #e91e8c;
-  --color-purple: #8b2be2;
+  --color-purple: #7c3aed;
   --color-blue: #0284c7;
   --color-mint: #10b981;
   --color-yellow: #f59e0b;
@@ -97,23 +114,29 @@
   --color-subj-khmer: #c2410c;
 
   /* ── Surfaces: three intentional steps, page → card → elevated ── */
-  --color-bg: #faf5ff;
+  /* NEOBRUTALISM: a warm cream page under white cards, near-black ink for text,
+     outlines and the hard shadows. */
+  --color-bg: #fff7e8;
   --color-surface: #ffffff;
   --color-elevated: #ffffff;
   /* Raised controls sitting ON a surface — the math keyboard's keys. Distinct
      from --color-elevated because the two themes want opposite directions: in
      light a key is a faint tint *below* the white panel, in dark it has to be a
      step *above* it or the keyboard reads as holes punched in the panel. */
-  --color-control: #faf5ff;
-  --color-text: #1e1033;
-  --color-muted: #8b7ca3;
+  --color-control: #fff3dc;
+  --color-text: #141414;
+  --color-muted: #57506a; /* 7.3:1 on the cream page */
 
   /* ── shadcn-style roles. These used to be literals inside @theme; they were
      moved out here so .dark can reach them. ── */
-  --color-secondary: #f3e8ff;
-  --color-accent: #f3e8ff;
-  --color-border: rgba(139, 43, 226, 0.15);
-  --color-input: rgba(139, 43, 226, 0.15);
+  --color-secondary: #ede4ff;
+  --color-accent: #ede4ff;
+  /* NEOBRUTALISM: the border is solid ink, not a tint. Every border-border
+     and every shadcn outline becomes the style's 2px-ready black line. */
+  --color-border: #141414;
+  --color-input: #141414;
+  /* The colour of every hard shadow: ink on the light page. */
+  --color-shadow: #141414;
   --color-destructive: #ef4444;
   /* Text that sits on a --brand-* fill. White in both themes, named so the
      intent is legible at the call site. */
@@ -121,22 +144,25 @@
 
   /* ── Chart chrome. Recharts and the hand-coded SVG gauges take colours as
      props, not classes, so they need variables rather than utilities. ── */
-  --color-chart-grid: rgba(139, 43, 226, 0.08);
-  --color-chart-track: rgba(139, 43, 226, 0.1);
+  --color-chart-grid: rgba(20, 20, 20, 0.08);
+  --color-chart-track: rgba(20, 20, 20, 0.1);
   --color-tooltip-bg: #ffffff;
 
   /* ── Shadows. Purple-tinted glows read as depth on a lavender page; on dark
      they are invisible, so .dark swaps them for real black shadows. ── */
-  --shadow-panel: 0 2px 12px rgba(139, 43, 226, 0.08);
-  --shadow-panel-sm: 0 2px 12px rgba(139, 43, 226, 0.06);
-  --shadow-cta: 0 6px 18px rgba(139, 43, 226, 0.35);
-  --shadow-cta-lg: 0 6px 20px rgba(139, 43, 226, 0.45);
-  --shadow-drawer: 8px 0 40px rgba(139, 43, 226, 0.15);
-  --shadow-mint-cta: 0 4px 14px rgba(16, 185, 129, 0.3);
+  /* NEOBRUTALISM: hard offset shadows with NO blur, in --color-shadow, so a
+     card reads as a sticker on the page. Same names as before, so every
+     shadow-panel / shadow-cta in the app changed with no component edit. */
+  --shadow-panel: 4px 4px 0 0 var(--color-shadow);
+  --shadow-panel-sm: 2px 2px 0 0 var(--color-shadow);
+  --shadow-cta: 3px 3px 0 0 var(--color-shadow);
+  --shadow-cta-lg: 4px 4px 0 0 var(--color-shadow);
+  --shadow-drawer: 4px 0 0 0 var(--color-shadow);
+  --shadow-mint-cta: 3px 3px 0 0 var(--color-shadow);
   /* Warm halo under the streak flame disc. STATIC, never animated — a moving
      box-shadow is a paint property and repaints every frame; the disc animates
      `transform` instead. See the fabPulse note further down. */
-  --shadow-flame: 0 10px 30px rgba(234, 88, 12, 0.35);
+  --shadow-flame: 4px 4px 0 0 var(--color-shadow);
   /* Glow on the Roadmap's SVG path connector. */
   --path-glow: rgba(139, 43, 226, 0.75);
 
@@ -148,8 +174,8 @@
 
   /* Consumed via arbitrary values (bg-[var(--scrim)]) — not theme namespaces,
      so no utility is generated for them. */
-  --drawer-header: linear-gradient(to bottom right, #f5eeff, #ede0ff);
-  --scrim: rgba(30, 10, 60, 0.35);
+  --drawer-header: #fff1c2;
+  --scrim: rgba(20, 20, 20, 0.4);
 
   /* ── Font families ──
      next/font/google used to inject these four variables. The faces are now
@@ -194,44 +220,44 @@
   --color-subj-french: #f472b6;
   --color-subj-khmer: #fb923c;
 
-  --color-bg: #100e18;
-  --color-surface: #1a1726;
-  --color-elevated: #241f33;
-  --color-control: #241f33;
-  --color-text: #ece9f5; /* 14.3:1 on surface — near-white, not pure white */
-  --color-muted: #9b93b0; /* 6.0:1 — muted without dropping below AA */
+  --color-bg: #16131f;
+  --color-surface: #221e2e;
+  --color-elevated: #2b2639;
+  --color-control: #2b2639;
+  --color-text: #f4efe6; /* warm cream ink */
+  --color-muted: #bdb5cf;
 
-  --color-secondary: #2a2340;
-  --color-accent: #2a2340;
+  --color-secondary: #3b2d63;
+  --color-accent: #3b2d63;
   /* Keyed off the LIFTED purple: a border built from #8b2be2 at 16% over
      #1a1726 is indistinguishable from the card it is supposed to outline. */
-  --color-border: rgba(180, 124, 245, 0.16);
-  --color-input: rgba(180, 124, 245, 0.16);
+  /* NEOBRUTALISM: cream outlines AND cream hard shadows, the mirror of the
+     light theme's ink-on-ink (the user's call, 1 Oct 2026: "when light it
+     black, so dark it white"). A black shadow would be invisible here. */
+  --color-border: #f4efe6;
+  --color-input: #f4efe6;
+  --color-shadow: #f4efe6;
   --color-destructive: #ff6b6b;
 
-  --color-chart-grid: rgba(180, 124, 245, 0.12);
-  --color-chart-track: rgba(180, 124, 245, 0.14);
-  --color-tooltip-bg: #241f33;
+  --color-chart-grid: rgba(244, 239, 230, 0.1);
+  --color-chart-track: rgba(244, 239, 230, 0.14);
+  --color-tooltip-bg: #2b2639;
 
   /* Real shadows, not glows. On dark, depth comes from occlusion plus the
      surface step — a coloured halo just looks like a rendering artefact. */
-  --shadow-panel: 0 2px 14px rgba(0, 0, 0, 0.5);
-  --shadow-panel-sm: 0 1px 8px rgba(0, 0, 0, 0.4);
-  --shadow-cta: 0 6px 18px rgba(0, 0, 0, 0.55);
-  --shadow-cta-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
-  --shadow-drawer: 8px 0 40px rgba(0, 0, 0, 0.6);
-  --shadow-mint-cta: 0 4px 14px rgba(0, 0, 0, 0.5);
+  /* The shadows themselves are the light-theme ones (they all read
+     --color-shadow); only the colour changes here. */
   /* The one shadow kept COLOURED on dark. Every other one becomes a real black
      shadow here because a coloured halo reads as an artefact — but the flame
      disc is the page's single focal point and a black shadow under a glowing
      object is the wrong physics. Lifted to 0.45 since a 0.35 orange wash
      disappears against #100e18. */
-  --shadow-flame: 0 10px 34px rgba(234, 88, 12, 0.45);
+  --shadow-flame: 4px 4px 0 0 var(--color-shadow);
   /* Brighter than the light-mode glow: a 75% #8b2be2 halo disappears against
      #100e18, and the path connector is the Roadmap's main visual thread. */
   --path-glow: rgba(180, 124, 245, 0.55);
 
-  --drawer-header: linear-gradient(to bottom right, #241f33, #1a1726);
+  --drawer-header: #2b2639;
   /* Much darker than the light scrim: a 35% wash over an already-dark page
      leaves the drawer floating with no separation from what is behind it. */
   --scrim: rgba(6, 4, 12, 0.66);
@@ -263,6 +289,14 @@
   --color-text: var(--color-text);
   --color-muted: var(--color-muted);
   --color-on-brand: var(--color-on-brand);
+  --color-shadow: var(--color-shadow);
+  --color-ink: var(--color-ink);
+  --color-neo-yellow: var(--neo-yellow);
+  --color-neo-pink: var(--neo-pink);
+  --color-neo-mint: var(--neo-mint);
+  --color-neo-blue: var(--neo-blue);
+  --color-neo-orange: var(--neo-orange);
+  --color-neo-red: var(--neo-red);
 
   --color-chart-grid: var(--color-chart-grid);
   --color-chart-track: var(--color-chart-track);
@@ -277,6 +311,10 @@
   --shadow-drawer: var(--shadow-drawer);
   --shadow-mint-cta: var(--shadow-mint-cta);
   --shadow-flame: var(--shadow-flame);
+  /* Hard INK shadows in both themes, for things sitting ON a bright neo fill
+     (the hero's chips), where the theme's purple dark-mode shadow would clash. */
+  --shadow-hard: 3px 3px 0 0 var(--color-ink);
+  --shadow-hard-sm: 2px 2px 0 0 var(--color-ink);
 
   /* Khmer is listed as a fallback, not applied conditionally: the Latin fonts
      have no Khmer glyphs, so the browser reaches for Noto per glyph. Mixed
@@ -309,27 +347,35 @@
   --color-card-foreground: var(--color-text);
   --color-popover: var(--color-elevated);
   --color-popover-foreground: var(--color-text);
-  --radius: 1rem;
+  --radius: 0.75rem;
+  /* NEOBRUTALISM: corners one step tighter than Tailwind's defaults, so every
+     rounded-xl / -2xl / -3xl in the app shrinks with no component edit.
+     rounded-full (pills, avatars) is untouched. */
+  --radius-xl: 0.625rem;
+  --radius-2xl: 0.875rem;
+  --radius-3xl: 1.125rem;
+  /* NEOBRUTALISM: a bare `border` (and border-t, divide-y, …) is 2px app-wide,
+     the style's outline weight. Set once here rather than as border-2 at every
+     call site, so new components get it for free. */
+  --default-border-width: 2px;
 }
 
 /* The two brand gradients, which appeared verbatim in ~56 places. They resolve
    --brand-* rather than --color-*, so they look identical in both themes and
    keep carrying white text safely. */
+/* NEOBRUTALISM: both "gradients" are now ONE FLAT brand purple. The utility
+   names stay so the ~90 call sites changed with no edit; the colour still
+   carries white text (5.7:1). */
 @utility bg-brand {
-  background-image: linear-gradient(
-    to right,
-    var(--brand-pink),
-    var(--brand-purple)
-  );
+  background-color: var(--brand-purple);
 }
 
 @utility bg-brand-tri {
-  background-image: linear-gradient(
-    to right,
-    var(--brand-pink),
-    var(--brand-purple),
-    var(--brand-blue)
-  );
+  /* A gradient of ONE colour, not a background-color: this utility is also
+     clipped into text (bg-clip-text text-transparent) for page titles and the
+     wordmark, and background-clip needs an image to clip. */
+  background-image: linear-gradient(var(--brand-purple), var(--brand-purple));
+  background-color: var(--brand-purple);
 }
 
 /* The streak flame ramp, as a fill and as a bg-clip-text source. Declared as a
@@ -337,19 +383,21 @@
    the streak count and the milestone bar, and three hand-written copies of one
    gradient is how they end up different. */
 @utility bg-flame {
-  background-image: linear-gradient(
-    135deg,
-    var(--brand-flame-from),
-    var(--brand-flame-to)
-  );
+  /* Flat, and still an image for the bg-clip-text streak count. */
+  background-image: linear-gradient(var(--brand-flame-from), var(--brand-flame-from));
+  background-color: var(--brand-flame-from);
 }
 
+/* The one gradient the neobrutalism pass kept, on the user's call: it was
+   flattened with the rest and the Bac II Simulation card lost its "exam hall at
+   night" feel. It still gets the 2px outline and hard shadow like every card. */
 @utility bg-night {
   background-image: linear-gradient(
     135deg,
     var(--brand-night-from),
     var(--brand-night-to)
   );
+  background-color: var(--brand-night-to);
 }
 
 body {

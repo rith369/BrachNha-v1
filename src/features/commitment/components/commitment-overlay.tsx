@@ -111,7 +111,7 @@ export function CommitmentOverlay() {
       {confirming ? (
         <div className="flex flex-1 flex-col items-center justify-center px-6">
           <div className="animate-banner-in flex flex-col items-center">
-            <div className="mb-4 flex size-16 items-center justify-center rounded-full bg-linear-to-br from-[var(--brand-pink)] via-[var(--brand-purple)] to-[var(--brand-blue)] text-on-brand shadow-cta-lg">
+            <div className="mb-4 flex size-16 items-center justify-center rounded-full border border-border bg-[var(--brand-purple)] text-on-brand shadow-cta-lg">
               <Check className="size-8" strokeWidth={3} />
             </div>
             <div className="font-heading text-xl font-extrabold">
@@ -120,7 +120,7 @@ export function CommitmentOverlay() {
             <div className="mt-1 text-center text-xs font-bold text-muted">
               {c.committedSub}
             </div>
-            <div className="mt-5 flex h-20 w-56 items-center justify-center rounded-2xl border border-purple/10 bg-surface px-4">
+            <div className="mt-5 flex h-20 w-56 items-center justify-center rounded-2xl border border-border bg-surface px-4">
               <SignatureDisplay kind={value.kind} signature={value.signature} />
             </div>
           </div>
@@ -137,14 +137,14 @@ export function CommitmentOverlay() {
             <button
               onClick={close}
               aria-label={c.close}
-              className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full border border-purple/10 bg-surface text-purple active:scale-95"
+              className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-purple active:scale-95"
             >
               <X className="size-4" strokeWidth={2.5} />
             </button>
           </div>
 
           <div className="mx-auto w-full min-h-0 max-w-2xl flex-1 overflow-y-auto px-5 pb-4">
-            <div className="mb-4 rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+            <div className="mb-4 rounded-2xl border border-border bg-surface p-4 shadow-panel">
               <p className="text-sm font-bold text-text">
                 {splitEmphasis(c.pledge({
                   name: userName,
@@ -170,7 +170,7 @@ export function CommitmentOverlay() {
               {pills.map((pill) => (
                 <div
                   key={pill.label}
-                  className="rounded-2xl border border-purple/10 bg-surface p-3 text-center shadow-panel-sm"
+                  className="rounded-2xl border border-border bg-surface p-3 text-center shadow-panel-sm"
                 >
                   <div className="font-heading text-lg font-extrabold text-purple">
                     {pill.value}

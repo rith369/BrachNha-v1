@@ -98,7 +98,7 @@ export function PastPaperResults({
           the unanswered questions in the review below would read as their
           choice. Derived from the count rather than a second stored flag. */}
       {leaves !== undefined && leaves > MAX_EXAM_LEAVES && (
-        <div className="mb-5 flex items-start gap-2 rounded-2xl border border-pink/25 bg-pink/8 p-3.5 text-xs font-bold text-text md:text-sm">
+        <div className="mb-5 flex items-start gap-2 rounded-2xl border border-border bg-pink/8 p-3.5 text-xs font-bold text-text md:text-sm">
           <ShieldAlert
             className="mt-0.5 size-4 shrink-0 text-pink"
             strokeWidth={2.5}
@@ -112,7 +112,7 @@ export function PastPaperResults({
 
       {/* Part by part — where the marks went, which is the first thing a
           student wants after the total. */}
-      <div className="mb-5 rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+      <div className="mb-5 rounded-2xl border border-border bg-surface p-4 shadow-panel">
         {marked.sections.map((section) => (
           <div key={section.id} className="mb-3 last:mb-0">
             <div className="mb-1 flex items-center justify-between gap-3 text-xs font-extrabold md:text-sm">
@@ -131,7 +131,7 @@ export function PastPaperResults({
         ))}
 
         {content.writing && (
-          <div className="mt-3 border-t border-purple/10 pt-3 text-xs font-bold text-muted md:text-sm">
+          <div className="mt-3 border-t border-border pt-3 text-xs font-bold text-muted md:text-sm">
             {content.writing.title} · មិនគិតពិន្ទុក្នុងកម្មវិធី —
             ពិនិត្យដោយខ្លួនឯងខាងក្រោម។
           </div>
@@ -168,7 +168,7 @@ export function PastPaperResults({
       </button>
       <button
         onClick={onBack}
-        className="block w-full rounded-2xl border border-purple/20 bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
+        className="block w-full rounded-2xl border border-border bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
       >
         ← ត្រឡប់
       </button>
@@ -196,7 +196,7 @@ function ReviewRow({ item }: { item: ReviewItem }) {
     <div
       className={cn(
         "mb-2.5 rounded-2xl border p-3.5",
-        item.ok ? "border-mint/25 bg-mint/8" : "border-pink/20 bg-pink/8"
+        item.ok ? "border-border bg-mint/8" : "border-border bg-pink/8"
       )}
     >
       <div className="mb-1.5 flex items-center gap-2">
@@ -270,14 +270,14 @@ function WritingReview({
   const [showModel, setShowModel] = useState(false);
 
   return (
-    <div className="mb-5 rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+    <div className="mb-5 rounded-2xl border border-border bg-surface p-4 shadow-panel">
       <div className="font-heading mb-1 flex items-center gap-1.5 text-base font-extrabold">
         <PenLine className="size-4 shrink-0 text-purple" strokeWidth={2.5} />
         {writing.title}
       </div>
       <div className="mb-3 text-sm font-semibold text-text">{writing.prompt}</div>
 
-      <div className="mb-3 rounded-xl border border-purple/10 bg-purple/5 p-3">
+      <div className="mb-3 rounded-xl border border-border bg-purple/5 p-3">
         <div className="mb-1.5 text-[11px] font-extrabold text-purple md:text-xs">
           ពិនិត្យអត្ថបទរបស់អ្នក
         </div>
@@ -293,12 +293,12 @@ function WritingReview({
       {!showModel ? (
         <button
           onClick={() => setShowModel(true)}
-          className="w-full rounded-xl border border-purple/20 bg-purple/8 px-4 py-2 text-xs font-extrabold text-purple transition hover:bg-purple/12 md:text-sm"
+          className="w-full rounded-xl border border-border bg-purple/8 px-4 py-2 text-xs font-extrabold text-purple transition hover:bg-purple/12 md:text-sm"
         >
           មើលអត្ថបទគំរូ
         </button>
       ) : (
-        <div className="rounded-xl border border-purple/10 bg-control p-3">
+        <div className="rounded-xl border border-border bg-control p-3">
           <div className="mb-1.5 text-[11px] font-extrabold text-muted md:text-xs">
             អត្ថបទគំរូ · សរសេរដោយ BrachNha
           </div>

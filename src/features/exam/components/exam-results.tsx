@@ -44,10 +44,10 @@ export function ExamResults({
       <div
         className={`mb-5 rounded-2xl border p-4 text-left ${
           pct >= 80
-            ? "border-mint/25 bg-mint/8"
+            ? "border-border bg-mint/8"
             : pct >= 60
-              ? "border-yellow/25 bg-yellow/10"
-              : "border-pink/20 bg-pink/8"
+              ? "border-border bg-yellow/10"
+              : "border-border bg-pink/8"
         }`}
       >
         <div className={`mb-1 text-xs font-extrabold ${scoreColor(pct)}`}>
@@ -63,7 +63,7 @@ export function ExamResults({
       </button>
       <button
         onClick={onBack}
-        className="block w-full rounded-2xl border border-purple/20 bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
+        className="block w-full rounded-2xl border border-border bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
       >
         ← ត្រឡប់
       </button>

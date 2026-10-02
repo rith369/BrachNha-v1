@@ -66,7 +66,7 @@ export function PhotoStrip({
             return (
               <div
                 key={p.path}
-                className="flex size-16 items-center justify-center rounded-xl border border-dashed border-pink/40 bg-pink/5 px-1 text-center text-[9px] font-extrabold text-pink md:size-20"
+                className="flex size-16 items-center justify-center rounded-xl border border-dashed border-border bg-pink/30 px-1 text-center text-[9px] font-extrabold text-pink md:size-20"
               >
                 {t.reported}
               </div>
@@ -78,7 +78,7 @@ export function PhotoStrip({
                 href={p.url}
                 target="_blank"
                 rel="noreferrer"
-                className="block size-16 overflow-hidden rounded-xl border border-purple/10 bg-control md:size-20"
+                className="block size-16 overflow-hidden rounded-xl border border-border bg-control md:size-20"
               >
                 <img
                   src={p.url}
@@ -103,7 +103,7 @@ export function PhotoStrip({
                     "absolute -top-1.5 -right-1.5 flex items-center justify-center rounded-full border shadow-panel-sm transition",
                     armed
                       ? "h-6 border-pink bg-[var(--brand-pink)] px-2 text-[9px] font-extrabold text-white"
-                      : "size-6 border-purple/20 bg-surface text-muted hover:text-pink"
+                      : "size-6 border-border bg-surface text-muted hover:text-pink"
                   )}
                 >
                   {armed ? t.deleteConfirmShort : <X className="size-3.5" strokeWidth={3} />}
@@ -122,7 +122,7 @@ export function PhotoStrip({
                     "absolute -top-1.5 -right-1.5 flex items-center justify-center rounded-full border shadow-panel-sm transition",
                     armed
                       ? "h-6 border-pink bg-[var(--brand-pink)] px-2 text-[9px] font-extrabold text-white"
-                      : "size-6 border-purple/20 bg-surface text-muted hover:text-pink"
+                      : "size-6 border-border bg-surface text-muted hover:text-pink"
                   )}
                 >
                   {armed ? t.reportConfirmShort : <Flag className="size-3" strokeWidth={3} />}
@@ -204,7 +204,7 @@ export function AddPhotosButton({
         type="button"
         onClick={() => input.current?.click()}
         disabled={uploading > 0}
-        className="flex items-center gap-1.5 rounded-xl border border-purple/20 bg-purple/8 px-3 py-2 text-[11px] font-extrabold text-purple transition hover:bg-purple/15 disabled:opacity-50"
+        className="flex items-center gap-1.5 rounded-xl border border-border bg-purple/8 px-3 py-2 text-[11px] font-extrabold text-purple transition hover:bg-purple/15 disabled:opacity-50"
       >
         <Camera className="size-3.5 shrink-0" strokeWidth={2.5} />
         {uploading > 0 ? `${t.uploadingPhoto} (${uploading})` : t.addPhoto}

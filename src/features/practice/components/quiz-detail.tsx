@@ -98,7 +98,7 @@ export function QuizDetail({
               />
             </div>
 
-            <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+            <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
               <div className="font-heading mb-2 text-sm font-extrabold md:text-base">
                 មុននឹងចាប់ផ្តើម
               </div>
@@ -122,7 +122,7 @@ export function QuizDetail({
                 key={r.date}
                 type="button"
                 onClick={() => onOpenResult(r)}
-                className="flex w-full items-center gap-3 rounded-2xl border border-purple/10 bg-surface p-3.5 text-left shadow-panel-sm transition hover:brightness-[1.03] active:scale-[0.985]"
+                className="flex w-full items-center gap-3 rounded-2xl border border-border bg-surface p-3.5 text-left shadow-panel-sm transition hover:brightness-[1.03] active:scale-[0.985]"
               >
                 <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-purple/8">
                   <History className="size-5 text-purple" strokeWidth={2.5} />
@@ -167,7 +167,7 @@ function Stat({
   tone?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-purple/10 bg-surface p-3.5 shadow-panel-sm">
+    <div className="rounded-2xl border border-border bg-surface p-3.5 shadow-panel-sm">
       <Icon className="mb-1 size-4 text-muted" strokeWidth={2.5} />
       <div
         className={cn(

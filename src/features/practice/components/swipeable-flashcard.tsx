@@ -295,7 +295,7 @@ export function SwipeableFlashcard({
                 origin, where it cannot be reached. `overscroll-contain` stops a
                 flick that reaches the end of the card from carrying on into the
                 page behind it. */}
-            <div className="absolute inset-0 touch-pan-y overflow-y-auto overscroll-contain rounded-2xl border border-purple/15 bg-surface p-6 shadow-panel [backface-visibility:hidden]">
+            <div className="absolute inset-0 touch-pan-y overflow-y-auto overscroll-contain rounded-2xl border border-border bg-surface p-6 shadow-panel [backface-visibility:hidden]">
               <div className="flex min-h-full flex-col items-center justify-center text-center">
                 <div className={cn("whitespace-pre-line", focusPrompt)}>
                   {card.front}
@@ -303,7 +303,7 @@ export function SwipeableFlashcard({
               </div>
             </div>
             <div
-              className="absolute inset-0 touch-pan-y overflow-y-auto overscroll-contain rounded-2xl border border-mint/25 bg-mint/8 p-6 shadow-panel [backface-visibility:hidden]"
+              className="absolute inset-0 touch-pan-y overflow-y-auto overscroll-contain rounded-2xl border border-border bg-mint/8 p-6 shadow-panel [backface-visibility:hidden]"
               style={{ transform: "rotateY(180deg)" }}
             >
               <div className="flex min-h-full flex-col items-center justify-center text-center">

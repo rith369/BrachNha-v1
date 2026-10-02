@@ -27,8 +27,8 @@ function Chip({
       className={cn(
         "rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition md:text-sm",
         selected
-          ? "border-purple/40 bg-purple/10 text-purple"
-          : "border-purple/10 bg-surface text-muted hover:bg-purple/5"
+          ? "border-border bg-purple/30 text-text"
+          : "border-border bg-surface text-muted hover:bg-purple/5"
       )}
     >
       {children}
@@ -132,7 +132,7 @@ export function CreateForm({
               return (
                 <div
                   key={subject.id}
-                  className="rounded-xl border border-purple/10 bg-surface p-2 opacity-60"
+                  className="rounded-xl border border-border bg-surface p-2 opacity-60"
                 >
                   {body}
                 </div>
@@ -147,8 +147,8 @@ export function CreateForm({
                 className={cn(
                   "rounded-xl border p-2 text-left transition",
                   selected
-                    ? "border-purple/40 bg-purple/10"
-                    : "border-purple/10 bg-surface hover:bg-purple/5"
+                    ? "border-border bg-purple/30"
+                    : "border-border bg-surface hover:bg-purple/5"
                 )}
               >
                 {body}

@@ -74,7 +74,7 @@ export function AiInsight({
   );
 
   return (
-    <div className="rounded-2xl border border-purple/15 bg-linear-to-br from-purple/8 via-pink/5 to-blue/8 p-4">
+    <div className="rounded-2xl border border-border bg-secondary p-4 shadow-panel">
       <div className="mb-2 flex items-center gap-1.5 font-heading text-sm font-extrabold text-purple">
         <Bot className="size-4" strokeWidth={2.5} />
         {t.aiInsight}

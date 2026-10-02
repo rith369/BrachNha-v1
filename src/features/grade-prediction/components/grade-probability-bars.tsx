@@ -21,7 +21,7 @@ export function GradeProbabilityBars({
   const t = useT(lang);
 
   return (
-    <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel-sm">
+    <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel-sm">
       <div className="mb-3 font-heading text-sm font-extrabold">
         📊 {t.gradeProbability}
       </div>

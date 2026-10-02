@@ -63,7 +63,7 @@ export function SubjectGradeBreakdown({
       </div>
 
       {weakest && (
-        <div className="mb-3 flex items-center gap-2.5 rounded-2xl border border-pink/20 bg-pink/8 p-3">
+        <div className="mb-3 flex items-center gap-2.5 rounded-2xl border border-border bg-pink/8 p-3">
           <span className="text-xl">⚠️</span>
           <div className="min-w-0 flex-1">
             <div className="text-sm font-extrabold text-pink">
@@ -82,7 +82,7 @@ export function SubjectGradeBreakdown({
           return (
             <div
               key={s.subject}
-              className="rounded-2xl border border-purple/10 bg-surface p-3.5 shadow-panel-sm"
+              className="rounded-2xl border border-border bg-surface p-3.5 shadow-panel-sm"
             >
               <div className="flex items-center gap-2.5">
                 <span className="text-xl">{SUBJECT_ICONS[s.subject] ?? "📚"}</span>

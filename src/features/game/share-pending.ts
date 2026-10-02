@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
-import { publishCompetition } from "@/lib/competitions";
+import { fetchMyGameHistory, publishCompetition } from "@/lib/competitions";
 
 /**
  * Uploads competitions that were saved locally but never reached the server.
@@ -29,6 +29,34 @@ import { publishCompetition } from "@/lib/competitions";
  * mean once.
  */
 const inFlight = new Set<string>();
+
+/**
+ * Accounts whose server history has already been merged on this page load.
+ * MODULE scope for the same StrictMode reason as `inFlight`: once per browser
+ * load, not once per mount.
+ */
+const restoredFor = new Set<string>();
+
+/**
+ * Brings back battles this device is missing. The sign-in pull
+ * (lib/supabase-sync.ts) restores them into an EMPTY store, but a device that
+ * already has a profile never pulls, so history lost before that restore
+ * existed, or made on another phone, would never return. Merging here, where
+ * the history is shown, closes both. Only adds what is missing; never pays XP.
+ */
+async function restoreHistory(userId: string): Promise<void> {
+  if (restoredFor.has(userId)) return;
+  restoredFor.add(userId);
+  const res = await fetchMyGameHistory(userId);
+  if (!res.ok) {
+    // Let the next visit try again.
+    restoredFor.delete(userId);
+    return;
+  }
+  useBrachNhaStore
+    .getState()
+    .mergeGameHistory(res.data.competitions, res.data.attempts);
+}
 
 async function sharePending(
   userId: string,
@@ -86,5 +114,6 @@ export function useSharePendingCompetitions(): void {
     // state, so finishing after the page closes is correct rather than a leak —
     // and abandoning a half-done pass would leave rows pending for no reason.
     void sharePending(authUserId, markCompetitionShared);
+    void restoreHistory(authUserId);
   }, [authStatus, authUserId, markCompetitionShared]);
 }

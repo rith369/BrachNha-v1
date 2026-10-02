@@ -29,7 +29,7 @@ export function CommitmentBanner({
   const c = PLEDGE_COPY[lang];
 
   return (
-    <div className="mb-4 rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+    <div className="mb-4 rounded-2xl border border-border bg-surface p-4 shadow-panel">
       <div className="flex items-center justify-between">
         <div className="font-heading text-sm font-extrabold">✍️ {c.title}</div>
         <button
@@ -41,7 +41,7 @@ export function CommitmentBanner({
         </button>
       </div>
 
-      <div className="mt-1 flex h-16 items-center border-b border-dashed border-purple/20">
+      <div className="mt-1 flex h-16 items-center border-b border-dashed border-border">
         <SignatureDisplay
           kind={commitment.kind}
           signature={commitment.signature}

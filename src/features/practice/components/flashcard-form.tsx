@@ -30,13 +30,13 @@ export function FlashcardForm({
   const canSave = front.trim().length > 0 && back.trim().length > 0;
 
   return (
-    <div className="mt-3 rounded-2xl border border-purple/15 bg-surface p-3.5 shadow-panel">
+    <div className="mt-3 rounded-2xl border border-border bg-surface p-3.5 shadow-panel">
       <div className="mb-2 text-xs font-extrabold text-muted">សំណួរ / ខាងមុខ</div>
       <textarea
         value={front}
         onChange={(e) => setFront(e.target.value)}
         rows={2}
-        className="mb-3 w-full resize-none rounded-xl border border-purple/15 bg-bg p-2.5 text-sm font-bold text-text outline-none focus:border-purple/40"
+        className="mb-3 w-full resize-none rounded-xl border border-border bg-bg p-2.5 text-sm font-bold text-text outline-none focus:border-purple"
         placeholder="សរសេរសំណួរ ឬពាក្យ..."
       />
       <div className="mb-2 text-xs font-extrabold text-muted">ចម្លើយ / ខាងក្រោយ</div>
@@ -44,13 +44,13 @@ export function FlashcardForm({
         value={back}
         onChange={(e) => setBack(e.target.value)}
         rows={2}
-        className="mb-3 w-full resize-none rounded-xl border border-purple/15 bg-bg p-2.5 text-sm font-bold text-text outline-none focus:border-purple/40"
+        className="mb-3 w-full resize-none rounded-xl border border-border bg-bg p-2.5 text-sm font-bold text-text outline-none focus:border-purple"
         placeholder="សរសេរចម្លើយ..."
       />
       <div className="flex gap-2">
         <button
           onClick={onCancel}
-          className="flex-1 rounded-xl border border-purple/20 bg-purple/8 px-4 py-2.5 text-xs font-extrabold text-purple"
+          className="flex-1 rounded-xl border border-border bg-purple/8 px-4 py-2.5 text-xs font-extrabold text-purple"
         >
           បោះបង់
         </button>

@@ -603,6 +603,18 @@ interface BrachNhaState {
    * trip. Returns the state unchanged when there is nothing to do.
    */
   setWorkPhoto: (competitionId: string, taken: boolean) => void;
+  /**
+   * Adds game history the server has and this device does not, from
+   * fetchMyGameHistory (lib/competitions.ts). Matched on the COMPETITION id for
+   * both lists: a local attempt mints its own id, so the server's attempt id can
+   * never match it, while one student has at most one attempt per competition.
+   * Pays no XP (that was paid when the battle was played) and keeps the same
+   * MAX_COMPETITIONS cap, oldest dropped. Unchanged state when nothing is new.
+   */
+  mergeGameHistory: (
+    competitions: Competition[],
+    attempts: CompetitionAttempt[]
+  ) => void;
   resetDailyTasks: () => void;
   /** Clears `tasks` and re-derives `streak` if `tasksDate` is not today.
    *  Idempotent and cheap, so the caller can run it on mount and on every
@@ -1205,6 +1217,23 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           ].slice(-MAX_COMPETITIONS),
           ...award(state, xp),
         })),
+
+      mergeGameHistory: (competitions, attempts) =>
+        set((state) => {
+          const haveC = new Set(state.competitions.map((c) => c.id));
+          const haveA = new Set(state.competitionAttempts.map((a) => a.competitionId));
+          const newC = competitions.filter((c) => !haveC.has(c.id));
+          const newA = attempts.filter((a) => !haveA.has(a.competitionId));
+          if (newC.length === 0 && newA.length === 0) return state;
+          return {
+            competitions: [...state.competitions, ...newC]
+              .sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1))
+              .slice(-MAX_COMPETITIONS),
+            competitionAttempts: [...state.competitionAttempts, ...newA]
+              .sort((a, b) => (a.playedAt < b.playedAt ? -1 : 1))
+              .slice(-MAX_COMPETITIONS),
+          };
+        }),
 
       setWorkPhoto: (competitionId, taken) =>
         set((state) => {

@@ -75,7 +75,7 @@ export function ExamPaperCard({
   return (
     <button
       onClick={onTest}
-      className="mb-3 block w-full overflow-hidden rounded-2xl border border-purple/10 bg-surface text-left shadow-panel transition hover:brightness-[1.03] active:brightness-95"
+      className="mb-3 block w-full overflow-hidden rounded-2xl border border-border bg-surface text-left shadow-panel transition hover:brightness-[1.03] active:brightness-95"
     >
       <SubjectArt subject={paper.subject} className="aspect-[11/4] max-h-44 rounded-none" />
 
@@ -97,7 +97,7 @@ export function ExamPaperCard({
               "flex shrink-0 items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-extrabold",
               ready
                 ? "text-white shadow-panel-sm"
-                : "border border-purple/15 bg-purple/8 text-purple"
+                : "border border-border bg-purple/8 text-purple"
             )}
             style={ready ? { backgroundColor: style.fill } : undefined}
           >
@@ -115,7 +115,7 @@ export function ExamPaperCard({
         {notice && (
           <div
             role="status"
-            className="mt-2 rounded-xl border border-purple/10 bg-purple/5 px-3 py-2 text-[11px] font-bold text-muted"
+            className="mt-2 rounded-xl border border-border bg-purple/5 px-3 py-2 text-[11px] font-bold text-muted"
           >
             មាតិកាវិញ្ញាសារនេះកំពុងរៀបចំ។ សូមរង់ចាំបន្តិច។
           </div>

@@ -21,9 +21,9 @@ export function PredictionEmpty({
 }) {
   const pct = Math.min(100, Math.round((answered / READY_ANSWERS) * 100));
   return (
-    <div className="rounded-2xl border border-purple/10 bg-surface p-5 text-center shadow-panel">
-      <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-full bg-linear-to-br from-pink/15 via-purple/15 to-blue/15">
-        <Gauge className="size-7 text-purple" strokeWidth={2.5} />
+    <div className="rounded-2xl border border-border bg-surface p-5 text-center shadow-panel">
+      <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl border border-border bg-[var(--brand-purple)]">
+        <Gauge className="size-7 text-white" strokeWidth={2.5} />
       </div>
       <div className="font-heading text-lg font-extrabold">
         {lang === "en" ? "Not enough data yet" : "ទិន្នន័យមិនទាន់គ្រប់គ្រាន់"}

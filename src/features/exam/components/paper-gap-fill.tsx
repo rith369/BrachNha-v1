@@ -101,7 +101,7 @@ export function PaperGapFillStep({
             return (
               <span
                 key={i}
-                className="mx-0.5 inline-block rounded-lg border border-purple/15 bg-purple/8 px-2 py-0.5 text-xs font-extrabold text-muted md:text-sm"
+                className="mx-0.5 inline-block rounded-lg border border-border bg-purple/8 px-2 py-0.5 text-xs font-extrabold text-muted md:text-sm"
               >
                 ({gap.number}) {word}
               </span>
@@ -116,10 +116,10 @@ export function PaperGapFillStep({
               className={cn(
                 "mx-0.5 inline-block min-w-16 rounded-lg border px-2 py-0.5 text-center text-xs font-extrabold transition md:text-sm",
                 active
-                  ? "border-purple/50 bg-purple/15 text-purple"
+                  ? "border-border bg-purple/30 text-text"
                   : word
-                    ? "border-purple/20 bg-surface text-text"
-                    : "border-dashed border-purple/30 bg-purple/5 text-muted"
+                    ? "border-border bg-surface text-text"
+                    : "border-dashed border-border bg-purple/30 text-muted"
               )}
             >
               ({gap.number}) {word ?? "______"}
@@ -134,7 +134,7 @@ export function PaperGapFillStep({
           to see where it went. The negative margins let it span the card's full
           width so its top border reads as one line; bg-surface is what stops the
           passage showing through. */}
-      <div className="sticky bottom-0 z-10 -mx-4 mt-5 border-t border-purple/10 bg-surface px-4 pt-4 pb-1 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
+      <div className="sticky bottom-0 z-10 -mx-4 mt-5 border-t border-border bg-surface px-4 pt-4 pb-1 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
         <div className="mb-2 flex items-center justify-between gap-2">
           <span className="text-xs font-extrabold text-muted md:text-sm">
             ជ្រើសពាក្យដាក់ក្នុងចន្លោះ
@@ -157,8 +157,8 @@ export function PaperGapFillStep({
                 className={cn(
                   "rounded-xl border px-3 py-2 text-sm font-bold transition disabled:opacity-40 md:text-base",
                   usedIn
-                    ? "border-purple/15 bg-purple/8 text-muted line-through"
-                    : "border-purple/15 bg-surface text-text hover:bg-purple/5"
+                    ? "border-border bg-purple/8 text-muted line-through"
+                    : "border-border bg-surface text-text hover:bg-purple/5"
                 )}
               >
                 {word}

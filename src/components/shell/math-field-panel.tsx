@@ -145,11 +145,11 @@ export function MathFieldPanel({
   }, [layout]);
 
   return (
-    <div className="mathkb mx-auto flex w-full max-w-2xl shrink-0 flex-col border-t border-purple/10 bg-surface">
+    <div className="mathkb mx-auto flex w-full max-w-2xl shrink-0 flex-col border-t border-border bg-surface">
       <div className="flex items-center gap-2 px-3 py-2">
         <div
           ref={hostRef}
-          className="min-w-0 flex-1 overflow-x-auto rounded-2xl border border-purple/15 bg-control px-3 py-2"
+          className="min-w-0 flex-1 overflow-x-auto rounded-2xl border border-border bg-control px-3 py-2"
         />
         <button
           onPointerDown={(e) => e.preventDefault()}

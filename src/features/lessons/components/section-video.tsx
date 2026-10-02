@@ -216,7 +216,7 @@ export function SectionVideoPlayer({
       : undefined;
 
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-purple/15 bg-control">
+    <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border bg-control">
       {playing && youtubeId ? (
         <iframe
           src={`${EMBED_ORIGIN}/embed/${youtubeId}?${PLAYER_PARAMS}`}

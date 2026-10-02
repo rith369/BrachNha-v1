@@ -54,7 +54,7 @@ export function FriendStreakHeader({
   const yourName = userName || you.name;
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-purple/10 bg-surface px-4 py-6 text-center shadow-panel md:py-8">
+    <div className="relative overflow-hidden rounded-2xl border border-border bg-surface px-4 py-6 text-center shadow-panel md:py-8">
       <CelebrationAnimation active={celebrating} />
 
       <div className="relative mx-auto flex w-fit items-center justify-center gap-2 md:gap-3">
@@ -103,7 +103,7 @@ export function FriendStreakHeader({
           the DOM is not announced. */}
       <div
         role="status"
-        className="mt-3 border-t border-purple/8 pt-3 text-xs font-extrabold md:text-sm"
+        className="mt-3 border-t border-border pt-3 text-xs font-extrabold md:text-sm"
       >
         <span
           className={cn(

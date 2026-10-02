@@ -648,7 +648,7 @@ export function ChatOverlay() {
         {msgs.length === 0 && (
           <>
             <div className="flex justify-start">
-              <div className="max-w-[80%] rounded-2xl border border-purple/10 bg-surface px-4 py-2.5 text-sm font-semibold text-text">
+              <div className="max-w-[80%] rounded-2xl border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-text">
                 {greeting}
               </div>
             </div>
@@ -661,7 +661,7 @@ export function ChatOverlay() {
                   <button
                     key={q}
                     onClick={() => send(q)}
-                    className="rounded-full border border-purple/15 bg-surface px-3 py-1.5 text-left text-xs font-bold text-purple transition hover:bg-purple/10"
+                    className="rounded-full border border-border bg-surface px-3 py-1.5 text-left text-xs font-bold text-purple transition hover:bg-purple/10"
                   >
                     {/* The exercise chip is LaTeX, so it typesets here exactly as
                         it will in the student's bubble once sent. Plain chips
@@ -693,7 +693,7 @@ export function ChatOverlay() {
                 className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm font-semibold whitespace-pre-wrap ${
                   m.role === "user"
                     ? "bg-brand text-white"
-                    : "border border-purple/10 bg-surface text-text"
+                    : "border border-border bg-surface text-text"
                 }`}
               >
                 {m.image && (
@@ -722,7 +722,7 @@ export function ChatOverlay() {
             <div className="flex justify-start">
               <button
                 onClick={() => send(SHOW_SOLUTION[lang])}
-                className="flex items-center gap-1.5 rounded-full border border-purple/20 bg-surface px-3 py-1.5 text-xs font-extrabold text-purple transition hover:bg-purple/10"
+                className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-extrabold text-purple transition hover:bg-purple/10"
               >
                 <Lightbulb className="size-3.5" strokeWidth={2.5} />
                 {lang === "en" ? "Show full solution" : "បង្ហាញដំណោះស្រាយពេញ"}
@@ -737,7 +737,7 @@ export function ChatOverlay() {
           <div className="flex justify-start">
             <button
               onClick={() => void retry()}
-              className="flex items-center gap-1.5 rounded-full border border-purple/20 bg-surface px-3 py-1.5 text-xs font-extrabold text-purple transition hover:bg-purple/10"
+              className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-extrabold text-purple transition hover:bg-purple/10"
             >
               <RotateCcw className="size-3.5" strokeWidth={2.5} />
               {lang === "en" ? "Try again" : "ព្យាយាមម្តងទៀត"}
@@ -747,7 +747,7 @@ export function ChatOverlay() {
 
         {loading && !msgs[msgs.length - 1]?.text && (
           <div className="flex justify-start">
-            <div className="flex items-center gap-1.5 rounded-2xl border border-purple/10 bg-surface px-4 py-2.5">
+            <div className="flex items-center gap-1.5 rounded-2xl border border-border bg-surface px-4 py-2.5">
               <Bot className="size-3.5 text-purple" />
               <span className="text-xs font-bold text-muted">...</span>
             </div>
@@ -757,7 +757,7 @@ export function ChatOverlay() {
       </div>
 
       {/* Input */}
-      <div className="mx-auto w-full max-w-2xl shrink-0 border-t border-purple/10 p-3">
+      <div className="mx-auto w-full max-w-2xl shrink-0 border-t border-border p-3">
         {left !== null && left <= LOW_LEFT && (
           <div
             className={cn(
@@ -817,7 +817,7 @@ export function ChatOverlay() {
                   : "សួរអំពីរូបភាពនេះ..."
                 : t.askQuestion
             }
-            className="min-w-0 flex-1 rounded-full border border-purple/15 bg-surface px-4 py-2.5 text-sm font-semibold outline-none focus:border-purple/40"
+            className="min-w-0 flex-1 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-semibold outline-none focus:border-purple"
           />
           {/* While an answer is coming, Send becomes Stop: a long answer to the
               wrong question should not have to be sat through. */}
@@ -848,7 +848,7 @@ export function ChatOverlay() {
       {mode === "math" && (
         <Suspense
           fallback={
-            <div className="mx-auto flex h-[332px] w-full max-w-2xl shrink-0 items-center justify-center border-t border-purple/10 bg-surface text-xs font-bold text-muted">
+            <div className="mx-auto flex h-[332px] w-full max-w-2xl shrink-0 items-center justify-center border-t border-border bg-surface text-xs font-bold text-muted">
               {t.mathKeyboard}…
             </div>
           }
@@ -1003,7 +1003,7 @@ function HistoryPanel({
       transition={{ duration: 0.24, ease: [0.4, 0, 0.2, 1] }}
       className="absolute inset-0 z-10 flex flex-col bg-bg"
     >
-      <div className="mx-auto flex w-full max-w-2xl shrink-0 items-center justify-between gap-2 border-b border-purple/10 px-4 pt-4 pb-3">
+      <div className="mx-auto flex w-full max-w-2xl shrink-0 items-center justify-between gap-2 border-b border-border px-4 pt-4 pb-3">
         <button
           onClick={onBack}
           className="flex items-center gap-1.5 rounded-full bg-purple/10 px-3 py-1.5 text-xs font-extrabold text-purple transition hover:bg-purple/20"
@@ -1045,7 +1045,7 @@ function HistoryPanel({
                   className={cn(
                     "mb-1 flex items-center gap-3 rounded-2xl px-4 py-3 transition",
                     c.id === activeId
-                      ? "border border-purple/20 bg-linear-to-r from-pink/10 to-purple/10"
+                      ? "border border-border bg-secondary"
                       : "hover:bg-purple/8"
                   )}
                 >
@@ -1065,7 +1065,7 @@ function HistoryPanel({
                     <div className="flex shrink-0 items-center gap-1.5">
                       <button
                         onClick={() => setConfirmingId(null)}
-                        className="rounded-full border border-purple/20 bg-surface px-2.5 py-1 text-[11px] font-extrabold text-purple"
+                        className="rounded-full border border-border bg-surface px-2.5 py-1 text-[11px] font-extrabold text-purple"
                       >
                         {t.cancelDelete}
                       </button>

@@ -58,7 +58,7 @@ export function LeaderboardControls({
                 "flex flex-col items-center justify-center gap-1 rounded-2xl border px-2 py-2.5 text-[11px] font-extrabold transition md:flex-row md:gap-2 md:py-3 md:text-xs",
                 active
                   ? "border-transparent bg-brand text-on-brand shadow-cta"
-                  : "border-purple/10 bg-surface text-muted hover:bg-purple/8 hover:text-text"
+                  : "border-border bg-surface text-muted hover:bg-purple/8 hover:text-text"
               )}
             >
               <Icon
@@ -74,7 +74,7 @@ export function LeaderboardControls({
       <div
         role="group"
         aria-label={t.periodWeekly}
-        className="flex items-center gap-1 rounded-full border border-purple/10 bg-surface p-1"
+        className="flex items-center gap-1 rounded-full border border-border bg-surface p-1"
       >
         {PERIODS.map((p) => {
           const active = period === p;

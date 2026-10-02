@@ -92,7 +92,7 @@ export function InvitePanel({
   return (
     <div
       className={cn(
-        "mx-auto w-full max-w-xs rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel-sm",
+        "mx-auto w-full max-w-xs rounded-2xl border border-border bg-surface p-3 shadow-panel-sm",
         className
       )}
     >
@@ -120,8 +120,8 @@ export function InvitePanel({
           className={cn(
             "flex flex-1 items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-[11px] font-extrabold transition",
             copied
-              ? "border-mint/40 bg-mint/10 text-mint"
-              : "border-purple/20 bg-purple/8 text-purple hover:bg-purple/15"
+              ? "border-border bg-mint/30 text-text"
+              : "border-border bg-purple/8 text-purple hover:bg-purple/15"
           )}
         >
           {copied ? (

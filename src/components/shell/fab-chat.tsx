@@ -162,7 +162,7 @@ export function FabChat() {
         <button
           type="button"
           onClick={openMentor}
-          className="relative rounded-2xl border border-purple/30 bg-elevated py-2 pr-7 pl-3 text-left text-sm leading-snug font-semibold text-purple shadow-panel [overflow-wrap:anywhere]"
+          className="relative rounded-2xl border border-border bg-elevated py-2 pr-7 pl-3 text-left text-sm leading-snug font-semibold text-purple shadow-panel [overflow-wrap:anywhere]"
         >
           {/* Two lines, the greeting and then the question, so a narrow
               phone never breaks the Khmer question mid-phrase. */}
@@ -172,7 +172,7 @@ export function FabChat() {
               so it reads as one outline with the bubble. */}
           <span
             aria-hidden
-            className="absolute top-1/2 -right-1.5 size-3 -translate-y-1/2 rotate-45 border-t border-r border-purple/30 bg-elevated"
+            className="absolute top-1/2 -right-1.5 size-3 -translate-y-1/2 rotate-45 border-t border-r border-border bg-elevated"
           />
         </button>
         {/* A sibling, never nested: a button inside a button is invalid. */}
@@ -198,7 +198,7 @@ export function FabChat() {
       onClick={openMentor}
       aria-label="KruAI"
       className={cn(
-        "animate-fab-pulse absolute right-4 z-40 flex size-13 items-center justify-center rounded-full bg-linear-to-br from-[var(--brand-pink)] to-[var(--brand-purple)] shadow-cta-lg transition-opacity duration-150 lg:right-6",
+        "animate-fab-pulse absolute right-4 z-40 flex size-13 items-center justify-center rounded-2xl border border-border bg-[var(--brand-purple)] shadow-cta-lg transition-opacity duration-150 lg:right-6",
         // Faded and click-through rather than hidden outright: it stays
         // legible that the mentor is still there, one scroll away, while
         // guaranteeing the control underneath — not the FAB — receives the

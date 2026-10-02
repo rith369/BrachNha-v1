@@ -32,7 +32,7 @@ export function ScoreHero({ summary }: { summary: ProgressSummary }) {
   const flat = changePct === 0;
 
   return (
-    <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+    <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
       <div className="flex items-center gap-4">
         <div className="flex-1">
           {/* Uppercase and wide letter-spacing in ENGLISH ONLY. Khmer has no
@@ -115,7 +115,7 @@ export function ScoreHero({ summary }: { summary: ProgressSummary }) {
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-4 gap-2 border-t border-purple/8 pt-3.5">
+      <div className="mt-4 grid grid-cols-4 gap-2 border-t border-border pt-3.5">
         <Metric
           value={String(summary.questionsThisMonth)}
           label={c.tileQuestions}

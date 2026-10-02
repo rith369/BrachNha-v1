@@ -133,7 +133,7 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
   const showBest = metric === "xp" && bestDay !== null;
 
   return (
-    <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+    <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
       {/* flex-wrap, not a breakpoint: the toggle drops to its own line once the
           card is too narrow for the icon + title + pills on one row. ml-auto on
           the toggle rather than justify-between here — with justify-between a
@@ -144,7 +144,7 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
           {/* Brand fill, not the lifted accent scale: a white icon sits ON this,
               so it needs the identical-in-both-themes gradient — same rule as
               the FAB and the wordmark. */}
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-[var(--brand-blue)] to-[var(--brand-purple)] shadow-cta">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-border bg-[var(--brand-purple)] shadow-cta">
             <Sparkles className="size-4.5 text-white" strokeWidth={2.25} />
           </div>
           <div className="min-w-0">
@@ -168,7 +168,7 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
         <div
           role="group"
           aria-label={c.metricGroup}
-          className="ml-auto flex shrink-0 items-center gap-0.5 rounded-full border border-purple/10 bg-control p-0.5"
+          className="ml-auto flex shrink-0 items-center gap-0.5 rounded-full border border-border bg-control p-0.5"
         >
           {METRICS.map((m) => {
             const active = metric === m;
@@ -182,7 +182,7 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
                 className={cn(
                   "flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-extrabold whitespace-nowrap transition",
                   active
-                    ? "bg-linear-to-br from-[var(--brand-blue)] to-[var(--brand-purple)] text-on-brand shadow-cta"
+                    ? "border border-border bg-[var(--brand-purple)] text-on-brand shadow-cta"
                     : "text-muted hover:text-text"
                 )}
               >
@@ -264,7 +264,7 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
         </div>
       )}
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-purple/8 pt-3 text-[11px] font-bold">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3 text-[11px] font-bold">
         {/* Absent, not zeroed. The old version read the best day off the array
             unconditionally — on an empty week `indexOf(Math.max(...[]))` is -1
             and `week[-1].day` threw, and on an all-zero week it announced

@@ -87,7 +87,7 @@ export function ProfileIdentity() {
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               aria-label={t.editName}
-              className="min-w-0 flex-1 rounded-xl border border-purple/20 bg-surface px-3 py-1.5 text-sm font-bold text-text outline-none focus:border-purple/50"
+              className="min-w-0 flex-1 rounded-xl border border-border bg-surface px-3 py-1.5 text-sm font-bold text-text outline-none focus:border-purple"
             />
             <button
               type="submit"

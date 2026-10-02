@@ -30,19 +30,19 @@ export function MotivationHero() {
   }, [lang]);
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-pink/10 via-purple/10 to-blue/10 p-5">
-      <div className="flex items-center gap-1 text-xs font-extrabold text-purple">
+    <div className="relative overflow-hidden rounded-3xl border border-border bg-neo-yellow p-5 text-ink shadow-panel">
+      <div className="flex items-center gap-1 text-xs font-extrabold">
         <Sparkles className="size-3.5" strokeWidth={2.5} />
         {lang === "en" ? `Good Day, ${userName}!` : `ថ្ងៃល្អ, ${userName}!`}
       </div>
-      <div className="font-heading mt-1 text-2xl font-extrabold text-purple">
+      <div className="font-heading mt-1 text-2xl font-extrabold">
         {daysLeft} {lang === "en" ? "Days Left" : "ថ្ងៃទៅ"}
       </div>
-      <div className="mt-1.5 text-xs font-bold text-muted italic">
+      <div className="mt-1.5 text-xs font-bold text-ink/75 italic">
         &ldquo;{quote}&rdquo;
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-4 grid grid-cols-2 gap-2.5">
         {/* Stays a <Link> — it IS a link for anyone signed in, and keeping the
             href means middle-click and "open in new tab" still work. The guard
             only cancels the navigation for a guest so the prompt opens here
@@ -52,28 +52,28 @@ export function MotivationHero() {
           onClick={(e) => {
             if (!requireAuth("roadmap")) e.preventDefault();
           }}
-          className="flex items-center gap-1.5 rounded-full bg-pink/15 px-3.5 py-1.5 text-xs font-extrabold text-pink transition-transform active:scale-[0.98]"
+          className="flex items-center justify-center gap-1.5 rounded-xl border border-ink px-3 py-2 text-xs font-extrabold text-ink shadow-hard transition-transform active:translate-x-[3px] active:translate-y-[3px] active:shadow-none bg-white"
         >
           <Map className="size-3.5" strokeWidth={2.5} />
           {lang === "en" ? "Quest Map" : "ផែនទី"}
         </Link>
         <Link
           to="/exam"
-          className="flex items-center gap-1.5 rounded-full bg-blue/15 px-3.5 py-1.5 text-xs font-extrabold text-blue transition-transform active:scale-[0.98]"
+          className="flex items-center justify-center gap-1.5 rounded-xl border border-ink px-3 py-2 text-xs font-extrabold text-ink shadow-hard transition-transform active:translate-x-[3px] active:translate-y-[3px] active:shadow-none bg-neo-blue"
         >
           <ClipboardList className="size-3.5" strokeWidth={2.5} />
           {lang === "en" ? "Mock Exam" : "ប្រឡង"}
         </Link>
         <Link
           to="/progress"
-          className="flex items-center gap-1.5 rounded-full bg-purple/15 px-3.5 py-1.5 text-xs font-extrabold text-purple transition-transform active:scale-[0.98]"
+          className="flex items-center justify-center gap-1.5 rounded-xl border border-ink px-3 py-2 text-xs font-extrabold text-ink shadow-hard transition-transform active:translate-x-[3px] active:translate-y-[3px] active:shadow-none bg-neo-mint"
         >
           <LineChart className="size-3.5" strokeWidth={2.5} />
           {lang === "en" ? "Progress" : "ការរីកចម្រើន"}
         </Link>
         <Link
           to="/game"
-          className="flex items-center gap-1.5 rounded-full bg-yellow/15 px-3.5 py-1.5 text-xs font-extrabold text-yellow transition-transform active:scale-[0.98]"
+          className="flex items-center justify-center gap-1.5 rounded-xl border border-ink px-3 py-2 text-xs font-extrabold text-ink shadow-hard transition-transform active:translate-x-[3px] active:translate-y-[3px] active:shadow-none bg-neo-pink"
         >
           <Gamepad2 className="size-3.5" strokeWidth={2.5} />
           {lang === "en" ? "Game" : "ហ្គេម"}

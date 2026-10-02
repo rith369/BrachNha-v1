@@ -64,7 +64,7 @@ export function GameHistory() {
             <Link
               key={a.id}
               to={`/game/review/${a.competitionId}`}
-              className="flex items-center gap-3 rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel-sm transition hover:bg-purple/5"
+              className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-3 shadow-panel-sm transition hover:bg-purple/5"
             >
               <span
                 className={`shrink-0 rounded-full px-2 py-1 text-[9px] font-extrabold ${OUTCOME_STYLE[outcome]}`}

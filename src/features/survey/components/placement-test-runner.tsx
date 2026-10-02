@@ -81,8 +81,8 @@ export function PlacementTestRunner({
         <div
           className={`mb-4 rounded-xl border p-3 text-sm font-extrabold ${
             weak
-              ? "border-pink/20 bg-pink/8 text-pink"
-              : "border-mint/25 bg-mint/8 text-mint"
+              ? "border-border bg-pink/8 text-pink"
+              : "border-border bg-mint/8 text-mint"
           }`}
         >
           {weak ? t.weak : t.notWeak}
@@ -109,7 +109,7 @@ export function PlacementTestRunner({
   // a survey step card on a page that is itself narrow at every width, so
   // scaling it by viewport would blow it out of its container.
   const questionCard = (
-    <div className={focus ? focusCard : "rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel"}>
+    <div className={focus ? focusCard : "rounded-2xl border border-border bg-surface p-4 shadow-panel"}>
         <div
           className={
             "mb-2.5 text-purple " +
@@ -138,8 +138,8 @@ export function PlacementTestRunner({
                   : "rounded-xl border px-4 py-3 text-left text-sm font-bold transition") +
                 " " +
                 (answers[idx] === opt
-                  ? "border-purple/40 bg-purple/10 text-purple"
-                  : "border-purple/10 bg-surface text-text hover:bg-purple/5")
+                  ? "border-border bg-purple/30 text-text"
+                  : "border-border bg-surface text-text hover:bg-purple/5")
               }
             >
               {opt}
@@ -153,7 +153,7 @@ export function PlacementTestRunner({
     <div className="flex gap-2.5">
       <button
         onClick={idx > 0 ? () => setIdx(idx - 1) : onCancel}
-        className="flex-1 rounded-2xl border border-purple/20 bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
+        className="flex-1 rounded-2xl border border-border bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
       >
         ← {idx > 0 ? (lang === "en" ? "Prev" : "មុន") : (lang === "en" ? "Back" : "ត្រឡប់")}
       </button>

@@ -13,11 +13,11 @@ function toggleIn(list: string[], value: string) {
 }
 
 function chipClass(selected: boolean, tone: "pink" | "mint" | "purple") {
-  if (!selected) return "border-purple/10 bg-surface text-text hover:bg-purple/5";
+  if (!selected) return "border-border bg-surface text-text hover:bg-purple/5";
   return {
-    pink: "border-pink/40 bg-pink/10 text-pink",
-    mint: "border-mint/40 bg-mint/10 text-mint",
-    purple: "border-purple/40 bg-purple/10 text-purple",
+    pink: "border-border bg-pink/30 text-text",
+    mint: "border-border bg-mint/30 text-text",
+    purple: "border-border bg-purple/30 text-text",
   }[tone];
 }
 
@@ -80,7 +80,7 @@ export function WeaknessStep({
           return (
             <div
               key={subject}
-              className="rounded-xl border border-purple/10 bg-purple/4 p-3"
+              className="rounded-xl border border-border bg-purple/4 p-3"
             >
               <div className="mb-2 text-sm font-extrabold">
                 {t[subject as TranslationKey]}
@@ -130,13 +130,13 @@ export function WeaknessStep({
                   <div className="grid grid-cols-2 gap-1.5">
                     <button
                       onClick={() => answer(subject, "weak")}
-                      className="rounded-lg border border-pink/30 bg-pink/8 px-2 py-2 text-[11px] font-bold text-pink"
+                      className="rounded-lg border border-border bg-pink/30 px-2 py-2 text-[11px] font-bold text-pink"
                     >
                       {t.weak}
                     </button>
                     <button
                       onClick={() => answer(subject, "notWeak")}
-                      className="rounded-lg border border-mint/30 bg-mint/8 px-2 py-2 text-[11px] font-bold text-mint"
+                      className="rounded-lg border border-border bg-mint/30 px-2 py-2 text-[11px] font-bold text-mint"
                     >
                       {t.notWeak}
                     </button>
@@ -156,8 +156,8 @@ export function WeaknessStep({
             className={
               "rounded-xl border px-3 py-2.5 text-sm font-bold transition " +
               (weaknesses.includes(s)
-                ? "border-pink/40 bg-pink/10 text-pink"
-                : "border-purple/10 bg-surface text-text hover:bg-purple/5")
+                ? "border-border bg-pink/30 text-text"
+                : "border-border bg-surface text-text hover:bg-purple/5")
             }
           >
             {t[s as TranslationKey]}

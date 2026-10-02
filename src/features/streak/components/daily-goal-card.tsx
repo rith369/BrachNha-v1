@@ -192,7 +192,7 @@ export function DailyGoalCard({
           {continueTaskLabel(dailyTaskLabel(next.id, lang), lang)}
         </Link>
       ) : (
-        <div className="w-full rounded-2xl border border-mint/30 bg-mint/10 px-4 py-3 text-center text-sm font-extrabold text-mint">
+        <div className="w-full rounded-2xl border border-border bg-mint/30 px-4 py-3 text-center text-sm font-extrabold text-mint">
           {c.goalComplete}
         </div>
       )}

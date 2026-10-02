@@ -249,7 +249,7 @@ export function StudyCalendar() {
         {!onThisMonth && (
           <button
             onClick={() => setShown(thisMonth)}
-            className="ml-auto rounded-full border border-purple/20 bg-purple/8 px-2.5 py-0.5 font-body text-[11px] font-extrabold text-purple transition active:scale-95"
+            className="ml-auto rounded-full border border-border bg-purple/8 px-2.5 py-0.5 font-body text-[11px] font-extrabold text-purple transition active:scale-95"
           >
             {t.calendarToday}
           </button>

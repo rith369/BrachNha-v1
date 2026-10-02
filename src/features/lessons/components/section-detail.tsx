@@ -204,10 +204,10 @@ function QuizQuestion({
                 focusOption +
                 " " +
                 (state === "correct"
-                  ? "border-mint/40 bg-mint/10 text-mint"
+                  ? "border-border bg-mint/30 text-text"
                   : state === "wrong"
-                    ? "border-pink/40 bg-pink/10 text-pink"
-                    : "border-purple/10 bg-surface text-text hover:bg-purple/5")
+                    ? "border-border bg-pink/30 text-text"
+                    : "border-border bg-surface text-text hover:bg-purple/5")
               }
             >
               <MathText text={opt} />
@@ -394,7 +394,7 @@ export function SectionDetail({
                   </div>
                 }
               >
-                <div className="h-64 w-full overflow-hidden rounded-2xl border border-purple/15 bg-surface md:h-80 lg:h-96">
+                <div className="h-64 w-full overflow-hidden rounded-2xl border border-border bg-surface md:h-80 lg:h-96">
                   <BrainModelViewer model={section.model3d} lang={lang} />
                 </div>
               </Suspense>

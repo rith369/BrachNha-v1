@@ -209,7 +209,7 @@ export function ReviewSession({
           <button
             onClick={() => rate("again")}
             aria-label="មិនទាន់ចងចាំ"
-            className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-pink/30 bg-pink/8 py-3.5 text-sm font-extrabold text-pink transition hover:bg-pink/15 active:scale-[0.98]"
+            className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-border bg-pink/30 py-3.5 text-sm font-extrabold text-pink transition hover:bg-pink/15 active:scale-[0.98]"
           >
             <X className="size-5" strokeWidth={3} />
             មិនទាន់ចងចាំ
@@ -217,7 +217,7 @@ export function ReviewSession({
           <button
             onClick={() => rate("good")}
             aria-label="ចងចាំ"
-            className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-mint/30 bg-mint/8 py-3.5 text-sm font-extrabold text-mint transition hover:bg-mint/15 active:scale-[0.98]"
+            className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-border bg-mint/30 py-3.5 text-sm font-extrabold text-mint transition hover:bg-mint/15 active:scale-[0.98]"
           >
             <Check className="size-5" strokeWidth={3} />
             ចងចាំ
@@ -227,10 +227,10 @@ export function ReviewSession({
     >
       <div>
         <div className="mb-4 flex items-center justify-center gap-3">
-          <span className="rounded-full border border-pink/30 px-3 py-1 text-xs font-extrabold text-pink">
+          <span className="rounded-full border border-border px-3 py-1 text-xs font-extrabold text-pink">
             {dontKnowSoFar}
           </span>
-          <span className="rounded-full border border-mint/30 px-3 py-1 text-xs font-extrabold text-mint">
+          <span className="rounded-full border border-border px-3 py-1 text-xs font-extrabold text-mint">
             {knowSoFar}
           </span>
         </div>

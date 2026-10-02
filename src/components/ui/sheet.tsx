@@ -58,13 +58,13 @@ function SheetContent({
         className={cn(
           "bg-surface data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col shadow-drawer transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-300",
           side === "left" &&
-            "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-4/5 max-w-[300px] border-r border-purple/10",
+            "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-4/5 max-w-[300px] border-r border-border",
           side === "right" &&
-            "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-4/5 max-w-[300px] border-l border-purple/10",
+            "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-4/5 max-w-[300px] border-l border-border",
           side === "top" &&
-            "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b border-purple/10",
+            "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b border-border",
           side === "bottom" &&
-            "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t border-purple/10",
+            "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t border-border",
           className
         )}
         {...props}

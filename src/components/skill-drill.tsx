@@ -73,7 +73,7 @@ export function DrillGroup({
             // state that jumps between siblings.
             <div
               key={qi}
-              className="rounded-xl border border-purple/10 bg-surface p-3"
+              className="rounded-xl border border-border bg-surface p-3"
             >
               <div className="mb-2 text-xs font-extrabold text-text md:text-sm">
                 {qi + 1}. <MathText text={question.prompt} />
@@ -96,12 +96,12 @@ export function DrillGroup({
                       className={cn(
                         "flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs font-bold transition md:text-sm",
                         !picked
-                          ? "border-purple/10 bg-surface text-text hover:bg-purple/5"
+                          ? "border-border bg-surface text-text hover:bg-purple/5"
                           : isCorrect
-                            ? "border-mint/30 bg-mint/10 text-mint"
+                            ? "border-border bg-mint/30 text-text"
                             : chosen
-                              ? "border-pink/30 bg-pink/8 text-pink"
-                              : "border-purple/10 bg-surface text-muted"
+                              ? "border-border bg-pink/30 text-text"
+                              : "border-border bg-surface text-muted"
                       )}
                     >
                       {picked && isCorrect && (
@@ -157,7 +157,7 @@ export function SkillDrill({
 
   return (
     <div className="mt-3">
-      <div className="rounded-xl border border-blue/20 bg-blue/5 p-3">
+      <div className="rounded-xl border border-border bg-blue/5 p-3">
         <div className="mb-1 text-[11px] font-extrabold text-blue md:text-xs">
           ចំណាំ · {help.label}
         </div>
@@ -175,7 +175,7 @@ export function SkillDrill({
           read past each other when they are one list. Pink stripe, no pink
           fill — one coloured element per card, the Callout rule. */}
       {help.mistake && (
-        <div className="mt-2 rounded-xl border border-pink/20 border-l-4 border-l-pink bg-surface p-3">
+        <div className="mt-2 rounded-xl border border-border border-l-4 border-l-pink bg-surface p-3">
           <div className="mb-1 text-[11px] font-extrabold text-pink md:text-xs">
             កំហុសញឹកញាប់
           </div>
@@ -188,7 +188,7 @@ export function SkillDrill({
       {!open ? (
         <button
           onClick={expand}
-          className="mt-2 w-full rounded-xl border border-purple/20 bg-purple/8 px-4 py-2 text-xs font-extrabold text-purple transition hover:bg-purple/12 md:text-sm"
+          className="mt-2 w-full rounded-xl border border-border bg-purple/8 px-4 py-2 text-xs font-extrabold text-purple transition hover:bg-purple/12 md:text-sm"
         >
           ហាត់បន្ថែម · លំហាត់ {total}
         </button>

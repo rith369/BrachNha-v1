@@ -22,7 +22,7 @@ export function GeneratedExamPanel({ onStart }: { onStart: () => void }) {
 
   return (
     <div>
-      <div className="mb-4 rounded-2xl border border-purple/10 bg-surface p-7 text-center shadow-panel">
+      <div className="mb-4 rounded-2xl border border-border bg-surface p-7 text-center shadow-panel">
         <div className="mb-3 text-5xl">🎯</div>
         <div className="mb-2 text-lg font-extrabold">ចាប់ផ្តើមប្រឡងសាកល្បង</div>
         <div className="mb-4 text-sm font-bold text-muted">
@@ -41,7 +41,7 @@ export function GeneratedExamPanel({ onStart }: { onStart: () => void }) {
       </div>
 
       {examResults.length > 0 && (
-        <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+        <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
           <div className="mb-3 text-sm font-extrabold">លទ្ធផលមុន</div>
           <div className="flex flex-col gap-2">
             {[...examResults]
@@ -50,7 +50,7 @@ export function GeneratedExamPanel({ onStart }: { onStart: () => void }) {
               .map((r) => (
                 <div
                   key={r.date}
-                  className="flex items-center justify-between rounded-xl border border-purple/8 bg-purple/4 px-3 py-2.5"
+                  className="flex items-center justify-between rounded-xl border border-border bg-purple/4 px-3 py-2.5"
                 >
                   <div>
                     <div className="text-sm font-extrabold">

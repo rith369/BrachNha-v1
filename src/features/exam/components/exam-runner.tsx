@@ -130,8 +130,8 @@ export function ExamRunner({
                 focusOption +
                 " " +
                 (answers[idx] === opt
-                  ? "border-purple/40 bg-purple/10 text-purple"
-                  : "border-purple/10 bg-surface text-text hover:bg-purple/5")
+                  ? "border-border bg-purple/30 text-text"
+                  : "border-border bg-surface text-text hover:bg-purple/5")
               }
             >
               {opt}

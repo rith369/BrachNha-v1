@@ -70,7 +70,7 @@ export function WorkPhotoStep({
       {questions.map((q, i) => (
         <div
           key={i}
-          className="rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel-sm"
+          className="rounded-2xl border border-border bg-surface p-3 shadow-panel-sm"
         >
           <div className="mb-1 text-[10px] font-extrabold text-muted">
             {t.questionLabel} {i + 1}

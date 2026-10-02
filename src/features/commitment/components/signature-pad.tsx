@@ -21,7 +21,7 @@ export interface SignatureValue {
 const PEN_WIDTH = 5; // matches SignatureDisplay's strokeWidth exactly
 
 const inputClasses =
-  "w-full rounded-xl border border-purple/10 bg-surface px-3.5 py-3 text-sm font-bold text-text outline-none focus:border-purple/40";
+  "w-full rounded-xl border border-border bg-surface px-3.5 py-3 text-sm font-bold text-text outline-none focus:border-purple";
 
 export function SignaturePad({
   lang,
@@ -166,7 +166,7 @@ export function SignaturePad({
     }`;
 
   return (
-    <div className="rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel">
+    <div className="rounded-2xl border border-border bg-surface p-3 shadow-panel">
       <div className="mb-3 flex gap-1 rounded-xl bg-purple/5 p-1">
         <button
           type="button"
@@ -210,7 +210,7 @@ export function SignaturePad({
               </span>
             )}
           </div>
-          <div className="mt-1 flex items-center justify-between border-t border-dashed border-purple/20 pt-2">
+          <div className="mt-1 flex items-center justify-between border-t border-dashed border-border pt-2">
             <span className="text-[11px] font-bold text-muted">
               {c.drawHint}
             </span>

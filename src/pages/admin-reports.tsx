@@ -120,7 +120,7 @@ function ReportCard({
   }
 
   return (
-    <div className="flex gap-3 rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel-sm">
+    <div className="flex gap-3 rounded-2xl border border-border bg-surface p-3 shadow-panel-sm">
       {item.url ? (
         // A plain link to the full image, like the battle review's own strip:
         // the browser's viewer gives zoom for free.
@@ -128,7 +128,7 @@ function ReportCard({
           href={item.url}
           target="_blank"
           rel="noreferrer"
-          className="block size-28 shrink-0 overflow-hidden rounded-xl border border-purple/10 bg-control md:size-36"
+          className="block size-28 shrink-0 overflow-hidden rounded-xl border border-border bg-control md:size-36"
         >
           <img src={item.url} alt="" className="size-full object-cover" />
         </a>
@@ -173,7 +173,7 @@ function ReportCard({
             type="button"
             disabled={busy}
             onClick={() => void act("keep")}
-            className="flex items-center gap-1 rounded-xl border border-mint/30 bg-mint/10 px-3 py-1.5 text-xs font-extrabold text-mint disabled:opacity-50"
+            className="flex items-center gap-1 rounded-xl border border-border bg-mint/30 px-3 py-1.5 text-xs font-extrabold text-mint disabled:opacity-50"
           >
             <Check className="size-3.5" strokeWidth={3} />
             {c.keep}
@@ -186,7 +186,7 @@ function ReportCard({
               "flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-extrabold disabled:opacity-50 " +
               (armed
                 ? "bg-[var(--brand-pink)] text-white"
-                : "border border-pink/30 bg-pink/8 text-pink")
+                : "border border-border bg-pink/30 text-text")
             }
           >
             <Trash2 className="size-3.5" strokeWidth={2.5} />
@@ -256,7 +256,7 @@ export default function AdminReportsPage() {
         )}
 
         {access === "denied" && (
-          <div className="mt-6 rounded-2xl border border-purple/10 bg-surface p-5 text-center shadow-panel">
+          <div className="mt-6 rounded-2xl border border-border bg-surface p-5 text-center shadow-panel">
             <p className="text-sm font-bold">{c.denied}</p>
             <Link
               to="/"
@@ -277,7 +277,7 @@ export default function AdminReportsPage() {
               <p className="text-sm font-bold text-pink">{c.failed}</p>
             )}
             {load === "ready" && items.length === 0 && (
-              <div className="rounded-2xl border border-purple/10 bg-surface p-5 text-center text-sm font-bold text-muted shadow-panel">
+              <div className="rounded-2xl border border-border bg-surface p-5 text-center text-sm font-bold text-muted shadow-panel">
                 {c.empty}
               </div>
             )}

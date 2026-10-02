@@ -27,7 +27,7 @@ export function StudiedStep({
       <div className="mb-4 flex flex-col gap-2">
         <button
           onClick={() => onAnswer(false)}
-          className="w-full rounded-xl border border-mint/40 bg-mint/10 px-3 py-3 text-sm font-bold text-mint transition hover:bg-mint/15"
+          className="w-full rounded-xl border border-border bg-mint/30 px-3 py-3 text-sm font-bold text-mint transition hover:bg-mint/15"
         >
           {t.notStudiedYet}
         </button>
@@ -35,7 +35,7 @@ export function StudiedStep({
         {/* A div, not a button — it does nothing, and the sidebar renders its
             unbuilt routes the same way (nav-items with href: null). A <button>
             here would invite a tap and answer it with silence. */}
-        <div className="flex w-full cursor-default items-center justify-center gap-2 rounded-xl border border-purple/10 bg-surface px-3 py-3 text-sm font-bold text-text opacity-45">
+        <div className="flex w-full cursor-default items-center justify-center gap-2 rounded-xl border border-border bg-surface px-3 py-3 text-sm font-bold text-text opacity-45">
           {t.alreadyStudied}
           <span className="rounded-full bg-purple/8 px-2 py-0.5 text-[9px] font-extrabold text-muted">
             {lang === "en" ? "Soon" : "ឆាប់ៗ"}

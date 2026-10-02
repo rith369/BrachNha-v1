@@ -119,7 +119,7 @@ export function ActivityHeatmap({ contentLog }: { contentLog: ContentLog }) {
                 <div
                   key={key}
                   aria-hidden="true"
-                  className="aspect-square rounded-md border border-dashed border-purple/15"
+                  className="aspect-square rounded-md border border-dashed border-border"
                 />
               );
             }
@@ -138,7 +138,7 @@ export function ActivityHeatmap({ contentLog }: { contentLog: ContentLog }) {
                 {open && (
                   <div
                     role="tooltip"
-                    className={`absolute bottom-full z-30 mb-1.5 rounded-lg border border-purple/15 bg-elevated px-2.5 py-1.5 text-[10px] font-bold whitespace-nowrap text-text shadow-panel-sm ${
+                    className={`absolute bottom-full z-30 mb-1.5 rounded-lg border border-border bg-elevated px-2.5 py-1.5 text-[10px] font-bold whitespace-nowrap text-text shadow-panel-sm ${
                       di <= 1 ? "left-0" : di >= 5 ? "right-0" : "left-1/2 -translate-x-1/2"
                     }`}
                   >

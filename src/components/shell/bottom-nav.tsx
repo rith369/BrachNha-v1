@@ -29,7 +29,7 @@ export function BottomNav() {
     // lg:hidden, so the blur only ever ran where it cost the most and never
     // where there was headroom for it. The bar is fully opaque now, which is
     // what the translucency was approximating anyway.
-    <div className="shrink-0 border-t border-purple/10 bg-surface lg:hidden">
+    <div className="shrink-0 border-t border-border bg-surface lg:hidden">
       <div className="mx-auto flex w-full max-w-lg items-center justify-around px-2 pt-2 pb-5">
         {bottomNavItems.map((item) => {
           // A sub-page keeps its section lit (/exam/subjects under Mock Exam).
@@ -45,17 +45,17 @@ export function BottomNav() {
               to={item.href ?? "#"}
               className={cn(
                 "flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 transition",
-                active && "bg-purple/10"
+                active && "border border-border bg-neo-yellow shadow-panel-sm"
               )}
             >
               <Icon
-                className={cn("size-5", active ? "text-purple" : "text-muted")}
+                className={cn("size-5", active ? "text-ink" : "text-muted")}
                 strokeWidth={2.25}
               />
               <span
                 className={cn(
                   "text-[10px] font-extrabold",
-                  active ? "text-purple" : "text-muted"
+                  active ? "text-ink" : "text-muted"
                 )}
               >
                 {(item.shortLabel ?? item.label)[lang]}

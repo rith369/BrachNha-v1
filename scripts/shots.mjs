@@ -80,6 +80,9 @@ const ROUTES = [
   // live one level down and land on the past-papers one.
   { name: "exam", path: "/exam" },
   { name: "exam-subjects", path: "/exam/subjects" },
+  // The 2-day simulation's briefing screen. It scrolled sideways at every width
+  // for as long as it had no entry here: a decorative orb hung past its edge.
+  { name: "exam-simulation", path: "/exam/simulation" },
   { name: "progress", path: "/progress" },
   { name: "game", path: "/game" },
   { name: "grade-prediction", path: "/grade-prediction" },

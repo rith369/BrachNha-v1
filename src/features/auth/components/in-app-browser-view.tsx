@@ -91,7 +91,7 @@ export function InAppBrowserView() {
             instruction has to be able to switch before following it. */}
         <button
           onClick={() => setLang(lang === "en" ? "km" : "en")}
-          className="flex items-center gap-1.5 rounded-full border border-purple/20 bg-purple/8 px-3 py-1.5 text-xs font-extrabold text-purple"
+          className="flex items-center gap-1.5 rounded-full border border-border bg-purple/8 px-3 py-1.5 text-xs font-extrabold text-purple"
         >
           <Flag code={lang === "en" ? "kh" : "gb"} className="size-3.5" />
           {lang === "en" ? "ខ្មែរ" : "EN"}
@@ -113,7 +113,7 @@ export function InAppBrowserView() {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+        <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
           <button
             onClick={open}
             className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand px-6 py-3.5 text-sm font-extrabold text-white shadow-cta transition active:scale-[0.98]"

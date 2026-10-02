@@ -50,7 +50,7 @@ export function SubjectBarChart({ summary }: { summary: ProgressSummary }) {
   const empty = subjects.every((s) => s.questions === 0);
 
   return (
-    <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+    <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
       <div className="mb-3">
         <div className="font-heading text-sm font-extrabold">
           <TitleWithTip text={c.answeredTitle} label={c.answeredAbout}>

@@ -228,6 +228,70 @@ the rule, not the language.
   - If options carry Khmer letter prefixes (`"ក. "`, `"ខ. "`, `"គ. "`, `"ឃ. "`), ensure both the option string and the `correct` field match, and that index 0 is always labeled `ក`, index 1 `ខ`, index 2 `គ`, and index 3 `ឃ`.
   - Explanations must focus on mathematical steps or factual explanations rather than hardcoding "The answer is ក", so explanations remain robust.
 
+### The look is NEOBRUTALISM (1 Oct 2026)
+
+The user moved the app from the soft pink/purple gradient style to neobrutalism,
+after approving a preview canvas (light and dark). Text is UNCHANGED (same
+fonts and weights, the user's call). Almost all of it is token-level in
+`src/styles/globals.css`, so most components changed with no edit:
+
+- **Outlines.** `--color-border` is solid ink (`#141414` light, cream `#f4efe6`
+  dark), and `--default-border-width: 2px` in `@theme` makes every bare
+  `border` (and `border-t`, `divide-y`, …) 2px app-wide. New components just
+  write `border border-border`.
+- **Hard shadows, no blur.** `shadow-panel` / `-panel-sm` / `-cta` / `-cta-lg`
+  keep their names and are now `Npx Npx 0 0 var(--color-shadow)`: ink in light,
+  CREAM `#f4efe6` in dark, the same colour as the outlines (the user's call:
+  black in light, so white in dark). It was purple for one revision. `shadow-hard` /
+  `shadow-hard-sm` are INK in both themes, for things sitting on a bright fill.
+  They are not called `shadow-ink`: Tailwind would read that as a shadow COLOUR
+  because `--color-ink` exists too.
+- **Flat colour.** `bg-brand` and `bg-brand-tri` are one flat brand purple
+  (`#7c3aed`, white text 5.7:1); `bg-brand-tri` and `bg-flame` stay single-colour
+  gradient IMAGES because page titles clip them into text. **`bg-night` is the
+  ONE real gradient left** (navy to purple): it was flattened with the rest, and
+  the user asked for it back because the Bac II Simulation card in flat neo-blue
+  "is not premium". Don't flatten it again.
+- **Bright fills** `bg-neo-yellow / -pink / -mint / -blue / -orange / -red`,
+  identical in both themes, ALWAYS with `text-ink` (near-black in both themes,
+  never `text-text`, which turns cream in dark). Home's hero is `bg-neo-yellow`;
+  the active bottom-nav tab is a yellow sticker.
+- **Page and surfaces:** cream `#fff7e8` page, white cards; dark `#16131f` /
+  `#221e2e`. Corners one step tighter (`--radius-xl/2xl/3xl` overridden), pills
+  (`rounded-full`) unchanged.
+- **States keep their colour in the FILL, not the outline**: a selected or
+  correct/wrong option is `border-border bg-{mint|pink|purple}/30 text-text`
+  (the sweep turned every `border-x/30-50 bg-x/N text-x` triple into that).
+  A focused input is `focus:border-purple`.
+
+**The sweep that went with it:** ~310 tinted borders (`border-purple/10` and the
+like) became `border-border` across 104 files by script; hand-made gradients on
+the KruAI button, the drawer/sidebar active row, the language and theme
+switches, Grade Prediction, the pledge button, the Roadmap nodes and the weekly
+chart were flattened. **Left on purpose:** the dark overlay on the video poster
+(text legibility) and the subject-art placeholder. `features/practice/components/
+quiz-results.tsx` was skipped while another session had it open and may still
+carry a tinted border.
+
+**The Mock Exam chooser and `/exam/simulation` came in a second pass.** The
+simulation briefing (`exam-simulation-view.tsx`) had been built as a dark "glass"
+screen of its own: a fixed `#090b14` background in BOTH themes, frosted cards
+and blurred orbs. One orb sat at `-right-24` inside the page's `overflow-y-auto`
+scroller, which forces overflow-x to auto, so **the whole page scrolled
+sideways at every width**. Nothing caught it because `scripts/shots.mjs` had no
+route for it; it has one now (`exam-simulation`). The page is on the theme
+tokens throughout, each subject's icon tile is its own `--subject-*` fill under
+a white glyph, and the grade scale is the five neo fills. Its closing "Ready to
+test yourself?" block is the one exception: `bg-night` with the dot texture and
+a clipped yellow glow, matching the simulation card on `/exam`. **The rule it broke,
+for any decoration:** nothing may be positioned past its own box unless an
+ancestor clips it, because every page scroller here turns that into a sideways
+scroll.
+
+**The "two accent scales" section below still holds** for `--brand-*` vs
+`--color-*`; the new `--neo-*` fills are a third role (light fills under ink
+text) and must never carry white text.
+
 ### Theming: two accent scales, and why one isn't enough
 
 The app ships light **and** dark, **light by default**. `theme: "dark" | "light"`
@@ -2442,10 +2506,10 @@ refill-over-time rules and a paywall story nobody has designed.
 **`/exam` IS A CHOOSER NOW, and the two tabs below live at `/exam/subjects`**
 (18 Sep 2026). `features/exam/components/exam-hub.tsx` shows two cards:
 **វិញ្ញាសារតាមមុខវិជ្ជា** (Subject Mock Exams), a `<Link>` to `/exam/subjects`,
-and **ប្រឡងបាក់ឌុបសាកល្បង** (Bac II Simulation, the full 2-day exam), which is a
-dimmed `<div>` with a `ឆាប់ៗនេះ` chip because nothing is designed behind it yet
-— the user will specify it later. Don't make it tappable until it has somewhere
-to go. The tabs are a ROUTE rather than state in the hub so the phone's back
+and **ប្រឡងបាក់ឌុបសាកល្បង** (Bac II Simulation, the full 2-day exam). That card
+was a dimmed `<div>` until `/exam/simulation` existed; it is a `<Link>` to that
+briefing screen now. The briefing's "Enter Day 1 Exam" still lands on
+`/exam/subjects`, since no 2-day runner is built. The tabs are a ROUTE rather than state in the hub so the phone's back
 button steps tabs → chooser, the same reason `/practice`'s levels are routes;
 `ExamView` carries a `<Link to="/exam">` back link and its title is now
 វិញ្ញាសារតាមមុខវិជ្ជា. Everything below describes `/exam/subjects`. The chooser
@@ -2454,17 +2518,19 @@ is Khmer-only too, and uses Lucide icons, not the reference sketch's emoji.
 The chooser was then restyled on request ("make it look cool"). Three blocks:
 a **countdown card** whose numbers are all real (`daysUntilExam()`, plus the
 count and average of `examResults` — generated mocks only, so it agrees with
-Home's pill); the **subject card** as a `bg-brand` fill with the path nodes'
-black-mixed lip and press, glass icon tile and a row of `SubjectArt` avatars;
-and the **simulation card** on a new `bg-night` utility
-(`--brand-night-from/to`, brand scale — a fill under white text, identical in
-both themes) with a padlock chip, dotted texture and two dashed "day" tiles.
-**Only the card that goes somewhere gets the lip** — the simulation card must
-stay unpressable-looking until it is built. Stacked on phones (two 136px columns
-broke the Khmer titles mid-word), two columns from `md`. Nothing loops; the
-blurred blobs are static. `scripts/shots.mjs` reports soft hits on `exam` at
-every width because those decorative blobs sit past their card's box — they are
-clipped by `overflow-hidden`, and there is no hard overflow.
+Home's pill); the **subject card** as a `bg-brand` fill under white text with
+an icon tile and a row of `SubjectArt` avatars; and the **simulation card**,
+which now LINKS to `/exam/simulation` (the 2-day briefing screen) and so is
+pressable too. **Since the neobrutalism pass (1 Oct 2026)** both cards carry a
+2px outline and a hard `shadow-panel` they sink into on `:active` (the black
+"lip" is gone). The subject card is a flat `bg-brand`. **The simulation card
+KEEPS its night look**: the `bg-night` gradient, the dotted texture, the yellow
+glow and yellow accents under white text. It was briefly `bg-neo-blue` and the
+user had it reverted ("not premium"); the briefing screen's closing block uses
+the same look. Stacked on phones (two 136px columns broke the Khmer titles mid-word), two
+columns from `md`. `scripts/shots.mjs` still reports soft hits on `exam`: the
+large watermark glyph in each card's corner sits past its box and is clipped by
+`overflow-hidden`, and there is no hard overflow.
 
 **`BottomNav` and `SidebarNav` highlight on PREFIX now** (`pathname === href` or
 starts with `href + "/"`, with `/` excluded so Home doesn't match everything), so

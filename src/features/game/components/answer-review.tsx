@@ -69,7 +69,7 @@ export function AnswerReview({
         return (
           <div
             key={i}
-            className="rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel-sm md:p-4"
+            className="rounded-2xl border border-border bg-surface p-3 shadow-panel-sm md:p-4"
           >
             <div className="mb-1 text-[10px] font-extrabold text-muted md:text-xs">
               {t.questionLabel} {i + 1}
@@ -90,10 +90,10 @@ export function AnswerReview({
                     className={cn(
                       "flex items-start gap-2 rounded-xl border px-2.5 py-2 text-xs font-bold md:text-sm",
                       correct
-                        ? "border-mint/40 bg-mint/10 text-mint"
+                        ? "border-border bg-mint/30 text-text"
                         : isMine || isTheirs
-                          ? "border-pink/30 bg-pink/8 text-text"
-                          : "border-purple/10 bg-control text-muted"
+                          ? "border-border bg-pink/30 text-text"
+                          : "border-border bg-control text-muted"
                     )}
                   >
                     {correct && (
@@ -118,7 +118,7 @@ export function AnswerReview({
             </div>
 
             {question.explanation && (
-              <div className="mt-3 rounded-xl border border-purple/10 bg-purple/5 p-3 text-xs text-muted md:text-sm">
+              <div className="mt-3 rounded-xl border border-border bg-purple/5 p-3 text-xs text-muted md:text-sm">
                 <div className="mb-1 font-extrabold text-text">
                   {lang === "km" ? "ការពន្យល់៖" : "Explanation:"}
                 </div>
@@ -148,7 +148,7 @@ export function AnswerReview({
             {/* The working for THIS question, under the answer it explains —
                 which is the whole point of photographing per question. */}
             {renderExtra && (
-              <div className="mt-3 border-t border-purple/10 pt-3">
+              <div className="mt-3 border-t border-border pt-3">
                 {renderExtra(i)}
               </div>
             )}

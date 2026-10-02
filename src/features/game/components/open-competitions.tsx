@@ -145,7 +145,7 @@ export function OpenCompetitions() {
       </div>
 
       {state !== "ready" && (
-        <div className="rounded-2xl border border-purple/10 bg-surface p-4 text-center text-xs font-bold text-muted shadow-panel-sm">
+        <div className="rounded-2xl border border-border bg-surface p-4 text-center text-xs font-bold text-muted shadow-panel-sm">
           {state === "loading"
             ? t.loadingCompetitions
             : state === "guest"
@@ -158,7 +158,7 @@ export function OpenCompetitions() {
           played them all" look identical in the data and mean opposite things —
           one is an empty app, the other is a finished student. */}
       {state === "ready" && visible.length === 0 && (
-        <div className="rounded-2xl border border-purple/10 bg-surface p-4 text-center text-xs font-bold text-muted shadow-panel-sm">
+        <div className="rounded-2xl border border-border bg-surface p-4 text-center text-xs font-bold text-muted shadow-panel-sm">
           {rows.length === 0 ? t.competitionsEmpty : t.allPlayed}
         </div>
       )}
@@ -171,7 +171,7 @@ export function OpenCompetitions() {
             return (
               <div
                 key={c.id}
-                className="flex items-center gap-3 rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel-sm"
+                className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-3 shadow-panel-sm"
               >
                 <Avatar
                   // Derived from the account id, so the same student looks the

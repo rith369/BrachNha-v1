@@ -288,10 +288,10 @@ export function QuizRunner({
                     focusOption +
                     " " +
                     (state === "correct"
-                      ? "border-mint/40 bg-mint/10 text-mint"
+                      ? "border-border bg-mint/30 text-text"
                       : state === "wrong"
-                        ? "border-pink/40 bg-pink/10 text-pink"
-                        : "border-purple/10 bg-surface text-text hover:bg-purple/5")
+                        ? "border-border bg-pink/30 text-text"
+                        : "border-border bg-surface text-text hover:bg-purple/5")
                   }
                 >
                   <MathText text={opt} />

@@ -49,7 +49,7 @@ export function PredictionFactors({
   ];
 
   return (
-    <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+    <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
       <div className="mb-3 font-heading text-sm font-extrabold">
         {t.whatsAffecting}
       </div>

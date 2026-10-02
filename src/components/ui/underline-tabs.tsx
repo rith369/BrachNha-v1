@@ -33,7 +33,7 @@ export function UnderlineTabs<T extends string>({
   return (
     <div
       role="tablist"
-      className={cn("mb-4 flex border-b border-purple/10", className)}
+      className={cn("mb-4 flex border-b border-border", className)}
     >
       {tabs.map((tab) => {
         const active = tab.id === value;

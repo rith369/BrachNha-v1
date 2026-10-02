@@ -392,7 +392,7 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
         <Link
           to="/lessons"
           aria-label="ត្រឡប់"
-          className="mb-3 flex size-9 shrink-0 items-center justify-center rounded-xl border border-purple/20 bg-purple/8 text-purple transition hover:bg-purple/15"
+          className="mb-3 flex size-9 shrink-0 items-center justify-center rounded-xl border border-border bg-purple/8 text-purple transition hover:bg-purple/15"
         >
           <ArrowLeft className="size-4.5" strokeWidth={2.5} />
         </Link>

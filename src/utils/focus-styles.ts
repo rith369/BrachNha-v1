@@ -20,7 +20,7 @@
 
 /** The panel a question sits in. Keeps the app's card + shadow identity. */
 export const focusCard =
-  "rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel md:p-6 lg:p-8";
+  "rounded-2xl border border-border bg-surface p-4 shadow-panel md:p-6 lg:p-8";
 
 /** Small uppercase label above a prompt (subject name, step name). */
 export const focusKicker =

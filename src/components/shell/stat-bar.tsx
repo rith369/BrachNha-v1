@@ -62,7 +62,7 @@ export function StatBar({
       {items.map((it) => (
         <div
           key={it.label}
-          className="flex items-center gap-1 rounded-full border border-purple/15 bg-surface px-2 py-1 shadow-panel-sm"
+          className="flex items-center gap-1 rounded-full border border-border bg-surface px-2 py-1 shadow-panel-sm"
         >
           <it.icon
             className={cn("size-3.5 shrink-0", it.tone)}
@@ -89,7 +89,7 @@ export function StatBar({
                 ? "ប្តូរទៅភ្លឺ"
                 : "ប្តូរទៅងងឹត"
           }
-          className="flex size-7 shrink-0 items-center justify-center rounded-full border border-purple/15 bg-surface text-muted shadow-panel-sm transition hover:text-purple"
+          className="flex size-7 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-muted shadow-panel-sm transition hover:text-purple"
         >
           {dark ? (
             <Sun className="size-3.5" strokeWidth={2.5} />

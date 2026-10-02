@@ -52,7 +52,7 @@ export function PlacementTestPage({ subject }: { subject: string }) {
       <div className="mb-4 text-xs font-bold text-muted">
         {t[subject as TranslationKey] ?? subject}
       </div>
-      <div className="rounded-2xl border border-purple/10 bg-surface p-6 text-center shadow-panel">
+      <div className="rounded-2xl border border-border bg-surface p-6 text-center shadow-panel">
         <div className="mb-3 text-sm font-bold text-muted">
           🔬 {t.testComingSoon}
         </div>

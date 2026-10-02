@@ -108,7 +108,7 @@ export function PersonalSummary({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 border-t border-purple/8 pt-3">
+      <div className="grid grid-cols-2 gap-2 border-t border-border pt-3">
         {supportingMetrics(metric).map((m) => {
           const supportMeta = METRIC_META[m];
           const SupportIcon = supportMeta.icon;

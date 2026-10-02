@@ -71,7 +71,7 @@ function NavRow({
     // is pointer-driven and has 12 rows plus two switchers to fit in one column,
     // so it tightens slightly rather than scrolling on a 768px-tall laptop.
     "flex items-center gap-3 rounded-2xl px-3.5 py-3 transition lg:py-2.5",
-    active && "border border-purple/20 bg-linear-to-r from-pink/10 to-purple/10",
+    active && "border border-border bg-secondary shadow-panel-sm",
     !item.href && "cursor-default opacity-45",
     item.href && !active && "hover:bg-purple/8"
   );
@@ -93,7 +93,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <>
-      <div className="shrink-0 border-b border-purple/10 bg-[image:var(--drawer-header)] px-6 pt-4 pr-14 pb-5 lg:pt-6 lg:pr-6">
+      <div className="shrink-0 border-b border-border bg-[image:var(--drawer-header)] px-6 pt-4 pr-14 pb-5 lg:pt-6 lg:pr-6">
         <Wordmark
           subtitle={
             <div className="text-xs font-bold text-muted">
@@ -151,7 +151,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
       {/* Pinned below the nav rather than inside the scroll area: the list
           scrolls once there are enough nav items, and switching language or
           theme shouldn't require scrolling to find the control. */}
-      <div className="shrink-0 space-y-3 border-t border-purple/10 p-3">
+      <div className="shrink-0 space-y-3 border-t border-border p-3">
         <ThemeSwitcher />
         <LanguageSwitcher />
       </div>
@@ -170,7 +170,7 @@ export function Sidebar() {
     // "វិញ្ញាសារត្រៀមប្រឡង" are the long cases, and anything under ~240px
     // ellipsises them. Even at w-64 a 1024px laptop still leaves ~344px columns,
     // comfortably above the 288px a 320px phone already gives these cards.
-    <aside className="hidden w-64 shrink-0 flex-col border-r border-purple/10 bg-surface lg:flex xl:w-72">
+    <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-surface lg:flex xl:w-72">
       <SidebarNav />
     </aside>
   );

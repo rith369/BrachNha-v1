@@ -26,7 +26,7 @@ export function PredictionTrendChart({
   const trendUp = delta >= 0;
 
   return (
-    <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+    <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
       <div className="mb-3 flex items-start justify-between">
         <div>
           <div className="font-heading text-sm font-extrabold">

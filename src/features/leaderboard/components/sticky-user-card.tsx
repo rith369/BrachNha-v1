@@ -53,7 +53,7 @@ export function StickyUserCard({ lang, row, metric, gap, name }: Props) {
           This is the worst case for a backdrop-filter: a sticky element with a
           list scrolling underneath it, so the blur was recomputed on every
           frame of every scroll. See the same change in shell/bottom-nav.tsx. */}
-      <div className="rounded-2xl border border-purple/30 bg-elevated p-2.5 pr-16 shadow-panel">
+      <div className="rounded-2xl border border-border bg-elevated p-2.5 pr-16 shadow-panel">
         <div className="mb-1 text-[9px] font-extrabold tracking-widest text-muted uppercase">
           {t.yourRanking}
         </div>
@@ -64,7 +64,7 @@ export function StickyUserCard({ lang, row, metric, gap, name }: Props) {
           <Avatar
             seed={row.student.avatarSeed}
             name={name}
-            className="size-9 shrink-0 border-2 border-purple/30"
+            className="size-9 shrink-0 border-2 border-border"
           />
           <div className="min-w-0 flex-1">
             <div className="truncate text-[13px] font-extrabold md:text-sm">

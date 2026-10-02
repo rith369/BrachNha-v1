@@ -22,7 +22,7 @@ export function FocusAreas({ summary }: { summary: ProgressSummary }) {
         {c.focusTitle}
       </div>
       {areas.length === 0 ? (
-        <div className="rounded-2xl border border-purple/10 bg-surface p-3.5 text-xs font-bold text-muted shadow-panel-sm">
+        <div className="rounded-2xl border border-border bg-surface p-3.5 text-xs font-bold text-muted shadow-panel-sm">
           {c.focusEmpty(MIN_SAMPLE)}
         </div>
       ) : (
@@ -33,8 +33,8 @@ export function FocusAreas({ summary }: { summary: ProgressSummary }) {
               className={
                 "rounded-2xl border p-3.5 " +
                 (a.kind === "weak"
-                  ? "border-pink/20 bg-pink/6"
-                  : "border-mint/20 bg-mint/6")
+                  ? "border-border bg-pink/6"
+                  : "border-border bg-mint/6")
               }
             >
               <div className="mb-1.5 text-lg">{ICON[a.label]}</div>

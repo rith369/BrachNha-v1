@@ -95,7 +95,7 @@ function LessonRow({
   // StudiedStep and subject-card.tsx's zero-lesson tile.
   if (lesson.count === 0) {
     return (
-      <div className="mb-3 flex items-center gap-3 rounded-2xl border border-purple/10 bg-surface p-3.5 opacity-60">
+      <div className="mb-3 flex items-center gap-3 rounded-2xl border border-border bg-surface p-3.5 opacity-60">
         <div className="min-w-0 flex-1">
           <div className="font-heading truncate text-sm font-extrabold text-text md:text-base">
             {lessonHeading(lesson.lessonNumber, lesson.title)}

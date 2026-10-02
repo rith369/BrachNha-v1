@@ -266,7 +266,7 @@ export function InfoTip({
           ref={tipRef}
           id={id}
           role="tooltip"
-          className="absolute top-0 left-0 z-30 block w-56 max-w-[calc(100vw-2rem)] rounded-lg border border-purple/15 bg-elevated px-3 py-2 text-left [font-family:var(--font-body),sans-serif] text-[11px] leading-snug font-bold tracking-normal whitespace-normal normal-case text-text no-underline shadow-panel-sm"
+          className="absolute top-0 left-0 z-30 block w-56 max-w-[calc(100vw-2rem)] rounded-lg border border-border bg-elevated px-3 py-2 text-left [font-family:var(--font-body),sans-serif] text-[11px] leading-snug font-bold tracking-normal whitespace-normal normal-case text-text no-underline shadow-panel-sm"
         >
           {children}
         </span>

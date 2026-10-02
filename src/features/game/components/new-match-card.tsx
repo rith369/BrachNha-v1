@@ -111,7 +111,7 @@ export function NewMatchCard() {
     total > 0 && theirScore !== null ? Math.round((theirScore / total) * 100) : 0;
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-purple/10 bg-linear-to-br from-purple/8 via-pink/6 to-blue/8 p-4">
+    <div className="relative overflow-hidden rounded-2xl border border-border bg-surface p-4 shadow-panel">
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex w-fit items-center gap-1.5 rounded-full bg-surface/70 px-2.5 py-1">
           <span className="size-1.5 rounded-full bg-pink" />
@@ -181,7 +181,7 @@ export function NewMatchCard() {
             </>
           ) : (
             <>
-              <div className="mx-auto mb-1.5 flex size-14 items-center justify-center rounded-full border-2 border-dashed border-blue/40 font-heading text-xl font-extrabold text-blue/60">
+              <div className="mx-auto mb-1.5 flex size-14 items-center justify-center rounded-full border-2 border-dashed border-border font-heading text-xl font-extrabold text-blue/60">
                 ?
               </div>
               <div className="text-[11px] font-bold text-muted">

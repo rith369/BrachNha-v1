@@ -7,10 +7,10 @@ import type { ProgressSummary } from "../summary";
 import { buildStudyTips, type StudyTip, type TipTone } from "../study-tips";
 
 const TONE: Record<TipTone, string> = {
-  purple: "border-purple/20 bg-purple/6 text-purple",
-  pink: "border-pink/20 bg-pink/6 text-pink",
-  blue: "border-blue/20 bg-blue/6 text-blue",
-  mint: "border-mint/20 bg-mint/6 text-mint",
+  purple: "border-border bg-purple/6 text-purple",
+  pink: "border-border bg-pink/6 text-pink",
+  blue: "border-border bg-blue/6 text-blue",
+  mint: "border-border bg-mint/6 text-mint",
 };
 
 function TipBody({ tip }: { tip: StudyTip }) {

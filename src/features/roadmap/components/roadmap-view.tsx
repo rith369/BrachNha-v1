@@ -69,9 +69,9 @@ function PhaseNode({
   // nodes never even set --glow-color, so they were borrowing the FAB's purple
   // glow by accident. The start and finish markers are what the eye needs here.
   const nodeClasses = isFirst
-    ? "bg-linear-to-br from-[var(--brand-pink)] via-[var(--brand-purple)] to-[var(--brand-blue)] animate-fab-pulse"
+    ? "bg-[var(--brand-purple)] animate-fab-pulse"
     : isLast
-      ? "bg-linear-to-br from-[var(--brand-yellow)] to-[var(--brand-pink)] animate-fab-pulse"
+      ? "bg-[var(--brand-pink)] animate-fab-pulse"
       : "bg-purple/10";
 
   return (
@@ -180,7 +180,7 @@ export function RoadmapView() {
       )}
 
       {/* Target grade + time left + recommended hours */}
-      <div className="mb-4 rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+      <div className="mb-4 rounded-2xl border border-border bg-surface p-4 shadow-panel">
         <div className="mb-3.5 flex items-center gap-2.5">
           <span className="text-xl">🎯</span>
           <div>
@@ -209,7 +209,7 @@ export function RoadmapView() {
           <div className="mb-1.5 text-[11px] font-extrabold tracking-widest text-muted uppercase">
             ⏰ {t.recommendedTime}
           </div>
-          <div className="font-heading bg-linear-to-br from-pink to-yellow bg-clip-text text-4xl font-bold text-transparent">
+          <div className="font-heading text-4xl font-bold text-[var(--brand-flame-from)]">
             {hrs}
           </div>
           <div className="text-sm font-bold text-muted">{t.hoursPerDay}</div>
@@ -221,7 +221,7 @@ export function RoadmapView() {
           rendered — `new Date("")` is Invalid Date, and a test with no day has
           nothing useful to say here anyway. */}
       {scheduledTests.length > 0 && (
-        <div className="mb-4 rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+        <div className="mb-4 rounded-2xl border border-border bg-surface p-4 shadow-panel">
           <div className="mb-3 flex items-center gap-1.5 font-heading text-sm font-extrabold">
             📅 {t.pendingTests}
           </div>
@@ -259,7 +259,7 @@ export function RoadmapView() {
       )}
 
       {/* Daily Mission */}
-      <div className="mb-4 rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+      <div className="mb-4 rounded-2xl border border-border bg-surface p-4 shadow-panel">
         <div className="mb-3 flex items-center gap-1.5 font-heading text-sm font-extrabold">
           🎯 {t.dailyMission}
         </div>
@@ -334,7 +334,7 @@ export function RoadmapView() {
                   className={`flex items-center gap-3 ${onRight ? "flex-row-reverse" : ""}`}
                 >
                   <PhaseNode phase={p} isFirst={isFirst} isLast={isLast} />
-                  <div className="max-w-[210px] rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel-sm">
+                  <div className="max-w-[210px] rounded-2xl border border-border bg-surface p-3 shadow-panel-sm">
                     <div className="text-[11px] font-extrabold text-muted">
                       {t.month} {p.month}
                       {isMissingContent && ` · ${t.comingSoon}`}

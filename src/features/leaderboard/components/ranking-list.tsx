@@ -55,8 +55,8 @@ export function RankingList({
             className={cn(
               "flex items-center gap-2.5 rounded-2xl border p-2.5 transition md:gap-3 md:p-3",
               mine
-                ? "border-purple/40 bg-purple/8 shadow-panel-sm"
-                : "border-purple/10 bg-surface shadow-panel-sm hover:border-purple/25"
+                ? "border-border bg-purple/30 shadow-panel-sm"
+                : "border-border bg-surface shadow-panel-sm hover:border-border"
             )}
           >
             <span className="w-7 shrink-0 text-center font-heading text-xs font-extrabold text-muted md:w-9 md:text-sm">
@@ -66,7 +66,7 @@ export function RankingList({
             <Avatar
               seed={row.student.avatarSeed}
               name={name}
-              className="size-9 shrink-0 border-2 border-purple/10 md:size-11"
+              className="size-9 shrink-0 border-2 border-border md:size-11"
             />
 
             <div className="min-w-0 flex-1">

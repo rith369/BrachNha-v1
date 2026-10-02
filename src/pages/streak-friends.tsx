@@ -40,7 +40,7 @@ export default function StreakFriendsPage() {
             <Link
               to="/streak"
               aria-label={c.title}
-              className="flex size-8 shrink-0 items-center justify-center rounded-full border border-purple/15 bg-surface text-muted shadow-panel-sm transition hover:text-purple"
+              className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-muted shadow-panel-sm transition hover:text-purple"
             >
               <ArrowLeft className="size-4" strokeWidth={2.5} aria-hidden />
             </Link>

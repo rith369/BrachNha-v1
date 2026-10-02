@@ -23,7 +23,7 @@ export function GameStatsCard() {
   return (
     <div>
       <div className="mb-3 font-heading text-sm font-extrabold">{t.myStats}</div>
-      <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+      <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
         <div className="grid grid-cols-4 gap-2 text-center">
           <div>
             <div className="font-heading text-lg font-extrabold text-mint">

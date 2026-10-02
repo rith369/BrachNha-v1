@@ -65,7 +65,7 @@ export function MyCompetitions() {
             // escaping the corners.
             <div
               key={c.id}
-              className="overflow-hidden rounded-2xl border border-purple/10 bg-surface shadow-panel-sm"
+              className="overflow-hidden rounded-2xl border border-border bg-surface shadow-panel-sm"
             >
               <div className="flex items-center gap-2 p-3">
                 <Link
@@ -78,7 +78,7 @@ export function MyCompetitions() {
                   <span
                     className={cn(
                       "flex size-11 shrink-0 items-center justify-center rounded-full border-2",
-                      style ? style.card : "border-purple/20 bg-control"
+                      style ? style.card : "border-border bg-control"
                     )}
                   >
                     <Hourglass
@@ -142,8 +142,8 @@ export function MyCompetitions() {
                     className={cn(
                       "flex shrink-0 items-center gap-1 rounded-xl border px-2 py-1.5 text-[10px] font-extrabold transition",
                       open
-                        ? "border-purple/40 bg-purple/15 text-purple"
-                        : "border-purple/20 bg-purple/8 text-purple hover:bg-purple/15"
+                        ? "border-border bg-purple/30 text-text"
+                        : "border-border bg-purple/8 text-purple hover:bg-purple/15"
                     )}
                   >
                     <Share2 className="size-3.5 shrink-0" strokeWidth={2.5} />
@@ -156,7 +156,7 @@ export function MyCompetitions() {
                   encoder off the wire until someone actually asks for it — see
                   the lazy boundary in invite-qr.tsx. */}
               {open && (
-                <div className="border-t border-purple/10 p-3">
+                <div className="border-t border-border p-3">
                   <InvitePanel
                     competitionId={c.id}
                     // The row already IS a card; without this the panel draws a

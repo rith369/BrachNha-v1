@@ -60,8 +60,8 @@ export function Podium({
               "flex flex-col items-center rounded-2xl border px-1.5 pb-3 text-center md:px-2.5",
               first ? "pt-4 shadow-panel md:pt-6" : "pt-3 shadow-panel-sm",
               mine
-                ? "border-purple/40 bg-purple/6"
-                : "border-purple/10 bg-surface"
+                ? "border-border bg-purple/30"
+                : "border-border bg-surface"
             )}
           >
             <div

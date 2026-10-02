@@ -88,7 +88,7 @@ export function FlashcardSummary({
           {stats.map((s) => (
             <div
               key={s.label}
-              className="rounded-xl border border-purple/10 bg-surface p-3"
+              className="rounded-xl border border-border bg-surface p-3"
             >
               <div className={`text-lg font-extrabold ${s.tone}`}>
                 {s.value}

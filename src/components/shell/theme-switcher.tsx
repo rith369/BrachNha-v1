@@ -35,8 +35,8 @@ export function ThemeSwitcher() {
               className={cn(
                 "flex items-center justify-center gap-2 rounded-2xl border px-3 py-2.5 text-sm font-extrabold transition",
                 active
-                  ? "border-purple/30 bg-linear-to-r from-pink/10 to-purple/10 text-purple"
-                  : "border-purple/10 bg-surface text-text hover:bg-purple/8"
+                  ? "border-border bg-secondary text-purple shadow-panel-sm"
+                  : "border-border bg-surface text-text hover:bg-purple/8"
               )}
             >
               <Icon className="size-4.5" strokeWidth={2.25} />

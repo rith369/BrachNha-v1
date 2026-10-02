@@ -344,6 +344,99 @@ export async function fetchMyAttemptIds(
   return { ok: true, data: (data ?? []).map((r) => r.competition_id) };
 }
 
+/** Mirrors MAX_COMPETITIONS in lib/store.ts: the newest this many of each are
+ *  rebuilt, the same cap the store applies when it writes them. */
+const HISTORY_LIMIT = 50;
+
+/**
+ * This student's whole game history, rebuilt from the server: the competitions
+ * they CREATED and the attempts they MADE at other students' competitions.
+ *
+ * Used by the sign-in pull (lib/supabase-sync.ts). `logout()` clears both lists
+ * from the device, and before this nothing brought them back, so signing out
+ * and in again (or opening a new phone) showed an empty Recent Games and My
+ * Competitions although every row was still on the server.
+ *
+ * An attempt locally carries BOTH halves of the comparison (the opponent's name,
+ * score, time, answers and the frozen questions), so each attempt is joined to
+ * its competition row here. A competition that has since been deleted takes its
+ * attempts with it (on delete cascade), so a missing one cannot happen in
+ * practice; it is skipped rather than rebuilt half-empty.
+ *
+ * Everything goes through the same narrowing as a browse-list row
+ * (toCompetition / toQuestions / toAnswers): a competition is another student's
+ * device writing, not app content, wherever it is read.
+ */
+export async function fetchMyGameHistory(
+  userId: string
+): Promise<Result<{ competitions: Competition[]; attempts: CompetitionAttempt[] }>> {
+  const db = await client();
+  if (!db) return fail("unconfigured");
+  if (!userId) return fail("unauthenticated");
+
+  const [created, played] = await Promise.all([
+    db
+      .from("competitions")
+      .select("*")
+      .eq("creator_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(HISTORY_LIMIT),
+    db
+      .from("competition_attempts")
+      .select("id, competition_id, user_id, user_name, score, ms, played_at, answers")
+      .eq("user_id", userId)
+      .order("played_at", { ascending: false })
+      .limit(HISTORY_LIMIT),
+  ]);
+  if (created.error || played.error) return fail("failed");
+
+  const attemptRows = played.data ?? [];
+  const ids = [...new Set(attemptRows.map((a) => a.competition_id))];
+  const opponents = new Map<string, Competition>();
+  if (ids.length > 0) {
+    const { data, error } = await db.from("competitions").select("*").in("id", ids);
+    if (error) return fail("failed");
+    for (const row of data ?? []) {
+      opponents.set(row.id, toCompetition(row, userId));
+    }
+  }
+
+  // Oldest first, the order the store appends in (newest is last).
+  const competitions: Competition[] = (created.data ?? [])
+    .map((row) => {
+      const { mine: _mine, ...c } = toCompetition(row, userId);
+      // On the server, so it was shared: the hub must not label it "Not shared".
+      return { ...c, sharedAt: row.created_at };
+    })
+    .reverse();
+
+  const attempts: CompetitionAttempt[] = [];
+  for (const a of [...attemptRows].reverse()) {
+    const c = opponents.get(a.competition_id);
+    if (!c) continue;
+    attempts.push({
+      id: a.id,
+      competitionId: a.competition_id,
+      userId: a.user_id,
+      userName: a.user_name,
+      score: a.score,
+      ms: a.ms,
+      opponentName: c.creatorName,
+      opponentId: c.creatorId,
+      opponentScore: c.creatorScore,
+      opponentMs: c.creatorMs,
+      subject: c.subject,
+      total: c.total,
+      playedAt: a.played_at,
+      questions: c.questions,
+      answers: toAnswers(a.answers),
+      opponentAnswers: c.creatorAnswers,
+    });
+  }
+
+  return { ok: true, data: { competitions, attempts } };
+}
+
 /** One joiner's run, as the creator sees it on their own competition. */
 export interface JoinerAttempt {
   competitionId: string;

@@ -86,7 +86,7 @@ export function FocusLayout({
           </button>
           <button
             onClick={onExit}
-            className="rounded-2xl border border-pink/30 bg-pink/8 px-6 py-3 text-sm font-extrabold text-pink"
+            className="rounded-2xl border border-border bg-pink/30 px-6 py-3 text-sm font-extrabold text-pink"
           >
             {lang === "en" ? "Leave" : "ចាកចេញ"}
           </button>
@@ -100,7 +100,7 @@ export function FocusLayout({
       {/* Top bar. Spans the full width so its bottom edge reads as one line,
           with its contents capped to the same width as the body below — all
           three bands carry the identical max-w so their edges stay aligned. */}
-      <div className="shrink-0 border-b border-purple/10">
+      <div className="shrink-0 border-b border-border">
         {/* Counters get their OWN row rather than joining the X + progress row.
             At the 320px floor that row is already a 32px button, a flexible bar
             and a "1 / 2" — three chips and a toggle squeezed alongside would
@@ -150,7 +150,7 @@ export function FocusLayout({
       </div>
 
       {footer && (
-        <div className="shrink-0 border-t border-purple/10 bg-surface">
+        <div className="shrink-0 border-t border-border bg-surface">
           {/* items-stretch, so the back button takes its height from the action
               button beside it rather than needing the two kept in step by hand.
               The footer node sits in a flex-1 wrapper, which is what keeps
@@ -160,7 +160,7 @@ export function FocusLayout({
               <button
                 onClick={onBack}
                 aria-label={lang === "en" ? "Back" : "ថយក្រោយ"}
-                className="flex shrink-0 items-center justify-center rounded-2xl border border-purple/20 bg-purple/8 px-4 text-purple transition hover:bg-purple/15 md:px-5"
+                className="flex shrink-0 items-center justify-center rounded-2xl border border-border bg-purple/8 px-4 text-purple transition hover:bg-purple/15 md:px-5"
               >
                 <ChevronLeft className="size-5 md:size-6" strokeWidth={2.5} />
               </button>
@@ -196,7 +196,7 @@ export function FocusButton({
         "w-full rounded-2xl px-6 py-3.5 text-sm font-extrabold transition disabled:opacity-40 md:py-4 md:text-base lg:text-lg " +
         (variant === "primary"
           ? "bg-brand text-white shadow-cta"
-          : "border border-purple/20 bg-purple/8 text-purple")
+          : "border border-border bg-purple/8 text-purple")
       }
     >
       {children}

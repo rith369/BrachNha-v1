@@ -15,6 +15,63 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 1 Oct 2026 — New Look: Neobrutalism
+
+Not committed yet.
+
+**What changed.** The whole app now has a bolder, flatter look, chosen from a
+preview the team approved:
+- thick dark outlines around cards and buttons;
+- solid "sticker" shadows instead of soft glows;
+- flat bright colours instead of gradients;
+- a warm cream page instead of light lavender.
+
+Home's main card is bright yellow with four coloured buttons, and the selected
+tab at the bottom is a yellow sticker. Dark mode follows the same style, with
+light outlines and light shadows (the mirror of light mode's dark ones). Text is the same as before.
+
+The Mock Exam page and the 2-Day Bac II Simulation page got the new look too.
+The simulation page used to stay dark even in light mode, and it could be
+dragged sideways on every screen size; both are fixed. The Bac II Simulation
+card keeps its dark navy-to-purple "exam night" colours (they were briefly
+changed to light blue and put back, as it looked less premium), and the last
+box on the simulation page uses the same colours.
+
+**What did not change.** Everything works exactly as before: no features, data or
+KruAI changes. The Leaderboard got the new look like every other screen, but its
+students and numbers are untouched.
+
+**Re-test.** Open Home, Study, a lesson, a quiz, Flashcards, Mock Exam (and its
+2-Day Bac II Simulation page), Progress, Streak, Game and Profile, in light and
+dark, on a phone and a laptop. On the simulation page, check the page no longer
+moves sideways. Look for
+anything hard to read, a button that no longer looks tappable, or a card that
+looks unfinished. A selected or correct/wrong answer should still be easy to
+tell apart.
+
+## 1 Oct 2026 — Fixes: Photo Reports Page and Game History
+
+Not committed yet. One database step:
+`supabase/migrations/20261001000004_fix_admin_photo_reports.sql`, run in the
+Supabase SQL editor (already done on our project).
+
+**Why.** Two bugs found while testing:
+- the team's Photo reports page always said "Could not load reports", even
+  with reports waiting;
+- after logging out and signing back in, your Game history (the battles you
+  created and the ones you played) was gone.
+
+**What changed.**
+- The Photo reports page loads again.
+- Signing back in brings your battles back, with their results. No XP is paid a
+  second time.
+
+**What to re-test.**
+- On an admin account, report a photo from another account, then open Team →
+  Photo reports: the report should be listed.
+- Create or play a battle, log out, sign in again with the same Google account
+  and open Game: Recent Games and My Competitions should show it.
+
 ## 1 Oct 2026 — KruAI: Remembers the Exercise, Stop and Try Again, Questions Left
 
 Commit `59ae567`. No database step needed.

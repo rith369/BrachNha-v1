@@ -164,7 +164,7 @@ export function LessonDetail({
             <div className="mb-2 text-[10px] font-extrabold tracking-widest text-muted uppercase md:text-xs">
               {lang === "en" ? "Quest Importance" : "សារៈសំខាន់"}
             </div>
-            <div className="font-heading mb-1.5 bg-linear-to-br from-pink to-yellow bg-clip-text text-4xl font-bold text-transparent md:text-6xl">
+            <div className="font-heading mb-1.5 text-4xl font-bold text-[var(--brand-flame-from)] md:text-6xl">
               {ld.importance}
             </div>
             <div className="mb-2 text-xl font-extrabold md:text-3xl">{ld.title[lang]}</div>
@@ -191,7 +191,7 @@ export function LessonDetail({
                   </div>
                 }
               >
-                <div className="mb-3 h-64 w-full overflow-hidden rounded-2xl border border-purple/15 bg-surface md:mb-4 md:h-80 lg:h-96">
+                <div className="mb-3 h-64 w-full overflow-hidden rounded-2xl border border-border bg-surface md:mb-4 md:h-80 lg:h-96">
                   <BrainModelViewer model={ld.model3d} lang={lang} />
                 </div>
               </Suspense>
@@ -209,7 +209,7 @@ export function LessonDetail({
             >
               {ld.content[lang]}
             </div>
-            <div className="rounded-2xl border border-purple/15 bg-purple/8 p-4 md:p-6">
+            <div className="rounded-2xl border border-border bg-purple/8 p-4 md:p-6">
               <div className={`mb-1 text-purple ${focusLabel}`}>
                 📝 {t.summary}
               </div>
@@ -237,7 +237,7 @@ export function LessonDetail({
                       transform: flipped ? "rotateY(180deg)" : "rotateY(0)",
                     }}
                   >
-                    <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-purple/15 bg-surface p-6 text-center [backface-visibility:hidden]">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-border bg-surface p-6 text-center [backface-visibility:hidden]">
                       <div className="mb-3 text-3xl md:text-5xl">❓</div>
                       <div className="text-base font-extrabold md:text-xl">
                         {cards[0].q[lang]}
@@ -247,7 +247,7 @@ export function LessonDetail({
                       </div>
                     </div>
                     <div
-                      className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-mint/25 bg-mint/8 p-6 text-center [backface-visibility:hidden]"
+                      className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-border bg-mint/8 p-6 text-center [backface-visibility:hidden]"
                       style={{ transform: "rotateY(180deg)" }}
                     >
                       <div className="mb-3 text-3xl md:text-5xl">✅</div>
@@ -271,13 +271,13 @@ export function LessonDetail({
         {/* Step 3 — Fun fact + tip */}
         {step === 3 && (
           <div>
-            <div className="mb-3 rounded-2xl border border-yellow/25 bg-yellow/10 p-4 md:mb-4 md:p-6">
+            <div className="mb-3 rounded-2xl border border-border bg-yellow/10 p-4 md:mb-4 md:p-6">
               <div className={`mb-1 text-yellow ${focusLabel}`}>
                 🎉 {t.funFact}
               </div>
               <div className={focusBody}>{ld.funFact[lang]}</div>
             </div>
-            <div className="rounded-2xl border border-pink/20 bg-pink/8 p-4 md:p-6">
+            <div className="rounded-2xl border border-border bg-pink/8 p-4 md:p-6">
               <div className={`mb-1 text-pink ${focusLabel}`}>
                 💡 {t.surpriseTip}
               </div>
@@ -289,7 +289,7 @@ export function LessonDetail({
         {/* Step 4 — Did you know (only reachable when the lesson has this content) */}
         {step === 4 && ld.didYouKnow && (
           <div>
-            <div className="rounded-2xl border border-mint/25 bg-mint/8 p-6 text-center md:p-8">
+            <div className="rounded-2xl border border-border bg-mint/8 p-6 text-center md:p-8">
               <div className="mb-2.5 text-4xl md:text-6xl">🧠</div>
               <div className={`mb-1 text-mint ${focusLabel}`}>
                 {t.didYouKnow}
@@ -329,10 +329,10 @@ export function LessonDetail({
                         focusOption +
                         " " +
                         (state === "correct"
-                          ? "border-mint/40 bg-mint/10 text-mint"
+                          ? "border-border bg-mint/30 text-text"
                           : state === "wrong"
-                            ? "border-pink/40 bg-pink/10 text-pink"
-                            : "border-purple/10 bg-surface text-text hover:bg-purple/5")
+                            ? "border-border bg-pink/30 text-text"
+                            : "border-border bg-surface text-text hover:bg-purple/5")
                       }
                     >
                       {opt}
@@ -345,8 +345,8 @@ export function LessonDetail({
                   className={
                     "mt-3 rounded-2xl p-4 md:mt-4 md:p-6 " +
                     (selected === question.correct
-                      ? "border border-mint/25 bg-mint/8"
-                      : "border border-pink/20 bg-pink/8")
+                      ? "border border-border bg-mint/8"
+                      : "border border-border bg-pink/8")
                   }
                 >
                   <div

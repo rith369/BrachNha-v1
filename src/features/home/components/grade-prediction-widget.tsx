@@ -17,10 +17,10 @@ export function GradePredictionWidget() {
   return (
     <Link
       to="/grade-prediction"
-      className="flex items-center gap-3 rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel transition-transform active:scale-[0.99]"
+      className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 shadow-panel transition-transform active:scale-[0.99]"
     >
-      <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-pink/15 via-purple/15 to-blue/15">
-        <Gauge className="size-5 text-purple" strokeWidth={2.5} />
+      <div className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-border bg-[var(--brand-purple)]">
+        <Gauge className="size-5 text-white" strokeWidth={2.5} />
       </div>
       <div className="min-w-0 flex-1">
         <div className="text-[11px] font-extrabold tracking-widest text-muted uppercase">

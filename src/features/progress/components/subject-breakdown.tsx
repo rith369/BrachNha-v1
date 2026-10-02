@@ -57,7 +57,7 @@ export function SubjectBreakdown({ summary }: { summary: ProgressSummary }) {
 function SubjectRowEmpty({ subject: s, c }: { subject: ProgressSubject; c: ProgressCopy }) {
   const Icon = s.icon;
   return (
-    <div className="rounded-2xl border border-purple/10 bg-surface p-3.5 opacity-60 shadow-panel-sm">
+    <div className="rounded-2xl border border-border bg-surface p-3.5 opacity-60 shadow-panel-sm">
       <div className="flex items-center gap-2.5">
         <Icon
           className="size-5 shrink-0"
@@ -98,7 +98,7 @@ function SubjectRow({ subject: s, c }: { subject: ProgressSubject; c: ProgressCo
   const flat = s.trendPct === 0;
 
   return (
-    <div className="rounded-2xl border border-purple/10 bg-surface p-3.5 shadow-panel-sm">
+    <div className="rounded-2xl border border-border bg-surface p-3.5 shadow-panel-sm">
       <div className="mb-2.5 flex items-center gap-2.5">
         {/* The catalog's Lucide icon, tinted to the subject's own accent — not
             the emoji this list used to hand-pick per subject. */}

@@ -112,8 +112,8 @@ export function GameQuestion({
               // not whether it was right. Colouring it by correctness here would
               // be the reveal this screen deliberately does not do.
               picked === opt
-                ? "border-purple/40 bg-purple/10 text-purple"
-                : "border-purple/10 bg-surface text-text hover:bg-purple/5"
+                ? "border-border bg-purple/30 text-text"
+                : "border-border bg-surface text-text hover:bg-purple/5"
             )}
           >
             <MathText text={opt} />

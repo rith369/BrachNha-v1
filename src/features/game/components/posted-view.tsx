@@ -104,7 +104,7 @@ export function PostedView({
               <button
                 type="button"
                 onClick={() => setInviting(true)}
-                className="rounded-2xl border border-purple/20 bg-purple/8 px-5 py-2.5 text-xs font-extrabold text-purple transition hover:bg-purple/15"
+                className="rounded-2xl border border-border bg-purple/8 px-5 py-2.5 text-xs font-extrabold text-purple transition hover:bg-purple/15"
               >
                 {t.invite}
               </button>

@@ -211,7 +211,7 @@ export default function GameReviewPage() {
             of "add your own working to see theirs" is a wall of the same
             sentence; one, above the answers, is a rule. */}
         {gateShut && (
-          <p className="rounded-2xl border border-purple/10 bg-purple/8 px-3 py-2.5 text-center text-xs font-bold text-purple">
+          <p className="rounded-2xl border border-border bg-purple/8 px-3 py-2.5 text-center text-xs font-bold text-purple">
             {t.photoLocked}
           </p>
         )}
@@ -270,7 +270,7 @@ function Scoreline({
   );
 
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-purple/10 bg-surface p-3 shadow-panel-sm">
+    <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-3 shadow-panel-sm">
       <span
         className={cn(
           "shrink-0 rounded-full px-2 py-1 text-[9px] font-extrabold",
@@ -334,8 +334,8 @@ function JoinerPicker({
                 className={cn(
                   "flex items-center gap-3 rounded-2xl border p-2.5 text-left transition",
                   on
-                    ? "border-purple/40 bg-purple/10"
-                    : "border-purple/10 bg-surface hover:bg-purple/5"
+                    ? "border-border bg-purple/30"
+                    : "border-border bg-surface hover:bg-purple/5"
                 )}
               >
                 <Avatar

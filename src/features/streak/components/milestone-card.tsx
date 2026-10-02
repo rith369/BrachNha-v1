@@ -37,8 +37,8 @@ export function MilestoneCard({ milestone }: { milestone: RankedMilestone }) {
     <div
       className={cn(
         "flex flex-col items-center gap-1.5 rounded-2xl border p-3 text-center transition-colors",
-        reached && "border-mint/30 bg-mint/8",
-        next && "border-purple/40 bg-purple/8 ring-2 ring-purple/15",
+        reached && "border-border bg-mint/30",
+        next && "border-border bg-purple/30 ring-2 ring-purple/15",
         !reached && !next && "border-border bg-surface opacity-60"
       )}
     >

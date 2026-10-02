@@ -39,7 +39,7 @@ export function RecommendedActions({
   const t = useT(lang);
 
   return (
-    <div className="rounded-2xl border border-purple/10 bg-surface p-4 shadow-panel">
+    <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
       <div className="mb-3 flex items-center gap-1.5 font-heading text-sm font-extrabold">
         <Rocket className="size-4 text-pink" strokeWidth={2.5} />
         {t.recommendedActions}
@@ -50,7 +50,7 @@ export function RecommendedActions({
           <Link
             key={a.id}
             to={a.href}
-            className="flex items-center gap-3 rounded-xl border border-purple/10 bg-purple/4 px-3 py-2.5 transition-transform active:scale-[0.98]"
+            className="flex items-center gap-3 rounded-xl border border-border bg-purple/4 px-3 py-2.5 transition-transform active:scale-[0.98]"
           >
             <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-purple/10 text-xs font-extrabold text-purple">
               {i + 1}

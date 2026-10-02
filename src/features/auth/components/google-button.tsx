@@ -83,7 +83,7 @@ export function GoogleButton({
           "flex w-full items-center justify-center gap-2.5 rounded-2xl px-6 py-3.5 text-sm font-extrabold transition disabled:opacity-60",
           variant === "primary"
             ? "bg-brand text-white shadow-cta active:scale-[0.98]"
-            : "border border-purple/20 bg-surface text-text active:scale-[0.98]"
+            : "border border-border bg-surface text-text active:scale-[0.98]"
         )}
       >
         <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-white">
