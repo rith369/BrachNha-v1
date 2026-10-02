@@ -15,7 +15,12 @@ export interface AuthInfo {
   /** A REAL, non-anonymous Supabase session exists. The only honest answer to
    *  "is this student authenticated". */
   isAuthenticated: boolean;
-  /** Chose to look around without an account. */
+  /**
+   * Signed out, with accounts available to sign in to. Not a choice: there is
+   * no entry screen any more, so every signed-out student is a guest from the
+   * moment the intro ends. False while the session is still resolving, so a
+   * returning signed-in student is not shown the guest card for a frame.
+   */
   isGuest: boolean;
   /**
    * May this student use the account-only features?
@@ -41,15 +46,13 @@ export interface AuthInfo {
 export function useAuth(): AuthInfo {
   const status = useBrachNhaStore((s) => s.authStatus);
   const user = useBrachNhaStore((s) => s.authUser);
-  const guestMode = useBrachNhaStore((s) => s.guestMode);
-
   const isAuthenticated = user !== null;
 
   return {
     status,
     user,
     isAuthenticated,
-    isGuest: !isAuthenticated && guestMode,
+    isGuest: status === "ready" && !isAuthenticated && isSupabaseConfigured,
     hasFullAccess: isAuthenticated || !isSupabaseConfigured,
   };
 }

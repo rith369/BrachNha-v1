@@ -91,7 +91,7 @@ export function PaperDetail({
         វិញ្ញាសារតាមមុខវិជ្ជា
       </Link>
 
-      <div className="mb-4 flex items-center gap-3 pr-14">
+      <div className="mb-4 flex items-center gap-3">
         <SubjectArt
           subject={paper.subject}
           className="size-14 shrink-0 rounded-xl md:size-16"

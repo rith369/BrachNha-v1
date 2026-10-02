@@ -28,7 +28,7 @@ export default function ProgressPage() {
         {/* Every card on this page runs on the student's own data. The last
             three (Focus Areas, Study Activity, Study tips) were demo until
             1 Oct 2026. */}
-        <div className="font-heading mb-4 bg-brand-tri bg-clip-text pr-14 text-xl font-extrabold text-transparent">
+        <div className="font-heading mb-4 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
           📈 {T[lang].progress}
         </div>
         {/* One column on a phone, two from md (tablet) and no further. Columns

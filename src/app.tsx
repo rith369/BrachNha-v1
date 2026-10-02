@@ -154,8 +154,8 @@ function ShellLayout() {
     pathname === "/roadmap" && hasFullAccess && !commitment && !pledgeSeen;
 
   // Lessons and tests hide the same NAVIGATION, for a different reason: mid-task
-  // the screen should be the exercise and nothing else. Both cases drop TopBar
-  // and the Sidebar. BottomNav reads useFocusMode() itself since the pages, not
+  // the screen should be the exercise and nothing else. Both cases drop the app
+  // bar and the Sidebar. BottomNav reads useFocusMode() itself since the pages, not
   // the shell, render it.
   // Both hooks are called unconditionally, before any `||` — putting either on
   // the right of one would short-circuit the call and break the rules of hooks.
@@ -202,7 +202,7 @@ export default function App() {
       <Routes>
         {/* OUTSIDE ShellLayout, and that is the whole point of it being here.
             Every route below passes through AppShell's auth gate, which would
-            render the entry screen instead of the policy — breaking the two
+            render the intro or the signup form instead of the policy — breaking the two
             readers who matter most: Google, which checks this URL resolves
             before it will publish the OAuth app, and a student deciding whether
             to sign up at all. A privacy policy you have to log in to read is

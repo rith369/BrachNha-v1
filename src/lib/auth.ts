@@ -6,10 +6,9 @@ import { resetSyncCache } from "@/lib/supabase-sync";
  * Google sign-in, sign-out, and the one question that has to be answered
  * BEFORE the Supabase SDK is downloaded.
  *
- * The session is the ONLY proof of authentication in this app. The store's
- * `guestMode` flag says the student chose to look around without an account; it
- * grants nothing, and nothing may ever be unlocked by reading it. See the auth
- * section of CLAUDE.md.
+ * The session is the ONLY proof of authentication in this app. Every student
+ * without one is a guest; there is no stored flag to read. See the auth section
+ * of CLAUDE.md.
  */
 
 /** Where supabase-js keeps the session. Must match `storageKey` in supabase.ts. */
@@ -41,7 +40,7 @@ export interface AuthUser {
  *   out of the URL, and it runs when the client is CONSTRUCTED. On the redirect
  *   back from Google there is no stored session yet — the SDK is what writes
  *   it. So "no stored session, skip the import" would swallow every single
- *   sign-in and bounce the student back to the entry screen, with nothing in
+ *   sign-in and leave the student a guest, with nothing in
  *   the console to explain it.
  *
  * Hence three independent tells, any one of which forces the slow path:
@@ -51,7 +50,7 @@ export interface AuthUser {
  *     ("brachnha-auth-code-verifier" and friends) before any session exists.
  *  2. OAuth parameters in the URL — query or hash, success or failure. The
  *     error cases matter as much as the happy one: without them a declined
- *     consent screen lands back on the entry screen saying nothing at all.
+ *     consent screen lands back as a guest saying nothing at all.
  *  3. Our own sentinel, set before the redirect. This is the version-proof one:
  *     it does not depend on the SDK's internal key layout, so an upgrade that
  *     renames its storage cannot quietly break sign-in.
@@ -146,7 +145,7 @@ export async function signInWithGoogle(): Promise<string | null> {
     }
 
     // Logout lives on /profile and leaves the student standing there, so a
-    // returning student who signs in from the entry screen would otherwise
+    // returning student who signs in from there would otherwise
     // come back to Profile instead of Home.
     const path =
       window.location.pathname === "/profile" ? "/" : window.location.pathname;

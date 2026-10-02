@@ -52,10 +52,10 @@ export default function GamePage() {
   return (
     <div className="flex h-full flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-20 lg:pb-8 md:px-6 lg:px-8">
-        <div className="mb-0.5 font-heading pr-14 text-xl font-extrabold">
+        <div className="mb-0.5 font-heading text-xl font-extrabold">
           {t.title}
         </div>
-        <div className="mb-4 pr-14 text-xs font-bold text-muted">
+        <div className="mb-4 text-xs font-bold text-muted">
           {t.subtitle}
         </div>
 

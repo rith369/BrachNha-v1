@@ -239,23 +239,11 @@ interface BrachNhaState {
   //
   /** "loading" until the session has been resolved (or ruled out without even
    *  importing the SDK — see hasAuthTraces in lib/auth.ts). Nothing may treat
-   *  "loading" as "signed out": that is what would flash the entry screen at a
+   *  "loading" as "signed out": that is what would flash guest-only UI at a
    *  student who is in fact signed in. */
   authStatus: AuthStatus;
   /** Non-null ONLY for a real, non-anonymous session. Not persisted. */
   authUser: AuthUser | null;
-  /**
-   * The student chose "Continue as Guest". Persisted, and it GRANTS NOTHING —
-   * it only routes them past the entry screen on the next load. Every check
-   * that unlocks a feature reads `authUser`, never this.
-   *
-   * Deliberately does NOT set a userName: writing a placeholder like "Guest"
-   * into the store would push it to profiles.display_name, surface it on the
-   * leaderboard and pre-fill it into the pledge signature, and then survive a
-   * later Google sign-in — leaving the student permanently named "Guest".
-   * useDisplayName() supplies the fallback at render time instead.
-   */
-  guestMode: boolean;
   /** Which feature raised the "login required" prompt, or null. A string rather
    *  than a boolean so the modal can say what it was that needed an account. */
   authPrompt: AuthFeature | null;
@@ -478,9 +466,6 @@ interface BrachNhaState {
    *  fires on every token refresh and every tab focus, and `persist` writes the
    *  whole store to localStorage on every set(). */
   setAuthSession: (status: AuthStatus, user: AuthUser | null) => void;
-  /** "Continue as Guest". Sets the flag and NOTHING else — deliberately no
-   *  placeholder userName; see the field's own comment. */
-  continueAsGuest: () => void;
   openAuthPrompt: (feature: AuthFeature) => void;
   closeAuthPrompt: () => void;
   setSyncedUserId: (userId: string | null) => void;
@@ -796,20 +781,19 @@ const emptyUserData: UserData = {
 // Named rather than inline so `migrate` can borrow its return type — the two
 // have to agree on exactly which keys reach localStorage.
 const partializeState = (state: BrachNhaState) => ({
-  // Persisted, but NOT synced — the two exceptions to the one-to-one with
+  // Persisted, but NOT synced — an exception to the one-to-one with
   // syncRelevantChange in hooks/use-supabase-sync.ts, noted here so the next
-  // person auditing the two lists does not "fix" them:
+  // person auditing the two lists does not "fix" it:
   //
-  //   guestMode    — a choice about this device, not study data. Pushing it
-  //                  would be pushing it for an account that by definition has
-  //                  no session to push with.
   //   syncedUserId — bookkeeping ABOUT the sync, so syncing it is circular.
+  //
+  // There is no guest flag: every signed-out student is a guest (see
+  // hooks/use-auth.ts), so there is nothing about it to persist.
   //
   // authStatus/authUser/authPrompt/accountConflict are excluded outright, like
   // the UI flags below: the session is re-derived from Supabase on every load,
   // and a persisted copy of "who is signed in" would be exactly the thing an
   // attacker edits.
-  guestMode: state.guestMode,
   syncedUserId: state.syncedUserId,
   lang: state.lang,
   userName: state.userName,
@@ -856,10 +840,9 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       // "loading" is the honest opening value even when Supabase is
       // unconfigured — use-auth-session.ts settles it on mount either way, and
       // the gate in AppShell only ever renders a splash for a student who would
-      // be looking at the entry screen anyway.
+      // be resolving an OAuth callback anyway.
       authStatus: "loading",
       authUser: null,
-      guestMode: false,
       authPrompt: null,
       syncedUserId: null,
       accountConflict: null,
@@ -912,10 +895,6 @@ export const useBrachNhaStore = create<BrachNhaState>()(
        * this is called from an auth listener that fires on every hourly token
        * refresh and every tab focus. Comparing the id rather than the object is
        * the point; the listener builds a fresh AuthUser each time.
-       *
-       * Signing IN also clears `guestMode`. Without that a guest who signs in
-       * keeps the flag, which would skip the survey and leave every locked
-       * feature still locked for someone who now has an account.
        */
       setAuthSession: (status, user) =>
         set((state) => {
@@ -924,14 +903,12 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           return {
             authStatus: status,
             authUser: user,
-            guestMode: user ? false : state.guestMode,
             // A prompt on screen is asking them to do exactly this; leaving it
             // up over the app they just unlocked would be its own bug.
             authPrompt: user ? null : state.authPrompt,
           };
         }),
 
-      continueAsGuest: () => set({ guestMode: true, authPrompt: null }),
       openAuthPrompt: (feature) => set({ authPrompt: feature }),
       closeAuthPrompt: () => set({ authPrompt: null }),
       setSyncedUserId: (userId) => set({ syncedUserId: userId }),
@@ -1402,7 +1379,6 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           // in but no profile" and flash LoginView on the way out.
           authStatus: "ready",
           authUser: null,
-          guestMode: false,
           authPrompt: null,
           syncedUserId: null,
           accountConflict: null,

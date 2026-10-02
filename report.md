@@ -15,6 +15,67 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 2 Oct 2026 — New Top Bar: Level Ring and XP Progress
+
+Commit: not committed yet. No database step needed.
+
+**Why.** The top of every page used two rows: a row of four small number badges, then a
+row with the menu button. On Home, level and XP were shown twice. Four header designs
+were mocked up side by side, and the "level ring" one was chosen.
+
+**What changed.**
+
+- **One row at the top of every page:** a ring around your level number that fills up as
+  you earn XP, the words "Level 1" with a small bar and "30 / 100 XP", then your streak,
+  your coins and the menu button.
+- **You can see how close the next level is**, not only the total XP.
+- **Tapping the streak opens the Streak page.**
+- **Home no longer has the BrachNha logo row** at the top. The logo is still in the menu.
+- Page titles start a little higher, since the menu button is no longer floating on top
+  of them.
+
+**What to re-test.**
+
+- On a phone: Home, Study, Profile and Streak all show the new bar, the menu button opens
+  the menu, and nothing is cut off on a small phone.
+- Earn some XP (answer a quiz question) and check the ring and bar move.
+- On a laptop the bar shows without the menu button, because the side menu is always
+  open there.
+
+## 2 Oct 2026 — No More Login Page: Straight to Home as a Guest
+
+Commit: not committed yet. No database step needed.
+
+**Why.** Opening the app for the first time meant three "why science" screens, then a page
+asking you to sign in with Google or continue as a guest. That extra choice slowed new
+students down before they had seen anything.
+
+**What changed.**
+
+- **After the three "why science" screens, the app goes straight to Home as a guest.** The
+  login page is gone. Nobody has to choose anything to start.
+- **Signing in works where it did before.** Tapping KruAI, Roadmap or creating a Battle
+  shows the "Login required" pop-up with the Google button. Profile still has the Google
+  button too. After signing in, new students still fill in their name and the short survey.
+- **Logging out (or "Exit guest mode") now returns to Home as a guest**, not to a login page.
+- **The privacy policy link** used to be on the login page. It is now under the Google
+  button in the "Login required" pop-up and on Profile.
+- **Opened from Telegram or Messenger:** these students used to be stopped by an
+  "Open in browser" screen. Now they use the app as a guest like everyone else. Only when
+  they try to sign in does the pop-up show "Open in Browser" instead of Google, because
+  Google sign-in does not work inside those apps.
+- The app still starts in English. The language can be changed from the menu.
+
+**What to re-test.**
+
+- On a fresh browser (or after clearing site data): the three screens, then Home, with no
+  login page. Reload: still Home.
+- As a guest: tap KruAI, open Roadmap, and go to Profile. Each should offer Google sign-in,
+  and signing in should go through the name and survey screens as before.
+- Open the site link from Telegram: you should reach Home. Tap KruAI and check the pop-up
+  says "Open in Browser".
+- Log out from Profile: you should land on Home as a guest.
+
 ## 2 Oct 2026 — You Can See Who Played Your Battle
 
 Commit `abf6b99`. No database step needed.

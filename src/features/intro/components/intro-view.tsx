@@ -13,9 +13,9 @@ import { ACCENT, TONE_TILE, glow } from "../styles";
 import { IntroArt } from "./intro-art";
 
 /**
- * Three "why science" screens, shown once per device before the entry screen.
- * Rendered by AppShell's gate rather than a route, like EntryView, LoginView
- * and SurveyView — see the gate in components/shell/app-shell.tsx for exactly
+ * Three "why science" screens, shown once per device, then straight to Home as
+ * a guest (there is no entry screen). Rendered by AppShell's gate rather than a
+ * route, like LoginView and SurveyView — see the gate in components/shell/app-shell.tsx for exactly
  * who sees it.
  *
  * Four ways forward, all ending in the same `go()`: the big button, a

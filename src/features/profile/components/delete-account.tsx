@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { Trash2 } from "lucide-react";
 import type { Lang } from "@/types";
 import { deleteMyAccount } from "@/lib/account-deletion";
@@ -37,7 +38,7 @@ const COPY = {
  * disabled until a native checkbox is ticked — the paper-exam tickbox pattern,
  * keyboard-reachable and announcing its own state. The work itself is
  * lib/account-deletion.ts; on success the store resets and the app returns to
- * the entry screen on its own, so this component has nothing to do after.
+ * Home (this component navigates there) as a guest.
  *
  * THE OWNER gets a one-line note instead of the button (20261002000002): the
  * owner's account can only be removed in the SQL editor. The database refuses
@@ -50,13 +51,17 @@ export function DeleteAccount({ lang }: { lang: Lang }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
   const { isOwner } = useAdminStatus();
+  const navigate = useNavigate();
 
   async function confirm() {
     setBusy(true);
     setError(false);
     const result = await deleteMyAccount();
-    // On success the store reset unmounts this screen; only failure lands here.
-    if (!result.ok) {
+    // On success the store is reset and the student is a guest; send them
+    // Home rather than leaving them on an empty Profile.
+    if (result.ok) {
+      navigate("/", { replace: true });
+    } else {
       setBusy(false);
       setError(true);
     }

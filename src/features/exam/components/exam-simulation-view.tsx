@@ -208,8 +208,8 @@ export function ExamSimulationView() {
       <div className="relative mx-auto w-full max-w-5xl px-4 pt-4 pb-36 sm:px-5 sm:pb-32 md:px-6 lg:pb-16">
         {/* ── Page Header: Breadcrumb & Title ── */}
         <header className="mb-5 sm:mb-6">
-          {/* Top navigation row: back breadcrumb on left, pr-14 preserves space for TopBar hamburger on right */}
-          <div className="flex items-center justify-between pr-14">
+          {/* Top navigation row: back breadcrumb on left */}
+          <div className="flex items-center justify-between">
             <Link
               to="/exam"
               className="inline-flex items-center gap-1 text-xs font-extrabold text-muted transition hover:text-text sm:text-sm"

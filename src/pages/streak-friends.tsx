@@ -35,8 +35,7 @@ export default function StreakFriendsPage() {
     <div className="flex h-full flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-20 md:px-6 lg:px-8 lg:pb-8">
         <div className="mx-auto w-full max-w-2xl">
-          {/* pr-14 keeps the row clear of TopBar's floating hamburger. */}
-          <div className="mb-2 flex items-center gap-2 pr-14">
+          <div className="mb-2 flex items-center gap-2">
             <Link
               to="/streak"
               aria-label={c.title}

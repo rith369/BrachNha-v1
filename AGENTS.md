@@ -1356,7 +1356,7 @@ Three consequences worth having in mind here:
   a hundred anonymous accounts per run because the seeded `userName` was all the
   old hook needed. Nothing signs in without a student pressing a button now.
   Run it with the Supabase vars blanked anyway — that is still the documented
-  command, and it is what makes the screenshots skip the entry screen.
+  command, and it is what makes the screenshots skip the auth gate.
 - **Anonymous sign-ins can be turned OFF in the dashboard** (Authentication →
   Sign In / Providers). Nothing calls it. It is still ON in the projects in use,
   and leaving it on is harmless but pointless.
@@ -1480,14 +1480,13 @@ server-rendered request cycle, which this app does not have. Safe to remove.
 a phone mockup: no frame, notch, or status bar, just a `mx-auto h-dvh` container
 that goes full-bleed on a phone. It was renamed from `PhoneShell` because that
 name kept implying a device frame that has never existed; don't add one. Also
-`TopBar` (a floating absolutely-positioned
-hamburger button, not a bar — nothing reserves space for it), `Drawer`
+`AppHeader` (the app bar with the menu button, below), `Drawer`
 (Sheet-based, built from one shared `src/lib/nav-items.ts` config), `BottomNav`,
 `FabChat`, `ChatOverlay`. `AppShell` also syncs `document.documentElement.lang`
 from the store in an effect, because `index.html` ships `lang="en"` and the real
 value isn't known until React mounts.
 
-`AppShell` takes optional `hideChrome` (unmounts `TopBar` and `Sidebar`) and
+`AppShell` takes optional `hideChrome` (unmounts the app bar and `Sidebar`) and
 `hideMentor` (unmounts `FabChat` and `ChatOverlay`) props — see the focus-mode
 section for why those are two props and not one. The roadmap onboarding lock
 below passes **both**, leaving the page's own CTA as the only way forward.
@@ -1502,60 +1501,42 @@ hamburger and never reach the commitment pledge. `pledgeSeen` (persisted, set in
 `commitment !== null` alone would strip the page forever for a student who taps
 "Maybe later", which is an allowed choice.
 
-### The global stat bar — level/XP/streak/coins, on every ordinary screen
+### The app bar — level ring, streak, coins and the menu in ONE row
 
-`AppShell` renders `StatBar` (no `theme` prop, so no light/dark toggle) as its
-own row, right-aligned, at the top of the content column — above `TopBar`, so it
-appears on every screen that isn't hidden-chrome, without any individual page
-knowing it exists. This was a deliberate widening: `StatBar` used to appear only
-where a screen opted in (`FocusLayout`'s `showStats` prop, and one inline call in
-`subject-path-view.tsx`), and the product call was that these numbers are the
-core of the app's gamification loop and belong somewhere the student sees them
-constantly, not just mid-lesson.
+`components/shell/app-header.tsx`, rendered by `AppShell` at the top of the
+content column on every screen that isn't hidden-chrome. **It replaced two rows
+(2 Oct 2026, the user's pick of "option C" from a page of four mockups):** a
+right-aligned global `StatBar` of four pills (Lv / XP / streak / coins), and below
+it `TopBar`, a floating `absolute top-3 right-4` hamburger every page had to keep
+a `pr-14` gutter for. Home also had its own `HomeHeader` (logo + "Level 2 · 130
+XP"), repeating two of those numbers. `TopBar` and `HomeHeader` are deleted; the
+logo and name now live only in the sidebar and drawer.
 
-**Four pills, not three: `Lv{level}` leads the row**, added right after the bar
-went global — level was the one number Home's own header already showed
-(`កម្រិត 2 · 130 XP`) that the bar itself was still missing. It reuses
-`StatPills`' `Target` icon for level, so there's one visual convention for "what
-level am I" rather than two, and is given its own `text-blue` tone (the app's
-`text-purple`/`text-pink`/`text-yellow` were already spoken for by XP, streak and
-coins) so four adjacent pills stay scannable rather than reading as a single
-repeated colour.
+- **Level and XP are ONE element**: a ring around the level number that fills with
+  the XP earned inside the current level, plus "Level N", a thin bar and "30 / 100
+  XP". The level rule is `award()`'s in `lib/store.ts` (the level goes up once XP
+  reaches `level * 100`), so a level spans the 100 XP below that threshold; the
+  share is clamped because one large award can overshoot while the level moves by
+  one. If the rule changes, `XP_PER_LEVEL` in the header changes with it.
+- **The streak pill links to `/streak`** (the same doorway as Home's Flame pill);
+  coins are a plain div, since there is no page behind them.
+- **The menu button is in normal flow**, `lg:hidden` (the sidebar replaces it), and
+  `invisible` rather than unmounted while the chat is open so the row doesn't shift.
+  No page reserves space for it any more: every `pr-14` that existed for the old
+  hamburger was removed. (`sidebar-nav.tsx`'s `pr-14` is for the drawer's own close
+  button and stays.)
+- **The XP bar is `w-full max-w-24` inside a `flex-1 min-w-0` column.** A fixed
+  width ran into the streak pill at 320px.
+- **Gated on `!hideChrome`**, like the Sidebar: focus tasks, the mock exam and
+  placement test (a live counter turns a measurement into a scoreboard) and the
+  roadmap's onboarding lock stay clear of it. `FocusLayout`'s `showStats` still
+  renders `StatBar` (with the theme toggle) on lessons; that is the only `StatBar`
+  left, and those routes hide the app bar, so the two never show together.
 
-**Gated on the exact same `!hideChrome` that already hides `Sidebar`/`TopBar`**,
-which is what makes this correct with zero new logic: focus tasks, the mock exam
-and placement test (where a live counter would turn a measurement into a
-scoreboard — the same reasoning `FocusLayout`'s own `showStats` already encodes,
-and which stays true here since those routes hide chrome too), and the roadmap's
-one-way onboarding lock all correctly stay clear of it for the reasons they
-already hide the rest of the chrome.
-
-**`subject-path-view.tsx`'s own inline `<StatBar />` was removed** the moment
-this landed, and **`lessons-list.tsx`'s own streak-only chip went with it** —
-both would have shown a number the global bar already shows a few pixels away.
-`FocusLayout`'s `showStats` StatBar is a SEPARATE instance and was deliberately
-left alone: those routes have `hideChrome = true`, so the global one is absent
-there and the task screen's own copy is the only one rendering — no double-up,
-and no shared state to keep in step since both read the same store.
-
-**The tricky part was the hamburger, not the bar.** `TopBar`'s button is
-`absolute top-3 right-4`, measured from its nearest positioned ancestor — so a
-new row placed INSIDE that same ancestor would sit in normal flow while the
-button stayed pinned to the ancestor's original top edge, and the two would
-overlap. The fix was to nest: the stat-bar row is a sibling BEFORE a `relative`
-wrapper, not a child inside it, so it pushes that wrapper's top edge down as a
-whole, and the hamburger's `top-3` — still measured from the same wrapper — moves
-down by exactly the bar's height along with it. That keeps it aligned with each
-page's own `pt-4` title row exactly as before, just both shifted down together;
-see the comment in `app-shell.tsx` for the fuller version of this argument.
-
-**Page top-spacing convention:** pages start at `pt-4` and put `pr-14` on their
-header block, so the page title sits on the same row as the floating hamburger
-(button spans y=12–50px; a `text-xl` line at `pt-4` centres at ~30px against the
-button's ~31px). Bottom padding is `pb-20` on pages that render `BottomNav` and
-`pb-36` on those that don't (roadmap/profile/lesson-detail), so content clears
-the FAB at `bottom-20`. The old `pt-14` convention was removed on purpose — it
-existed only to dodge the hamburger and left a 56px dead band above every header.
+**Page top-spacing convention:** pages start at `pt-4` under the app bar, with no
+right gutter (there is no floating button to clear). Bottom padding is `pb-20` on
+pages that render `BottomNav` and `pb-36` on those that don't
+(roadmap/profile/lesson-detail), so content clears the FAB at `bottom-20`.
 
 ### Responsive layout — two rules, and they pull in opposite directions
 
@@ -1620,15 +1601,15 @@ Before adding a row for a new route, check whether Home already points at it.
 The comment block where those two used to sit spells this out; don't quietly
 re-add them.
 
-`BottomNav` and `TopBar` carry `lg:hidden` on their own roots rather than on the
+`BottomNav` and the app bar's menu button carry `lg:hidden` on their own roots rather than on the
 9 pages that render them. `FabChat` and page `pb-20`/`pb-36` both exist to clear
 the bottom nav, so both get `lg:` overrides — without them desktop has ~80px of
 dead space under every page.
 
 **One name lockup, for the same reason.** `components/shell/wordmark.tsx` owns
 the logo + "BrachNha" + optional subtitle, and is the ONLY place that gradient
-wordmark is spelled out. Its four consumers are `HomeHeader`, `SidebarNav` (so
-the drawer and the desktop sidebar both get it), `LoginView` and `SurveyView`.
+wordmark is spelled out. Its consumers are `SidebarNav` (so
+the drawer and the desktop sidebar both get it), `LoginView` and `SurveyView` (Home had one too, `HomeHeader`, deleted with the app bar change).
 They had already drifted before it existed — four hand-written copies carrying
 four *different* decorations beside the name (⚔️ on login and survey, ✨ in the
 sidebar, a Lucide `<Sparkles>` on Home). The logo is the decoration now; don't
@@ -1752,7 +1733,7 @@ differently:
   returning student on a screen with no way out.
 
 Consumers are `ShellLayout` (ORs it into the existing `hideChrome`, which already
-drops `TopBar`/`Sidebar` for the roadmap onboarding lock) and `BottomNav`
+drops the app bar/`Sidebar` for the roadmap onboarding lock) and `BottomNav`
 (returns `null`), which is checked in the component rather than in the 6 pages
 that render it.
 
@@ -1892,22 +1873,21 @@ Duolingo's flat no-card look, split SKIP/CHECK footer and option number badges
 were considered and **declined** — the card-and-shadow style is the app's
 identity everywhere else.
 
-### The intro: three "why science" screens before the entry screen
+### The intro: three "why science" screens, then Home as a guest
 
 `features/intro` (the user's brief, 28 Sep 2026): ឱកាសកាន់តែទូលាយ → វិថីកាន់តែច្រើន
-ក្រោយចប់ថ្នាក់ទី 12 → វិទ្យាសាស្ត្រគឺលើសពីរូបមន្ត, then the entry screen. Its job is
+ក្រោយចប់ថ្នាក់ទី 12 → វិទ្យាសាស្ត្រគឺលើសពីរូបមន្ត, then straight to Home as a guest
+(there has been no entry screen since 2 Oct 2026; see the auth section). Its job is
 to make a student feel that choosing science was right before asking them for
 anything. Khmer-only, like the Study/Exam/Practice pages; the copy is the user's,
 with the one change that "grade 12" is written with Latin digits.
 
 - **One branch in `AppShell`'s gate, after the conflict screen**: `!introSeen &&
-  !userName && !guestMode && !isAuthenticated && !IN_APP_BROWSER`. Only someone
-  who has not started yet sees it, which keeps every existing student, a signed-in
-  student during the session-loading window, an OAuth callback and
-  `scripts/shots.mjs`' seeded profile clear of it with no extra condition. With
-  Supabase unconfigured it shows before `LoginView` instead. Not in an in-app
-  browser: that student is sent to their real browser, which has its own storage
-  and would show it again.
+  !userName && !isAuthenticated`. Only someone who has not started yet sees it,
+  which keeps every existing student, an OAuth callback and `scripts/shots.mjs`'
+  seeded profile clear of it with no extra condition. With Supabase unconfigured
+  it shows before `LoginView` instead. In-app browsers (Telegram) see it too now:
+  they use the app in place as a guest rather than being sent away first.
 - **Seen-ness is a DEVICE fact in its own key** (`lib/intro-seen.ts`,
   `localStorage["brachnha-intro"]`), the install prompt's reasoning: as a store
   field it would sync for nothing and be wiped by `logout()`, replaying the intro
@@ -2107,9 +2087,8 @@ be a decision. `--square --width 96` reproduces the logo raster.
 **Two deliberate departures from the reference design**, both because this is a
 bottom-nav tab inside existing chrome rather than a standalone screen: there is
 **no back arrow** (you don't go back from a tab), and the **streak chip is not
-top-right** — `TopBar`'s floating hamburger already owns `absolute top-3 right-4`,
-so the header keeps the app's title-left + `pr-14` convention with the streak
-inside that reserved space.
+top-right**: the app bar above every page already shows the streak, so the
+page keeps a plain title-left header.
 
 **The grid is `columns-2 md:columns-3 lg:columns-4`, not a grid** — the staggered
 look comes from cards of differing height flowing into balanced columns, which is
@@ -2929,7 +2908,7 @@ still there) rather than showing a remembered percentage. Capped at
 has a `kind` column that could carry these but no column saying WHICH paper, so a
 pulled row could not be told apart from another year's paper in the same subject.
 Syncing it needs a `paper_key` column first, and `syncRelevantChange` names it as
-a deliberate exception alongside `guestMode`/`syncedUserId`.
+a deliberate exception alongside `syncedUserId`.
 
 **Tab B is unchanged and still runs its papers in place.** A generated paper has
 no printed minutes, points or parts, so a detail screen for one could only invent
@@ -7157,34 +7136,46 @@ Real login landed. The section this replaces described three seams "for the
 login that is coming"; all three were used, and the design they anticipated is
 now built. The anonymous-identity section above records what was removed.
 
-### The state model — three states, one source of truth
+### The state model — guest is the default, not a choice
 
 **THE SUPABASE SESSION IS THE ONLY PROOF OF AUTHENTICATION.** Everything else is
 routing.
 
-| | `authStatus` | `authUser` | `guestMode` |
+| | `authStatus` | `authUser` | `isGuest` |
 | --- | --- | --- | --- |
-| Loading | `"loading"` | `null` | — |
+| Loading | `"loading"` | `null` | `false` |
 | Authenticated | `"ready"` | the flattened session | `false` |
 | Guest | `"ready"` | `null` | `true` |
-| Not chosen yet | `"ready"` | `null` | `false` |
+
+**THERE IS NO ENTRY SCREEN (2 Oct 2026, the user's call).** A new student sees
+the three intro screens and lands on Home as a guest. There used to be a door
+between them (Google or "Continue as Guest") and a persisted `guestMode` flag
+recording the choice; both are deleted, along with `continueAsGuest()` and
+`entry-view.tsx`. `isGuest` in `hooks/use-auth.ts` is now DERIVED: `status ===
+"ready" && !isAuthenticated && isSupabaseConfigured`. The `ready` is what keeps
+a returning signed-in student from seeing the guest card on Profile while their
+session loads. Signing in happens where an account is needed: the login prompt
+(KruAI, Roadmap, Battle) and Profile's guest card, both through `GoogleButton`.
+Logout and "exit guest mode" now land on Home as a fresh guest.
 
 `authStatus`, `authUser`, `authPrompt` and `accountConflict` are **excluded from
 `partializeState`**, exactly like `chatOpen` — re-derived from Supabase on every
-load. Only `guestMode` and `syncedUserId` persist, and `guestMode` **grants
-nothing**: it routes past the entry screen and that is all. `hooks/use-auth.ts`
-is where every question about identity is answered.
+load. Only `syncedUserId` persists. `hooks/use-auth.ts` is where every question
+about identity is answered.
 
-**A GUEST HAS NO `userName`, deliberately.** `continueAsGuest()` sets one flag
-and nothing else. A placeholder like "Guest" in the store would reach
-`profiles.display_name`, the leaderboard and the pledge signature — and survive a
-later Google sign-in, leaving the student permanently named "Guest".
-`useDisplayName()` supplies the fallback at render time instead.
+**A GUEST HAS NO `userName`, deliberately.** A placeholder like "Guest" in the
+store would reach `profiles.display_name`, the leaderboard and the pledge
+signature — and survive a later Google sign-in, leaving the student permanently
+named "Guest". `useDisplayName()` supplies the fallback at render time instead.
 
-**No persist `version` bump.** `guestMode` and `syncedUserId` are new keys with
-defaults, which `merge()` already handles (see its comment). That also settles
-what happens to existing installs: they arrive with `guestMode: false`, land on
-the entry screen, and keep every byte of local data whichever button they press.
+**No persist `version` bump for removing `guestMode`.** An old payload still
+carrying it has the key spread into state by `merge()`, where nothing reads it,
+and `partializeState` no longer lists it, so the next write drops it.
+
+**The privacy link moved with the door.** The entry screen was where Google's
+requirement (the policy reachable where a student decides to sign in) was met,
+so `/privacy` is now linked under the Google button in the login prompt and on
+Profile's guest card.
 
 ### The gate, in `app-shell.tsx`
 
@@ -7192,12 +7183,12 @@ A ternary chain, in priority order, kept as JSX rather than early returns so
 nothing above it closes over a possibly-null `authUser`:
 
 ```
-loading, and they'd be on the entry screen anyway -> <AuthSplash/>
+loading, no local name                            -> <AuthSplash/>
 conflict pending                                  -> <AccountConflictView/>
-ready, not authenticated, not guest               -> <EntryView/>
+intro not seen, no name, not signed in            -> <IntroView/>
 authenticated, no name                            -> <LoginView/>   (prefilled)
 authenticated, not surveyed                       -> <SurveyView/>
-                                                  -> the app
+                                                  -> the app (a guest if signed out)
 ```
 
 Three things there are load-bearing and easy to undo:
@@ -7208,15 +7199,13 @@ Three things there are load-bearing and easy to undo:
   a missing `GEMINI_API_KEY`. It is also what keeps `npm run preview`, a fresh
   fork and `scripts/shots.mjs` working with **no change to the screenshot seed**:
   the documented blanked-env command was already the right one.
-- **`status === "ready"` on the EntryView branch.** A returning student has a
-  name and a session, but the session takes a dynamic import to resolve — so for
-  that window they are "not authenticated and not a guest", and without this they
-  would be thrown onto the entry screen and asked to sign in to the account they
-  are already signed in to.
-- **The splash renders only when the student would see the entry screen anyway.**
-  Gating the whole tree on "loading" would put an import — and, for an expired
-  token, a network round trip — in front of first paint for every returning
-  student. See the top of `lib/supabase.ts` for why that is not affordable.
+- **The splash renders only for a student with no local name.** That is the
+  OAuth callback case: without it, a student coming back from Google would see
+  Home flash before `LoginView`. With no auth traces the session settles in the
+  mount effect, so for an ordinary guest it lasts one frame. Gating the whole
+  tree on "loading" would put an import — and, for an expired token, a network
+  round trip — in front of first paint for every returning student. See the top
+  of `lib/supabase.ts` for why that is not affordable.
 
 `userName`/`surveyed` now gate **authenticated students only**. A guest falls
 straight through to Home, and because their `surveyed` was never faked, signing
@@ -7328,8 +7317,8 @@ other direction swallows every sign-in**, and the mechanism is not obvious: the
 SDK's own `_initialize()` is the only thing that parses an OAuth callback out of
 the URL, and it runs when the client is CONSTRUCTED. On the redirect back from
 Google there is no stored session yet — the SDK is what writes it. "No stored
-session, skip the import" would have bounced every student straight back to the
-entry screen with nothing in the console.
+session, skip the import" would have left every student straight back in
+guest mode with nothing in the console.
 
 Three independent tells, any one of which forces the slow path: a localStorage
 key **starting with** the auth key (a prefix scan — PKCE parks code verifiers
@@ -7387,20 +7376,19 @@ chooser, and increasingly refuses the embedded user agent outright
 (`disallowed_useragent`). **None of that is fixable from inside the webview**, so
 the app detects it and asks to be reopened in the real browser.
 
-`utils/in-app-browser.ts` decides, and `features/auth/components/in-app-browser-view.tsx`
-is the screen. **Nothing else changed** — no new sign-in path, no change to
-`lib/auth.ts`, no route, no store field, no migration.
+`utils/in-app-browser.ts` decides, and `features/auth/components/open-in-browser.tsx`
+is what the student sees.
 
-**THE GATE IS ONE BRANCH, EXACTLY WHERE `EntryView` WOULD RENDER**, in
-`app-shell.tsx`. That placement is the whole design, and every "must not" falls
-out of it rather than needing a condition of its own: Chrome and Safari are not
-in-app browsers so they never reach it; a signed-in student already failed
-`!isAuthenticated`, in any browser, so **an OAuth callback resolves into a
-session and the chain moves past this branch on its own** — nothing here can
-interrupt a callback or touch a session; a student who already chose guest is
-past it too; and an unconfigured Supabase makes `hasFullAccess` true, so a fresh
-fork and `scripts/shots.mjs` behave exactly as before. Don't move the check onto
-a route or into a hook that runs earlier.
+**IT LIVES INSIDE `GoogleButton`, NOT IN THE GATE (2 Oct 2026).** It used to be a
+whole screen standing in for the entry screen, which blocked the app entirely
+for a Telegram visitor. With the entry screen gone, a Telegram visitor sees the
+intro and uses the app as a guest like anyone else, and only meets "Open in
+browser" where sign-in is offered: `GoogleButton` renders `OpenInBrowser` in
+place of Google when `isInAppBrowser()` (read once at module scope). That one
+switch covers the login prompt, `LockedFeature` and Profile's guest card. It is
+two components rather than an early return so neither calls hooks
+conditionally. Nothing can touch an OAuth callback, because nothing in the gate
+looks at the browser any more.
 
 **TWO KINDS OF SIGNAL, because Telegram stamps nothing.** Named UA tokens
 (`FBAN`, `FB_IAB`, `Instagram`, `MicroMessenger`, `Zalo`, `Line/`…) are the
@@ -7438,21 +7426,19 @@ webview's storage, so carrying it over can only produce a failed exchange) and
 the **hash** (Android's `intent:` URLs need the fragment for their own payload,
 and nothing here routes on it).
 
-**ONE BUTTON, and the rest of the screen is not a control.** No "continue here",
-no guest, no Google — every one of those leads back into the webview, which is
-the thing that does not work. The link sits in a `select-all` box rather than
-behind a copy button, the shape `features/game`'s invite panel already uses.
-**The known cost, weighed and accepted:** a first-time visitor arriving from
-Telegram cannot reach guest mode either, since guest is chosen on the screen this
-one replaces. Guest mode itself is untouched and works normally in a real
-browser, and localStorage is per-browser so nothing is lost or duplicated.
+**No Google button inside a webview** — it leads back into the thing that does
+not work. The link sits in a `select-all` box rather than behind a copy button,
+the shape `features/game`'s invite panel already uses. A guest's progress in the
+webview stays in the webview: localStorage is per-browser, so switching to the
+real browser to sign in starts that browser fresh.
 
 **Verified against 26 real user-agent strings** (both directions, plus the PWA,
 the Telegram JS bridge and iPadOS-reporting-as-Mac) and then in real Chrome under
-spoofed UAs: Telegram/Messenger see the screen and exactly two buttons, Chrome
-and Safari still get the ordinary entry screen with Google and guest intact, an
-existing guest inside Telegram is not interrupted, the intent URL carries the
-path and query, and 320px Khmer in both themes has no sideways scroll.
+spoofed UAs (that was the full-screen version; re-checked 2 Oct 2026 after the
+move: a Telegram UA goes intro → Home, the login prompt shows Open in Browser
+with no Google, and the help text appears after the tap). The intent URL
+carries the path and query, and 320px Khmer in both themes has no sideways
+scroll.
 **Scanning the real thing still needs two phones** — a spoofed UA proves the
 detection, not that Telegram honours the intent.
 
@@ -7764,8 +7750,8 @@ curl -i -X POST localhost:5173/api/chat -H 'Content-Type: application/json' \
   -d '{"messages":[{"role":"user","text":"hi"}],"lang":"en"}'      # expect 401
 ```
 
-Then in a browser: a fresh profile shows the entry screen and downloads NO
-Supabase chunk; "Continue as Guest" lands on Home and survives a reload; the chat
+Then in a browser: a fresh profile shows the intro, then Home, and downloads NO
+Supabase chunk; a reload stays on Home; the chat
 FAB raises the prompt and fires no `/api/chat` request; a typed `/roadmap` shows
 the locked panel **with the navigation still on screen**; and loading with
 `?code=x` in the URL DOES pull the SDK (that last one is the callback-swallowing

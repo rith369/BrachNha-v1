@@ -77,7 +77,7 @@ export function AdminGate({
             {c.backToAdmin}
           </Link>
         )}
-        <div className="mb-1 flex items-center gap-2 pr-14">
+        <div className="mb-1 flex items-center gap-2">
           <Icon className="size-5 text-purple" strokeWidth={2.5} />
           <h1 className="font-heading text-xl font-extrabold">{title}</h1>
         </div>

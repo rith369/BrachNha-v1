@@ -13,8 +13,8 @@
  * iPHONE has no API at all. Apple gives a page no event and no dialog, so the
  * pop-up there shows the two manual steps (Share → Add to Home Screen).
  *
- * IN-APP BROWSERS (Telegram, Messenger) cannot install, and on the entry screen
- * they already get the "open in your browser" detour. Nothing is shown there.
+ * IN-APP BROWSERS (Telegram, Messenger) cannot install, and are asked to open
+ * their real browser when they sign in. Nothing is shown there.
  *
  * ── Two moments, both requested ───────────────────────────────────────────
  *

@@ -25,9 +25,8 @@ import {
  * screen: no back arrow. You do not "go back" from a tab; BottomNav is how you
  * leave.
  *
- * The reference's own streak chip is gone from this header — it used to sit in
- * the `pr-14` space reserved for TopBar's floating hamburger, but AppShell's
- * global StatBar (see app-shell.tsx) now shows streak, plus level/XP/coins, on
+ * The reference's own streak chip is gone from this header — the app bar
+ * (components/shell/app-header.tsx) now shows streak, plus level/XP/coins, on
  * every ordinary screen including this one. Keeping a second streak number here
  * would just be the same value shown twice a few pixels apart.
  */
@@ -44,7 +43,7 @@ export function LessonsList() {
 
   return (
     <div>
-      <div className="font-heading mb-4 bg-brand-tri bg-clip-text pr-14 text-xl font-extrabold text-transparent">
+      <div className="font-heading mb-4 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
         វគ្គសិក្សា
       </div>
 

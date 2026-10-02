@@ -3,12 +3,14 @@ import { useBrachNhaStore } from "@/lib/store";
 import { useT } from "@/data/translations";
 import { signInWithGoogle } from "@/lib/auth";
 import { cn } from "@/utils/cn";
+import { isInAppBrowser } from "@/utils/in-app-browser";
+import { OpenInBrowser } from "./open-in-browser";
 
 /**
  * "Continue with Google" — the one place the sign-in redirect is started.
  *
- * Shared by the entry screen, the login-required prompt and Profile's upgrade
- * row, for the same reason shell/wordmark.tsx exists: three hand-written copies
+ * Shared by the login-required prompt, the locked-feature panel and Profile's
+ * upgrade row, for the same reason shell/wordmark.tsx exists: three hand-written copies
  * of a branded button drift, and this one carries a trademark.
  */
 
@@ -51,7 +53,26 @@ interface GoogleButtonProps {
   className?: string;
 }
 
-export function GoogleButton({
+// Read ONCE, at module scope: a user agent does not change mid-session, and it
+// keeps an impure call out of the render path.
+const IN_APP_BROWSER = isInAppBrowser();
+
+/**
+ * Inside Telegram's or Messenger's own browser, Google sign-in cannot work, so
+ * every place that offers it offers "Open in browser" instead. One switch here
+ * covers the login prompt, the locked-feature panel and Profile's guest card.
+ * Two components rather than an early return so neither calls hooks
+ * conditionally.
+ */
+export function GoogleButton(props: GoogleButtonProps) {
+  return IN_APP_BROWSER ? (
+    <OpenInBrowser {...props} />
+  ) : (
+    <GoogleSignInButton {...props} />
+  );
+}
+
+function GoogleSignInButton({
   variant = "primary",
   className,
 }: GoogleButtonProps) {

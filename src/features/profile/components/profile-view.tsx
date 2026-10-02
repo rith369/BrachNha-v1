@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { LogOut } from "lucide-react";
+import { Link, useNavigate } from "react-router";
 import { Card } from "@/components/ui/card";
 import { StatPills } from "@/features/home/components/stat-pills";
 import { GoogleButton } from "@/features/auth/components/google-button";
@@ -27,6 +28,7 @@ export function ProfileView() {
   const t = useT(lang);
   const { isGuest, isAuthenticated } = useAuth();
   const [confirming, setConfirming] = useState(false);
+  const navigate = useNavigate();
 
   // What the app is ACTUALLY doing, not what was stored. A guest never sets
   // this, and allSubjects() (features/lessons/subjects.ts) falls back to
@@ -46,17 +48,18 @@ export function ProfileView() {
    * effect would be the wrong trade. signOutAccount never throws and signs out
    * LOCALLY, so it needs no network to succeed.
    */
+  // Home afterwards. There is no login page to take over the screen any more
+  // (a signed-out student is simply a guest), so without this they would be
+  // left standing on a now-empty Profile.
   function confirmLogout() {
     void signOutAccount();
     logout();
+    navigate("/", { replace: true });
   }
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-36 lg:pb-10">
-      {/* The title alone carries pr-14 — it shares a row with the floating
-          hamburger. The identity row sits below that button, so it gets the
-          full width for a long name. */}
-      <div className="mb-4 pr-14">
+      <div className="mb-4">
         <div className="font-heading bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
           {t.yourProfile} 🎓
         </div>
@@ -123,6 +126,12 @@ export function ProfileView() {
             </div>
           </div>
           <GoogleButton variant="outline" />
+          <Link
+            to="/privacy"
+            className="block text-center text-xs font-bold text-muted underline underline-offset-2 hover:text-purple"
+          >
+            {t.privacyPolicy}
+          </Link>
         </Card>
       )}
 

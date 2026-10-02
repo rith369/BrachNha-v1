@@ -10,7 +10,7 @@ export type Lang = "en" | "km";
 
 /** "loading" until the session is resolved, or ruled out without importing the
  *  SDK at all (see hasAuthTraces in lib/auth.ts). NOTHING may read "loading" as
- *  "signed out" — that is what flashes the entry screen at a signed-in student. */
+ *  "signed out" — that is what flashes guest-only UI at a signed-in student. */
 export type AuthStatus = "loading" | "ready";
 
 /** The identity, flattened out of a Supabase session. Non-null only for a real,

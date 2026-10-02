@@ -58,8 +58,8 @@ export async function clearPhotoFolders(
  *  3. CALL delete_my_account() (20261001000002), which deletes the auth user;
  *     every table cascades from it.
  *
- * Then the session is dropped and the store reset, which returns the app to the
- * entry screen. What stays on the device is only device settings (theme, the
+ * Then the session is dropped and the store reset, which returns the app to
+ * Home as a guest. What stays on the device is only device settings (theme, the
  * intro having been seen), the same as after Logout.
  */
 export async function deleteMyAccount(): Promise<Result<null>> {

@@ -6,8 +6,8 @@ import { Wordmark } from "@/components/shell/wordmark";
  * ── Who actually sees this ────────────────────────────────────────────────
  *
  * Almost nobody, and that is deliberate. The gate in app-shell.tsx renders it
- * ONLY for a student who has no local profile and has not chosen guest — i.e.
- * someone who would be looking at the entry screen anyway. A returning student
+ * ONLY for a student who has no local profile while the session resolves —
+ * which is the OAuth callback case it exists for. A returning student
  * gets the app immediately and the session resolves behind it.
  *
  * That restraint is the whole design. Gating the whole tree on "loading" would

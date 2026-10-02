@@ -44,7 +44,7 @@ export function LockedFeature({
 
   return (
     <div className="flex h-full flex-col overflow-y-auto px-4 pt-4 pb-20 lg:pb-8">
-      <div className="pr-14">
+      <div>
         <h1 className="font-heading text-xl font-extrabold">{title}</h1>
       </div>
 

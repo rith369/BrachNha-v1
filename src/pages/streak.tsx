@@ -24,9 +24,7 @@ export default function StreakPage() {
     <div className="flex h-full flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-20 md:px-6 lg:px-8 lg:pb-8">
         <div className="mx-auto w-full max-w-2xl">
-          {/* pr-14 keeps the title clear of TopBar's floating hamburger, which
-              is absolutely positioned at top-3 right-4. */}
-          <div className="mb-4 flex items-center gap-2 pr-14">
+          <div className="mb-4 flex items-center gap-2">
             <Flame
               className="size-5 shrink-0 text-pink"
               fill="currentColor"

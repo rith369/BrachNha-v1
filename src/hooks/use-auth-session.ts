@@ -35,8 +35,8 @@ let anonSignOutDone = false;
 
 /** How long to wait for the SDK before assuming there is no session.
  *  Only reachable for a student with stored auth traces and no local profile —
- *  a fresh sign-in, or a cleared cache. They land on the entry screen and can
- *  tap Google again, which is a far better outcome than an endless splash. */
+ *  a fresh sign-in, or a cleared cache. They land on Home as a guest and can
+ *  sign in again, which is a far better outcome than an endless splash. */
 const RESOLVE_TIMEOUT_MS = 8_000;
 
 export function useAuthSession() {

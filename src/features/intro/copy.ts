@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 
 /**
- * The three "why science" screens shown once, before the entry screen.
+ * The three "why science" screens shown once, before Home.
  *
  * KHMER-ONLY, like the Study, Exam and Practice pages: the copy was supplied in
  * Khmer and an English column would be invented. The one change from the
@@ -130,5 +130,5 @@ export const INTRO_SLIDES: IntroSlide[] = [
   },
 ];
 
-/** Leaves the intro for the entry screen. Not in the brief; see intro-view. */
+/** Leaves the intro for Home. Not in the brief; see intro-view. */
 export const INTRO_SKIP = "រំលង";

@@ -18,8 +18,6 @@ import { PRACTICE_TABS, subjectsFor, type PracticeMode } from "../practice";
  * make, because this is a drawer destination inside existing app chrome:
  *
  *  - No back arrow. You do not "go back" from a nav destination.
- *  - Title left with pr-14 on the header, because TopBar's floating hamburger
- *    already owns `absolute top-3 right-4`.
  *
  * The tab is component state, not store state: it is how the screen is being
  * looked at right now, not something a reload should inherit. Same call as the
@@ -33,7 +31,7 @@ export function PracticeView() {
 
   return (
     <div>
-      <div className="font-heading mb-4 bg-brand-tri bg-clip-text pr-14 text-xl font-extrabold text-transparent">
+      <div className="font-heading mb-4 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
         ការអនុវត្ត
       </div>
 

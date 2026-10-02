@@ -7,7 +7,7 @@ import { Wordmark } from "@/components/shell/wordmark";
  * ── Why this route sits OUTSIDE ShellLayout ───────────────────────────────
  *
  * Every other route is nested under it and therefore passes through AppShell's
- * auth gate, which would render the entry screen here instead of the policy.
+ * auth gate, which could render the intro or the signup form here instead.
  * That breaks the two readers who matter most: Google, which checks the URL
  * resolves before it will let the OAuth app be published, and a student
  * deciding whether to sign up at all. A privacy policy you have to log in to

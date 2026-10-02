@@ -1,15 +1,12 @@
 import { track } from "@/lib/telemetry";
 import { lazy, Suspense, useEffect, useState } from "react";
-import { TopBar } from "./top-bar";
 import { Drawer } from "./drawer";
 import { Sidebar } from "./sidebar-nav";
 import { FabChat } from "./fab-chat";
-import { StatBar } from "./stat-bar";
+import { AppHeader } from "./app-header";
 import { LoginView } from "@/features/login/components/login-view";
 import { SurveyView } from "@/features/survey/components/survey-view";
 import { CommitmentOverlay } from "@/features/commitment/components/commitment-overlay";
-import { EntryView } from "@/features/auth/components/entry-view";
-import { InAppBrowserView } from "@/features/auth/components/in-app-browser-view";
 import { AuthSplash } from "@/features/auth/components/auth-splash";
 import { AuthPromptOverlay } from "@/features/auth/components/auth-prompt-overlay";
 import { AccountConflictView } from "@/features/auth/components/account-conflict-view";
@@ -20,7 +17,6 @@ import { useSupabaseSync } from "@/hooks/use-supabase-sync";
 import { useStudyTimer } from "@/hooks/use-study-timer";
 import { useAuthSession } from "@/hooks/use-auth-session";
 import { useAuth } from "@/hooks/use-auth";
-import { isInAppBrowser } from "@/utils/in-app-browser";
 
 // The mentor pulls in KaTeX and its web fonts for typesetting replies. It is
 // only mounted when chatOpen is true, but a static import would still ship all
@@ -43,12 +39,6 @@ const IntroView = lazy(() =>
     default: m.IntroView,
   }))
 );
-
-// Read ONCE, at module scope, because the answer cannot change while the page
-// is open — a user agent does not change mid-session. It is also what keeps the
-// check out of the render path entirely, so the gate below stays a plain
-// boolean compare and the React Compiler has no impure call to reason about.
-const IN_APP_BROWSER = isInAppBrowser();
 
 // Not a phone mockup — no frame, notch, or status bar. This is just the app's
 // outer container: full-bleed on a phone, then widening in steps so a laptop
@@ -81,7 +71,6 @@ export function AppShell({
   const lang = useBrachNhaStore((s) => s.lang);
   const theme = useBrachNhaStore((s) => s.theme);
   const rolloverDailyTasks = useBrachNhaStore((s) => s.rolloverDailyTasks);
-  const guestMode = useBrachNhaStore((s) => s.guestMode);
   const authPrompt = useBrachNhaStore((s) => s.authPrompt);
   const accountConflict = useBrachNhaStore((s) => s.accountConflict);
 
@@ -183,62 +172,32 @@ export function AppShell({
           scripts/shots.mjs: with no project there is no account to have, and
           the app behaves exactly as it did before auth existed.
 
-          Note the last two conditions apply to AUTHENTICATED students only.
-          A guest falls straight through to the app with no name and no survey,
-          which is the point — and because their `surveyed` was never faked,
-          signing in later walks them through it properly. */}
-      {status === "loading" && !hasFullAccess && !guestMode && !userName ? (
+          The last two conditions apply to AUTHENTICATED students only. A
+          signed-out student is a guest and falls straight through to the app
+          with no name and no survey, which is the point — and because their
+          `surveyed` was never faked, signing in later walks them through it. */}
+      {/* The splash covers the moment an OAuth callback is being resolved, so
+         a student coming back from Google does not see Home flash before
+         LoginView. With no auth traces the session settles in the mount
+         effect, so for an ordinary guest this lasts one frame. A returning
+         student with a name skips it: they render the app at once and only
+         the locked features wait on the session. */
+      status === "loading" && !hasFullAccess && !userName ? (
         <AuthSplash />
       ) : accountConflict ? (
         <AccountConflictView />
       ) : /* ── The intro ─────────────────────────────────────────────────────
-             Before the entry screen (and before LoginView when Supabase is
-             unconfigured), once per device. Only someone who has not started
-             yet sees it: no name, not a guest, not signed in. That is what
-             keeps every existing student, a returning signed-in student during
-             the session-loading window, an OAuth callback and the screenshot
-             harness's seeded profile all clear of it with no extra condition.
-             Not in an in-app browser: that student is sent to their real
-             browser, which has its own storage and would show it again. */
-      !introSeen &&
-        !userName &&
-        !guestMode &&
-        !isAuthenticated &&
-        !IN_APP_BROWSER ? (
+             Once per device, then straight to Home as a guest. There is no
+             entry screen: every signed-out student IS a guest, and signing in
+             is offered where an account is needed (KruAI, Roadmap, Battle,
+             Profile). Only someone who has not started yet sees the intro: no
+             name, not signed in. That keeps every existing student, an OAuth
+             callback and the screenshot harness's seeded profile clear of it
+             with no extra condition. */
+      !introSeen && !userName && !isAuthenticated ? (
         <Suspense fallback={null}>
           <IntroView onDone={finishIntro} />
         </Suspense>
-      ) : /* `status === "ready"` is load-bearing here, not belt-and-braces.
-             A returning student HAS a name and a session, but the session takes
-             a dynamic import to resolve — so during that window they are
-             "not authenticated and not a guest", and without this they would be
-             thrown onto the entry screen and asked to sign in to the account
-             they are already signed in to. Falling through to the app instead
-             is the whole point of not gating first paint on auth: the only
-             thing that arrives late is whether the locked features unlock. */
-      status === "ready" && !isAuthenticated && !guestMode && !hasFullAccess ? (
-        /* ── The in-app browser detour ──────────────────────────────────
-           Exactly where the entry screen would be, and nowhere else. That
-           placement is the whole rule, and it is what makes every "must not"
-           in this feature true without a second condition to keep in step:
-
-            - a student in Chrome or Safari never reaches it, because
-              isInAppBrowser() is false for them;
-            - a signed-in student never reaches it, in any browser, because
-              `!isAuthenticated` already failed — the OAuth callback resolves
-              into a session and the chain moves past this branch on its own,
-              so nothing here can interrupt a callback or touch a session;
-            - a guest who already chose guest mode never reaches it either;
-            - and an unconfigured Supabase makes `hasFullAccess` true, so a
-              fresh fork and scripts/shots.mjs behave exactly as before.
-
-           The one thing it does cost is the guest option for a first-time
-           visitor arriving from Telegram — see the component's own header. */
-        IN_APP_BROWSER ? (
-          <InAppBrowserView />
-        ) : (
-          <EntryView />
-        )
       ) : hasFullAccess && !userName ? (
         <LoginView />
       ) : hasFullAccess && !surveyed ? (
@@ -248,40 +207,19 @@ export function AppShell({
           {/* Hidden below lg by the component itself. hideChrome drops it too,
               so the roadmap's one-way onboarding stays one-way on desktop. */}
           {!hideChrome && <Sidebar />}
-          {/* Outer, NOT `relative`. GlobalStatBar sits here, as a normal-flow
-              sibling ABOVE the relative wrapper below, so it pushes that
-              wrapper's top edge down rather than sitting inside it. That
-              matters because TopBar's hamburger is `absolute top-3` measured
-              from the relative wrapper's own top edge, which is also where a
-              page's `pt-4` header starts (see top-bar.tsx and the header
-              convention in CLAUDE.md) — the two stay aligned to each other
-              exactly as before, just both shifted down by GlobalStatBar's
-              height as one unit. Putting the bar INSIDE the relative wrapper
-              instead would not have worked: absolute positioning ignores
-              sibling flow, so the hamburger would have stayed pinned to the
-              wrapper's original top edge and overlapped it. */}
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            {/* THE GLOBAL STAT BAR. XP/streak/coins are the app's whole
-                gamification loop, so this is deliberately not confined to the
-                task screens FocusLayout already shows it on (see its
-                `showStats` prop) — it is now the first thing on every ordinary
-                page. Gated on the SAME `!hideChrome` as Sidebar/TopBar just
-                above: focus tasks, the mock exam and placement test (measuring
-                rather than teaching — a live counter there turns a test into a
-                scoreboard, the reasoning FocusLayout's own showStats already
-                encodes) and the roadmap's one-way onboarding lock all correctly
-                stay clear of it for the same reasons they already hide the rest
-                of the chrome. subject-path-view.tsx's own inline StatBar was
-                removed once this landed — this is now the one place that
-                renders it for an ordinary page, not a second copy that could
-                disagree with it. */}
-            {!hideChrome && (
-              <div className="shrink-0 flex justify-end px-4 pt-3 md:px-6 md:pt-4">
-                <StatBar />
-              </div>
-            )}
+            {/* THE APP BAR: level ring with XP progress, streak, coins and the
+                menu button in one row (see app-header.tsx). XP/streak/coins are
+                the app's gamification loop, so it is on every ordinary page.
+                Gated on `!hideChrome` like the Sidebar: focus tasks, the mock
+                exam and placement test (a live counter there turns a test into
+                a scoreboard; FocusLayout's own `showStats` covers the lessons)
+                and the roadmap's one-way onboarding lock all stay clear of it.
+                It is in normal flow, ABOVE the relative wrapper below, so the
+                page content starts under it and no page reserves room for a
+                floating menu button any more. */}
+            {!hideChrome && <AppHeader />}
             <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-              {!hideChrome && <TopBar />}
               <Drawer />
               {/* overflow-HIDDEN, not auto. Every page already owns its own
                   scroll container — they have to, because the ones rendering
@@ -312,7 +250,7 @@ export function AppShell({
           </div>
           {/* A level ABOVE the relative wrapper, unlike CommitmentOverlay.
               This one is a translucent scrim rather than an opaque panel, so
-              rendering it inside that wrapper left the StatBar row undimmed
+              rendering it inside that wrapper left the app bar undimmed
               along the top edge — visibly a modal sitting "inside" the page.
               Anchors to the shell root, which carries `relative` for this.
 

@@ -163,7 +163,7 @@ export function PracticeLessonList({
         ការអនុវត្ត
       </Link>
 
-      <div className="mb-4 flex items-center gap-3 pr-14">
+      <div className="mb-4 flex items-center gap-3">
         <SubjectArt
           subject={subject}
           className="size-14 shrink-0 rounded-xl md:size-16"

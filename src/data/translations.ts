@@ -191,11 +191,7 @@ export const T = {
     // Bilingual, not Khmer-only: this is chrome, like Home and Profile, rather
     // than curriculum content — so it follows the store's `lang` the way the
     // rest of the shell does. "Google" is never translated, it is a brand name.
-    entryTitle: "Welcome, Hero!",
-    entryTagline: "Your quest to conquer Bac II starts here.",
     continueWithGoogle: "Continue with Google",
-    continueAsGuest: "Continue as Guest",
-    guestNote: "Look around first. You can sign in any time to save your progress.",
     googleNote: "Saves your progress and unlocks your AI coach.",
     signingIn: "Signing in...",
     signInFailed: "Sign-in could not start. Please check your connection and try again.",
@@ -203,7 +199,7 @@ export const T = {
     privacyPolicy: "Privacy policy",
 
     // ── in-app browser ──
-    // Shown in place of the entry screen when BrachNha was opened inside
+    // Shown inside the Google button when BrachNha was opened inside
     // Telegram's or Messenger's own browser. "Browser", "Chrome" and "Safari"
     // stay in Latin script in both columns: they are the words printed on the
     // menus the student is being sent to look for, so translating them would
@@ -444,11 +440,7 @@ export const T = {
     titleMaster: "មេជំនាញ",
 
     // ── auth ──
-    entryTitle: "សូមស្វាគមន៍វីរបុរស!",
-    entryTagline: "ដំណើរយកឈ្នះ Bac II របស់អ្នកចាប់ផ្តើមនៅទីនេះ។",
     continueWithGoogle: "បន្តជាមួយ Google",
-    continueAsGuest: "បន្តជាភ្ញៀវ",
-    guestNote: "មើលសិនក៏បាន។ អ្នកអាចចូលគណនីពេលណាក៏បាន ដើម្បីរក្សាទុកវឌ្ឍនភាព។",
     googleNote: "រក្សាទុកវឌ្ឍនភាព និងបើកប្រើ KruAI របស់អ្នក។",
     signingIn: "កំពុងចូល...",
     signInFailed: "មិនអាចចាប់ផ្តើមការចូលបានទេ។ សូមពិនិត្យអ៊ីនធឺណិត រួចព្យាយាមម្ដងទៀត។",

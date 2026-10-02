@@ -1,4 +1,3 @@
-import { HomeHeader } from "@/features/home/components/home-header";
 import { MotivationHero } from "@/features/home/components/motivation-hero";
 import { StatPills } from "@/features/home/components/stat-pills";
 import { GradePredictionWidget } from "@/features/home/components/grade-prediction-widget";
@@ -18,7 +17,6 @@ export default function HomePage() {
           {/* Greeting, hero and stat pills are the page's masthead: full width
               at every size, stacked as before. */}
           <div className="space-y-4 md:col-span-2">
-            <HomeHeader />
             <MotivationHero />
             <StatPills />
           </div>

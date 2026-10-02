@@ -5,7 +5,7 @@ import { useBrachNhaStore } from "@/lib/store";
 /**
  * The mobile/tablet nav: the same SidebarNav the desktop Sidebar renders, in a
  * slide-over Sheet. Only the wrapper differs, so the two navs cannot drift.
- * Below lg this is reached from TopBar's hamburger; at lg and above the
+ * Below lg this is reached from the app bar's menu button; at lg and above the
  * permanent Sidebar takes over and the hamburger is hidden.
  */
 export function Drawer() {

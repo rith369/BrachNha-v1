@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
+import { Link } from "react-router";
 import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
 import { useT } from "@/data/translations";
@@ -89,6 +90,18 @@ export function AuthPromptOverlay() {
         >
           {t.maybeLater}
         </button>
+
+        {/* The entry screen used to carry this. This is now where a student
+            decides whether to hand over their Google account, and Google
+            requires the policy to be reachable there. /privacy is routed
+            outside the shell, so it opens without signing in. */}
+        <Link
+          to="/privacy"
+          onClick={closeAuthPrompt}
+          className="mt-1 block text-center text-xs font-bold text-muted underline underline-offset-2 hover:text-purple"
+        >
+          {t.privacyPolicy}
+        </Link>
       </motion.div>
     </motion.div>
   );

@@ -299,7 +299,7 @@ export function QuizPathView({ subject }: { subject: SubjectMeta }) {
       <div className="sticky -top-4 z-20 -mt-4 bg-bg pt-4 pb-3">
         <Link
           to="/practice"
-          className="mb-3 inline-flex items-center gap-1 pr-14 text-xs font-extrabold text-muted transition hover:text-text md:text-sm"
+          className="mb-3 inline-flex items-center gap-1 text-xs font-extrabold text-muted transition hover:text-text md:text-sm"
         >
           <ChevronLeft className="size-4 shrink-0" strokeWidth={2.5} />
           ការអនុវត្ត

@@ -30,9 +30,6 @@ type Run = { kind: "generated"; paper: ExamPaper };
  * KHMER-ONLY, on purpose. See EXAM_PAGE_LANG in ../papers for the why and for
  * the two carve-outs it does NOT cover.
  *
- * Title left with pr-14 on the header, because TopBar's floating hamburger
- * already owns `absolute top-3 right-4`.
- *
  * THIS COMPONENT OWNS ITS OWN FRAME, unlike the Study page where lessons.tsx
  * supplies the padding. That is deliberate: the two branches need different
  * frames — the tabbed and results screens want a padded scroller, while the
@@ -138,7 +135,7 @@ export function ExamView() {
               វិញ្ញាសារត្រៀមប្រឡង
             </Link>
 
-            <div className="font-heading mb-4 bg-brand-tri bg-clip-text pr-14 text-xl font-extrabold text-transparent">
+            <div className="font-heading mb-4 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
               វិញ្ញាសារតាមមុខវិជ្ជា
             </div>
 
