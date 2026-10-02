@@ -64,7 +64,14 @@ export function QuizResults({
     <FocusLayout
       progressPct={100}
       onExit={onBack}
-      footer={<FocusButton onClick={onRetake}>ធ្វើម្តងទៀត →</FocusButton>}
+      footer={
+        <div className="flex gap-2.5">
+          <FocusButton variant="secondary" onClick={onBack}>
+            ← ត្រឡប់ក្រោយ
+          </FocusButton>
+          <FocusButton onClick={onRetake}>ធ្វើម្តងទៀត →</FocusButton>
+        </div>
+      }
     >
       <div className="mx-auto w-full max-w-2xl">
         <div className="text-center">

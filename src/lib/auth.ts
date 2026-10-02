@@ -145,11 +145,14 @@ export async function signInWithGoogle(): Promise<string | null> {
       return "unconfigured";
     }
 
+    // Logout lives on /profile and leaves the student standing there, so a
+    // returning student who signs in from the entry screen would otherwise
+    // come back to Profile instead of Home.
+    const path =
+      window.location.pathname === "/profile" ? "/" : window.location.pathname;
     const { error } = await db.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}${window.location.pathname}`,
-      },
+      options: { redirectTo: `${window.location.origin}${path}` },
     });
 
     if (error) {

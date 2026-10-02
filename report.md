@@ -15,6 +15,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 2 Oct 2026 — Small Fixes: Back Button on Quiz Results, Sign-in Lands on Home
+
+Not committed yet. No database step needed.
+
+**What changed.**
+
+- **Quiz results screen:** a "← ត្រឡប់ក្រោយ" (back) button now sits next to
+  "ធ្វើម្តងទៀត" (try again), so leaving the results no longer needs the small ✕
+  at the top.
+- **Signing in after logging out:** you log out from the Profile page, so
+  signing in again used to bring you back to Profile. It now brings you to Home.
+
+**What to re-test.** Finish a practice quiz and press back on the results
+screen. Log out from Profile, sign in with Google again, and check that you land
+on Home.
+
 ## 1 Oct 2026 — KruAI: A Follow-up About a Photo Costs 1, Not 3
 
 Commit `d0fb895`. No database step needed.
