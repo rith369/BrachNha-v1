@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 1 Oct 2026 — KruAI: A Follow-up About a Photo Costs 1, Not 3
 
-Not committed yet. No database step needed.
+Commit `d0fb895`. No database step needed.
 
 **Why.** Found while testing: after sending a photo, every follow-up question in
 the same chat also counted as 3 of the 30 daily questions. KruAI is shown the
