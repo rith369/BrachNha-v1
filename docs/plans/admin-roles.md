@@ -1,9 +1,11 @@
 # Roles and the admin area
 
-> **Status: Step A BUILT (2 Oct 2026), plus an OWNER role. Not committed yet.
-> All three migrations (20261002000001 roles, 000002 owner, 000003 creator
-> photo cleanup) are applied on the live project, and keop1484 is the owner. Steps B and C not started.** Written 1 Oct 2026. Steps A, B and C
-> are built in order, one commit each. When a step ships, mark it done here.
+> **Status: Step A DONE (2 Oct 2026, commit `4540f42`), with an OWNER role and
+> the creator photo cleanup. All three migrations (20261002000001 roles, 000002
+> owner, 000003 creator photo cleanup) are applied on the live project, and
+> keop1484 is the owner. Steps B and C not started.** Written 1 Oct 2026.
+> Steps A, B and C are built in order, one commit each. When a step ships, mark
+> it done here.
 
 ## Context
 

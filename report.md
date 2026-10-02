@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 2 Oct 2026 — An Admin Area: Dashboard, Students, Admins and an Owner
 
-Commit `(not committed yet)`. **Database steps needed,** each once in the Supabase SQL
+Commit `4540f42`. **Database steps needed,** each once in the Supabase SQL
 editor, in one go:
 
 1. `supabase/migrations/20261002000001_roles_and_admin_tools.sql` (already applied);
