@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 2 Oct 2026 — KruAI's Full Solution Ends With the Formal Bac II Answer
 
-Not committed yet. No database step needed.
+Commit `a2d497b`. No database step needed.
 
 **Why.** A full solution explained each step and then gave only the final number. A
 student never saw how the answer must be written on the exam paper.
