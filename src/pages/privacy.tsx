@@ -36,6 +36,7 @@ import { Wordmark } from "@/components/shell/wordmark";
  *   leaderboard name    → the leaderboard() function, 20260916000004
  *   account deletion    → lib/account-deletion.ts (+ 20261001000002)
  *   what admins see     → admin_students() in 20261002000001
+ *   pausing KruAI       → admin_set_kruai_block() in 20261002000004
  * If any of those change, this page is part of the change.
  */
 
@@ -231,7 +232,8 @@ export default function PrivacyPage() {
             show your name, email, when you joined and last opened the app, your
             study numbers (XP, level, streak) and how many KruAI questions you
             asked. They use this to help you when something goes wrong and to
-            keep the app safe.
+            keep the app safe, and they can pause KruAI for an account that
+            misuses it.
           </p>
           <p>
             សេវាកម្មបីៈ Google សម្រាប់ការចូលគណនី, Supabase
@@ -243,7 +245,8 @@ export default function PrivacyPage() {
             ឧបករណ៍របស់ពួកគេបង្ហាញឈ្មោះ អ៊ីមែល ថ្ងៃដែលអ្នកចូលរួម
             និងថ្ងៃដែលអ្នកបើកកម្មវិធីចុងក្រោយ លេខសិក្សារបស់អ្នក (XP កម្រិត Streak)
             និងចំនួនសំណួរដែលអ្នកសួរ KruAI។
-            ពួកគេប្រើវាដើម្បីជួយអ្នកពេលមានបញ្ហា និងរក្សាសុវត្ថិភាពកម្មវិធី។
+            ពួកគេប្រើវាដើម្បីជួយអ្នកពេលមានបញ្ហា និងរក្សាសុវត្ថិភាពកម្មវិធី
+            ហើយអាចផ្អាក KruAI សម្រាប់គណនីដែលប្រើវាមិនត្រឹមត្រូវ។
           </p>
         </Section>
 

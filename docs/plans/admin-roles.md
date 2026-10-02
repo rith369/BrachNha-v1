@@ -1,9 +1,9 @@
 # Roles and the admin area
 
 > **Status: Step A DONE (2 Oct 2026, commit `4540f42`), with an OWNER role and
-> the creator photo cleanup. All three migrations (20261002000001 roles, 000002
-> owner, 000003 creator photo cleanup) are applied on the live project, and
-> keop1484 is the owner. Steps B and C not started.** Written 1 Oct 2026.
+> the creator photo cleanup; its three migrations are applied, and keop1484 is
+> the owner. Step B BUILT (2 Oct 2026), not committed yet; its migration
+> (20261002000004) is applied on the live project. Step C not started.** Written 1 Oct 2026.
 > Steps A, B and C are built in order, one commit each. When a step ships, mark
 > it done here.
 
@@ -158,6 +158,19 @@ This plan grows that into a role system and a small admin area.
 ---
 
 ## B. KruAI and cost
+
+> **Built 2 Oct 2026.** As planned, with these differences:
+>
+> - **Changing the limits is OWNER ONLY** (`owner_only`), since they decide how
+>   fast the prepaid credit goes. Pausing is any admin, but an admin cannot
+>   pause themselves, another admin or the owner.
+> - The limits are read through one helper, `kruai_limits()`, which falls back to
+>   30 / 300 and clamps to the bounds, so a hand-edited settings row cannot make
+>   every question fail.
+> - `admin_students()` gained `kruai_blocked` for the Pause toggle, so it is
+>   dropped and re-created in the same migration.
+> - A paused student still gets the free curated answers; pausing stops model
+>   use, which is what costs money.
 
 ### Migration `20261002000004_kruai_controls.sql` (the next free number; 000002 is the owner role, 000003 the creator photo cleanup)
 

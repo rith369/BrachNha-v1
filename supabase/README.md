@@ -40,15 +40,28 @@ supabase/migrations/
                                    competition, so "Delete my account" leaves
                                    no joiner photos behind. Apply BEFORE the app
                                    that uses it ships
+  20261002000004_kruai_controls.sql
+                                   KruAI limits set on /admin/kruai (owner
+                                   only), and pausing KruAI for a student
 ```
 
-**Changing KruAI's daily limits** (`20260929000001`): they are the two
-constants at the top of `public.kruai_take` (`user_daily`, `app_daily`). Open
-that migration, change the numbers, and run its `create or replace function`
-block again in the SQL editor. They are not parameters on purpose, because a
-student can call the function directly with their own token. When changing
-`user_daily`, change `USER_DAILY_UNITS` in `server/chat-handler.ts` to match:
-it is what the chat's "questions left today" line counts down from.
+**Changing KruAI's daily limits:** since `20261002000004`, the owner changes
+them on **`/admin/kruai`** (1 to 200 a student, 1 to 10000 for the whole app).
+They live in `app_settings` (`key = 'kruai_limits'`), which no client can read
+or write, and `kruai_take` reads them inside the function: they are still not
+parameters, because a student can call it directly with their own token. The
+server needs no change: `kruai_take` returns the student limit it enforced, and
+the chat's "questions left today" counts down from that. By hand, if the page is
+not to hand:
+
+```sql
+update public.app_settings
+set value = '{"user_daily": 30, "app_daily": 300}', updated_at = now()
+where key = 'kruai_limits';
+```
+
+A bad value cannot take KruAI down: a missing row or a non-number falls back to
+30 / 300, and anything outside the bounds is clamped.
 
 The SQL is the source of truth for the schema, checked into git like any other
 code. Do not create or alter tables from the dashboard's Table Editor: the

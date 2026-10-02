@@ -573,8 +573,9 @@ Cutting the model off:
   on every charged answer, and on a refusal at the student's own limit.
 - A curated answer is free and sends none. The whole-app refusal sends none either, since a
   count under "KruAI is resting" would contradict it.
-- **`USER_DAILY_UNITS` in the handler MIRRORS `user_daily` in the migration.** Change both
-  together. If they drift, the count shown is wrong but the limit is not.
+- **"Left" is computed from the limit the database enforced.** `kruai_take` returns it as
+  `user_limit` (since `20261002000004`), so there is no copy in the handler to drift. Before that
+  migration the server falls back to 30 (`DEFAULT_USER_DAILY_UNITS` in `server/kruai-quota.ts`).
 - The screen shows a line above the composer once `LOW_LEFT` (10) or fewer are left, with
   "a photo counts as 3" while a photo is attached.
 - The count is kept in module scope, with the day, so it survives closing and reopening the chat
@@ -927,8 +928,10 @@ on every cold start. A money limit must be one number shared by every instance.
 **Three decisions in `kruai_take`, each closing a real hole:**
 - **The server calls it with the STUDENT'S OWN token**, so `auth.uid()` is the
   student and no secret key is needed. The catch is that any student can also
-  call it directly. So the **limits are constants inside the function, never
-  parameters** (a parameter would let them choose the limit). `p_units` must be
+  call it directly. So the **limits are never parameters** (a parameter would let
+  them choose the limit). They were constants inside the function until
+  `20261002000004`; now they are read inside it from `app_settings`, a table no
+  student can write, which the owner sets on `/admin/kruai`. `p_units` must be
   1–10 (no negative refunds), and a refused call **changes nothing**, so a student
   hammering at their limit cannot eat into everyone's count. The worst a student
   can do by calling it directly is spend their own 30.
@@ -956,11 +959,9 @@ Take the average cost per unit from those lines and Google's price page, then
 set `app_daily ≈ dollars per day accepted / cost per unit` (about $1/day for $30
 to last a month). The worst case is bounded: `max_output_tokens` is 3000 and the
 prompt budgets are fixed, so a day can never cost more than
-`app_daily × worst-case cost of one unit`. **Change a limit by editing the constant
-in the migration and re-running its `create or replace function` in the SQL
-editor.** `supabase/README.md` says the same. For `user_daily`, also change
-`USER_DAILY_UNITS` in `server/chat-handler.ts`, which turns "used" into the "questions
-left" the chat shows.
+`app_daily × worst-case cost of one unit`. **Change a limit on `/admin/kruai`**
+(owner only, since `20261002000004`; see "KruAI limits and pausing" in the admin
+section). Nothing in the server needs to change with it.
 
 **Production uses ONE key.** Vercel holds only `GEMINI_API_KEY` (the paid one).
 `GEMINI_API_KEYS` and `_1..5` are deleted there, because mixing in free keys from
@@ -6519,6 +6520,74 @@ single remaining CHECK; then 22 browser checks of the owner's and an admin's
 views and of Profile, in English and Khmer.
 
 
+### KruAI limits and pausing (2 Oct 2026, Step B of `docs/plans/admin-roles.md`)
+
+`/admin/kruai` (`features/admin/components/kruai-view.tsx`, migration
+`20261002000004_kruai_controls.sql`): today's units against the whole-app limit,
+a 14-day bar chart with the limit as a dashed line, the 10 heaviest students
+today, the two daily limits, and the paused students with a Resume button. The
+Students page gained Pause / Resume KruAI and a "KruAI paused" chip.
+
+**The limits moved from constants in `kruai_take` into `app_settings`.**
+`kruai_limits()` is the ONE reader (not granted to anyone; only the security
+definer functions call it): a missing row or a non-number falls back to 30 /
+300, and any value is clamped to the setter's bounds, so a row edited by hand
+can make the limits odd but can never make every question fail. They are still
+NOT a parameter of `kruai_take`. `kruai_take` gained a fifth column,
+`user_limit`, which changed its return type, so the migration drops and creates
+it inside one transaction.
+
+**`USER_DAILY_UNITS` is GONE from the handler.** "Left today" is now
+`quota.userLimit - quota.userUnits`, from the limit `kruai_take` enforced, so the
+count a student sees can no longer drift from the limit. Without the migration
+`user_limit` is absent and `server/kruai-quota.ts` falls back to
+`DEFAULT_USER_DAILY_UNITS` (30), so code and migration ship in either order.
+
+**Who may do what:**
+
+| action | who | refusal (`hint`) |
+| --- | --- | --- |
+| see `/admin/kruai` | any admin | |
+| change the limits (`admin_set_kruai_limits`) | **the owner only** | `owner_only`; out of 1–200 / 1–10000: `range` |
+| pause a student (`admin_set_kruai_block`) | any admin | yourself `self`, the owner `owner`, an admin `admin` |
+| resume | any admin, anyone | never refused |
+
+Limits are owner-only because they decide how fast the prepaid credit can be
+spent; this was my call when building it, beyond the plan's "admin". Pausing is
+moderation, so every admin has it, but admins cannot silence each other or the
+owner.
+
+**A paused student gets a 403** with "⏸️ KruAI is paused for this account.
+Contact the BrachNha team…" (both languages, sibling voice) and
+`X-KruAI-Limit: blocked`, no "left" header. `chat-overlay.tsx` needed no change:
+a 4xx that is not a busy 429 is already marked `failed: "final"`, so there is no
+Try again. Refused in dev too, since unlike a failed check it is a definite
+answer. **Curated answers still come** (`server/chat-cache.ts` runs before the
+quota and costs nothing): pausing stops model use, which is what costs money.
+
+**The page re-asks after every save or resume** (`version` bump) and keeps the
+old numbers on screen while it does. The limit form checks whole numbers inside
+`KRUAI_LIMIT_BOUNDS` before sending; the database checks again. Units, not
+dollars: the page says the cost in dollars is only in the server logs.
+
+**The hub's tool row has three cards now.** The third (KruAI) spans both columns
+until `xl`, where three fit across, so the grid never holes.
+
+**Verified:** the migration after `20260929000001`, `…0001` and `…0002`, applied
+twice, against PGlite: 43 checks (old 4-column `kruai_take` replaced, seeded and
+saved limits enforced, owner-only and range refusals, junk / out-of-range /
+missing settings rows, paused refusal charging nothing, reason trimming and the
+200-character cut, overview shape, `admin_students.kruai_blocked`, grants, RLS
+hiding both tables). The REAL `handleChat` through `ssrLoadModule` against a fake
+Supabase (JWKS + scripted `kruai_take`, ES256 token) and a fake model: 10 checks
+(paused 403 in both languages with no model call, "left" from a 50 limit, the
+photo refusal with 2 left, the fallback to 30 with no `user_limit`). Browser,
+Supabase faked through Playwright `route`: 34 checks at 1280 / 390 / 320 dark
+Khmer (owner save with invalid-value refusal and re-ask, admin read-only, resume,
+pause with trimmed reason and chip, no Pause on an admin row, no sideways
+scroll, no page error).
+
+
 ## Installable app: "add to home screen" and the two pop-ups
 
 BrachNha is an installable web app (PWA). None of this touches Google sign-in:
@@ -7711,6 +7780,12 @@ someone joined with photos. Until it is, `db:check` names
 this" for the dashboard, and `/admin/students` fails to load; the photo-report
 page keeps working on the old `app_admins`. Afterwards a publishable-key-only
 call to `/rest/v1/rpc/admin_dashboard` must be refused.
+
+**`20261002000004_kruai_controls.sql` (KruAI limits and pausing)** can ship before
+or after the code: the server falls back to 30 a student without it. Until it is
+applied, `db:check` names `app_settings` and `kruai_blocks` as missing and
+`/admin/kruai` says it could not load. Afterwards a publishable-key-only call to
+`/rest/v1/rpc/admin_kruai_overview` must be refused.
 
 **The Game feature needs BOTH its migrations applied before db:check passes** —
 `20260913000001_competitions.sql` and

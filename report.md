@@ -15,6 +15,42 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 2 Oct 2026 — KruAI Limits and Pausing, From the Admin Area
+
+Commit `(not committed yet)`. **Database step:** `supabase/migrations/20261002000004_kruai_controls.sql`, run once in the
+Supabase SQL editor (already applied).
+
+**Why.** Changing how many KruAI questions a student or the whole app may ask each day meant
+editing the database by hand, and the server kept its own copy of the student limit that had
+to be changed too. There was no way to stop one account from using KruAI.
+
+**What changed.**
+
+- **A new KruAI page in the admin area (`/admin/kruai`):**
+  - how many KruAI units were used today, against the whole-app limit;
+  - a chart of the last 14 days, with the limit drawn as a dashed line;
+  - the students who used the most today;
+  - the two daily limits (per student, and for the whole app);
+  - the students whose KruAI is paused, with a Resume button.
+- **Only the owner can change the limits.** Other admins see them but cannot edit them, because
+  the limits decide how fast the prepaid credit is spent. A question is 1 unit and a new photo
+  is 3. The page shows units, not dollars.
+- **Admins can pause KruAI for one student**, from that student's row on the Students page,
+  with an optional reason. The student sees "KruAI is paused for this account" and can still
+  use the rest of the app. Admins cannot pause each other or the owner.
+- **"Questions left today" now follows the limit you set**, so it always matches what the app
+  enforces.
+- **The privacy page now says** that the team can pause KruAI for an account that misuses it.
+
+**What to re-test** (after running the migration):
+
+- As the owner, open Admin, then KruAI: check today's number and the chart.
+- Change the per-student limit (for example to 20), then ask KruAI a question on a test account:
+  the "questions left" line should count down from the new number. Set it back afterwards.
+- On Students, pause a TEST account, then ask KruAI from it: it should say KruAI is paused.
+  Resume it from the KruAI page.
+- Signed in as an ordinary admin: the limits are shown but cannot be edited.
+
 ## 2 Oct 2026 — New Top Bar: Level Ring and XP Progress
 
 Commit `5ad5eb9`. No database step needed.

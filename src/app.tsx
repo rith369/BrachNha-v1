@@ -78,6 +78,7 @@ const PrivacyPage = lazy(routeModules.privacy);
 // every student's phone.
 const AdminPage = lazy(() => import("@/pages/admin"));
 const AdminStudentsPage = lazy(() => import("@/pages/admin-students"));
+const AdminKruaiPage = lazy(() => import("@/pages/admin-kruai"));
 const AdminReportsPage = lazy(() => import("@/pages/admin-reports"));
 const ProfilePage = lazy(routeModules.profile);
 const ProgressPage = lazy(routeModules.progress);
@@ -282,6 +283,7 @@ export default function App() {
               features/admin/components/admin-gate.tsx. */}
           <Route path="admin" element={<AdminPage />} />
           <Route path="admin/students" element={<AdminStudentsPage />} />
+          <Route path="admin/kruai" element={<AdminKruaiPage />} />
           <Route path="admin/reports" element={<AdminReportsPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>

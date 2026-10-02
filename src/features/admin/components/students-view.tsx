@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { ChevronDown, Search, ShieldCheck, ShieldOff, Trash2 } from "lucide-react";
+import { ChevronDown, Pause, Play, Search, ShieldCheck, ShieldOff, Trash2 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { useAdminStatus } from "@/lib/admin-status";
 import {
   deleteStudent,
   listStudents,
   setAdmin,
+  setKruaiBlock,
   type AdminFail,
   type AdminStudent,
 } from "@/lib/admin-tools";
@@ -204,6 +205,114 @@ function DeletePanel({
  *  - only the owner sees Make admin / Remove admin;
  *  - an admin's account is deleted only by the owner, after removing the role.
  */
+/**
+ * Pause or resume KruAI for one student (20261002000004). Pausing takes two
+ * taps and offers an optional reason, which the KruAI page's paused list shows
+ * the rest of the team; resuming is one tap, since it only gives back what
+ * everyone else has. Offered on ordinary students only: the database refuses
+ * to pause an admin or the owner, so their rows never show it.
+ */
+function PauseButton({
+  student,
+  lang,
+  onChanged,
+}: {
+  student: AdminStudent;
+  lang: Lang;
+  onChanged: (blocked: boolean) => void;
+}) {
+  const c = ADMIN_COPY[lang];
+  const [armed, setArmed] = useState(false);
+  const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<AdminFail | null>(null);
+  const pause = !student.kruaiBlocked;
+
+  async function confirm() {
+    setBusy(true);
+    setError(null);
+    const result = await setKruaiBlock(student.id, pause, reason);
+    setBusy(false);
+    if (result.ok) {
+      setArmed(false);
+      setReason("");
+      onChanged(pause);
+    } else {
+      setError(result.reason);
+    }
+  }
+
+  if (!pause) {
+    return (
+      <div>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void confirm()}
+          className="flex items-center gap-1.5 rounded-xl border border-border bg-mint/30 px-3 py-2 text-xs font-extrabold text-text disabled:opacity-50"
+        >
+          <Play className="size-3.5" strokeWidth={2.5} />
+          {busy ? c.working : c.resumeKruai}
+        </button>
+        {error && <ErrorLine reason={error} lang={lang} />}
+      </div>
+    );
+  }
+
+  if (!armed) {
+    return (
+      <button
+        type="button"
+        onClick={() => setArmed(true)}
+        className="flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-2 text-xs font-extrabold text-text"
+      >
+        <Pause className="size-3.5" strokeWidth={2.5} />
+        {c.pauseKruai}
+      </button>
+    );
+  }
+
+  return (
+    <div className="w-full rounded-2xl border border-border bg-yellow/30 p-3">
+      <p className="mb-2 text-xs leading-relaxed font-semibold">{c.pauseNote}</p>
+      <input
+        type="text"
+        value={reason}
+        maxLength={200}
+        disabled={busy}
+        onChange={(e) => setReason(e.target.value)}
+        placeholder={c.pauseReason}
+        aria-label={c.pauseReason}
+        className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-xs font-bold outline-none placeholder:text-muted focus:border-purple"
+      />
+      {error && <ErrorLine reason={error} lang={lang} />}
+      <div className="mt-2 flex gap-2">
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => {
+            setArmed(false);
+            setReason("");
+            setError(null);
+          }}
+          className="flex-1 rounded-xl border border-border bg-surface px-3 py-2.5 text-xs font-extrabold disabled:opacity-50"
+        >
+          {c.cancel}
+        </button>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void confirm()}
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-border bg-[var(--brand-purple)] px-3 py-2.5 text-xs font-extrabold text-white disabled:opacity-50"
+        >
+          <Pause className="size-3.5" strokeWidth={2.5} />
+          {busy ? c.working : c.confirmPause}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function Actions({
   student,
   viewerIsOwner,
@@ -234,6 +343,13 @@ function Actions({
         />
       ) : (
         <p className="text-xs font-semibold text-muted">{c.ownerOnly}</p>
+      )}
+      {!student.isAdmin && (
+        <PauseButton
+          student={student}
+          lang={lang}
+          onChanged={(kruaiBlocked) => onChanged({ ...student, kruaiBlocked })}
+        />
       )}
       {student.isAdmin ? (
         <p className="text-xs font-semibold text-muted">{c.deleteAdminFirst}</p>
@@ -347,6 +463,11 @@ function StudentRow({
                   {c.adminChip}
                 </span>
               )
+            )}
+            {student.kruaiBlocked && (
+              <span className="rounded-full border border-border bg-neo-orange px-2 py-0.5 text-[10px] font-extrabold text-ink">
+                {c.kruaiPausedChip}
+              </span>
             )}
           </span>
           <span className="block truncate text-xs font-semibold text-muted">

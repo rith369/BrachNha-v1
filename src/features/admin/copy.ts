@@ -75,6 +75,40 @@ const en = {
   toolReports: "Photo reports",
   toolReportsBlurb: "Battle photos students reported.",
   openCount: (n: number) => `${n} open`,
+  toolKruai: "KruAI",
+  toolKruaiBlurb: "Daily limits, usage, and paused students.",
+
+  // ── /admin/kruai ──────────────────────────────────────────────────────────
+  kruaiTitle: "KruAI",
+  kruaiBlurb: "How much KruAI is used, the daily limits, and students whose KruAI is paused.",
+  todayTitle: "Today",
+  usedOfLimit: (used: number, limit: number) =>
+    `${used} of ${limit} units for the whole app`,
+  studentsToday: (n: number) =>
+    `${n} ${n === 1 ? "student" : "students"} asked today`,
+  unitsNote:
+    "A question is 1 unit and a new photo is 3. These are units, not dollars: the cost in dollars is only in the server logs.",
+  kruaiDailyTitle: "Units per day, last 14 days",
+  chartUnits: "Units",
+  chartLimit: "Whole-app limit",
+  topTitle: "Most units today",
+  topEmpty: "Nobody has asked KruAI today.",
+  unitsLabel: (n: number) => `${n} ${n === 1 ? "unit" : "units"}`,
+  pausedChip: "Paused",
+  limitsTitle: "Daily limits",
+  limitUser: "Per student, each day",
+  limitApp: "Whole app, each day",
+  limitRange: (min: number, max: number) => `${min} to ${max}`,
+  saveLimits: "Save limits",
+  limitsSaved: "Saved. The new limits apply from the next question.",
+  ownerOnlyLimits: "Only the owner can change the limits.",
+  limitInvalid: "Enter whole numbers inside the ranges shown.",
+  blockedTitle: "Paused students",
+  blockedEmpty: "Nobody is paused.",
+  blockedBy: (name: string, when: string) =>
+    name ? `Paused by ${name}, ${when}` : `Paused ${when}`,
+  noReason: "No reason given",
+  pausedHelp: "To pause a student, open them on the Students page.",
 
   // ── /admin/students ───────────────────────────────────────────────────────
   studentsTitle: "Students",
@@ -107,6 +141,13 @@ const en = {
   ownerNote: "This is the owner. The owner can only be changed in the database.",
   ownerOnly: "Only the owner can add or remove admins.",
   ownerOnlyAdmin: "Only the owner can remove an admin or delete their account.",
+  pauseKruai: "Pause KruAI",
+  resumeKruai: "Resume KruAI",
+  confirmPause: "Confirm: pause KruAI",
+  pauseReason: "Reason (optional)",
+  pauseNote:
+    "They will see that KruAI is paused for their account. Everything else in the app keeps working.",
+  kruaiPausedChip: "KruAI paused",
   deleteOpen: "Delete account",
   deleteTitle: "Delete this account?",
   deleteBody: (name: string) =>
@@ -126,6 +167,7 @@ const en = {
     owner: "The owner's account cannot be deleted from the app.",
     self: "Use Profile to delete your own account.",
     admin: "Remove the admin role before deleting this account.",
+    range: "Those numbers are outside the allowed range.",
   },
 };
 
@@ -189,6 +231,38 @@ const km: AdminCopy = {
   toolReports: "របាយការណ៍រូបថត",
   toolReportsBlurb: "រូបថតក្នុងការប្រកួតដែលសិស្សបានរាយការណ៍។",
   openCount: (n: number) => `${n} កំពុងរង់ចាំ`,
+  toolKruai: "KruAI",
+  toolKruaiBlurb: "កម្រិតប្រចាំថ្ងៃ ការប្រើប្រាស់ និងសិស្សដែលត្រូវបានផ្អាក។",
+
+  kruaiTitle: "KruAI",
+  kruaiBlurb: "ការប្រើប្រាស់ KruAI កម្រិតប្រចាំថ្ងៃ និងសិស្សដែលត្រូវបានផ្អាក KruAI។",
+  todayTitle: "ថ្ងៃនេះ",
+  usedOfLimit: (used: number, limit: number) =>
+    `${used} ក្នុងចំណោម ${limit} ឯកតា សម្រាប់កម្មវិធីទាំងមូល`,
+  studentsToday: (n: number) => `សិស្ស ${n} នាក់បានសួរថ្ងៃនេះ`,
+  unitsNote:
+    "សំណួរមួយស្មើ 1 ឯកតា ហើយរូបថតថ្មីមួយស្មើ 3។ នេះជាឯកតា មិនមែនជាប្រាក់ដុល្លារទេ៖ តម្លៃជាដុល្លារមានតែក្នុងកំណត់ត្រារបស់ម៉ាស៊ីនមេប៉ុណ្ណោះ។",
+  kruaiDailyTitle: "ឯកតាក្នុងមួយថ្ងៃ 14 ថ្ងៃចុងក្រោយ",
+  chartUnits: "ឯកតា",
+  chartLimit: "កម្រិតកម្មវិធីទាំងមូល",
+  topTitle: "ប្រើច្រើនជាងគេថ្ងៃនេះ",
+  topEmpty: "ថ្ងៃនេះមិនទាន់មាននរណាសួរ KruAI ទេ។",
+  unitsLabel: (n: number) => `${n} ឯកតា`,
+  pausedChip: "បានផ្អាក",
+  limitsTitle: "កម្រិតប្រចាំថ្ងៃ",
+  limitUser: "សិស្សម្នាក់ ក្នុងមួយថ្ងៃ",
+  limitApp: "កម្មវិធីទាំងមូល ក្នុងមួយថ្ងៃ",
+  limitRange: (min: number, max: number) => `${min} ដល់ ${max}`,
+  saveLimits: "រក្សាទុកកម្រិត",
+  limitsSaved: "បានរក្សាទុក។ កម្រិតថ្មីអនុវត្តចាប់ពីសំណួរបន្ទាប់។",
+  ownerOnlyLimits: "មានតែម្ចាស់ទេ ដែលអាចប្តូរកម្រិតបាន។",
+  limitInvalid: "សូមបញ្ចូលចំនួនគត់ ក្នុងចន្លោះដែលបានបង្ហាញ។",
+  blockedTitle: "សិស្សដែលត្រូវបានផ្អាក",
+  blockedEmpty: "មិនមាននរណាត្រូវបានផ្អាកទេ។",
+  blockedBy: (name: string, when: string) =>
+    name ? `ផ្អាកដោយ ${name} ${when}` : `ផ្អាក ${when}`,
+  noReason: "គ្មានមូលហេតុ",
+  pausedHelp: "ដើម្បីផ្អាកសិស្ស សូមបើកសិស្សនោះនៅទំព័រសិស្ស។",
 
   studentsTitle: "សិស្ស",
   studentsBlurb: "គណនីពិតប្រាកដប៉ុណ្ណោះ។ ចុចលើសិស្សដើម្បីមើលព័ត៌មានលម្អិត។",
@@ -220,6 +294,13 @@ const km: AdminCopy = {
   ownerNote: "នេះជាម្ចាស់។ ម្ចាស់អាចផ្លាស់ប្តូរបានតែក្នុងមូលដ្ឋានទិន្នន័យប៉ុណ្ណោះ។",
   ownerOnly: "មានតែម្ចាស់ទេ ដែលអាចបន្ថែម ឬដកអ្នកគ្រប់គ្រងបាន។",
   ownerOnlyAdmin: "មានតែម្ចាស់ទេ ដែលអាចដកអ្នកគ្រប់គ្រង ឬលុបគណនីរបស់គាត់បាន។",
+  pauseKruai: "ផ្អាក KruAI",
+  resumeKruai: "បើក KruAI វិញ",
+  confirmPause: "បញ្ជាក់៖ ផ្អាក KruAI",
+  pauseReason: "មូលហេតុ (មិនចាំបាច់)",
+  pauseNote:
+    "សិស្សនឹងឃើញថា KruAI ត្រូវបានផ្អាកសម្រាប់គណនីរបស់គាត់។ ផ្នែកផ្សេងទៀតនៃកម្មវិធីនៅតែដំណើរការធម្មតា។",
+  kruaiPausedChip: "KruAI បានផ្អាក",
   deleteOpen: "លុបគណនី",
   deleteTitle: "លុបគណនីនេះ?",
   deleteBody: (name: string) =>
@@ -239,6 +320,7 @@ const km: AdminCopy = {
     owner: "គណនីម្ចាស់មិនអាចលុបពីកម្មវិធីបានទេ។",
     self: "សូមប្រើទំព័រប្រវត្តិរូប ដើម្បីលុបគណនីរបស់អ្នកផ្ទាល់។",
     admin: "សូមដកតួនាទីអ្នកគ្រប់គ្រងចេញសិន មុននឹងលុបគណនីនេះ។",
+    range: "ចំនួនទាំងនេះនៅក្រៅចន្លោះដែលអនុញ្ញាត។",
   },
 };
 

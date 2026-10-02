@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router";
-import { ChevronRight, ShieldAlert, Users } from "lucide-react";
+import { Bot, ChevronRight, ShieldAlert, Users } from "lucide-react";
 import {
   CartesianGrid,
   Legend,
@@ -151,14 +151,15 @@ function DailyChart({ data, lang }: { data: AdminDashboard["daily"]; lang: Lang 
   );
 }
 
-/** The two tools, outside the dashboard's own load: if admin_dashboard()
- *  fails (say, its migration not applied yet), the reports page must still be
- *  one tap from the menu. */
+/** The tools, outside the dashboard's own load: if admin_dashboard() fails
+ *  (say, its migration not applied yet), each tool must still be one tap from
+ *  the menu. Three cards: the third spans both columns until xl, where there is
+ *  room for three across, so the grid never holes. */
 function Tools({ lang }: { lang: Lang }) {
   const c = ADMIN_COPY[lang];
   const { openReports } = useAdminStatus();
   return (
-    <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+    <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
       <ToolLink
         to="/admin/students"
         icon={Users}
@@ -175,6 +176,16 @@ function Tools({ lang }: { lang: Lang }) {
         blurb={c.toolReportsBlurb}
         count={openReports ? c.openCount(openReports) : null}
       />
+      <div className="md:col-span-2 xl:col-span-1">
+        <ToolLink
+          to="/admin/kruai"
+          icon={Bot}
+          fill="bg-neo-orange"
+          title={c.toolKruai}
+          blurb={c.toolKruaiBlurb}
+          count={null}
+        />
+      </div>
     </div>
   );
 }

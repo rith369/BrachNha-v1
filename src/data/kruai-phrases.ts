@@ -31,8 +31,9 @@ export const GUIDE_MARK = "🧭";
  * at the student's own limit. A curated answer is free and sends none, so the
  * screen keeps the last number it had.
  *
- * LIMIT: "user" or "app" on a refusal at a daily limit. The screen offers no
- * "try again" under those, since trying again cannot help until tomorrow.
+ * LIMIT: "user" or "app" on a refusal at a daily limit, or "blocked" when the
+ * team paused KruAI for this account (a 403). The screen offers no "try again"
+ * under any of them, since trying again cannot help.
  */
 export const KRUAI_LEFT_HEADER = "X-KruAI-Left";
 export const KRUAI_LIMIT_HEADER = "X-KruAI-Limit";

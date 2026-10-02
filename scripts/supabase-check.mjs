@@ -52,6 +52,10 @@ const TABLES = [
   // 20261001000003). Its functions are invisible to this check; the table is
   // the probe.
   "user_roles",
+  // KruAI limits and pausing (20261002000004). Both have RLS with no client
+  // policies, so a select answers 200 [] when they exist.
+  "app_settings",
+  "kruai_blocks",
 ];
 
 /**

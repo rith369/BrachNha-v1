@@ -533,6 +533,45 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["user_roles"]["Insert"]>;
         Relationships: [];
       };
+
+      // 20261002000004_kruai_controls.sql. Settings the owner changes from the
+      // admin area; today only "kruai_limits" ({ user_daily, app_daily }). No
+      // client policies: read inside kruai_take and admin_kruai_overview().
+      app_settings: {
+        Row: {
+          key: string;
+          value: Json;
+          updated_by: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          key: string;
+          value: Json;
+          updated_by?: string | null;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["app_settings"]["Insert"]>;
+        Relationships: [];
+      };
+
+      // 20261002000004_kruai_controls.sql. Students whose KruAI is paused. No
+      // client policies: written by admin_set_kruai_block() only.
+      kruai_blocks: {
+        Row: {
+          user_id: string;
+          reason: string | null;
+          blocked_by: string | null;
+          blocked_at: string;
+        };
+        Insert: {
+          user_id: string;
+          reason?: string | null;
+          blocked_by?: string | null;
+          blocked_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["kruai_blocks"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {
@@ -592,6 +631,8 @@ export type Database = {
           kruai_7d: number;
           is_admin: boolean;
           is_owner: boolean;
+          // 20261002000004: KruAI is paused for this student.
+          kruai_blocked: boolean;
         }[];
       };
       admin_user_competition_ids: {
@@ -635,7 +676,27 @@ export type Database = {
           user_units: number;
           all_units: number;
           reason: string | null;
+          // 20261002000004: the student limit that was enforced. Absent before
+          // that migration; server/kruai-quota.ts falls back to 30.
+          user_limit?: number;
         }[];
+      };
+      // 20261002000004_kruai_controls.sql, behind /admin/kruai. One jsonb
+      // document; its shape is KruaiOverview in lib/admin-tools.ts, checked
+      // there rather than trusted.
+      admin_kruai_overview: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      // Owner only. Bounded 1 to 200 a student, 1 to 10000 for the whole app.
+      admin_set_kruai_limits: {
+        Args: { p_user_daily: number; p_app_daily: number };
+        Returns: undefined;
+      };
+      // Any admin. Refuses pausing yourself, the owner or an admin.
+      admin_set_kruai_block: {
+        Args: { p_user: string; p_blocked: boolean; p_reason: string };
+        Returns: undefined;
       };
       // supabase/migrations/20260916000004_leaderboard.sql. Returns real
       // students only (never the caller) with public-safe columns.

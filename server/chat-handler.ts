@@ -294,20 +294,22 @@ const IMAGE_RATE_LIMIT = 6;
  * text question. A follow-up is charged 1 although the earlier photo travels
  * with it (see `newPhoto` in the handler): the re-read is one image on top of a
  * prompt of several thousand tokens, not three questions' worth. The limits
- * themselves (per student and for the whole app) live in the kruai_take SQL
- * function, so a student cannot choose them.
+ * themselves (per student and for the whole app) are in the database
+ * (app_settings, set by the owner on /admin/kruai) and enforced by kruai_take,
+ * so a student cannot choose them. kruai_take also returns the student limit it
+ * used, which is what turns "used" into "left today" below: there is no copy of
+ * it here to drift.
  */
 const TEXT_UNITS = 1;
 const PHOTO_UNITS = 3;
 
-/**
- * A student's daily units. MIRRORS `user_daily` in
- * supabase/migrations/20260929000001_kruai_usage.sql, which is the one that
- * actually enforces it: change both together. This copy only turns "used so
- * far" (what kruai_take returns) into "left today" for the chat screen, so if
- * the two ever drift, the count a student sees is wrong but the limit is not.
- */
-const USER_DAILY_UNITS = 30;
+/** The team paused KruAI for this account (/admin/kruai or /admin/students).
+ *  Sibling voice, like the other KruAI-bubble messages. */
+function pausedMessage(lang: Lang): string {
+  return lang === "km"
+    ? "⏸️ KruAI ត្រូវបានផ្អាកសម្រាប់គណនីរបស់ប្អូន។ សូមទាក់ទងក្រុម BrachNha ដើម្បីដឹងបន្ថែម។"
+    : "⏸️ KruAI is paused for this account. Contact the BrachNha team to find out more.";
+}
 
 function quotaMessage(reason: "user" | "app", left: number, lang: Lang): string {
   // Only a photo can be refused with units still left (it costs 3), and those
@@ -929,18 +931,27 @@ export async function handleChat(req: Request): Promise<Response> {
   if (isVerificationConfigured()) {
     const quota = await takeQuota(req, newPhoto ? PHOTO_UNITS : TEXT_UNITS);
     if (!quota.ok && quota.reason !== "error") {
+      if (quota.reason === "blocked") {
+        // A 403, which the chat screen marks as final (no Try again): asking
+        // again cannot help until the team resumes it. No "left" count, since a
+        // number under "paused" would contradict it. Refused in dev too: unlike
+        // a failed check, this is a definite answer.
+        return textResponse(pausedMessage(lang), 403, {
+          [KRUAI_LIMIT_HEADER]: "blocked",
+        });
+      }
       // Usually 0 left, but not always: a photo (3 units) is refused with 2
       // left, and those 2 still buy two typed questions. No count with the
       // whole app's refusal: "8 left today" under "KruAI is resting until
       // tomorrow" would contradict it.
-      const left = Math.max(0, USER_DAILY_UNITS - quota.userUnits);
+      const left = Math.max(0, quota.userLimit - quota.userUnits);
       return textResponse(quotaMessage(quota.reason, left, lang), 429, {
         [KRUAI_LIMIT_HEADER]: quota.reason,
         ...(quota.reason === "user" ? { [KRUAI_LEFT_HEADER]: String(left) } : {}),
       });
     }
     if (quota.ok) {
-      unitsLeft = Math.max(0, USER_DAILY_UNITS - quota.userUnits);
+      unitsLeft = Math.max(0, quota.userLimit - quota.userUnits);
     }
     if (!quota.ok) {
       // FAILS CLOSED in production, like the auth gate above: the one job of

@@ -21,7 +21,8 @@ export type AdminFail =
   | "owner_only"
   | "owner"
   | "self"
-  | "admin";
+  | "admin"
+  | "range";
 
 export type AdminResult<T> =
   | { ok: true; data: T }
@@ -42,6 +43,9 @@ export interface AdminStudent {
   isAdmin: boolean;
   /** Set in the SQL editor only; an owner is an admin everywhere. */
   isOwner: boolean;
+  /** KruAI is paused for this student (20261002000004). False before that
+   *  migration, when the column does not exist. */
+  kruaiBlocked: boolean;
 }
 
 export interface DashboardDay {
@@ -116,7 +120,9 @@ function devReport(op: string, error: DbError | null): void {
  *  no longer an admin". */
 function reasonOf(error: DbError): AdminFail {
   const h = error.hint;
-  if (h === "owner_only" || h === "owner" || h === "self" || h === "admin") return h;
+  if (h === "owner_only" || h === "owner" || h === "self" || h === "admin" || h === "range") {
+    return h;
+  }
   if (error.code === "42501") return "denied";
   return "failed";
 }
@@ -152,6 +158,7 @@ export async function listStudents(search: string): Promise<AdminResult<AdminStu
       kruai7d: r.kruai_7d,
       isAdmin: r.is_admin,
       isOwner: r.is_owner,
+      kruaiBlocked: r.kruai_blocked === true,
     })),
   };
 }
@@ -209,6 +216,104 @@ export async function deleteStudent(userId: string): Promise<AdminResult<null>> 
   const { error } = await db.rpc("admin_delete_user", { p_user: userId });
   if (error) {
     devReport("admin_delete_user", error);
+    return { ok: false, reason: reasonOf(error) };
+  }
+  return { ok: true, data: null };
+}
+
+// ── KruAI (/admin/kruai) ────────────────────────────────────────────────────
+
+export interface KruaiDay {
+  day: string;
+  units: number;
+  students: number;
+}
+
+export interface KruaiStudent {
+  id: string;
+  name: string;
+  email: string;
+  units: number;
+  blocked: boolean;
+}
+
+export interface KruaiBlocked {
+  id: string;
+  name: string;
+  email: string;
+  reason: string;
+  blockedAt: string;
+  blockedByName: string;
+}
+
+/** admin_kruai_overview() (20261002000004). Units, not dollars: what a unit
+ *  costs is only in the server's log lines. */
+export interface KruaiOverview {
+  today: string;
+  userDaily: number;
+  appDaily: number;
+  todayUnits: number;
+  todayStudents: number;
+  daily: KruaiDay[];
+  top: KruaiStudent[];
+  blocked: KruaiBlocked[];
+}
+
+/** The bounds admin_set_kruai_limits() enforces, mirrored for the form so a
+ *  typo is caught before the round trip. The database is still the one that
+ *  refuses. */
+export const KRUAI_LIMIT_BOUNDS = {
+  user: { min: 1, max: 200 },
+  app: { min: 1, max: 10000 },
+} as const;
+
+export async function loadKruai(): Promise<AdminResult<KruaiOverview>> {
+  const db = await client();
+  if (!db) return { ok: false, reason: "unconfigured" };
+  const { data, error } = await db.rpc("admin_kruai_overview");
+  if (error) {
+    devReport("admin_kruai_overview", error);
+    return { ok: false, reason: reasonOf(error) };
+  }
+  const overview = toKruaiOverview(data);
+  return overview ? { ok: true, data: overview } : { ok: false, reason: "failed" };
+}
+
+/** OWNER ONLY: the database refuses any other admin ("owner_only"), and a
+ *  value outside KRUAI_LIMIT_BOUNDS ("range"). */
+export async function setKruaiLimits(
+  userDaily: number,
+  appDaily: number
+): Promise<AdminResult<null>> {
+  const db = await client();
+  if (!db) return { ok: false, reason: "unconfigured" };
+  const { error } = await db.rpc("admin_set_kruai_limits", {
+    p_user_daily: userDaily,
+    p_app_daily: appDaily,
+  });
+  if (error) {
+    devReport("admin_set_kruai_limits", error);
+    return { ok: false, reason: reasonOf(error) };
+  }
+  return { ok: true, data: null };
+}
+
+/** Pause or resume KruAI for one student. Pausing yourself ("self"), the owner
+ *  ("owner") or an admin ("admin") is refused; resuming never is. */
+export async function setKruaiBlock(
+  userId: string,
+  blocked: boolean,
+  reason = ""
+): Promise<AdminResult<null>> {
+  const db = await client();
+  if (!db) return { ok: false, reason: "unconfigured" };
+  const { error } = await db.rpc("admin_set_kruai_block", {
+    p_user: userId,
+    p_blocked: blocked,
+    p_reason: reason.trim().slice(0, 200),
+  });
+  if (error) {
+    devReport("admin_set_kruai_block", error);
     return { ok: false, reason: reasonOf(error) };
   }
   return { ok: true, data: null };
@@ -281,6 +386,38 @@ function toDashboard(raw: unknown): AdminDashboard | null {
       lastSeen: str(c.last_seen),
       route: strOrNull(c.route),
       version: strOrNull(c.version),
+    })),
+  };
+}
+
+/** Checks admin_kruai_overview()'s jsonb field by field, like toDashboard. */
+function toKruaiOverview(raw: unknown): KruaiOverview | null {
+  if (!isObj(raw)) return null;
+  return {
+    today: str(raw.today),
+    userDaily: num(raw.user_daily),
+    appDaily: num(raw.app_daily),
+    todayUnits: num(raw.today_units),
+    todayStudents: num(raw.today_students),
+    daily: list(raw.daily).map((d) => ({
+      day: str(d.day),
+      units: num(d.units),
+      students: num(d.students),
+    })),
+    top: list(raw.top).map((t) => ({
+      id: str(t.id),
+      name: str(t.name),
+      email: str(t.email),
+      units: num(t.units),
+      blocked: t.blocked === true,
+    })),
+    blocked: list(raw.blocked).map((b) => ({
+      id: str(b.id),
+      name: str(b.name),
+      email: str(b.email),
+      reason: str(b.reason),
+      blockedAt: str(b.blocked_at),
+      blockedByName: str(b.blocked_by_name),
     })),
   };
 }
