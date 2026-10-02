@@ -12,4 +12,4 @@ commit it shipped in).
 
 | plan | status |
 | --- | --- |
-| [admin-roles.md](admin-roles.md) | Step A done (`4540f42`, applied); B done (`68dacec`, applied); C built and applied (not committed) |
+| [admin-roles.md](admin-roles.md) | Step A done (`4540f42`, applied); B done (`68dacec`, applied); C done (`56016bf`, applied). Complete |

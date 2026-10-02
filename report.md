@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 2 Oct 2026 — Announcements, and Students Reporting a Mistake in a Question
 
-Commit `(not committed yet)`. **Database step:** `supabase/migrations/20261002000005_announcements_and_content_reports.sql`,
+Commit `56016bf`. **Database step:** `supabase/migrations/20261002000005_announcements_and_content_reports.sql`,
 run once in the Supabase SQL editor (already applied).
 
 **Why.** The team had no way to tell every student something (a mock exam on Saturday, a
