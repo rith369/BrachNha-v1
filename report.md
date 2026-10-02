@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 2 Oct 2026 — KruAI Talks Like a Kind Big Brother or Sister
 
-Not committed yet. No database step needed.
+Commit `2e1000e`. No database step needed.
 
 **Why.** KruAI's answers were correct but stiff, like a textbook: it said "អ្នក" to
 everyone, never used the student's name, and gave even "what is photosynthesis?" the
