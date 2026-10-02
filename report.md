@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 2 Oct 2026 — Small Fixes: Back Button on Quiz Results, Sign-in Lands on Home
 
-Not committed yet. No database step needed.
+Commit `4be456f`. No database step needed.
 
 **What changed.**
 
