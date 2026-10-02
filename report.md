@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 2 Oct 2026 — You Can See Who Played Your Battle
 
-Commit `(not committed yet)`. No database step needed.
+Commit `abf6b99`. No database step needed.
 
 **Why.** When someone played a battle you created, your Game page never showed it. The
 "Your latest battle" card kept saying "Waiting for a joiner", and only the battle's answer
