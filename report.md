@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 2 Oct 2026 — New Top Bar: Level Ring and XP Progress
 
-Commit: not committed yet. No database step needed.
+Commit `5ad5eb9`. No database step needed.
 
 **Why.** The top of every page used two rows: a row of four small number badges, then a
 row with the menu button. On Home, level and XP were shown twice. Four header designs
@@ -44,7 +44,7 @@ were mocked up side by side, and the "level ring" one was chosen.
 
 ## 2 Oct 2026 — No More Login Page: Straight to Home as a Guest
 
-Commit: not committed yet. No database step needed.
+Commit `5ad5eb9`. No database step needed.
 
 **Why.** Opening the app for the first time meant three "why science" screens, then a page
 asking you to sign in with Google or continue as a guest. That extra choice slowed new
