@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 1 Oct 2026 — New Look: Neobrutalism
 
-Not committed yet.
+Commit `fc55120`. No database step needed.
 
 **What changed.** The whole app now has a bolder, flatter look, chosen from a
 preview the team approved:
@@ -51,7 +51,7 @@ tell apart.
 
 ## 1 Oct 2026 — Fixes: Photo Reports Page and Game History
 
-Not committed yet. One database step:
+Commit `fc55120`. One database step:
 `supabase/migrations/20261001000004_fix_admin_photo_reports.sql`, run in the
 Supabase SQL editor (already done on our project).
 
