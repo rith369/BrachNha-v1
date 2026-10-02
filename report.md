@@ -15,6 +15,37 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 2 Oct 2026 — KruAI Talks Like a Kind Big Brother or Sister
+
+Not committed yet. No database step needed.
+
+**Why.** KruAI's answers were correct but stiff, like a textbook: it said "អ្នក" to
+everyone, never used the student's name, and gave even "what is photosynthesis?" the
+full exam layout. The aim is a chat that feels friendly and cute.
+
+**What changed.**
+
+- **KruAI talks like a kind big brother or sister.** It calls itself "បង" and the
+  student "ប្អូន" or by name, praises right answers, is gentle with mistakes, and uses
+  1 or 2 emoji. The name is written exactly as the student typed it ("Panharith" stays
+  "Panharith"), never changed into Khmer letters.
+- **Simple questions get short answers.** A question like "what is X?" now gets a few
+  friendly lines instead of the full exam layout. Exercise solutions still use the full
+  layout, and comparisons still come as a table.
+- **When a student is stressed,** KruAI is kind first, then suggests one small step.
+- **KruAI is a study helper, not a boyfriend or girlfriend.** If someone asks for that,
+  it kindly says no and brings them back to studying. This is on purpose: most students
+  are under 18.
+- **The chat screen:** the greeting says the student's name, and while KruAI writes,
+  three bouncing dots show "KruAI កំពុងគិត…". The dots stay still for anyone who has
+  turned on reduced motion on their phone.
+- **Chemistry equations with a Khmer word on the arrow** (like "ពន្លឺព្រះអាទិត្យ" in
+  photosynthesis) now show as a proper equation, with the word right after the arrow in
+  brackets. Before, the whole line showed as computer code.
+
+**What to re-test.** Ask an exercise, a "what is…?" question and a comparison, and
+check the tone. Open the chat and look for your name in the greeting.
+
 ## 2 Oct 2026 — Small Fixes: Back Button on Quiz Results, Sign-in Lands on Home
 
 Commit `4be456f`. No database step needed.

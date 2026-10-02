@@ -314,12 +314,12 @@ function quotaMessage(reason: "user" | "app", left: number, lang: Lang): string 
   // still buy typed questions, so "come back tomorrow" would be wrong there.
   if (reason === "user" && left > 0) {
     return lang === "km"
-      ? `📷 សំណួរដែលមានរូបភាព រាប់ជា 3 សំណួរ ប៉ុន្តែថ្ងៃនេះអ្នកនៅសល់តែ ${left} សំណួរទៀតប៉ុណ្ណោះ។ សូមសរសេរសំណួរជាអក្សរជំនួសវិញ ឬត្រឡប់មកវិញនៅថ្ងៃស្អែក។`
+      ? `📷 សំណួរដែលមានរូបភាព រាប់ជា 3 សំណួរ ប៉ុន្តែថ្ងៃនេះប្អូននៅសល់តែ ${left} សំណួរទៀតប៉ុណ្ណោះ។ សូមសរសេរសំណួរជាអក្សរជំនួសវិញ ឬត្រឡប់មកវិញនៅថ្ងៃស្អែក។`
       : `📷 A question with a photo counts as 3, and you have only ${left} left today. Type your question instead, or come back tomorrow.`;
   }
   if (reason === "user") {
     return lang === "km"
-      ? "📚 អ្នកបានសួរ KruAI គ្រប់ចំនួនសម្រាប់ថ្ងៃនេះហើយ។ សូមត្រឡប់មកសួរម្ដងទៀតនៅថ្ងៃស្អែក! សំណួរដែលមានរូបភាព រាប់ជា 3 សំណួរ។"
+      ? "📚 ប្អូនបានសួរ KruAI គ្រប់ចំនួនសម្រាប់ថ្ងៃនេះហើយ។ សូមត្រឡប់មកសួរម្ដងទៀតនៅថ្ងៃស្អែក! សំណួរដែលមានរូបភាព រាប់ជា 3 សំណួរ។"
       : "📚 You have reached today's question limit for KruAI. Come back tomorrow! A question with a photo counts as 3.";
   }
   return lang === "km"
@@ -1136,7 +1136,7 @@ export async function handleChat(req: Request): Promise<Response> {
     }
     return textResponse(
       lang === "km"
-        ? "⚠️ សុំទោស ខ្ញុំមិនអាចឆ្លើយបានទេ។ សូមព្យាយាមម្ដងទៀត។"
+        ? "⚠️ សុំទោសប្អូន បងមិនអាចឆ្លើយបានទេ។ សូមព្យាយាមម្ដងទៀត។"
         : "⚠️ Sorry, I could not answer that. Please try again.",
       500
     );

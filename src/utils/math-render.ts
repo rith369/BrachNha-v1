@@ -87,6 +87,101 @@ function closingBrace(tex: string, start: number): number {
   return -1;
 }
 
+/** A command that writes a label over (or under) an arrow or symbol. Captures
+ *  the name: the `\x…` stretchy arrows (`\xrightarrow`, `\xrightleftharpoons`…),
+ *  plus `\overset`, `\underset` and `\stackrel`. */
+const LABELLED = /\\(x[A-Za-z]+|overset|underset|stackrel)(?![A-Za-z])/g;
+
+/** A text command around plain words, for unwrapping a label. */
+const TEXT_WRAPPED = /\\(?:text|textrm|mathrm|mbox)\s*\{([^{}]*)\}/g;
+
+/** The words of a label with any `\text{…}` unwrapped, or null when what is
+ *  left is more than plain words (a command, a brace, a dollar). */
+function labelWords(label: string): string | null {
+  const words = label.replace(TEXT_WRAPPED, "$1").trim();
+  return /[\\{}$]/.test(words) ? null : words;
+}
+
+/** The `{…}` group starting at `from` (after any spaces), or null. */
+function groupAt(tex: string, from: number): { open: number; close: number } | null {
+  let i = from;
+  while (tex[i] === " ") i++;
+  if (tex[i] !== "{") return null;
+  const close = closingBrace(tex, i + 1);
+  return close === -1 ? null : { open: i + 1, close };
+}
+
+/**
+ * Moves a Khmer label off an arrow, so liftKhmerText can split it out.
+ *
+ * The model writes a reaction condition in Khmer over the arrow, e.g.
+ * `\xrightarrow{\text{ពន្លឺព្រះអាទិត្យ}}` ("sunlight") in the photosynthesis
+ * equation. The `\text` there sits INSIDE the arrow's group, which
+ * liftKhmerText refuses on purpose (cutting inside a group unbalances braces),
+ * so the whole equation used to show as raw LaTeX.
+ *
+ * The rewrite keeps the arrow and puts the words right after it, in brackets,
+ * as a top-level `\text{(…)}`:
+ *   `A \xrightarrow{\text{ក}} B`   ->  `A \xrightarrow{} \text{(ក)} B`
+ *   `A \overset{\text{ក}}{\to} B`  ->  `A \to \text{(ក)} B`
+ * so the reader still sees the condition next to the arrow, and KaTeX still
+ * never receives a Khmer glyph. A label with no Khmer is left alone, and so is
+ * one holding anything but plain words: nothing is guessed.
+ */
+function moveArrowLabelsOut(tex: string): string {
+  let out = "";
+  let last = 0;
+  for (const m of tex.matchAll(LABELLED)) {
+    const start = m.index;
+    if (start < last) continue; // inside a label already rewritten
+    const name = m[1];
+    const after = start + m[0].length;
+
+    if (name.startsWith("x")) {
+      // \xrightarrow[below]{above}: the optional label first, then the required.
+      let i = after;
+      while (tex[i] === " ") i++;
+      let below = "";
+      if (tex[i] === "[") {
+        const end = tex.indexOf("]", i);
+        if (end === -1) continue;
+        below = tex.slice(i + 1, end);
+        i = end + 1;
+      }
+      const group = groupAt(tex, i);
+      if (!group) continue;
+      const above = tex.slice(group.open, group.close);
+      const khmer = [above, below].filter((label) => KHMER.test(label));
+      if (!khmer.length) continue;
+      const words = khmer.map(labelWords);
+      if (words.some((w) => w === null)) continue;
+
+      const keptBelow = below && !KHMER.test(below) ? `[${below}]` : "";
+      const keptAbove = KHMER.test(above) ? "" : above;
+      out +=
+        tex.slice(last, start) +
+        `\\${name}${keptBelow}{${keptAbove}} \\text{(${words.join(", ")})}`;
+      last = group.close + 1;
+      continue;
+    }
+
+    // \overset{label}{base}, \underset{label}{base}, \stackrel{label}{base}
+    const label = groupAt(tex, after);
+    if (!label) continue;
+    const base = groupAt(tex, label.close + 1);
+    if (!base) continue;
+    const text = tex.slice(label.open, label.close);
+    if (!KHMER.test(text)) continue;
+    const words = labelWords(text);
+    if (words === null) continue;
+    out +=
+      tex.slice(last, start) +
+      `${tex.slice(base.open, base.close)} \\text{(${words})}`;
+    last = base.close + 1;
+  }
+  return out + tex.slice(last);
+}
+
 /**
  * A formula with Khmer words inside `\text{…}`, split into math and plain text —
  * or null when it is anything less clear-cut than that.
@@ -114,9 +209,14 @@ function closingBrace(tex: string, start: number): number {
  *
  * Every piece is emitted INLINE, even from a `$$…$$` block: a display formula
  * followed by its own words on the next line reads worse than one flowing line.
+ *
+ * A Khmer label on an ARROW is moved out to the top level first (see
+ * moveArrowLabelsOut), so it is lifted like any other text instead of failing
+ * the "nested in a group" rule.
  */
-function liftKhmerText(tex: string, display: boolean): MathSegment[] | null {
-  if (!display && tex.includes("\n")) return null;
+function liftKhmerText(source: string, display: boolean): MathSegment[] | null {
+  if (!display && source.includes("\n")) return null;
+  const tex = moveArrowLabelsOut(source);
 
   const parts: MathSegment[] = [];
   let math = "";

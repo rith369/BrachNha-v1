@@ -4,7 +4,6 @@ import { useLocation } from "react-router";
 import { motion } from "framer-motion";
 import {
   X,
-  Bot,
   Send,
   Plus,
   MessageSquareText,
@@ -383,10 +382,14 @@ export function ChatOverlay() {
     }
   }, [msgs, loading, view]);
 
+  // In KruAI's big-sibling voice (បង / ប្អូន, see VOICE in utils/chat-prompt.ts),
+  // with the student's name when there is one, so the first thing on screen
+  // already sounds like the replies that follow.
+  const name = userName.trim();
   const greeting =
     lang === "en"
-      ? "👋 Hi! I am KruAI, your BrachNha study mentor. Ask me anything about your Bac II subjects!"
-      : "👋 សួស្ដី! ខ្ញុំជា KruAI គ្រូជំនួយសិក្សា BrachNha។ សួរខ្ញុំអ្វីក៏បានអំពី Bac II!";
+      ? `👋 Hi${name ? ` ${name}` : ""}! I'm KruAI, your study buddy. What shall we learn today? ✨`
+      : `👋 សួស្ដី${name ? ` ${name}` : ""}! បងគឺ KruAI ជាគ្រូជំនួយសិក្សារបស់ប្អូន។ ថ្ងៃនេះចង់រៀនអ្វីដែរ? ✨`;
 
   async function send(question?: string) {
     const typed = (question ?? input).trim();
@@ -521,7 +524,7 @@ export function ChatOverlay() {
           detail ||
             (lang === "en"
               ? "⚠️ Sorry, I could not answer that. Try again!"
-              : "⚠️ សុំទោស មិនអាចឆ្លើយបានទេ។ សូមព្យាយាមម្ដងទៀត!")
+              : "⚠️ សុំទោសប្អូន មិនអាចឆ្លើយបានទេ។ សូមព្យាយាមម្ដងទៀត!")
         );
         // Busy (429 with no daily limit named) and server-side failures can
         // pass on a second try. A daily limit, signing in and a refused photo
@@ -548,7 +551,7 @@ export function ChatOverlay() {
         appendChatChunk(
           lang === "en"
             ? "⚠️ Sorry, I could not answer that. Try again!"
-            : "⚠️ សុំទោស មិនអាចឆ្លើយបានទេ។ សូមព្យាយាមម្ដងទៀត!"
+            : "⚠️ សុំទោសប្អូន មិនអាចឆ្លើយបានទេ។ សូមព្យាយាមម្ដងទៀត!"
         );
         failed = "retry";
       }
@@ -747,9 +750,25 @@ export function ChatOverlay() {
 
         {loading && !msgs[msgs.length - 1]?.text && (
           <div className="flex justify-start">
-            <div className="flex items-center gap-1.5 rounded-2xl border border-border bg-surface px-4 py-2.5">
-              <Bot className="size-3.5 text-purple" />
-              <span className="text-xs font-bold text-muted">...</span>
+            {/* Three bouncing dots, staggered. motion-safe: they hold still
+                for anyone who asked their device for reduced motion, and
+                Tailwind's bounce is transform-only, like every loop here. */}
+            <div
+              role="status"
+              className="flex items-center gap-2 rounded-2xl border border-border bg-surface px-4 py-2.5"
+            >
+              <span className="flex items-center gap-1" aria-hidden="true">
+                {[0, 150, 300].map((delay) => (
+                  <span
+                    key={delay}
+                    className="size-1.5 rounded-full bg-purple motion-safe:animate-bounce"
+                    style={{ animationDelay: `${delay}ms` }}
+                  />
+                ))}
+              </span>
+              <span className="text-xs font-bold text-muted">
+                {lang === "en" ? "KruAI is thinking…" : "KruAI កំពុងគិត…"}
+              </span>
             </div>
           </div>
         )}

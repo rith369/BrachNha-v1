@@ -597,6 +597,84 @@ back as similarities + a differences table.
   no Try again under a limit refusal, no sideways scroll, no page error;
 - the dev upstream really closing after Stop (the fake logged it).
 
+### KruAI's voice: a kind big sibling (2 Oct 2026)
+
+The user asked for the chat to feel "friendly and cutie", and floated a boyfriend/girlfriend
+persona. **There is no romantic persona, and that is deliberate.** The users are high-school
+students, many under 18; a romantic AI partner for minors invites emotional dependence, would
+cost the trust of parents and schools, and pulls students off studying. The user chose a
+**big sibling** instead. Their choices:
+- **Address:** KruAI calls itself **បង** and the student **ប្អូន** or by name.
+- **Emoji:** 1 or 2 per reply.
+- **Shape:** short answers for simple questions.
+- **Screen:** a cuter typing indicator and greeting. No KruAI picture.
+
+Where it lives:
+- **`VOICE` in the persona block of `utils/chat-prompt.ts`:**
+  - address (never អ្នក to the student);
+  - the student's name written EXACTLY as stored, never transliterated: the user caught
+    "Panharith" rendered as a wrong Khmer spelling, and a misspelt name is worse than none;
+  - praise right steps, gentle on mistakes;
+  - be kind first when the student is stressed;
+  - point to a trusted adult if they mention harm or not being safe;
+  - **politely refuse romance or flirting and steer back to studying.**
+- **`BAC2_ANSWER_RULES` (`data/bac2-format.ts`):**
+  - the Given → Method → Steps → Answer → Exam tip skeleton is for a FULL EXERCISE SOLUTION
+    only;
+  - a fact, definition or "why" question gets 2 to 5 short lines plus an optional exam tip;
+  - comparisons keep the table;
+  - the emoji rule is 1 or 2 per reply, never in a formula, a step, a table or the answer
+    line;
+  - "write like a Cambodian teacher" became "like a kind older sibling (បង) helping a
+    younger one (ប្អូន)".
+- **Examples moved with the rules**, because an example outweighs a rule:
+  - `SOCRATIC_EXAMPLE` speaks as បង to ប្អូន with an emoji;
+  - the brain example (a fact question) was reshaped from the full skeleton into the short
+    form;
+  - the examples heading now says to match the example "of the same kind".
+- **The app's own KruAI-bubble messages** say ប្អូន (and បង) in place of អ្នក/ខ្ញុំ:
+  - the daily-limit and refused-photo messages, and the apology in `chat-handler.ts`;
+  - the apologies in `chat-overlay.tsx`;
+  - one curated answer in `chat-cache.ts`.
+- **`chat-overlay.tsx`:**
+  - the greeting uses `userName` in the sibling voice;
+  - the "..." bubble is three `motion-safe:animate-bounce` dots plus "KruAI កំពុងគិត…", with
+    `role="status"`.
+
+**Prompt size after:** 18,509 characters on Home and **23,330 on a section page**, against
+`PROMPT_BUDGET_CHARS` 24,000. **Only ~670 characters of headroom again.**
+
+Re-run with the Latin name "Panharith": every reply that used the name wrote it exactly,
+and none put it into Khmer letters.
+
+**Verified with the real model** (8 messages, profile name ដារ៉ា). The guided exercise, the
+right step and the wrong step:
+- use the name and ប្អូន;
+- carry 1 or 2 emoji;
+- give no answer.
+
+The others:
+- "show full solution" gives the skeleton;
+- "what is photosynthesis?" gets 5 lines and no skeleton;
+- a non-cached comparison still gets a table;
+- "I'm stressed" gets kindness first, one small step and a question;
+- "be my girlfriend" gets a kind no and a return to studying.
+
+None of the 8 has an em dash or a Khmer numeral.
+
+Browser, 28 checks at 390 light, 320 dark with reduced motion, English, and a blank name:
+- the greeting carries the name, or none;
+- the dots bounce, and stand still under reduced motion;
+- no sideways scroll, no page error.
+
+**Seen in testing:**
+- **Not fixed:** the girlfriend reply called KruAI "បងប្រុស" (big BROTHER). The prompt does
+  not give KruAI a gender.
+- **Fixed the same day:** the photosynthesis answer wrote
+  `\xrightarrow{\text{ពន្លឺព្រះអាទិត្យ}}`. That is Khmer inside a `\text` nested in a group,
+  which `liftKhmerText` deliberately refuses, so the line showed as raw LaTeX. See "a Khmer
+  label on an ARROW" in the LaTeX section near the end of this file.
+
 ### The key pool and the fallback loop
 
 Keys come from `GEMINI_API_KEYS` (comma-separated), `GEMINI_API_KEY`, and
@@ -7257,6 +7335,26 @@ argument holding `\` or `$`, or inline math spanning a newline. Pieces from a
 than a display block with its words stranded underneath. Checked offline, no
 API calls, on 15 cases including every earlier guard: 0 KaTeX errors, 0 math
 segments containing Khmer.
+
+**A FOURTH failure (2 Oct 2026): a Khmer label on an ARROW.** The model writes a reaction
+condition over the arrow, `\xrightarrow{\text{ពន្លឺព្រះអាទិត្យ}}` ("sunlight"). That `\text`
+sits inside the arrow's group, which `liftKhmerText` refuses by design, so the whole equation
+showed as raw LaTeX.
+
+`moveArrowLabelsOut()` in `utils/math-render.ts` now runs first inside `liftKhmerText`:
+- It covers the `\x…` arrows (with the optional `[below]` label) and
+  `\overset` / `\underset` / `\stackrel`.
+- A label holding Khmer comes off the arrow and is re-emitted right after it as a top-level
+  `\text{(…)}`. So `A \xrightarrow{\text{ក}} B` becomes `A \xrightarrow{} \text{(ក)} B`, and
+  the ordinary lift splits it.
+- The student sees "6CO₂ + 6H₂O ⟶ (ពន្លឺព្រះអាទិត្យ) C₆H₁₂O₆ + 6O₂", and KaTeX still never
+  receives a Khmer glyph.
+- A Latin label, a label with a command in it, and an arrow nested in another group are all
+  left exactly as before.
+
+**Checked on 13 cases**, every math piece typeset with `throwOnError`, with the earlier guard
+cases unchanged. Then in real Chrome at 390 light and 320 dark: no raw LaTeX, no KaTeX error,
+no sideways scroll.
 
 **Deliberately left: padded plain arithmetic** (`$ 2 + 2 $`) still shows raw.
 Accepting `+` or `=` as a TeX marker would start typesetting dollar AMOUNTS in
