@@ -641,11 +641,62 @@ Where it lives:
   - the "..." bubble is three `motion-safe:animate-bounce` dots plus "KruAI កំពុងគិត…", with
     `role="status"`.
 
-**Prompt size after:** 18,509 characters on Home and **23,330 on a section page**, against
-`PROMPT_BUDGET_CHARS` 24,000. **Only ~670 characters of headroom again.**
-
 Re-run with the Latin name "Panharith": every reply that used the name wrote it exactly,
 and none put it into Khmer letters.
+
+**A full solution ENDS WITH THE FORMAL BAC II ANSWER** (the user's call, same day). The
+explanation alone ended in a one-line "ចម្លើយ៖ … = 6", and the user pointed out that a
+student never saw the answer as it must be WRITTEN on the exam paper. Skeleton step 4 is now
+**"ចម្លើយ (សរសេរលើក្រដាសប្រឡង)៖"**, the whole solution again from start to end, in the
+answer key's own style (`data/papers/math-2025.ts`):
+- one line naming the form or formula, e.g. មានរាងមិនកំណត់ $\frac{0}{0}$;
+- ONE chain of equalities from the question to the result;
+- a closing "ដូចនេះ …" line;
+- no explanation inside it.
+
+**TWO LENGTHS, chosen by whether the exercise was guided** (the user's call, after first
+choosing "always explain"):
+
+| how the student got here | full solution |
+| --- | --- |
+| guided first (earlier replies about it start with 🧭) | SHORT: one-line METHOD + FORMAL ANSWER + EXAM TIP. The guided turns already explained |
+| asked for the solution straight away | LONG: all five parts, numbered explanation steps included |
+
+The model decides from the 🧭 replies it can see in the history. Nothing in the handler marks
+it.
+- The rule is "Two lengths" under the skeleton in `BAC2_ANSWER_RULES`.
+- `SOCRATIC_EXAMPLE` now ends with the student pressing the button and the SHORT form.
+- The worked limit example (asked directly) shows the LONG form, so each length has an
+  example of its own.
+
+Two phone details:
+- **At most 3 "=" per `$$…$$` line**, each continuation line starting with "=", the way the
+  key breaks a long chain.
+- **KruAI's bubbles are `max-w-[92%]`** (the student's stay 80%). Measured: an 80% bubble made
+  the limit's first chain line overflow by 9px at 360 and 41px at 320. Now 0 at 360/390 and
+  6px at 320, the narrowest phone, where `overflow-x-auto` on the display block makes it a
+  small swipe rather than a broken page.
+
+The worked example shows the formal block, and its "ទម្រង់មិនកំណត់" became the key's
+"រាងមិនកំណត់".
+
+**Two cuts made room.**
+- **The monocot/dicot comparison example was removed.** It duplicated a curated answer (the
+  starter chip), exactly as the sympathetic one did.
+- **The comparison rule no longer spells out a sample table.** The plant-hormone example shows
+  a real one.
+
+Real model, with "Panharith":
+- a limit and a derivative AFTER guiding came back SHORT (formal answer, no numbered steps);
+- a limit and a physics problem asked DIRECTLY came back LONG (steps + formal answer);
+- all four had the formal heading, the chain and "ដូចនេះ", with 0 KaTeX errors and no raw
+  LaTeX;
+- a non-cached comparison still came back as a table.
+
+**Prompt size after:** 18,979 characters on Home and **23,800 on a section page**, against
+`PROMPT_BUDGET_CHARS` 24,000. **Only ~200 characters of headroom.** The next addition needs a
+cut first; the plant-hormone example (~1,500 characters) is the obvious one, if the
+comparison rule alone keeps producing tables without it.
 
 **Verified with the real model** (8 messages, profile name ដារ៉ា). The guided exercise, the
 right step and the wrong step:

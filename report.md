@@ -15,6 +15,31 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 2 Oct 2026 — KruAI's Full Solution Ends With the Formal Bac II Answer
+
+Not committed yet. No database step needed.
+
+**Why.** A full solution explained each step and then gave only the final number. A
+student never saw how the answer must be written on the exam paper.
+
+**What changed.**
+
+- **A full solution now ends with "ចម្លើយ (សរសេរលើក្រដាសប្រឡង)៖".** That is the whole
+  answer written from start to end the way a student writes it on the Bac II paper, in
+  the same style as the answer keys: the form or formula used, the chain of steps, then
+  "ដូចនេះ …" with the result.
+- **Two lengths:**
+  - If KruAI already guided the exercise step by step, the full solution is short: one
+    method line and the formal answer, since the explaining already happened.
+  - If the student asks for the solution straight away, KruAI explains the steps first,
+    then gives the formal answer.
+- **Long chains break over several short lines,** so they fit on a phone screen.
+- **KruAI's chat bubbles are a little wider,** so formulas fit without sliding sideways
+  on most phones.
+
+**What to re-test.** Ask KruAI an exercise, press "បង្ហាញដំណោះស្រាយពេញ", and check the
+formal answer at the bottom.
+
 ## 2 Oct 2026 — KruAI Talks Like a Kind Big Brother or Sister
 
 Commit `2e1000e`. No database step needed.

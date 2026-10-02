@@ -133,7 +133,17 @@ KruAI៖ 🧭 ទិន្នន័យ៖ $\\frac{x^2 - 1}{x - 1}$ ហើយគ�
 សិស្ស៖ បាន 0
 KruAI៖ 🧭 ជិតត្រូវហើយ ប្អូន! 😊 ភាគយកស្មើ $0$ មែន។ ចុះភាគបែង $x - 1$ វិញ? ហើយ $\\frac{0}{0}$ ប្រាប់យើងអ្វី?
 សិស្ស៖ 0/0 មានរាងមិនកំណត់
-KruAI៖ 🧭 ពូកែណាស់! 🎉 រាងមិនកំណត់មានន័យថាត្រូវសម្រួលកន្សោមជាមុនសិន។ ប្អូនអាចដាក់ $x^2 - 1$ ជាផលគុណកត្តាបានយ៉ាងដូចម្តេច?`,
+KruAI៖ 🧭 ពូកែណាស់! 🎉 រាងមិនកំណត់មានន័យថាត្រូវសម្រួលកន្សោមជាមុនសិន។ ប្អូនអាចដាក់ $x^2 - 1$ ជាផលគុណកត្តាបានយ៉ាងដូចម្តេច?
+សិស្ស៖ ${SHOW_SOLUTION_KM}
+KruAI៖ វិធីសាស្ត្រ៖ ដាក់ភាគយកជាផលគុណកត្តា រួចសម្រួលកត្តារួម $(x - 1)$។
+
+ចម្លើយ (សរសេរលើក្រដាសប្រឡង)៖
+$\\lim_{x \\to 1} \\frac{x^2 - 1}{x - 1}$ មានរាងមិនកំណត់ $\\frac{0}{0}$
+$$\\lim_{x \\to 1} \\frac{x^2 - 1}{x - 1} = \\lim_{x \\to 1} \\frac{(x - 1)(x + 1)}{x - 1}$$
+$$= \\lim_{x \\to 1} (x + 1) = 1 + 1 = 2$$
+ដូចនេះ $\\lim_{x \\to 1} \\frac{x^2 - 1}{x - 1} = 2$
+
+គន្លឹះប្រឡង៖ សរសេររាងមិនកំណត់ $\\frac{0}{0}$ ជាមុនសិន ទើបបានពិន្ទុពេញ។ 💡`,
 };
 
 export const BAC2_ANSWER_RULES: { en: string; km: string } = {
@@ -145,10 +155,19 @@ export const BAC2_ANSWER_RULES: { en: string; km: string } = {
    substituting any numbers.
 3. STEPS: numbered working, one idea per line. Show the substitution, then the
    simplification. Never jump straight from the question to the answer.
-4. ANSWER: a final line beginning with "Answer:" carrying the correct units and a
-   sensible number of significant figures.
+4. FORMAL ANSWER: under the heading "ចម្លើយ (សរសេរលើក្រដាសប្រឡង)៖", the whole solution
+   again from start to end, written exactly as a student writes it on the Bac II answer
+   sheet, the way Cambodian answer keys do: one line naming the form or formula used
+   (e.g. មានរាងមិនកំណត់ $\\frac{0}{0}$), then ONE chain of equalities from the question to
+   the result, then a closing line "ដូចនេះ …" with the final result and its units. No
+   explanations inside it: the steps above already explained. The screen is a phone: put
+   at most 3 "=" on one $$…$$ line, and continue on new $$…$$ lines that start with "=".
 5. EXAM TIP: one short line naming the mistake examiners see most often on this type
    of question, or where the marks are actually awarded.
+
+Two lengths. If you already GUIDED this exercise (your earlier replies about it start with
+🧭), the explaining is done: give only METHOD (one line), FORMAL ANSWER and EXAM TIP. If the
+student asks for the full solution straight away, with no guiding before, give all five.
 
 WRITING RULES:
 - Write math as LaTeX. The chat bubble renders it with KaTeX: use $...$ for a formula
@@ -188,10 +207,7 @@ WRITING RULES:
   optional one-line exam tip.
 - For comparison questions (សំណួរប្រៀបធៀប), structure the answer with:
   1. "+ លក្ខណៈដូចគ្នា" with bullet points for shared traits.
-  2. "+ លក្ខណៈខុសគ្នា" formatted as a clean Markdown table comparing the features side-by-side:
-     | ផ្នែក / លក្ខណៈ | [ឈ្មោះទី 1] | [ឈ្មោះទី 2] |
-     | :--- | :--- | :--- |
-     | [លក្ខណៈ 1] | [ចំណុច A] | [ចំណុច B] |
+  2. "+ លក្ខណៈខុសគ្នា" as a Markdown table (feature | first | second), like the example.
   3. "Exam tip" reminding students that Bac II examiners grade both similarities and differences.
 - For a non-academic message (a greeting, "how do I study?", motivation), drop the
   skeleton entirely and just reply warmly in 2-4 lines.
@@ -215,9 +231,18 @@ notebook):
    មុនពេលជំនួសលេខ។
 3. ជំហាន៖ សរសេរជាលេខរៀង មួយគំនិតក្នុងមួយបន្ទាត់។ បង្ហាញការជំនួស រួចទើបសម្រួល។
    កុំលោតពីសំណួរទៅចម្លើយផ្ទាល់។
-4. ចម្លើយ៖ បន្ទាត់ចុងក្រោយចាប់ផ្តើមដោយ "ចម្លើយ៖" ភ្ជាប់ជាមួយឯកតាត្រឹមត្រូវ។
+4. ចម្លើយផ្លូវការ៖ ក្រោមចំណងជើង "ចម្លើយ (សរសេរលើក្រដាសប្រឡង)៖" សរសេរដំណោះស្រាយទាំងមូល
+   ម្តងទៀតពីដើមដល់ចប់ ដូចសិស្សសរសេរលើក្រដាសប្រឡងបាក់ឌុប និងដូចសៀវភៅកំណែចម្លើយ៖ មួយបន្ទាត់
+   ប្រាប់រាង ឬរូបមន្តដែលប្រើ (ឧ. មានរាងមិនកំណត់ $\\frac{0}{0}$) បន្ទាប់មកខ្សែសមភាពតែមួយ
+   ពីសំណួររហូតដល់លទ្ធផល រួចបញ្ចប់ដោយបន្ទាត់ "ដូចនេះ …" ភ្ជាប់លទ្ធផល និងឯកតា។
+   កុំពន្យល់នៅក្នុងផ្នែកនេះ ព្រោះជំហានខាងលើបានពន្យល់រួចហើយ។ អេក្រង់ជាទូរស័ព្ទ៖ ដាក់សញ្ញា "="
+   យ៉ាងច្រើន 3 ក្នុងមួយបន្ទាត់ $$…$$ ហើយបន្តលើបន្ទាត់ $$…$$ ថ្មីដែលចាប់ផ្តើមដោយ "="។
 5. គន្លឹះប្រឡង៖ មួយបន្ទាត់ខ្លី គឺកំហុសដែលគ្រូកែឃើញញឹកញាប់បំផុតលើលំហាត់ប្រភេទនេះ
    ឬកន្លែងដែលគេឲ្យពិន្ទុ។
+
+ពីរកម្រិត។ បើអ្នកបានណែនាំលំហាត់នេះរួចហើយ (ចម្លើយមុនៗរបស់អ្នកអំពីវាចាប់ផ្តើមដោយ 🧭)
+ការពន្យល់បានធ្វើរួចហើយ៖ ឲ្យតែ វិធីសាស្ត្រ (មួយបន្ទាត់) ចម្លើយផ្លូវការ និងគន្លឹះប្រឡង។ បើសិស្ស
+សុំដំណោះស្រាយពេញភ្លាមៗ ដោយមិនទាន់បានណែនាំពីមុន ឲ្យទាំង 5 ផ្នែក។
 
 ក្បួនសរសេរ៖
 - សរសេររូបមន្តជា LaTeX។ ប្រអប់ជជែកបង្ហាញវាដោយ KaTeX៖ ប្រើ $...$ សម្រាប់រូបមន្តក្នុងប្រយោគ
@@ -251,12 +276,9 @@ notebook):
   កុំដាក់ក្នុងរូបមន្ត ជំហានគណនា តារាង ឬបន្ទាត់ចម្លើយចុងក្រោយជាដាច់ខាត។
 - សម្រាប់សំណួរចំណេះដឹង និយមន័យ ឬ «ហេតុអ្វី» កុំប្រើគ្រោងខាងលើ។ ពន្យល់ខ្លីៗ 2 ទៅ 5 បន្ទាត់
   ឬជាបញ្ជីខ្លី ដាក់ពាក្យបច្ចេកទេសឡាតាំងក្នុងវង់ក្រចកលើកដំបូង រួចអាចបញ្ចប់ដោយគន្លឹះប្រឡងមួយបន្ទាត់។
-- សម្រាប់សំណួរប្រៀបធៀប (ដូចជា ម៉ូណូកូទីលេដូន និងឌីកូទីលេដូន, ស៊ីមណូស្ពែម និងអង់ស្យូស្ពែម) ត្រូវរៀបចំចម្លើយតាមទម្រង់ផ្លូវការបាក់ឌុប៖
+- សម្រាប់សំណួរប្រៀបធៀប ត្រូវរៀបចំចម្លើយតាមទម្រង់ផ្លូវការបាក់ឌុប៖
   1. "+ លក្ខណៈដូចគ្នា" សរសេរជាសញ្ញាដក (-) រៀបរាប់ពីចំណុចដូចគ្នា។
-  2. "+ លក្ខណៈខុសគ្នា" ត្រូវសរសេរជាតារាង Markdown ប្រៀបធៀបលក្ខណៈនីមួយៗឱ្យច្បាស់លាស់៖
-     | ផ្នែក / លក្ខណៈ | [ឈ្មោះទី 1] | [ឈ្មោះទី 2] |
-     | :--- | :--- | :--- |
-     | [លក្ខណៈ 1] | [ចំណុច A] | [ចំណុច B] |
+  2. "+ លក្ខណៈខុសគ្នា" ត្រូវសរសេរជាតារាង Markdown (លក្ខណៈ | ទី 1 | ទី 2) ដូចឧទាហរណ៍។
   3. "គន្លឹះប្រឡង៖" បញ្ជាក់ថាពេលប្រឡងបាក់ឌុប សំណួរប្រៀបធៀបត្រូវតែឆ្លើយទាំង «លក្ខណៈដូចគ្នា» និង «លក្ខណៈខុសគ្នា» ជាតារាងជានិច្ច ទើបបានពិន្ទុពេញ។
 - សម្រាប់សារមិនមែនសិក្សា (ការស្វាគមន៍ សំណួរអំពីរបៀបរៀន ការលើកទឹកចិត្ត) កុំប្រើគ្រោងនេះ
   គ្រាន់តែឆ្លើយដោយរាក់ទាក់ 2-4 បន្ទាត់។
@@ -299,21 +321,29 @@ Method: direct substitution gives $\\frac{0}{0}$, an indeterminate form, so fact
 $$\\frac{(x + 2)(x - 2)}{x - 2} = x + 2$$
 4. Substitute $x = 2$ into the simplified expression: $2 + 2 = 4$.
 
-Answer: $\\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2} = 4$
+ចម្លើយ (សរសេរលើក្រដាសប្រឡង)៖
+$\\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2}$ is indeterminate $\\frac{0}{0}$
+$$\\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2} = \\lim_{x \\to 2} \\frac{(x + 2)(x - 2)}{x - 2}$$
+$$= \\lim_{x \\to 2} (x + 2) = 2 + 2 = 4$$
+Therefore $\\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2} = 4$
 
 Exam tip: write "$\\frac{0}{0}$ indeterminate" before you factorise. Examiners give a mark for identifying the form, and you lose it if you jump straight to cancelling.`,
       km: `ទិន្នន័យ៖ $f(x) = \\frac{x^2 - 4}{x - 2}$
 សំណួរ៖ រកលីមីតនៅពេល $x$ ទៅជិត $2$
 
-វិធីសាស្ត្រ៖ ជំនួស $x = 2$ ផ្ទាល់ ទទួលបាន $\\frac{0}{0}$ ដែលជាទម្រង់មិនកំណត់ ដូច្នេះត្រូវដាក់កត្តាភាគយកជាមុនសិន។
+វិធីសាស្ត្រ៖ ជំនួស $x = 2$ ផ្ទាល់ ទទួលបាន $\\frac{0}{0}$ ដែលជារាងមិនកំណត់ ដូច្នេះត្រូវដាក់កត្តាភាគយកជាមុនសិន។
 
-1. ពិនិត្យដោយជំនួស $x = 2$៖ $\\frac{2^2 - 4}{2 - 2} = \\frac{0}{0}$ ដែលមិនកំណត់។
+1. ពិនិត្យដោយជំនួស $x = 2$៖ $\\frac{2^2 - 4}{2 - 2} = \\frac{0}{0}$ ជារាងមិនកំណត់។
 2. ដាក់កត្តាភាគយក៖ $x^2 - 4 = (x + 2)(x - 2)$។
 3. សម្រួលកត្តារួម $(x - 2)$។ ធ្វើបានព្រោះ $x$ ត្រឹមតែទៅជិត 2 ប៉ុន្តែមិនស្មើ 2៖
 $$\\frac{(x + 2)(x - 2)}{x - 2} = x + 2$$
 4. ជំនួស $x = 2$ ក្នុងកន្សោមដែលសម្រួលរួច៖ $2 + 2 = 4$។
 
-ចម្លើយ៖ $\\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2} = 4$
+ចម្លើយ (សរសេរលើក្រដាសប្រឡង)៖
+$\\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2}$ មានរាងមិនកំណត់ $\\frac{0}{0}$
+$$\\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2} = \\lim_{x \\to 2} \\frac{(x + 2)(x - 2)}{x - 2}$$
+$$= \\lim_{x \\to 2} (x + 2) = 2 + 2 = 4$$
+ដូចនេះ $\\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2} = 4$
 
 គន្លឹះប្រឡង៖ សរសេរ "$\\frac{0}{0}$ មិនកំណត់" មុនពេលដាក់កត្តា។ គ្រូកែឲ្យពិន្ទុលើការកំណត់ទម្រង់នេះ ហើយប្អូននឹងបាត់ពិន្ទុបើលោតទៅសម្រួលភ្លាម។`,
     },
@@ -343,44 +373,12 @@ Exam tip: write each function right next to its part. The mark scheme pairs name
 គន្លឹះប្រឡង៖ ប្អូនត្រូវសរសេរមុខងារជាប់នឹងឈ្មោះផ្នែកនីមួយៗ។ តារាងពិន្ទុផ្គូផ្គងឈ្មោះនឹងមុខងារ ដូច្នេះឈ្មោះតែឯងបានត្រឹមពាក់កណ្តាលពិន្ទុ។`,
     },
   },
-  {
-    subject: "biology",
-    verified: true,
-    question: {
-      en: "Compare monocotyledons and dicotyledons.",
-      km: "ប្រៀបធៀបម៉ូណូកូទីលេដូន និងឌីកូទីលេដូន។",
-    },
-    answer: {
-      en: `+ លក្ខណៈដូចគ្នា
-- ជារុក្ខជាតិមានផ្កា (អង់ស្យូស្ពែម) ដូចគ្នា
-- មានគ្រាប់ការពារដោយផ្លែ និងមានប្រព័ន្ធសរសៃនាំដូចគ្នា។
-
-+ លក្ខណៈខុសគ្នា
-| លក្ខណៈ | ម៉ូណូកូទីលេដូន | ឌីកូទីលេដូន |
-| :--- | :--- | :--- |
-| គ្រាប់ | មានកូទីលេដុង 1 | មានកូទីលេដុង 2 |
-| ស្លឹក | ស្លឹកមានទ្រនុងស្រប | ស្លឹកមានទ្រនុងបែកខ្នែង |
-| ផ្កា | មាន 3 ស្រទាប់ ឬពហុគុណនឹង 3 | មាន 4 ឬ 5 ស្រទាប់ |
-| ដើម | បាច់សរសៃនាំស្ថិតនៅរាយប៉ាយ | បាច់សរសៃនាំស្ថិតជារង្វង់ |
-| ឫស | ប្រព័ន្ធឫសស្ញែ | ប្រព័ន្ធឫសកែវ |
-
-គន្លឹះប្រឡង៖ ពេលប្រឡងបាក់ឌុប សំណួរប្រៀបធៀបត្រូវឆ្លើយទាំង «លក្ខណៈដូចគ្នា» និង «លក្ខណៈខុសគ្នា» ជាតារាងជានិច្ច។ បើឆ្លើយតែលក្ខណៈខុសគ្នា នោះនឹងបាត់ពិន្ទុពាក់កណ្តាលលើលក្ខណៈដូចគ្នា!`,
-      km: `+ លក្ខណៈដូចគ្នា
-- ជារុក្ខជាតិមានផ្កាដូចគ្នា
-- មានគ្រាប់ការពារដោយផ្លែ និងមានសរសៃនាំដូចគ្នា។
-
-+ លក្ខណៈខុសគ្នា
-| លក្ខណៈ | ម៉ូណូកូទីលេដូន | ឌីកូទីលេដូន |
-| :--- | :--- | :--- |
-| គ្រាប់ | មានកូទីលេដុង 1 | មានកូទីលេដុង 2 |
-| ស្លឹក | ស្លឹកមានទ្រនុងស្រប | ស្លឹកមានទ្រនុងបែកខ្នែង |
-| ផ្កា | មាន 3 ស្រទាប់ ឬពហុគុណនឹង 3 | មាន 4 ឬ 5 ស្រទាប់ |
-| ដើម | បាច់សរសៃនាំស្ថិតនៅរាយប៉ាយ | បាច់សរសៃនាំស្ថិតជារង្វង់ |
-| ឫស | ប្រព័ន្ធឫសស្ញែ | ប្រព័ន្ធឫសកែវ |
-
-គន្លឹះប្រឡង៖ ពេលប្រឡងបាក់ឌុប សំណួរប្រៀបធៀបត្រូវឆ្លើយទាំង «លក្ខណៈដូចគ្នា» និង «លក្ខណៈខុសគ្នា» ជាតារាងជានិច្ច។ បើឆ្លើយតែលក្ខណៈខុសគ្នា នោះនឹងបាត់ពិន្ទុពាក់កណ្តាលលើលក្ខណៈដូចគ្នា!`,
-    },
-  },
+  // A monocot vs dicot comparison table used to sit here. Removed (2 Oct 2026)
+  // for the reason the sympathetic one went: server/chat-cache.ts serves that
+  // exact answer hand-written and free (it is one of the chat's starter chips),
+  // so as an example it only cost prompt space, and the full solution's formal
+  // Bac II write-up needed the room. The plant-hormone entry below still teaches
+  // the similarities + differences table.
   {
     subject: "biology",
     verified: true,

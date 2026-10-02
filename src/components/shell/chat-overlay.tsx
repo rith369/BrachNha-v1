@@ -693,10 +693,15 @@ export function ChatOverlay() {
               className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm font-semibold whitespace-pre-wrap ${
+                // KruAI's bubble is wider than the student's: its answers carry
+                // display maths, and a full solution's formal Bac II write-up
+                // overflowed an 80% bubble on a 360px phone (a sideways swipe
+                // inside the formula). The student's own stays at 80%, so the
+                // two sides still read as two sides.
+                className={`rounded-2xl px-4 py-2.5 text-sm font-semibold whitespace-pre-wrap ${
                   m.role === "user"
-                    ? "bg-brand text-white"
-                    : "border border-border bg-surface text-text"
+                    ? "max-w-[80%] bg-brand text-white"
+                    : "max-w-[92%] border border-border bg-surface text-text"
                 }`}
               >
                 {m.image && (
