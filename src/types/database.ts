@@ -35,6 +35,12 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
+/** The roles user_roles' CHECK allows (20261002000001, owner added by
+ *  20261002000002). An owner is an admin everywhere and the only one who can
+ *  manage admins; the owner role itself is set in the SQL editor only. A
+ *  Teacher role later is one more member here and one wider CHECK there. */
+export type AppRole = "admin" | "owner";
+
 type ProfileFk<Name extends string> = {
   foreignKeyName: Name;
   columns: ["user_id"];
@@ -508,12 +514,23 @@ export type Database = {
         Relationships: [];
       };
 
-      // 20261001000003_report_review.sql. Who the team is. No client policies:
-      // filled by hand in the SQL editor, read only through is_app_admin().
-      app_admins: {
-        Row: { user_id: string; created_at: string };
-        Insert: { user_id: string; created_at?: string };
-        Update: Partial<Database["public"]["Tables"]["app_admins"]["Insert"]>;
+      // 20261002000001_roles_and_admin_tools.sql (it replaced app_admins). Who
+      // has which role. No client policies: read only through has_role() and
+      // the admin_* functions, written by admin_set_role() or the SQL editor.
+      user_roles: {
+        Row: {
+          user_id: string;
+          role: AppRole;
+          granted_by: string | null;
+          granted_at: string;
+        };
+        Insert: {
+          user_id: string;
+          role: AppRole;
+          granted_by?: string | null;
+          granted_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["user_roles"]["Insert"]>;
         Relationships: [];
       };
     };
@@ -542,11 +559,54 @@ export type Database = {
         Args: Record<string, never>;
         Returns: undefined;
       };
-      // 20261001000003_report_review.sql. The /admin/reports page. Each
-      // admin_* function refuses a caller who is not in app_admins.
+      // 20261001000003_report_review.sql, redefined by 20261002000001 as
+      // has_role('admin'). Every admin_* function refuses a non-admin caller.
       is_app_admin: {
         Args: Record<string, never>;
         Returns: boolean;
+      };
+      // 20261002000001_roles_and_admin_tools.sql. Answers for the CALLER only.
+      has_role: {
+        Args: { p_role: AppRole };
+        Returns: boolean;
+      };
+      // Owner only (20261002000002), and only the admin role: the owner role is
+      // never granted or removed from the app.
+      admin_set_role: {
+        Args: { p_user: string; p_role: "admin"; p_grant: boolean };
+        Returns: undefined;
+      };
+      admin_students: {
+        Args: { p_search: string; p_limit: number };
+        Returns: {
+          id: string;
+          display_name: string;
+          email: string;
+          joined_at: string;
+          last_seen: string | null;
+          xp: number;
+          level: number;
+          streak: number;
+          active_days_30: number;
+          kruai_today: number;
+          kruai_7d: number;
+          is_admin: boolean;
+          is_owner: boolean;
+        }[];
+      };
+      admin_user_competition_ids: {
+        Args: { p_user: string };
+        Returns: { competition_id: string; created: boolean }[];
+      };
+      admin_delete_user: {
+        Args: { p_user: string };
+        Returns: boolean;
+      };
+      // One jsonb document. Its shape is AdminDashboard in lib/admin-tools.ts,
+      // and it is checked there rather than trusted.
+      admin_dashboard: {
+        Args: Record<string, never>;
+        Returns: Json;
       };
       admin_photo_reports: {
         Args: Record<string, never>;

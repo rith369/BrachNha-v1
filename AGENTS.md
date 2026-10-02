@@ -6328,10 +6328,13 @@ owner reads them in the SQL editor (queries in `supabase/README.md`).
 Profile, signed-in only, below Logout: a quiet text button, a confirm box that
 says what is removed, and a native checkbox that must be ticked. ORDER MATTERS:
 (1) collect every competition id the student is in, from the server AND the
-store, while those rows still exist; (2) remove their folder in each through
-the Storage API (`deleteMyFolder` in `lib/competition-photos.ts`; storage has no
-FK and Supabase refuses SQL deletes on it), and STOP on any failure so no photo
-is orphaned; (3) `delete_my_account()` deletes `auth.users` where id =
+store, while those rows still exist, and which of them they CREATED; (2)
+remove the photos through the Storage API (`clearPhotoFolders`; storage has no
+FK and Supabase refuses SQL deletes on it): their own folder in a competition
+they joined, and the WHOLE folder of one they created, since it is deleted with
+them and every joiner's attempt with it (`"competition work: creator delete"`,
+`20261002000003`, is what lets them). STOP on any failure so no photo is
+orphaned; (3) `delete_my_account()` deletes `auth.users` where id =
 `auth.uid()`, and every table cascades. Then sign out and `logout()`. Not
 verified against a real account: try it on a TEST Google account first.
 
@@ -6348,18 +6351,18 @@ hides it for that visit.
 `lib/admin-reports.ts`, migration `20261001000003_report_review.sql`). In no
 nav list and deliberately NOT in `routeModules`, which is also the idle
 prefetch list: the page has its own lazy chunk that students never download.
-ADMIN IS DECIDED IN THE DATABASE: `app_admins` (no client policies, filled by
-hand in the SQL editor) and `is_app_admin()`, which every `admin_*` function and
+ADMIN IS DECIDED IN THE DATABASE: `user_roles` (it replaced `app_admins`, see
+"Roles and the admin area" below) and `is_app_admin()`, which every `admin_*` function and
 two extra Storage policies (admin read, admin delete on `competition-work`)
 check. The page is only a screen over them. Keep and Delete RECORD the decision
 on the report rows (`resolution` / `resolved_at` / `resolved_by`) rather than
 deleting them. Delete removes the file FIRST and closes the reports only if
 that worked; and because Storage answers a policy-blocked delete with success
 and nothing removed, `deletePhoto` treats "a file the list could sign, but
-nothing was removed" as a failure. `db:check` sees `app_admins` but not the
+nothing was removed" as a failure. `db:check` sees `user_roles` but not the
 functions or policies.
 
-**An admin account sees a "Team → Photo reports" row in the menu** (drawer and
+**An admin account sees a "Team → Admin" row in the menu** (drawer and
 desktop sidebar, `components/shell/sidebar-nav.tsx`), with a badge counting
 open reports; everyone else sees nothing, not even a greyed row. The answer
 comes from `lib/admin-status.ts`, which asks `is_app_admin()` once per signed-in
@@ -6369,6 +6372,156 @@ app. The review page reports its loaded count and every Keep/Delete back through
 `setOpenReports()`, so the badge follows without another request. This is the
 user's "option 2": the ordinary student app plus an admin-only extra, so the
 same account can still be used to test the app as a student.
+
+### Roles and the admin area (2 Oct 2026, Step A of `docs/plans/admin-roles.md`)
+
+The single photo-report page grew into a small admin area: **`/admin`** (the
+dashboard and the tools), **`/admin/students`** and the existing
+**`/admin/reports`**. Steps B (KruAI limits and pausing) and C (announcements
+and mistake reports) are planned in that file and not built.
+
+**`user_roles` REPLACED `app_admins`** (`20261002000001_roles_and_admin_tools.sql`).
+One row per (student, role); the roles are `admin` and `owner` (see THE OWNER ROLE
+below), and a Teacher role later
+is one wider CHECK plus one member in `AppRole` (`types/database.ts`). No client
+policies. `has_role(role)` answers for the CALLER only, and `is_app_admin()`
+was redefined as `has_role('admin')` with the same name and signature, so
+`admin_photo_reports()`, `admin_resolve_photo()` and both admin Storage
+policies needed no edit. **The migration's order is load-bearing**: create
+`user_roles`, copy the `app_admins` rows, redefine `is_app_admin()`, THEN drop
+`app_admins`, all in one `begin … commit`.
+
+**Five admin functions, each SECURITY DEFINER, raising 42501 for a non-admin,
+granted to `authenticated` only:**
+
+| function | what it does | refuses (with `hint`) |
+| --- | --- | --- |
+| `admin_set_role(user, role, grant)` | add or remove the `admin` role | anyone but the owner (`owner_only`) |
+| `admin_students(search, limit)` | real (non-anonymous) students, most recently active first, max 50; name/email search with `%` and `_` escaped | |
+| `admin_user_competition_ids(user)` | the competitions a student is in, and whether they CREATED each | the same accounts as the delete, so nothing is touched first |
+| `admin_delete_user(user)` | deletes the auth user; every table cascades | own account (`self`), the owner (`owner`), an admin (`admin`) |
+| `admin_dashboard()` | one jsonb for the whole `/admin` page (below) | |
+
+`lib/admin-tools.ts` maps each `hint` to an `AdminFail` the screen can say.
+**Nothing in the app is the security**: the client only decides what to OFFER.
+
+**The dashboard is one call**, so every number on the page comes from the same
+moment. Daily active = distinct `app_open` per Phnom Penh day (`log_event`
+accepts it once per student per day). "Came back in week 2" = of the students
+who joined in a week, how many opened the app 7 to 13 days after joining, for
+the last 4 COMPLETE cohorts. `tracked_since` (the first event ever recorded) is
+what stops a 0 meaning "nothing was counting": the chart's caption says so, and a
+cohort whose second week began before tracking reads "Not measured yet", never
+0%. Students = non-anonymous accounts, so the ~205 harness accounts are left out.
+`toDashboard()` checks the jsonb field by field rather than trusting it.
+
+**Deleting a CREATOR clears the joiners' photos too, from either path.** A
+creator's competitions are deleted with them, and every joiner's attempt with
+those, so the JOINERS' photos would be left with nothing pointing at them.
+`clearPhotoFolders(user, folders)` in `lib/account-deletion.ts` is shared by
+the admin delete and "Delete my account": a created competition's whole folder
+goes (`deleteCompetitionFolder`), a joined one's only the student's own folder.
+Self-deletion first could NOT do this (a student reached only their own
+folder), and `20261002000003_creator_photo_cleanup.sql` closed that: the
+creator of a competition may delete any file in its folder. **That is not a
+new power**: a creator could already delete the whole competition
+(`"competitions: delete own"`), wiping every joiner's attempt, and could already
+see every joiner's photos in it. Joiners still cannot touch each other's or the
+creator's. Verified against the REAL read and delete-own policies in PGlite (a
+creator clears all 5 files of their competition, only their own in one they
+joined, a joiner only theirs, a stranger nothing; without the policy the creator
+cleared 1 of 5), and in the browser: with the policy refused, the account is
+NOT deleted and the error shows. `deleteMyFolder` became
+`deleteUserFolder` and now treats **fewer files removed than listed as a
+failure**, because Storage answers a policy-blocked delete with success and an
+empty list. Photos first, then `admin_delete_user`; any failure stops with
+nothing deleted.
+
+**`AdminGate`** (`features/admin/components/admin-gate.tsx`) is the frame every
+admin page shares: the scroller, the title, an optional "← Admin" back link,
+and checking / "This page is for the BrachNha team." / the page. Its children
+MOUNT ONLY ONCE ACCESS IS CONFIRMED, so a page's own loading never runs for a
+student. `pages/admin-reports.tsx` now uses it instead of its own copy.
+
+Things a later edit could undo:
+
+- **All three admin pages are lazy and NOT in `routeModules`** (the idle
+  prefetch list). Their code is ~25KB gzipped across `admin-*.js` chunks;
+  `features/admin/copy.ts` lands in `admin-gate-*.js`. The entry chunk only has
+  the menu row's label.
+- **The menu row is now "Admin" → `/admin`**, lit by prefix on its sub-pages,
+  still badged with open photo reports from `lib/admin-status.ts`.
+- **The hub's two tool links render OUTSIDE the dashboard's load**, so
+  `/admin/reports` stays one tap from the menu even if `admin_dashboard()`
+  fails (for example before the migration is applied).
+- **Students page actions**: your own row offers nothing (Profile is where you
+  change yourself); an admin's row offers no Delete until the role is removed;
+  role changes take two taps; delete takes two taps plus a native tick box, like
+  Profile's `delete-account.tsx`. The search is debounced (300ms) and the old
+  rows stay, dimmed, while a new search loads.
+- **The privacy page says the team can see** name, email, joined / last seen,
+  study numbers and KruAI usage. That list mirrors `admin_students()`'s columns:
+  widen one, widen the other.
+
+**Verified:** the migration ran twice against an in-memory Postgres (PGlite)
+with stand-in `auth.users` and the referenced tables: 57 checks covering the
+row carry-over, every refusal, the escaping, the created flag, the cascades and
+the dashboard's shape; `anon` was refused every function and `authenticated`
+could not read `user_roles`. Then 98 browser checks at 1280/390/320, both themes
+and Khmer, with the Supabase REST and Storage calls faked through Playwright
+`route` (the access gate as guest, student and admin; the debounced search; the
+role confirm; the delete order and the folders it cleared; the refusal
+messages; no sideways scroll; no page error). The migration was then applied to
+the live project: `db:check` passes and every admin function refuses the
+publishable key.
+
+**THE OWNER ROLE (`20261002000002_owner_role.sql`, same day).** Step A first
+made every admin equal, and testing on the real project found two holes:
+
+- any admin could remove any other admin and then delete their account, so a
+  second admin could take the app over;
+- Profile's "Delete my account" never looked at roles. The only admin deleted
+  themselves there, the role went with the account (cascade), and the team was
+  left with NO admin, fixable only in the SQL editor. The old "never remove the
+  last admin" rule only guarded the admin page, so it was never real.
+
+The fix is one role above admin, the user's call:
+
+- **The owner is an admin everywhere** (`is_app_admin()` is true for `admin` OR
+  `owner`), and **the ONLY one who can make or remove admins**
+  (`admin_set_role` raises 42501 with hint `owner_only` for anyone else, and
+  only touches the `admin` role).
+- **The owner role is set in the SQL editor only.** Nothing in the app grants
+  or removes it.
+- **An owner's account cannot be deleted from the app**: `admin_delete_user`
+  refuses it (hint `owner`), and `delete_my_account()` now refuses the owner
+  too. An ordinary admin can still delete their own account on Profile; with an
+  owner always there, the team can no longer end up with nobody in charge.
+- **The last-admin rule is GONE.** The owner manages admins and is an admin by
+  definition, so it was redundant, and it would have stopped the owner removing
+  the last ordinary admin.
+- **Refusals come BEFORE any photo is removed.** `admin_user_competition_ids`,
+  the admin delete's first call, refuses the same accounts with the same hints,
+  and `deleteMyAccount()` asks `has_role('owner')` before step 1. The database
+  functions at the end are still the real gate.
+- **The constraint swap drops every CHECK on `user_roles`** rather than one by
+  name, so a differently named old constraint cannot survive and keep refusing
+  `'owner'`.
+- `admin_students()` gained `is_owner`, which changes its type, so the
+  migration drops and re-creates it (and re-grants) inside its transaction.
+
+On screen: `lib/admin-status.ts` also answers `isOwner` (asked once, after
+`isAdmin`, through `has_role('owner')` in `lib/admin-reports.ts`). The Students
+page offers Make/Remove admin to the owner only, shows an **Owner** chip, gives
+the owner's row no actions at all, and tells an ordinary admin "Only the owner
+can …" where a button would be. Profile shows the owner "This is the owner
+account, so it cannot be deleted from the app." instead of the delete button.
+
+Verified: both migrations in order (000002 twice) against PGlite, 30 checks
+covering each refusal, the cascades, the grants after the drop/create and the
+single remaining CHECK; then 22 browser checks of the owner's and an admin's
+views and of Profile, in English and Khmer.
+
 
 ## Installable app: "add to home screen" and the two pop-ups
 
@@ -7543,6 +7696,18 @@ the functions (`log_client_error`, `log_event`, `delete_my_account`): a
 publishable-key-only call to `/rest/v1/rpc/log_event` must be refused. Until
 they are applied, error reports and events are dropped silently, Delete my
 account shows its error, and Report says it could not send.
+
+**The admin area needs `20261002000001_roles_and_admin_tools.sql` AND
+`20261002000002_owner_role.sql` applied**, by hand, each in ONE run (each is
+one transaction), then an owner row added in the SQL editor (see
+`supabase/README.md`). **`20261002000003_creator_photo_cleanup.sql` must be
+applied BEFORE the app that uses it ships**: without it, "Delete my account"
+fails (safely, nothing deleted) for any student who created a competition that
+someone joined with photos. Until it is, `db:check` names
+`user_roles` as missing, `/admin` shows its tool links but "Could not load
+this" for the dashboard, and `/admin/students` fails to load; the photo-report
+page keeps working on the old `app_admins`. Afterwards a publishable-key-only
+call to `/rest/v1/rpc/admin_dashboard` must be refused.
 
 **The Game feature needs BOTH its migrations applied before db:check passes** —
 `20260913000001_competitions.sql` and

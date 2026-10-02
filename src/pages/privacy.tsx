@@ -35,6 +35,7 @@ import { Wordmark } from "@/components/shell/wordmark";
  *   battle photos       → lib/competition-photos.ts, lib/photo-reports.ts
  *   leaderboard name    → the leaderboard() function, 20260916000004
  *   account deletion    → lib/account-deletion.ts (+ 20261001000002)
+ *   what admins see     → admin_students() in 20261002000001
  * If any of those change, this page is part of the change.
  */
 
@@ -226,9 +227,23 @@ export default function PrivacyPage() {
             cannot open it at all.
           </p>
           <p>
+            A few people on the BrachNha team have admin access. Their tools
+            show your name, email, when you joined and last opened the app, your
+            study numbers (XP, level, streak) and how many KruAI questions you
+            asked. They use this to help you when something goes wrong and to
+            keep the app safe.
+          </p>
+          <p>
             សេវាកម្មបីៈ Google សម្រាប់ការចូលគណនី, Supabase
             សម្រាប់រក្សាទុកទិន្នន័យ, និង Google Gemini សម្រាប់ KruAI។
             បើអ្នកមិនប្រើ KruAI ទេ គ្មានអ្វីផ្ញើទៅ AI ឡើយ។
+          </p>
+          <p>
+            មនុស្សមួយចំនួនក្នុងក្រុម BrachNha មានសិទ្ធិគ្រប់គ្រង។
+            ឧបករណ៍របស់ពួកគេបង្ហាញឈ្មោះ អ៊ីមែល ថ្ងៃដែលអ្នកចូលរួម
+            និងថ្ងៃដែលអ្នកបើកកម្មវិធីចុងក្រោយ លេខសិក្សារបស់អ្នក (XP កម្រិត Streak)
+            និងចំនួនសំណួរដែលអ្នកសួរ KruAI។
+            ពួកគេប្រើវាដើម្បីជួយអ្នកពេលមានបញ្ហា និងរក្សាសុវត្ថិភាពកម្មវិធី។
           </p>
         </Section>
 

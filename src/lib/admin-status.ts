@@ -1,13 +1,14 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { useBrachNhaStore } from "./store";
-import { countOpenReports, isAdmin } from "./admin-reports";
+import { countOpenReports, isAdmin, isOwner } from "./admin-reports";
 
 /**
- * Whether the signed-in account is on the team's admin list, and how many photo
- * reports are waiting — for the Admin row in the menu (sidebar-nav.tsx).
+ * Whether the signed-in account is an admin, and how many photo reports are
+ * waiting, for the Admin row in the menu (sidebar-nav.tsx) and the /admin hub.
  *
  * THE DATABASE DECIDES. The app never compares an email: it asks
- * is_app_admin() (20261001000003), which reads app_admins for the caller only.
+ * is_app_admin(), which since 20261002000001 is has_role('admin') over
+ * user_roles, for the caller only.
  * A student who edits their copy of the app to show the row still gets nothing
  * from the page behind it.
  *
@@ -20,11 +21,15 @@ import { countOpenReports, isAdmin } from "./admin-reports";
 
 interface AdminStatus {
   isAdmin: boolean;
+  /** The owner (an admin who also manages admins). Read by the Students page
+   *  to decide which buttons to offer, and by Profile to hide "Delete my
+   *  account". The database enforces both either way. */
+  isOwner: boolean;
   /** Open reports, or null before the count has arrived. */
   openReports: number | null;
 }
 
-const NOT_ADMIN: AdminStatus = { isAdmin: false, openReports: null };
+const NOT_ADMIN: AdminStatus = { isAdmin: false, isOwner: false, openReports: null };
 
 let status: AdminStatus = NOT_ADMIN;
 let askedFor: string | null = null;
@@ -51,10 +56,12 @@ function load(userId: string | null) {
   void (async () => {
     const admin = await isAdmin();
     if (askedFor !== userId || !admin) return;
-    emit({ isAdmin: true, openReports: null });
+    const owner = await isOwner();
+    if (askedFor !== userId) return;
+    emit({ isAdmin: true, isOwner: owner, openReports: null });
     const count = await countOpenReports();
     if (askedFor !== userId) return;
-    emit({ isAdmin: true, openReports: count });
+    emit({ isAdmin: true, isOwner: owner, openReports: count });
   })();
 }
 
@@ -62,7 +69,7 @@ function load(userId: string | null) {
  *  Delete after that, so the badge follows without asking the server again. */
 export function setOpenReports(count: number) {
   if (status.isAdmin && status.openReports !== count) {
-    emit({ isAdmin: true, openReports: count });
+    emit({ ...status, openReports: count });
   }
 }
 

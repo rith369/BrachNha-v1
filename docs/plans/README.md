@@ -12,4 +12,4 @@ commit it shipped in).
 
 | plan | status |
 | --- | --- |
-| [admin-roles.md](admin-roles.md) | Planned, not built yet |
+| [admin-roles.md](admin-roles.md) | Step A + owner role built and applied (not committed); B and C planned |

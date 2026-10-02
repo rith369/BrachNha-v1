@@ -48,9 +48,10 @@ const TABLES = [
   // Photo reports (20261001000002), which also adds delete_my_account() — a
   // function this check cannot see.
   "photo_reports",
-  // The team's review page (20261001000003). Its functions and Storage
-  // policies are invisible to this check; the table is the probe.
-  "app_admins",
+  // Roles and the admin area (20261002000001, which replaced app_admins from
+  // 20261001000003). Its functions are invisible to this check; the table is
+  // the probe.
+  "user_roles",
 ];
 
 /**

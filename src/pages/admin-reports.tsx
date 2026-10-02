@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
 import { Check, ImageOff, ShieldAlert, Trash2 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
-import { useAuth } from "@/hooks/use-auth";
+import { AdminGate } from "@/features/admin/components/admin-gate";
 import {
   deletePhoto,
-  isAdmin,
   keepPhoto,
   listReportedPhotos,
   type ReportedPhoto,
@@ -16,10 +14,11 @@ import type { Lang } from "@/types";
 /**
  * /admin/reports — the team's review of reported battle photos.
  *
- * Not in any nav list, and not in app.tsx's prefetch map: nobody but the team
- * should download it. Being an admin is decided by the DATABASE (app_admins,
- * 20261001000003); a student who types this URL sees "not for you", and every
- * call behind the page would refuse them anyway.
+ * Reached from the /admin hub, and not in app.tsx's prefetch map: nobody but
+ * the team should download it. Being an admin is decided by the DATABASE
+ * (is_app_admin(), over user_roles since 20261002000001); a student who types
+ * this URL sees "not for you" (AdminGate), and every call behind the page would
+ * refuse them anyway.
  *
  * Keep closes the reports and leaves the photo. Delete removes the photo for
  * everyone (two taps), then closes the reports. Both are recorded on the report
@@ -30,9 +29,6 @@ const COPY = {
   en: {
     title: "Photo reports",
     blurb: "Photos students reported in battle reviews. Keep closes the report; Delete removes the photo for everyone.",
-    checking: "Checking access…",
-    denied: "This page is for the BrachNha team.",
-    home: "Back to Home",
     loading: "Loading reports…",
     failed: "Could not load reports. Check your connection and reload.",
     empty: "No reports waiting. 🎉",
@@ -51,9 +47,6 @@ const COPY = {
   km: {
     title: "របាយការណ៍រូបថត",
     blurb: "រូបថតដែលសិស្សបានរាយការណ៍ក្នុងការប្រកួត។ «រក្សាទុក» បិទរបាយការណ៍។ «លុប» លុបរូបថតសម្រាប់គ្រប់គ្នា។",
-    checking: "កំពុងពិនិត្យសិទ្ធិ…",
-    denied: "ទំព័រនេះសម្រាប់ក្រុម BrachNha ប៉ុណ្ណោះ។",
-    home: "ត្រឡប់ទៅទំព័រដើម",
     loading: "កំពុងទាញយករបាយការណ៍…",
     failed: "មិនអាចទាញយករបាយការណ៍បានទេ។ សូមពិនិត្យអ៊ីនធឺណិត រួចផ្ទុកឡើងវិញ។",
     empty: "មិនមានរបាយការណ៍រង់ចាំទេ។ 🎉",
@@ -71,7 +64,6 @@ const COPY = {
   },
 };
 
-type Access = "checking" | "denied" | "admin";
 type Load = "loading" | "failed" | "ready";
 
 /** The question number from `{competition}/{owner}/{q}-{id}.jpg`, 1-based. */
@@ -203,28 +195,17 @@ function ReportCard({
   );
 }
 
-export default function AdminReportsPage() {
+function ReportsBody() {
   const lang = useBrachNhaStore((s) => s.lang);
-  const { isAuthenticated } = useAuth();
   const c = COPY[lang];
-
-  const [checked, setChecked] = useState<Access>("checking");
   const [load, setLoad] = useState<Load>("loading");
   const [items, setItems] = useState<ReportedPhoto[]>([]);
 
-  // Every setState here runs from the async callback, never synchronously in
-  // the effect body (oxlint's react(set-state-in-effect)).
+  // Mounted by AdminGate only once access is confirmed. setState only from the
+  // async callback (oxlint's react(set-state-in-effect)).
   useEffect(() => {
-    if (!isAuthenticated) return;
     let alive = true;
     void (async () => {
-      const ok = await isAdmin();
-      if (!alive) return;
-      if (!ok) {
-        setChecked("denied");
-        return;
-      }
-      setChecked("admin");
       const result = await listReportedPhotos();
       if (!alive) return;
       if (result.ok) {
@@ -238,69 +219,48 @@ export default function AdminReportsPage() {
     return () => {
       alive = false;
     };
-  }, [isAuthenticated]);
-
-  // A guest (or an unconfigured project) is denied without asking anything.
-  const access: Access = isAuthenticated ? checked : "denied";
+  }, []);
 
   return (
-    <div className="h-full overflow-y-auto">
-      <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-36 lg:pb-10">
-        <div className="mb-1 flex items-center gap-2 pr-14">
-          <ShieldAlert className="size-5 text-pink" strokeWidth={2.5} />
-          <h1 className="font-heading text-xl font-extrabold">{c.title}</h1>
+    <>
+      <p className="mb-4 text-xs font-semibold text-muted">{c.blurb}</p>
+      {load === "loading" && (
+        <p className="text-sm font-bold text-muted">{c.loading}</p>
+      )}
+      {load === "failed" && (
+        <p className="text-sm font-bold text-pink">{c.failed}</p>
+      )}
+      {load === "ready" && items.length === 0 && (
+        <div className="rounded-2xl border border-border bg-surface p-5 text-center text-sm font-bold text-muted shadow-panel">
+          {c.empty}
         </div>
+      )}
+      {load === "ready" && items.length > 0 && (
+        <div className="flex flex-col gap-3">
+          {items.map((item) => (
+            <ReportCard
+              key={item.path}
+              item={item}
+              lang={lang}
+              onDone={(path) => {
+                const rest = items.filter((i) => i.path !== path);
+                setItems(rest);
+                // The menu badge follows without asking the server again.
+                setOpenReports(rest.length);
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
 
-        {access === "checking" && (
-          <p className="mt-4 text-sm font-bold text-muted">{c.checking}</p>
-        )}
-
-        {access === "denied" && (
-          <div className="mt-6 rounded-2xl border border-border bg-surface p-5 text-center shadow-panel">
-            <p className="text-sm font-bold">{c.denied}</p>
-            <Link
-              to="/"
-              className="mt-3 inline-block rounded-full bg-[var(--brand-purple)] px-5 py-2 text-sm font-bold text-on-brand"
-            >
-              {c.home}
-            </Link>
-          </div>
-        )}
-
-        {access === "admin" && (
-          <>
-            <p className="mb-4 text-xs font-semibold text-muted">{c.blurb}</p>
-            {load === "loading" && (
-              <p className="text-sm font-bold text-muted">{c.loading}</p>
-            )}
-            {load === "failed" && (
-              <p className="text-sm font-bold text-pink">{c.failed}</p>
-            )}
-            {load === "ready" && items.length === 0 && (
-              <div className="rounded-2xl border border-border bg-surface p-5 text-center text-sm font-bold text-muted shadow-panel">
-                {c.empty}
-              </div>
-            )}
-            {load === "ready" && items.length > 0 && (
-              <div className="flex flex-col gap-3">
-                {items.map((item) => (
-                  <ReportCard
-                    key={item.path}
-                    item={item}
-                    lang={lang}
-                    onDone={(path) => {
-                      const rest = items.filter((i) => i.path !== path);
-                      setItems(rest);
-                      // The menu badge follows without asking the server again.
-                      setOpenReports(rest.length);
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </div>
+export default function AdminReportsPage() {
+  const lang = useBrachNhaStore((s) => s.lang);
+  return (
+    <AdminGate title={COPY[lang].title} icon={ShieldAlert} back>
+      <ReportsBody />
+    </AdminGate>
   );
 }

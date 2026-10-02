@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import type { Lang } from "@/types";
 import { deleteMyAccount } from "@/lib/account-deletion";
+import { useAdminStatus } from "@/lib/admin-status";
 
 const COPY = {
   en: {
@@ -13,6 +14,7 @@ const COPY = {
     confirm: "Delete for good",
     working: "Deleting…",
     failed: "Could not delete your account. Check your connection and try again.",
+    owner: "This is the owner account, so it cannot be deleted from the app.",
   },
   km: {
     open: "លុបគណនីរបស់ខ្ញុំ",
@@ -23,6 +25,7 @@ const COPY = {
     confirm: "លុបជាអចិន្ត្រៃយ៍",
     working: "កំពុងលុប…",
     failed: "មិនអាចលុបគណនីបានទេ។ សូមពិនិត្យអ៊ីនធឺណិត រួចព្យាយាមម្តងទៀត។",
+    owner: "នេះជាគណនីម្ចាស់ ដូច្នេះមិនអាចលុបពីកម្មវិធីបានទេ។",
   },
 } as const;
 
@@ -35,6 +38,10 @@ const COPY = {
  * keyboard-reachable and announcing its own state. The work itself is
  * lib/account-deletion.ts; on success the store resets and the app returns to
  * the entry screen on its own, so this component has nothing to do after.
+ *
+ * THE OWNER gets a one-line note instead of the button (20261002000002): the
+ * owner's account can only be removed in the SQL editor. The database refuses
+ * it anyway; hiding the button just saves the owner a confusing error.
  */
 export function DeleteAccount({ lang }: { lang: Lang }) {
   const c = COPY[lang];
@@ -42,6 +49,7 @@ export function DeleteAccount({ lang }: { lang: Lang }) {
   const [agreed, setAgreed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
+  const { isOwner } = useAdminStatus();
 
   async function confirm() {
     setBusy(true);
@@ -52,6 +60,10 @@ export function DeleteAccount({ lang }: { lang: Lang }) {
       setBusy(false);
       setError(true);
     }
+  }
+
+  if (isOwner) {
+    return <p className="mt-4 text-center text-xs font-bold text-muted">{c.owner}</p>;
   }
 
   if (!open) {

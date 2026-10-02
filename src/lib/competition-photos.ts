@@ -196,19 +196,25 @@ export async function deleteWorkPhoto(path: string): Promise<Result<null>> {
 }
 
 /**
- * Remove EVERY file this student has in one competition's folder — the account
+ * Remove EVERY file one student has in one competition's folder, the account
  * deletion step (lib/account-deletion.ts).
  *
  * Photos have no foreign key, so deleting the account row cannot reach them,
  * and Supabase refuses a direct SQL delete on storage tables. This goes through
- * the Storage API under the same "delete own" policy a single delete uses, so it
- * can only ever reach the caller's own folder.
+ * the Storage API, so the policies decide what it can reach: a student only
+ * their own folder ("delete own"), an admin any folder ("admin delete",
+ * 20261001000003), which is what lets /admin/students delete someone else.
  *
  * Everything listed is removed, not only names that match PHOTO_NAME, plus the
  * old single-photo path (`{competition}/{user}.jpg`) from before photos were
  * per question. A file that is already gone is not an error.
+ *
+ * FEWER REMOVED THAN LISTED IS A FAILURE. Storage answers a delete that a
+ * policy blocked with success and an empty list, so without this check a
+ * refused delete would read as done and the account delete would go ahead,
+ * leaving the photos behind with nothing pointing at them.
  */
-export async function deleteMyFolder(
+export async function deleteUserFolder(
   competitionId: string,
   userId: string
 ): Promise<Result<null>> {
@@ -226,10 +232,60 @@ export async function deleteMyFolder(
     ...listed.data.map((f) => `${folder}/${f.name}`),
     `${competitionId}/${userId}.jpg`,
   ];
-  const { error } = await db.storage.from(BUCKET).remove(paths);
+  const { data, error } = await db.storage.from(BUCKET).remove(paths);
   if (error) {
     devReport("delete folder", error);
     return fail("failed");
+  }
+  if ((data?.length ?? 0) < listed.data.length) {
+    devReport("delete folder", { message: "fewer files removed than listed" });
+    return fail("failed");
+  }
+  return { ok: true, data: null };
+}
+
+/**
+ * Remove every student's photos in one competition. Reachable by an ADMIN (the
+ * admin Storage policies, 20261001000003) and by that competition's CREATOR
+ * ("creator delete", 20261002000003, plus the read policy that already lets a
+ * creator see every joiner's photos). Anyone else lists only their own files,
+ * and a refused delete reads as a failure below, never as done.
+ *
+ * Used whenever a competition's CREATOR is deleted, by an admin
+ * (lib/admin-tools.ts) or by themselves on Profile (lib/account-deletion.ts).
+ * The competition row goes with its creator and every joiner's attempt with
+ * it, so the joiners' photos would otherwise be left behind with nothing
+ * pointing at them.
+ *
+ * The folder's top level holds one sub-folder per student (`id: null` in a
+ * listing) and, from before photos were per question, loose `{user}.jpg` files.
+ */
+export async function deleteCompetitionFolder(
+  competitionId: string
+): Promise<Result<null>> {
+  const db = await client();
+  if (!db) return fail("unconfigured");
+
+  const listed = await db.storage.from(BUCKET).list(competitionId, { limit: 1000 });
+  if (listed.error) {
+    devReport("list competition", listed.error);
+    return fail("failed");
+  }
+  const loose: string[] = [];
+  for (const entry of listed.data) {
+    if (entry.id === null) {
+      const one = await deleteUserFolder(competitionId, entry.name);
+      if (!one.ok) return one;
+    } else {
+      loose.push(`${competitionId}/${entry.name}`);
+    }
+  }
+  if (loose.length > 0) {
+    const { data, error } = await db.storage.from(BUCKET).remove(loose);
+    if (error || (data?.length ?? 0) < loose.length) {
+      devReport("delete loose files", error ?? { message: "not all removed" });
+      return fail("failed");
+    }
   }
   return { ok: true, data: null };
 }

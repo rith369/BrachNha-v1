@@ -25,6 +25,21 @@ supabase/migrations/
                                    guard for the paid model). REQUIRED in
                                    production: without it KruAI refuses every
                                    question, on purpose
+  20261001000001_telemetry.sql     error reports and usage events
+  20261001000002_account_deletion_and_reports.sql
+                                   "Delete my account" and photo reports
+  20261001000003_report_review.sql the team's photo-report page (/admin/reports)
+  20261001000004_fix_admin_photo_reports.sql
+  20261002000001_roles_and_admin_tools.sql
+                                   user_roles (replaces app_admins), and the
+                                   admin area: /admin and /admin/students
+  20261002000002_owner_role.sql    the owner: the only one who manages admins,
+                                   and never deleted from the app
+  20261002000003_creator_photo_cleanup.sql
+                                   a creator may delete the photos in their own
+                                   competition, so "Delete my account" leaves
+                                   no joiner photos behind. Apply BEFORE the app
+                                   that uses it ships
 ```
 
 **Changing KruAI's daily limits** (`20260929000001`): they are the two
@@ -331,17 +346,55 @@ from public.photo_reports r order by r.created_at desc;
 adds the team's review page at **`/admin/reports`** (in no menu; type the URL).
 It shows each reported photo with **Keep** and **Delete** buttons, and records
 the decision on the report rows (`resolution`, `resolved_at`, `resolved_by`)
-instead of deleting them. Only accounts in `app_admins` get anything back; add
-one by hand in the SQL editor:
+instead of deleting them. Only admins get anything back (see "Admins" below).
+
+### Admins and the owner
+
+`20261002000001_roles_and_admin_tools.sql` replaced `app_admins` with
+**`user_roles`** (one row per student and role) and moved every existing admin
+across. It also adds the admin area: **`/admin`** (the dashboard) and
+**`/admin/students`** (search, manage admins, delete an account). Admins and the
+owner see an **Admin** row in the app's menu; nobody else does.
+
+**`20261002000002_owner_role.sql`** adds the **owner**:
+
+| | admin | owner |
+| --- | --- | --- |
+| sees `/admin`, the dashboard, photo reports | yes | yes |
+| looks students up, deletes a student's account | yes | yes |
+| makes or removes admins | no | **yes, the only one** |
+| deletes an admin's account | no | yes, after removing the role |
+| can be removed or deleted from the app | yes (own account, on Profile) | **no, SQL editor only** |
+
+**The owner is set here, in the SQL editor, and nowhere else.** The account
+must have signed in with Google at least once, or there is no `auth.users` row:
 
 ```sql
-insert into public.app_admins (user_id)
-select id from auth.users where email = 'someone@example.com';
+insert into public.user_roles (user_id, role)
+select id, 'owner' from auth.users where email = 'someone@example.com';
 ```
 
-The account must have signed in with Google at least once, or there is no
-`auth.users` row to insert. Remove someone with
-`delete from public.app_admins where user_id = '…';`.
+After that the owner adds and removes admins on `/admin/students`. Removing the
+owner (for example to hand the app to someone else, add the new owner first):
+
+```sql
+delete from public.user_roles where role = 'owner'
+  and user_id = (select id from auth.users where email = 'someone@example.com');
+```
+
+Who has which role:
+
+```sql
+select u.email, r.role, r.granted_at
+from public.user_roles r join auth.users u on u.id = r.user_id
+order by r.role, u.email;
+```
+
+**Apply each migration in ONE go** (each is a single transaction). 000001 drops
+`app_admins` only after copying its rows and redefining `is_app_admin()`, so the
+photo-report page keeps working throughout. `db:check` sees `user_roles` but not
+the functions; check those with a publishable-key-only call to
+`/rest/v1/rpc/admin_dashboard`, which must be refused.
 
 Still possible by hand: Storage → `competition-work` → open the folder named by
 the report's `photo_path` (`{competition}/{student}/…`) and delete the file.

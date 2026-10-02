@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router";
-import { ShieldAlert } from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
 import { LanguageSwitcher } from "./language-switcher";
 import { ThemeSwitcher } from "./theme-switcher";
 import { Wordmark } from "./wordmark";
@@ -16,14 +16,15 @@ import { useAdminStatus } from "@/lib/admin-status";
  * once and they can never drift apart.
  */
 
-/** The team's row. Not in lib/nav-items.ts: it is not a destination every
- *  student has, and only an admin account (decided by the database, see
- *  lib/admin-status.ts) ever renders it. */
+/** The team's row, into the /admin hub (its Students and Photo reports pages
+ *  light it too, by prefix). Not in lib/nav-items.ts: it is not a destination
+ *  every student has, and only an admin account (decided by the database, see
+ *  lib/admin-status.ts) ever renders it. The badge counts open photo reports. */
 const ADMIN_ITEM: NavItem = {
-  id: "admin-reports",
-  href: "/admin/reports",
-  label: { en: "Photo reports", km: "របាយការណ៍រូបថត" },
-  icon: ShieldAlert,
+  id: "admin",
+  href: "/admin",
+  label: { en: "Admin", km: "ផ្ទាំងគ្រប់គ្រង" },
+  icon: LayoutDashboard,
 };
 
 function NavRow({

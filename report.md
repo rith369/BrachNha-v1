@@ -15,6 +15,63 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 2 Oct 2026 — An Admin Area: Dashboard, Students, Admins and an Owner
+
+Commit `(not committed yet)`. **Database steps needed,** each once in the Supabase SQL
+editor, in one go:
+
+1. `supabase/migrations/20261002000001_roles_and_admin_tools.sql` (already applied);
+2. `supabase/migrations/20261002000002_owner_role.sql` (already applied);
+3. make the owner, with the SQL in `supabase/README.md` ("Admins and the owner"). Done:
+   the owner is keop1484.
+4. `supabase/migrations/20261002000003_creator_photo_cleanup.sql` (already applied).
+
+**Why.** The team had one admin screen (photo reports) and the list of admins could only
+be changed by hand in the database. There was no way to see how many students use the
+app, look a student up, or remove an account without opening the database.
+
+**What changed.**
+
+- **Admins have an "Admin" row in the menu.** Students never see it. It opens the new
+  admin hub and still shows how many photo reports are waiting.
+- **The admin hub (`/admin`) shows how BrachNha is doing:**
+  - students in total, active today, active this week, new this week, KruAI use today and
+    crashes this week;
+  - a chart of students per day for the last 30 days;
+  - what students did this week (lessons finished, KruAI questions, and so on);
+  - how many new students came back in their second week;
+  - the most frequent crashes.
+- **A Students page (`/admin/students`):**
+  - search by name or email, and tap a student to see when they joined, when they were
+    last seen, their XP and streak, and their KruAI use;
+  - the owner can make someone an admin, or remove the role;
+  - delete a student's account, with the same two steps and tick box as "Delete my
+    account". Their battle photos are removed first. You cannot delete your own account
+    here, and only the owner can delete an admin's (after removing the role).
+- **There is one owner, above the admins.** The owner is the only one who can add or
+  remove admins, and the owner's account can never be removed or deleted from the app,
+  not even by the owner on Profile. Only the database can change who the owner is. This
+  came from testing: with admins all equal, one admin could remove another and delete
+  their account, and the only admin deleting their own account left nobody in charge.
+- **The list of admins moved to a new "roles" table.** Everyone who was an admin stays
+  an admin. A "teacher" role can be added later without redoing this.
+- **"Delete my account" now leaves no photos behind.** Before, when a student who had
+  created a battle deleted their account, the photos other players had added to that
+  battle stayed in storage with nothing pointing at them. Now they are removed too.
+- **The privacy page now says** that the BrachNha team can see a student's name, email,
+  activity and KruAI use.
+
+**What to re-test** (after running the migration):
+
+- Signed in as the owner: open the menu, tap Admin, and check the numbers and chart.
+- Open Students, search for someone, and make a TEST account an admin, then remove it.
+- On the owner's Profile there is no "Delete my account" button, only a note.
+- Signed in as that test admin: there is no "Make admin" button, and the owner's row
+  has no buttons.
+- Delete a TEST account (never a real student) and check it is gone.
+- Signed in as a student: there is no Admin row, and typing `/admin` says the page is for
+  the team.
+
 ## 2 Oct 2026 — KruAI's Full Solution Ends With the Formal Bac II Answer
 
 Commit `a2d497b`. No database step needed.

@@ -48,6 +48,18 @@ export async function isAdmin(): Promise<boolean> {
   return data === true;
 }
 
+/** Whether the signed-in account is the OWNER (20261002000002): the one who
+ *  can make and remove admins, and whose account the app will not delete.
+ *  False on any failure, which only hides controls the database would refuse
+ *  anyway. */
+export async function isOwner(): Promise<boolean> {
+  const db = await client();
+  if (!db) return false;
+  const { data, error } = await db.rpc("has_role", { p_role: "owner" });
+  devReport("has_role owner", error);
+  return data === true;
+}
+
 /** How many photos have open reports, for the menu badge. Null on failure or
  *  for a non-admin; no links are signed, so this is one cheap call. */
 export async function countOpenReports(): Promise<number | null> {

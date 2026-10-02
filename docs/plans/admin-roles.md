@@ -1,8 +1,9 @@
 # Roles and the admin area
 
-> **Status: planned, NOT built yet.** Written 1 Oct 2026, updated 2 Oct 2026.
-> Waiting for the user to say "start step A". Steps A, B and C are built in
-> order, one commit each. When a step ships, mark it done here.
+> **Status: Step A BUILT (2 Oct 2026), plus an OWNER role. Not committed yet.
+> All three migrations (20261002000001 roles, 000002 owner, 000003 creator
+> photo cleanup) are applied on the live project, and keop1484 is the owner. Steps B and C not started.** Written 1 Oct 2026. Steps A, B and C
+> are built in order, one commit each. When a step ships, mark it done here.
 
 ## Context
 
@@ -59,6 +60,32 @@ This plan grows that into a role system and a small admin area.
 
 ## A. Roles, admin hub, Students, Dashboard
 
+> **Built 2 Oct 2026.** As planned, with these differences:
+>
+> - `admin_students()` also returns level, days active in the last 30 days and
+>   KruAI units for the last 7 days. "Last seen" is the latest usage event of
+>   any kind, not only `app_open`.
+> - `admin_user_competition_ids()` also says whether the student CREATED each
+>   competition. For those, the admin delete clears the whole competition
+>   folder, since every joiner's attempt is deleted with the creator.
+> - "7-day return" is "came back in week 2": opened the app 7 to 13 days after
+>   joining, for the last 4 complete weekly cohorts, with cohorts from before
+>   tracking began shown as "Not measured yet".
+> - The `openMistakes` badge count waits for step C.
+>
+> **Then an OWNER role (`20261002000002_owner_role.sql`), the user's call after
+> testing on the real project.** With admins all equal, one admin could remove
+> another and delete their account, and the only admin deleting their own account
+> on Profile left the team with no admin. Now:
+>
+> - the owner is an admin everywhere and the ONLY one who makes or removes admins;
+> - the owner role is set in the SQL editor only, never from the app;
+> - the owner's account cannot be deleted from the app, by an admin or on Profile;
+> - the last-admin rule is gone (the owner always remains).
+>
+> For steps B and C: anything that changes who may manage the team belongs to
+> the owner, not to every admin.
+
 ### Migration `20261002000001_roles_and_admin_tools.sql`
 
 **Roles table:**
@@ -75,7 +102,7 @@ This plan grows that into a role system and a small admin area.
 
 **Admin functions** (each `security definer`, raises if `not is_app_admin()`, granted to `authenticated` only):
 
-- `admin_set_role(p_user, p_role, p_grant)`: refuses to remove the LAST admin, so the team cannot lock itself out.
+- `admin_set_role(p_user, p_role, p_grant)`: refuses to remove the LAST admin, so the team cannot lock itself out. **Superseded by the owner role below.**
 - `admin_students(p_search, p_limit)`: returns id, display name, email, joined, last seen (latest `app_open`), xp, streak, KruAI units today, and is-admin. Search matches name or email. Limited to 50 rows.
 - `admin_user_competition_ids(p_user)`: the folders to clear before a deletion.
 - `admin_delete_user(p_user)`:
@@ -130,7 +157,7 @@ This plan grows that into a role system and a small admin area.
 
 ## B. KruAI and cost
 
-### Migration `20261002000002_kruai_controls.sql`
+### Migration `20261002000004_kruai_controls.sql` (the next free number; 000002 is the owner role, 000003 the creator photo cleanup)
 
 **New tables:**
 
@@ -177,7 +204,7 @@ This plan grows that into a role system and a small admin area.
 
 ## C. Announcements and mistake reports
 
-### Migration `20261002000003_announcements_and_content_reports.sql`
+### Migration `20261002000005_announcements_and_content_reports.sql` (the next free number)
 
 **`announcements` table:**
 
