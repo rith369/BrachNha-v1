@@ -775,10 +775,21 @@ top-up. There are two layers, and they do different jobs.
    adds `kruai_usage` and `public.kruai_take(p_units)`, and `server/kruai-quota.ts`
    calls it. Per student it is **30 units a day** (the user's number); for the
    whole app it is **300 units a day**, a starting guess to be retuned (below). A
-   text question costs 1 unit and a photo costs 3 (`TEXT_UNITS`/`PHOTO_UNITS` in
-   the handler). A curated answer is free and is charged nothing. At a limit,
+   text question costs 1 unit and a NEW photo costs 3 (`TEXT_UNITS`/`PHOTO_UNITS`
+   in the handler). A curated answer is free and is charged nothing. At a limit,
    KruAI answers with a readable 429 ("come back tomorrow" or "KruAI is resting
    until tomorrow").
+
+   **A follow-up costs 1, although the earlier photo travels with it** (1 Oct
+   2026, a bug the user found by testing). The chat screen re-sends the latest
+   photo with every follow-up so KruAI can still see it, and the charge used to
+   key on "any image in the request" (`hasImage`), so every follow-up in a photo
+   chat cost 3, and a guided photo exercise used up the day's 30 in about ten
+   turns. The charge now keys on `newPhoto`, a photo on the LAST message (the
+   question being asked). `hasImage` still drives what a re-sent photo really
+   does change: the longer timeouts, `IMAGE_RATE_LIMIT` and no curated answer.
+   The token log line says `photo=new|resent|no`, so what a re-sent photo
+   actually costs Google can be read off the logs rather than guessed.
 
 **Why the database and not `rate-limit.ts`.** That limiter is in memory and per
 serverless instance, and its own header says a daily counter held that way resets
@@ -810,7 +821,7 @@ unit. A refund RPC would be callable by students too, and is not worth it.
 **Tuning the whole-app number.** The handler logs one line per answer from the
 `interaction.completed` event:
 
-    [api/chat] tokens in=… out=… thought=… photo=… model=…
+    [api/chat] tokens in=… out=… thought=… photo=new|resent|no model=…
 
 Take the average cost per unit from those lines and Google's price page, then
 set `app_daily ≈ dollars per day accepted / cost per unit` (about $1/day for $30

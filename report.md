@@ -15,6 +15,23 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 1 Oct 2026 — KruAI: A Follow-up About a Photo Costs 1, Not 3
+
+Not committed yet. No database step needed.
+
+**Why.** Found while testing: after sending a photo, every follow-up question in
+the same chat also counted as 3 of the 30 daily questions. KruAI is shown the
+photo again with each follow-up so it can still see the exercise, and the app
+was charging for that photo every time. A guided photo exercise could use up a
+whole day's questions in about ten turns.
+
+**What changed.** Only the message that carries a NEW photo counts as 3. A
+follow-up counts as 1, and KruAI still sees the photo.
+
+**What to re-test.** On a real account, send a photo and watch the "questions
+left" line (it shows once 10 or fewer are left): the photo takes 3, and each
+follow-up after it takes 1.
+
 ## 1 Oct 2026 — New Look: Neobrutalism
 
 Commit `fc55120`. No database step needed.

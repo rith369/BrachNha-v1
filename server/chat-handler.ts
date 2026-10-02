@@ -289,10 +289,13 @@ const RATE_WINDOW_MS = 60_000;
 const IMAGE_RATE_LIMIT = 6;
 
 /**
- * What one question costs against the DAILY limits in kruai-quota.ts. A photo
- * is charged 3 because reading an image costs the model several times a text
- * question. The limits themselves (per student and for the whole app) live in
- * the kruai_take SQL function, so a student cannot choose them.
+ * What one question costs against the DAILY limits in kruai-quota.ts. A NEW
+ * photo is charged 3 because reading an image costs the model several times a
+ * text question. A follow-up is charged 1 although the earlier photo travels
+ * with it (see `newPhoto` in the handler): the re-read is one image on top of a
+ * prompt of several thousand tokens, not three questions' worth. The limits
+ * themselves (per student and for the whole app) live in the kruai_take SQL
+ * function, so a student cannot choose them.
  */
 const TEXT_UNITS = 1;
 const PHOTO_UNITS = 3;
@@ -808,7 +811,17 @@ export async function handleChat(req: Request): Promise<Response> {
       ?.content.map((c) => (c.type === "text" ? c.text : ""))
       .join(" ")
       .trim() ?? "";
+  // ANY photo in the request: it slows the first character (the longer
+  // timeouts), costs the model more (the image rate limit) and must never get
+  // a curated answer.
   const hasImage = imageCount > 0;
+  // A photo on the question being asked NOW, which is what the daily limit
+  // charges for. Not the same thing: the chat screen re-sends the latest photo
+  // with every follow-up so KruAI can still see it, and charging those as photos
+  // made each follow-up cost 3, so a guided photo exercise used up a day's 30 in
+  // about ten turns. The last message is always the new question (the input is
+  // refused above unless it ends on a student turn).
+  const newPhoto = images[messages.length - 1] != null;
 
   // ── who is asking ─────────────────────────────────────────────────────────
   //
@@ -914,7 +927,7 @@ export async function handleChat(req: Request): Promise<Response> {
   // verified student, and in dev without Supabase there is no student.
   let unitsLeft: number | null = null;
   if (isVerificationConfigured()) {
-    const quota = await takeQuota(req, hasImage ? PHOTO_UNITS : TEXT_UNITS);
+    const quota = await takeQuota(req, newPhoto ? PHOTO_UNITS : TEXT_UNITS);
     if (!quota.ok && quota.reason !== "error") {
       // Usually 0 left, but not always: a photo (3 units) is refused with 2
       // left, and those 2 still buy two typed questions. No count with the
@@ -1176,7 +1189,8 @@ export async function handleChat(req: Request): Promise<Response> {
                 `[api/chat] tokens in=${u.total_input_tokens ?? "?"} ` +
                   `out=${u.total_output_tokens ?? "?"} ` +
                   `thought=${u.total_thought_tokens ?? 0} ` +
-                  `photo=${hasImage ? "yes" : "no"} model=${served.candidate.model}`
+                  `photo=${newPhoto ? "new" : hasImage ? "resent" : "no"} ` +
+                  `model=${served.candidate.model}`
               );
             }
           }
