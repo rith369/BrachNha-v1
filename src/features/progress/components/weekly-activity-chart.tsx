@@ -19,7 +19,7 @@ import type { Lang } from "@/types";
 import { weekdayLabel } from "@/features/streak/copy";
 import type { WeekdayId } from "@/features/streak/types";
 import { PROGRESS_COPY } from "../copy";
-import { TitleWithTip } from "./title-with-tip";
+import { TitleWithTip } from "@/components/title-with-tip";
 
 /** Sunday first — the index `Date.getDay()` returns. */
 const WEEKDAY_IDS: WeekdayId[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];

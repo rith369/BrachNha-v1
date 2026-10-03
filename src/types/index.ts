@@ -312,6 +312,14 @@ export interface Misconception {
 
 /** Khmer-only sibling of PracticeQuestion. */
 export interface SectionQuestion {
+  /**
+   * A stable id ("q3"), set on practice quizzes stored in the database
+   * (supabase/migrations/20261003000001). A mistake report names a question by
+   * it (quiz:math-1-1-1#q3), so the report still points at the right question
+   * after the questions are reordered. Never reused within one quiz. Absent on
+   * questions still written in code (sections, until stage 2).
+   */
+  id?: string;
   /** Optional ស្ថានភាព setting the question up. Rendered above the prompt in a
    *  quieter style, because it is the situation rather than the question. */
   scenario?: string;
@@ -465,6 +473,30 @@ export interface PracticeCard {
   createdAt: string;
   updatedAt: string;
 }
+
+/**
+ * Content stored in the database (supabase/migrations/20261003000001,
+ * docs/plans/content-in-database.md): flashcard decks and practice quizzes,
+ * one row per deck or quiz, keyed like the code they replace ("biology-1-1",
+ * "math-1-1-1").
+ */
+export type ContentKind = "deck" | "quiz";
+
+/** One card as stored. The app adds `source` and the timestamps when it turns
+ *  a stored card into a PracticeCard. The id is kept for ever: review history
+ *  is keyed by it. */
+export interface DeckCardBody {
+  id: string;
+  front: string;
+  back: string;
+}
+
+/** One quiz question as stored: a SectionQuestion with its id required. */
+export type QuizQuestionBody = SectionQuestion & { id: string };
+
+export type ContentBody<K extends ContentKind> = K extends "deck"
+  ? DeckCardBody[]
+  : QuizQuestionBody[];
 
 export type MockExamSubject = "math" | "biology" | "chemistry" | "physics";
 

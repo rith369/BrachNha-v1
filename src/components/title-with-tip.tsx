@@ -4,6 +4,9 @@ import { InfoTip } from "@/components/ui/info-tip";
 /**
  * A card title with its ⓘ glued to the LAST WORD.
  *
+ * Shared by the Progress cards and the admin hub (lifted out of
+ * features/progress the moment the second caller arrived).
+ *
  * Four cards carried this markup by hand while their titles were fixed English
  * strings. Once titles come from `copy.ts` in two languages, the split point
  * has to be computed rather than written into the JSX — so it lives here once.

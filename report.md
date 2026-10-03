@@ -15,6 +15,76 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 3 Oct 2026 — Explanations on the Admin Page and the Content Pages
+
+Commit `(not committed yet)`. No database step.
+
+**Why.** The Admin page was hard to read: it was not clear what each number counted. The
+Content pages (where flashcards and quizzes are edited) had the same problem.
+
+**What changed.** On the Admin page, point at something with the mouse, or tap it on a
+phone, to see what it means:
+
+- each of the six numbers at the top (Students, Active today, KruAI units today, …);
+- the ⓘ beside every card title (Students per day, What students did, Came back in week 2,
+  Most frequent crashes);
+- each activity name in "What students did".
+
+The short paragraph that used to sit under the six numbers is gone; each number now explains
+itself. Works in English and Khmer.
+
+**On the Content pages** (Admin → Content), the same works for:
+
+- **the list:** the New and Import panels, the "publish items never published" box, and three
+  coloured labels above the list (Live, Not published, Draft) that say what each label on a
+  row means;
+- **the editor:** who sees what, Checks, Versions, the buttons at the bottom (Save draft,
+  Publish, Undo, Discard), a card's id, and each field (front, back, situation, options,
+  explanation, the help parts);
+- **every problem shown under a field:** point at it or tap it to see how to fix it.
+
+**What to re-test:**
+
+- open Admin, point at or tap each number and each ⓘ;
+- open Admin → Content, point at or tap the three coloured labels and each ⓘ;
+- open a quiz, type a long dash (—) into an explanation, then point at the red line under it;
+- tap a field's name (for example "Front") and check the cursor goes into its box.
+
+## 3 Oct 2026 — Content Editor for Flashcards and Quizzes (Part 1 of 2)
+
+Commit `(not committed yet)`. **Database step needed:** run
+`supabase/migrations/20261003000001_content_in_database.sql` once in the Supabase SQL
+editor, all in one go.
+
+**Why.** Fixing a wrong flashcard or quiz question needed a code change, so the "Fixed"
+button on Mistake reports could only record that someone had fixed it elsewhere. Also, every
+student downloads all the flashcards and quizzes before the first screen appears, whatever
+they open.
+
+**What changed.**
+
+- **A new Admin page, "Content".** Every flashcard deck and practice quiz, named the way
+  students see it. Open one to change its cards or questions, options, the correct answer
+  (tap the circle beside it), the explanation, and the help shown after answering.
+- **Checks as you type.** Broken maths, Khmer inside a formula, Khmer numerals, long dashes
+  and a missing correct answer are listed, and an error stops it being published. Fields with
+  maths show a preview.
+- **Draft, then Publish.** Anyone on the team can save a draft. **Only the owner can press
+  Publish.** Every published version is kept, so an older one can be restored.
+- **Import.** The owner can import a file of decks and quizzes. It arrives as drafts to check
+  first.
+- **Students are not affected yet.** They still see the copy built into the app. Part 2
+  switches the app to what is published here, and makes it load one lesson at a time.
+
+**What to do** (owner, after running the migration):
+
+1. Open Admin → Content → **Import a file**, choose `content/fixture.json`, tick "Publish
+   items that have never been published", press **Import**. It should say 26 published.
+2. Tell the developer, who checks that every item arrived exactly before Part 2.
+
+**What to re-test:** open a quiz, change a word, Save draft, Publish, then open Versions and
+restore version 1.
+
 ## 2 Oct 2026 — Announcements, and Students Reporting a Mistake in a Question
 
 Commit `56016bf`. **Database step:** `supabase/migrations/20261002000005_announcements_and_content_reports.sql`,

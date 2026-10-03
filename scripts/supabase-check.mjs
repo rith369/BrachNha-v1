@@ -61,6 +61,12 @@ const TABLES = [
   // student's own rows, so a select here answers 200 [] when it exists.
   "announcements",
   "content_reports",
+  // Flashcards and quizzes in the database (20261003000001). The manifest
+  // and the versions answer 200 to anyone; drafts answer 401 (no client may
+  // read them), which still proves the table exists.
+  "content_items",
+  "content_versions",
+  "content_drafts",
 ];
 
 /**

@@ -3,7 +3,7 @@ import { InfoTip } from "@/components/ui/info-tip";
 import { progressSubjects, type ProgressSubject } from "../subjects";
 import { MIN_SAMPLE, type ProgressSummary } from "../summary";
 import { PROGRESS_COPY, type ProgressCopy } from "../copy";
-import { TitleWithTip } from "./title-with-tip";
+import { TitleWithTip } from "@/components/title-with-tip";
 
 export function SubjectBreakdown({ summary }: { summary: ProgressSummary }) {
   // `userLanguage` decides WHICH language subject shows (English or French);

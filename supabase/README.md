@@ -46,6 +46,10 @@ supabase/migrations/
   20261002000005_announcements_and_content_reports.sql
                                    the banner every student sees, and students
                                    reporting a mistake in a question
+  20261003000001_content_in_database.sql
+                                   flashcards and practice quizzes stored here,
+                                   edited on /admin/content, published by the
+                                   owner only
 ```
 
 **Changing KruAI's daily limits:** since `20261002000004`, the owner changes
@@ -422,3 +426,39 @@ Still possible by hand: Storage → `competition-work` → open the folder named
 the report's `photo_path` (`{competition}/{student}/…`) and delete the file.
 Reports never hide anything automatically: one report hiding a photo for
 everyone would let any student hide a classmate's work.
+
+## `20261003000001`: flashcards and quizzes in the database
+
+Flashcard decks and practice quizzes move out of the code into three tables, so
+the team can fix them on **`/admin/content`** without a code change
+(`docs/plans/content-in-database.md`):
+
+| table | what | readable by |
+| --- | --- | --- |
+| `content_items` | which version of each deck or quiz students see | anyone (published rows) |
+| `content_versions` | every version ever published, never changed | anyone |
+| `content_drafts` | unpublished drafts | nobody directly |
+
+Any admin can save a draft. **Only the owner can publish, hide or import.**
+
+**The one-time move, in order:**
+
+1. Run the migration in the SQL editor, in one go.
+2. Sign in as the owner, open `/admin/content`, press **Import a file**, choose
+   `content/fixture.json` (made by `npm run content:export`), tick **Publish items
+   that have never been published**, and press **Import**. It should say 26 published.
+3. Check it arrived exactly: `npm run check:content -- --live content/fixture.json`
+   must say "26 of 26 item(s) published exactly as in the file".
+
+Until step 1b ships, students still see the copy in the code; publishing here
+changes nothing for them yet.
+
+`db:check` lists the three tables but cannot see the functions. Check those with
+a publishable-key-only call to `/rest/v1/rpc/admin_content_list`, which must be
+refused, and `/rest/v1/rpc/content_current?p_kind=quiz`, which must answer 200.
+
+What is live, by hand:
+
+```sql
+select kind, key, version, item_count from public.content_items order by kind, key;
+```

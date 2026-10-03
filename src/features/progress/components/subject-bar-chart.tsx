@@ -3,7 +3,7 @@ import { useBrachNhaStore } from "@/lib/store";
 import { progressSubjects, type ProgressSubject } from "../subjects";
 import type { ProgressSummary } from "../summary";
 import { PROGRESS_COPY } from "../copy";
-import { TitleWithTip } from "./title-with-tip";
+import { TitleWithTip } from "@/components/title-with-tip";
 
 /**
  * Recharts' tooltip content signature — not exported from the package, so

@@ -1,6 +1,6 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { Bot, ChevronRight, Flag, Megaphone, ShieldAlert, Users } from "lucide-react";
+import { BookOpen, Bot, ChevronRight, Flag, Megaphone, ShieldAlert, Users } from "lucide-react";
 import {
   CartesianGrid,
   Legend,
@@ -12,6 +12,8 @@ import {
   YAxis,
 } from "recharts";
 import { useBrachNhaStore } from "@/lib/store";
+import { InfoTip } from "@/components/ui/info-tip";
+import { TitleWithTip } from "@/components/title-with-tip";
 import { useAdminStatus } from "@/lib/admin-status";
 import { loadDashboard, type AdminDashboard } from "@/lib/admin-tools";
 import type { Lang } from "@/types";
@@ -29,22 +31,66 @@ import { ADMIN_COPY, dayLabel, whenLabel } from "../copy";
  * Laid out like Progress: one column on a phone, two from md, with the wide
  * cards spanning both. The two un-spanned cards (events, retention) are an
  * even pair, so the last row never holes.
+ *
+ * EVERYTHING EXPLAINS ITSELF the way Progress does (components/ui/info-tip.tsx,
+ * the user's request): every card title carries an ⓘ, and every number and
+ * every activity name is itself the trigger, opening on hover with a mouse
+ * and on tap with a finger. The words live in ../copy.ts, so changing what a
+ * number counts means changing its sentence there too.
  */
 
 const CARD = "rounded-2xl border border-border bg-surface p-4 shadow-panel";
 const PRESS =
   "transition-transform active:translate-x-[3px] active:translate-y-[3px] active:shadow-none";
 
-function CardTitle({ children }: { children: ReactNode }) {
-  return <h2 className="mb-3 font-heading text-sm font-extrabold">{children}</h2>;
+/** A card title, with an ⓘ glued to its last word when there is a `tip`. */
+function CardTitle({
+  children,
+  tip,
+  lang,
+}: {
+  children: string;
+  tip?: string;
+  lang: Lang;
+}) {
+  return (
+    <h2 className="mb-3 font-heading text-sm font-extrabold">
+      {tip ? (
+        <TitleWithTip text={children} label={ADMIN_COPY[lang].whatIsThis}>
+          {tip}
+        </TitleWithTip>
+      ) : (
+        children
+      )}
+    </h2>
+  );
 }
 
-function Tile({ label, value, fill }: { label: string; value: number; fill: string }) {
+/** One number. The whole tile is the trigger for what it counts. */
+function Tile({
+  label,
+  value,
+  fill,
+  tip,
+}: {
+  label: string;
+  value: number;
+  fill: string;
+  tip: string;
+}) {
   return (
-    <div className={`rounded-xl border border-border p-3 text-ink ${fill}`}>
-      <div className="font-heading text-2xl leading-none font-extrabold">{value}</div>
-      <div className="mt-1.5 text-[11px] leading-tight font-bold">{label}</div>
-    </div>
+    <InfoTip
+      className="flex w-full"
+      triggerClassName={`flex w-full flex-col items-start rounded-xl border border-border p-3 text-left text-ink ${fill}`}
+      trigger={
+        <>
+          <span className="font-heading text-2xl leading-none font-extrabold">{value}</span>
+          <span className="mt-1.5 text-[11px] leading-tight font-bold">{label}</span>
+        </>
+      }
+    >
+      {tip}
+    </InfoTip>
   );
 }
 
@@ -155,24 +201,30 @@ function DailyChart({ data, lang }: { data: AdminDashboard["daily"]; lang: Lang 
  *  (say, its migration not applied yet), each tool must still be one tap from
  *  the menu.
  *
- *  FIVE CARDS, and Students spans two columns at both md and xl, so neither
- *  grid ever holes: md is 2 + 2 + 2 (Students alone, then pairs), xl is
- *  2 + 1 and then 3 across. */
+ *  SIX CARDS and none spans, so neither grid ever holes: md is three rows of
+ *  2, xl two rows of 3. (With five, Students spanned two columns to make the
+ *  rows come out even; the Content card made that unnecessary.) */
 function Tools({ lang }: { lang: Lang }) {
   const c = ADMIN_COPY[lang];
   const { openReports, openMistakes } = useAdminStatus();
   return (
     <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-      <div className="md:col-span-2">
-        <ToolLink
-          to="/admin/students"
-          icon={Users}
-          fill="bg-neo-blue"
-          title={c.toolStudents}
-          blurb={c.toolStudentsBlurb}
-          count={null}
-        />
-      </div>
+      <ToolLink
+        to="/admin/students"
+        icon={Users}
+        fill="bg-neo-blue"
+        title={c.toolStudents}
+        blurb={c.toolStudentsBlurb}
+        count={null}
+      />
+      <ToolLink
+        to="/admin/content"
+        icon={BookOpen}
+        fill="bg-neo-orange"
+        title={c.toolContent}
+        blurb={c.toolContentBlurb}
+        count={null}
+      />
       <ToolLink
         to="/admin/reports"
         icon={ShieldAlert}
@@ -216,21 +268,19 @@ function Dashboard({ data, lang }: { data: AdminDashboard; lang: Lang }) {
   return (
     <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
       <div className={`md:col-span-2 ${CARD}`}>
+        <CardTitle tip={c.glanceTip} lang={lang}>{c.glanceTitle}</CardTitle>
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-          <Tile label={c.tiles.students} value={t.students} fill="bg-neo-blue" />
-          <Tile label={c.tiles.activeToday} value={t.activeToday} fill="bg-neo-mint" />
-          <Tile label={c.tiles.active7d} value={t.active7d} fill="bg-neo-mint" />
-          <Tile label={c.tiles.new7d} value={t.new7d} fill="bg-neo-yellow" />
-          <Tile label={c.tiles.kruaiToday} value={t.kruaiToday} fill="bg-neo-orange" />
-          <Tile label={c.tiles.crashes7d} value={t.crashes7d} fill="bg-neo-pink" />
+          <Tile label={c.tiles.students} value={t.students} fill="bg-neo-blue" tip={c.tileTips.students} />
+          <Tile label={c.tiles.activeToday} value={t.activeToday} fill="bg-neo-mint" tip={c.tileTips.activeToday} />
+          <Tile label={c.tiles.active7d} value={t.active7d} fill="bg-neo-mint" tip={c.tileTips.active7d} />
+          <Tile label={c.tiles.new7d} value={t.new7d} fill="bg-neo-yellow" tip={c.tileTips.new7d} />
+          <Tile label={c.tiles.kruaiToday} value={t.kruaiToday} fill="bg-neo-orange" tip={c.tileTips.kruaiToday} />
+          <Tile label={c.tiles.crashes7d} value={t.crashes7d} fill="bg-neo-pink" tip={c.tileTips.crashes7d} />
         </div>
-        <p className="mt-3 text-[11px] leading-relaxed font-semibold text-muted">
-          {c.tilesTip}
-        </p>
       </div>
 
       <div className={`md:col-span-2 ${CARD}`}>
-        <CardTitle>{c.dailyTitle}</CardTitle>
+        <CardTitle tip={c.dailyTip} lang={lang}>{c.dailyTitle}</CardTitle>
         <DailyChart data={data.daily} lang={lang} />
         <p className="mt-2 text-[11px] font-semibold text-muted">
           {data.trackedSince
@@ -240,7 +290,7 @@ function Dashboard({ data, lang }: { data: AdminDashboard; lang: Lang }) {
       </div>
 
       <div className={CARD}>
-        <CardTitle>{c.eventsTitle}</CardTitle>
+        <CardTitle tip={c.eventsTip} lang={lang}>{c.eventsTitle}</CardTitle>
         {data.events.length === 0 ? (
           <p className="text-xs font-bold text-muted">{c.eventsEmpty}</p>
         ) : (
@@ -255,7 +305,18 @@ function Dashboard({ data, lang }: { data: AdminDashboard; lang: Lang }) {
             <tbody className="divide-y divide-border/30">
               {data.events.map((e) => (
                 <tr key={e.name} className="font-bold">
-                  <td className="py-1.5 pr-2">{c.eventNames[e.name] ?? e.name}</td>
+                  <td className="py-1.5 pr-2">
+                    {c.eventTips[e.name] ? (
+                      <InfoTip
+                        triggerClassName="text-left font-bold"
+                        trigger={<span>{c.eventNames[e.name] ?? e.name}</span>}
+                      >
+                        {c.eventTips[e.name]}
+                      </InfoTip>
+                    ) : (
+                      (c.eventNames[e.name] ?? e.name)
+                    )}
+                  </td>
                   <td className="py-1.5 text-right tabular-nums">{e.count}</td>
                   <td className="py-1.5 text-right tabular-nums">{e.students}</td>
                 </tr>
@@ -266,7 +327,7 @@ function Dashboard({ data, lang }: { data: AdminDashboard; lang: Lang }) {
       </div>
 
       <div className={CARD}>
-        <CardTitle>{c.retentionTitle}</CardTitle>
+        <CardTitle tip={c.retentionTip} lang={lang}>{c.retentionTitle}</CardTitle>
         <p className="mb-3 text-[11px] leading-relaxed font-semibold text-muted">
           {c.retentionBlurb}
         </p>
@@ -302,7 +363,7 @@ function Dashboard({ data, lang }: { data: AdminDashboard; lang: Lang }) {
       </div>
 
       <div className={`md:col-span-2 ${CARD}`}>
-        <CardTitle>{c.crashesTitle}</CardTitle>
+        <CardTitle tip={c.crashesTip} lang={lang}>{c.crashesTitle}</CardTitle>
         {data.crashes.length === 0 ? (
           <p className="text-xs font-bold text-muted">{c.crashesEmpty}</p>
         ) : (

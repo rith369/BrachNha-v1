@@ -41,6 +41,10 @@ export type Json =
  *  Teacher role later is one more member here and one wider CHECK there. */
 export type AppRole = "admin" | "owner";
 
+/** Which kind of content a row holds (20261003000001). The same union the
+ *  app uses, restated so this file keeps importing nothing from the app. */
+export type ContentKind = "deck" | "quiz";
+
 /** announcements.tone (20261002000005): which neo fill the banner wears. */
 export type AnnouncementTone = "info" | "success" | "warning";
 
@@ -634,6 +638,72 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["content_reports"]["Insert"]>;
         Relationships: [];
       };
+
+      // 20261003000001_content_in_database.sql. Flashcard decks and practice
+      // quizzes. The PUBLISHED rows of content_items (the manifest) and every
+      // content_versions row are readable by anyone, guests too; nothing is
+      // writable from a client, and content_drafts is not readable either. The
+      // admin_* functions below do every write.
+      content_items: {
+        Row: {
+          kind: ContentKind;
+          key: string;
+          version: number | null;
+          item_count: number;
+          item_ids: string[];
+          updated_at: string;
+        };
+        Insert: {
+          kind: ContentKind;
+          key: string;
+          version?: number | null;
+          item_count?: number;
+          item_ids?: string[];
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["content_items"]["Insert"]>;
+        Relationships: [];
+      };
+      content_versions: {
+        Row: {
+          kind: ContentKind;
+          key: string;
+          version: number;
+          body: Json;
+          published_at: string;
+          published_by: string | null;
+        };
+        Insert: {
+          kind: ContentKind;
+          key: string;
+          version: number;
+          body: Json;
+          published_at?: string;
+          published_by?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["content_versions"]["Insert"]>;
+        Relationships: [];
+      };
+      content_drafts: {
+        Row: {
+          kind: ContentKind;
+          key: string;
+          body: Json;
+          base_version: number | null;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          kind: ContentKind;
+          key: string;
+          body: Json;
+          base_version?: number | null;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["content_drafts"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {
@@ -813,6 +883,58 @@ export type Database = {
       admin_resolve_content: {
         Args: { p_ref: string; p_resolution: "fixed" | "not_mistake" };
         Returns: number;
+      };
+      // 20261003000001. The current body of every published item of one kind
+      // (anyone, guests too).
+      content_current: {
+        Args: { p_kind: ContentKind };
+        Returns: { key: string; version: number; body: Json }[];
+      };
+      // The rest are admins only. Refusals carry a hint: key, shape, stale,
+      // missing, owner_only.
+      admin_content_list: {
+        Args: Record<string, never>;
+        Returns: {
+          kind: ContentKind;
+          key: string;
+          published_version: number | null;
+          published_count: number | null;
+          published_at: string | null;
+          draft_updated_at: string | null;
+          draft_updated_by: string | null;
+          draft_count: number | null;
+        }[];
+      };
+      // { published, draft, used_ids, versions }; shaped at the boundary in
+      // lib/admin-content.ts.
+      admin_content_get: {
+        Args: { p_kind: ContentKind; p_key: string };
+        Returns: Json;
+      };
+      admin_save_content_draft: {
+        Args: { p_kind: ContentKind; p_key: string; p_body: Json; p_expected: string | null };
+        Returns: string;
+      };
+      admin_discard_content_draft: {
+        Args: { p_kind: ContentKind; p_key: string; p_expected: string | null };
+        Returns: boolean;
+      };
+      admin_restore_content_version: {
+        Args: { p_kind: ContentKind; p_key: string; p_version: number; p_expected: string | null };
+        Returns: string;
+      };
+      // Owner only.
+      admin_publish_content: {
+        Args: { p_kind: ContentKind; p_key: string; p_expected: string | null };
+        Returns: number;
+      };
+      admin_unpublish_content: {
+        Args: { p_kind: ContentKind; p_key: string };
+        Returns: boolean;
+      };
+      admin_import_content: {
+        Args: { p_items: Json; p_publish: boolean };
+        Returns: { item_kind: ContentKind; item_key: string; outcome: "published" | "draft" | "skipped" }[];
       };
       // supabase/migrations/20260916000004_leaderboard.sql. Returns real
       // students only (never the caller) with public-safe columns.

@@ -2,7 +2,7 @@ import { useBrachNhaStore } from "@/lib/store";
 import { InfoTip } from "@/components/ui/info-tip";
 import type { ProgressSummary } from "../summary";
 import { PROGRESS_COPY } from "../copy";
-import { TitleWithTip } from "./title-with-tip";
+import { TitleWithTip } from "@/components/title-with-tip";
 
 const R = 40;
 const CIRC = 2 * Math.PI * R;

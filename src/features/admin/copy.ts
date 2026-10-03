@@ -34,8 +34,43 @@ const en = {
     kruaiToday: "KruAI units today",
     crashes7d: "Crashes, 7 days",
   },
-  tilesTip:
-    "Students are real accounts (no test accounts). Active means the student opened the app that day. KruAI units: a question is 1, a new photo is 3.",
+  // ── Explanations (hover with a mouse, tap with a finger). They replaced a
+  // paragraph under the tiles that explained all six at once. ──
+  whatIsThis: "What this means",
+  glanceTitle: "Key numbers",
+  glanceTip: "Point at a number, or tap it, to see exactly what it counts.",
+  tileTips: {
+    students:
+      "Every real account that has signed in with Google. Test accounts and guests (people using the app without signing in) are not counted.",
+    activeToday:
+      "Students who opened the app today, Phnom Penh time. Each student counts once, however many times they opened it.",
+    active7d:
+      "How many different students opened the app at least once in the last 7 days, today included.",
+    new7d: "Accounts created in the last 7 days, today included.",
+    kruaiToday:
+      "How much KruAI was used today by the whole app. A typed question is 1 unit and a new photo is 3. The daily limits are on the KruAI page.",
+    crashes7d:
+      "Errors that broke a screen for a student in the last 7 days. 0 is good. The list at the bottom of this page shows which ones.",
+  },
+  dailyTip:
+    "Active: students who opened the app that day (Phnom Penh time). New: accounts created that day. Guests are not counted, because they have no account. Point at the chart, or tap it, to see one day.",
+  eventsTip:
+    "Times: how often it happened. Students: how many different students did it. Only signed-in students are counted. Point at a name, or tap it, to see what it means.",
+  eventTips: {
+    app_open: "Opened the app. Each student counts once a day.",
+    sign_up: "Signed in with Google for the first time and filled in their name.",
+    survey_done: "Finished the 4-step survey that comes after signing up.",
+    lesson_done: "Finished a lesson, or one section of a lesson, on the Lessons page.",
+    quiz_done: "Finished a practice Quiz.",
+    flashcards_done: "Finished a Flashcard review.",
+    exam_done: "Finished a mock exam or a past exam paper.",
+    battle_done: "Finished a Game battle, by creating one or by joining one.",
+    kruai_question: "Asked KruAI a question.",
+  } as Record<string, string>,
+  retentionTip:
+    "This shows whether students keep using BrachNha. For the students who joined in each week, how many opened the app again 7 to 13 days later. Example: 10 joined and 4 came back, so 40%. Higher is better. \"Not measured yet\" means that week's second week has not finished, or started before counting did.",
+  crashesTip:
+    "A crash is an error that broke a screen for a student. Under each one: how many times it happened, how many different students hit it, when it last happened, the page, and the app version. Send the top ones to the developer.",
   dailyTitle: "Students per day, last 30 days",
   dailyActive: "Active",
   dailyNew: "New",
@@ -115,6 +150,8 @@ const en = {
   toolAnnouncementsBlurb: "A message for every student, under the app bar.",
   toolMistakes: "Mistake reports",
   toolMistakesBlurb: "Questions students say are wrong or unclear.",
+  toolContent: "Content",
+  toolContentBlurb: "Write and fix flashcards and quizzes. The owner publishes.",
 
   // ── /admin/announcements ──────────────────────────────────────────────────
   annTitle: "Announcements",
@@ -254,8 +291,41 @@ const km: AdminCopy = {
     kruaiToday: "ឯកតា KruAI ថ្ងៃនេះ",
     crashes7d: "កំហុសកម្មវិធី 7 ថ្ងៃ",
   },
-  tilesTip:
-    "សិស្សគឺគណនីពិតប្រាកដ (មិនរាប់គណនីសាកល្បង)។ សកម្ម មានន័យថាសិស្សបានបើកកម្មវិធីនៅថ្ងៃនោះ។ ឯកតា KruAI៖ សំណួរមួយស្មើ 1 រូបថតថ្មីមួយស្មើ 3។",
+  whatIsThis: "តើនេះមានន័យថាអ្វី",
+  glanceTitle: "លេខសំខាន់ៗ",
+  glanceTip: "ដាក់ម៉ៅស៍លើលេខ ឬចុចលើវា ដើម្បីមើលថាវារាប់អ្វី។",
+  tileTips: {
+    students:
+      "គណនីពិតប្រាកដទាំងអស់ដែលបានចូលដោយ Google។ គណនីសាកល្បង និងភ្ញៀវ (អ្នកប្រើកម្មវិធីដោយមិនចូលគណនី) មិនត្រូវបានរាប់ទេ។",
+    activeToday:
+      "សិស្សដែលបានបើកកម្មវិធីថ្ងៃនេះ តាមម៉ោងភ្នំពេញ។ សិស្សម្នាក់រាប់តែម្តង ទោះបីបើកប៉ុន្មានដងក៏ដោយ។",
+    active7d:
+      "ចំនួនសិស្សខុសៗគ្នាដែលបានបើកកម្មវិធីយ៉ាងហោចណាស់ម្តង ក្នុង 7 ថ្ងៃចុងក្រោយ រួមទាំងថ្ងៃនេះ។",
+    new7d: "គណនីដែលបានបង្កើតក្នុង 7 ថ្ងៃចុងក្រោយ រួមទាំងថ្ងៃនេះ។",
+    kruaiToday:
+      "ការប្រើ KruAI ថ្ងៃនេះ សម្រាប់កម្មវិធីទាំងមូល។ សំណួរវាយមួយស្មើ 1 ឯកតា រូបថតថ្មីមួយស្មើ 3។ កម្រិតប្រចាំថ្ងៃនៅលើទំព័រ KruAI។",
+    crashes7d:
+      "កំហុសដែលធ្វើឱ្យអេក្រង់ខូចសម្រាប់សិស្ស ក្នុង 7 ថ្ងៃចុងក្រោយ។ 0 គឺល្អ។ បញ្ជីនៅខាងក្រោមទំព័រនេះបង្ហាញថាកំហុសណាខ្លះ។",
+  },
+  dailyTip:
+    "សកម្ម៖ សិស្សដែលបានបើកកម្មវិធីថ្ងៃនោះ (ម៉ោងភ្នំពេញ)។ ថ្មី៖ គណនីដែលបានបង្កើតថ្ងៃនោះ។ ភ្ញៀវមិនត្រូវបានរាប់ទេ ព្រោះគ្មានគណនី។ ដាក់ម៉ៅស៍លើក្រាហ្វ ឬចុចលើវា ដើម្បីមើលមួយថ្ងៃ។",
+  eventsTip:
+    "ចំនួនដង៖ វាបានកើតឡើងប៉ុន្មានដង។ សិស្ស៖ សិស្សខុសៗគ្នាប៉ុន្មាននាក់ដែលបានធ្វើវា។ រាប់តែសិស្សដែលបានចូលគណនីប៉ុណ្ណោះ។ ដាក់ម៉ៅស៍លើឈ្មោះ ឬចុចលើវា ដើម្បីមើលន័យរបស់វា។",
+  eventTips: {
+    app_open: "បានបើកកម្មវិធី។ សិស្សម្នាក់រាប់តែម្តងក្នុងមួយថ្ងៃ។",
+    sign_up: "បានចូលដោយ Google ជាលើកដំបូង ហើយបំពេញឈ្មោះរបស់ខ្លួន។",
+    survey_done: "បានបញ្ចប់ការស្ទង់មតិ 4 ជំហាន ដែលមកបន្ទាប់ពីចុះឈ្មោះ។",
+    lesson_done: "បានបញ្ចប់មេរៀនមួយ ឬផ្នែកមួយនៃមេរៀន នៅលើទំព័រមេរៀន។",
+    quiz_done: "បានបញ្ចប់ Quiz លំហាត់។",
+    flashcards_done: "បានបញ្ចប់ការពិនិត្យ Flashcard។",
+    exam_done: "បានបញ្ចប់ការប្រឡងសាកល្បង ឬវិញ្ញាសាឆ្នាំចាស់។",
+    battle_done: "បានបញ្ចប់ការប្រកួតក្នុង Game ទាំងការបង្កើត និងការចូលរួម។",
+    kruai_question: "បានសួរ KruAI មួយសំណួរ។",
+  },
+  retentionTip:
+    "នេះបង្ហាញថាតើសិស្សនៅតែប្រើ BrachNha ឬអត់។ ក្នុងចំណោមសិស្សដែលចូលរួមក្នុងសប្តាហ៍នីមួយៗ តើប៉ុន្មាននាក់បានបើកកម្មវិធីម្តងទៀត 7 ដល់ 13 ថ្ងៃក្រោយមក។ ឧទាហរណ៍៖ ចូលរួម 10 នាក់ ត្រឡប់មកវិញ 4 នាក់ ស្មើ 40%។ កាន់តែខ្ពស់ កាន់តែល្អ។ «មិនទាន់វាស់បាន» មានន័យថាសប្តាហ៍ទី 2 នៃសប្តាហ៍នោះមិនទាន់ចប់ ឬបានចាប់ផ្តើមមុនពេលចាប់ផ្តើមរាប់។",
+  crashesTip:
+    "កំហុសកម្មវិធី គឺកំហុសដែលធ្វើឱ្យអេក្រង់ខូចសម្រាប់សិស្ស។ ក្រោមកំហុសនីមួយៗ៖ វាកើតឡើងប៉ុន្មានដង សិស្សខុសៗគ្នាប៉ុន្មាននាក់បានជួប ពេលចុងក្រោយ ទំព័រ និងកំណែកម្មវិធី។ សូមផ្ញើកំហុសនៅខាងលើគេទៅអ្នកអភិវឌ្ឍន៍។",
   dailyTitle: "សិស្សក្នុងមួយថ្ងៃ 30 ថ្ងៃចុងក្រោយ",
   dailyActive: "សកម្ម",
   dailyNew: "ថ្មី",
@@ -331,6 +401,8 @@ const km: AdminCopy = {
   toolAnnouncementsBlurb: "សារសម្រាប់សិស្សទាំងអស់ នៅក្រោមរបារខាងលើ។",
   toolMistakes: "របាយការណ៍កំហុស",
   toolMistakesBlurb: "សំណួរដែលសិស្សថាខុស ឬមិនច្បាស់។",
+  toolContent: "មាតិកា",
+  toolContentBlurb: "សរសេរ និងកែ Flashcard និង Quiz។ ម្ចាស់ជាអ្នកផ្សាយ។",
 
   annTitle: "សេចក្តីប្រកាស",
   annBlurb:
