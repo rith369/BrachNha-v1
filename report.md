@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Oct 2026 — Flashcards and Quizzes Now Come from the Content Editor (Part 2 of 2)
 
-Commit `(not committed yet)`. No database step: the migration was run and the content was
+Commit `5e95715`. No database step: the migration was run and the content was
 imported earlier today.
 
 **Why.** Part 1 built the Content editor, but students still saw the copy of the flashcards and

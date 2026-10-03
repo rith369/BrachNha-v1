@@ -1,6 +1,6 @@
 > **Status: Stage 1 COMPLETE (3 Oct 2026).** Step 1a (tables, editor, import) in `64efc97`;
 > the migration is applied; the owner imported the fixture (26 of 26 exact by `--live`).
-> Step 1b (students read from the database, code copy deleted) is built, not yet committed.
+> Step 1b (students read from the database, code copy deleted) is in `5e95715`.
 > AGENTS.md's "Step 1b" section records what was built. Not done from the plan: offering to
 > mark a quiz's open reports Fixed when publishing it (the Edit link is there).
 >
