@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Oct 2026 — Explanations on the Admin Page and the Content Pages
 
-Commit `(not committed yet)`. No database step.
+Commit `64efc97`. No database step.
 
 **Why.** The Admin page was hard to read: it was not clear what each number counted. The
 Content pages (where flashcards and quizzes are edited) had the same problem.
@@ -52,7 +52,7 @@ itself. Works in English and Khmer.
 
 ## 3 Oct 2026 — Content Editor for Flashcards and Quizzes (Part 1 of 2)
 
-Commit `(not committed yet)`. **Database step needed:** run
+Commit `64efc97`. **Database step needed:** run
 `supabase/migrations/20261003000001_content_in_database.sql` once in the Supabase SQL
 editor, all in one go.
 

@@ -13,4 +13,4 @@ commit it shipped in).
 | plan | status |
 | --- | --- |
 | [admin-roles.md](admin-roles.md) | Step A done (`4540f42`, applied); B done (`68dacec`, applied); C done (`56016bf`, applied). Complete |
-| [content-in-database.md](content-in-database.md) | Stage 1: step 1a built, migration applied; 1b next |
+| [content-in-database.md](content-in-database.md) | Stage 1: step 1a built (`64efc97`), migration applied; 1b next |

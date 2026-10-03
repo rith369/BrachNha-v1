@@ -1,4 +1,4 @@
-> **Status: in progress.** Step 1a (tables, editor, import) BUILT 3 Oct 2026; its migration
+> **Status: in progress.** Step 1a (tables, editor, import) BUILT 3 Oct 2026 in `64efc97`; its migration
 > (20261003000001) is applied to the live project (checked with db:check). Step 1b (students read from the database)
 > waits for the owner's import and the `--live` check.
 >
