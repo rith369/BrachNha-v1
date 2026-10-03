@@ -9,12 +9,60 @@ import { quizSessionId } from "../quiz-path";
 import { QuizDetail } from "./quiz-detail";
 import { QuizResults } from "./quiz-results";
 import { QuizRunner, type QuizAttempt } from "./quiz-runner";
+import { ContentWaitingScreen } from "./content-waiting";
+import { retryBody, useContentBody } from "@/lib/content";
 
-/** Which of the section's three screens is on. */
+/** Which of the section's three screens is on. A result carries the VERSION
+ *  it was taken on, which may be older than the one published now. */
 type Mode =
   | { kind: "detail" }
   | { kind: "run" }
-  | { kind: "result"; attempt: QuizAttempt };
+  | { kind: "result"; attempt: QuizAttempt; version: number };
+
+/**
+ * The review of an attempt taken on an OLDER version of this quiz. Its answers
+ * are index-aligned with the questions the student saw, so marking them
+ * against today's questions would mark the wrong things after an edit. That
+ * version is downloaded (once; versions never change) and marked against.
+ */
+function OlderVersionResults({
+  contentKey,
+  version,
+  fallback,
+  attempt,
+  title,
+  onRetake,
+  onBack,
+}: {
+  contentKey: string;
+  version: number;
+  /** Today's questions, used only if the old version cannot be found. */
+  fallback: SectionQuestion[];
+  attempt: QuizAttempt;
+  title: string;
+  onRetake: () => void;
+  onBack: () => void;
+}) {
+  const old = useContentBody("quiz", contentKey, version);
+  if (old.status === "loading" || old.status === "offline") {
+    return (
+      <ContentWaitingScreen
+        state={old.status}
+        onRetry={() => retryBody("quiz", contentKey, version)}
+        onExit={onBack}
+      />
+    );
+  }
+  return (
+    <QuizResults
+      questions={old.status === "ready" ? old.body : fallback}
+      attempt={attempt}
+      title={title}
+      onRetake={onRetake}
+      onBack={onBack}
+    />
+  );
+}
 
 /**
  * One quiz section, end to end: its detail screen, the sitting, and the review.
@@ -39,14 +87,17 @@ type Mode =
  */
 export function QuizScreen({
   questions,
+  version,
   subjectId,
   contentKey,
   title,
 }: {
   questions: SectionQuestion[];
+  /** The published version `questions` belong to (lib/content.ts). */
+  version: number;
   subjectId: string;
-  /** The content key — `"math-1-1-1"`, what PRACTICE_QUIZZES is keyed by and
-   *  what this section's history rows are filed under. */
+  /** The content key — `"math-1-1-1"`, what the database's quizzes are keyed
+   *  by and what this section's history rows are filed under. */
   contentKey: string;
   /** What this section is called, for the detail and review headings. */
   title: string;
@@ -95,6 +146,7 @@ export function QuizScreen({
     track("quiz_done", { key: contentKey, score: attempt.score, total: attempt.total });
     addQuizResult({
       quizKey: contentKey,
+      version,
       score: attempt.score,
       total: attempt.total,
       pct: attempt.pct,
@@ -102,7 +154,7 @@ export function QuizScreen({
       questionMs: attempt.questionMs,
       answers: attempt.answers,
     });
-    setMode({ kind: "result", attempt });
+    setMode({ kind: "result", attempt, version });
   }
 
   /** Reopen a stored attempt — the review re-marks from the questions, so an
@@ -118,6 +170,7 @@ export function QuizScreen({
         questionMs: result.questionMs,
         answers: result.answers,
       },
+      version: result.version ?? 1,
     });
   }
 
@@ -129,6 +182,20 @@ export function QuizScreen({
         contentKey={contentKey}
         mode="quiz"
         onSubmit={handleSubmit}
+      />
+    );
+  }
+
+  if (mode.kind === "result" && mode.version !== version) {
+    return (
+      <OlderVersionResults
+        contentKey={contentKey}
+        version={mode.version}
+        fallback={questions}
+        attempt={mode.attempt}
+        title={title}
+        onRetake={() => setMode({ kind: "run" })}
+        onBack={exit}
       />
     );
   }

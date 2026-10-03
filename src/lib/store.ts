@@ -202,8 +202,15 @@ export interface PaperResult {
  * needs a `quiz_key` column first.
  */
 export interface QuizResult {
-  /** The content key — `"math-1-1-1"`, what PRACTICE_QUIZZES is keyed by. */
+  /** The content key — `"math-1-1-1"`, what the database's quizzes are keyed by. */
   quizKey: string;
+  /**
+   * The published version this attempt was taken on (lib/content.ts), so
+   * reopening it re-marks against the questions the student actually saw, not
+   * a later edit. Absent on attempts from before quizzes moved into the
+   * database: those were taken on what became version 1.
+   */
+  version?: number;
   /** ISO instant, so it sorts and formats without a second field. */
   date: string;
   score: number;

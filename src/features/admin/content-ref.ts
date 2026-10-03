@@ -1,6 +1,6 @@
 import { SECTION_CONTENT } from "@/data/sections";
-import { PRACTICE_QUIZZES } from "@/data/practice";
 import { PAST_PAPERS } from "@/data/past-papers";
+import type { QuizQuestionBody } from "@/types";
 import { scorePaper } from "@/features/exam/paper-scoring";
 import { pastPaperByKey } from "@/features/exam/papers";
 import { findSubject } from "@/features/lessons/subjects";
@@ -11,10 +11,12 @@ import { parseContentRef, type ContentRefKind } from "@/utils/content-ref";
  * /admin/mistakes shows the real prompt, options, marked answer and
  * explanation instead of a code.
  *
- * Reached ONLY from the lazy /admin/mistakes chunk. It imports the whole
- * question corpus (sections, practice quizzes, past papers), which must never
- * be pulled into the entry chunk; the student-side button builds refs with
- * utils/content-ref.ts alone.
+ * Reached ONLY from the lazy /admin/mistakes chunk. It imports the sections
+ * and past papers still written in code, which must never be pulled into the
+ * entry chunk; the student-side button builds refs with utils/content-ref.ts
+ * alone. Practice QUIZZES live in the database, so the page passes them in
+ * (lib/content.ts's useAllBodies), and a quiz question also gets an Edit link
+ * to /admin/content.
  *
  * EVERY LOOKUP IS GUARDED with Object.hasOwn, never `in` or a truthiness test:
  * these are plain object literals, so "constructor" is `in` them and
@@ -43,9 +45,14 @@ export interface ResolvedQuestion {
   explanation: string;
   /** Where the question lives in the app, for "Open it in the app". */
   link: string;
+  /** Practice quizzes only: the question in the content editor. */
+  edit?: string;
 }
 
-export function resolveContentRef(ref: string): ResolvedQuestion | null {
+export function resolveContentRef(
+  ref: string,
+  quizzes: Record<string, QuizQuestionBody[]>
+): ResolvedQuestion | null {
   const parsed = parseContentRef(ref);
   if (!parsed) return null;
   const { kind, key, item } = parsed;
@@ -75,10 +82,12 @@ export function resolveContentRef(ref: string): ResolvedQuestion | null {
   }
 
   if (kind === "quiz") {
-    if (!Object.hasOwn(PRACTICE_QUIZZES, key)) return null;
-    if (!/^\d{1,3}$/.test(item)) return null;
-    const index = Number(item);
-    const q = PRACTICE_QUIZZES[key][index];
+    if (!Object.hasOwn(quizzes, key)) return null;
+    const list = quizzes[key];
+    // A question's own id ("q4") since quizzes moved into the database; an
+    // older report names it by position ("3").
+    const index = /^\d{1,3}$/.test(item) ? Number(item) : list.findIndex((x) => x.id === item);
+    const q = index >= 0 ? list[index] : undefined;
     if (!q) return null;
     // "math-1-1-1": the subject, then the numbers the quiz path prints.
     const [subjectId, ...numbers] = key.split("-");
@@ -93,6 +102,7 @@ export function resolveContentRef(ref: string): ResolvedQuestion | null {
       correct: q.correct,
       explanation: q.explanation,
       link: `/practice/quiz/${subjectId}/${numbers.join("-")}`,
+      edit: `/admin/content/quiz/${key}?q=${encodeURIComponent(q.id)}`,
     };
   }
 

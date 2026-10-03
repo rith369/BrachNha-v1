@@ -3,7 +3,8 @@
  * reports (supabase/migrations/20261002000005, `content_reports.content_ref`):
  *
  *   section:biology-3-1-1#0-2      a section-quiz question: step 0, index 2
- *   quiz:math-1-1-1#3              a practice-quiz question: index 3
+ *   quiz:math-1-1-1#q4             a practice-quiz question: its own id
+ *   quiz:math-1-1-1#3              (older reports: index 3, read by position)
  *   paper:2025-math#l1             a past-paper question: its own id
  *
  * A report therefore stays small, and the admin page shows whatever the
@@ -23,8 +24,11 @@ export function sectionRef(sectionId: string, step: number, index: number): stri
   return `section:${sectionId}#${step}-${index}`;
 }
 
-export function quizRef(contentKey: string, index: number): string {
-  return `quiz:${contentKey}#${index}`;
+/** A practice-quiz question by its stable id ("q4"), so the report still
+ *  names the right question after the quiz's questions are reordered. A
+ *  question without an id (none today) falls back to its position. */
+export function quizRef(contentKey: string, question: { id?: string }, index: number): string {
+  return `quiz:${contentKey}#${question.id ?? index}`;
 }
 
 export function paperRef(paperKey: string, questionId: string): string {
@@ -39,7 +43,8 @@ export interface ParsedRef {
   kind: ContentRefKind;
   /** The section id, the quiz's content key, or the paper key. */
   key: string;
-  /** "0-2" for a section, "3" for a quiz, the question id for a paper. */
+  /** "0-2" for a section, "q4" (or an older "3") for a quiz, the question id
+   *  for a paper. */
   item: string;
 }
 

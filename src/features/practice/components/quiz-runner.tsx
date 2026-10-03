@@ -316,7 +316,7 @@ export function QuizRunner({
           {answer && (
             <ReportMistake
               key={`report-${index}`}
-              contentRef={quizRef(contentKey, index)}
+              contentRef={quizRef(contentKey, question, index)}
               className="mt-3"
             />
           )}

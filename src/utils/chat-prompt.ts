@@ -12,7 +12,6 @@ import {
 } from "../data/lessons.js";
 import { MOCK_QS } from "../data/questions.js";
 import { SECTION_CONTENT } from "../data/sections.js";
-import { PRACTICE_DECKS } from "../data/practice.js";
 import {
   BAC2_ANSWER_RULES,
   BAC2_EXAMPLES,
@@ -348,11 +347,19 @@ function lessonChunk(lessonId: string): RetrievedChunk | null {
   };
 }
 
+/**
+ * The published flashcard decks, keyed like "biology-1-1". They live in the
+ * database now (supabase/migrations/20261003000001), so the server fetches them
+ * (server/content-source.ts) and passes them in; this module stays pure and
+ * does no I/O.
+ */
+export type DeckMap = Record<string, readonly { front: string; back: string }[]>;
+
 /** A practice deck's flashcards, as one chunk. Khmer-only content, so no bi(). */
-function deckChunk(deckKey: string): RetrievedChunk | null {
+function deckChunk(deckKey: string, decks: DeckMap): RetrievedChunk | null {
   if (!isLookupKey(deckKey)) return null;
-  if (!Object.hasOwn(PRACTICE_DECKS, deckKey)) return null;
-  const cards = PRACTICE_DECKS[deckKey];
+  if (!Object.hasOwn(decks, deckKey)) return null;
+  const cards = decks[deckKey];
   if (!cards.length) return null;
   return {
     id: `deck:${deckKey}`,
@@ -379,7 +386,7 @@ function deckChunk(deckKey: string): RetrievedChunk | null {
  * `SECTION_CONTENT["toString"]` is a function. An untrusted string used as a key
  * on an inherited-from object is exactly how that becomes a bug.
  */
-export function pinnedContextFor(screen: ScreenRef): RetrievedChunk[] {
+export function pinnedContextFor(screen: ScreenRef, decks: DeckMap = {}): RetrievedChunk[] {
   if (screen.sectionId) {
     const chunks = sectionChunks(screen.sectionId);
     if (chunks.length) return chunks;
@@ -391,7 +398,7 @@ export function pinnedContextFor(screen: ScreenRef): RetrievedChunk[] {
   }
 
   if (screen.practiceKey) {
-    const chunk = deckChunk(screen.practiceKey);
+    const chunk = deckChunk(screen.practiceKey, decks);
     if (chunk) return [chunk];
   }
 
@@ -527,7 +534,7 @@ const CATALOG_BUDGET_CHARS = 3_500;
  * forces some entries down to their titles, the ones nearest the question keep
  * their detail. Every item appears either way.
  */
-export function buildCatalogBlock(lang: Lang, focusSubject?: string): string {
+export function buildCatalogBlock(lang: Lang, focusSubject?: string, decks: DeckMap = {}): string {
   const entries: CatalogEntry[] = [];
 
   for (const [subject, lesson] of Object.entries(FOUNDATION)) {
@@ -576,7 +583,7 @@ export function buildCatalogBlock(lang: Lang, focusSubject?: string): string {
     });
   }
 
-  for (const [deckKey, cards] of Object.entries(PRACTICE_DECKS)) {
+  for (const [deckKey, cards] of Object.entries(decks)) {
     if (!cards.length) continue;
     entries.push({
       subject: deckKey.split("-")[0],
@@ -624,7 +631,7 @@ export function buildCatalogBlock(lang: Lang, focusSubject?: string): string {
     ...Object.keys(FLASHCARDS),
     ...Object.keys(PRACTICE),
     ...MOCK_QS.map((q) => q.subj),
-    ...Object.keys(PRACTICE_DECKS).map((key) => key.split("-")[0]),
+    ...Object.keys(decks).map((key) => key.split("-")[0]),
     // Section ids are `{subject}-{chapter}-{lesson}-{section}`, so the subject
     // is the first segment. Without this, a subject whose only content is
     // authored sections would still be announced as having none — and the
@@ -767,8 +774,12 @@ export function buildSystemPrompt({
   profile,
   context = [],
   focusSubject,
+  decks = {},
 }: {
   profile: ChatProfile;
+  /** The published flashcard decks, for the catalog. Empty when the server
+   *  could not fetch them: KruAI then answers without the deck list. */
+  decks?: DeckMap;
   /**
    * Content to send in full, assembled by the caller.
    *
@@ -835,7 +846,7 @@ HONESTY. This matters more than sounding confident:
     BAC2_ANSWER_RULES[ANSWER_LANG],
     buildSocraticExampleBlock(ANSWER_LANG),
     buildExamplesBlock(ANSWER_LANG),
-    buildCatalogBlock(ANSWER_LANG, focusSubject),
+    buildCatalogBlock(ANSWER_LANG, focusSubject, decks),
     buildContextBlock(context),
     buildStudentBlock(profile),
     `LENGTH: this is a chat bubble on a phone. A guided reply (🧭) stays under 80 words and ends

@@ -15,6 +15,54 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 3 Oct 2026 — Flashcards and Quizzes Now Come from the Content Editor (Part 2 of 2)
+
+Commit `(not committed yet)`. No database step: the migration was run and the content was
+imported earlier today.
+
+**Why.** Part 1 built the Content editor, but students still saw the copy of the flashcards and
+quizzes written into the app. Now they see what is published on Admin → Content, so a
+mistake can be fixed without a new version of the app.
+
+**What changed for students:**
+
+- **The app opens faster.** It used to download every flashcard deck and quiz before the
+  first screen. Now each one downloads only when it is opened. The first screen downloads
+  about 60 KB less.
+- **A deck or quiz opened once works without internet** afterwards. The first time needs a
+  connection; with none, the screen says so and offers Try again.
+- **A fix reaches students the next time they open the app**, after the owner presses Publish.
+- **Old quiz results stay correct.** Reopening an earlier attempt shows the questions as they
+  were when it was taken, even if the quiz was edited since.
+- Home quietly downloads the next couple of decks or quizzes it suggests, so tapping one
+  opens at once.
+
+**What changed for the team:**
+
+- On Admin → Mistake reports, a practice-quiz question now has an **Edit** button that opens
+  it in the Content editor. Fix it there, the owner publishes, then press Fixed. Lesson and
+  past-paper questions are still fixed in the code.
+- KruAI now reads the flashcard decks from the database too. It starts that download as
+  soon as a question arrives, at the same time as its sign-in and daily-limit checks, so
+  students don't wait longer for an answer.
+- The yellow note on the Content page ("students still see the copy built into the app") is
+  gone, because it is no longer true.
+- The copy of the decks and quizzes inside the app's code is deleted. **The database is the
+  only copy now.**
+
+**What to re-test:**
+
+- open Practice, a flashcard deck and a quiz: each opens and shows the right content;
+- open a deck, turn on airplane mode, close and reopen the app, open the same deck: it still
+  works;
+- on a phone that has never opened the app, turn off the internet and open Practice: it says
+  the first open needs internet, and Try again works once you are back online;
+- edit a quiz question on Admin → Content and publish, then reopen the app as a student: the
+  change shows;
+- reopen an old quiz result from before the edit: it shows the old question;
+- report a mistake on a quiz question, then open it on Admin → Mistake reports and press
+  Edit: the editor opens on that question.
+
 ## 3 Oct 2026 — Explanations on the Admin Page and the Content Pages
 
 Commit `64efc97`. No database step.

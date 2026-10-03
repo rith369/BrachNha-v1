@@ -6,6 +6,7 @@ import { SubjectArt } from "@/features/lessons/components/subject-art";
 import { lessonHeading } from "@/features/lessons/sessions";
 import type { SubjectMeta } from "@/features/lessons/subjects";
 import { practiceLessonsFor, type PracticeLesson, type PracticeMode } from "../practice";
+import type { ContentManifest } from "@/utils/content-manifest";
 
 /**
  * One subject's lessons, for one mode — the middle screen between the hub and a
@@ -143,11 +144,14 @@ function LessonRow({
 export function PracticeLessonList({
   subject,
   mode,
+  manifest,
 }: {
   subject: SubjectMeta;
   mode: PracticeMode;
+  /** What is published (lib/content.ts), which decides each row's count. */
+  manifest: ContentManifest;
 }) {
-  const lessons = practiceLessonsFor(subject.id, mode);
+  const lessons = practiceLessonsFor(subject.id, mode, manifest);
   const label = mode === "flashcards" ? "Flashcard" : "Quiz";
 
   // Group by chapter for the kicker, without re-deriving the list: the lessons

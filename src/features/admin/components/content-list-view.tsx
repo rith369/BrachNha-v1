@@ -314,10 +314,7 @@ export function ContentListView() {
 
   return (
     <>
-      <p className="mb-3 text-xs font-semibold text-muted">{c.blurb}</p>
-      <p className="mb-4 rounded-xl border border-border bg-neo-yellow px-3 py-2 text-xs font-bold text-ink">
-        {c.notLiveYet}
-      </p>
+      <p className="mb-4 text-xs font-semibold text-muted">{c.blurb}</p>
 
       <UnderlineTabs
         tabs={[

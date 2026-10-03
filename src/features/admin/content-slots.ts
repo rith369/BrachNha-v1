@@ -1,7 +1,7 @@
 import { chaptersFor, lessonHeading } from "@/features/lessons/sessions";
 import { SUBJECTS, findSubject, type SubjectId } from "@/features/lessons/subjects";
 import { FLASHCARD_SUBJECTS, lessonRef, practiceKey } from "@/features/practice/practice";
-import { quizPathFor } from "@/features/practice/quiz-path";
+import { quizPathShape } from "@/features/practice/quiz-path";
 import type { ContentKind } from "@/types";
 
 /**
@@ -9,7 +9,7 @@ import type { ContentKind } from "@/types";
  * content editor (/admin/content).
  *
  * THE SLOTS COME FROM THE SAME CURRICULUM THE APP RENDERS: chaptersFor() for
- * the Study and flashcard lessons, quizPathFor() for the Bac II quiz paths.
+ * the Study and flashcard lessons, quizPathShape() for the Bac II quiz paths.
  * So "New" can only offer a key a student can actually reach, and the editor
  * names an item exactly as the student sees it. A key is never typed by hand.
  *
@@ -45,7 +45,7 @@ function deckSlots(): ContentSlot[] {
 function quizSlots(): ContentSlot[] {
   return SUBJECTS.flatMap((meta) => {
     const subject = meta.id;
-    const path = quizPathFor(subject);
+    const path = quizPathShape(subject);
     if (path) {
       // A quiz path: one slot per SECTION node. The node's id is
       // quiz-{contentKey} (quizSessionId), so the key is read off it rather

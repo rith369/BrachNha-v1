@@ -16,8 +16,6 @@ const en = {
   title: "Content",
   blurb:
     "Flashcards and practice quizzes. Anyone on the team can save a draft; students see a change only after the owner presses Publish.",
-  notLiveYet:
-    "Students still see the copy built into the app. Once everything is imported and checked, the app switches to what is published here.",
   tabs: { deck: "Flashcards", quiz: "Quizzes" },
   allSubjects: "All",
   empty: "Nothing here yet.",
@@ -242,8 +240,6 @@ const km: ContentCopy = {
   title: "មាតិកា",
   blurb:
     "Flashcard និង Quiz លំហាត់។ អ្នកណាក្នុងក្រុមក៏អាចរក្សាទុកសេចក្តីព្រាងបាន។ សិស្សឃើញការកែប្រែ លុះត្រាតែម្ចាស់ចុចផ្សាយ។",
-  notLiveYet:
-    "សិស្សនៅតែឃើញច្បាប់ដែលមានក្នុងកម្មវិធី។ ពេលនាំចូល និងពិនិត្យទាំងអស់រួចហើយ កម្មវិធីនឹងប្តូរមកប្រើអ្វីដែលបានផ្សាយនៅទីនេះ។",
   tabs: { deck: "Flashcard", quiz: "Quiz" },
   allSubjects: "ទាំងអស់",
   empty: "មិនទាន់មានអ្វីនៅទីនេះទេ។",

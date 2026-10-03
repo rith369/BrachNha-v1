@@ -10,7 +10,8 @@ import {
   readyQuizSectionCount,
   type PracticeMode,
 } from "../practice";
-import { quizPathFor } from "../quiz-path";
+import { quizPathShape } from "../quiz-path";
+import type { ContentManifest } from "@/utils/content-manifest";
 
 /**
  * One subject tile on the practice hub.
@@ -36,7 +37,7 @@ import { quizPathFor } from "../quiz-path";
  * subject grids in the app now behave identically instead of one being the
  * exception. Don't "restore" it for the plain lesson list.
  *
- * ONE DELIBERATE EXCEPTION: a subject with a `quizPathFor()` entry stays
+ * ONE DELIBERATE EXCEPTION: a subject with a `quizPathShape()` entry stays
  * tappable on Quiz even at zero real lesson content, provided that subject is
  * active in ACTIVE_QUIZ_SUBJECTS.
  *
@@ -47,9 +48,12 @@ import { quizPathFor } from "../quiz-path";
 export function PracticeSubjectCard({
   subject,
   mode,
+  manifest,
 }: {
   subject: SubjectMeta;
   mode: PracticeMode;
+  /** What is published (lib/content.ts). The hub reads it once for all tiles. */
+  manifest: ContentManifest;
 }) {
   const style = SUBJECT_STYLE[subject.id];
   // Quiz mode is strictly restricted to active quiz subjects (currently only math).
@@ -57,10 +61,10 @@ export function PracticeSubjectCard({
   // and cannot be opened.
   const isQuiz = mode === "quiz";
   const quizActive = !isQuiz || isQuizSubjectActive(subject.id);
-  const onPath = isQuiz && quizActive && quizPathFor(subject.id) !== null;
+  const onPath = isQuiz && quizActive && quizPathShape(subject.id) !== null;
   const ready = onPath
-    ? readyQuizSectionCount(subject.id)
-    : readyLessonCount(subject.id, mode);
+    ? readyQuizSectionCount(subject.id, manifest)
+    : readyLessonCount(subject.id, mode, manifest);
   const unit = onPath ? "ផ្នែក" : "មេរៀន";
   const preview = onPath && ready === 0;
   const openable = quizActive && (ready > 0 || preview);

@@ -1,5 +1,7 @@
-// Content check for the practice quizzes AND the real past papers — the things
-// tsc and oxlint cannot see.
+// Content check for the section quizzes, the real past papers and the game
+// questions still written in code — the things tsc and oxlint cannot see.
+// (Practice quizzes and flashcards live in the database since 3 Oct 2026;
+// `npm run check:content` checks those.)
 //
 //   npm run check:quiz
 //
@@ -118,13 +120,6 @@ function checkChoices(where, options, correct) {
   }
 }
 
-function checkDrill(splitMath, where, drill) {
-  checkMath(splitMath, `${where} prompt`, drill.prompt);
-  checkMath(splitMath, `${where} explanation`, drill.explanation);
-  for (const opt of drill.options ?? []) checkMath(splitMath, `${where} option`, opt);
-  checkChoices(where, drill.options, drill.correct);
-}
-
 const { createServer } = await import("vite");
 const server = await createServer({
   root,
@@ -143,35 +138,11 @@ const server = await createServer({
 });
 
 try {
-  const { PRACTICE_QUIZZES } = await server.ssrLoadModule("/src/data/practice.ts");
   const { splitMath } = await server.ssrLoadModule("/src/utils/math-render.ts");
 
-  const keys = Object.keys(PRACTICE_QUIZZES);
-  if (keys.length === 0) {
-    console.log("check:quiz — PRACTICE_QUIZZES is empty, nothing to check.");
-  }
-
-  for (const key of keys) {
-    PRACTICE_QUIZZES[key].forEach((question, qi) => {
-      const where = `${key} · question ${qi + 1}`;
-      checkMath(splitMath, `${where} q`, question.q);
-      checkMath(splitMath, `${where} explanation`, question.explanation);
-      if (question.scenario) checkMath(splitMath, `${where} scenario`, question.scenario);
-      for (const opt of question.options ?? []) checkMath(splitMath, `${where} option`, opt);
-      checkChoices(where, question.options, question.correct);
-
-      const help = question.help;
-      if (!help) return;
-      for (const line of help.note ?? []) checkMath(splitMath, `${where} note`, line);
-      if (help.mistake) checkMath(splitMath, `${where} mistake`, help.mistake);
-      (help.questions ?? []).forEach((d, di) =>
-        checkDrill(splitMath, `${where} · similar ${di + 1}`, d)
-      );
-      (help.foundation ?? []).forEach((d, di) =>
-        checkDrill(splitMath, `${where} · foundation ${di + 1}`, d)
-      );
-    });
-  }
+  // Practice quizzes and flashcard decks are not here any more: they live in
+  // the database (docs/plans/content-in-database.md) and are checked with the
+  // same rules by the editor and by `npm run check:content`.
 
   // ── the real past papers ────────────────────────────────────────────────
   //
@@ -301,10 +272,9 @@ try {
     for (const p of problems) console.error("  " + p + "\n");
     process.exitCode = 1;
   } else {
-    const n = keys.reduce((s, k) => s + PRACTICE_QUIZZES[k].length, 0);
     console.log(
-      `check:quiz — ok. ${n} question(s) across ${keys.length} quiz(zes), ` +
-        `${paperQuestions} across ${paperKeys.length} past paper(s), ` +
+      `check:quiz — ok. ` +
+        `${paperQuestions} question(s) across ${paperKeys.length} past paper(s), ` +
         `${gameQuestions} across ${gameKeys.length} game subject(s), ` +
         `${sectionQuestions} across ${sectionKeys.length} section(s); ` +
         `${checked} string(s) with math typeset cleanly.`

@@ -16,6 +16,7 @@ import { isVerificationConfigured, verifyRequestUser } from "./verify-user.js";
 import { searchBiologyTextbook, searchHistoryTextbook, searchMathTextbook } from "./textbook-search.js";
 import { getCachedAnswer, createCachedStreamResponse } from "./chat-cache.js";
 import { takeQuota } from "./kruai-quota.js";
+import { publishedDecks } from "./content-source.js";
 import { guidedAnchorIndex } from "../src/utils/chat-anchor.js";
 import { KRUAI_LEFT_HEADER, KRUAI_LIMIT_HEADER } from "../src/data/kruai-phrases.js";
 
@@ -825,6 +826,15 @@ export async function handleChat(req: Request): Promise<Response> {
   // refused above unless it ends on a student turn).
   const newPhoto = images[messages.length - 1] != null;
 
+  // The published decks, started NOW and awaited further down, so the request
+  // runs while the sign-in and daily-limit checks below wait on the network.
+  // Usually it is this instance's 10-minute copy and costs nothing; when that
+  // copy has expired, the database round trip hides behind those checks rather
+  // than adding to the student's wait. publishedDecks() never rejects (it gives
+  // {} when the database cannot be reached), so a request refused before the
+  // await leaves no unhandled rejection behind.
+  const decksPromise = publishedDecks();
+
   // ── who is asking ─────────────────────────────────────────────────────────
   //
   // Hiding the button in the UI is not a gate; this is. Without it a guest can
@@ -995,7 +1005,10 @@ export async function handleChat(req: Request): Promise<Response> {
   // pinnedContextFor, which is what makes the text safe — it comes from the
   // app's own content, never from the request.
   const screen = cleanScreen(body.screen);
-  const pinned = pinnedContextFor(screen);
+  // The decks started above (or {} if the database could not be reached:
+  // KruAI then answers without them).
+  const decks = await decksPromise;
+  const pinned = pinnedContextFor(screen, decks);
 
   // Ground KruAI in official MoEYS textbook text (Biology, Math, and History)
   const isMathQuery =
@@ -1025,6 +1038,7 @@ export async function handleChat(req: Request): Promise<Response> {
     profile,
     context,
     focusSubject: screen.subjectId,
+    decks,
   });
 
   // ── upstream, with fallback ───────────────────────────────────────────────

@@ -1,6 +1,8 @@
-> **Status: in progress.** Step 1a (tables, editor, import) BUILT 3 Oct 2026 in `64efc97`; its migration
-> (20261003000001) is applied to the live project (checked with db:check). Step 1b (students read from the database)
-> waits for the owner's import and the `--live` check.
+> **Status: Stage 1 COMPLETE (3 Oct 2026).** Step 1a (tables, editor, import) in `64efc97`;
+> the migration is applied; the owner imported the fixture (26 of 26 exact by `--live`).
+> Step 1b (students read from the database, code copy deleted) is built, not yet committed.
+> AGENTS.md's "Step 1b" section records what was built. Not done from the plan: offering to
+> mark a quiz's open reports Fixed when publishing it (the Edit link is there).
 >
 > **Built differently from the plan:** a draft only needs unique ids, so unfinished work can be
 > saved; the full shape check runs at publish and import. `admin_content_get` also returns

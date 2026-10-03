@@ -1,13 +1,13 @@
 import type { ContentLog, PracticeCard } from "@/types";
 import type { ReviewState } from "@/utils/spaced-repetition";
+import { deckEntry, type ContentManifest } from "@/utils/content-manifest";
 import { allSubjects, type SubjectId } from "@/features/lessons/subjects";
 import { chaptersFor, lessonHeading } from "@/features/lessons/sessions";
 import { quizPathFor } from "@/features/practice/quiz-path";
 import { isQuizSubjectActive, practiceKey, lessonRef } from "@/features/practice/practice";
-import { cardsFor, deckProgress } from "@/features/practice/review";
+import { deckProgress, deckStates } from "@/features/practice/review";
 import { isDue } from "@/utils/spaced-repetition";
 import { lessonKeyOf } from "@/features/progress/content-keys";
-import { deckFor } from "@/data/practice";
 import { PAST_PAPERS } from "@/data/past-papers";
 import { pastPaperByKey } from "@/features/exam/papers";
 
@@ -17,8 +17,10 @@ import { pastPaperByKey } from "@/features/exam/papers";
  *
  * THE CATALOG IS DERIVED FROM WHAT EXISTS, never authored beside it. An item is
  * here because its content is: a section with SECTION_CONTENT behind it, a
- * flashcard deck with cards in it, a quiz-path node with a quiz behind it, a
- * past paper in PAST_PAPERS. So writing new content adds it to Home with no
+ * published flashcard deck, a quiz-path node with a published quiz behind it,
+ * a past paper in PAST_PAPERS. Decks and quizzes are read off the MANIFEST
+ * (lib/content.ts), which carries each deck's card ids, so Home downloads no
+ * lesson to draw this card. So writing new content adds it to Home with no
  * edit here, and Home can never point at something that is not written — the
  * rule lessonCountFor() and sectionsFor()'s `href` already follow.
  *
@@ -75,6 +77,8 @@ export interface StudyFeedInput {
   studentCards: Record<string, PracticeCard[]>;
   paperResults: { paperKey: string }[];
   contentLog: ContentLog;
+  /** What is published (lib/content.ts). */
+  manifest: ContentManifest;
 }
 
 /** How many rows Home shows. The user's number. */
@@ -107,8 +111,9 @@ function catalogFor(subject: SubjectId, input: StudyFeedInput): StudyItem[] {
       }
 
       const key = practiceKey(subject, chapter.number, lesson.number);
-      if (deckFor(key).length === 0) continue;
-      const cards = cardsFor(key, input.studentCards, input.cardReviews);
+      const deck = deckEntry(input.manifest, key);
+      if (!deck) continue;
+      const cards = deckStates(key, deck.ids, input.studentCards, input.cardReviews);
       const graded = cards.filter((qc) => qc.state.lastGrade !== null).length;
       const all = graded === cards.length;
       const p = deckProgress(cards);
@@ -131,7 +136,7 @@ function catalogFor(subject: SubjectId, input: StudyFeedInput): StudyItem[] {
   }
 
   if (isQuizSubjectActive(subject)) {
-    for (const chapter of quizPathFor(subject) ?? []) {
+    for (const chapter of quizPathFor(subject, input.manifest) ?? []) {
     for (const lesson of chapter.lessons) {
       for (const s of lesson.sessions) {
         if (!s.href) continue;

@@ -1,5 +1,6 @@
 import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
+import { useContentManifest } from "@/lib/content";
 import { todayKey } from "@/utils/day";
 import { buildRealPrediction, type RealPrediction } from "./real-prediction";
 
@@ -21,8 +22,9 @@ export function useGradePrediction(): RealPrediction {
       userLanguage: s.userLanguage,
     }))
   );
+  const manifest = useContentManifest();
   return buildRealPrediction(
-    { ...input, userLanguage: input.userLanguage || "english" },
+    { ...input, userLanguage: input.userLanguage || "english", manifest },
     todayKey()
   );
 }

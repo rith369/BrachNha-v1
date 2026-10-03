@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { Check, ExternalLink, X } from "lucide-react";
+import { Check, ExternalLink, Pencil, X } from "lucide-react";
 import { MathText } from "@/components/shell/math-text";
 import { useBrachNhaStore } from "@/lib/store";
+import { useAllBodies, useContentManifest } from "@/lib/content";
+import { parseContentRef } from "@/utils/content-ref";
+import type { QuizQuestionBody } from "@/types";
 import { setOpenMistakes } from "@/lib/admin-status";
 import {
   listMistakes,
@@ -23,10 +26,11 @@ import { resolveContentRef } from "../content-ref";
  * the report's content_ref by ../content-ref.ts: the prompt, every option, the
  * one marked correct and the explanation, with a link to where it lives.
  *
- * THE FIX IS A CODE EDIT. This page cannot change a question; it records that
- * someone looked. "Fixed" means the question was corrected in the code (which
- * then goes through check:quiz); "Not a mistake" closes the reports with no
- * change. Both close every open report on that question at once.
+ * A PRACTICE-QUIZ question is fixed on /admin/content: its card carries an
+ * Edit link that opens the editor at that question, and the owner publishes the
+ * fix. Section and past-paper questions are still code edits (they move to the
+ * database in later stages). Either way this page only records the outcome:
+ * "Fixed" or "Not a mistake", each closing every open report on that question.
  *
  * KaTeX comes with MathText, from its own shared chunk; this page is lazy, so
  * neither it nor the question corpus reaches a student.
@@ -37,14 +41,18 @@ const CARD = "rounded-2xl border border-border bg-surface p-4 shadow-panel-sm";
 function MistakeCard({
   group,
   lang,
+  quizzes,
   onDone,
 }: {
   group: MistakeGroup;
   lang: Lang;
+  /** Every published quiz, or null while they download. */
+  quizzes: Record<string, QuizQuestionBody[]> | null;
   onDone: (ref: string) => void;
 }) {
   const c = ADMIN_COPY[lang];
-  const q = resolveContentRef(group.ref);
+  const waiting = quizzes === null && parseContentRef(group.ref)?.kind === "quiz";
+  const q = resolveContentRef(group.ref, quizzes ?? {});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<AdminFail | null>(null);
 
@@ -133,14 +141,27 @@ function MistakeCard({
             </div>
           </div>
 
-          <Link
-            to={q.link}
-            className="mb-2 inline-flex items-center gap-1 text-xs font-extrabold text-purple"
-          >
-            <ExternalLink className="size-3.5" strokeWidth={2.5} />
-            {c.openIt}
-          </Link>
+          <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+            <Link
+              to={q.link}
+              className="inline-flex items-center gap-1 text-xs font-extrabold text-purple"
+            >
+              <ExternalLink className="size-3.5" strokeWidth={2.5} />
+              {c.openIt}
+            </Link>
+            {q.edit && (
+              <Link
+                to={q.edit}
+                className="inline-flex items-center gap-1 text-xs font-extrabold text-purple"
+              >
+                <Pencil className="size-3.5" strokeWidth={2.5} />
+                {c.editIt}
+              </Link>
+            )}
+          </div>
         </>
+      ) : waiting ? (
+        <p className="mb-2 text-xs font-bold text-muted">{c.loading}</p>
       ) : (
         <p className="mb-2 text-xs font-bold text-muted">
           {c.missing} <span className="font-mono [overflow-wrap:anywhere]">{group.ref}</span>
@@ -206,6 +227,11 @@ export function MistakesView() {
   const lang = useBrachNhaStore((s) => s.lang);
   const c = ADMIN_COPY[lang];
   const [load, setLoad] = useState<Load>({ state: "loading" });
+  // Practice quizzes come from the database, all of them in one request (or
+  // from this device, if already held), to show a quiz report's question.
+  const manifest = useContentManifest();
+  const quizSet = useAllBodies("quiz", manifest);
+  const quizzes = quizSet.status === "ready" ? quizSet.bodies : null;
 
   // setState only from the async callback (react(set-state-in-effect)).
   useEffect(() => {
@@ -247,6 +273,7 @@ export function MistakesView() {
               key={g.ref}
               group={g}
               lang={lang}
+              quizzes={quizzes}
               onDone={(ref) => {
                 const rest = items.filter((x) => x.ref !== ref);
                 setLoad({ state: "ready", items: rest });

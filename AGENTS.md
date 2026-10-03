@@ -1445,9 +1445,10 @@ have no content yet and the curriculum shape is still moving; a schema would
 make every content edit a migration. Revisit when content settles, not before.
 
 **Revisited for flashcards and practice quizzes (3 Oct 2026, the user's call)**:
-they are moving into the database so the team can fix them without a code change.
-See "Flashcards and quizzes move into the database" near the end of this file.
-Sections and past papers stay here until their own stage.
+they now LIVE in the database, so the team fixes them without a code change, and
+`data/practice.ts` and `data/quizzes/` are deleted. See "Flashcards and quizzes
+move into the database" near the end of this file. Sections and past papers stay
+here until their own stage.
 
 ### Keeping the three copies in step
 
@@ -3169,6 +3170,14 @@ subject with real content or it stops reaching the runner at all.
 **Practice** (`features/practice`) — Flashcards & Quiz; see its own section below.
 
 ### The practice page is two tabs, three levels, and empty on purpose
+
+> **Since 3 Oct 2026 the decks and quizzes live in the DATABASE**, not in
+> `data/practice.ts` / `data/quizzes/` (both deleted). Read this section and the
+> ones after it for the screens and the reasoning, which still hold; where they
+> say `PRACTICE_DECKS`, `PRACTICE_QUIZZES`, `deckFor()` or `quizFor()`, read
+> "the manifest" (what is published) or "the loaded body" instead. How content
+> reaches a phone now is "Step 1b: students read from the database" near the end
+> of this file; how to write it is `content/README.md`.
 
 `/practice` fills the `flashcards` nav item that sat as a disabled `href: null`
 placeholder. It is the Mock Exam page's shape — **two tabs over the subject
@@ -6699,16 +6708,17 @@ about 182KB gzip, with no SDK, KaTeX or question corpus.
 
 ## Flashcards and quizzes move into the database (stage 1, 3 Oct 2026)
 
-The plan is `docs/plans/content-in-database.md`; this records what is built. **Step 1a is
-built: the tables, the editor and the import. Students still read the content in code**
-(`src/data/practice.ts`, `src/data/quizzes/*.ts`) until step 1b switches them over. The
-user's decision that shapes everything below: **only the owner presses Publish.**
+The plan is `docs/plans/content-in-database.md`; this records what is built. **Stage 1 is
+COMPLETE**: step 1a (the tables, the editor, the import, commit `64efc97`) and step 1b
+(students read from the database; the code copy deleted). The owner imported
+`content/fixture.json` on 3 Oct 2026 and `check:content --live` confirmed 26 of 26 items
+exactly. The user's decision that shapes everything below: **only the owner presses Publish.**
 
 Why it exists:
 - **Fixing a question took a code change.** The "Fixed" button on `/admin/mistakes` only
   recorded that someone had already fixed it in code.
 - **Every student downloaded every deck and quiz before the first screen.** `index.html`
-  modulepreloads `practice-*.js` (349 KB raw, 87 KB gzip). Step 1b removes it.
+  modulepreloaded `practice-*.js` (349 KB raw, 62 KB gzip). Step 1b removed it.
 
 This **reverses "Content stays in `src/data/`"** for these two kinds only. Sections (stage 2)
 and past papers (stage 3) stay in code until their own stage.
@@ -6797,7 +6807,7 @@ not `math-text-*.js` (now 4 KB, the component only). It is still lazy and still 
   takes two taps. Leaving with unsaved changes asks first.
 - **Import** (owner, on the list): a JSON file is checked in the browser with the same rules
   before it is sent; "publish items never published" is for the one-time move only.
-- A yellow note on the list says students still see the code's copy. **Remove it in 1b.**
+- The yellow "students still see the code's copy" note on the list is gone (step 1b).
 - Copy is bilingual in `features/admin/content-copy.ts`; the hub's sixth tool card is
   Content (six cards, none spanning: md 3×2, xl 2×3).
 - **Everything explains itself on hover or tap** (3 Oct 2026, the hub's pattern), from
@@ -6829,16 +6839,19 @@ not `math-text-*.js` (now 4 KB, the component only). It is still lazy and still 
 
 ### Moving the content, and new content afterwards
 
-- `npm run content:export` writes `content/fixture.json` from `data/practice.ts`: 17 decks
-  (192 cards) and 9 quizzes (98 questions), refusing to write if any item fails the checks.
-  The file is both the import and step 1b's development fixture.
+- `content/fixture.json` is what the database was filled from: 17 decks (192 cards) and 9
+  quizzes (98 questions), exported from the code on 3 Oct 2026 before the code was deleted.
+  It is now the DEVELOPMENT FIXTURE (below). `npm run content:export` refreshes it by
+  DOWNLOADING what is published (`content_current`, publishable key from `.env`), checked
+  with the same rules; it no longer reads code, since there is none.
 - `npm run check:content` checks every `.json` under `content/`; `-- --live <file>` downloads
   what is published (`content_current`, publishable key) and compares item by item. That is
   the proof the import arrived exactly.
-- **Between the import and step 1b, do not change practice content in code**, or re-export
-  and re-import it: the database is about to become the only copy.
-- After stage 1, new decks and quizzes are written as JSON under `content/new/`, checked with
-  `check:content`, imported by the owner as drafts, reviewed, published, and the file deleted.
+- **The database is the only copy.** New decks and quizzes are written as JSON under
+  `content/new/`, checked with `check:content`, imported by the owner as drafts, reviewed,
+  published, and the file deleted. **`content/README.md` holds the authoring rules** that
+  used to sit in the headers of `data/quizzes/*.ts`: the distractor rules, the LaTeX and
+  Khmer rules, keys and ids, and where the first content came from.
 
 ### Verified
 
@@ -6855,6 +6868,115 @@ not `math-text-*.js` (now 4 KB, the component only). It is still lazy and still 
   or Import, a student refused and never calling an admin function, no sideways scroll, no
   page error).
 - The build: no admin or checker code in the entry chunk; KaTeX lazy (above).
+
+### Step 1b: students read from the database
+
+**`src/lib/content.ts` is the whole client side**, and it downloads two things:
+
+- **The manifest** (`content_items`, published rows only): kind, key, version, count, and a
+  deck's card ids. A plain `fetch` with the publishable key, like `lib/announcements.ts`, so
+  guests read content and never download the SDK. Once per app load, and again after 30
+  minutes in the background. Kept in `localStorage["brachnha-content"]`, so a returning
+  phone has it at once and an offline open still knows what exists.
+- **A body** (`content_versions`, by kind + key + version), only when a deck or quiz is
+  OPENED. A published version never changes, so it is stored for good in **Cache Storage**
+  (`brachnha-content-v1`, keyed `https://content.brachnha.invalid/{kind}/{key}/{version}`, a
+  name only, never fetched). NOT the service worker, which still caches only
+  `offline.html`. Without Cache Storage (an insecure origin) bodies live in memory.
+
+Read through `useContentManifest()`, `useContentBody(kind, key, version)` and, for the two
+screens that need every body of a kind, `useAllBodies(kind, manifest)` (Daily Review, the
+admin's mistakes page): whatever the phone holds is reused and the rest comes in ONE
+`content_current` request. Module state behind `useSyncExternalStore`.
+
+**`src/utils/content-manifest.ts` holds the pure side** (the `ContentManifest` type,
+`deckEntry`, `quizCount`, `entryVersion`, `toPracticeCards`). **The manifest is passed as an
+ARGUMENT to every function that decides what exists**: `quizPathFor(subject, manifest)`,
+`practiceLessonsFor(subject, mode, manifest)`, `readyLessonCount`, `readyQuizSectionCount`,
+`buildStudyFeed`, `buildRealPrediction`. A helper that read module state on its own would be
+memoised around by the React Compiler and keep its old answer after the manifest arrived.
+
+**What only COUNTS downloads no lesson.** The manifest carries each deck's card ids, so
+Home's study feed, Progress's study tips (`gradedDueCount`) and Grade Prediction work from it
+alone; `deckStates()` in `features/practice/review.ts` pairs ids with review states without
+the cards. `cardsFor`, `dueCardsFor`, `allCards` and `allDueCards` take the official cards as
+an argument now.
+
+**`quizPathShape(subject)` vs `quizPathFor(subject, manifest)`.** The path's STRUCTURE stays
+in code (`features/practice/quiz-path.ts`) with every `href` null; `quizPathFor` adds a link to
+each section the manifest says is published. `findQuizSection` and the admin's slots
+(`content-slots.ts`) read the shape.
+
+**The states a student can see**, all in `features/practice/components/content-waiting.tsx`:
+a quiet "កំពុងទាញយក…" while something downloads (no skeleton bars), and, on a FIRST open
+with no network, a sentence saying the first open needs internet, with Try again. The
+runner's version is a FocusLayout with its X, because a focus route has no navigation.
+**`pages/practice-run.tsx` redirects only once the manifest has ANSWERED** that an item is
+missing, never while it loads.
+
+**Quiz attempts record their version** (`QuizResult.version`, optional; absent = version 1,
+which is what the code copy became). `QuizScreen` reopens an older attempt through
+`OlderVersionResults`, which downloads THAT version, because answers are index-aligned with
+the questions the student saw. A retake runs the current version.
+
+**Mistake reports name a quiz question by its id** (`quiz:math-1-1-1#q4`):
+`quizRef(key, question, index)`. Older reports by position still resolve.
+`features/admin/content-ref.ts` takes the quizzes as an argument (`useAllBodies("quiz")` on
+the page), and a quiz report's card has an **Edit** link to
+`/admin/content/quiz/{key}?q={id}`. "Fixed" now means fixed there, for quizzes.
+
+**KruAI reads the decks from the database**: `server/content-source.ts` fetches
+`content_current('deck')` with the publishable key and keeps it 10 minutes per instance (one
+retry a minute after a failure, 3s timeout). `buildSystemPrompt`, `buildCatalogBlock` and
+`pinnedContextFor` take a `DeckMap` argument, so `chat-prompt.ts` stays pure and alias-free.
+**Unreachable means no deck list, never no answer.** The client still sends only a key.
+
+**The deck request starts the moment a question arrives** (`decksPromise` in
+`handleChat`, right after the body is validated) and is awaited only where the prompt is
+built, so a cold copy's round trip (measured 0.7 to 1.6 s for the whole 75 KB of decks)
+runs in the shadow of the sign-in and daily-limit checks instead of after them. Safe
+because `publishedDecks()` never rejects: a request refused before the await leaves no
+unhandled rejection, and a refused or curated question just warms the copy for the next
+one. Don't move the call back down beside `pinnedContextFor`.
+
+**Development without Supabase reads `content/fixture.json`** (`import.meta.glob` behind
+`import.meta.env.DEV`), so a fork and `scripts/shots.mjs` (run with the variables blanked)
+still show content. Production builds drop the branch: the fixture's text is in no chunk of
+`dist/` (checked).
+
+**Home prefetches the likely next tap**: at idle, the bodies of the top 3 decks or quizzes
+on the study card (`use-study-feed.ts`), once per version like any other body.
+
+**Deleted:** `src/data/practice.ts` and `src/data/quizzes/*.ts`. `check:quiz` no longer checks
+practice quizzes (`check:content` and the editor do).
+
+**Bundle, measured on the same machine:** what the first screen downloads (entry + every
+modulepreload, gzip) went **305 KB → 245 KB**. The 62 KB practice chunk is gone from the
+preloads; the entry grew about 3.5 KB for the loader. The SDK is still its own lazy chunk.
+
+**Verified:**
+- Browser, the database faked through Playwright `route` with the real fixture as content:
+  **34 checks** at 390 light, 320 dark Khmer and 1280. The hub and lists come from the
+  manifest with no body downloaded and no SDK for a guest. Opening a deck downloads only that
+  deck, and its review history stays attached. Reopened with downloads blocked, it comes from
+  Cache Storage; with the manifest unreachable, the hub opens from the phone's copy. The Daily
+  Review uses one request; Progress downloads nothing; Home prefetches its top two decks. A
+  republished quiz opens on version 2 while an old attempt reopens on version 1. A report
+  names `#q1`. The owner's mistakes page resolves `#q2` and an old `#3` with Edit links. A
+  first open offline shows the notice and Try again recovers. No sideways scroll, no page
+  error.
+- The 1a editor run (46 checks) and the explanations run (40) still pass.
+- KruAI through `ssrLoadModule` against a fake `content_current`: **7 checks** (17 decks read,
+  the second question reuses the copy, the catalog and an open deck in the prompt, an
+  untrusted key gives nothing, an unreachable database gives no decks in 4ms and the prompt
+  still builds).
+- The real `handleChat` against a fake Supabase where the deck request and `kruai_take`
+  each take 600ms: **8 checks**. The model is reached at 680ms (one wait, where two would
+  be 1,200), the open deck still reaches the prompt, a warm instance makes no deck
+  request, a refused request and a failing deck request leave no unhandled rejection,
+  and KruAI still answers with the deck request failing.
+- A dev server with Supabase blanked opens a quiz and a deck from the fixture with no
+  database request (4 checks).
 
 ## Installable app: "add to home screen" and the two pop-ups
 
@@ -7037,10 +7159,9 @@ leaderboard is waiting on, and a reminder has nowhere to go. Same state the
 past-papers tab and the practice decks were in, and by design.
 
 **Flashcards/Quiz has left this list.** It is `/practice` now, a real feature —
-see its section above. What is still missing there is CONTENT, not code:
-`data/practice.ts` is empty, so every lesson row is a `ឆាប់ៗនេះ` placeholder and
-neither runner is reachable in the app as shipped. That is the same state the
-past-papers tab is in, and it is by design.
+see its section above. Its decks and quizzes are published from Admin → Content
+(the database since 3 Oct 2026); a lesson with nothing published is still a
+`ឆាប់ៗនេះ` placeholder, by design.
 
 The drawer's Main section is Home / Mock Exam / Lessons / Flashcards-Quiz. An
 "Exam Papers" placeholder used to sit there and was deleted outright — its Khmer
@@ -7978,7 +8099,7 @@ The third is there because the first two cannot see it: to `tsc` and to oxlint,
 so there is no reason to skip it on a change that "obviously" touches no copy.
 
 **`check:quiz` is the same argument for authored QUIZ AND PAST-PAPER content**
-(`scripts/check-quiz.mjs`). It covers `PRACTICE_QUIZZES`, `PAST_PAPERS`,
+(`scripts/check-quiz.mjs`). It covers `PAST_PAPERS`,
 `GAME_QUESTIONS` and — since a section first carried LaTeX (`math-1-1-1`) —
 `SECTION_CONTENT`, walking every block's intro and outro, every item label, body
 and nested item, both halves of every misconception, and the quiz when one is
@@ -8069,9 +8190,10 @@ after step 1a's code: without it `/admin/content` says it could not load and not
 changes, because students still read the code's copy until step 1b. Afterwards `db:check`
 lists `content_items`, `content_versions` and `content_drafts`, a publishable-key-only call to
 `/rest/v1/rpc/admin_content_list` must be refused, and `/rest/v1/rpc/content_current?p_kind=quiz`
-answers `200` (`[]` until the import). **Step 1b must NOT ship before the import**, or every
-deck and quiz shows as coming soon; `npm run check:content -- --live content/fixture.json`
-is the proof it is safe.
+answers `200`. **Since step 1b students read content ONLY from here**: the import was done
+on 3 Oct 2026 (26 of 26 exact). On a NEW project, import `content/fixture.json` before
+deploying, or every deck and quiz shows as coming soon; `npm run check:content -- --live
+content/fixture.json` is the proof it is safe.
 
 **The Game feature needs BOTH its migrations applied before db:check passes** —
 `20260913000001_competitions.sql` and

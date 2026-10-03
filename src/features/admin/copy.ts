@@ -185,7 +185,7 @@ const en = {
   // ── /admin/mistakes ───────────────────────────────────────────────────────
   mistakesTitle: "Mistake reports",
   mistakesBlurb:
-    "Questions students flagged. Fix the question in the code, then mark it Fixed. Not a mistake closes the reports with no change.",
+    "Questions students flagged. Fix a practice-quiz question with Edit; other questions are fixed in the code. Then mark it Fixed. Not a mistake closes the reports with no change.",
   mistakesEmpty: "No reports waiting. 🎉",
   reportsCount: (n: number) => `${n} ${n === 1 ? "report" : "reports"}`,
   kindNames: {
@@ -202,6 +202,7 @@ const en = {
   explanationLabel: "Explanation",
   notesLabel: "What students wrote",
   openIt: "Open it in the app",
+  editIt: "Edit",
   missing: "This question is no longer in the app. It may have been moved or removed.",
   lastReported: (when: string) => `Last reported ${when}`,
   fixed: "Fixed",
@@ -434,7 +435,7 @@ const km: AdminCopy = {
 
   mistakesTitle: "របាយការណ៍កំហុស",
   mistakesBlurb:
-    "សំណួរដែលសិស្សបានរាយការណ៍។ កែសំណួរក្នុងកូដ រួចចុច «បានកែ»។ «មិនមែនកំហុស» បិទរបាយការណ៍ដោយមិនកែអ្វីទេ។",
+    "សំណួរដែលសិស្សបានរាយការណ៍។ កែសំណួរ Quiz អនុវត្តដោយចុច «កែ»។ សំណួរផ្សេងទៀតត្រូវកែក្នុងកូដ។ រួចចុច «បានកែ»។ «មិនមែនកំហុស» បិទរបាយការណ៍ដោយមិនកែអ្វីទេ។",
   mistakesEmpty: "មិនមានរបាយការណ៍រង់ចាំទេ។ 🎉",
   reportsCount: (n: number) => `របាយការណ៍ ${n}`,
   kindNames: {
@@ -451,6 +452,7 @@ const km: AdminCopy = {
   explanationLabel: "ការពន្យល់",
   notesLabel: "អ្វីដែលសិស្សបានសរសេរ",
   openIt: "បើកក្នុងកម្មវិធី",
+  editIt: "កែ",
   missing: "សំណួរនេះលែងមានក្នុងកម្មវិធីហើយ។ វាប្រហែលជាត្រូវបានផ្លាស់ទី ឬលុបចេញ។",
   lastReported: (when: string) => `រាយការណ៍ចុងក្រោយ ${when}`,
   fixed: "បានកែ",

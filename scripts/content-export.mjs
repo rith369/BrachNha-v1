@@ -1,29 +1,62 @@
-// Writes every flashcard deck and practice quiz in the code to one file, for
-// the one-time move into the database (docs/plans/content-in-database.md).
+// Downloads every PUBLISHED flashcard deck and practice quiz into
+// content/fixture.json.
 //
 //   npm run content:export
 //
-// The file, content/fixture.json, is two things at once:
-//   - what the owner imports on /admin/content (with "publish now"), and
-//   - what the app reads in development when Supabase is not configured.
+// The fixture is what a development server shows when Supabase is not
+// configured (src/lib/content.ts), and scripts/shots.mjs runs that way. Run
+// this after publishing changes on /admin/content so development matches what
+// students see.
 //
-// Each quiz question gets its stable id here, `q1`, `q2`… in today's order,
-// so the first published version of a quiz asks its questions in exactly the
-// order students have been answering them. Card ids are kept as they are: a
-// student's spaced-repetition history is keyed by them.
+// Until 3 Oct 2026 this script exported the decks and quizzes written in the
+// code, for the one-time move into the database. That code is gone; the
+// database is the only copy now (docs/plans/content-in-database.md).
 //
-// Every item is run through src/utils/content-check.ts first, and the export
-// refuses to write a file with an error in it.
-//
-// Loaded through Vite's ssrLoadModule for the same reason check-quiz.mjs is:
-// data/*.ts uses `.js` specifiers that only resolve under a bundler.
+// Reads with the publishable key from .env (content_current, which anyone may
+// call), checks every item with src/utils/content-check.ts, and refuses to
+// write a file with an error in it.
 
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const outFile = path.join(root, "content", "fixture.json");
+
+function env(name) {
+  if (process.env[name]) return process.env[name].trim();
+  for (const file of [".env.local", ".env"]) {
+    try {
+      for (const line of readFileSync(path.join(root, file), "utf8").split(/\r?\n/)) {
+        const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
+        if (m && m[1] === name) return m[2].replace(/^["']|["']$/g, "");
+      }
+    } catch {
+      // No such file.
+    }
+  }
+  return "";
+}
+
+const url = env("VITE_SUPABASE_URL").replace(/\/+$/, "");
+const key = env("VITE_SUPABASE_ANON_KEY");
+if (!url || !key) {
+  console.error("content:export: VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are needed (.env).");
+  process.exit(1);
+}
+
+async function current(kind) {
+  const res = await fetch(`${url}/rest/v1/rpc/content_current`, {
+    method: "POST",
+    headers: { apikey: key, "content-type": "application/json" },
+    body: JSON.stringify({ p_kind: kind }),
+  });
+  if (!res.ok) throw new Error(`content_current(${kind}) answered ${res.status}`);
+  const rows = await res.json();
+  return rows
+    .map((r) => ({ kind, key: r.key, body: r.body }))
+    .sort((a, b) => a.key.localeCompare(b.key));
+}
 
 const { createServer } = await import("vite");
 const server = await createServer({
@@ -37,27 +70,8 @@ const server = await createServer({
 });
 
 try {
-  const { PRACTICE_DECKS, PRACTICE_QUIZZES } = await server.ssrLoadModule("/src/data/practice.ts");
+  const items = [...(await current("deck")), ...(await current("quiz"))];
   const { checkContent, describeIssue } = await server.ssrLoadModule("/src/utils/content-check.ts");
-
-  const items = [];
-  for (const key of Object.keys(PRACTICE_DECKS).sort()) {
-    const body = PRACTICE_DECKS[key].map((card) => ({
-      id: card.id,
-      front: card.front,
-      back: card.back,
-    }));
-    items.push({ kind: "deck", key, body });
-  }
-  for (const key of Object.keys(PRACTICE_QUIZZES).sort()) {
-    // JSON drops undefined fields, so a question without a scenario or help
-    // stores neither, exactly as the code wrote it.
-    const body = PRACTICE_QUIZZES[key].map((question, i) => ({
-      id: `q${i + 1}`,
-      ...JSON.parse(JSON.stringify(question)),
-    }));
-    items.push({ kind: "quiz", key, body });
-  }
 
   let errors = 0;
   let warnings = 0;

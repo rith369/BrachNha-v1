@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useBrachNhaStore } from "@/lib/store";
 import { UnderlineTabs } from "@/components/ui/underline-tabs";
 import { PracticeSubjectCard } from "./practice-subject-card";
+import { ContentNotice } from "./content-waiting";
+import { retryContent, useContentManifest } from "@/lib/content";
 import { PRACTICE_TABS, subjectsFor, type PracticeMode } from "../practice";
 
 /**
@@ -26,6 +28,10 @@ import { PRACTICE_TABS, subjectsFor, type PracticeMode } from "../practice";
 export function PracticeView() {
   const userLanguage = useBrachNhaStore((s) => s.userLanguage);
   const [mode, setMode] = useState<PracticeMode>("flashcards");
+  // Read once here for every tile. Before the first list ever arrives the
+  // tiles would all read as coming soon, which is not true, so a quiet line
+  // stands in for them; a returning device already has the list stored.
+  const manifest = useContentManifest();
 
   const subjects = subjectsFor(mode, userLanguage);
 
@@ -47,11 +53,18 @@ export function PracticeView() {
         protects dense stat cards needing ~288px, while these are image tiles
         that read fine at ~144px. 320px is the floor and is checked.
       */}
-      <div className="columns-2 gap-3 md:columns-3 lg:columns-4">
-        {subjects.map((s) => (
-          <PracticeSubjectCard key={s.id} subject={s} mode={mode} />
-        ))}
-      </div>
+      {manifest.status !== "ready" ? (
+        <ContentNotice
+          state={manifest.status === "failed" ? "offline" : "loading"}
+          onRetry={retryContent}
+        />
+      ) : (
+        <div className="columns-2 gap-3 md:columns-3 lg:columns-4">
+          {subjects.map((s) => (
+            <PracticeSubjectCard key={s.id} subject={s} mode={mode} manifest={manifest} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

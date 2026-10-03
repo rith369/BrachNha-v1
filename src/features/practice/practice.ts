@@ -1,5 +1,5 @@
-import { deckFor, quizFor } from "@/data/practice";
 import { chaptersFor } from "@/features/lessons/sessions";
+import { deckCount, quizCount, type ContentManifest } from "@/utils/content-manifest";
 import { quizPathFor } from "./quiz-path";
 import { SUBJECTS, allSubjects, type SubjectId, type SubjectMeta } from "@/features/lessons/subjects";
 import type { UnderlineTab } from "@/components/ui/underline-tabs";
@@ -146,23 +146,25 @@ export interface PracticeLesson {
  * authored, which is one row. That thinness is the honest state today, not a
  * bug — it fills in by itself the moment a curriculum is entered.
  *
- * `count` is READ FROM THE CONTENT rather than authored beside it, the rule
- * lessonCountFor() exists to enforce: a row cannot claim a deck the app does not
- * have, and playability is derived from the same number.
+ * `count` is READ FROM WHAT IS PUBLISHED (the manifest, lib/content.ts) rather
+ * than authored beside it, the rule lessonCountFor() exists to enforce: a row
+ * cannot claim a deck the app does not have, and playability is derived from
+ * the same number.
  */
 export function practiceLessonsFor(
   subjectId: SubjectId,
-  mode: PracticeMode
+  mode: PracticeMode,
+  manifest: ContentManifest
 ): PracticeLesson[] {
   return chaptersFor(subjectId).flatMap((chapter) =>
     chapter.lessons.map((lesson) => {
       const key = practiceKey(subjectId, chapter.number, lesson.number);
-      const content =
+      const count =
         mode === "flashcards"
-          ? deckFor(key)
+          ? deckCount(manifest, key)
           : isQuizSubjectActive(subjectId)
-            ? quizFor(key)
-            : [];
+            ? quizCount(manifest, key)
+            : 0;
       return {
         key,
         ref: lessonRef(chapter.number, lesson.number),
@@ -171,7 +173,7 @@ export function practiceLessonsFor(
         chapterFlat: chapter.flat ?? false,
         lessonNumber: lesson.number,
         title: lesson.title,
-        count: content.length,
+        count,
       };
     })
   );
@@ -180,9 +182,10 @@ export function practiceLessonsFor(
 /** How many of a subject's lessons have content in this mode. Feeds the card. */
 export function readyLessonCount(
   subjectId: SubjectId,
-  mode: PracticeMode
+  mode: PracticeMode,
+  manifest: ContentManifest
 ): number {
-  return practiceLessonsFor(subjectId, mode).filter((l) => l.count > 0).length;
+  return practiceLessonsFor(subjectId, mode, manifest).filter((l) => l.count > 0).length;
 }
 
 /**
@@ -194,13 +197,13 @@ export function readyLessonCount(
  * PRACTICE_QUIZZES["math-1-1-1"] moved that count by exactly nothing, and the
  * hub tile kept calling itself a design sample on the day it stopped being one.
  *
- * DERIVED from `href`, which quiz-path.ts already sets from `quizFor(...)` — so
- * the number on the tile and the nodes a student can actually tap are the same
+ * DERIVED from `href`, which quizPathFor() sets from the manifest, so the
+ * number on the tile and the nodes a student can actually tap are the same
  * fact, not two that agree today.
  */
-export function readyQuizSectionCount(subjectId: SubjectId): number {
+export function readyQuizSectionCount(subjectId: SubjectId, manifest: ContentManifest): number {
   if (!isQuizSubjectActive(subjectId)) return 0;
-  return (quizPathFor(subjectId) ?? [])
+  return (quizPathFor(subjectId, manifest) ?? [])
     .flatMap((chapter) => chapter.lessons)
     .flatMap((lesson) => lesson.sessions)
     .filter((session) => session.href).length;
@@ -218,9 +221,8 @@ export function parseMode(value: string | undefined): PracticeMode | null {
  * The third is what the quiz path's section nodes link to — see quizSections()
  * in ./quiz-path, where a node's playability is derived from a quiz existing
  * under exactly this key. Both shapes resolve to a key in the same
- * `{subjectId}-…` namespace data/practice.ts is keyed by, so authoring
- * `PRACTICE_QUIZZES["math-1-3-2"]` is the only step needed to turn that node
- * on. The lesson-name lookup in pages/practice-run.tsx reads the first two
+ * `{subjectId}-…` namespace the database's content is keyed by, so publishing
+ * a quiz under "math-1-3-2" is the only step needed to turn that node on. The lesson-name lookup in pages/practice-run.tsx reads the first two
  * numbers, so it names the right lesson for either shape.
  */
 export function keyFromRef(

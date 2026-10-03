@@ -1,11 +1,13 @@
-import { Navigate, useParams } from "react-router";
-import { deckFor, quizFor } from "@/data/practice";
+import { Navigate, useNavigate, useParams } from "react-router";
 import { findSubject } from "@/features/lessons/subjects";
 import { chaptersFor, lessonHeading } from "@/features/lessons/sessions";
 import { isQuizSubjectActive, keyFromRef, parseMode } from "@/features/practice/practice";
 import { findQuizSection } from "@/features/practice/quiz-path";
 import { FlashcardRunner } from "@/features/practice/components/flashcard-runner";
 import { QuizScreen } from "@/features/practice/components/quiz-screen";
+import { ContentWaitingScreen } from "@/features/practice/components/content-waiting";
+import { retryBody, retryContent, useContentBody, useContentManifest } from "@/lib/content";
+import { entryVersion, toPracticeCards } from "@/utils/content-manifest";
 
 /**
  * `/practice/:mode/:subjectId/:lessonRef` — the deck or the quiz.
@@ -25,20 +27,35 @@ import { QuizScreen } from "@/features/practice/components/quiz-screen";
  * bring FocusLayout's own scroller, and nesting two costs a scroll-chaining
  * resolution on every touch drag before anything moves.
  *
+ * THE CONTENT COMES FROM THE DATABASE (lib/content.ts): the manifest says
+ * whether this deck or quiz is published and at which version, and only then
+ * is its body downloaded (or read from the phone, if it was opened before).
+ * A redirect happens only once the manifest has ANSWERED that it is missing,
+ * never while it is still loading: a slow phone must not be bounced back to
+ * the list for being slow.
+ *
  * Anything malformed — unknown mode, unknown subject, a lessonRef that isn't
- * two numbers, or a lesson with no content written — redirects rather than
- * rendering an empty runner. The content check is the same DERIVED rule the rest
- * of the feature uses: playability is read from the data, never authored.
+ * two numbers, or a lesson with nothing published — redirects rather than
+ * rendering an empty runner.
  */
 export default function PracticeRunPage() {
+  const navigate = useNavigate();
   const { mode, subjectId, lessonRef } = useParams<{
     mode: string;
     subjectId: string;
     lessonRef: string;
   }>();
+  const manifest = useContentManifest();
 
   const parsed = parseMode(mode);
   const subject = findSubject(subjectId);
+  const key = subject ? keyFromRef(subject.id, lessonRef) : null;
+  const kind = parsed === "quiz" ? "quiz" : "deck";
+  const version = parsed && key ? entryVersion(manifest, kind, key) : null;
+  // Called on every render, before any early return (a hook cannot be
+  // skipped). With version null it answers "missing" and fetches nothing.
+  const body = useContentBody(kind, key ?? "", version);
+
   if (!parsed || !subject) return <Navigate to="/practice" replace />;
 
   // Only active quiz subjects (math) are accessible in Quiz mode.
@@ -46,8 +63,28 @@ export default function PracticeRunPage() {
     return <Navigate to="/practice" replace />;
   }
 
-  const key = keyFromRef(subject.id, lessonRef);
-  if (!key) return <Navigate to={`/practice/${parsed}/${subject.id}`} replace />;
+  const list = `/practice/${parsed}/${subject.id}`;
+  if (!key) return <Navigate to={list} replace />;
+
+  if (manifest.status !== "ready") {
+    return (
+      <ContentWaitingScreen
+        state={manifest.status === "failed" ? "offline" : "loading"}
+        onRetry={retryContent}
+        onExit={() => navigate(list)}
+      />
+    );
+  }
+  if (version === null || body.status === "missing") return <Navigate to={list} replace />;
+  if (body.status !== "ready") {
+    return (
+      <ContentWaitingScreen
+        state={body.status}
+        onRetry={() => retryBody(kind, key, version)}
+        onExit={() => navigate(list)}
+      />
+    );
+  }
 
   // The name for the completion screen, taken from THE SAME structure the list
   // or path was built from, so the two cannot disagree about what this is
@@ -64,7 +101,7 @@ export default function PracticeRunPage() {
   // chaptersFor() lookup, so the branch cannot key on "the ref has three
   // numbers".
   const onQuizPath = parsed === "quiz" ? findQuizSection(subject.id, key) : null;
-  const [chapterNo, lessonNo] = lessonRef!.split("-").map(Number);
+  const [chapterNo, lessonNo] = key.slice(subject.id.length + 1).split("-").map(Number);
   const foundLesson = chaptersFor(subject.id)
     .find((c) => c.number === chapterNo)
     ?.lessons.find((l) => l.number === lessonNo);
@@ -82,18 +119,14 @@ export default function PracticeRunPage() {
       ? lessonHeading(foundLesson.number, foundLesson.title)
       : subject.name;
 
-  if (parsed === "flashcards") {
-    // Gate on the OFFICIAL deck only, matching practiceLessonsFor()'s `count` —
-    // the same reason a lesson with nothing official written is a dimmed row,
-    // never a <Link>, on the list one level up. A student's own cards live
-    // alongside an official deck, not as a substitute for one; FlashcardRunner
-    // reads both once it's actually rendered.
-    if (deckFor(key).length === 0) {
-      return <Navigate to={`/practice/flashcards/${subject.id}`} replace />;
-    }
+  if (body.kind === "deck") {
+    // The OFFICIAL deck decides whether this opens, matching practiceLessonsFor()'s
+    // `count`: a student's own cards live alongside an official deck, not as a
+    // substitute for one. FlashcardRunner adds them once it renders.
     return (
       <FlashcardRunner
         deckKey={key}
+        cards={toPracticeCards(body.body, body.publishedAt)}
         subjectId={subject.id}
         mode="flashcards"
         title={title}
@@ -101,17 +134,14 @@ export default function PracticeRunPage() {
     );
   }
 
-  const questions = quizFor(key);
-  if (questions.length === 0) {
-    return <Navigate to={`/practice/quiz/${subject.id}`} replace />;
-  }
   // QuizScreen, not QuizRunner: a quiz section is a thing you can attempt more
   // than once, so it opens on its own detail screen — what is in it, how you
   // have done before, and the button that starts it — and ends on a review.
   // All three are one route, the same call PaperScreen makes.
   return (
     <QuizScreen
-      questions={questions}
+      questions={body.body}
+      version={version}
       subjectId={subject.id}
       contentKey={key}
       title={title}

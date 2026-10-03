@@ -240,22 +240,23 @@ function PileList({
  * but KEEPS KruAI, the same rule a lesson gets, and removes the cleanup-effect
  * failure mode ExamRunner's own flag needs to guard against.
  *
- * TAKES A deckKey, NOT a `cards` ARRAY. The runner needs to combine the
- * official deck with this student's own cards and pair both with live review
- * state from the store — reading `deckFor()` here directly (via cardsFor in
- * ../review) rather than have the caller assemble that is what keeps
- * pages/practice-run.tsx a thin route resolver instead of duplicating this
- * lookup.
+ * TAKES THE OFFICIAL CARDS AND THE deckKey. The official deck comes from the
+ * database (pages/practice-run.tsx loads it through lib/content.ts); the runner
+ * adds this student's own cards, filed under the same key, and pairs both with
+ * live review state from the store through cardsFor in ../review.
  *
  * KHMER-ONLY. See PRACTICE_PAGE_LANG in ../practice.
  */
 export function FlashcardRunner({
   deckKey,
+  cards,
   subjectId,
   mode,
   title,
 }: {
   deckKey: string;
+  /** The official deck, as published. */
+  cards: PracticeCard[];
   subjectId: string;
   /** Carried only so the X returns to the list the student came from. */
   mode: PracticeMode;
@@ -304,8 +305,8 @@ export function FlashcardRunner({
     navigate(`/practice/${mode}/${subjectId}`);
   }
 
-  const all = cardsFor(deckKey, studentCards, cardReviews);
-  const due = dueCardsFor(deckKey, studentCards, cardReviews);
+  const all = cardsFor(deckKey, cards, studentCards, cardReviews);
+  const due = dueCardsFor(deckKey, cards, studentCards, cardReviews);
   const mine = all.filter((qc) => qc.card.source === "student");
   const retention = averageMockRetention(all.map((qc) => qc.state));
 

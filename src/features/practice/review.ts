@@ -1,13 +1,11 @@
-import { deckFor } from "@/data/practice";
-import { chaptersFor } from "@/features/lessons/sessions";
 import type { PracticeCard } from "@/types";
 import { todayKey } from "@/utils/day";
+import type { ContentManifest } from "@/utils/content-manifest";
 import {
   initialReviewState,
   isDue,
   type ReviewState,
 } from "@/utils/spaced-repetition";
-import { FLASHCARD_SUBJECTS, practiceKey } from "./practice";
 
 /**
  * Pure queries over the flashcard review state — no store import, no React.
@@ -16,6 +14,11 @@ import { FLASHCARD_SUBJECTS, practiceKey } from "./practice";
  * callable from anywhere, including the store's own actions if a future one
  * ever needs a due count. Same pattern as `pathProgress(chapters, completed)`
  * in features/lessons/sessions.ts.
+ *
+ * THE OFFICIAL CARDS ARE AN ARGUMENT TOO, since they live in the database now
+ * (lib/content.ts) and arrive only when a deck is opened. What only needs to
+ * COUNT (Home's feed, Progress's tips) uses deckStates(), which works from the
+ * manifest's card ids and so downloads no deck at all.
  */
 
 /** One card paired with its current review state — a fresh "new" state for any
@@ -30,11 +33,12 @@ export interface QueueCard {
  *  paired with its review state. */
 export function cardsFor(
   deckKey: string,
+  official: PracticeCard[],
   studentCards: Record<string, PracticeCard[]>,
   cardReviews: Record<string, ReviewState>,
   now: Date = new Date()
 ): QueueCard[] {
-  const all = [...deckFor(deckKey), ...(studentCards[deckKey] ?? [])];
+  const all = [...official, ...(studentCards[deckKey] ?? [])];
   return all.map((card) => ({
     card,
     deckKey,
@@ -46,56 +50,85 @@ export function cardsFor(
  *  earlier. This is what "Start Review" actually queues up. */
 export function dueCardsFor(
   deckKey: string,
+  official: PracticeCard[],
   studentCards: Record<string, PracticeCard[]>,
   cardReviews: Record<string, ReviewState>,
   now: Date = new Date()
 ): QueueCard[] {
-  return cardsFor(deckKey, studentCards, cardReviews, now).filter((qc) =>
+  return cardsFor(deckKey, official, studentCards, cardReviews, now).filter((qc) =>
     isDue(qc.state, now)
   );
 }
 
+/** A card's review state without its text: enough to count with. */
+export interface CardState {
+  id: string;
+  deckKey: string;
+  state: ReviewState;
+}
+
+/** One deck's cards as ids and states: the official ids from the manifest,
+ *  then this student's own cards. No deck body needed. */
+export function deckStates(
+  deckKey: string,
+  officialIds: string[],
+  studentCards: Record<string, PracticeCard[]>,
+  cardReviews: Record<string, ReviewState>,
+  now: Date = new Date()
+): CardState[] {
+  const ids = [...officialIds, ...(studentCards[deckKey] ?? []).map((c) => c.id)];
+  return ids.map((id) => ({ id, deckKey, state: cardReviews[id] ?? initialReviewState(now) }));
+}
+
+/** Deck keys in curriculum order ("biology-2-1" before "biology-10-1"). */
+function byCurriculum(keys: string[]): string[] {
+  return [...keys].sort((a, b) => a.localeCompare(b, "en", { numeric: true }));
+}
+
 /**
- * Every flashcard deck key that could have content, across the flashcard tab's
- * whole subject scope (FLASHCARD_SUBJECTS — physics/chemistry/biology/history,
- * matching the tab itself). Used to build the Daily Review aggregate; a key
- * with nothing written just contributes zero cards, exactly like every other
- * derived-count in this feature.
+ * Cards due again that the student HAS graded before, across every published
+ * deck, for Progress's study tips. A never-seen card is "due" to the scheduler,
+ * and counting those would nag a student about a deck they have never opened.
  */
-export function allDeckKeys(): string[] {
-  return FLASHCARD_SUBJECTS.flatMap((subjectId) =>
-    chaptersFor(subjectId).flatMap((chapter) =>
-      chapter.lessons.map((lesson) =>
-        practiceKey(subjectId, chapter.number, lesson.number)
-      )
-    )
+export function gradedDueCount(
+  manifest: ContentManifest,
+  studentCards: Record<string, PracticeCard[]>,
+  cardReviews: Record<string, ReviewState>,
+  now: Date = new Date()
+): number {
+  return Object.keys(manifest.deck).reduce(
+    (n, key) =>
+      n +
+      deckStates(key, manifest.deck[key].ids, studentCards, cardReviews, now).filter(
+        (c) => cardReviews[c.id] !== undefined && isDue(c.state, now)
+      ).length,
+    0
   );
 }
 
-/** Due cards across EVERY deck — the Daily Review queue. Today this reduces to
- *  "whatever Biology has," since it is the only subject with real content; the
- *  function is written to the full catalog so nothing here needs to change as
- *  more decks are written. */
+/** Due cards across EVERY published deck: the Daily Review queue. `decks` is
+ *  every deck's official cards (lib/content.ts's useAllBodies). */
 export function allDueCards(
+  decks: Record<string, PracticeCard[]>,
   studentCards: Record<string, PracticeCard[]>,
   cardReviews: Record<string, ReviewState>,
   now: Date = new Date()
 ): QueueCard[] {
-  return allDeckKeys().flatMap((key) =>
-    dueCardsFor(key, studentCards, cardReviews, now)
+  return byCurriculum(Object.keys(decks)).flatMap((key) =>
+    dueCardsFor(key, decks[key], studentCards, cardReviews, now)
   );
 }
 
-/** EVERY card across every deck, due or not — the fallback queue for
- *  "review anyway" when nothing is due. See allDueCards for the same idea
- *  scoped to one deck. */
+/** EVERY card across every published deck, due or not: the fallback queue
+ *  for "review anyway" when nothing is due. */
 export function allCards(
+  decks: Record<string, PracticeCard[]>,
   studentCards: Record<string, PracticeCard[]>,
   cardReviews: Record<string, ReviewState>,
   now: Date = new Date()
 ): QueueCard[] {
-  return allDeckKeys().flatMap((key) =>
-    cardsFor(key, studentCards, cardReviews, now)
+  return byCurriculum(Object.keys(decks)).flatMap((key) =>
+    cardsFor(key, decks[key], studentCards, cardReviews, now)
   );
 }
 
@@ -116,13 +149,13 @@ export function allCards(
  * UI offers two options but the scheduler's vocabulary is still four, so "hard"
  * folds in with "again" and "easy" with "good" rather than being dropped.
  */
-export function rememberedCards(cards: QueueCard[]): QueueCard[] {
+export function rememberedCards<T extends { state: ReviewState }>(cards: T[]): T[] {
   return cards.filter(
     (qc) => qc.state.lastGrade === "good" || qc.state.lastGrade === "easy"
   );
 }
 
-export function notRememberedCards(cards: QueueCard[]): QueueCard[] {
+export function notRememberedCards<T extends { state: ReviewState }>(cards: T[]): T[] {
   return cards.filter(
     (qc) => qc.state.lastGrade === "again" || qc.state.lastGrade === "hard"
   );
@@ -160,7 +193,7 @@ export interface DeckProgress {
   total: number;
 }
 
-export function deckProgress(cards: QueueCard[]): DeckProgress {
+export function deckProgress(cards: { state: ReviewState }[]): DeckProgress {
   return {
     remembered: rememberedCards(cards).length,
     notRemembered: notRememberedCards(cards).length,

@@ -1,5 +1,5 @@
-import { quizFor } from "@/data/practice";
 import type { Chapter, PathLesson, Session } from "@/features/lessons/sessions";
+import { quizCount, type ContentManifest } from "@/utils/content-manifest";
 import type { SubjectId } from "@/features/lessons/subjects";
 
 /**
@@ -64,12 +64,12 @@ const SECTIONS_PER_LESSON = 6;
  * it is only ever the progress identity.
  *
  * **PLAYABILITY IS DERIVED, never authored beside the node** — the rule
- * sectionsFor() and lessonCountFor() both exist to enforce. A section is
- * playable if and only if a quiz is written under its content key in
- * data/practice.ts, which today is none of them, so every node is locked and
- * non-interactive. Authoring `PRACTICE_QUIZZES["math-1-3-2"]` turns that one
- * node into a real <Link> with no code change here — which is why keyFromRef()
- * in ./practice accepts a three-number ref.
+ * sectionsFor() and lessonCountFor() both exist to enforce. The STRUCTURE built
+ * here has no links at all; quizPathFor() adds one to every section the
+ * manifest says is published (lib/content.ts), so publishing a quiz under
+ * "math-1-3-2" on /admin/content turns that one node into a real <Link> with no
+ * code change — which is why keyFromRef() in ./practice accepts a three-number
+ * ref.
  */
 function quizSections(
   subjectId: SubjectId,
@@ -95,10 +95,8 @@ function quizSections(
       // that has not been supplied. A count is structure and may be reserved; a
       // name is content and may not be invented.
       title: titles[i] ?? "",
-      href:
-        quizFor(contentKey).length > 0
-          ? `/practice/quiz/${subjectId}/${ref}`
-          : null,
+      // Set by quizPathFor() from the manifest. Never here: this is the shape.
+      href: null,
     };
   });
 }
@@ -205,15 +203,43 @@ const PHYSICS_QUIZ_PATH: Chapter[] = [1, 2].map((chapter) => ({
   lessons: [quizLesson("physics", chapter, 1, "", false)],
 }));
 
-/** Which subjects render as a quiz path rather than the plain lesson list. */
-export const QUIZ_PATHS: Partial<Record<SubjectId, Chapter[]>> = {
+/** Which subjects render as a quiz path rather than the plain lesson list.
+ *  The SHAPE only: every section's `href` is null here. */
+const QUIZ_PATHS: Partial<Record<SubjectId, Chapter[]>> = {
   math: MATH_QUIZ_PATH,
   physics: PHYSICS_QUIZ_PATH,
 };
 
-/** A subject's quiz path, or null when it still uses the plain lesson list. */
-export function quizPathFor(subjectId: SubjectId): Chapter[] | null {
+/** A subject's quiz path SHAPE (no links), for what does not depend on what is
+ *  published: the admin's list of places, a section's name. */
+export function quizPathShape(subjectId: SubjectId): Chapter[] | null {
   return QUIZ_PATHS[subjectId] ?? null;
+}
+
+/** "math-1-1-1" back out of a quiz section's progress id. */
+export function contentKeyOfQuizSession(sessionId: string): string {
+  return sessionId.replace(/^quiz-/, "");
+}
+
+/**
+ * A subject's quiz path with a link on every section the manifest says is
+ * published, or null when the subject still uses the plain lesson list.
+ */
+export function quizPathFor(subjectId: SubjectId, manifest: ContentManifest): Chapter[] | null {
+  const shape = QUIZ_PATHS[subjectId];
+  if (!shape) return null;
+  return shape.map((chapter) => ({
+    ...chapter,
+    lessons: chapter.lessons.map((lesson) => ({
+      ...lesson,
+      sessions: lesson.sessions.map((s) => {
+        const key = contentKeyOfQuizSession(s.id);
+        return quizCount(manifest, key) > 0
+          ? { ...s, href: `/practice/quiz/${subjectId}/${key.slice(subjectId.length + 1)}` }
+          : s;
+      }),
+    })),
+  }));
 }
 
 /**
@@ -260,7 +286,7 @@ export function findQuizSection(
   contentKey: string
 ): { lesson: PathLesson; section: Session } | null {
   const id = quizSessionId(contentKey);
-  for (const chapter of quizPathFor(subjectId) ?? []) {
+  for (const chapter of quizPathShape(subjectId) ?? []) {
     for (const lesson of chapter.lessons) {
       const section = lesson.sessions.find((s) => s.id === id);
       if (section) return { lesson, section };

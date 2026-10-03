@@ -1,7 +1,8 @@
 import { Link } from "react-router";
 import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
-import { allDueCards } from "@/features/practice/review";
+import { gradedDueCount } from "@/features/practice/review";
+import { useContentManifest } from "@/lib/content";
 import { PROGRESS_COPY } from "../copy";
 import type { ProgressSummary } from "../summary";
 import { buildStudyTips, type StudyTip, type TipTone } from "../study-tips";
@@ -36,6 +37,9 @@ export function StudyTips({ summary }: { summary: ProgressSummary }) {
         cardReviews: s.cardReviews,
       }))
     );
+  // Card ids come from what is published, so counting due cards downloads no
+  // deck (lib/content.ts).
+  const manifest = useContentManifest();
   const c = PROGRESS_COPY[lang];
   // The rolling week ends today, so its last key IS today, as the summary
   // computed it. Re-reading the clock here could disagree across midnight.
@@ -44,9 +48,7 @@ export function StudyTips({ summary }: { summary: ProgressSummary }) {
   // Only cards the student has graded before: a never-seen card is "due" to
   // the scheduler, and counting those would nag a student about a deck they
   // have never opened.
-  const cardsDue = allDueCards(studentCards, cardReviews).filter(
-    (qc) => cardReviews[qc.card.id] !== undefined
-  ).length;
+  const cardsDue = gradedDueCount(manifest, studentCards, cardReviews);
 
   const tips = buildStudyTips({
     summary,

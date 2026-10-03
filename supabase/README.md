@@ -450,8 +450,9 @@ Any admin can save a draft. **Only the owner can publish, hide or import.**
 3. Check it arrived exactly: `npm run check:content -- --live content/fixture.json`
    must say "26 of 26 item(s) published exactly as in the file".
 
-Until step 1b ships, students still see the copy in the code; publishing here
-changes nothing for them yet.
+Since step 1b (3 Oct 2026) students read decks and quizzes ONLY from here: a
+new publish reaches them the next time they open the app. On a new project, do
+steps 1 to 3 before deploying, or every deck and quiz shows as coming soon.
 
 `db:check` lists the three tables but cannot see the functions. Check those with
 a publishable-key-only call to `/rest/v1/rpc/admin_content_list`, which must be

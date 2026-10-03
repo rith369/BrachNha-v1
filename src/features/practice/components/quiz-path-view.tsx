@@ -9,6 +9,7 @@ import {
   ChevronUp
 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
+import type { ContentManifest } from "@/utils/content-manifest";
 import { cn } from "@/utils/cn";
 import { SUBJECT_STYLE } from "@/features/lessons/subject-styles";
 import { SubjectArt } from "@/features/lessons/components/subject-art";
@@ -228,10 +229,17 @@ function QuizJumpList({
   );
 }
 
-export function QuizPathView({ subject }: { subject: SubjectMeta }) {
+export function QuizPathView({
+  subject,
+  manifest,
+}: {
+  subject: SubjectMeta;
+  /** What is published (lib/content.ts): a section links only if its quiz is. */
+  manifest: ContentManifest;
+}) {
   const completedSessions = useBrachNhaStore((s) => s.completedSessions);
   const c = SUBJECT_STYLE[subject.id];
-  const chapters = quizPathFor(subject.id) ?? [];
+  const chapters = quizPathFor(subject.id, manifest) ?? [];
 
   const progress = quizPathProgress(chapters, completedSessions);
   const pct = progress.total

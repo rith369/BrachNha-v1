@@ -15,6 +15,7 @@ import { buildProgressSummary } from "@/features/progress/summary";
 import { SUBJECTS, type SubjectId } from "@/features/lessons/subjects";
 import { chaptersFor, pathProgress } from "@/features/lessons/sessions";
 import { quizPathFor } from "@/features/practice/quiz-path";
+import type { ContentManifest } from "@/utils/content-manifest";
 
 /**
  * The Grade Prediction page, computed from the student's OWN work.
@@ -53,6 +54,9 @@ export interface PredictionInput {
   paperResults: PaperResult[];
   completedSessions: string[];
   userLanguage: string;
+  /** What is published (lib/content.ts): a quiz section counts as playable
+   *  only when its quiz is. */
+  manifest: ContentManifest;
 }
 
 export interface PredictionResult {
@@ -135,14 +139,14 @@ function consistencyUpTo(log: ActivityLog, upTo: string): number {
  * student's. Not windowed by date: `completedSessions` records no dates, so the
  * history points reuse today's figure.
  */
-function lessonCompletion(completed: string[]): number | null {
+function lessonCompletion(completed: string[], manifest: ContentManifest): number | null {
   let done = 0;
   let total = 0;
   for (const { id } of SUBJECTS) {
     const study = pathProgress(chaptersFor(id as SubjectId), completed);
     done += study.done;
     total += study.playable;
-    const quiz = quizPathFor(id as SubjectId);
+    const quiz = quizPathFor(id as SubjectId, manifest);
     if (quiz) {
       const playable = quiz.flatMap((c) =>
         c.lessons.flatMap((l) => l.sessions.filter((s) => s.href))
@@ -221,7 +225,7 @@ export function buildRealPrediction(
   input: PredictionInput,
   today: string
 ): RealPrediction {
-  const completionPct = lessonCompletion(input.completedSessions);
+  const completionPct = lessonCompletion(input.completedSessions, input.manifest);
   const now = snapshot(input, today, completionPct);
   const { subjects } = computeGradePrediction(
     now.performance,
