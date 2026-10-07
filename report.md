@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 7 Oct 2026 — Game Questions Are Khmer Only
 
-Commit: not committed yet. No database step left: the owner ran
+Commit `7ba13dd`. No database step left: the owner ran
 `20261007000002_game_questions_one_language.sql` today, and all 4 pools are now one
 Khmer text per question (checked against the database).
 
