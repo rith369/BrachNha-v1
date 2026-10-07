@@ -14,4 +14,4 @@ commit it shipped in).
 | --- | --- |
 | [admin-roles.md](admin-roles.md) | Step A done (`4540f42`, applied); B done (`68dacec`, applied); C done (`56016bf`, applied). Complete |
 | [content-in-database.md](content-in-database.md) | Stage 1 complete: 1a (`64efc97`), import done, 1b (`5e95715`) |
-| [sections-and-papers-in-database.md](sections-and-papers-in-database.md) | Stages 2 and 3 (lesson sections, past papers) complete: step A, import done (7 Oct), step B. Not committed yet |
+| [sections-and-papers-in-database.md](sections-and-papers-in-database.md) | Stages 2 and 3 (lesson sections, past papers) complete: step A, import done (7 Oct), step B, all in `7c4512a` |

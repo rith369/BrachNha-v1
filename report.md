@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 7 Oct 2026 — Lessons and Past Papers Now Come from the Content Editor (Part 2 of 2)
 
-Commit: not committed yet. No database step: the migration was run and the 7 lesson sections
+Commit `7c4512a` (parts 1 and 2 together). No database step: the migration was run and the 7 lesson sections
 and 2 past papers were imported today (all 9 checked against the database and identical).
 
 **Why.** Part 1 gave lesson sections and past papers an editor, but students still saw the copy
@@ -67,7 +67,7 @@ of the app.
 
 ## 4 Oct 2026 — Lessons and Past Papers Get an Editor Too (Part 1 of 2)
 
-Commit: not committed yet. **Database step needed:** the owner runs
+Commit `7c4512a` (shipped together with part 2). **Database step needed:** the owner runs
 `20261003000002_sections_and_papers.sql` in the Supabase SQL editor, then imports
 `content/sections-papers.json` on Admin → Content with "publish items never published"
 ticked (see `supabase/README.md`). Done on 7 Oct 2026.

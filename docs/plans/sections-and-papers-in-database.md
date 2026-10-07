@@ -1,6 +1,6 @@
 # Stages 2 and 3: lesson sections and past papers move into the database
 
-> **Status: done, not committed yet.** Step A built (4 Oct 2026); the owner applied the
+> **Status: done, in `7c4512a` (steps A and B in one commit).** Step A built (4 Oct 2026); the owner applied the
 > migration and imported the 7 sections and 2 papers (7 Oct 2026, 9 of 9 exact); step B
 > built (7 Oct 2026). See "Step A, as built" and "Step B, as built" at the end for what
 > differs from the plan below.
