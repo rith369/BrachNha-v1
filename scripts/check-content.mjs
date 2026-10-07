@@ -39,7 +39,7 @@ function jsonFilesUnder(dir) {
   });
 }
 
-const LIST_KINDS = new Set(["deck", "quiz"]);
+const LIST_KINDS = new Set(["deck", "quiz", "game"]);
 const OBJECT_KINDS = new Set(["section", "paper"]);
 
 /** Cards or questions; a section's questions; a paper's scored questions and

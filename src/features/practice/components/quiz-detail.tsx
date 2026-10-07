@@ -20,8 +20,8 @@ import { formatKmDate } from "@/utils/khmer-dates";
  *
  * EVERY NUMBER IS DERIVED. The question count comes from the array, the exercise
  * count from the questions' own `help`, and the best score from the history —
- * none of it authored beside the content, which is the rule lessonCountFor()
- * exists to enforce. The reference design's "difficulty" tile is simply absent:
+ * none of it authored beside the content, the app-wide rule for any number
+ * that describes content. The reference design's "difficulty" tile is simply absent:
  * nobody graded these, so there is nothing to put in it.
  */
 export function QuizDetail({

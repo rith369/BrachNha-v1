@@ -172,7 +172,7 @@ export function importantCards(
 
 /**
  * How much of a set of cards the student has actually learned. Derived, never
- * stored — same rule `lessonCountFor()` follows: a stored progress figure
+ * stored — the app-wide rule for counts: a stored progress figure
  * drifts from the review state it claims to describe the first time a card is
  * added, deleted or reset.
  *

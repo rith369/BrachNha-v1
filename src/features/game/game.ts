@@ -1,20 +1,19 @@
-import { GAME_QUESTIONS } from "@/data/game-questions";
-import { GENERATED_EXAM_QUESTIONS } from "@/data/generated-exams";
-import { allSubjects, type SubjectId, type SubjectMeta } from "@/features/lessons/subjects";
+import { allSubjects, type SubjectMeta } from "@/features/lessons/subjects";
 import type {
   Competition,
   CompetitionAttempt,
   ExamQuestion,
   GameDifficulty,
+  GameQuestionBody,
 } from "@/types";
+import { gameCount, type ContentManifest } from "@/utils/content-manifest";
 import type { JoinerAttempt } from "@/lib/competitions";
 import { avatarSeedFor } from "@/utils/avatar-seed";
 
 /**
  * The most questions a match will ask. A CEILING, never a target — a subject
  * with fewer plays what it has, and nothing pads or repeats to reach this
- * number. Padding would invent content, which is the one thing the empty-record
- * discipline in data/game-questions.ts exists to prevent.
+ * number. Padding would invent content.
  */
 export const MATCH_QUESTIONS = 10;
 
@@ -61,42 +60,48 @@ export const DIFFICULTIES: {
 ];
 
 /**
- * A subject's match questions.
+ * A subject's question pool as a Battle uses it. The pools live in the
+ * database (Admin → Content → Game questions, kind `game`, keyed by subject),
+ * so the team fixes a question without a code change; they were
+ * data/game-questions.ts until 7 Oct 2026, with a fallback to the mock-exam
+ * questions for a subject that had none (every such subject has a pool now).
  *
- * THE FALLBACK IS THE ONE JUDGEMENT CALL IN THIS FILE, and deleting one `??`
- * clause reverses it. If GAME_QUESTIONS has questions for the subject, return
- * the full pool so pickQuestions() can filter by difficulty. Otherwise fallback
- * to GENERATED_EXAM_QUESTIONS.
- *
- * An authored GAME_QUESTIONS entry replaces the fallback for that subject
- * wholesale — it is not merged with it.
+ * The stored id is dropped: a Battle FREEZES the questions it drew onto the
+ * competition row (lib/competitions.ts), so an edit to the pool reaches new
+ * Battles only, and nothing downstream reads an id.
  */
-export function gameQuestionsFor(id: SubjectId): ExamQuestion[] {
-  return (
-    GAME_QUESTIONS[id] ??
-    (GENERATED_EXAM_QUESTIONS[id] ?? []).slice(0, MATCH_QUESTIONS)
-  );
+export function toGameQuestions(body: readonly GameQuestionBody[]): ExamQuestion[] {
+  return body.map((g) => ({
+    q: { en: g.q.en, km: g.q.km },
+    options: [...g.options],
+    correct: g.correct,
+    ...(g.difficulty ? { difficulty: g.difficulty } : {}),
+    ...(g.explanation ? { explanation: g.explanation } : {}),
+  }));
 }
 
 export interface GameSubject {
   subject: SubjectMeta;
-  /** Empty means the tile is dimmed and not tappable — playability is DERIVED
-   *  from content existing, never authored beside it. */
-  questions: ExamQuestion[];
+  /** Questions in the subject's published pool. 0 means the tile is dimmed
+   *  and not tappable: playability is DERIVED from content existing. */
+  count: number;
 }
 
 /**
  * One card per subject, built from the catalog rather than from what has
  * content — 7 cards, not 8, since allSubjects() drops the language the student
- * didn't choose.
+ * didn't choose. The counts come from the manifest, so this downloads no pool.
  *
- * Filtering to subjects that HAVE questions would render zero cards today, and
- * zero cards is not a screen. Same reasoning as papersForYear().
+ * Filtering to subjects that HAVE questions could render zero cards, and zero
+ * cards is not a screen. Same reasoning as papersForYear().
  */
-export function gameSubjects(userLanguage: string | undefined): GameSubject[] {
+export function gameSubjects(
+  userLanguage: string | undefined,
+  manifest: ContentManifest
+): GameSubject[] {
   return allSubjects(userLanguage).map((subject) => ({
     subject,
-    questions: gameQuestionsFor(subject.id),
+    count: gameCount(manifest, subject.id),
   }));
 }
 
@@ -112,7 +117,7 @@ export type MatchOutcome = "win" | "loss" | "draw";
 /**
  * DERIVED from the two runs, never stored beside them.
  *
- * Same rule as sessionStatus(), levelForCount() and lessonCountFor(): a status
+ * Same rule as sessionStatus() and levelForCount(): a status
  * kept alongside the numbers it describes is a second copy waiting to disagree
  * with them. (ExamResult.pct is stored and derivable, but it predates the rule —
  * don't propagate it.)
@@ -143,10 +148,8 @@ export function outcomeOf(mine: Run, theirs: Run): MatchOutcome {
  * fixed confetti table and the deleted bot planner both existed to honour.
  *
  * An UNTAGGED question passes every difficulty, and "mix" accepts everything.
- * Today no question carries a difficulty at all, so every filter is a no-op and
- * a competition is a shuffled slice of the subject's pool — the accepted
- * prototype behaviour, not a bug. Tagging content later starts the filter
- * working with no code change here.
+ * The pool is passed in (the subject's published questions, through
+ * toGameQuestions), so this stays pure and downloads nothing.
  *
  * FALLS BACK TO THE UNFILTERED POOL rather than returning nothing when a
  * difficulty matches no question. An empty set would post a competition nobody
@@ -154,11 +157,10 @@ export function outcomeOf(mine: Run, theirs: Run): MatchOutcome {
  * and the create screen cannot know how a future tagged pool is distributed.
  */
 export function pickQuestions(
-  id: SubjectId,
+  pool: readonly ExamQuestion[],
   difficulty: GameDifficulty,
   rand: () => number = Math.random
 ): ExamQuestion[] {
-  const pool = gameQuestionsFor(id);
   const matching =
     difficulty === "mix"
       ? pool

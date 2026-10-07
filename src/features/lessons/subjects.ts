@@ -8,7 +8,6 @@ import {
   Sigma,
   type LucideIcon,
 } from "lucide-react";
-import { LESSONS } from "@/data/lessons";
 import { FOUNDATION_SUBJECTS } from "@/utils/placement";
 import type { UnderlineTab } from "@/components/ui/underline-tabs";
 
@@ -62,7 +61,8 @@ export type SubjectId =
   | "french";
 
 export interface SubjectMeta {
-  /** Matches the LESSONS key, FOUNDATION_SUBJECTS, and the translation keys. */
+  /** Matches FOUNDATION_SUBJECTS, the content keys' first segment and the
+   *  translation keys. */
   id: SubjectId;
   /** Khmer display name. */
   name: string;
@@ -135,18 +135,6 @@ export const SUBJECTS: SubjectMeta[] = [
  * isn't. Replace this with real timings once lesson content lands.
  */
 export const MINUTES_PER_LESSON = 3;
-
-/**
- * How many lessons a subject actually has, counted from LESSONS rather than
- * authored alongside it. The card's number therefore cannot drift from the
- * content it describes — the same reason levelForCount() replaced a
- * hand-authored level in utils/activity-heatmap.ts.
- *
- * Most subjects return 0 today. That is the empty state, not a bug.
- */
-export function lessonCountFor(subjectId: string): number {
-  return Object.keys(LESSONS[subjectId] ?? {}).length;
-}
 
 /**
  * The two tabs. Foundation is derived from FOUNDATION_SUBJECTS (already exactly

@@ -17,6 +17,8 @@ import {
 import type { Tasks } from "@/types";
 import { PLEDGE_COPY } from "@/features/commitment/copy";
 import { CommitmentBanner } from "./commitment-banner";
+import { useContentManifest } from "@/lib/content";
+import { subjectHasSections } from "@/utils/content-manifest";
 
 function PathConnector({ flip }: { flip: boolean }) {
   return (
@@ -107,6 +109,7 @@ export function RoadmapView() {
   );
   const t = useT(lang);
   const navigate = useNavigate();
+  const manifest = useContentManifest();
 
   // Nothing in the survey books a placement test any more, so this is only ever
   // non-empty for an account that scheduled one before that changed. Undated
@@ -124,7 +127,8 @@ export function RoadmapView() {
     userData.weaknesses,
     monthsLeft,
     (s) => t[s as TranslationKey] ?? s,
-    lang
+    lang,
+    (s) => subjectHasSections(manifest, s)
   );
 
   const mission = computeDailyMission(userData.grade, monthsLeft);

@@ -20,13 +20,10 @@ import { pastPaperCard } from "@/features/exam/papers";
  * (lib/content.ts), which carries each deck's card ids, so Home downloads no
  * lesson to draw this card. So writing new content adds it to Home with no
  * edit here, and Home can never point at something that is not written — the
- * rule lessonCountFor() and sectionsFor()'s `href` already follow.
+ * rule sectionsFor()'s `href` already follows.
  *
- * The legacy 7-step lessons (data/lessons.ts — biology-body, math-limits…) are
- * deliberately NOT in it. They are the old content this card used to list by
- * hand; they stay reachable by URL, the way the Study path already treats them.
- * That is also why a section only counts with a /sections/ href: chaptersFor()'s
- * derived fallback gives the legacy lessons /lessons/ hrefs.
+ * The old 7-step lessons this card used to list by hand were deleted on 7 Oct
+ * 2026; a section counts only with a /sections/ href.
  */
 
 export type StudyKind = "section" | "flashcards" | "quiz" | "paper";

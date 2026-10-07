@@ -49,7 +49,7 @@ type Step =
  * ExamQuestion[] and still serves every generated paper unchanged; a paper has
  * sections, a passage, a word bank, a clock and an unmarkable essay, and one
  * component serving both shapes would be a fork down the middle of every step —
- * the same call SectionDetail makes against lesson-detail.tsx. WHAT IS SHARED IS
+ * the same call SectionDetail made against the old 7-step lesson screen. WHAT IS SHARED IS
  * THE FRAME: FocusLayout/FocusButton and the utils/focus-styles.ts ladder, which
  * exist precisely so the task screens cannot drift.
  *

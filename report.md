@@ -15,6 +15,70 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 7 Oct 2026 — Game Questions Get an Editor Too
+
+Commit: not committed yet. No database step left: the owner ran
+`20261007000001_game_questions.sql` and imported the 4 question pools today (all 4 checked
+against the database and identical).
+
+**Why.** The 120 questions the Game (Battle) picks from were written into the app's code, so
+fixing a typo in one needed a developer and a new version of the app. Now they are on Admin →
+Content like everything else.
+
+**What changed for the team (Admin → Content):**
+
+- **A fifth tab: Game questions.** One pool per subject (maths, history, chemistry and biology
+  have 30 questions each today). Each question has its English and Khmer wording, the options,
+  the right answer, an explanation and a level (Basic, Medium or Hard). Save a draft (anyone on
+  the team), publish (the owner only), every old version kept, Restore as draft to undo.
+- **New** can start a pool for a subject that has none yet, such as physics.
+- The same checks as everywhere else, on both languages: broken maths, Khmer numerals, long
+  dashes, a right answer missing from the options, answers bunched on one letter.
+
+**What changed for students:**
+
+- **Nothing they will notice.** Creating a game looks and works as before: the same subjects
+  have questions, and the level they pick still chooses the questions.
+- **A fix reaches new games only.** A game keeps the questions it started with, so nobody's
+  game changes while it is being played, and every joiner still answers exactly what the
+  creator answered.
+- Creating a game now downloads only the chosen subject's questions, a moment before Start.
+  The first time needs a connection; with none, the screen says so and offers Try again.
+
+**What to re-test (after the database step and the deploy):**
+
+- create a game in maths at Hard: the questions are hard ones;
+- create one in history in English: the questions show their English wording;
+- edit a game question on Admin → Content and publish, then create a new game: the change
+  shows; a game created before the edit keeps the old question.
+
+## 7 Oct 2026 — The Old Starter Lessons Are Removed
+
+Commit: not committed yet. No database step.
+
+**Why.** The app still carried six lessons from its very first version: Basic Limits and
+Basic Probability (maths), Human Body and Human Brain (biology), and a maths and a biology
+"foundation" lesson. The new lesson sections on the Study path had replaced them, and no
+screen linked to them any more, so they could only be opened by typing their address. They
+were also the last lessons that could only be changed in the code.
+
+**What changed for students:**
+
+- **Nothing they normally see.** The Study page, every subject path, the lesson sections and
+  the roadmap look and work as before.
+- **An old saved link to one of those lessons now opens the Study page** instead.
+- **The 3D brain model is still in the app**, in biology section 3.1.1.
+- The app opens very slightly faster (about 7 KB less to download first).
+- KruAI no longer reads those old lessons, so it only points students to content they can
+  actually find in the app.
+
+**What to re-test:**
+
+- open the Study page: maths opens from the first tab, biology from the second;
+- open biology section 3.1.1 and check the 3D brain still appears;
+- on the roadmap, a month for a weak subject that has lessons (biology, maths) opens the
+  Study page; one for a subject without lessons says it is coming soon.
+
 ## 7 Oct 2026 — Lessons and Past Papers Now Come from the Content Editor (Part 2 of 2)
 
 Commit `7c4512a` (parts 1 and 2 together). No database step: the migration was run and the 7 lesson sections

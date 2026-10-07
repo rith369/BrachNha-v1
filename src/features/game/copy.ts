@@ -62,6 +62,8 @@ export const GAME_COPY = {
     startPlaying: "Start playing",
     comingSoon: "Coming soon",
     noQuestions: "No subject has questions yet.",
+    loadingQuestions: "Getting the questions…",
+    questionsOffline: "The questions need the internet the first time. Connect and try again.",
     // Run
     saving: "Saving…",
     // Posted
@@ -202,6 +204,8 @@ export const GAME_COPY = {
     startPlaying: "ចាប់ផ្តើមលេង",
     comingSoon: "ឆាប់ៗនេះ",
     noQuestions: "មិនទាន់មានសំណួរសម្រាប់មុខវិជ្ជាណាមួយនៅឡើយទេ។",
+    loadingQuestions: "កំពុងទាញយកសំណួរ…",
+    questionsOffline: "សំណួរត្រូវការអ៊ីនធឺណិតនៅលើកដំបូង។ សូមភ្ជាប់ ហើយព្យាយាមម្តងទៀត។",
     saving: "កំពុងរក្សាទុក…",
     posted: "បានបង្កើតការប្រកួត!",
     yourScore: "ពិន្ទុរបស់អ្នក",

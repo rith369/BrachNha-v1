@@ -3,6 +3,7 @@ import type {
   ContentKind,
   DeckCardBody,
   DrillQuestion,
+  GameQuestionBody,
   PaperBody,
   PaperGapBody,
   PaperQuestionBody,
@@ -45,7 +46,8 @@ export function newCardId(key: string, body: DeckCardBody[], usedIds: string[]):
   return `${key}-${nextNumber([...body.map((c) => c.id), ...usedIds], pattern)}`;
 }
 
-export function newQuestionId(body: QuizQuestionBody[], usedIds: string[]): string {
+/** A quiz question's or a Battle question's id: "q" and the next number. */
+export function newQuestionId(body: readonly { id: string }[], usedIds: string[]): string {
   return `q${nextNumber([...body.map((q) => q.id), ...usedIds], /^q(\d+)$/)}`;
 }
 
@@ -102,6 +104,18 @@ export function newPaperItemId(body: PaperBody, part: PaperSectionBody, usedIds:
 }
 
 const EMPTY_BLOCK = (): SectionBlock => ({ items: [] });
+
+/** A new Battle question: lettered options and no difficulty yet (an
+ *  untagged question is offered under every difficulty). */
+export function emptyGameQuestion(id: string): GameQuestionBody {
+  return {
+    id,
+    q: { en: "", km: "" },
+    options: ["ក. ", "ខ. ", "គ. ", "ឃ. "],
+    correct: "",
+    explanation: "",
+  };
+}
 
 /** A new section starts with its title from the curriculum and empty blocks. */
 export function emptySection(title: string): SectionBody {
@@ -281,6 +295,15 @@ export function tidyBody(kind: ContentKind, body: AnyBody): AnyBody {
       return tidySection(body as SectionBody);
     case "paper":
       return tidyPaper(body as PaperBody);
+    case "game":
+      return (body as GameQuestionBody[]).map((g) => ({
+        id: g.id,
+        q: { en: g.q.en, km: g.q.km },
+        options: g.options,
+        correct: g.correct,
+        ...(g.difficulty ? { difficulty: g.difficulty } : {}),
+        explanation: g.explanation,
+      }));
   }
 }
 

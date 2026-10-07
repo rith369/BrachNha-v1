@@ -574,7 +574,6 @@ function cleanScreen(value: unknown): ScreenRef {
   const raw = value as Record<string, unknown>;
   return {
     sectionId: screenId(raw.sectionId),
-    lessonId: screenId(raw.lessonId),
     subjectId: screenId(raw.subjectId),
     practiceKey: screenId(raw.practiceKey),
   };

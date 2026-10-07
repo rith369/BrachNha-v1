@@ -6,8 +6,9 @@ import { quizPathShape } from "@/features/practice/quiz-path";
 import type { ContentKind } from "@/types";
 
 /**
- * Every place a deck, quiz, lesson section or past paper can live, named the
- * way the app names it, for the content editor (/admin/content).
+ * Every place a deck, quiz, lesson section, past paper or Battle question pool
+ * can live, named the way the app names it, for the content editor
+ * (/admin/content).
  *
  * THE SLOTS COME FROM THE SAME CURRICULUM THE APP RENDERS: chaptersShape() for
  * the Study and flashcard lessons, quizPathShape() for the Bac II quiz paths.
@@ -88,8 +89,8 @@ function quizSlots(): ContentSlot[] {
   });
 }
 
-/** Every node on an authored Study path (chapter, lesson, section). A path
- *  derived from the legacy lessons has no such ids, so it offers nothing. */
+/** Every node on an authored Study path (chapter, lesson, section). A subject
+ *  with no authored path has only placeholders, so it offers nothing. */
 function sectionSlots(): ContentSlot[] {
   return SUBJECTS.flatMap((meta) =>
     chaptersShape(meta.id).flatMap((chapter) =>
@@ -125,6 +126,17 @@ function paperSlots(): ContentSlot[] {
   );
 }
 
+/** One Battle pool per subject: a Battle is one subject end to end. */
+function gameSlots(): ContentSlot[] {
+  return SUBJECTS.map((meta) => ({
+    kind: "game" as const,
+    key: meta.id,
+    subject: meta.id,
+    title: meta.name,
+    link: "/game/create",
+  }));
+}
+
 export function contentSlots(kind: ContentKind): ContentSlot[] {
   switch (kind) {
     case "deck":
@@ -135,6 +147,8 @@ export function contentSlots(kind: ContentKind): ContentSlot[] {
       return sectionSlots();
     case "paper":
       return paperSlots();
+    case "game":
+      return gameSlots();
   }
 }
 
@@ -146,6 +160,16 @@ export function contentSlots(kind: ContentKind): ContentSlot[] {
 export function slotFor(kind: ContentKind, key: string): ContentSlot {
   const found = contentSlots(kind).find((s) => s.key === key);
   if (found) return found;
+  if (kind === "game") {
+    const subject = findSubject(key);
+    return {
+      kind,
+      key,
+      subject: (subject?.id ?? "math") as SubjectId,
+      title: subject?.name ?? key,
+      link: "/game/create",
+    };
+  }
   if (kind === "paper") {
     const [year, subjectId = ""] = key.split("-");
     const subject = findSubject(subjectId);

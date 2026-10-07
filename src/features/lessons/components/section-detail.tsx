@@ -35,8 +35,7 @@ import { useFocusScrollTop } from "@/hooks/use-focus-scroll-top";
 
 // three.js + react-three-fiber + drei is a large dependency needed only by the
 // sections that carry a model. Behind React.lazy so it downloads on opening one
-// of those, not on every section — the same boundary lesson-detail.tsx uses, and
-// the same chunk, since both point at this module.
+// of those, not on every section.
 const BrainModelViewer = lazy(() =>
   import("./brain-model-viewer").then((m) => ({ default: m.BrainModelViewer }))
 );
@@ -70,11 +69,9 @@ const BrainModelViewer = lazy(() =>
  * NO EMOJI anywhere in here: headings take Lucide icons, the same swap the rest
  * of the app made because emoji render differently on every handset.
  *
- * Deliberately SEPARATE from lesson-detail.tsx rather than a branch inside it.
- * That component runs the older content/summary/funFact/tip/didYouKnow shape for
- * the two legacy lessons; this one runs the curriculum shape every future
- * section uses. One component doing both would be a permanent fork down the
- * middle of every step.
+ * It was built SEPARATE from the old 7-step lesson screen (deleted 7 Oct 2026)
+ * rather than as a branch inside it: one component running both shapes would
+ * have been a permanent fork down the middle of every step.
  *
  * What it does NOT re-invent: the task frame. FocusLayout, FocusButton and the
  * focus-styles size ladder are shared with the lesson flow, the mock exam and

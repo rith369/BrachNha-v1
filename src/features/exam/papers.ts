@@ -90,8 +90,8 @@ export interface PastPaper extends ExamPaper {
  *
  * DERIVED, never authored beside the sections. The card's readiness rule, the
  * results screen's total and the content log all count this array, so a paper
- * cannot show "7 questions" while holding 6 — the same discipline
- * `lessonCountFor()` enforces on the Study page.
+ * cannot show "7 questions" while holding 6 — the same discipline the Study
+ * page's lesson counts follow.
  *
  * A gap-fill section contributes its answerable gaps as questions whose options
  * are the whole word bank: that is exactly what a student picks from, and it

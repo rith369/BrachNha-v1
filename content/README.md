@@ -1,9 +1,9 @@
 # Content: how to write it
 
-Flashcard decks, practice quizzes, lesson sections and past papers live in the
-**database**, not in the code (decks and quizzes since 3 Oct 2026,
-`docs/plans/content-in-database.md`; sections and papers since 7 Oct 2026,
-`docs/plans/sections-and-papers-in-database.md`). The team edits everything on
+Flashcard decks, practice quizzes, lesson sections, past papers and the game
+questions live in the **database**, not in the code (decks and quizzes since 3 Oct
+2026, `docs/plans/content-in-database.md`; sections and papers since 7 Oct 2026,
+`docs/plans/sections-and-papers-in-database.md`; the game questions the same day). The team edits everything on
 **Admin → Content** and only the owner publishes. This folder holds content as
 JSON files on their way in, plus `fixture.json`.
 
@@ -11,11 +11,11 @@ JSON files on their way in, plus `fixture.json`.
 
 | file | what it is |
 | --- | --- |
-| `fixture.json` | A copy of everything published (17 decks, 9 quizzes, 7 lesson sections, 2 past papers on 7 Oct 2026). It is the content a development server shows when Supabase is not configured, and what a NEW project is filled from. `npm run content:export` refreshes it from what is published now. |
+| `fixture.json` | A copy of everything published (17 decks, 9 quizzes, 7 lesson sections, 2 past papers and 4 game question pools on 7 Oct 2026). It is the content a development server shows when Supabase is not configured, and what a NEW project is filled from. `npm run content:export` refreshes it from what is published now. |
 | `new/*.json` | New content waiting to be imported (a new past paper arrives this way). Delete each file once its content is published: the database is the only copy. |
 
-A file is `{ "format": 1, "items": [ { "kind": "deck" | "quiz" | "section" | "paper", "key": "...", "body": ... } ] }`.
-A deck's or a quiz's body is a list; a section's or a paper's is an object.
+A file is `{ "format": 1, "items": [ { "kind": "deck" | "quiz" | "section" | "paper" | "game", "key": "...", "body": ... } ] }`.
+A deck's, a quiz's or a game pool's body is a list; a section's or a paper's is an object.
 
 ## Adding content
 
@@ -32,7 +32,8 @@ A deck's or a quiz's body is a list; a section's or a paper's is an object.
   `"{subject}-{chapter}-{lesson}"` for a deck (`biology-1-1`),
   `"{subject}-{chapter}-{lesson}-{section}"` for a quiz on a quiz path
   (`math-1-1-1`) and for a lesson section (`biology-3-1-1`, the node on the
-  Study path), and `"{year}-{subject}"` for a past paper (`2025-math`). New
+  Study path), `"{year}-{subject}"` for a past paper (`2025-math`), and the
+  subject alone for a game question pool (`math`). New
   on Admin → Content only offers keys a student can reach.
 - **A card id is kept for ever** (`biology-1-1-3`). Each student's review
   history is filed under it, so an id is never changed and never given to

@@ -46,7 +46,7 @@ type Posted = RunResult & { shared: boolean; competitionId: string | null };
  * render — Math.random() in a render body is the purity violation the React
  * Compiler may memoise around. They are then frozen onto the Competition, which
  * is what guarantees a joiner answers exactly what the creator answered even
- * after data/game-questions.ts is edited.
+ * after the subject's question pool is edited on Admin → Content.
  *
  * THE LOCAL WRITE HAPPENS FIRST AND UNCONDITIONALLY. Publishing to the server
  * can fail — offline, unconfigured, a signed-out session — and if it does the
@@ -195,12 +195,12 @@ export default function GameCreatePage() {
 
   return (
     <CreateForm
-      onStart={({ subjectId, difficulty, minutes }) =>
+      onStart={({ subjectId, difficulty, minutes, pool }) =>
         setDraft({
           subjectId,
           difficulty,
           minutes,
-          questions: pickQuestions(subjectId, difficulty),
+          questions: pickQuestions(pool, difficulty),
         })
       }
       onExit={exit}

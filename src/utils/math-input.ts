@@ -35,10 +35,8 @@ export function applyInsert(
  *
  * The overlay is global — `chatOpen` is a bare boolean in the store and the FAB
  * renders on every page — so the route is the only honest signal of what the
- * student was looking at. Lesson ids are `<subject>-<topic>` (see
- * getLessonData in features/lessons/components/lesson-detail.tsx) and section
- * ids are `<subject>-<chapter>-<lesson>-<n>`, so the subject is the first
- * segment of both and one regex covers the two routes.
+ * student was looking at. Section ids are `<subject>-<chapter>-<lesson>-<n>`,
+ * so the subject is the first segment of the id.
  *
  * These are MathLive's stock layout names, so the mapping is coarser than the
  * five hand-built tabs it replaces: physics and chemistry both want Greek
@@ -54,16 +52,16 @@ export function defaultMathLayout(pathname: string | null): VirtualKeyboardName 
  * The subject a route is about, or null.
  *
  * TWO PATTERNS, because the subject sits in a different place in each. On a
- * lesson or section it is the first id segment (`biology-brain`,
- * `biology-3-1-1`); on a practice route the mode comes first, so the subject is
- * its own third segment (`/practice/quiz/physics/1-1`).
+ * section it is the first id segment (`biology-3-1-1`); on a practice route
+ * the mode comes first, so the subject is its own third segment
+ * (`/practice/quiz/physics/1-1`).
  */
 function subjectFromPath(pathname: string | null): string | null {
   const practice = pathname?.match(/^\/practice\/[^/?#]+\/([^/?#]+)/);
   if (practice) return decodeURIComponent(practice[1]);
 
-  const lesson = pathname?.match(/^\/(?:lessons|sections)\/([^/?#]+)/);
-  if (lesson) return decodeURIComponent(lesson[1]).split("-")[0];
+  const section = pathname?.match(/^\/sections\/([^/?#]+)/);
+  if (section) return decodeURIComponent(section[1]).split("-")[0];
 
   return null;
 }

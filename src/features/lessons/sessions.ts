@@ -1,4 +1,3 @@
-import { LESSONS } from "@/data/lessons";
 import { sectionPublished, type ContentManifest } from "@/utils/content-manifest";
 import type { SubjectId, SubjectTab } from "./subjects";
 
@@ -146,7 +145,7 @@ const PLACEHOLDER_SECTIONS = ["ផ្នែកទី 1", "ផ្នែកទី 
  *
  * Ids and labels are GENERATED from position rather than typed out, so a
  * "3.1.4" on screen cannot drift from where the node actually sits — the same
- * reason lessonCountFor() counts LESSONS instead of being authored beside it.
+ * reason a count on screen is derived from content rather than authored.
  * Labels use Arabic digits to match the numbering printed in the textbook.
  *
  * `tail` defaults to LESSON_TAIL (the usual កំហុស/សេចក្តីសង្ខេប/តេស្ត three), but
@@ -201,9 +200,9 @@ function sectionsFor(
  * pending, and its banner shows "ជំពូក 2" alone until they arrive.
  *
  * Every section is locked because no content is written behind any of them yet.
- * Note this REPLACES the derived fallback below, so biology-body and
- * biology-brain no longer appear on the path. Both remain reachable at
- * /lessons/biology-body and /lessons/biology-brain.
+ * Note this REPLACES the derived fallback below. (That fallback once listed
+ * the old 7-step lessons biology-body and biology-brain; they were deleted on
+ * 7 Oct 2026, and the brain's 3D model lives on in section 3.1.1.)
  */
 export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
   math: [
@@ -569,30 +568,20 @@ const DEFAULT_CHAPTER = 1;
  * authored section linked. For the callers that only need what a lesson is
  * called (the practice lesson list, a runner's title, the admin's places).
  *
- * Falls back to a DERIVED path when nothing is authored: one session per lesson
- * that genuinely exists in data/lessons.ts, followed by locked placeholders,
- * wrapped in a single chapter and a single lesson so the shape matches. Derived
- * rather than authored for the same reason lessonCountFor() is — a number on
- * screen can then never claim content the app does not have. Those legacy
- * lessons are still in code, so their /lessons/ links are part of the shape.
+ * Falls back to locked placeholders when nothing is authored, wrapped in a
+ * single chapter and a single lesson so the shape matches. A subject with no
+ * authored path has no content to link: the old 7-step lessons this fallback
+ * used to list (data/lessons.ts) were deleted on 7 Oct 2026.
  */
 export function chaptersShape(subjectId: SubjectId): Chapter[] {
   const authored = SUBJECT_SESSIONS[subjectId];
   if (authored?.length) return authored;
 
-  const topics = Object.keys(LESSONS[subjectId] ?? {});
-  const real: Session[] = topics.map((topic, i) => ({
-    id: `${subjectId}-${topic}`,
-    label: `${DEFAULT_CHAPTER}.${i + 1}`,
-    title: LESSONS[subjectId][topic].title.km,
-    href: `/lessons/${subjectId}-${topic}`,
-  }));
-
   const locked: Session[] = Array.from(
     { length: PLACEHOLDER_SESSIONS },
     (_, i) => ({
       id: `${subjectId}-soon-${i + 1}`,
-      label: `${DEFAULT_CHAPTER}.${real.length + i + 1}`,
+      label: `${DEFAULT_CHAPTER}.${i + 1}`,
       title: "ឆាប់ៗនេះ",
       href: null,
     })
@@ -606,7 +595,7 @@ export function chaptersShape(subjectId: SubjectId): Chapter[] {
         {
           number: 1,
           title: "",
-          sessions: [...real, ...locked],
+          sessions: locked,
         },
       ],
     },

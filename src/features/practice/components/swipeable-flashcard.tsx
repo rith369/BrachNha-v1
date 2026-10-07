@@ -72,7 +72,7 @@ const FLYOFF_MS = 220;
  * (`translateX` + a slight `rotate` — the same "card being flicked" tilt
  * Tinder/Quizlet both use), and an inner wrapper carries the existing flip
  * (`rotateY` in its own `perspective` container — the same technique
- * lesson-detail.tsx's step 2 uses, deliberately on a SEPARATE element from the
+ * the old 7-step lesson screen's flashcard step used, deliberately on a SEPARATE element from the
  * drag transform rather than sharing one). CSS transforms compose through the
  * DOM, so a card can be mid-flip AND mid-drag at once with no special-casing —
  * matching "they always can flip always."

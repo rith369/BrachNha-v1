@@ -1,5 +1,5 @@
-// Downloads every PUBLISHED deck, quiz, lesson section and past paper into
-// content/fixture.json.
+// Downloads every PUBLISHED deck, quiz, lesson section, past paper and game
+// question pool into content/fixture.json.
 //
 //   npm run content:export
 //
@@ -11,7 +11,8 @@
 // The code copies this script once exported from are gone: decks and quizzes
 // moved into the database on 3 Oct 2026 (docs/plans/content-in-database.md),
 // lesson sections and past papers on 7 Oct 2026
-// (docs/plans/sections-and-papers-in-database.md). The database is the only copy.
+// (docs/plans/sections-and-papers-in-database.md), the game questions on 7 Oct
+// 2026 too. The database is the only copy.
 //
 // Reads with the publishable key from .env (content_current, which anyone may
 // call), checks every item with src/utils/content-check.ts, and refuses to
@@ -23,7 +24,7 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const outFile = path.join(root, "content", "fixture.json");
-const KINDS = ["deck", "quiz", "section", "paper"];
+const KINDS = ["deck", "quiz", "section", "paper", "game"];
 
 function env(name) {
   if (process.env[name]) return process.env[name].trim();

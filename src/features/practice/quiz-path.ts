@@ -64,7 +64,7 @@ const SECTIONS_PER_LESSON = 6;
  * it is only ever the progress identity.
  *
  * **PLAYABILITY IS DERIVED, never authored beside the node** — the rule
- * sectionsFor() and lessonCountFor() both exist to enforce. The STRUCTURE built
+ * sectionsFor() exists to enforce. The STRUCTURE built
  * here has no links at all; quizPathFor() adds one to every section the
  * manifest says is published (lib/content.ts), so publishing a quiz under
  * "math-1-3-2" on /admin/content turns that one node into a real <Link> with no

@@ -10,15 +10,12 @@
  * See use-focus-mode.ts, which ORs the two together.
  */
 export function isFocusRoute(pathname: string): boolean {
-  // startsWith("/lessons/") and NOT "/lessons": the lessons LIST is an ordinary
-  // page and must keep its nav. Only a lesson with an id is a task.
-  //
-  // "/sections/" is the same kind of thing one level down — one section of the
-  // real curriculum, run by SectionDetail. Note "/subjects/" is deliberately NOT
-  // here: a subject path is where a student CHOOSES what to do, so it keeps its
-  // navigation.
+  // "/sections/" is one section of the real curriculum, run by SectionDetail.
+  // (The old 7-step lessons at "/lessons/:id" were here too until 7 Oct 2026;
+  // that path only redirects to the Study page now.) Note "/subjects/" is
+  // deliberately NOT here: a subject path is where a student CHOOSES what to
+  // do, so it keeps its navigation.
   return (
-    pathname.startsWith("/lessons/") ||
     pathname.startsWith("/sections/") ||
     pathname === "/practice/review" ||
     isPracticeRunRoute(pathname) ||
@@ -162,7 +159,6 @@ export function isAssessmentRoute(pathname: string): boolean {
  */
 export function isStudyRoute(pathname: string): boolean {
   return (
-    pathname.startsWith("/lessons/") ||
     pathname.startsWith("/sections/") ||
     pathname === "/practice/review" ||
     isPracticeRunRoute(pathname) ||

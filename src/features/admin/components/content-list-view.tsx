@@ -319,7 +319,7 @@ export function ContentListView() {
       <p className="mb-4 text-xs font-semibold text-muted">{c.blurb}</p>
 
       <UnderlineTabs
-        // Four tabs at 320px: a long Khmer label wraps inside its own tab
+        // Five tabs at 320px: a long Khmer label wraps inside its own tab
         // rather than pushing the row past the screen, and below 360px the
         // labels drop a size so "Flashcard" is not broken mid-word.
         className="[&>button]:min-w-0 [&>button]:px-1 [&>button]:text-xs [&>button]:[overflow-wrap:anywhere] min-[360px]:[&>button]:text-sm md:[&>button]:text-base"
@@ -328,6 +328,7 @@ export function ContentListView() {
           { id: "deck", label: c.tabs.deck },
           { id: "section", label: c.tabs.section },
           { id: "paper", label: c.tabs.paper },
+          { id: "game", label: c.tabs.game },
         ]}
         value={kind}
         onChange={(k) => {

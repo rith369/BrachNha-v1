@@ -39,7 +39,7 @@ export function SectionBlockBody({ block }: { block: SectionBlock }) {
       {block.intro && (
         // whitespace-pre-line so paragraphs written as paragraphs survive —
         // HTML collapses newlines, which is what turned the long brain lesson
-        // into one unreadable run-on block before lesson-detail.tsx got this.
+        // into one unreadable run-on block before the old lesson screen got this.
         <div className={`mb-3 whitespace-pre-line ${focusBody}`}>
           <MathText text={block.intro} />
         </div>

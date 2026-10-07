@@ -18,9 +18,9 @@ import { SHOW_SOLUTION_KM } from "./kruai-phrases.js";
  *     MoEYS paper or answer key.
  *
  * The two seed examples below are written in the target format but are NOT
- * teacher-verified yet — they are drawn from the app's own math/biology lesson
- * content (data/lessons.ts) so the bot at least stays consistent with what the
- * student sees elsewhere in the app.
+ * teacher-verified yet — they were drawn from the app's own math/biology lesson
+ * content (the old 7-step lessons, since deleted) so the bot stays consistent
+ * with what students were shown.
  *
  * EVERY LaTeX BACKSLASH IN THIS FILE IS DOUBLED, AND MUST STAY THAT WAY. These
  * are JavaScript template literals, so `\frac` is not a backslash and "frac" —

@@ -147,7 +147,7 @@ export interface PracticeLesson {
  * bug — it fills in by itself the moment a curriculum is entered.
  *
  * `count` is READ FROM WHAT IS PUBLISHED (the manifest, lib/content.ts) rather
- * than authored beside it, the rule lessonCountFor() exists to enforce: a row
+ * than authored beside it, the app-wide rule for counts: a row
  * cannot claim a deck the app does not have, and playability is derived from
  * the same number.
  */

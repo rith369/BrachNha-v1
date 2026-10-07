@@ -18,6 +18,7 @@ import { checkContent, type ContentIssue } from "@/utils/content-check";
 import type {
   ContentKind,
   DeckCardBody,
+  GameQuestionBody,
   Lang,
   PaperBody,
   QuizQuestionBody,
@@ -31,6 +32,7 @@ import { CONTENT_COPY, fieldLabel, locationLabel } from "../content-copy";
 import { slotFor } from "../content-slots";
 import {
   emptyBody,
+  emptyGameQuestion,
   emptyQuestion,
   moveItem,
   newCardId,
@@ -38,7 +40,7 @@ import {
   sameBody,
   tidyBody,
 } from "../content-edit";
-import { CardEditor, QuestionEditor } from "./content-item-editors";
+import { CardEditor, GameQuestionEditor, QuestionEditor } from "./content-item-editors";
 import { PaperEditor } from "./paper-editor";
 import { SectionEditor } from "./section-editor";
 
@@ -322,7 +324,7 @@ export function ContentEditorView({
   }
 
   function jumpTo(index: number) {
-    const item = (body as DeckCardBody[] | QuizQuestionBody[])[index];
+    const item = (body as { id: string }[])[index];
     if (!item) return;
     setOpen(item.id);
     requestAnimationFrame(() =>
@@ -390,6 +392,11 @@ export function ContentEditorView({
     if (kind === "deck") {
       const cards = body as DeckCardBody[];
       setBody([...cards, { id: newCardId(contentKey, cards, usedIds), front: "", back: "" }]);
+    } else if (kind === "game") {
+      const questions = body as GameQuestionBody[];
+      const id = newQuestionId(questions, usedIds);
+      setBody([...questions, emptyGameQuestion(id)]);
+      setOpen(id);
     } else {
       const questions = body as QuizQuestionBody[];
       const id = newQuestionId(questions, usedIds);
@@ -442,7 +449,7 @@ export function ContentEditorView({
   }
 
   const warnings = issues.length - errorCount;
-  const isList = kind === "deck" || kind === "quiz";
+  const isList = kind === "deck" || kind === "quiz" || kind === "game";
 
   return (
     <>
@@ -529,6 +536,29 @@ export function ContentEditorView({
           onToggle={toggle}
           onChange={setBody}
         />
+      ) : kind === "game" ? (
+        <>
+          <p className="mb-3 flex items-start gap-1.5 text-xs font-semibold text-muted">
+            <span>{c.tips.gamePool}</span>
+          </p>
+          <ol className="flex flex-col gap-3">
+            {(body as GameQuestionBody[]).map((question, i, questions) => (
+              <GameQuestionEditor
+                key={question.id}
+                question={question}
+                index={i}
+                count={questions.length}
+                issues={byItem.get(i) ?? []}
+                open={open === question.id}
+                lang={lang}
+                onToggle={() => toggle(question.id)}
+                onChange={(next) => setBody(questions.map((x, j) => (j === i ? next : x)))}
+                onMove={(d) => setBody(moveItem(questions, i, d))}
+                onRemove={() => setBody(questions.filter((_, j) => j !== i))}
+              />
+            ))}
+          </ol>
+        </>
       ) : kind === "deck" ? (
         <ol className="flex flex-col gap-3">
           {(body as DeckCardBody[]).map((card, i, cards) => (

@@ -53,7 +53,6 @@ const VIEWPORTS = [
 const ROUTES = [
   { name: "home", path: "/" },
   { name: "lessons", path: "/lessons" },
-  { name: "lesson-detail", path: "/lessons/math-limits" },
   { name: "subject-path", path: "/subjects/biology" },
   { name: "section-detail", path: "/sections/biology-3-1-1" },
   { name: "practice", path: "/practice" },
@@ -101,15 +100,6 @@ const ROUTES = [
 
 
   // ── focus mode: nav must be gone on all of these ──
-  // Scoped to `button:has-text`, NOT a bare `text=`: on the lesson intro the
-  // title and the CTA share the same words, and a bare text selector picks the
-  // heading (a div), so the click silently does nothing and the shot is of the
-  // intro screen.
-  {
-    name: "focus-lesson-content",
-    path: "/lessons/math-limits",
-    clicks: ['button:has-text("Start Learning")'],
-  },
   // The 2025 English paper's own screen: what the paper is, and its history.
   // A real route, so no click chain — tapping its card on /exam/subjects lands
   // exactly here rather than starting the exam.

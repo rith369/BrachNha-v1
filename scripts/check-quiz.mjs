@@ -1,7 +1,9 @@
-// Content check for the game questions, the last question content still
-// written in code — the things tsc and oxlint cannot see. (Flashcards, practice
-// quizzes, lesson sections and past papers live in the database;
-// `npm run check:content` checks those, with the same rules.)
+// Content check for the mock-exam questions (data/questions.ts, MOCK_QS), the
+// last question content still written in code: the generated papers on the
+// exam tab, the placement test and KruAI's catalog read them. The things tsc and
+// oxlint cannot see. (Flashcards, practice quizzes, lesson sections, past papers
+// and the game questions live in the database; `npm run check:content` checks
+// those, with the same rules.)
 //
 //   npm run check:quiz
 //
@@ -134,28 +136,28 @@ const server = await createServer({
 try {
   const { splitMath } = await server.ssrLoadModule("/src/utils/math-render.ts");
 
-  // Practice quizzes, flashcard decks, lesson sections and past papers are not
-  // here any more: they live in the database (docs/plans/content-in-database.md,
+  // Practice quizzes, flashcard decks, lesson sections, past papers and the
+  // game questions are not here any more: they live in the database
+  // (docs/plans/content-in-database.md,
   // docs/plans/sections-and-papers-in-database.md) and are checked with the
   // same rules by the editor and by `npm run check:content`.
 
-  // ── game match questions ────────────────────────────────────────────────
-  const { GAME_QUESTIONS } = await server.ssrLoadModule("/src/data/game-questions.ts");
-  const gameKeys = Object.keys(GAME_QUESTIONS);
-  let gameQuestions = 0;
+  // ── mock-exam questions ─────────────────────────────────────────────────
+  const { MOCK_QS } = await server.ssrLoadModule("/src/data/questions.ts");
+  const subjects = new Set();
+  let mockQuestions = 0;
 
-  for (const subj of gameKeys) {
-    GAME_QUESTIONS[subj].forEach((question, qi) => {
-      gameQuestions += 1;
-      const where = `game · ${subj} · question ${qi + 1}`;
-      checkMath(splitMath, `${where} q.en`, question.q.en);
-      checkMath(splitMath, `${where} q.km`, question.q.km);
-      checkMath(splitMath, `${where} explanation`, question.explanation);
-      for (const opt of question.options ?? [])
-        checkMath(splitMath, `${where} option`, opt);
-      checkChoices(where, question.options, question.correct);
-    });
-  }
+  MOCK_QS.forEach((question, qi) => {
+    mockQuestions += 1;
+    subjects.add(question.subj);
+    const where = `mock · ${question.subj} · question ${qi + 1}`;
+    checkMath(splitMath, `${where} q.en`, question.q.en);
+    checkMath(splitMath, `${where} q.km`, question.q.km);
+    if (question.explanation) checkMath(splitMath, `${where} explanation`, question.explanation);
+    for (const opt of question.options ?? [])
+      checkMath(splitMath, `${where} option`, opt);
+    checkChoices(where, question.options, question.correct);
+  });
 
   if (problems.length) {
     console.error(`\ncheck:quiz — ${problems.length} problem(s):\n`);
@@ -164,7 +166,7 @@ try {
   } else {
     console.log(
       `check:quiz — ok. ` +
-        `${gameQuestions} question(s) across ${gameKeys.length} game subject(s); ` +
+        `${mockQuestions} mock-exam question(s) across ${subjects.size} subject(s); ` +
         `${checked} string(s) with math typeset cleanly.`
     );
   }

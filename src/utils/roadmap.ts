@@ -1,4 +1,3 @@
-import { LESSONS } from "@/data/lessons";
 import type { Lang } from "@/types";
 
 export const GRADE_HOURS: Record<string, number> = {
@@ -89,11 +88,17 @@ function chunk<T>(items: T[], count: number): T[][] {
   return buckets;
 }
 
+/**
+ * `hasLessons` answers whether a subject has lessons to send a phase to. The
+ * caller asks the published content (utils/ stays pure and does no I/O); it
+ * read the old 7-step lessons in data/lessons.ts until they were deleted.
+ */
 export function buildRoadmapPhases(
   weaknesses: string[],
   months: number,
   subjectLabel: (subject: string) => string,
-  lang: Lang
+  lang: Lang,
+  hasLessons: (subject: string) => boolean
 ): RoadmapPhase[] {
   const contentMonths = Math.max(1, months - 1);
   const uniqueWeak = Array.from(new Set(weaknesses));
@@ -121,7 +126,7 @@ export function buildRoadmapPhases(
       ? `${focusOn} ${subjects.map(subjectLabel).join(" & ")}`
       : mixedTitle,
     subjects,
-    hasLessonContent: subjects.some((s) => !!LESSONS[s]),
+    hasLessonContent: subjects.some(hasLessons),
   }));
 
   phases.push({

@@ -4,6 +4,7 @@ import type {
   ContentKind,
   DeckCardBody,
   DrillQuestion,
+  GameQuestionBody,
   PaperBody,
   PaperSectionBody,
   QuizQuestionBody,
@@ -53,7 +54,12 @@ export interface ContentRow {
 }
 
 /** A deck or quiz is a list; a section or paper is one object. */
-export type AnyBody = DeckCardBody[] | QuizQuestionBody[] | SectionBody | PaperBody;
+export type AnyBody =
+  | DeckCardBody[]
+  | QuizQuestionBody[]
+  | SectionBody
+  | PaperBody
+  | GameQuestionBody[];
 
 export interface ContentVersionInfo {
   version: number;
@@ -175,6 +181,24 @@ export function toQuizBody(raw: unknown): QuizQuestionBody[] {
 
 const num = (v: unknown): number | undefined => (typeof v === "number" ? v : undefined);
 
+const GAME_LEVELS = ["easy", "medium", "hard"] as const;
+
+export function toGameBody(raw: unknown): GameQuestionBody[] {
+  return objs(raw).map((g) => {
+    const q = isObj(g.q) ? g.q : {};
+    const question: GameQuestionBody = {
+      id: str(g.id),
+      q: { en: str(q.en), km: str(q.km) },
+      options: strs(g.options),
+      correct: str(g.correct),
+      explanation: str(g.explanation),
+    };
+    const level = GAME_LEVELS.find((l) => l === g.difficulty);
+    if (level) question.difficulty = level;
+    return question;
+  });
+}
+
 function toBlock(v: unknown): SectionBlock {
   const b = isObj(v) ? v : {};
   const block: SectionBlock = {
@@ -294,16 +318,18 @@ export function toBody(kind: ContentKind, raw: unknown): AnyBody {
       return toSectionBody(raw);
     case "paper":
       return toPaperBody(raw);
+    case "game":
+      return toGameBody(raw);
   }
 }
 
-/** Whether a body has the right outer shape for its kind: a list for a deck
- *  or quiz, one object for a section or paper. */
+/** Whether a body has the right outer shape for its kind: a list for a deck,
+ *  quiz or game pool, one object for a section or paper. */
 export function bodyFits(kind: ContentKind, raw: unknown): boolean {
-  return kind === "deck" || kind === "quiz" ? Array.isArray(raw) : isObj(raw);
+  return kind === "deck" || kind === "quiz" || kind === "game" ? Array.isArray(raw) : isObj(raw);
 }
 
-export const CONTENT_KINDS: readonly ContentKind[] = ["deck", "quiz", "section", "paper"];
+export const CONTENT_KINDS: readonly ContentKind[] = ["deck", "quiz", "section", "paper", "game"];
 
 // ── Calls ───────────────────────────────────────────────────────────────────
 

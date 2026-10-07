@@ -5,6 +5,7 @@ import type {
   ContentKind,
   DeckCardBody,
   DrillQuestion,
+  GameQuestionBody,
   PaperBody,
   PaperGapBody,
   PaperQuestionBody,
@@ -19,7 +20,8 @@ import type {
  * The checks every piece of content stored in the database must pass before
  * students see it: flashcard decks and practice quizzes
  * (docs/plans/content-in-database.md), lesson sections and past papers
- * (docs/plans/sections-and-papers-in-database.md).
+ * (docs/plans/sections-and-papers-in-database.md), and the Battle question
+ * pools.
  *
  * ONE SET OF RULES, used in three places:
  *   - the editor on /admin/content, live, as the team types (errors block
@@ -73,7 +75,8 @@ export type IssueCode =
   | "gapMissing"
   | "duplicateGap"
   | "sameWords"
-  | "unknownSkill";
+  | "unknownSkill"
+  | "badDifficulty";
 
 export interface ContentIssue {
   level: "error" | "warning";
@@ -682,6 +685,38 @@ export function checkPaper(body: PaperBody): ContentIssue[] {
   return issues;
 }
 
+// ── Battle questions ──────────────────────────────────────────────────────
+
+/** The difficulties a Battle question may carry ("mix" is a creator's choice,
+ *  never a question's). */
+export const GAME_DIFFICULTIES = ["easy", "medium", "hard"] as const;
+
+/** One subject's pool of Battle questions. Both languages are student-visible
+ *  (the Battle page follows the app's language), so both get the text rules. */
+export function checkGame(questions: GameQuestionBody[]): ContentIssue[] {
+  const issues: ContentIssue[] = [];
+  if (questions.length === 0) {
+    issues.push({ level: "error", code: "emptyList", item: -1, field: "" });
+  }
+  if (questions.length > LIMITS.items) {
+    issues.push({ level: "error", code: "tooLong", item: -1, field: "", detail: `${questions.length} / ${LIMITS.items}` });
+  }
+  checkIds(issues, questions.map((q) => q.id), QUIZ_ID);
+  questions.forEach((question, i) => {
+    const q: Record<string, unknown> = isObj(question.q) ? question.q : {};
+    checkText(issues, i, "q.en", q.en, LIMITS.q, true);
+    checkText(issues, i, "q.km", q.km, LIMITS.q, true);
+    checkChoices(issues, i, "", question.options, question.correct);
+    checkText(issues, i, "explanation", question.explanation, LIMITS.explanation, true);
+    const d = question.difficulty as unknown;
+    if (d !== undefined && d !== null && !(GAME_DIFFICULTIES as readonly unknown[]).includes(d)) {
+      issues.push({ level: "error", code: "badDifficulty", item: i, field: "difficulty", detail: String(d) });
+    }
+  });
+  checkBunched(issues, questions, "");
+  return issues;
+}
+
 export function checkContent(kind: ContentKind, body: unknown): ContentIssue[] {
   switch (kind) {
     case "deck":
@@ -692,6 +727,8 @@ export function checkContent(kind: ContentKind, body: unknown): ContentIssue[] {
       return checkSection(body as SectionBody);
     case "paper":
       return checkPaper(body as PaperBody);
+    case "game":
+      return checkGame(listOf<GameQuestionBody>(body));
   }
 }
 
@@ -725,6 +762,7 @@ export function describeIssue(issue: ContentIssue): string {
     duplicateGap: "uses a gap number twice",
     sameWords: "has two words in the bank spelled the same",
     unknownSkill: "names a skill the paper does not have",
+    badDifficulty: "has a difficulty other than easy, medium or hard",
   };
   const where =
     issue.item < 0

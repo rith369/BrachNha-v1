@@ -3,14 +3,15 @@ import type { ContentKind, DeckCardBody, PracticeCard, QuizQuestionBody } from "
 /**
  * WHAT IS PUBLISHED: the small list a student's phone downloads once per app
  * load (lib/content.ts), one entry per flashcard deck, practice quiz, lesson
- * section and past paper. It is the database's `content_items` table
- * (supabase/migrations/20261003000001 and 20261003000002), published rows only.
+ * section, past paper and Battle question pool. It is the database's
+ * `content_items` table (supabase/migrations/20261003000001, 20261003000002
+ * and 20261007000001), published rows only.
  *
  * Everything that decides what EXISTS (a lesson row's count, a quiz node's
  * link, a Study-path node's link, an exam card, Home's study feed, the
  * prediction's playable sections) reads this rather than a body, so those
  * screens never download a single lesson. A body is fetched only when a deck,
- * quiz, section or paper is opened.
+ * quiz, section or paper is opened, or a Battle is about to be created.
  *
  * PURE, and passed in as an ARGUMENT to every function that reads it. The
  * React Compiler memoises a component on what it reads; a helper that reached
@@ -35,6 +36,7 @@ export interface DeckEntry extends ContentEntry {
 export type QuizEntry = ContentEntry;
 export type SectionEntry = ContentEntry;
 export type PaperEntry = ContentEntry;
+export type GameEntry = ContentEntry;
 
 export interface ContentManifest {
   /**
@@ -47,6 +49,8 @@ export interface ContentManifest {
   quiz: Record<string, QuizEntry>;
   section: Record<string, SectionEntry>;
   paper: Record<string, PaperEntry>;
+  /** Battle question pools, keyed by subject id ("math"). */
+  game: Record<string, GameEntry>;
 }
 
 /** For callers that need the curriculum's SHAPE and not what is published
@@ -57,16 +61,18 @@ export const EMPTY_MANIFEST: ContentManifest = {
   quiz: {},
   section: {},
   paper: {},
+  game: {},
 };
 
 /** A key as the database stores it, per kind (content_key_ok() in SQL, with
  *  the subject checked separately where it matters): "biology-1-1",
- *  "math-1-1-1", "biology-3-1-1", "2025-math". */
+ *  "math-1-1-1", "biology-3-1-1", "2025-math", "math". */
 export const CONTENT_KEY: Record<ContentKind, RegExp> = {
   deck: /^[a-z]+-\d{1,3}-\d{1,3}$/,
   quiz: /^[a-z]+-\d{1,3}-\d{1,3}(-\d{1,3})?$/,
   section: /^[a-z]+-\d{1,3}-\d{1,3}-\d{1,3}$/,
   paper: /^20\d{2}-[a-z]+$/,
+  game: /^[a-z]+$/,
 };
 
 /** The published entry for one item, or null. `Object.hasOwn`, never `in`:
@@ -94,6 +100,16 @@ export function sectionPublished(manifest: ContentManifest, id: string): boolean
   return contentEntry(manifest, "section", id) !== null;
 }
 
+/** Whether a subject has at least one published lesson section. */
+export function subjectHasSections(manifest: ContentManifest, subjectId: string): boolean {
+  return Object.keys(manifest.section).some((id) => id.startsWith(`${subjectId}-`));
+}
+
+/** Questions in a subject's published Battle pool, 0 when there is none. */
+export function gameCount(manifest: ContentManifest, subjectId: string): number {
+  return contentEntry(manifest, "game", subjectId)?.count ?? 0;
+}
+
 /** Cards in a published deck, 0 when there is none. */
 export function deckCount(manifest: ContentManifest, key: string): number {
   return deckEntry(manifest, key)?.count ?? 0;
@@ -117,7 +133,7 @@ export function entryVersion(
  * development fixture, which has bodies and no manifest of its own.
  */
 export function bodyCount(kind: ContentKind, body: unknown): number {
-  if (kind === "deck" || kind === "quiz") return Array.isArray(body) ? body.length : 0;
+  if (kind === "deck" || kind === "quiz" || kind === "game") return Array.isArray(body) ? body.length : 0;
   if (typeof body !== "object" || body === null) return 0;
   const b = body as Record<string, unknown>;
   const len = (v: unknown) => (Array.isArray(v) ? v.length : 0);

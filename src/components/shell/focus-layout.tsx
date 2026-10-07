@@ -44,7 +44,7 @@ export function FocusLayout({
    * Show the XP / streak / coins counters and the light-dark toggle above the
    * progress bar.
    *
-   * Opt-in, and the LESSONS opt in — not the assessments. Dangling a running XP
+   * Opt-in, and lesson sections opt in — not the assessments. Dangling a running XP
    * counter in front of someone mid-exam turns a measurement into a scoreboard,
    * and the theme toggle is a settings control that has no business being one
    * tap from an answer that counts.

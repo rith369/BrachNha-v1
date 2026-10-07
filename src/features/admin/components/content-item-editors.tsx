@@ -16,6 +16,7 @@ import type { ContentIssue } from "@/utils/content-check";
 import type {
   DeckCardBody,
   DrillQuestion,
+  GameQuestionBody,
   Lang,
   QuizQuestionBody,
   SkillHelp,
@@ -365,6 +366,9 @@ export function CardEditor({
  */
 export function ChoiceFields({
   prompt,
+  promptLabel,
+  promptTip,
+  before,
   options,
   correct,
   explanation,
@@ -375,6 +379,12 @@ export function ChoiceFields({
   onChange,
 }: {
   prompt: string;
+  /** The prompt's label, when "Question" alone would be ambiguous (a game
+   *  question has one in each language). */
+  promptLabel?: string;
+  promptTip?: string;
+  /** Rendered above the prompt (a game question's English text). */
+  before?: ReactNode;
   options: string[];
   correct: string;
   explanation: string;
@@ -390,8 +400,10 @@ export function ChoiceFields({
   );
   return (
     <div className="flex flex-col gap-2">
+      {before}
       <TextField
-        label={c.promptLabel}
+        label={promptLabel ?? c.promptLabel}
+        tip={promptTip}
         value={prompt}
         path={`${prefix}${promptPath}`}
         issues={issues}
@@ -768,6 +780,168 @@ export function QuestionEditor({
       {!open && (
         <p className="mt-1 line-clamp-2 text-xs font-semibold text-muted [overflow-wrap:anywhere]">
           {question.q || "…"}
+        </p>
+      )}
+      {body}
+    </li>
+  );
+}
+
+
+/** A game question as students see it: the Khmer prompt, the English one
+ *  under it, the options with the right one ticked, and the explanation. */
+function GamePreview({ question, lang }: { question: GameQuestionBody; lang: Lang }) {
+  const c = CONTENT_COPY[lang];
+  return (
+    <div className="mt-3 rounded-xl border border-border bg-control p-3">
+      <div className="mb-1.5 text-[10px] font-extrabold text-muted">{c.previewTitle}</div>
+      <div className="text-sm font-bold whitespace-pre-line">
+        <MathText text={question.q.km} />
+      </div>
+      <div className="mb-2 text-xs font-semibold whitespace-pre-line text-muted">
+        <MathText text={question.q.en} />
+      </div>
+      <ul className="mb-2 flex flex-col gap-1">
+        {question.options.map((opt, i) => (
+          <li
+            key={i}
+            className={cn(
+              "flex items-start gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-semibold",
+              opt === question.correct ? "bg-mint/30" : "bg-surface"
+            )}
+          >
+            {opt === question.correct && <Check className="mt-0.5 size-3.5 shrink-0" strokeWidth={3} />}
+            <MathText text={opt} />
+          </li>
+        ))}
+      </ul>
+      <div className="text-xs font-semibold whitespace-pre-line">
+        <MathText text={question.explanation} />
+      </div>
+    </div>
+  );
+}
+
+const GAME_LEVELS = ["easy", "medium", "hard"] as const;
+
+/** One game question: the prompt in both languages, the shared options,
+ *  answer and explanation, and its level. */
+export function GameQuestionEditor({
+  question,
+  index,
+  count,
+  issues,
+  open,
+  lang,
+  onToggle,
+  onChange,
+  onMove,
+  onRemove,
+}: {
+  question: GameQuestionBody;
+  index: number;
+  count: number;
+  issues: ContentIssue[];
+  open: boolean;
+  lang: Lang;
+  onToggle: () => void;
+  onChange: (q: GameQuestionBody) => void;
+  onMove: (delta: -1 | 1) => void;
+  onRemove: () => void;
+}) {
+  const c = CONTENT_COPY[lang];
+  const [preview, setPreview] = useState(false);
+  const Chevron = open ? ChevronDown : ChevronRight;
+  let body: ReactNode = null;
+  if (open) {
+    body = (
+      <div className="mt-3 flex flex-col gap-2.5">
+        <ChoiceFields
+          prompt={question.q.km}
+          promptLabel={c.game.questionKm}
+          promptTip={c.tips.gameText}
+          options={question.options}
+          correct={question.correct}
+          explanation={question.explanation}
+          promptPath="q.km"
+          prefix=""
+          issues={issues}
+          lang={lang}
+          onChange={(patch) =>
+            onChange({
+              ...question,
+              q: { en: question.q.en, km: patch.prompt ?? question.q.km },
+              options: patch.options ?? question.options,
+              correct: patch.correct ?? question.correct,
+              explanation: patch.explanation ?? question.explanation,
+            })
+          }
+          before={
+            <TextField
+              label={c.game.questionEn}
+              value={question.q.en}
+              path="q.en"
+              issues={issues}
+              lang={lang}
+              onChange={(v) => onChange({ ...question, q: { en: v, km: question.q.km } })}
+            />
+          }
+        />
+        <SelectField
+          label={c.game.difficulty}
+          tip={c.tips.difficulty}
+          value={question.difficulty ?? ""}
+          options={GAME_LEVELS.map((l) => ({ value: l, label: c.game.levels[l] }))}
+          placeholder={c.game.noLevel}
+          path="difficulty"
+          issues={issues}
+          lang={lang}
+          onChange={(v) => {
+            const level = GAME_LEVELS.find((l) => l === v);
+            const next: GameQuestionBody = { ...question };
+            if (level) next.difficulty = level;
+            else delete next.difficulty;
+            onChange(next);
+          }}
+        />
+        <IssueLines issues={issues.filter((i) => i.field === "id")} lang={lang} />
+        {preview && <GamePreview question={question} lang={lang} />}
+      </div>
+    );
+  }
+  return (
+    <li id={`item-${question.id}`} className="rounded-2xl border border-border bg-surface p-3 shadow-panel-sm">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          className="flex min-w-0 grow basis-44 items-center gap-1.5 text-left"
+        >
+          <Chevron className="size-4 shrink-0" strokeWidth={2.5} />
+          <span className="font-heading text-sm font-extrabold">{c.question(index + 1)}</span>
+          <span className="font-mono text-[10px] font-bold text-muted">{question.id}</span>
+          {question.difficulty && (
+            <span className="rounded-full bg-control px-1.5 py-0.5 text-[10px] font-extrabold text-muted">
+              {c.game.levels[question.difficulty]}
+            </span>
+          )}
+          <ErrorBadge issues={issues} />
+        </button>
+        <span className="ml-auto inline-flex flex-wrap gap-1">
+          {open && (
+            <button type="button" onClick={() => setPreview(!preview)} className={SMALL_BTN} aria-pressed={preview}>
+              <Eye className="size-3" strokeWidth={2.5} />
+              {c.preview}
+            </button>
+          )}
+          <MoveButtons index={index} count={count} onMove={onMove} lang={lang} />
+          <RemoveButton onRemove={onRemove} lang={lang} />
+        </span>
+      </div>
+      {!open && (
+        <p className="mt-1 line-clamp-2 text-xs font-semibold text-muted [overflow-wrap:anywhere]">
+          {question.q.km || question.q.en || "…"}
         </p>
       )}
       {body}

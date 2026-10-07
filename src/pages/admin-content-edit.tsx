@@ -13,18 +13,19 @@ const KEY: Record<ContentKind, RegExp> = {
   quiz: /^[a-z]+-[1-9][0-9]?-[1-9][0-9]?(-[1-9][0-9]?)?$/,
   section: /^[a-z]+-[1-9][0-9]?-[1-9][0-9]?-[1-9][0-9]?$/,
   paper: /^20[0-9]{2}-[a-z]+$/,
+  game: /^[a-z]+$/,
 };
 
 /** A question id: q3 in a quiz or a section, l1 or g4 in a paper. */
 const ITEM_ID = /^[a-z][a-z0-9-]{0,19}$/;
 
 function isKind(value: string | undefined): value is ContentKind {
-  return value === "deck" || value === "quiz" || value === "section" || value === "paper";
+  return value === "deck" || value === "quiz" || value === "section" || value === "paper" || value === "game";
 }
 
 /**
- * /admin/content/:kind/:key: edit one deck, quiz, lesson section or past
- * paper. `?q=q3` opens that question on arrival. Lazy and kept out of
+ * /admin/content/:kind/:key: edit one deck, quiz, lesson section, past
+ * paper or game question pool. `?q=q3` opens that question on arrival. Lazy and kept out of
  * routeModules.
  *
  * Keyed on kind and key, so moving from one item to another starts a fresh

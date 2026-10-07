@@ -6,7 +6,6 @@ import { SubjectArt } from "./subject-art";
 import { PATH_TAB, SUBJECT_SESSIONS } from "../sessions";
 import {
   MINUTES_PER_LESSON,
-  lessonCountFor,
   type SubjectId,
   type SubjectMeta,
   type SubjectTab,
@@ -17,11 +16,12 @@ import {
  *
  * An authored path counts only on the tab PATH_TAB assigns it to — that is the
  * whole point: math's foundation path opens from មូលដ្ឋានគ្រឹះ and is closed
- * under មុខវិជ្ជា. A foundation path counts its own lessons. A Bac II path
- * keeps counting LESSONS, exactly as the card always has.
+ * under មុខវិជ្ជា. Each path counts its own lessons.
  *
- * A subject with no authored path gets one derived from LESSONS, which is Bac
- * II topic content, so it can only open from មុខវិជ្ជា.
+ * A subject with no authored path has nothing to open, so its card is closed on
+ * both tabs. (It used to count the old 7-step lessons in data/lessons.ts, which
+ * were deleted on 7 Oct 2026; by then every subject that had one also had an
+ * authored path, so no card changed.)
  */
 function lessonsOnTab(id: SubjectId, tab: SubjectTab): number {
   const path = SUBJECT_SESSIONS[id];
@@ -29,7 +29,7 @@ function lessonsOnTab(id: SubjectId, tab: SubjectTab): number {
     if (PATH_TAB[id] !== tab) return 0;
     return path.flatMap((c) => c.lessons).length;
   }
-  return tab === "all" ? lessonCountFor(id) : 0;
+  return 0;
 }
 
 function Meta({ count, id }: { count: number; id: SubjectId }) {

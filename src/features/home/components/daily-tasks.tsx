@@ -13,7 +13,7 @@ import { taskHref } from "../task-links";
  * checkbox: it ticks only when the work is actually finished, because each
  * task has a real completion behind it now —
  *
- *   lesson      finishing a section or lesson     (section-detail, lesson-detail)
+ *   lesson      finishing a lesson section         (section-detail)
  *   practice    finishing a practice quiz          (quiz-screen)
  *   flashcards  finishing a flashcard review       (review-session)
  *   challenge   finishing a Game battle or an exam (game-create/-play, exam-view, paper-screen)

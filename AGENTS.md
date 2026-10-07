@@ -1081,7 +1081,8 @@ are a sample.
 emit `en [KH: km]` for every field — 5,999 Latin characters in a 12,595-char
 block, for a mentor forbidden to reply in English (`ANSWER_LANG`). The English
 is not dropped outright because some Khmer entries in `data/lessons.ts` really
-are abbreviated; WHICH ones was measured rather than guessed — across the 57
+were abbreviated (that file was deleted on 7 Oct 2026; `MOCK_QS` is what goes through
+`bi()` now); WHICH ones was measured rather than guessed — across the 57
 pairs the Khmer runs at a median **0.71× the English length**, and Khmer is
 denser per character, so that is a complete rendering. Only the 15 pairs below
 `KM_STUB_RATIO` (0.6) keep both. If that column is ever completed, `bi()`
@@ -1452,8 +1453,10 @@ move into the database" near the end of this file. **Lesson sections and past
 papers followed on 7 Oct 2026** (stages 2 and 3): `data/sections.ts` and
 `data/papers/` are deleted too. What stays in code is STRUCTURE (subjects, the
 path shapes in `features/lessons/sessions.ts` and `quiz-path.ts`,
-`PAST_PAPER_YEARS`) plus the legacy 7-step lessons (`data/lessons.ts`) and the
-game questions (`data/game-questions.ts`).
+`PAST_PAPER_YEARS`) plus the mock-exam questions (`data/questions.ts`, `MOCK_QS`). The
+game questions moved into the database the same day ("Game questions move into the
+database"), and the legacy 7-step lessons (`data/lessons.ts`) were deleted ("The old
+7-step lessons are deleted").
 
 ### Keeping the three copies in step
 
@@ -1548,7 +1551,7 @@ logo and name now live only in the sidebar and drawer.
 **Page top-spacing convention:** pages start at `pt-4` under the app bar, with no
 right gutter (there is no floating button to clear). Bottom padding is `pb-20` on
 pages that render `BottomNav` and `pb-36` on those that don't
-(roadmap/profile/lesson-detail), so content clears the FAB at `bottom-20`.
+(roadmap/profile), so content clears the FAB at `bottom-20`.
 
 ### Responsive layout — two rules, and they pull in opposite directions
 
@@ -1729,9 +1732,10 @@ middle of a laptop screen while a long one still scrolls from the top.
 differently:
 
 - **Route** — `utils/focus-routes.ts`'s `isFocusRoute()` for screens that are
-  nothing but a task from the moment you land: `/lessons/:id`, `/placement-test/:subject`.
-  It tests `startsWith("/lessons/")` **with the trailing slash**, so the
-  `/lessons` LIST stays an ordinary page with full navigation. Don't loosen that.
+  nothing but a task from the moment you land: `/sections/:id`, `/placement-test/:subject`.
+  (It tested `startsWith("/lessons/")` with the trailing slash for the old 7-step
+  lessons, so the `/lessons` LIST stayed an ordinary page; that path only redirects
+  now.)
 - **Store** — `focusMode`, for the mock exam, where `/exam` is an ordinary
   destination (its intro screen shows past results) until the student actually
   starts answering. `ExamRunner` sets it in a **mount/unmount** effect — that
@@ -1755,7 +1759,7 @@ hooks in `hooks/use-focus-mode.ts`:
 
 | Screen | Nav | Mentor |
 | --- | --- | --- |
-| Lesson (`/lessons/:id` — content, flashcard, quiz) | hidden | **available** |
+| Lesson section (`/sections/:id`) | hidden | **available** |
 | Mock exam, while answering | hidden | blocked |
 | Placement test (`/placement-test/:subject`) | hidden | blocked |
 | Roadmap onboarding lock | hidden | blocked |
@@ -1784,12 +1788,11 @@ so it moves to `bottom-22 md:bottom-26 lg:bottom-28`. It only ever sees focus
 mode on a lesson, since the shell doesn't render it on the assessments at all.
 
 `defaultMathLayout` (`utils/math-input.ts`) keys the math keyboard's opening
-layout off `/lessons/:id`. That branch was unreachable until the mentor was
-allowed inside lessons — it was written for this and is now live.
+layout off `/sections/:id` (and `/lessons/:id` until the old lessons were deleted).
 
 **`FocusLayout`'s `showStats` puts the XP / streak / coins counters and a
-light-dark toggle above the progress bar.** It is opt-in and the LESSONS opt in —
-`LessonDetail` and `SectionDetail` — while the mock exam and placement test do
+light-dark toggle above the progress bar.** It is opt-in and lesson sections opt in —
+`SectionDetail` (and the deleted `LessonDetail`) — while the mock exam and placement test do
 not: a live XP counter mid-exam turns a measurement into a scoreboard, and a
 theme toggle one tap from an answer that counts is a settings control in the
 wrong place. The counters get their OWN row rather than joining the X + progress
@@ -1983,9 +1986,10 @@ stat pills, grade-prediction widget, lesson preview list, daily tasks (that
 order is what `pages/home.tsx` renders; the grade card sits between `StatPills`
 and `LessonPreviewList`).
 
-**Lessons** (`features/lessons`) — a two-tab grid of SUBJECT tiles + dynamic
-`/lessons/:lessonId` route with the full 7-step lesson flow (intro → content →
-flashcard flip → fun fact → did-you-know → quiz → completion).
+**Lessons** (`features/lessons`) — a two-tab grid of SUBJECT tiles, each opening
+its subject's path (`/subjects/:subjectId`), whose nodes open lesson sections
+(`/sections/:sectionId`). The old 7-step lessons at `/lessons/:lessonId` were deleted
+on 7 Oct 2026; that path redirects to `/lessons`.
 
 ### The Study page is subject-first, and Khmer-only
 
@@ -2004,17 +2008,15 @@ accent, Lucide icon — plus the derivations. Four things there are load-bearing
   the student typed (`ANSWER_LANG` in `utils/chat-prompt.ts`). Strings here are
   Khmer literals, NOT `{ en, km }` pairs behind `T[lang]`. Don't "fix" them.
   The constant exists so the decision is greppable and reversible in one edit.
-- **Lesson counts and durations are DERIVED, never authored.** `lessonCountFor()`
-  counts `LESSONS[id]`, so a card's number cannot drift from the content it
-  describes — the same reason `levelForCount()` replaced a hand-authored level in
-  `utils/activity-heatmap.ts`. `MINUTES_PER_LESSON` is one named constant rather
+- **Lesson counts and durations are DERIVED, never authored.** A card counts the
+  lessons of its subject's authored path (`SUBJECT_SESSIONS`, on the tab `PATH_TAB`
+  assigns it to); a subject with no authored path is closed. (`lessonCountFor()`, which
+  counted the old `LESSONS`, was deleted with them on 7 Oct 2026.) `MINUTES_PER_LESSON` is one named constant rather
   than eight fake per-subject numbers; replace it with real timings when lesson
   content lands.
 - **The Foundation tab derives from `FOUNDATION_SUBJECTS`** (`utils/placement.ts`,
   already exactly math/physics/chemistry and shared with the survey), rather than
-  hardcoding a second list that can drift. Note `FOUNDATION` in `data/lessons.ts`
-  still holds math + **biology**, which predates that constant; the biology entry
-  is unreferenced by this page but still reachable at `/lessons/biology-foundation`.
+  hardcoding a second list that can drift.
 - `english` and `french` are both in the catalog; `allSubjects()` renders whichever
   `userLanguage` chose and drops the other.
 
@@ -2200,10 +2202,10 @@ connector is its own fixed-height element between rows, so no geometry breaks.
 
 **Session structure is DERIVED until it is authored.** `SUBJECT_SESSIONS` holds
 the authored structure — the same shape as `PAST_PAPERS`, and most
-subjects are absent, which is the normal state. `chaptersFor()` falls back to one
-session per lesson that genuinely exists in `data/lessons.ts` plus
+subjects are absent, which is the normal state. `chaptersShape()` falls back to
 `PLACEHOLDER_SESSIONS` locked nodes, wrapped in one chapter and one lesson so the
-shape matches, so a node can never claim content the app lacks.
+shape matches, so a node can never claim content the app lacks. (It also listed the
+old 7-step lessons until they were deleted on 7 Oct 2026.)
 
 **Math's foundation path is FOUR lessons, and three of them are structure.**
 មេរៀនទី 1 · ប្រមាណវិធីបូក ដក គុណ ចែក has six named sections (three written);
@@ -2225,15 +2227,11 @@ contents: 3 chapters, 7 lessons, 6 sections each = 42 nodes, **every one locked*
 because no content is written behind any of them. Chapters 1–2 are titleless
 pending a legible scan. Two things follow that are easy to mistake for bugs:
 
-- **An authored structure REPLACES the derived fallback wholesale**, so
-  `biology-body` and `biology-brain` no longer appear on the biology path. Both
-  are still reachable at `/lessons/biology-body` and `/lessons/biology-brain`, and
-  the 3D brain lesson is intact.
-- **`lessonCountFor("biology")` still says 2**, because it counts `LESSONS`. The
-  Study card therefore reads "2 មេរៀន" while the path shows 7 locked lessons.
-  Left alone on purpose: making the card count *authored* lessons would have it
-  claim seven lessons of content that does not exist, which is the rule that
-  function exists to enforce. Revisit when content lands, not before.
+- **An authored structure REPLACES the derived fallback wholesale**, so the old
+  `biology-body` and `biology-brain` lessons never appeared on the biology path. Both
+  were deleted on 7 Oct 2026; the brain's 3D model lives on in section 3.1.1.
+- **The Study card counts the authored path's lessons**, written or not (it once
+  counted the old `LESSONS`; `lessonCountFor()` is gone).
 
 **The page does NOT open at the top.** A path is long — biology is 43 nodes — so
 landing at the very top means scrolling past everything already behind you to
@@ -2529,7 +2527,8 @@ had to stop being lesson-specific — ONE field rather than two that drift:
 
 - authored section → `/sections/{id}` **iff the manifest lists it as published**
   (`sectionPublished()`; `SECTION_CONTENT[id]` existing, before 7 Oct 2026)
-- derived fallback → `/lessons/{subject}-{topic}`
+- derived fallback → `/lessons/{subject}-{topic}` (the old 7-step lessons; gone since 7 Oct
+  2026, so the fallback has placeholders only)
 
 That `iff` is the rule: playability is DERIVED from content existing, never
 authored beside it. `completedSessions` is untouched — it matches on
@@ -2543,8 +2542,7 @@ types.)
 
 `/sections/:sectionId` is a focus route (nav hidden) but **not** an assessment
 route, so KruAI stays reachable — same rule as a lesson. `defaultMathLayout`
-matches `/(?:lessons|sections)/` since the subject is the first id segment of
-both.
+matches `/sections/` since the subject is the first id segment.
 
 **`LESSON_TAIL` — កំហុស / សេចក្តីសង្ខេប / តេស្ត — is appended to EVERY lesson.**
 Those three are structural rather than topic-specific, so only sections 1–3 differ
@@ -5072,6 +5070,11 @@ formats `km-KH` in English with no warning.
 
 #### Content, and the difficulty that does nothing yet
 
+> **Since 7 Oct 2026 the question pools live in the DATABASE** (kind `game`, edited on
+> Admin → Content → Game questions), `data/game-questions.ts` is deleted, and every
+> question carries a difficulty. The two paragraphs below are the history. See "Game
+> questions move into the database" near the end of this file.
+
 `data/game-questions.ts`'s `GAME_QUESTIONS` is **empty, and that is the normal
 state** — the `PAST_PAPERS` discipline. `gameQuestionsFor()` falls back
 to `GENERATED_EXAM_QUESTIONS`, so math and biology are playable today from the
@@ -6177,7 +6180,7 @@ button was deleted. Every task has a real completion:
 
 | task | completed by |
 | --- | --- |
-| lesson | finishing a section (`section-detail`) or a legacy lesson |
+| lesson | finishing a section (`section-detail`) |
 | practice | finishing a practice quiz (`quiz-screen`) |
 | flashcards | finishing a flashcard review (`review-session`) |
 | challenge | finishing a Game battle (`game-create`/`game-play`) or an exam (`exam-view`, `paper-screen`) |
@@ -7224,8 +7227,8 @@ is larger and is fetched when opened.
 
 **Deleted:** `src/data/sections.ts`, `src/data/papers/math-2025.ts`, `english-2025.ts`,
 `english-drills.ts`, `content/sections-papers.json` and `content:export --from-code`.
-`check:quiz` checks game questions only; `check:content` and the editor check sections and
-papers.
+`check:quiz` checked game questions only (since the game move, the mock-exam questions);
+`check:content` and the editor check sections and papers.
 
 **Bundle, measured on the same machine:** the first screen (entry + every modulepreload,
 gzip) went **268 KB → 238 KB** (268,400 → 237,998 bytes). The 17 KB `sections-*.js` preload
@@ -7261,6 +7264,134 @@ chunk of `dist/` (checked).
   content request; KruAI still answers with both failing; no unhandled rejection.
 - A dev server with Supabase blanked opens a quiz, a deck, a section and a paper from the
   fixture with no database request (7 checks).
+
+## Game questions move into the database (7 Oct 2026)
+
+The user's call, after the sections and papers. The Battle's question pools were
+`src/data/game-questions.ts` (120 questions: maths, history, chemistry and biology, 30
+each, 213 KB). They are now the fifth content kind, `game`, edited on Admin → Content →
+**Game questions** / **សំណួរហ្គេម**, and the file is deleted.
+
+**What is stored** (`GameQuestionBody` in `types/index.ts`): one item per SUBJECT, key
+`math`, `history`…, its body a list of `{ id, q: { en, km }, options, correct,
+difficulty?, explanation }`.
+- **The text is a PAIR, unlike a past paper's single string.** The Battle page follows the
+  app's language, and these questions carry real English and Khmer wording.
+- **`difficulty` is `easy` / `medium` / `hard` or absent**; absent is offered at every level.
+  `mix` is a creator's choice, never a question's.
+- **Ids are `q1…` per subject, never reused** (the stage 1 `used_ids` rule), although nothing
+  downstream reads them yet: a Battle FREEZES its questions onto the competition row without
+  the id (`toGameQuestions()` drops it, and `lib/competitions.ts`'s `toQuestions()` keeps only
+  text, options, answer and explanation). So **an edit reaches new Battles only**, and a Battle
+  already being played never changes.
+
+**The database: `20261007000001_game_questions.sql`.** Apply AFTER `20261003000002`.
+- The kind CHECKs are replaced by text, as before, now five kinds.
+- `content_key_ok`, `content_item_ids`, `content_count`, `content_draft_problem` and
+  `content_body_problem` are redefined with the same signatures; a pool is a list, like a
+  quiz.
+- `content_game_question_problem` checks one question: both texts, the level, then the quiz
+  rules (`content_choice_problem`) with the Khmer text as the prompt.
+- **An empty pool cannot be published**: said inside `content_body_problem`, so the publish
+  and import functions needed no edit.
+- An app that predates the migration ignores the kind in its manifest, so publishing first
+  is safe.
+
+**The checker:** `checkGame()` in `utils/content-check.ts` runs the text rules on BOTH
+languages (both are student-visible), the choice rules, and a new `badDifficulty` code
+with its `issueHelp` sentence.
+
+**The editor:** a fifth tab. `GameQuestionEditor` (`content-item-editors.tsx`) shows the
+English text above the shared `ChoiceFields`, which gained optional `promptLabel`,
+`promptTip` and `before` props for it. The level is a `SelectField` whose empty choice
+means "not set". New offers each subject with no pool (`gameSlots()`), after picking the
+subject, like every kind. The page explains the pool's rule above the list (`tips.gamePool`).
+
+**The Battle create screen** (`create-form.tsx`):
+- `gameSubjects(lang, manifest)` gives each subject its COUNT from the manifest, so the
+  screen downloads no pool to draw its tiles;
+- the CHOSEN subject's pool downloads while the student picks a level and a time
+  (`useContentBody("game", …)`), and Start stays off until it is in hand, saying
+  "Getting the questions…";
+- a first open with no internet says so, with Try again;
+- `pickQuestions(pool, difficulty)` takes the pool now instead of looking it up.
+
+`gameQuestionsFor()` and its fallback to the mock-exam questions are gone: every subject the
+fallback covered has a pool.
+
+**Deleted:** `src/data/game-questions.ts`. **`check:quiz` now checks `MOCK_QS`**
+(`data/questions.ts`, the generated papers, placement test and KruAI's catalog), the last
+question content in code; `check:content` covers the five database kinds.
+
+**The move (done 7 Oct 2026)**: `content/game-questions.json` (4 pools, 120 questions, 0
+errors, 0 warnings, and nothing the editor's Save would change) was imported by the owner with
+"publish items never published"; `check:content --live` confirmed **4 of 4** exact, the
+helpers refuse the publishable key, and the file was deleted. `content/fixture.json` now holds
+all five kinds (39 items).
+
+**Verified:**
+- PGlite: **43 checks** (the migration twice after stages 1 to 3; keys; the real file
+  publishes as version 1 and reads back identical with 30 each; guests read the manifest and
+  bodies; draft vs publish; owner-only publish; used ids; 12 publish refusals; import all or
+  nothing; the other four kinds still import; no client can call a helper). Stage 1's 95,
+  stage 2/3's 79 and the real-fixture 5 still pass with it on top.
+- Browser, the database faked: **28 editor checks** (five tabs; import checked in the browser;
+  4 pools of 30; New offers physics; both language fields; edit and publish version 2 with the
+  level; an untouched question keeps every field; a new question takes q31; an em dash blocks
+  Publish; Undo; an admin saves a draft that drops the level and has no Publish; the five tabs
+  fit at 320 dark Khmer) and **15 Battle checks** (4 subjects selectable and the rest coming
+  soon; only the chosen pool downloads; a Hard battle opens on a hard question; English shows
+  the English text; offline then Try again; no sideways scroll; no page error). The earlier
+  suites (36, 34, 59, 46, 40, 14) still pass.
+- The build: no game question text in any chunk; the first screen is unchanged (231 KB), since
+  the questions were never on it.
+
+## The old 7-step lessons are deleted (7 Oct 2026)
+
+The user's call, once lesson sections had moved into the database. These were the six
+lessons carried over from the first version of the app, in `data/lessons.ts`: Basic Limits
+and Basic Probability (maths), Human Body and Human Brain (biology), and a maths and a
+biology "foundation" lesson, run by the 7-step `LessonDetail` flow (intro → content →
+flashcard → fun fact → did-you-know → quiz → completion) at `/lessons/:lessonId`. The
+authored Study paths had already replaced them, so they were reachable only by a typed URL.
+
+**Deleted:** `src/data/lessons.ts` (`LESSONS`, `FOUNDATION`, their own `FLASHCARDS` and
+`PRACTICE`, `lessonDataFor`), `features/lessons/components/lesson-detail.tsx`,
+`pages/lesson-detail.tsx`, the `Lesson` / `Flashcard` / `PracticeQuestion` types,
+`lessonCountFor()`, and five translation keys only that screen used (`summary`, `funFact`,
+`surpriseTip`, `didYouKnow`, `incorrect`).
+
+What changed around them:
+- **`/lessons/:lessonId` REDIRECTS to `/lessons`** (a `<Navigate replace>` in `app.tsx`), so
+  a saved link lands on the Study page rather than "not found". `isFocusRoute`,
+  `isStudyRoute`, `screenRefFor` (no `lessonId` any more, and the handler's `cleanScreen`
+  dropped it) and `defaultMathLayout` no longer know the path.
+- **The Study cards did not change.** An authored path counts its own lessons, and a
+  subject with no authored path is closed: `lessonCountFor()` only ever counted subjects
+  that had BOTH an authored path and old lessons, so it returned 0 for every card that
+  reached it.
+- **`chaptersShape()`'s fallback** (a subject with no authored path) is now placeholders
+  only; it never listed an old lesson for any subject in practice, for the same reason.
+- **The roadmap** asks `buildRoadmapPhases(…, hasLessons)`, and `roadmap-view.tsx` answers
+  with `subjectHasSections(manifest, s)` (`utils/content-manifest.ts`): a month links to
+  Study when its subject has a published lesson section, else to the exam tab with "coming
+  soon". Today that is biology and maths, exactly as before.
+- **KruAI's catalog** lost the old lessons, their flashcards and practice questions, and
+  the `/lessons/` screen chunk. The prompt went **18,835 → 17,587** characters on Home and
+  **23,656 → 22,229** on a section page (budget 24,000). `bi()` stays for `MOCK_QS`.
+- **The 3D brain model lives on** in section `biology-3-1-1`; the `brain-model-viewer` chunk is
+  still its own, reached from `section-detail.tsx`.
+- **`completedSessions` and `contentLog` may still hold old ids** (`biology-brain`…) on a
+  student's phone. Harmless: nothing renders them, and `subjectOfKey()` still maps them to
+  their subject.
+- **First screen: 237,998 → 231,255 bytes gzip**; `lessons-*.js` is gone from the preloads.
+
+**Verified:** `tsc -b`, oxlint, `check:digits`, `check:quiz`, `check:content` and the build
+clean. Browser, the database faked: 14 checks (the Study tabs open the same cards; three old
+links land on the Study page; on the roadmap biology's month links to Study and physics'
+to the exam tab, at 320 dark; section 3.1.1 still loads the 3D viewer; no sideways scroll;
+no page error), and step B's 36 still pass. KruAI: 14 checks (no old lesson, flashcard or
+practice line in the catalog; an old `lessonId` screen ref gives nothing).
 
 ## Installable app: "add to home screen" and the two pop-ups
 
@@ -7305,8 +7436,8 @@ already-installed app (`isInstalledApp()`, now exported from
   "Not now"/"Got it" snoozes it for `OPEN_SNOOZE_DAYS` (3) so a student is not
   greeted by the same pop-up on every visit.
 - **`"lesson"`**: after finishing a lesson or a section. `markLessonFinished()`
-  is called beside `completeSession` in `lesson-detail.tsx` and
-  `section-detail.tsx`; practice quizzes are deliberately left out. Once per
+  is called beside `completeSession` in `section-detail.tsx` (and in the old
+  `lesson-detail.tsx` until it was deleted); practice quizzes are deliberately left out. Once per
   device, ever. It outranks the open pop-up, and closing either one consumes the
   other for that page load, so two never arrive back to back.
 
@@ -7800,6 +7931,9 @@ No migration for existing `cardReviews`: the shift is at most a day, and due-nes
 prioritises rather than gates.
 
 ### `/lessons/:lessonId` was the one route that did not guard its param
+
+> The route and the old lessons behind it were deleted on 7 Oct 2026; `/lessons/:id`
+> now redirects to the Study page. Kept as the record of the bug.
 
 `getLessonData` did `LESSONS[cat][topic]` bare, so any unknown id threw during
 render. Every sibling already resolved-then-redirected
@@ -8375,17 +8509,17 @@ npx tsc -b            # NOT `tsc --noEmit -p tsconfig.json` — this is a soluti
 npx oxlint            # NOT eslint — there is no eslint config in this repo
 npm run check:digits  # no Khmer numerals — see "Digits are Latin everywhere"
 npm run check:quiz    # authored quiz content — see below
-npm run check:content # content files under content/ (the database's four kinds)
+npm run check:content # content files under content/ (the database's five kinds)
 ```
 
 The third is there because the first two cannot see it: to `tsc` and to oxlint,
 `"១២"` and `"12"` are both just strings. It is instant and has no dependencies,
 so there is no reason to skip it on a change that "obviously" touches no copy.
 
-**Since 7 Oct 2026 `check:quiz` checks the GAME QUESTIONS only**: every other
-kind of content lives in the database, and `check:content` and the editor run the
-same rules on it (`utils/content-check.ts`). The history below is why those rules
-exist.
+**Since 7 Oct 2026 `check:quiz` checks the MOCK-EXAM questions only** (`MOCK_QS`,
+`data/questions.ts`): every other kind of question lives in the database, the game
+questions included, and `check:content` and the editor run the same rules on it
+(`utils/content-check.ts`). The history below is why those rules exist.
 
 **`check:quiz` is the same argument for authored QUIZ AND PAST-PAPER content**
 (`scripts/check-quiz.mjs`). It covered `PAST_PAPERS`,
@@ -8490,6 +8624,13 @@ sees no new table; `/rest/v1/rpc/content_current?p_kind=section` answers `200`. 
 step B students read sections and papers ONLY from here**: the import was done on 7 Oct
 2026 (9 of 9 exact). On a NEW project, import `content/fixture.json` (all four kinds)
 before deploying, or every section and paper shows as coming soon.
+
+**`20261007000001_game_questions.sql`** (the game questions) must be applied AFTER
+`20261003000002`, and BEFORE the code that reads it ships: once the app reads the pools
+from here, a project without them has no game questions at all. `db:check` sees no new
+table; `/rest/v1/rpc/content_current?p_kind=game` answers `200`. The import was done on
+7 Oct 2026 (4 of 4 exact). On a NEW project, import `content/fixture.json` (all five kinds)
+before deploying, or every subject's game says it has no questions.
 
 **The Game feature needs BOTH its migrations applied before db:check passes** —
 `20260913000001_competitions.sql` and

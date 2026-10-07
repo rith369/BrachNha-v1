@@ -231,8 +231,7 @@ export interface Conversation {
   updatedAt: string;
 }
 
-// ── Content types (used once data/lessons.ts, data/questions.ts,
-//    data/translations.ts are ported from the old content-*.js files) ──
+// ── Content types ──
 
 export interface Model3DRef {
   /** public/-relative path, e.g. "/models/brain.glb" — loaded by URL, not imported. */
@@ -245,42 +244,14 @@ export interface Model3DRef {
   title?: string;
 }
 
-export interface Lesson {
-  title: { en: string; km: string };
-  importance: string;
-  icon: string;
-  content: { en: string; km: string };
-  summary: { en: string; km: string };
-  funFact: { en: string; km: string };
-  tip: { en: string; km: string };
-  didYouKnow?: { en: string; km: string };
-  /** Only set on lessons with an interactive 3D model (currently just the
-   *  Human Brain lesson). Absent everywhere else — no other lesson's render
-   *  path changes. */
-  model3d?: Model3DRef;
-}
-
-export interface Flashcard {
-  q: { en: string; km: string };
-  a: { en: string; km: string };
-  topic: string;
-}
-
-export interface PracticeQuestion {
-  q: { en: string; km: string };
-  correct: string;
-  options: string[];
-  explanation: { en: string; km: string };
-}
-
 // ── Section content ──
 //
 // A SECTION is one node on a subject path and the unit the real curriculum is
-// written in: មេរៀនសង្ខេប → ឧទាហរណ៍ → ចំណាំសំខាន់ៗ → កំហុស. That is deliberately
-// NOT the shape of `Lesson` above, which is the older
-// content/summary/funFact/tip/didYouKnow flow and stays as it is for the two
-// legacy lessons. Bending one into the other would lose what makes each work —
-// most visibly `Misconception`, where the pairing IS the teaching.
+// written in: មេរៀនសង្ខេប → ឧទាហរណ៍ → ចំណាំសំខាន់ៗ → កំហុស. It was deliberately
+// NOT the shape of the old 7-step `Lesson` (content/summary/funFact/tip/
+// didYouKnow, deleted with those lessons on 7 Oct 2026): bending one into the
+// other would have lost what makes a section work, most visibly
+// `Misconception`, where the pairing IS the teaching.
 //
 // Every string here is KHMER ONLY, not an { en, km } pair. Same decision as
 // LESSONS_PAGE_LANG, EXAM_PAGE_LANG and KruAI's ANSWER_LANG: the content exists
@@ -475,15 +446,16 @@ export interface PracticeCard {
 }
 
 /**
- * Content stored in the database (supabase/migrations/20261003000001 and
- * 20261003000002, docs/plans/content-in-database.md and
+ * Content stored in the database (supabase/migrations/20261003000001,
+ * 20261003000002 and 20261007000001, docs/plans/content-in-database.md and
  * sections-and-papers-in-database.md): flashcard decks, practice quizzes,
- * lesson sections and past papers, one row per item, keyed like the code they
- * replace ("biology-1-1", "math-1-1-1", "biology-3-1-1", "2025-math").
+ * lesson sections, past papers and Battle question pools, one row per item,
+ * keyed like the code they replace ("biology-1-1", "math-1-1-1",
+ * "biology-3-1-1", "2025-math", "math").
  *
- * A deck or quiz body is a LIST; a section or paper body is one OBJECT.
+ * A deck, quiz or game body is a LIST; a section or paper body is one OBJECT.
  */
-export type ContentKind = "deck" | "quiz" | "section" | "paper";
+export type ContentKind = "deck" | "quiz" | "section" | "paper" | "game";
 
 /** One card as stored. The app adds `source` and the timestamps when it turns
  *  a stored card into a PracticeCard. The id is kept for ever: review history
@@ -564,13 +536,31 @@ export interface PaperBody {
   skills?: Record<string, SkillHelp>;
 }
 
+/**
+ * One Battle question as stored: an ExamQuestion with an id ("q1"…, never
+ * reused) and its explanation required. The text is a PAIR, unlike a paper's:
+ * the Battle page follows the app's language and these carry real English and
+ * Khmer wording. A Battle FREEZES the questions it drew on the competition row,
+ * so an edit reaches new Battles only.
+ */
+export interface GameQuestionBody {
+  id: string;
+  q: { en: string; km: string };
+  options: string[];
+  correct: string;
+  difficulty?: Exclude<GameDifficulty, "mix">;
+  explanation: string;
+}
+
 export type ContentBody<K extends ContentKind> = K extends "deck"
   ? DeckCardBody[]
   : K extends "quiz"
     ? QuizQuestionBody[]
     : K extends "section"
       ? SectionBody
-      : PaperBody;
+      : K extends "paper"
+        ? PaperBody
+        : GameQuestionBody[];
 
 export type MockExamSubject = "math" | "biology" | "chemistry" | "physics";
 
@@ -591,12 +581,10 @@ export interface ExamQuestion {
    * How hard this question is, used by the Game feature when a creator picks a
    * difficulty for their competition.
    *
-   * OPTIONAL, and left unset on every question that exists today. None of the
-   * authored questions carry a difficulty, and assigning one to each of them
-   * would be inventing a judgement nobody made — the same reason a chapter with
-   * no supplied title carries "" rather than a made-up one. An untagged question
-   * passes every filter, so tagging content later starts the filter working with
-   * no code change, exactly as adding a GAME_QUESTIONS entry turns a subject on.
+   * OPTIONAL: assigning one to a question nobody judged would be inventing a
+   * judgement, the same reason a chapter with no supplied title carries "". An
+   * untagged question passes every filter. The Battle pools (Admin → Content →
+   * Battle questions) tag every question today.
    */
   difficulty?: GameDifficulty;
   /** Optional step-by-step mathematical or conceptual explanation for why the correct answer is right. */
@@ -827,8 +815,8 @@ export type GameDifficulty = "easy" | "medium" | "hard" | "mix";
  * subject's pool. It costs a little more storage and buys the one property the
  * whole feature rests on: a joiner answers EXACTLY what the creator answered,
  * for as long as the competition exists. A reference into the pool would break
- * the moment data/game-questions.ts is edited — and since content is explicitly
- * arriving later, that edit is not hypothetical. It also means a result stays
+ * the moment the pool is edited (Admin → Content → Game questions), and that
+ * edit is the point of having an editor. It also means a result stays
  * meaningful after the source questions are reworded or removed.
  *
  * `creatorName` IS DENORMALISED ON PURPOSE AND MUST STAY THAT WAY. The result

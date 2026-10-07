@@ -456,8 +456,8 @@ Any admin can save a draft. **Only the owner can publish, hide or import.**
 
 Since step 1b (3 Oct 2026) students read decks and quizzes ONLY from here: a
 new publish reaches them the next time they open the app. **On a new project**,
-apply this migration AND `20261003000002` below first: `fixture.json` now holds
-all four kinds (35 items), so one import fills everything. Do it before
+apply this migration, `20261003000002` and `20261007000001` below first:
+`fixture.json` holds every kind, so one import fills everything. Do it before
 deploying, or every deck, quiz, section and paper shows as coming soon.
 
 `db:check` lists the three tables but cannot see the functions. Check those with
@@ -492,3 +492,22 @@ new publish reaches them the next time they open the app.
 `db:check` sees no new table. Check the migration with
 `/rest/v1/rpc/content_current?p_kind=section` (publishable key), which answers
 200 (`[]` before the import).
+
+## `20261007000001`: game questions
+
+A fifth kind in the same three tables, `game` (key: the subject alone, `math`),
+holding each subject's pool of Battle questions, so the team can fix one on
+**/admin/content** without a code change. The functions keep their names and
+arguments; the other four kinds behave as before.
+
+**The one-time move (done 7 Oct 2026, before the code that reads it shipped):**
+
+1. Run the migration in the SQL editor, in one go, AFTER `20261003000002`.
+2. Import the 4 pools on `/admin/content` with **Publish items that have never
+   been published** ticked (it said 4 published). The file,
+   `content/game-questions.json`, was deleted afterwards; a new project imports
+   `content/fixture.json` instead.
+3. `npm run check:content -- --live` confirmed 4 of 4 exactly.
+
+Check the migration with `/rest/v1/rpc/content_current?p_kind=game`
+(publishable key), which answers 200 (`[]` before the import).

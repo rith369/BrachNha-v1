@@ -5,10 +5,12 @@ import { focusCard } from "@/utils/focus-styles";
 import { cn } from "@/utils/cn";
 import { SubjectArt } from "@/features/lessons/components/subject-art";
 import { SUBJECT_STYLE } from "@/features/lessons/subject-styles";
-import { DIFFICULTIES, MATCH_MINUTES, gameSubjects } from "../game";
+import { DIFFICULTIES, MATCH_MINUTES, gameSubjects, toGameQuestions } from "../game";
 import { gameCopy } from "../copy";
 import { useBrachNhaStore } from "@/lib/store";
-import type { GameDifficulty } from "@/types";
+import { retryBody, retryContent, useContentBody, useContentManifest } from "@/lib/content";
+import { entryVersion } from "@/utils/content-manifest";
+import type { ExamQuestion, GameDifficulty } from "@/types";
 import type { SubjectId } from "@/features/lessons/subjects";
 
 function Chip({
@@ -50,6 +52,12 @@ function Chip({
  *
  * It wears FocusLayout because it is on a focus route: the X is the way back to
  * /game, and the navigation is already hidden by then.
+ *
+ * THE QUESTIONS COME FROM THE DATABASE (kind `game`): which subjects have a
+ * pool is read off the manifest, and the chosen subject's pool downloads while
+ * the student picks a level and a time, so Start rarely waits. Start stays off
+ * until that pool is in hand; a first open with no internet says so, with
+ * Try again.
  */
 export function CreateForm({
   onStart,
@@ -59,17 +67,26 @@ export function CreateForm({
     subjectId: SubjectId;
     difficulty: GameDifficulty;
     minutes: number;
+    /** The subject's whole published pool; the page draws from it. */
+    pool: ExamQuestion[];
   }) => void;
   onExit: () => void;
 }) {
   const lang = useBrachNhaStore((s) => s.lang);
   const t = gameCopy(lang);
-  const subjects = gameSubjects(undefined);
-  const playable = subjects.filter((s) => s.questions.length > 0);
+  const manifest = useContentManifest();
+  const subjects = gameSubjects(undefined, manifest);
+  const playable = subjects.filter((s) => s.count > 0);
 
-  const [subjectId, setSubjectId] = useState<SubjectId | null>(
-    playable[0]?.subject.id ?? null
-  );
+  // The student's pick, or the first playable subject. Derived rather than an
+  // initial state: the manifest can arrive after the first render.
+  const [picked, setSubjectId] = useState<SubjectId | null>(null);
+  const subjectId =
+    picked && playable.some((p) => p.subject.id === picked)
+      ? picked
+      : (playable[0]?.subject.id ?? null);
+  const version = subjectId ? entryVersion(manifest, "game", subjectId) : null;
+  const pool = useContentBody("game", subjectId ?? "", version);
   const [difficulty, setDifficulty] = useState<GameDifficulty>("mix");
   const [minutes, setMinutes] = useState<number>(MATCH_MINUTES[1]);
 
@@ -79,10 +96,14 @@ export function CreateForm({
       onExit={onExit}
       footer={
         <FocusButton
-          onClick={() => subjectId && onStart({ subjectId, difficulty, minutes })}
-          disabled={!subjectId}
+          onClick={() =>
+            subjectId &&
+            pool.status === "ready" &&
+            onStart({ subjectId, difficulty, minutes, pool: toGameQuestions(pool.body) })
+          }
+          disabled={!subjectId || pool.status !== "ready"}
         >
-          {t.startPlaying}
+          {subjectId && pool.status === "loading" ? t.loadingQuestions : t.startPlaying}
         </FocusButton>
       }
     >
@@ -98,9 +119,9 @@ export function CreateForm({
           {t.subject}
         </div>
         <div className="mb-5 grid grid-cols-2 gap-2.5 md:grid-cols-3">
-          {subjects.map(({ subject, questions }) => {
+          {subjects.map(({ subject, count }) => {
             const style = SUBJECT_STYLE[subject.id];
-            const empty = questions.length === 0;
+            const empty = count === 0;
             const selected = subject.id === subjectId;
 
             const body = (
@@ -121,7 +142,7 @@ export function CreateForm({
                         className={cn("size-2.5 shrink-0", style.text)}
                         strokeWidth={2.5}
                       />
-                      {questions.length} {t.questions}
+                      {count} {t.questions}
                     </span>
                   )}
                 </div>
@@ -186,11 +207,36 @@ export function CreateForm({
           ))}
         </div>
 
+        {pool.status === "offline" && subjectId && version !== null && (
+          <div className={cn(focusCard, "mt-5 text-center")}>
+            <p className="mb-2 text-sm font-bold text-muted">{t.questionsOffline}</p>
+            <button
+              type="button"
+              onClick={() => retryBody("game", subjectId, version)}
+              className="text-sm font-extrabold text-purple"
+            >
+              {t.retry}
+            </button>
+          </div>
+        )}
         {playable.length === 0 && (
           <div className={cn(focusCard, "mt-5 text-center")}>
             <p className="text-sm font-bold text-muted">
-              {t.noQuestions}
+              {manifest.status === "loading"
+                ? t.loadingQuestions
+                : manifest.status === "failed"
+                  ? t.questionsOffline
+                  : t.noQuestions}
             </p>
+            {manifest.status === "failed" && (
+              <button
+                type="button"
+                onClick={retryContent}
+                className="mt-2 text-sm font-extrabold text-purple"
+              >
+                {t.retry}
+              </button>
+            )}
           </div>
         )}
       </div>

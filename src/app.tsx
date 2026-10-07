@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
-import { Outlet, Route, Routes, useLocation } from "react-router";
+import { Navigate, Outlet, Route, Routes, useLocation } from "react-router";
 import { AppShell } from "@/components/shell/app-shell";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { useFocusMode, useMentorBlocked } from "@/hooks/use-focus-mode";
@@ -37,7 +37,6 @@ const routeModules = {
   gradePrediction: () => import("@/pages/grade-prediction"),
   leaderboard: () => import("@/pages/leaderboard"),
   lessons: () => import("@/pages/lessons"),
-  lessonDetail: () => import("@/pages/lesson-detail"),
   sectionDetail: () => import("@/pages/section-detail"),
   subjectPath: () => import("@/pages/subject-path"),
   placementTest: () => import("@/pages/placement-test"),
@@ -64,7 +63,6 @@ const ExamPaperPage = lazy(routeModules.examPaper);
 const GradePredictionPage = lazy(routeModules.gradePrediction);
 const LeaderboardPage = lazy(routeModules.leaderboard);
 const LessonsPage = lazy(routeModules.lessons);
-const LessonDetailPage = lazy(routeModules.lessonDetail);
 const SectionDetailPage = lazy(routeModules.sectionDetail);
 const SubjectPathPage = lazy(routeModules.subjectPath);
 const PlacementTestRoute = lazy(routeModules.placementTest);
@@ -251,7 +249,9 @@ export default function App() {
           <Route path="grade-prediction" element={<GradePredictionPage />} />
           <Route path="leaderboard" element={<LeaderboardPage />} />
           <Route path="lessons" element={<LessonsPage />} />
-          <Route path="lessons/:lessonId" element={<LessonDetailPage />} />
+          {/* The old 7-step lessons lived here until 7 Oct 2026. A saved link
+              to one lands on the Study page rather than on "not found". */}
+          <Route path="lessons/:lessonId" element={<Navigate to="/lessons" replace />} />
           <Route path="sections/:sectionId" element={<SectionDetailPage />} />
           <Route path="subjects/:subjectId" element={<SubjectPathPage />} />
           <Route

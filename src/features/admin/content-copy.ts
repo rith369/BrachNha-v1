@@ -15,12 +15,13 @@ const en = {
   // ── The list (/admin/content) ────────────────────────────────────────────
   title: "Content",
   blurb:
-    "Flashcards, practice quizzes, lesson sections and past papers. Anyone on the team can save a draft; students see a change only after the owner presses Publish.",
+    "Flashcards, practice quizzes, lesson sections, past papers and game questions. Anyone on the team can save a draft; students see a change only after the owner presses Publish.",
   tabs: {
     deck: "Flashcards",
     quiz: "Quizzes",
     section: "Lesson sections",
     paper: "Past papers",
+    game: "Game questions",
   } satisfies Record<ContentKind, string>,
   allSubjects: "All",
   empty: "Nothing here yet.",
@@ -36,7 +37,7 @@ const en = {
 
   importTitle: "Import a file",
   importBlurb:
-    "A .json file of content (decks, quizzes, lesson sections or past papers), as content:export writes it. Each item arrives as a draft for you to check and publish.",
+    "A .json file of content (decks, quizzes, lesson sections, past papers or game questions), as content:export writes it. Each item arrives as a draft for you to check and publish.",
   importPublish:
     "Publish items that have never been published (only for the first move out of the code)",
   importChoose: "Choose a file",
@@ -119,6 +120,7 @@ const en = {
     duplicateGap: "uses a gap number twice",
     sameWords: "has two words in the box that are the same",
     unknownSkill: "names a skill this paper does not have",
+    badDifficulty: "has a level other than Basic, Medium or Hard",
   } satisfies Record<IssueCode, string>,
   fields: {
     id: "Id",
@@ -139,6 +141,9 @@ const en = {
     similarList: "Similar exercises",
     foundation: (n: number) => `Foundation exercise ${n}`,
     foundationList: "Foundation exercises",
+    en: "English",
+    km: "Khmer",
+    difficulty: "Level",
   },
 
   card: (n: number) => `Card ${n}`,
@@ -260,6 +265,15 @@ const en = {
     noSkills: "No skills yet.",
   },
 
+  // ── The game question editor ───────────────────────────────────────────
+  game: {
+    questionEn: "Question in English",
+    questionKm: "Question in Khmer",
+    difficulty: "Level",
+    noLevel: "Not set (offered at every level)",
+    levels: { easy: "Basic", medium: "Medium", hard: "Hard" },
+  },
+
   // ── Explanations: hover with a mouse, tap with a finger ───────────────
   // Each is a claim about what the editor and the database do. Change the
   // rule, change the sentence, in both languages.
@@ -268,7 +282,7 @@ const en = {
   draftChip: "Draft",
   tips: {
     newItem:
-      "Start a deck, a quiz or a lesson section in a place in the app that has nothing yet. To change one that exists, open it from the list instead.",
+      "Start a deck, a quiz, a lesson section or a subject's game questions in a place in the app that has nothing yet. To change one that exists, open it from the list instead.",
     importFile:
       "Owner only. Load a file of content, for example one the developer made. The file is checked here first, and every item arrives as a draft for you to look at.",
     importPublish:
@@ -277,7 +291,12 @@ const en = {
     notPublished: "Students see this as coming soon and cannot open it.",
     draft:
       "Changes that are saved but not live. Students do not see them until the owner presses Publish.",
-    key: "This item's address in the app: the subject and its numbers (for a past paper, the year and the subject). It never changes.",
+    key: "This item's address in the app: the subject and its numbers (for a past paper, the year and the subject; for game questions, the subject alone). It never changes.",
+    gamePool:
+      "The questions a game in this subject draws from. Each new game picks up to 10 at random, at the level its creator chooses. A game keeps the questions it started with, so a fix here reaches new games only.",
+    gameText:
+      "Write the question in both languages: a student sees the one their app is set to. The options, the answer and the explanation are shared.",
+    difficulty: "Used when a student picks a level for their game. A question with no level is offered at every level.",
     cardId:
       "The card's id. Each student's review history is kept under it, so it never changes and is never given to another card.",
     status:
@@ -351,6 +370,7 @@ const en = {
     duplicateGap: "Give each gap its own number.",
     sameWords: "Each word is in the box once. Remove or change the copy.",
     unknownSkill: "Pick a skill from the list, or add it under Skills first.",
+    badDifficulty: "Pick Basic, Medium or Hard, or leave it unset.",
   } satisfies Record<IssueCode, string>,
 
   errors: {
@@ -371,12 +391,13 @@ type ContentCopy = typeof en;
 const km: ContentCopy = {
   title: "មាតិកា",
   blurb:
-    "Flashcard, Quiz លំហាត់, ផ្នែកមេរៀន និងវិញ្ញាសារឆ្នាំចាស់។ អ្នកណាក្នុងក្រុមក៏អាចរក្សាទុកសេចក្តីព្រាងបាន។ សិស្សឃើញការកែប្រែ លុះត្រាតែម្ចាស់ចុចផ្សាយ។",
+    "Flashcard, Quiz លំហាត់, ផ្នែកមេរៀន, វិញ្ញាសារឆ្នាំចាស់ និងសំណួរហ្គេម។ អ្នកណាក្នុងក្រុមក៏អាចរក្សាទុកសេចក្តីព្រាងបាន។ សិស្សឃើញការកែប្រែ លុះត្រាតែម្ចាស់ចុចផ្សាយ។",
   tabs: {
     deck: "Flashcard",
     quiz: "Quiz",
     section: "ផ្នែកមេរៀន",
     paper: "វិញ្ញាសារឆ្នាំចាស់",
+    game: "សំណួរហ្គេម",
   },
   allSubjects: "ទាំងអស់",
   empty: "មិនទាន់មានអ្វីនៅទីនេះទេ។",
@@ -393,7 +414,7 @@ const km: ContentCopy = {
 
   importTitle: "នាំចូលឯកសារ",
   importBlurb:
-    "ឯកសារ .json នៃមាតិកា (Flashcard, Quiz, ផ្នែកមេរៀន ឬវិញ្ញាសារឆ្នាំចាស់) ដូចដែល content:export សរសេរ។ របស់នីមួយៗចូលមកជាសេចក្តីព្រាង ដើម្បីឱ្យអ្នកពិនិត្យ និងផ្សាយ។",
+    "ឯកសារ .json នៃមាតិកា (Flashcard, Quiz, ផ្នែកមេរៀន, វិញ្ញាសារឆ្នាំចាស់ ឬសំណួរហ្គេម) ដូចដែល content:export សរសេរ។ របស់នីមួយៗចូលមកជាសេចក្តីព្រាង ដើម្បីឱ្យអ្នកពិនិត្យ និងផ្សាយ។",
   importPublish:
     "ផ្សាយរបស់ដែលមិនធ្លាប់ផ្សាយ (សម្រាប់តែការផ្លាស់ចេញពីកូដលើកដំបូងប៉ុណ្ណោះ)",
   importChoose: "ជ្រើសឯកសារ",
@@ -473,6 +494,7 @@ const km: ContentCopy = {
     duplicateGap: "ប្រើលេខចន្លោះពីរដង",
     sameWords: "មានពាក្យពីរដូចគ្នាក្នុងប្រអប់",
     unknownSkill: "ដាក់ជំនាញដែលវិញ្ញាសានេះមិនមាន",
+    badDifficulty: "មានកម្រិតក្រៅពី ងាយ មធ្យម ឬពិបាក",
   },
   fields: {
     id: "លេខសម្គាល់",
@@ -493,6 +515,9 @@ const km: ContentCopy = {
     similarList: "លំហាត់ស្រដៀង",
     foundation: (n: number) => `លំហាត់មូលដ្ឋានទី ${n}`,
     foundationList: "លំហាត់មូលដ្ឋាន",
+    en: "អង់គ្លេស",
+    km: "ខ្មែរ",
+    difficulty: "កម្រិត",
   },
 
   card: (n: number) => `កាតទី ${n}`,
@@ -612,12 +637,20 @@ const km: ContentCopy = {
     noSkills: "មិនទាន់មានជំនាញទេ។",
   },
 
+  game: {
+    questionEn: "សំណួរជាភាសាអង់គ្លេស",
+    questionKm: "សំណួរជាភាសាខ្មែរ",
+    difficulty: "កម្រិត",
+    noLevel: "មិនកំណត់ (បង្ហាញនៅគ្រប់កម្រិត)",
+    levels: { easy: "ងាយ", medium: "មធ្យម", hard: "ពិបាក" },
+  },
+
   whatIsThis: "តើនេះមានន័យថាអ្វី",
   labelsTitle: "ន័យនៃស្លាក៖",
   draftChip: "សេចក្តីព្រាង",
   tips: {
     newItem:
-      "ចាប់ផ្តើម Flashcard, Quiz ឬផ្នែកមេរៀន នៅកន្លែងក្នុងកម្មវិធីដែលមិនទាន់មានអ្វីសោះ។ ដើម្បីកែមួយដែលមានរួចហើយ សូមបើកវាពីបញ្ជីខាងក្រោម។",
+      "ចាប់ផ្តើម Flashcard, Quiz, ផ្នែកមេរៀន ឬសំណួរហ្គេមនៃមុខវិជ្ជាមួយ នៅកន្លែងក្នុងកម្មវិធីដែលមិនទាន់មានអ្វីសោះ។ ដើម្បីកែមួយដែលមានរួចហើយ សូមបើកវាពីបញ្ជីខាងក្រោម។",
     importFile:
       "សម្រាប់តែម្ចាស់។ ផ្ទុកឯកសារមាតិកា ឧទាហរណ៍ឯកសារដែលអ្នកអភិវឌ្ឍន៍បានធ្វើ។ ឯកសារត្រូវបានពិនិត្យនៅទីនេះជាមុន ហើយរបស់នីមួយៗចូលមកជាសេចក្តីព្រាង ដើម្បីឱ្យអ្នកមើល។",
     importPublish:
@@ -625,7 +658,12 @@ const km: ContentCopy = {
     live: "សិស្សឃើញកំណែនេះ។ លេខកើនឡើង 1 រាល់ពេលម្ចាស់ចុចផ្សាយ។",
     notPublished: "សិស្សឃើញវាជា «ឆាប់ៗនេះ» ហើយមិនអាចបើកបានទេ។",
     draft: "ការកែប្រែដែលបានរក្សាទុក តែមិនទាន់បង្ហាញ។ សិស្សមិនឃើញវាទេ រហូតដល់ម្ចាស់ចុចផ្សាយ។",
-    key: "អាសយដ្ឋានរបស់វាក្នុងកម្មវិធី៖ មុខវិជ្ជា និងលេខរបស់វា (សម្រាប់វិញ្ញាសារឆ្នាំចាស់៖ ឆ្នាំ និងមុខវិជ្ជា)។ វាមិនប្តូរទេ។",
+    key: "អាសយដ្ឋានរបស់វាក្នុងកម្មវិធី៖ មុខវិជ្ជា និងលេខរបស់វា (សម្រាប់វិញ្ញាសារឆ្នាំចាស់៖ ឆ្នាំ និងមុខវិជ្ជា សម្រាប់សំណួរហ្គេម៖ មុខវិជ្ជាតែប៉ុណ្ណោះ)។ វាមិនប្តូរទេ។",
+    gamePool:
+      "សំណួរដែលហ្គេមក្នុងមុខវិជ្ជានេះជ្រើសយក។ ហ្គេមថ្មីនីមួយៗជ្រើសយកដោយចៃដន្យរហូតដល់ 10 សំណួរ តាមកម្រិតដែលអ្នកបង្កើតជ្រើស។ ហ្គេមរក្សាសំណួរដែលវាចាប់ផ្តើមជាមួយ ដូច្នេះការកែនៅទីនេះទៅដល់តែហ្គេមថ្មីប៉ុណ្ណោះ។",
+    gameText:
+      "សរសេរសំណួរជាពីរភាសា៖ សិស្សឃើញភាសាដែលកម្មវិធីរបស់ខ្លួនកំណត់។ ជម្រើស ចម្លើយ និងការពន្យល់ ប្រើរួមគ្នា។",
+    difficulty: "ប្រើនៅពេលសិស្សជ្រើសកម្រិតសម្រាប់ហ្គេមរបស់ខ្លួន។ សំណួរដែលគ្មានកម្រិត បង្ហាញនៅគ្រប់កម្រិត។",
     cardId:
       "លេខសម្គាល់កាត។ ប្រវត្តិពិនិត្យរបស់សិស្សម្នាក់ៗត្រូវបានរក្សាទុកក្រោមលេខនេះ ដូច្នេះវាមិនប្តូរ ហើយមិនដែលឱ្យទៅកាតផ្សេងទេ។",
     status:
@@ -699,6 +737,7 @@ const km: ContentCopy = {
     duplicateGap: "ផ្តល់លេខផ្សេងគ្នាឱ្យចន្លោះនីមួយៗ។",
     sameWords: "ពាក្យនីមួយៗមានតែម្តងក្នុងប្រអប់។ លុប ឬប្តូរពាក្យដែលស្ទួន។",
     unknownSkill: "ជ្រើសជំនាញពីបញ្ជី ឬបន្ថែមវានៅក្រោម «ជំនាញ» ជាមុនសិន។",
+    badDifficulty: "ជ្រើស ងាយ មធ្យម ឬពិបាក ឬទុកឱ្យនៅទទេ។",
   },
 
   errors: {

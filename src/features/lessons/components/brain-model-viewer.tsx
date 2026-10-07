@@ -9,7 +9,7 @@ import type { Lang, Model3DRef } from "@/types";
 /**
  * THIS MODULE IS THE LAZY BOUNDARY for three.js. `three` + @react-three/fiber
  * + @react-three/drei together are a meaningfully large dependency — this
- * file is reached ONLY through React.lazy from lesson-detail.tsx, exactly
+ * file is reached ONLY through React.lazy from section-detail.tsx, exactly
  * like MathFieldPanel is reached from chat-overlay.tsx (see the header of
  * math-field-panel.tsx). A static import of this file — or of `three` /
  * `@react-three/fiber` / `@react-three/drei` — anywhere else in the app would

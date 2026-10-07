@@ -340,7 +340,8 @@ reviewed and published, then the file is deleted.
 ## Not doing
 
 - Legacy lessons (`data/lessons.ts`) and game questions (`data/game-questions.ts`, 213 KB,
-  already off the first screen) stay in code. A possible stage 4.
+  already off the first screen) stay in code. A possible stage 4. (The legacy lessons
+  were deleted instead on 7 Oct 2026, after this plan shipped; see AGENTS.md.)
 - No picture upload: a new poster or model still ships with the app.
 - No building whole new papers or new parts in the editor; those come as files.
 - No real-time push: students get a fix on their next app open.

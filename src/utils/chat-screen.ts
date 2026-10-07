@@ -36,8 +36,6 @@
 export interface ScreenRef {
   /** `/sections/:sectionId` — a section of the real curriculum, e.g. "biology-3-1-1". */
   sectionId?: string;
-  /** `/lessons/:lessonId` — one of the legacy 7-step lessons, e.g. "biology-brain". */
-  lessonId?: string;
   /** The subject in view. DERIVED from the ids above where possible, so it
    *  cannot disagree with them; only `/subjects/:subjectId` supplies it alone. */
   subjectId?: string;
@@ -55,7 +53,7 @@ function segmentsOf(pathname: string): string[] {
  * The subject an id belongs to.
  *
  * Every content id in the app is `{subject}-{rest}` — "biology-3-1-1",
- * "biology-brain", "math-limits" — so the subject is the first segment. This is
+ * "biology-1-1" — so the subject is the first segment. This is
  * the same derivation buildKnowledgeBlock already does for section ids, and the
  * same one sessionStatus() relies on.
  *
@@ -84,14 +82,6 @@ export function screenRefFor(pathname: string): ScreenRef {
   // signal there is, since the published section holds the full authored prose.
   if (head === "sections" && rest[0]) {
     return { sectionId: rest[0], subjectId: subjectOf(rest[0]) };
-  }
-
-  // /lessons/:lessonId, WITH the id. Bare /lessons is the subject grid — a
-  // place, not a lesson — and must not be mistaken for one. Same trailing-slash
-  // rule isFocusRoute() applies, and the reason `rest[0]` is tested rather than
-  // `head === "lessons"` alone.
-  if (head === "lessons" && rest[0]) {
-    return { lessonId: rest[0], subjectId: subjectOf(rest[0]) };
   }
 
   // /subjects/:subjectId — the session path. The student is CHOOSING here

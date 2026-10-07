@@ -3,13 +3,6 @@
 // bundler cannot resolve the alias. Keep it alias-free.
 import type { Lang, SectionContent } from "../types/index.js";
 import type { ScreenRef } from "./chat-screen.js";
-import {
-  LESSONS,
-  FOUNDATION,
-  FLASHCARDS,
-  PRACTICE,
-  lessonDataFor,
-} from "../data/lessons.js";
 import { MOCK_QS } from "../data/questions.js";
 import {
   BAC2_ANSWER_RULES,
@@ -142,18 +135,16 @@ function cleanNumber(value: unknown, min: number, max: number): number | null {
  * 12,595-character block — roughly half the app's entire content library spent
  * on a language the mentor is forbidden to reply in (see ANSWER_LANG).
  *
- * The English is not dropped outright, because the old comment's reason was a
- * real one: some Khmer entries in data/lessons.ts are abbreviated against their
- * English, so deleting it would lose content rather than duplication. WHICH ones
- * was measured rather than guessed — across the 57 pairs in data/lessons.ts the
- * Khmer runs at a median 0.71x the English length, and Khmer is denser per
- * character than English, so that is a COMPLETE rendering. Only 15 pairs fall
- * below KM_STUB_RATIO, and those are the ones that keep both.
+ * The English is not dropped outright, because some Khmer entries are
+ * abbreviated against their English, so deleting it would lose content rather
+ * than duplication. The ratio was measured on the old 7-step lessons (57 pairs,
+ * Khmer at a median 0.71x the English length, which is a COMPLETE rendering
+ * since Khmer is denser per character); those were deleted on 7 Oct 2026, and
+ * the mock-exam questions (MOCK_QS) are what still go through here.
  *
  * Tighten the ratio and full Khmer entries start dragging their English along
  * again; loosen it and a genuinely abbreviated entry loses the detail only the
- * English carries. If the Khmer column in data/lessons.ts is ever completed,
- * this whole function collapses to `pair.km`.
+ * English carries.
  */
 const KM_STUB_RATIO = 0.6;
 
@@ -315,38 +306,6 @@ export function sectionChunks(sectionId: string, sections: SectionMap): Retrieve
 }
 
 /**
- * One of the legacy 7-step lessons, as a single context chunk.
- *
- * Resolved through `lessonDataFor`, the same function pages/lesson-detail.tsx
- * uses, rather than reaching into LESSONS here. A lesson id is `{subject}-{topic}`
- * and the lesson lives at `LESSONS[subject][topic]` — not at `[subject][id]` —
- * and `math-foundation` / `biology-foundation` are special-cased on top of that.
- * Re-deriving any of it is how two lookups come to disagree about which ids are
- * real, and this one decides what the mentor is told exists.
- */
-function lessonChunk(lessonId: string): RetrievedChunk | null {
-  if (!isLookupKey(lessonId)) return null;
-  const lang = ANSWER_LANG;
-  const subject = lessonId.split("-")[0];
-  const lesson = lessonDataFor(lessonId);
-  if (!lesson) return null;
-
-  const parts = [
-    bi(lesson.content, lang),
-    `សង្ខេប៖ ${bi(lesson.summary, lang)}`,
-    `គន្លឹះ៖ ${bi(lesson.tip, lang)}`,
-  ];
-  if (lesson.didYouKnow) parts.push(`ដឹងទេ៖ ${bi(lesson.didYouKnow, lang)}`);
-
-  return {
-    id: `les:${lessonId}`,
-    where: `${subject} · ${bi(lesson.title, lang)}`,
-    text: parts.join("\n"),
-    pinned: true,
-  };
-}
-
-/**
  * The published flashcard decks, keyed like "biology-1-1". They live in the
  * database now (supabase/migrations/20261003000001), so the server fetches them
  * (server/content-source.ts) and passes them in; this module stays pure and
@@ -402,11 +361,6 @@ export function pinnedContextFor(
   if (screen.sectionId) {
     const chunks = sectionChunks(screen.sectionId, sections);
     if (chunks.length) return chunks;
-  }
-
-  if (screen.lessonId) {
-    const chunk = lessonChunk(screen.lessonId);
-    if (chunk) return [chunk];
   }
 
   if (screen.practiceKey) {
@@ -554,44 +508,6 @@ export function buildCatalogBlock(
 ): string {
   const entries: CatalogEntry[] = [];
 
-  for (const [subject, lesson] of Object.entries(FOUNDATION)) {
-    entries.push({
-      subject,
-      brief: `[${subject} · foundation] ${bi(lesson.title, lang)}`,
-      full: `[${subject} · foundation] ${bi(lesson.title, lang)}: ${bi(lesson.content, lang)} Key: ${bi(lesson.summary, lang)} Tip: ${bi(lesson.tip, lang)}`,
-    });
-  }
-
-  for (const [subject, lessons] of Object.entries(LESSONS)) {
-    for (const [lessonId, lesson] of Object.entries(lessons)) {
-      entries.push({
-        subject,
-        brief: `[${subject} · lesson:${lessonId}] ${bi(lesson.title, lang)}`,
-        full: `[${subject} · lesson:${lessonId} · exam weight ${lesson.importance}] ${bi(lesson.title, lang)}: ${bi(lesson.content, lang)} Key: ${bi(lesson.summary, lang)} Tip: ${bi(lesson.tip, lang)}`,
-      });
-    }
-  }
-
-  for (const [subject, cards] of Object.entries(FLASHCARDS)) {
-    for (const card of cards) {
-      entries.push({
-        subject,
-        brief: `[${subject} · flashcard:${card.topic}] ${bi(card.q, lang)}`,
-        full: `[${subject} · flashcard:${card.topic}] Q: ${bi(card.q, lang)} A: ${bi(card.a, lang)}`,
-      });
-    }
-  }
-
-  for (const [subject, questions] of Object.entries(PRACTICE)) {
-    for (const question of questions) {
-      entries.push({
-        subject,
-        brief: `[${subject} · practice] ${bi(question.q, lang)}`,
-        full: `[${subject} · practice] Q: ${bi(question.q, lang)} Correct: ${question.correct}. Why: ${bi(question.explanation, lang)}`,
-      });
-    }
-  }
-
   for (const question of MOCK_QS) {
     entries.push({
       subject: question.subj,
@@ -643,10 +559,6 @@ export function buildCatalogBlock(
   // derived from whatever happened to be selected for one turn, the mentor would
   // deny the existence of a lesson on any question that did not surface it.
   const covered = new Set([
-    ...Object.keys(LESSONS),
-    ...Object.keys(FOUNDATION),
-    ...Object.keys(FLASHCARDS),
-    ...Object.keys(PRACTICE),
     ...MOCK_QS.map((q) => q.subj),
     ...Object.keys(decks).map((key) => key.split("-")[0]),
     // Section ids are `{subject}-{chapter}-{lesson}-{section}`, so the subject

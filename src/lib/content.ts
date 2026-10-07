@@ -53,7 +53,7 @@ const CACHE_ORIGIN = "https://content.brachnha.invalid";
 const REFRESH_AFTER_MS = 30 * 60_000;
 const FETCH_TIMEOUT_MS = 15_000;
 
-const KINDS: readonly ContentKind[] = ["deck", "quiz", "section", "paper"];
+const KINDS: readonly ContentKind[] = ["deck", "quiz", "section", "paper", "game"];
 
 const useFixture = import.meta.env.DEV && !isSupabaseConfigured;
 
@@ -87,7 +87,7 @@ async function fetchJson(url: string, init?: RequestInit): Promise<unknown> {
 }
 
 function emptyManifest(status: ContentManifest["status"]): ContentManifest {
-  return { status, deck: {}, quiz: {}, section: {}, paper: {} };
+  return { status, deck: {}, quiz: {}, section: {}, paper: {}, game: {} };
 }
 
 // ── The development fixture ───────────────────────────────────────────────
@@ -153,8 +153,9 @@ function readStored(): ContentManifest | null {
     const raw: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null");
     if (typeof raw !== "object" || raw === null) return null;
     const r = raw as Partial<Record<ContentKind, unknown>>;
-    // A copy from before step B has no `section` or `paper`: read as none, and
-    // the network fills them in.
+    // A copy from before step B has no `section` or `paper` (and one from
+    // before the Battle pools moved, no `game`): read as none, and the network
+    // fills them in.
     if (typeof r.deck !== "object" || r.deck === null) return null;
     if (typeof r.quiz !== "object" || r.quiz === null) return null;
     // Re-checked through toManifest, so a hand-edited or older copy cannot
@@ -180,7 +181,7 @@ function store(m: ContentManifest) {
   try {
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ deck: m.deck, quiz: m.quiz, section: m.section, paper: m.paper })
+      JSON.stringify({ deck: m.deck, quiz: m.quiz, section: m.section, paper: m.paper, game: m.game })
     );
   } catch {
     // Kept for this page load only.
@@ -302,6 +303,8 @@ const isObj = (v: unknown): v is Record<string, unknown> =>
  * reaching a screen that would throw on it.
  *
  *   deck, quiz   a list of objects with ids
+ *   game         a list of questions with ids, a two-language text, options
+ *                and an answer (a Battle freezes them, so they must be whole)
  *   section      an object with a title and its four blocks
  *   paper        an object with minutes and at least one part
  */
@@ -311,6 +314,22 @@ function isBody(kind: ContentKind, value: unknown): boolean {
       Array.isArray(value) &&
       value.length > 0 &&
       value.every((x) => isObj(x) && typeof x.id === "string")
+    );
+  }
+  if (kind === "game") {
+    return (
+      Array.isArray(value) &&
+      value.length > 0 &&
+      value.every(
+        (x) =>
+          isObj(x) &&
+          typeof x.id === "string" &&
+          isObj(x.q) &&
+          typeof x.q.en === "string" &&
+          typeof x.q.km === "string" &&
+          Array.isArray(x.options) &&
+          typeof x.correct === "string"
+      )
     );
   }
   if (!isObj(value)) return false;
@@ -474,8 +493,9 @@ const all: Record<ContentKind, AllEntry> = {
   quiz: { sig: "", state: { status: "loading" } },
   section: { sig: "", state: { status: "loading" } },
   paper: { sig: "", state: { status: "loading" } },
+  game: { sig: "", state: { status: "loading" } },
 };
-const allInFlight: Record<ContentKind, string> = { deck: "", quiz: "", section: "", paper: "" };
+const allInFlight: Record<ContentKind, string> = { deck: "", quiz: "", section: "", paper: "", game: "" };
 
 function entriesOf(kind: ContentKind, m: ContentManifest): [string, number][] {
   const map: Record<string, ContentEntry> = m[kind];
