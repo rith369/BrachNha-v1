@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 7 Oct 2026 — Game Questions Get an Editor Too
 
-Commit: not committed yet. No database step left: the owner ran
+Commit `8029823`. No database step left: the owner ran
 `20261007000001_game_questions.sql` and imported the 4 question pools today (all 4 checked
 against the database and identical).
 
@@ -54,7 +54,7 @@ Content like everything else.
 
 ## 7 Oct 2026 — The Old Starter Lessons Are Removed
 
-Commit: not committed yet. No database step.
+Commit `8029823` (with the game questions). No database step.
 
 **Why.** The app still carried six lessons from its very first version: Basic Limits and
 Basic Probability (maths), Human Body and Human Brain (biology), and a maths and a biology
