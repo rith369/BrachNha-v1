@@ -303,8 +303,8 @@ const isObj = (v: unknown): v is Record<string, unknown> =>
  * reaching a screen that would throw on it.
  *
  *   deck, quiz   a list of objects with ids
- *   game         a list of questions with ids, a two-language text, options
- *                and an answer (a Battle freezes them, so they must be whole)
+ *   game         a list of questions with ids, a text, options and an answer
+ *                (a Battle freezes them, so they must be whole)
  *   section      an object with a title and its four blocks
  *   paper        an object with minutes and at least one part
  */
@@ -324,9 +324,8 @@ function isBody(kind: ContentKind, value: unknown): boolean {
         (x) =>
           isObj(x) &&
           typeof x.id === "string" &&
-          isObj(x.q) &&
-          typeof x.q.en === "string" &&
-          typeof x.q.km === "string" &&
+          // One text; a version from before 20261007000002 holds { en, km }.
+          (typeof x.q === "string" || (isObj(x.q) && typeof x.q.km === "string")) &&
           Array.isArray(x.options) &&
           typeof x.correct === "string"
       )

@@ -141,8 +141,6 @@ const en = {
     similarList: "Similar exercises",
     foundation: (n: number) => `Foundation exercise ${n}`,
     foundationList: "Foundation exercises",
-    en: "English",
-    km: "Khmer",
     difficulty: "Level",
   },
 
@@ -267,8 +265,6 @@ const en = {
 
   // ── The game question editor ───────────────────────────────────────────
   game: {
-    questionEn: "Question in English",
-    questionKm: "Question in Khmer",
     difficulty: "Level",
     noLevel: "Not set (offered at every level)",
     levels: { easy: "Basic", medium: "Medium", hard: "Hard" },
@@ -294,8 +290,6 @@ const en = {
     key: "This item's address in the app: the subject and its numbers (for a past paper, the year and the subject; for game questions, the subject alone). It never changes.",
     gamePool:
       "The questions a game in this subject draws from. Each new game picks up to 10 at random, at the level its creator chooses. A game keeps the questions it started with, so a fix here reaches new games only.",
-    gameText:
-      "Write the question in both languages: a student sees the one their app is set to. The options, the answer and the explanation are shared.",
     difficulty: "Used when a student picks a level for their game. A question with no level is offered at every level.",
     cardId:
       "The card's id. Each student's review history is kept under it, so it never changes and is never given to another card.",
@@ -515,8 +509,6 @@ const km: ContentCopy = {
     similarList: "លំហាត់ស្រដៀង",
     foundation: (n: number) => `លំហាត់មូលដ្ឋានទី ${n}`,
     foundationList: "លំហាត់មូលដ្ឋាន",
-    en: "អង់គ្លេស",
-    km: "ខ្មែរ",
     difficulty: "កម្រិត",
   },
 
@@ -638,8 +630,6 @@ const km: ContentCopy = {
   },
 
   game: {
-    questionEn: "សំណួរជាភាសាអង់គ្លេស",
-    questionKm: "សំណួរជាភាសាខ្មែរ",
     difficulty: "កម្រិត",
     noLevel: "មិនកំណត់ (បង្ហាញនៅគ្រប់កម្រិត)",
     levels: { easy: "ងាយ", medium: "មធ្យម", hard: "ពិបាក" },
@@ -661,8 +651,6 @@ const km: ContentCopy = {
     key: "អាសយដ្ឋានរបស់វាក្នុងកម្មវិធី៖ មុខវិជ្ជា និងលេខរបស់វា (សម្រាប់វិញ្ញាសារឆ្នាំចាស់៖ ឆ្នាំ និងមុខវិជ្ជា សម្រាប់សំណួរហ្គេម៖ មុខវិជ្ជាតែប៉ុណ្ណោះ)។ វាមិនប្តូរទេ។",
     gamePool:
       "សំណួរដែលហ្គេមក្នុងមុខវិជ្ជានេះជ្រើសយក។ ហ្គេមថ្មីនីមួយៗជ្រើសយកដោយចៃដន្យរហូតដល់ 10 សំណួរ តាមកម្រិតដែលអ្នកបង្កើតជ្រើស។ ហ្គេមរក្សាសំណួរដែលវាចាប់ផ្តើមជាមួយ ដូច្នេះការកែនៅទីនេះទៅដល់តែហ្គេមថ្មីប៉ុណ្ណោះ។",
-    gameText:
-      "សរសេរសំណួរជាពីរភាសា៖ សិស្សឃើញភាសាដែលកម្មវិធីរបស់ខ្លួនកំណត់។ ជម្រើស ចម្លើយ និងការពន្យល់ ប្រើរួមគ្នា។",
     difficulty: "ប្រើនៅពេលសិស្សជ្រើសកម្រិតសម្រាប់ហ្គេមរបស់ខ្លួន។ សំណួរដែលគ្មានកម្រិត បង្ហាញនៅគ្រប់កម្រិត។",
     cardId:
       "លេខសម្គាល់កាត។ ប្រវត្តិពិនិត្យរបស់សិស្សម្នាក់ៗត្រូវបានរក្សាទុកក្រោមលេខនេះ ដូច្នេះវាមិនប្តូរ ហើយមិនដែលឱ្យទៅកាតផ្សេងទេ។",

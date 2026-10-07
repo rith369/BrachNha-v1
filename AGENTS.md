@@ -7273,10 +7273,17 @@ each, 213 KB). They are now the fifth content kind, `game`, edited on Admin → 
 **Game questions** / **សំណួរហ្គេម**, and the file is deleted.
 
 **What is stored** (`GameQuestionBody` in `types/index.ts`): one item per SUBJECT, key
-`math`, `history`…, its body a list of `{ id, q: { en, km }, options, correct,
-difficulty?, explanation }`.
-- **The text is a PAIR, unlike a past paper's single string.** The Battle page follows the
-  app's language, and these questions carry real English and Khmer wording.
+`math`, `history`…, its body a list of `{ id, q, options, correct, difficulty?,
+explanation }`.
+- **`q` IS ONE TEXT, IN THE SUBJECT'S LANGUAGE: Khmer, or English for the English
+  subject. CONTENT IS NEVER TRANSLATED** (the user's rule, restated angrily on 7 Oct 2026).
+  The first version of this move stored an `{ en, km }` pair, carrying over English
+  versions an earlier session (28 Sep) had added to the code, and the editor REQUIRED an
+  English text. That was wrong: `20261007000002` keeps the Khmer and drops the English,
+  and nothing in the app may ask for or keep a second language of content again. The game
+  PAGE's own buttons and labels still follow the app's language; its questions do not.
+  `toGameQuestions()` puts the one text in both halves of `ExamQuestion.q` (shared with the
+  mock exam and the placement test), so the question reads the same whatever the language.
 - **`difficulty` is `easy` / `medium` / `hard` or absent**; absent is offered at every level.
   `mix` is a creator's choice, never a question's.
 - **Ids are `q1…` per subject, never reused** (the stage 1 `used_ids` rule), although nothing
@@ -7290,20 +7297,20 @@ difficulty?, explanation }`.
 - `content_key_ok`, `content_item_ids`, `content_count`, `content_draft_problem` and
   `content_body_problem` are redefined with the same signatures; a pool is a list, like a
   quiz.
-- `content_game_question_problem` checks one question: both texts, the level, then the quiz
-  rules (`content_choice_problem`) with the Khmer text as the prompt.
+- `content_game_question_problem` checks one question: the level, then the quiz rules
+  (`content_choice_problem`). Since `20261007000002` it requires `q` to be ONE string and
+  refuses a pair.
 - **An empty pool cannot be published**: said inside `content_body_problem`, so the publish
   and import functions needed no edit.
 - An app that predates the migration ignores the kind in its manifest, so publishing first
   is safe.
 
-**The checker:** `checkGame()` in `utils/content-check.ts` runs the text rules on BOTH
-languages (both are student-visible), the choice rules, and a new `badDifficulty` code
-with its `issueHelp` sentence.
+**The checker:** `checkGame()` in `utils/content-check.ts` runs the text rules on the one
+text, the choice rules, and a new `badDifficulty` code with its `issueHelp` sentence.
 
-**The editor:** a fifth tab. `GameQuestionEditor` (`content-item-editors.tsx`) shows the
-English text above the shared `ChoiceFields`, which gained optional `promptLabel`,
-`promptTip` and `before` props for it. The level is a `SelectField` whose empty choice
+**The editor:** a fifth tab. `GameQuestionEditor` (`content-item-editors.tsx`) is the quiz
+question's shape: ONE question field (`ChoiceFields`, unchanged), the options, the answer,
+the explanation. There is no English field, and there must not be one. The level is a `SelectField` whose empty choice
 means "not set". New offers each subject with no pool (`gameSlots()`), after picking the
 subject, like every kind. The page explains the pool's rule above the list (`tips.gamePool`).
 
@@ -7336,15 +7343,35 @@ all five kinds (39 items).
   nothing; the other four kinds still import; no client can call a helper). Stage 1's 95,
   stage 2/3's 79 and the real-fixture 5 still pass with it on top.
 - Browser, the database faked: **28 editor checks** (five tabs; import checked in the browser;
-  4 pools of 30; New offers physics; both language fields; edit and publish version 2 with the
+  4 pools of 30; New offers physics; the question field (one, since the correction below); edit and publish version 2 with the
   level; an untouched question keeps every field; a new question takes q31; an em dash blocks
   Publish; Undo; an admin saves a draft that drops the level and has no Publish; the five tabs
   fit at 320 dark Khmer) and **15 Battle checks** (4 subjects selectable and the rest coming
-  soon; only the chosen pool downloads; a Hard battle opens on a hard question; English shows
-  the English text; offline then Try again; no sideways scroll; no page error). The earlier
+  soon; only the chosen pool downloads; a Hard battle opens on a hard question; with the app in
+  English the question is still the Khmer text (since the correction below); offline then Try again; no sideways scroll; no page error). The earlier
   suites (36, 34, 59, 46, 40, 14) still pass.
 - The build: no game question text in any chunk; the first screen is unchanged (231 KB), since
   the questions were never on it.
+
+### The game questions are ONE language (7 Oct 2026, the same day)
+
+**`20261007000002_game_questions_one_language.sql`** (apply AFTER `20261007000001`; applied to the live project on 7 Oct 2026: all 4 pools at version 2, 120 one-text questions, 0 pairs, and `check:content --live` 39 of 39):
+- redefines `content_game_question_problem` to require ONE text;
+- republishes every pool whose current version still holds a pair, keeping only `q.km`, as
+  a NEW version (version 1 stays as it was, like every published version);
+- converts any saved draft the same way. Re-runnable: one-language pools are left alone.
+
+**The app reads BOTH shapes**, so the code and the migration can land in either order:
+`isBody` accepts a string or a pair, `toGameQuestions` takes the pair's Khmer, and the
+editor's `toGameBody` turns a pair into its Khmer (so Restore as draft of version 1 cannot
+bring the English back). `content/fixture.json` was converted the same way.
+
+**Verified:** PGlite **14 checks** (the 4 real pools with pairs republish once as version 2
+equal to the Khmer-only fixture; version 1 untouched; a draft converted with its edit kept;
+re-run is a no-op; a pair and an empty text refused at publish and import; other kinds still
+import), and stage 1's 95, stage 2/3's 79 and the real-fixture 5 still pass. Browser: the
+editor (28) shows one question field and no English one; game creation (15) shows the Khmer
+question with the app in English, against both the new data and the old two-language data.
 
 ## The old 7-step lessons are deleted (7 Oct 2026)
 
@@ -8631,6 +8658,11 @@ from here, a project without them has no game questions at all. `db:check` sees 
 table; `/rest/v1/rpc/content_current?p_kind=game` answers `200`. The import was done on
 7 Oct 2026 (4 of 4 exact). On a NEW project, import `content/fixture.json` (all five kinds)
 before deploying, or every subject's game says it has no questions.
+
+**`20261007000002_game_questions_one_language.sql`** must be applied AFTER
+`20261007000001`; the code reads either shape, so it can ship before or after. Afterwards
+every game pool's current version holds one text per question:
+`select key, version from content_items where kind = 'game'` shows version 2 for each.
 
 **The Game feature needs BOTH its migrations applied before db:check passes** —
 `20260913000001_competitions.sql` and

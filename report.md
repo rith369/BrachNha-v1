@@ -15,6 +15,30 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 7 Oct 2026 — Game Questions Are Khmer Only
+
+Commit: not committed yet. No database step left: the owner ran
+`20261007000002_game_questions_one_language.sql` today, and all 4 pools are now one
+Khmer text per question (checked against the database).
+
+**Why.** The game questions carried an English version of every question, added in an
+earlier change, and the new editor asked for an English version too. That goes against the
+rule that content is always Khmer (English only for the English subject) and is never
+translated.
+
+**What changed:**
+
+- **Every game question now has one text, in Khmer.** The English versions are removed; the
+  questions, options, answers, explanations and levels are otherwise exactly the same.
+- **The editor has one question field**, like a quiz question. There is no English field.
+- **With the app set to English, a game still shows its questions in Khmer.** The game's own
+  buttons and labels still follow the app language.
+- A game created earlier keeps the questions it started with.
+
+**What to re-test:** after the database step and the deploy, set the app to English and
+create a game: the questions are in Khmer. On Admin → Content → Game questions, open a
+question: there is one question field.
+
 ## 7 Oct 2026 — Game Questions Get an Editor Too
 
 Commit `8029823`. No database step left: the owner ran

@@ -185,10 +185,12 @@ const GAME_LEVELS = ["easy", "medium", "hard"] as const;
 
 export function toGameBody(raw: unknown): GameQuestionBody[] {
   return objs(raw).map((g) => {
-    const q = isObj(g.q) ? g.q : {};
     const question: GameQuestionBody = {
       id: str(g.id),
-      q: { en: str(q.en), km: str(q.km) },
+      // One text. A version from before 20261007000002 holds { en, km }: its
+      // Khmer is the text, and the English is dropped (content is never
+      // translated), so restoring one cannot bring the English back.
+      q: isObj(g.q) ? str(g.q.km) : str(g.q),
       options: strs(g.options),
       correct: str(g.correct),
       explanation: str(g.explanation),

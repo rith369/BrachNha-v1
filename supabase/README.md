@@ -511,3 +511,18 @@ arguments; the other four kinds behave as before.
 
 Check the migration with `/rest/v1/rpc/content_current?p_kind=game`
 (publishable key), which answers 200 (`[]` before the import).
+
+## `20261007000002`: game questions in one language
+
+Content is never translated: Khmer, or English for the English subject.
+`20261007000001` stored each game question's text as an English and Khmer pair;
+this migration makes the check require ONE text and republishes each pool with
+only its Khmer, as a new version (older versions are kept, never changed), and
+converts saved drafts the same way.
+
+Run it in the SQL editor, in one go, AFTER `20261007000001`. It is safe to run
+twice. Afterwards each game pool is at version 2:
+
+```sql
+select key, version, item_count from public.content_items where kind = 'game' order by key;
+```

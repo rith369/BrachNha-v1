@@ -110,7 +110,7 @@ const EMPTY_BLOCK = (): SectionBlock => ({ items: [] });
 export function emptyGameQuestion(id: string): GameQuestionBody {
   return {
     id,
-    q: { en: "", km: "" },
+    q: "",
     options: ["ក. ", "ខ. ", "គ. ", "ឃ. "],
     correct: "",
     explanation: "",
@@ -298,7 +298,7 @@ export function tidyBody(kind: ContentKind, body: AnyBody): AnyBody {
     case "game":
       return (body as GameQuestionBody[]).map((g) => ({
         id: g.id,
-        q: { en: g.q.en, km: g.q.km },
+        q: g.q,
         options: g.options,
         correct: g.correct,
         ...(g.difficulty ? { difficulty: g.difficulty } : {}),

@@ -69,15 +69,29 @@ export const DIFFICULTIES: {
  * The stored id is dropped: a Battle FREEZES the questions it drew onto the
  * competition row (lib/competitions.ts), so an edit to the pool reaches new
  * Battles only, and nothing downstream reads an id.
+ *
+ * ONE TEXT, shown whatever the app's language: content is Khmer (English for
+ * the English subject) and is never translated. ExamQuestion keeps its
+ * { en, km } pair because the mock exam and placement test share it, so the
+ * one text fills both. A version from before 20261007000002 still holds a
+ * pair; its Khmer is used.
  */
 export function toGameQuestions(body: readonly GameQuestionBody[]): ExamQuestion[] {
   return body.map((g) => ({
-    q: { en: g.q.en, km: g.q.km },
+    q: { en: oneText(g.q), km: oneText(g.q) },
     options: [...g.options],
     correct: g.correct,
     ...(g.difficulty ? { difficulty: g.difficulty } : {}),
     ...(g.explanation ? { explanation: g.explanation } : {}),
   }));
+}
+
+function oneText(q: unknown): string {
+  if (typeof q === "string") return q;
+  if (typeof q === "object" && q !== null && typeof (q as { km?: unknown }).km === "string") {
+    return (q as { km: string }).km;
+  }
+  return "";
 }
 
 export interface GameSubject {

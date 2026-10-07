@@ -366,9 +366,6 @@ export function CardEditor({
  */
 export function ChoiceFields({
   prompt,
-  promptLabel,
-  promptTip,
-  before,
   options,
   correct,
   explanation,
@@ -379,12 +376,6 @@ export function ChoiceFields({
   onChange,
 }: {
   prompt: string;
-  /** The prompt's label, when "Question" alone would be ambiguous (a game
-   *  question has one in each language). */
-  promptLabel?: string;
-  promptTip?: string;
-  /** Rendered above the prompt (a game question's English text). */
-  before?: ReactNode;
   options: string[];
   correct: string;
   explanation: string;
@@ -400,10 +391,8 @@ export function ChoiceFields({
   );
   return (
     <div className="flex flex-col gap-2">
-      {before}
       <TextField
-        label={promptLabel ?? c.promptLabel}
-        tip={promptTip}
+        label={c.promptLabel}
         value={prompt}
         path={`${prefix}${promptPath}`}
         issues={issues}
@@ -788,18 +777,15 @@ export function QuestionEditor({
 }
 
 
-/** A game question as students see it: the Khmer prompt, the English one
- *  under it, the options with the right one ticked, and the explanation. */
+/** A game question as students see it: the question, the options with the
+ *  right one ticked, and the explanation. */
 function GamePreview({ question, lang }: { question: GameQuestionBody; lang: Lang }) {
   const c = CONTENT_COPY[lang];
   return (
     <div className="mt-3 rounded-xl border border-border bg-control p-3">
       <div className="mb-1.5 text-[10px] font-extrabold text-muted">{c.previewTitle}</div>
-      <div className="text-sm font-bold whitespace-pre-line">
-        <MathText text={question.q.km} />
-      </div>
-      <div className="mb-2 text-xs font-semibold whitespace-pre-line text-muted">
-        <MathText text={question.q.en} />
+      <div className="mb-2 text-sm font-bold whitespace-pre-line">
+        <MathText text={question.q} />
       </div>
       <ul className="mb-2 flex flex-col gap-1">
         {question.options.map((opt, i) => (
@@ -824,8 +810,9 @@ function GamePreview({ question, lang }: { question: GameQuestionBody; lang: Lan
 
 const GAME_LEVELS = ["easy", "medium", "hard"] as const;
 
-/** One game question: the prompt in both languages, the shared options,
- *  answer and explanation, and its level. */
+/** One game question: its one text (Khmer, or English for the English
+ *  subject; never translated), the options, answer and explanation, and its
+ *  level. */
 export function GameQuestionEditor({
   question,
   index,
@@ -857,34 +844,22 @@ export function GameQuestionEditor({
     body = (
       <div className="mt-3 flex flex-col gap-2.5">
         <ChoiceFields
-          prompt={question.q.km}
-          promptLabel={c.game.questionKm}
-          promptTip={c.tips.gameText}
+          prompt={question.q}
           options={question.options}
           correct={question.correct}
           explanation={question.explanation}
-          promptPath="q.km"
+          promptPath="q"
           prefix=""
           issues={issues}
           lang={lang}
           onChange={(patch) =>
             onChange({
               ...question,
-              q: { en: question.q.en, km: patch.prompt ?? question.q.km },
+              q: patch.prompt ?? question.q,
               options: patch.options ?? question.options,
               correct: patch.correct ?? question.correct,
               explanation: patch.explanation ?? question.explanation,
             })
-          }
-          before={
-            <TextField
-              label={c.game.questionEn}
-              value={question.q.en}
-              path="q.en"
-              issues={issues}
-              lang={lang}
-              onChange={(v) => onChange({ ...question, q: { en: v, km: question.q.km } })}
-            />
           }
         />
         <SelectField
@@ -941,7 +916,7 @@ export function GameQuestionEditor({
       </div>
       {!open && (
         <p className="mt-1 line-clamp-2 text-xs font-semibold text-muted [overflow-wrap:anywhere]">
-          {question.q.km || question.q.en || "…"}
+          {question.q || "…"}
         </p>
       )}
       {body}

@@ -537,15 +537,18 @@ export interface PaperBody {
 }
 
 /**
- * One Battle question as stored: an ExamQuestion with an id ("q1"…, never
- * reused) and its explanation required. The text is a PAIR, unlike a paper's:
- * the Battle page follows the app's language and these carry real English and
- * Khmer wording. A Battle FREEZES the questions it drew on the competition row,
- * so an edit reaches new Battles only.
+ * One Battle question as stored: an id ("q1"…, never reused), ONE text, the
+ * options, the answer, a level and the explanation.
+ *
+ * ONE TEXT, IN THE SUBJECT'S LANGUAGE: Khmer, or English for the English
+ * subject. Content is never translated (the user's rule); the first version of
+ * this stored an { en, km } pair and 20261007000002 reduced it to the Khmer.
+ * A Battle FREEZES the questions it drew on the competition row, so an edit
+ * reaches new Battles only.
  */
 export interface GameQuestionBody {
   id: string;
-  q: { en: string; km: string };
+  q: string;
   options: string[];
   correct: string;
   difficulty?: Exclude<GameDifficulty, "mix">;

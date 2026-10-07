@@ -691,8 +691,8 @@ export function checkPaper(body: PaperBody): ContentIssue[] {
  *  never a question's). */
 export const GAME_DIFFICULTIES = ["easy", "medium", "hard"] as const;
 
-/** One subject's pool of Battle questions. Both languages are student-visible
- *  (the Battle page follows the app's language), so both get the text rules. */
+/** One subject's pool of Battle questions: one text per question, in the
+ *  subject's language, with the quiz rules. */
 export function checkGame(questions: GameQuestionBody[]): ContentIssue[] {
   const issues: ContentIssue[] = [];
   if (questions.length === 0) {
@@ -703,9 +703,7 @@ export function checkGame(questions: GameQuestionBody[]): ContentIssue[] {
   }
   checkIds(issues, questions.map((q) => q.id), QUIZ_ID);
   questions.forEach((question, i) => {
-    const q: Record<string, unknown> = isObj(question.q) ? question.q : {};
-    checkText(issues, i, "q.en", q.en, LIMITS.q, true);
-    checkText(issues, i, "q.km", q.km, LIMITS.q, true);
+    checkText(issues, i, "q", question.q, LIMITS.q, true);
     checkChoices(issues, i, "", question.options, question.correct);
     checkText(issues, i, "explanation", question.explanation, LIMITS.explanation, true);
     const d = question.difficulty as unknown;
