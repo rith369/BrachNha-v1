@@ -23,6 +23,7 @@ import type {
 import { cn } from "@/utils/cn";
 import { CONTENT_COPY } from "../content-copy";
 import { EMPTY_DRILL, EMPTY_HELP, moveItem } from "../content-edit";
+import { FIELD, SMALL_BTN } from "../editor-styles";
 
 /**
  * The parts of the content editor that edit ONE card or ONE question
@@ -35,12 +36,8 @@ import { EMPTY_DRILL, EMPTY_HELP, moveItem } from "../content-edit";
  * formula is the one thing that cannot be judged from its source.
  */
 
-const FIELD =
-  "mt-1 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold outline-none [field-sizing:content] placeholder:text-muted focus:border-purple";
-const SMALL_BTN =
-  "inline-flex items-center gap-1 rounded-lg border border-border bg-surface px-2 py-1 text-[11px] font-extrabold disabled:opacity-40";
 
-function IssueLines({ issues, lang }: { issues: ContentIssue[]; lang: Lang }) {
+export function IssueLines({ issues, lang }: { issues: ContentIssue[]; lang: Lang }) {
   const c = CONTENT_COPY[lang];
   if (issues.length === 0) return null;
   return (
@@ -126,8 +123,116 @@ export function TextField({
   );
 }
 
+/** A labelled whole-number box. Empty means "not set" (undefined), so an
+ *  optional number can be cleared. */
+export function NumberField({
+  label,
+  tip,
+  value,
+  onChange,
+  path,
+  issues,
+  lang,
+  min,
+  max,
+}: {
+  label: string;
+  tip?: string;
+  value: number | undefined;
+  onChange: (v: number | undefined) => void;
+  path: string;
+  issues: ContentIssue[];
+  lang: Lang;
+  min?: number;
+  max?: number;
+}) {
+  const c = CONTENT_COPY[lang];
+  const id = useId();
+  const mine = issues.filter((i) => i.field === path);
+  return (
+    <div>
+      <div className="text-xs font-bold">
+        <label htmlFor={id}>{label}</label>
+        {tip && (
+          <InfoTip label={c.whatIsThis} className="ml-1.5 align-middle">
+            {tip}
+          </InfoTip>
+        )}
+      </div>
+      <input
+        id={id}
+        type="number"
+        inputMode="numeric"
+        step={1}
+        min={min}
+        max={max}
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value === "" ? undefined : Number(e.target.value))}
+        className={cn(FIELD, "max-w-40", mine.some((i) => i.level === "error") && "border-pink")}
+      />
+      <IssueLines issues={mine} lang={lang} />
+    </div>
+  );
+}
+
+/** A labelled pick-one list. A stored value missing from `options` is still
+ *  shown, so opening an item never silently changes it. */
+export function SelectField({
+  label,
+  tip,
+  value,
+  options,
+  placeholder,
+  onChange,
+  path,
+  issues,
+  lang,
+}: {
+  label: string;
+  tip?: string;
+  value: string;
+  options: readonly { value: string; label: string }[];
+  /** The first, empty choice, e.g. "Choose a picture" or "None". */
+  placeholder: string;
+  onChange: (v: string) => void;
+  path: string;
+  issues: ContentIssue[];
+  lang: Lang;
+}) {
+  const c = CONTENT_COPY[lang];
+  const id = useId();
+  const mine = issues.filter((i) => i.field === path);
+  const all = value && !options.some((o) => o.value === value) ? [...options, { value, label: value }] : options;
+  return (
+    <div>
+      <div className="text-xs font-bold">
+        <label htmlFor={id}>{label}</label>
+        {tip && (
+          <InfoTip label={c.whatIsThis} className="ml-1.5 align-middle">
+            {tip}
+          </InfoTip>
+        )}
+      </div>
+      <select
+        id={id}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={cn(FIELD, "max-w-full", mine.some((i) => i.level === "error") && "border-pink")}
+      >
+        <option value="">{placeholder}</option>
+        {all.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <IssueLines issues={mine} lang={lang} />
+    </div>
+  );
+}
+
 /** Two taps to remove: the first arms it, the second does it. */
-function RemoveButton({ onRemove, lang, label }: { onRemove: () => void; lang: Lang; label?: string }) {
+export function RemoveButton({ onRemove, lang, label }: { onRemove: () => void; lang: Lang; label?: string }) {
   const c = CONTENT_COPY[lang];
   const [armed, setArmed] = useState(false);
   return armed ? (
@@ -148,7 +253,7 @@ function RemoveButton({ onRemove, lang, label }: { onRemove: () => void; lang: L
   );
 }
 
-function MoveButtons({
+export function MoveButtons({
   index,
   count,
   onMove,
@@ -172,7 +277,7 @@ function MoveButtons({
   );
 }
 
-function ErrorBadge({ issues }: { issues: ContentIssue[] }) {
+export function ErrorBadge({ issues }: { issues: ContentIssue[] }) {
   const errors = issues.filter((i) => i.level === "error").length;
   const warnings = issues.length - errors;
   if (issues.length === 0) return null;
@@ -258,7 +363,7 @@ export function CardEditor({
  * so it can never be missing from the options; editing the text of the
  * correct option carries `correct` along with it.
  */
-function ChoiceFields({
+export function ChoiceFields({
   prompt,
   options,
   correct,
@@ -450,26 +555,33 @@ function DrillList({
   );
 }
 
-function HelpEditor({
+export function HelpEditor({
   help,
   issues,
   lang,
   onChange,
+  title,
+  tip,
 }: {
   help: SkillHelp;
+  /** Its problems, with paths starting "help." (a paper's skill maps its
+   *  "skills.{id}." onto that). */
   issues: ContentIssue[];
   lang: Lang;
   onChange: (help: SkillHelp | undefined) => void;
+  /** Heading and explanation; a question's help by default. */
+  title?: string;
+  tip?: string;
 }) {
   const c = CONTENT_COPY[lang];
   const [armed, setArmed] = useState(false);
   return (
     <div className="flex flex-col gap-2.5 rounded-xl border border-border p-3">
       <div className="flex items-center gap-2">
-        <span className="pr-1 text-xs font-extrabold">
-          {c.helpTitle}
+        <span className="pr-1 text-xs font-extrabold [overflow-wrap:anywhere]">
+          {title ?? c.helpTitle}
           <InfoTip label={c.whatIsThis} className="ml-1.5 align-middle">
-            {c.tips.help}
+            {tip ?? c.tips.help}
           </InfoTip>
         </span>
         <span className="ml-auto">

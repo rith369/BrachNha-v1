@@ -27,8 +27,9 @@ import {
 import { QUIZ_COINS, QUIZ_XP } from "@/utils/rewards";
 import { MathText } from "@/components/shell/math-text";
 import { Callout } from "./callout";
+import { MisconceptionCard, SectionBlockBody } from "./section-blocks";
 import { SectionVideoPlayer } from "./section-video";
-import type { SectionBlock, SectionContent, SectionQuestion } from "@/types";
+import type { SectionContent, SectionQuestion } from "@/types";
 import { markLessonFinished } from "@/lib/install-prompt";
 import { useFocusScrollTop } from "@/hooks/use-focus-scroll-top";
 
@@ -83,82 +84,6 @@ const BrainModelViewer = lazy(() =>
  * KHMER-ONLY, like the rest of the Study feature. The content itself only exists
  * in Khmer; see the note on SectionContent in types/index.ts.
  */
-
-/**
- * Renders a lesson/example/note block: optional lead paragraph, then items.
- *
- * EVERY string goes through MathText, not out as a bare string. Authored section
- * content is written in LaTeX — the maths sections arrive as `$$ (+3)+(+5)=+8 $$`
- * and `$a-b=a+(-b)$` — and without this the student reads the raw source. Hand
- * converting it to Unicode instead was rejected for the reason recorded for the
- * 2025 maths paper: it is a transcription risk with no upper bound on how
- * quietly it fails, and the author writes in LaTeX anyway.
- *
- * FREE FOR THE SECTIONS THAT DON'T USE IT. `splitMath` leaves a dollar-free
- * string untouched and MathText short-circuits it to one inline node, so the
- * four biology sections — which contain zero `$` — render exactly as before.
- * And it costs no bytes: `math-text-*.js` is already a shared chunk warmed at
- * idle for every student, because quiz-runner.tsx imports it and practice-run is
- * in app.tsx's routeModules.
- *
- * `<div>` rather than `<p>` for the lead and the trailing paragraph, because
- * MathText emits a block `<table>` for a Markdown table — the sign table in
- * math-1-1-1 is one — and a table inside a `<p>` is invalid HTML that the parser
- * silently unnests.
- *
- * KHMER MUST NEVER GO INSIDE `$…$`: KaTeX swaps in maths fonts with no Khmer
- * coverage and renders a row of empty boxes. `splitMath` refuses such a span as
- * a second guard, but authored content should not rely on it.
- */
-function Block({ block }: { block: SectionBlock }) {
-  return (
-    <>
-      {block.intro && (
-        // whitespace-pre-line so paragraphs written as paragraphs survive —
-        // HTML collapses newlines, which is what turned the long brain lesson
-        // into one unreadable run-on block before lesson-detail.tsx got this.
-        <div className={`mb-3 whitespace-pre-line ${focusBody}`}>
-          <MathText text={block.intro} />
-        </div>
-      )}
-      {/* Bulleted, not bare paragraphs. Every one of these blocks is a LIST —
-          "the four systems", "what the lesson covers", "two worked examples" —
-          and without a marker the items ran together into one wall of Khmer
-          with only the bold label to break them up. list-outside keeps the
-          wrapped lines aligned under the text rather than under the bullet. */}
-      <ul className="flex list-outside list-disc flex-col gap-2.5 pl-5">
-        {block.items.map((item, i) => (
-          <li key={i} className={focusBody}>
-            {item.label && (
-              <span className="font-extrabold text-text">
-                <MathText text={item.label} />៖{" "}
-              </span>
-            )}
-            {item.body && (
-              <span className="whitespace-pre-line">
-                <MathText text={item.body} />
-              </span>
-            )}
-            {item.items && (
-              <ul className="mt-1.5 flex list-outside list-[circle] flex-col gap-1 pl-5">
-                {item.items.map((sub, j) => (
-                  <li key={j} className="whitespace-pre-line">
-                    <MathText text={sub} />
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ))}
-      </ul>
-      {block.outro && (
-        <div className={`mt-3 whitespace-pre-line ${focusBody}`}>
-          <MathText text={block.outro} />
-        </div>
-      )}
-    </>
-  );
-}
 
 /**
  * One multiple-choice question.
@@ -384,10 +309,10 @@ export function SectionDetail({
               <SectionVideoPlayer video={section.video} title={section.title} />
             )}
             <Callout tone="mint">
-              <Block block={section.intro} />
+              <SectionBlockBody block={section.intro} />
             </Callout>
             <Callout tone="yellow" icon={Lightbulb} label="ឧទាហរណ៍">
-              <Block block={section.examples} />
+              <SectionBlockBody block={section.examples} />
             </Callout>
 
             {section.model3d && (
@@ -418,7 +343,7 @@ export function SectionDetail({
                     question={q}
                     answer={answers[`0-${i}`] ?? null}
                     onAnswer={(opt) => answerQuestion(`0-${i}`, q, opt)}
-                    reportRef={sectionRef(sectionId, 0, i)}
+                    reportRef={sectionRef(sectionId, q, 0, i)}
                   />
                 ))}
               </>
@@ -429,11 +354,11 @@ export function SectionDetail({
         {step === 1 && (
           <div className="flex flex-col gap-3">
             <Callout tone="blue">
-              <Block block={section.lesson} />
+              <SectionBlockBody block={section.lesson} />
             </Callout>
 
             <Callout tone="purple" icon={NotebookPen} label="ចំណាំសំខាន់ៗ">
-              <Block block={section.notes} />
+              <SectionBlockBody block={section.notes} />
             </Callout>
 
             <div className="mt-1 flex items-center gap-1.5 text-xs font-extrabold text-muted md:text-sm">
@@ -441,29 +366,7 @@ export function SectionDetail({
               កំហុសឆ្គងដែលសិស្សតែងតែយល់ច្រឡំ
             </div>
             {section.mistakes.map((m, i) => (
-              // The misconception is the OUTER card and the truth is nested
-              // inside it, rather than two cards side by side: the pairing is
-              // the teaching, and separating them lets a student read the wrong
-              // half on its own.
-              <Callout key={i} tone="pink" icon={CircleX} label="យល់ច្រឡំថា">
-                <p className={`whitespace-pre-line ${focusBody}`}>
-                  <MathText text={m.wrong} />
-                </p>
-                {/* bg-control, not the default bg-surface: the outer card is
-                    already surface, so a nested one on the same background
-                    would have nothing but its stripe to separate it. `cn` is
-                    twMerge, so this overrides rather than stacks. */}
-                <Callout
-                  tone="mint"
-                  icon={CircleCheck}
-                  label="ការពិត"
-                  className="mt-3 bg-control"
-                >
-                  <p className={`whitespace-pre-line ${focusBody}`}>
-                    <MathText text={m.right} />
-                  </p>
-                </Callout>
-              </Callout>
+              <MisconceptionCard key={i} mistake={m} />
             ))}
 
             {/* The applied practice, LAST on the step — after the rules, the
@@ -482,7 +385,7 @@ export function SectionDetail({
                     question={q}
                     answer={answers[`1-${i}`] ?? null}
                     onAnswer={(opt) => answerQuestion(`1-${i}`, q, opt)}
-                    reportRef={sectionRef(sectionId, 1, i)}
+                    reportRef={sectionRef(sectionId, q, 1, i)}
                   />
                 ))}
               </>

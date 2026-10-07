@@ -31,7 +31,8 @@ The goal is for flashcards and quizzes to live in the database:
 
 **This reverses a rule in AGENTS.md** ("Content stays in `src/data/`"), for these two
 kinds of content only. Lessons/sections (stage 2) and past papers (stage 3) stay in
-code until their stage.
+code until their stage (they moved on 7 Oct 2026; see
+[sections-and-papers-in-database.md](sections-and-papers-in-database.md)).
 
 ## How it works for you
 
@@ -293,6 +294,10 @@ Buttons and history:
   `npm run db:check` after you apply the migration.
 
 ## Later stages (not in this plan)
+
+**Planned in full in [sections-and-papers-in-database.md](sections-and-papers-in-database.md)**
+(3 Oct 2026), and built: step A on 4 Oct, step B on 7 Oct 2026. The outline below is
+what this plan said at the time.
 
 - **Stage 2, lessons (sections):**
   - the same tables and editor, with a block editor for introduction, lesson,

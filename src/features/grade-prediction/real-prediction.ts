@@ -143,7 +143,7 @@ function lessonCompletion(completed: string[], manifest: ContentManifest): numbe
   let done = 0;
   let total = 0;
   for (const { id } of SUBJECTS) {
-    const study = pathProgress(chaptersFor(id as SubjectId), completed);
+    const study = pathProgress(chaptersFor(id as SubjectId, manifest), completed);
     done += study.done;
     total += study.playable;
     const quiz = quizPathFor(id as SubjectId, manifest);

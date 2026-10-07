@@ -1,4 +1,4 @@
-import type { Lang } from "@/types";
+import type { ContentKind, Lang } from "@/types";
 import type { IssueCode } from "@/utils/content-check";
 import type { ContentFail } from "@/lib/admin-content";
 
@@ -15,22 +15,28 @@ const en = {
   // ── The list (/admin/content) ────────────────────────────────────────────
   title: "Content",
   blurb:
-    "Flashcards and practice quizzes. Anyone on the team can save a draft; students see a change only after the owner presses Publish.",
-  tabs: { deck: "Flashcards", quiz: "Quizzes" },
+    "Flashcards, practice quizzes, lesson sections and past papers. Anyone on the team can save a draft; students see a change only after the owner presses Publish.",
+  tabs: {
+    deck: "Flashcards",
+    quiz: "Quizzes",
+    section: "Lesson sections",
+    paper: "Past papers",
+  } satisfies Record<ContentKind, string>,
   allSubjects: "All",
   empty: "Nothing here yet.",
   newItem: "New",
   newTitle: "Write something new",
   newBlurb: "Pick where it goes. Only places students can reach are listed.",
   noFreeSlots: "Every place in this subject already has something.",
-  live: (v: number, n: number, deck: boolean) =>
-    `Live: version ${v} · ${n} ${deck ? (n === 1 ? "card" : "cards") : n === 1 ? "question" : "questions"}`,
+  paperNewNote: "A new past paper arrives as a file from the developer: use Import.",
+  live: (v: number, n: number, kind: ContentKind) =>
+    `Live: version ${v} · ${n} ${kind === "deck" ? (n === 1 ? "card" : "cards") : n === 1 ? "question" : "questions"}`,
   notPublished: "Not published",
   draftBy: (name: string, when: string) => (name ? `Draft by ${name}, ${when}` : `Draft, ${when}`),
 
   importTitle: "Import a file",
   importBlurb:
-    "A .json file of decks and quizzes, as content:export writes it. Each item arrives as a draft for you to check and publish.",
+    "A .json file of content (decks, quizzes, lesson sections or past papers), as content:export writes it. Each item arrives as a draft for you to check and publish.",
   importPublish:
     "Publish items that have never been published (only for the first move out of the code)",
   importChoose: "Choose a file",
@@ -102,6 +108,17 @@ const en = {
     emptyList: "is empty",
     letterOrder: "has ក. ខ. គ. ឃ. out of order",
     answersBunched: "has most correct answers on the same letter",
+    badNumber: "is not a whole number in range",
+    badPoster: "is not a picture the app has",
+    badModel: "is not a 3D model the app has",
+    badVideoId: "is not a YouTube video id",
+    svgChanged: "has a drawing that would not show correctly",
+    partShape: "needs either questions or a gap-fill passage",
+    notInBank: "has an answer that is not in the word box",
+    gapMissing: "is not marked in the passage",
+    duplicateGap: "uses a gap number twice",
+    sameWords: "has two words in the box that are the same",
+    unknownSkill: "names a skill this paper does not have",
   } satisfies Record<IssueCode, string>,
   fields: {
     id: "Id",
@@ -160,6 +177,89 @@ const en = {
   working: "Working…",
   cancel: "Cancel",
 
+  // ── The section editor ─────────────────────────────────────────────────
+  section: {
+    whole: "The section",
+    stepOne: "Step 1: introduction, examples and first questions",
+    stepTwo: "Step 2: lesson, key notes, mistakes and applied questions",
+    title: "Section title",
+    blocks: { intro: "Introduction", examples: "Examples", lesson: "Lesson", notes: "Key notes" },
+    lead: "Opening paragraph (optional)",
+    outro: "Closing paragraph (optional)",
+    point: (n: number) => `Point ${n}`,
+    subPoint: (n: number) => `Sub-point ${n}`,
+    pointLabel: "Bold words at the start (optional)",
+    pointBody: "Text",
+    subPoints: "Sub-points (one per line, optional)",
+    addPoint: "Add a point",
+    noPoints: "No points yet.",
+    mistakes: "Common mistakes",
+    mistake: (n: number) => `Mistake ${n}`,
+    wrong: "What students wrongly think",
+    right: "What is true",
+    addMistake: "Add a mistake",
+    quiz: "Questions (step 1)",
+    quizHarder: "Applied questions (step 2)",
+    noQuestions: "No questions on this step.",
+    video: "Video",
+    addVideo: "Add a video",
+    removeVideo: "Remove the video",
+    poster: "Poster picture",
+    choosePoster: "Choose a picture",
+    duration: "Length in seconds (optional)",
+    youtube: "YouTube video id (optional)",
+    model: "3D model",
+    addModel: "Add a 3D model",
+    removeModel: "Remove the model",
+    modelFile: "Model file",
+    chooseModel: "Choose a model",
+    credit: "Credit (the model's licence asks for it)",
+    caption: "Caption (optional)",
+  },
+
+  // ── The paper editor ───────────────────────────────────────────────────
+  paper: {
+    whole: "The paper",
+    head: "The paper",
+    minutes: "Time in minutes (as printed)",
+    points: "Points (as printed, optional)",
+    note: "Note to students (optional)",
+    part: (n: number) => `Part ${n}`,
+    partTitle: "Title (as printed)",
+    instruction: "Instruction (as printed)",
+    statement: "The whole exercise, copied from the paper (optional)",
+    example: "Worked example (optional)",
+    questionPoints: "Marks on the paper (optional)",
+    skill: "Skill",
+    noSkill: "None",
+    passageTitle: "Passage title",
+    passage: "Passage: write each gap as {n}",
+    wordBank: "Word box",
+    word: (n: number) => `Word ${n}`,
+    addWord: "Add a word",
+    gaps: "Gaps",
+    gap: (n: number) => `Gap ${n}`,
+    gapNumber: "Number in the passage",
+    gapAnswer: "Answer",
+    chooseAnswer: "Choose the answer",
+    gapExample: "Already filled in as the example",
+    addGap: "Add a gap",
+    writing: "Writing task",
+    writingTitle: "Title",
+    writingPrompt: "Task",
+    minWords: "Minimum words",
+    essay: "Model essay (a blank line between paragraphs)",
+    paragraph: (n: number) => `Paragraph ${n}`,
+    checklist: "Checklist (one per line)",
+    checklistItem: (n: number) => `Checklist line ${n}`,
+    skills: "Skills",
+    skillN: (id: string) => `Skill ${id}`,
+    newSkillId: "New skill's id (small letters, digits and -)",
+    addSkill: "Add a skill",
+    skillIdBad: "That id is taken or not allowed.",
+    noSkills: "No skills yet.",
+  },
+
   // ── Explanations: hover with a mouse, tap with a finger ───────────────
   // Each is a claim about what the editor and the database do. Change the
   // rule, change the sentence, in both languages.
@@ -168,16 +268,16 @@ const en = {
   draftChip: "Draft",
   tips: {
     newItem:
-      "Start a deck or a quiz in a place in the app that has nothing yet. To change one that exists, open it from the list instead.",
+      "Start a deck, a quiz or a lesson section in a place in the app that has nothing yet. To change one that exists, open it from the list instead.",
     importFile:
-      "Owner only. Load a file of decks and quizzes, for example one the developer made. The file is checked here first, and every item arrives as a draft for you to look at.",
+      "Owner only. Load a file of content, for example one the developer made. The file is checked here first, and every item arrives as a draft for you to look at.",
     importPublish:
       "Only for the first move out of the code: items that were never published go live straight away as version 1. Leave it off for new content, so you can check it first.",
     live: "Students see this version. The number goes up by 1 every time the owner publishes.",
     notPublished: "Students see this as coming soon and cannot open it.",
     draft:
       "Changes that are saved but not live. Students do not see them until the owner presses Publish.",
-    key: "This item's address in the app: the subject, then the lesson and section numbers. It never changes.",
+    key: "This item's address in the app: the subject and its numbers (for a past paper, the year and the subject). It never changes.",
     cardId:
       "The card's id. Each student's review history is kept under it, so it never changes and is never given to another card.",
     status:
@@ -201,6 +301,27 @@ const en = {
     helpMistake: "The mistake students usually make here, in one sentence.",
     similar: "More questions of the same kind, for practice. They give no XP.",
     foundation: "Easier questions on the step a student who got it wrong probably missed.",
+    sectionSteps:
+      "Students see a section in two steps. Step 1 is the introduction, the examples and easy questions; step 2 is the lesson, the key notes, the mistakes and the applied questions. On step 1, only ask what the examples have already shown.",
+    blocks:
+      "Each block is a list of points. A point can start with a few bold words, then its text, then sub-points. Do not type ៖ after the bold words; the app adds it.",
+    video:
+      "The poster is shown at the top of the section. Add the YouTube id once the video is uploaded (unlisted, embedding allowed); until then students see the poster marked coming soon.",
+    model: "An interactive 3D model, shown under the examples on step 1.",
+    mistakes: "Pairs of a wrong idea students often have and what is actually true. Shown on step 2.",
+    paperPart:
+      "Copy the paper's own words for the title, the instruction and the exercise. Only the multiple-choice options and the explanations are ours.",
+    minutes:
+      "From the paper's own header. Students get this long, and running out submits what they answered.",
+    questionPoints: "What the printed paper gives this part. Shown to students, never used for the score.",
+    skill: "A wrong answer offers this skill's rule and exercises.",
+    passage:
+      "Write the passage once and put {1}, {2} and so on where each gap goes. The numbers must match the gaps below.",
+    wordBank: "The words students pick from, in the order the paper's box prints them. Renaming a word changes every gap that uses it.",
+    gapExample: "The paper fills this gap in for students, so it is not scored.",
+    skills:
+      "Each skill holds a rule and exercises. A question or gap that names it offers them after a wrong answer.",
+    writing: "Students write this on paper; nothing marks it. The model essay is shown afterwards, to compare against.",
   },
   issueHelp: {
     empty: "Write something here.",
@@ -216,9 +337,20 @@ const en = {
     correctMissing: "Tap the circle beside the right answer.",
     badId: "Ask the developer: this item's id is broken.",
     duplicateId: "Ask the developer: two items share one id.",
-    emptyList: "Add at least one card or question before publishing.",
+    emptyList: "Add at least one card, question or point before publishing.",
     letterOrder: "Start the options with ក. ខ. គ. ឃ. in that order, from top to bottom.",
     answersBunched: "Move some right answers to other letters, so they are spread across ក, ខ, គ and ឃ.",
+    badNumber: "Type a whole number, with no decimals, within the allowed range.",
+    badPoster: "Pick a picture from the list. A new picture has to be added to the app by the developer first.",
+    badModel: "Pick a model from the list. A new model has to be added to the app by the developer first.",
+    badVideoId: "Paste only the 11 characters after watch?v= in the video's address, not the whole link.",
+    svgChanged: "Ask the developer: part of this drawing is not allowed and would be removed.",
+    partShape: "Ask the developer: a part holds either a list of questions or one gap-fill passage.",
+    notInBank: "Pick the answer from the word box, or add the word to the box first.",
+    gapMissing: "Write the gap's number in curly brackets where it goes in the passage, for example {3}.",
+    duplicateGap: "Give each gap its own number.",
+    sameWords: "Each word is in the box once. Remove or change the copy.",
+    unknownSkill: "Pick a skill from the list, or add it under Skills first.",
   } satisfies Record<IssueCode, string>,
 
   errors: {
@@ -239,23 +371,29 @@ type ContentCopy = typeof en;
 const km: ContentCopy = {
   title: "មាតិកា",
   blurb:
-    "Flashcard និង Quiz លំហាត់។ អ្នកណាក្នុងក្រុមក៏អាចរក្សាទុកសេចក្តីព្រាងបាន។ សិស្សឃើញការកែប្រែ លុះត្រាតែម្ចាស់ចុចផ្សាយ។",
-  tabs: { deck: "Flashcard", quiz: "Quiz" },
+    "Flashcard, Quiz លំហាត់, ផ្នែកមេរៀន និងវិញ្ញាសារឆ្នាំចាស់។ អ្នកណាក្នុងក្រុមក៏អាចរក្សាទុកសេចក្តីព្រាងបាន។ សិស្សឃើញការកែប្រែ លុះត្រាតែម្ចាស់ចុចផ្សាយ។",
+  tabs: {
+    deck: "Flashcard",
+    quiz: "Quiz",
+    section: "ផ្នែកមេរៀន",
+    paper: "វិញ្ញាសារឆ្នាំចាស់",
+  },
   allSubjects: "ទាំងអស់",
   empty: "មិនទាន់មានអ្វីនៅទីនេះទេ។",
   newItem: "ថ្មី",
   newTitle: "សរសេរថ្មី",
   newBlurb: "ជ្រើសកន្លែងដែលវាត្រូវនៅ។ មានតែកន្លែងដែលសិស្សអាចចូលបានប៉ុណ្ណោះ។",
   noFreeSlots: "គ្រប់កន្លែងក្នុងមុខវិជ្ជានេះមានមាតិការួចហើយ។",
-  live: (v: number, n: number, deck: boolean) =>
-    `កំពុងបង្ហាញ៖ កំណែ ${v} · ${n} ${deck ? "កាត" : "សំណួរ"}`,
+  paperNewNote: "វិញ្ញាសារឆ្នាំចាស់ថ្មី មកជាឯកសារពីអ្នកអភិវឌ្ឍន៍៖ សូមប្រើ «នាំចូលឯកសារ»។",
+  live: (v: number, n: number, kind: ContentKind) =>
+    `កំពុងបង្ហាញ៖ កំណែ ${v} · ${n} ${kind === "deck" ? "កាត" : "សំណួរ"}`,
   notPublished: "មិនទាន់ផ្សាយ",
   draftBy: (name: string, when: string) =>
     name ? `សេចក្តីព្រាងដោយ ${name} ${when}` : `សេចក្តីព្រាង ${when}`,
 
   importTitle: "នាំចូលឯកសារ",
   importBlurb:
-    "ឯកសារ .json នៃ Flashcard និង Quiz ដូចដែល content:export សរសេរ។ របស់នីមួយៗចូលមកជាសេចក្តីព្រាង ដើម្បីឱ្យអ្នកពិនិត្យ និងផ្សាយ។",
+    "ឯកសារ .json នៃមាតិកា (Flashcard, Quiz, ផ្នែកមេរៀន ឬវិញ្ញាសារឆ្នាំចាស់) ដូចដែល content:export សរសេរ។ របស់នីមួយៗចូលមកជាសេចក្តីព្រាង ដើម្បីឱ្យអ្នកពិនិត្យ និងផ្សាយ។",
   importPublish:
     "ផ្សាយរបស់ដែលមិនធ្លាប់ផ្សាយ (សម្រាប់តែការផ្លាស់ចេញពីកូដលើកដំបូងប៉ុណ្ណោះ)",
   importChoose: "ជ្រើសឯកសារ",
@@ -324,6 +462,17 @@ const km: ContentCopy = {
     emptyList: "ទទេ",
     letterOrder: "មាន ក. ខ. គ. ឃ. មិនតាមលំដាប់",
     answersBunched: "ចម្លើយត្រូវភាគច្រើននៅលើអក្សរតែមួយ",
+    badNumber: "មិនមែនជាលេខគត់ក្នុងចន្លោះដែលអនុញ្ញាត",
+    badPoster: "មិនមែនជារូបភាពដែលកម្មវិធីមាន",
+    badModel: "មិនមែនជាម៉ូឌែល 3D ដែលកម្មវិធីមាន",
+    badVideoId: "មិនមែនជាលេខសម្គាល់វីដេអូ YouTube",
+    svgChanged: "មានរូបគំនូរដែលនឹងបង្ហាញមិនត្រឹមត្រូវ",
+    partShape: "ត្រូវការសំណួរ ឬអត្ថបទបំពេញចន្លោះ",
+    notInBank: "មានចម្លើយដែលមិននៅក្នុងប្រអប់ពាក្យ",
+    gapMissing: "មិនបានសម្គាល់ក្នុងអត្ថបទ",
+    duplicateGap: "ប្រើលេខចន្លោះពីរដង",
+    sameWords: "មានពាក្យពីរដូចគ្នាក្នុងប្រអប់",
+    unknownSkill: "ដាក់ជំនាញដែលវិញ្ញាសានេះមិនមាន",
   },
   fields: {
     id: "លេខសម្គាល់",
@@ -382,20 +531,101 @@ const km: ContentCopy = {
   working: "កំពុងដំណើរការ…",
   cancel: "បោះបង់",
 
+  section: {
+    whole: "ផ្នែកនេះ",
+    stepOne: "ជំហានទី 1៖ សេចក្ដីផ្ដើម ឧទាហរណ៍ និងសំណួរដំបូង",
+    stepTwo: "ជំហានទី 2៖ មេរៀន ចំណាំសំខាន់ៗ កំហុស និងសំណួរអនុវត្ត",
+    title: "ចំណងជើងផ្នែក",
+    blocks: { intro: "សេចក្ដីផ្ដើម", examples: "ឧទាហរណ៍", lesson: "មេរៀន", notes: "ចំណាំសំខាន់ៗ" },
+    lead: "កថាខណ្ឌបើក (មិនចាំបាច់)",
+    outro: "កថាខណ្ឌបិទ (មិនចាំបាច់)",
+    point: (n: number) => `ចំណុចទី ${n}`,
+    subPoint: (n: number) => `ចំណុចរងទី ${n}`,
+    pointLabel: "ពាក្យដិតនៅដើម (មិនចាំបាច់)",
+    pointBody: "អត្ថបទ",
+    subPoints: "ចំណុចរង (មួយបន្ទាត់ម្តង មិនចាំបាច់)",
+    addPoint: "បន្ថែមចំណុច",
+    noPoints: "មិនទាន់មានចំណុចទេ។",
+    mistakes: "កំហុសឆ្គងដែលសិស្សតែងតែយល់ច្រឡំ",
+    mistake: (n: number) => `កំហុសទី ${n}`,
+    wrong: "យល់ច្រឡំថា",
+    right: "ការពិត",
+    addMistake: "បន្ថែមកំហុស",
+    quiz: "សំណួរ (ជំហានទី 1)",
+    quizHarder: "សំណួរអនុវត្ត (ជំហានទី 2)",
+    noQuestions: "គ្មានសំណួរនៅជំហាននេះទេ។",
+    video: "វីដេអូ",
+    addVideo: "បន្ថែមវីដេអូ",
+    removeVideo: "លុបវីដេអូ",
+    poster: "រូបភាពគម្រប",
+    choosePoster: "ជ្រើសរូបភាព",
+    duration: "រយៈពេលគិតជាវិនាទី (មិនចាំបាច់)",
+    youtube: "លេខសម្គាល់វីដេអូ YouTube (មិនចាំបាច់)",
+    model: "ម៉ូឌែល 3D",
+    addModel: "បន្ថែមម៉ូឌែល 3D",
+    removeModel: "លុបម៉ូឌែល",
+    modelFile: "ឯកសារម៉ូឌែល",
+    chooseModel: "ជ្រើសម៉ូឌែល",
+    credit: "ឈ្មោះម្ចាស់ (អាជ្ញាប័ណ្ណរបស់ម៉ូឌែលតម្រូវ)",
+    caption: "ចំណងជើងតូច (មិនចាំបាច់)",
+  },
+
+  paper: {
+    whole: "វិញ្ញាសា",
+    head: "វិញ្ញាសា",
+    minutes: "រយៈពេលគិតជានាទី (តាមវិញ្ញាសា)",
+    points: "ពិន្ទុ (តាមវិញ្ញាសា មិនចាំបាច់)",
+    note: "កំណត់សម្គាល់សម្រាប់សិស្ស (មិនចាំបាច់)",
+    part: (n: number) => `ផ្នែកទី ${n}`,
+    partTitle: "ចំណងជើង (តាមវិញ្ញាសា)",
+    instruction: "សេចក្តីណែនាំ (តាមវិញ្ញាសា)",
+    statement: "លំហាត់ទាំងមូល ចម្លងពីវិញ្ញាសា (មិនចាំបាច់)",
+    example: "ឧទាហរណ៍គំរូ (មិនចាំបាច់)",
+    questionPoints: "ពិន្ទុលើវិញ្ញាសា (មិនចាំបាច់)",
+    skill: "ជំនាញ",
+    noSkill: "គ្មាន",
+    passageTitle: "ចំណងជើងអត្ថបទ",
+    passage: "អត្ថបទ៖ សរសេរចន្លោះនីមួយៗជា {n}",
+    wordBank: "ប្រអប់ពាក្យ",
+    word: (n: number) => `ពាក្យទី ${n}`,
+    addWord: "បន្ថែមពាក្យ",
+    gaps: "ចន្លោះ",
+    gap: (n: number) => `ចន្លោះទី ${n}`,
+    gapNumber: "លេខក្នុងអត្ថបទ",
+    gapAnswer: "ចម្លើយ",
+    chooseAnswer: "ជ្រើសចម្លើយ",
+    gapExample: "បំពេញរួចជាឧទាហរណ៍",
+    addGap: "បន្ថែមចន្លោះ",
+    writing: "ការសរសេរ",
+    writingTitle: "ចំណងជើង",
+    writingPrompt: "កិច្ចការ",
+    minWords: "ចំនួនពាក្យអប្បបរមា",
+    essay: "អត្ថបទគំរូ (បន្ទាត់ទទេមួយរវាងកថាខណ្ឌ)",
+    paragraph: (n: number) => `កថាខណ្ឌទី ${n}`,
+    checklist: "បញ្ជីត្រួតពិនិត្យ (មួយបន្ទាត់ម្តង)",
+    checklistItem: (n: number) => `បញ្ជីត្រួតពិនិត្យបន្ទាត់ទី ${n}`,
+    skills: "ជំនាញ",
+    skillN: (id: string) => `ជំនាញ ${id}`,
+    newSkillId: "លេខសម្គាល់ជំនាញថ្មី (អក្សរតូច លេខ និង -)",
+    addSkill: "បន្ថែមជំនាញ",
+    skillIdBad: "លេខសម្គាល់នោះមានរួចហើយ ឬមិនត្រូវបានអនុញ្ញាត។",
+    noSkills: "មិនទាន់មានជំនាញទេ។",
+  },
+
   whatIsThis: "តើនេះមានន័យថាអ្វី",
   labelsTitle: "ន័យនៃស្លាក៖",
   draftChip: "សេចក្តីព្រាង",
   tips: {
     newItem:
-      "ចាប់ផ្តើម Flashcard ឬ Quiz នៅកន្លែងក្នុងកម្មវិធីដែលមិនទាន់មានអ្វីសោះ។ ដើម្បីកែមួយដែលមានរួចហើយ សូមបើកវាពីបញ្ជីខាងក្រោម។",
+      "ចាប់ផ្តើម Flashcard, Quiz ឬផ្នែកមេរៀន នៅកន្លែងក្នុងកម្មវិធីដែលមិនទាន់មានអ្វីសោះ។ ដើម្បីកែមួយដែលមានរួចហើយ សូមបើកវាពីបញ្ជីខាងក្រោម។",
     importFile:
-      "សម្រាប់តែម្ចាស់។ ផ្ទុកឯកសារ Flashcard និង Quiz ឧទាហរណ៍ឯកសារដែលអ្នកអភិវឌ្ឍន៍បានធ្វើ។ ឯកសារត្រូវបានពិនិត្យនៅទីនេះជាមុន ហើយរបស់នីមួយៗចូលមកជាសេចក្តីព្រាង ដើម្បីឱ្យអ្នកមើល។",
+      "សម្រាប់តែម្ចាស់។ ផ្ទុកឯកសារមាតិកា ឧទាហរណ៍ឯកសារដែលអ្នកអភិវឌ្ឍន៍បានធ្វើ។ ឯកសារត្រូវបានពិនិត្យនៅទីនេះជាមុន ហើយរបស់នីមួយៗចូលមកជាសេចក្តីព្រាង ដើម្បីឱ្យអ្នកមើល។",
     importPublish:
       "សម្រាប់តែការផ្លាស់ចេញពីកូដលើកដំបូងប៉ុណ្ណោះ៖ របស់ដែលមិនធ្លាប់ផ្សាយ នឹងបង្ហាញភ្លាមៗជាកំណែ 1។ សម្រាប់មាតិកាថ្មី កុំធីក ដើម្បីឱ្យអ្នកពិនិត្យវាជាមុន។",
     live: "សិស្សឃើញកំណែនេះ។ លេខកើនឡើង 1 រាល់ពេលម្ចាស់ចុចផ្សាយ។",
     notPublished: "សិស្សឃើញវាជា «ឆាប់ៗនេះ» ហើយមិនអាចបើកបានទេ។",
     draft: "ការកែប្រែដែលបានរក្សាទុក តែមិនទាន់បង្ហាញ។ សិស្សមិនឃើញវាទេ រហូតដល់ម្ចាស់ចុចផ្សាយ។",
-    key: "អាសយដ្ឋានរបស់វាក្នុងកម្មវិធី៖ មុខវិជ្ជា បន្ទាប់មកលេខមេរៀន និងលេខផ្នែក។ វាមិនប្តូរទេ។",
+    key: "អាសយដ្ឋានរបស់វាក្នុងកម្មវិធី៖ មុខវិជ្ជា និងលេខរបស់វា (សម្រាប់វិញ្ញាសារឆ្នាំចាស់៖ ឆ្នាំ និងមុខវិជ្ជា)។ វាមិនប្តូរទេ។",
     cardId:
       "លេខសម្គាល់កាត។ ប្រវត្តិពិនិត្យរបស់សិស្សម្នាក់ៗត្រូវបានរក្សាទុកក្រោមលេខនេះ ដូច្នេះវាមិនប្តូរ ហើយមិនដែលឱ្យទៅកាតផ្សេងទេ។",
     status:
@@ -419,6 +649,27 @@ const km: ContentCopy = {
     helpMistake: "កំហុសដែលសិស្សតែងធ្វើនៅទីនេះ ក្នុងមួយប្រយោគ។",
     similar: "សំណួរប្រភេទដូចគ្នាបន្ថែម សម្រាប់ហ្វឹកហាត់។ មិនផ្តល់ XP ទេ។",
     foundation: "សំណួរងាយជាង លើជំហានដែលសិស្សឆ្លើយខុសប្រហែលជាខកខាន។",
+    sectionSteps:
+      "សិស្សឃើញផ្នែកមួយជាពីរជំហាន។ ជំហានទី 1 គឺសេចក្ដីផ្ដើម ឧទាហរណ៍ និងសំណួរងាយៗ។ ជំហានទី 2 គឺមេរៀន ចំណាំសំខាន់ៗ កំហុស និងសំណួរអនុវត្ត។ នៅជំហានទី 1 សួរតែអ្វីដែលឧទាហរណ៍បានបង្ហាញរួចហើយ។",
+    blocks:
+      "ប្លុកនីមួយៗជាបញ្ជីចំណុច។ ចំណុចមួយអាចចាប់ផ្តើមដោយពាក្យដិតពីរបី បន្ទាប់មកអត្ថបទ រួចចំណុចរង។ កុំវាយ ៖ ក្រោយពាក្យដិត ព្រោះកម្មវិធីបន្ថែមវាឱ្យ។",
+    video:
+      "រូបភាពគម្របបង្ហាញនៅខាងលើផ្នែក។ បន្ថែមលេខសម្គាល់ YouTube ពេលវីដេអូត្រូវបានបង្ហោះរួច (មិនបង្ហាញជាសាធារណៈ អនុញ្ញាតឱ្យបង្កប់)។ មុននោះ សិស្សឃើញរូបភាពគម្រប ជាមួយ «ឆាប់ៗនេះ»។",
+    model: "ម៉ូឌែល 3D ដែលអាចបង្វិលបាន បង្ហាញនៅក្រោមឧទាហរណ៍ក្នុងជំហានទី 1។",
+    mistakes: "គូនៃគំនិតខុសដែលសិស្សតែងមាន និងអ្វីដែលពិត។ បង្ហាញនៅជំហានទី 2។",
+    paperPart:
+      "ចម្លងពាក្យរបស់វិញ្ញាសាផ្ទាល់ សម្រាប់ចំណងជើង សេចក្តីណែនាំ និងលំហាត់។ មានតែជម្រើស និងការពន្យល់ប៉ុណ្ណោះដែលជារបស់យើង។",
+    minutes:
+      "យកពីក្បាលវិញ្ញាសាផ្ទាល់។ សិស្សមានពេលប៉ុណ្ណេះ ហើយពេលអស់ម៉ោង កម្មវិធីប្រគល់ចម្លើយដែលពួកគេបានឆ្លើយ។",
+    questionPoints: "ពិន្ទុដែលវិញ្ញាសាផ្តល់ឱ្យផ្នែកនេះ។ បង្ហាញដល់សិស្ស តែមិនប្រើគណនាពិន្ទុទេ។",
+    skill: "ចម្លើយខុសនឹងផ្តល់ចំណាំ និងលំហាត់របស់ជំនាញនេះ។",
+    passage:
+      "សរសេរអត្ថបទម្តង ហើយដាក់ {1} {2} ជាដើម នៅកន្លែងចន្លោះនីមួយៗ។ លេខត្រូវតែត្រូវនឹងចន្លោះខាងក្រោម។",
+    wordBank: "ពាក្យដែលសិស្សជ្រើស តាមលំដាប់ដែលប្រអប់ក្នុងវិញ្ញាសាបោះពុម្ព។ ការប្តូរពាក្យមួយ នឹងប្តូរគ្រប់ចន្លោះដែលប្រើវា។",
+    gapExample: "វិញ្ញាសាបំពេញចន្លោះនេះឱ្យសិស្សរួចហើយ ដូច្នេះវាមិនរាប់ពិន្ទុទេ។",
+    skills:
+      "ជំនាញនីមួយៗមានចំណាំ និងលំហាត់។ សំណួរ ឬចន្លោះដែលដាក់ជំនាញនោះ នឹងផ្តល់វាក្រោយចម្លើយខុស។",
+    writing: "សិស្សសរសេរកិច្ចការនេះលើក្រដាស ហើយគ្មានអ្វីដាក់ពិន្ទុទេ។ អត្ថបទគំរូបង្ហាញក្រោយមក ដើម្បីប្រៀបធៀប។",
   },
   issueHelp: {
     empty: "សរសេរអ្វីមួយនៅទីនេះ។",
@@ -434,9 +685,20 @@ const km: ContentCopy = {
     correctMissing: "ចុចរង្វង់ក្បែរចម្លើយត្រូវ។",
     badId: "សូមសួរអ្នកអភិវឌ្ឍន៍៖ លេខសម្គាល់របស់របស់នេះខូច។",
     duplicateId: "សូមសួរអ្នកអភិវឌ្ឍន៍៖ របស់ពីរប្រើលេខសម្គាល់តែមួយ។",
-    emptyList: "បន្ថែមកាត ឬសំណួរយ៉ាងហោចណាស់មួយ មុនពេលផ្សាយ។",
+    emptyList: "បន្ថែមកាត សំណួរ ឬចំណុចយ៉ាងហោចណាស់មួយ មុនពេលផ្សាយ។",
     letterOrder: "ចាប់ផ្តើមជម្រើសដោយ ក. ខ. គ. ឃ. តាមលំដាប់ ពីលើចុះក្រោម។",
     answersBunched: "ផ្លាស់ចម្លើយត្រូវខ្លះទៅអក្សរផ្សេង ដើម្បីឱ្យវានៅលើ ក ខ គ និង ឃ ប្រហែលៗគ្នា។",
+    badNumber: "វាយលេខគត់ ដោយគ្មានទសភាគ ក្នុងចន្លោះដែលអនុញ្ញាត។",
+    badPoster: "ជ្រើសរូបភាពពីបញ្ជី។ រូបភាពថ្មីត្រូវឱ្យអ្នកអភិវឌ្ឍន៍បន្ថែមចូលកម្មវិធីជាមុនសិន។",
+    badModel: "ជ្រើសម៉ូឌែលពីបញ្ជី។ ម៉ូឌែលថ្មីត្រូវឱ្យអ្នកអភិវឌ្ឍន៍បន្ថែមចូលកម្មវិធីជាមុនសិន។",
+    badVideoId: "បិទភ្ជាប់តែតួអក្សរ 11 ខ្ទង់ក្រោយ watch?v= ក្នុងអាសយដ្ឋានវីដេអូ មិនមែនតំណទាំងមូលទេ។",
+    svgChanged: "សូមសួរអ្នកអភិវឌ្ឍន៍៖ ផ្នែកខ្លះនៃរូបគំនូរនេះមិនត្រូវបានអនុញ្ញាត ហើយនឹងត្រូវដកចេញ។",
+    partShape: "សូមសួរអ្នកអភិវឌ្ឍន៍៖ ផ្នែកនីមួយៗមានបញ្ជីសំណួរ ឬអត្ថបទបំពេញចន្លោះមួយ។",
+    notInBank: "ជ្រើសចម្លើយពីប្រអប់ពាក្យ ឬបន្ថែមពាក្យនោះទៅក្នុងប្រអប់ជាមុនសិន។",
+    gapMissing: "សរសេរលេខចន្លោះក្នុងសញ្ញា { } នៅកន្លែងរបស់វាក្នុងអត្ថបទ ឧទាហរណ៍ {3}។",
+    duplicateGap: "ផ្តល់លេខផ្សេងគ្នាឱ្យចន្លោះនីមួយៗ។",
+    sameWords: "ពាក្យនីមួយៗមានតែម្តងក្នុងប្រអប់។ លុប ឬប្តូរពាក្យដែលស្ទួន។",
+    unknownSkill: "ជ្រើសជំនាញពីបញ្ជី ឬបន្ថែមវានៅក្រោម «ជំនាញ» ជាមុនសិន។",
   },
 
   errors: {
@@ -488,4 +750,123 @@ export function fieldLabel(path: string, lang: Lang): string {
     }
   }
   return words.join(" · ");
+}
+
+/**
+ * Where a problem is in a SECTION or a PAPER, as words: the checks name it by
+ * its whole path ("lesson.items.2.body", "sections.1.gapFill.gaps.3.correct"),
+ * and people count from 1. The tail of a question's path (options, help…) is
+ * named by fieldLabel, the same words a quiz uses.
+ */
+export function locationLabel(kind: ContentKind, path: string, lang: Lang): string {
+  const c = CONTENT_COPY[lang];
+  const p = path.split(".");
+  const n = (i: number) => Number(p[i]) + 1;
+  const words: string[] = [];
+
+  if (kind === "section") {
+    const s = c.section;
+    if (!path) return s.whole;
+    const head = p[0];
+    if (head === "title") return s.title;
+    if (head === "video") {
+      const f = { poster: s.poster, durationSec: s.duration, youtubeId: s.youtube }[p[1] ?? ""];
+      return [s.video, f].filter(Boolean).join(" · ");
+    }
+    if (head === "model3d") {
+      const f = { src: s.modelFile, credit: s.credit, title: s.caption }[p[1] ?? ""];
+      return [s.model, f].filter(Boolean).join(" · ");
+    }
+    if (head === "mistakes") {
+      words.push(s.mistakes);
+      if (p[1] !== undefined) words.push(s.mistake(n(1)));
+      if (p[2] === "wrong") words.push(s.wrong);
+      if (p[2] === "right") words.push(s.right);
+      return words.join(" · ");
+    }
+    if (head === "quiz" || head === "quizHarder") {
+      words.push(head === "quiz" ? s.quiz : s.quizHarder);
+      if (p[1] !== undefined) words.push(c.question(n(1)));
+      const rest = fieldLabel(p.slice(2).join("."), lang);
+      if (rest) words.push(rest);
+      return words.join(" · ");
+    }
+    if (head in s.blocks) {
+      words.push(s.blocks[head as keyof typeof s.blocks]);
+      if (p[1] === "intro") words.push(s.lead);
+      else if (p[1] === "outro") words.push(s.outro);
+      else if (p[1] === "items" && p[2] !== undefined) {
+        words.push(s.point(n(2)));
+        if (p[3] === "label") words.push(s.pointLabel);
+        if (p[3] === "body") words.push(s.pointBody);
+        if (p[3] === "items") words.push(p[4] !== undefined ? s.subPoint(n(4)) : s.subPoints);
+      }
+      return words.join(" · ");
+    }
+    return path;
+  }
+
+  if (kind === "paper") {
+    const t = c.paper;
+    if (!path) return t.whole;
+    const head = p[0];
+    if (head === "minutes") return t.minutes;
+    if (head === "points") return t.points;
+    if (head === "note") return t.note;
+    if (head === "skills") {
+      words.push(p[1] ? t.skillN(p[1]) : t.skills);
+      const rest = fieldLabel(p.slice(2).join("."), lang);
+      if (rest) words.push(rest);
+      return words.join(" · ");
+    }
+    if (head === "writing") {
+      words.push(t.writing);
+      const f = p[1];
+      if (f === "title") words.push(t.writingTitle);
+      if (f === "prompt") words.push(t.writingPrompt);
+      if (f === "minWords") words.push(t.minWords);
+      if (f === "modelEssay") words.push(p[2] !== undefined ? t.paragraph(n(2)) : t.essay);
+      if (f === "checklist") words.push(p[2] !== undefined ? t.checklistItem(n(2)) : t.checklist);
+      return words.join(" · ");
+    }
+    if (head === "sections") {
+      if (p[1] === undefined) return t.whole;
+      words.push(t.part(n(1)));
+      const f = p[2];
+      if (f === "title") words.push(t.partTitle);
+      if (f === "instruction") words.push(t.instruction);
+      if (f === "statement") words.push(t.statement);
+      if (f === "example") words.push(t.example);
+      if (f === "id") words.push(c.fields.id);
+      if (f === "questions") {
+        if (p[3] !== undefined) words.push(c.question(n(3)));
+        const g = p[4];
+        if (g === "points") words.push(t.questionPoints);
+        else if (g === "skill") words.push(t.skill);
+        else {
+          const rest = fieldLabel(p.slice(4).join("."), lang);
+          if (rest) words.push(rest);
+        }
+      }
+      if (f === "gapFill") {
+        const g = p[3];
+        if (g === "title") words.push(t.passageTitle);
+        if (g === "body") words.push(t.passage);
+        if (g === "wordBank") words.push(p[4] !== undefined ? `${t.wordBank} · ${t.word(n(4))}` : t.wordBank);
+        if (g === "gaps") {
+          words.push(p[4] !== undefined ? t.gap(n(4)) : t.gaps);
+          const h = p[5];
+          if (h === "number") words.push(t.gapNumber);
+          if (h === "correct") words.push(t.gapAnswer);
+          if (h === "skill") words.push(t.skill);
+          if (h === "explanation") words.push(c.fields.explanation);
+          if (h === "id") words.push(c.fields.id);
+        }
+      }
+      return words.join(" · ");
+    }
+    return path;
+  }
+
+  return fieldLabel(path, lang);
 }

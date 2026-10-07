@@ -64,9 +64,10 @@ grep -l "GoTrueClient" dist/assets/*.js   # should print exactly one chunk, not 
 ## 3. Mentor / chat changes
 
 Anything touching `server/chat-handler.ts`, `src/utils/chat-prompt.ts`,
-`server/verify-user.ts`, `server/rate-limit.ts`, or the data files that feed
-`buildKnowledgeBlock` (`src/data/lessons.ts`, `src/data/sections.ts`,
-`src/data/practice.ts`, `src/data/questions.ts`) needs a live check — neither
+`server/verify-user.ts`, `server/rate-limit.ts`, `server/content-source.ts`
+(the published decks and sections, read from the database), or the data files
+that feed `buildKnowledgeBlock` (`src/data/lessons.ts`,
+`src/data/questions.ts`) needs a live check — neither
 `tsc` nor `oxlint` can see a prompt regression or a broken auth gate:
 
 ```bash

@@ -2,7 +2,8 @@
  * A CONTENT REF names one question without copying its text, for mistake
  * reports (supabase/migrations/20261002000005, `content_reports.content_ref`):
  *
- *   section:biology-3-1-1#0-2      a section-quiz question: step 0, index 2
+ *   section:biology-3-1-1#q3       a section-quiz question: its own id
+ *   section:biology-3-1-1#0-2      (older reports: step 0, index 2)
  *   quiz:math-1-1-1#q4             a practice-quiz question: its own id
  *   quiz:math-1-1-1#3              (older reports: index 3, read by position)
  *   paper:2025-math#l1             a past-paper question: its own id
@@ -20,8 +21,16 @@ export type ContentRefKind = "section" | "quiz" | "paper";
 
 export const REF_PATTERN = /^(section|quiz|paper):([a-z0-9-]{1,60})#([A-Za-z0-9_.-]{1,40})$/;
 
-export function sectionRef(sectionId: string, step: number, index: number): string {
-  return `section:${sectionId}#${step}-${index}`;
+/** A section-quiz question by its stable id ("q3", unique across both of the
+ *  section's quizzes), so the report survives the questions being reordered.
+ *  A question without an id falls back to its step and position. */
+export function sectionRef(
+  sectionId: string,
+  question: { id?: string },
+  step: number,
+  index: number
+): string {
+  return `section:${sectionId}#${question.id ?? `${step}-${index}`}`;
 }
 
 /** A practice-quiz question by its stable id ("q4"), so the report still
@@ -43,8 +52,8 @@ export interface ParsedRef {
   kind: ContentRefKind;
   /** The section id, the quiz's content key, or the paper key. */
   key: string;
-  /** "0-2" for a section, "q4" (or an older "3") for a quiz, the question id
-   *  for a paper. */
+  /** "q3" (or an older "0-2") for a section, "q4" (or an older "3") for a
+   *  quiz, the question id for a paper. */
   item: string;
 }
 

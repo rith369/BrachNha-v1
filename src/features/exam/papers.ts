@@ -1,6 +1,6 @@
-import { PAST_PAPERS } from "@/data/past-papers";
 import { GENERATED_EXAM_QUESTIONS } from "@/data/generated-exams";
-import type { ExamQuestion, PastPaperContent } from "@/types";
+import type { ExamQuestion, PaperBody, PastPaperContent } from "@/types";
+import { contentEntry, type ContentManifest } from "@/utils/content-manifest";
 import type { UnderlineTab } from "@/components/ui/underline-tabs";
 import {
   allSubjects,
@@ -61,17 +61,26 @@ export interface ExamPaper {
   /** "វិញ្ញាសារ" + the subject's name. */
   title: string;
   blurb: string;
-  /** Empty until real content is dropped into the backing data file. */
+  /** Scored questions. 0 means nothing is there yet, and the card says so. A
+   *  past paper's comes from the manifest, so the card list downloads no
+   *  paper; a generated paper's is its question count. */
+  count: number;
+}
+
+/** A Tab B paper: its questions are in code (derived from MOCK_QS). */
+export interface GeneratedPaper extends ExamPaper {
   questions: ExamQuestion[];
 }
 
 export interface PastPaper extends ExamPaper {
   year: number;
+  /** The published version (lib/content.ts), or null when there is none. An
+   *  attempt records it, so reopening one marks against what was sat. */
+  version: number | null;
   /**
-   * The paper as printed — sections, the reading passage, the writing task.
-   * Undefined for every paper with no content yet, which is what `questions`
-   * being empty already says; the two can never disagree because `questions` is
-   * derived from this.
+   * The paper as printed — sections, the reading passage, the writing task,
+   * the drills. Present only once its body is downloaded, which happens on the
+   * paper's own screen; the card list needs only `count`.
    */
   content?: PastPaperContent;
 }
@@ -119,7 +128,7 @@ export function generatedPaperKey(id: SubjectId): string {
 // generatedPapers() so the two tabs render identical wording — "same style" was
 // asked for explicitly. If a subject ever needs a bespoke title, add an
 // optional `paperTitle` to SubjectMeta — don't special-case it here.
-function paperTitle(subject: SubjectMeta): string {
+export function paperTitle(subject: SubjectMeta): string {
   return `វិញ្ញាសារ${subject.name}`;
 }
 function paperBlurb(subject: SubjectMeta): string {
@@ -127,34 +136,59 @@ function paperBlurb(subject: SubjectMeta): string {
 }
 
 /**
- * ONE past paper, resolved from the key in a URL.
- *
- * `/exam/subjects/:paperKey` needs the same object the card list builds, and
- * building it there by hand is how the paper's own screen would end up titled
- * differently from the card that opened it — so both go through paperTitle()
- * here. Returns null for an unknown key, a subject outside the catalog, or a
- * paper with no content: none of those is a screen, and the page redirects.
+ * A stored paper as the app's PastPaperContent. The database keeps a question's
+ * text as ONE string (both papers carry the same text in both languages, and
+ * the move refused a paper where they differed); the runner reads `q[lang]`,
+ * so it gets the same string under both. Everything else is the same shape.
  */
-export function pastPaperByKey(key: string): PastPaper | null {
-  const dash = key.indexOf("-");
-  const year = Number(key.slice(0, dash));
-  const subject = findSubject(key.slice(dash + 1));
-  // Object.hasOwn, never `in` and never a truthiness test — PAST_PAPERS is a
-  // plain object literal, so "constructor" is `in` it and "toString" resolves
-  // to a function. Same guard chat-handler.ts documents for SECTION_CONTENT.
-  const content = Object.hasOwn(PAST_PAPERS, key) ? PAST_PAPERS[key] : undefined;
+export function toPastPaperContent(body: PaperBody): PastPaperContent {
+  return {
+    minutes: body.minutes,
+    points: body.points,
+    note: body.note,
+    writing: body.writing,
+    skills: body.skills,
+    sections: body.sections.map((part) => ({
+      ...part,
+      questions: part.questions?.map(({ q, ...rest }) => ({ ...rest, q: { en: q, km: q } })),
+    })),
+  };
+}
 
-  if (!subject || !content || !Number.isFinite(year)) return null;
+/** "2025-math" back into its year and subject, or null for anything else. */
+export function parsePaperKey(key: string): { year: number; subject: SubjectMeta } | null {
+  const m = /^(20\d{2})-([a-z]+)$/.exec(key);
+  const subject = m ? findSubject(m[2]) : undefined;
+  return m && subject ? { year: Number(m[1]), subject } : null;
+}
 
+/**
+ * ONE past paper's card, from the manifest: title, count and version, no
+ * content. For Home's study feed and the paper's own screen while its body
+ * downloads. Null for an unknown key or a paper nobody has published.
+ *
+ * The paper's own screen and the card list both go through paperTitle() here,
+ * so a paper cannot be titled differently from the card that opened it.
+ */
+export function pastPaperCard(key: string, manifest: ContentManifest): PastPaper | null {
+  const parsed = parsePaperKey(key);
+  const entry = contentEntry(manifest, "paper", key);
+  if (!parsed || !entry) return null;
   return {
     key,
-    year,
-    subject,
-    title: paperTitle(subject),
-    blurb: paperBlurb(subject),
-    content,
-    questions: paperQuestions(content),
+    year: parsed.year,
+    subject: parsed.subject,
+    title: paperTitle(parsed.subject),
+    blurb: paperBlurb(parsed.subject),
+    count: entry.count,
+    version: entry.version,
   };
+}
+
+/** The same card with its downloaded content, for the paper's own screen. */
+export function withContent(paper: PastPaper, body: PaperBody, version: number): PastPaper {
+  const content = toPastPaperContent(body);
+  return { ...paper, version, content, count: paperQuestions(content).length };
 }
 
 /**
@@ -163,26 +197,28 @@ export function pastPaperByKey(key: string): PastPaper | null {
  * DERIVED FROM THE SUBJECT CATALOG, not from the content. Filtering to subjects
  * that actually have questions would render zero cards today, and zero cards is
  * not a screen — empty is the normal state here exactly as it is for Study,
- * where most subjects have no lessons yet.
+ * where most subjects have no lessons yet. Whether a card has a paper behind it
+ * comes from the MANIFEST (lib/content.ts), so the list downloads no paper.
  *
  * allSubjects() also drops whichever of english/french the student didn't pick
  * at login, so a session is 7 papers rather than 8.
  */
 export function papersForYear(
   year: number,
-  userLanguage: string | undefined
+  userLanguage: string | undefined,
+  manifest: ContentManifest
 ): PastPaper[] {
   return allSubjects(userLanguage).map((subject) => {
     const key = paperKey(year, subject.id);
-    const content = PAST_PAPERS[key];
+    const entry = contentEntry(manifest, "paper", key);
     return {
       key,
       year,
       subject,
       title: paperTitle(subject),
       blurb: paperBlurb(subject),
-      content,
-      questions: content ? paperQuestions(content) : [],
+      count: entry?.count ?? 0,
+      version: entry?.version ?? null,
     };
   });
 }
@@ -204,15 +240,17 @@ export function papersForYear(
  * kept in the codebase, unreferenced by ExamView, rather than deleted — see
  * that file's own header.
  */
-export function generatedPapers(userLanguage: string | undefined): ExamPaper[] {
+export function generatedPapers(userLanguage: string | undefined): GeneratedPaper[] {
   return allSubjects(userLanguage).map((subject) => {
     const key = generatedPaperKey(subject.id);
+    const questions = GENERATED_EXAM_QUESTIONS[subject.id] ?? [];
     return {
       key,
       subject,
       title: paperTitle(subject),
       blurb: paperBlurb(subject),
-      questions: GENERATED_EXAM_QUESTIONS[subject.id] ?? [],
+      questions,
+      count: questions.length,
     };
   });
 }

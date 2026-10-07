@@ -1,15 +1,9 @@
-// Content check for the section quizzes, the real past papers and the game
-// questions still written in code — the things tsc and oxlint cannot see.
-// (Practice quizzes and flashcards live in the database since 3 Oct 2026;
-// `npm run check:content` checks those.)
+// Content check for the game questions, the last question content still
+// written in code — the things tsc and oxlint cannot see. (Flashcards, practice
+// quizzes, lesson sections and past papers live in the database;
+// `npm run check:content` checks those, with the same rules.)
 //
 //   npm run check:quiz
-//
-// The papers were added after a maths paper shipped with a Khmer term and some
-// notation that were wrong on screen and invisible to every other check. A
-// paper is authored the same way a quiz is, so it gets the same guards: every
-// `$…$` typeset for real, `correct` matched against its own options, and a gap's
-// answer matched against its own word bank.
 //
 // To a typechecker every field below is just a string. Nothing else in the repo
 // can tell you that an option list has two entries spelled the same, that
@@ -140,57 +134,10 @@ const server = await createServer({
 try {
   const { splitMath } = await server.ssrLoadModule("/src/utils/math-render.ts");
 
-  // Practice quizzes and flashcard decks are not here any more: they live in
-  // the database (docs/plans/content-in-database.md) and are checked with the
+  // Practice quizzes, flashcard decks, lesson sections and past papers are not
+  // here any more: they live in the database (docs/plans/content-in-database.md,
+  // docs/plans/sections-and-papers-in-database.md) and are checked with the
   // same rules by the editor and by `npm run check:content`.
-
-  // ── the real past papers ────────────────────────────────────────────────
-  //
-  // Same rules, a richer shape: a part carries the whole printed exercise
-  // (`statement`) above its sub-questions, and an English part carries a
-  // gap-fill whose answers must come out of its own word bank.
-  const { PAST_PAPERS } = await server.ssrLoadModule("/src/data/past-papers.ts");
-  const paperKeys = Object.keys(PAST_PAPERS);
-  let paperQuestions = 0;
-
-  for (const key of paperKeys) {
-    const paper = PAST_PAPERS[key];
-    checkMath(splitMath, `${key} · note`, paper.note);
-
-    for (const section of paper.sections) {
-      const at = `${key} · ${section.id}`;
-      checkMath(splitMath, `${at} statement`, section.statement);
-      checkMath(splitMath, `${at} instruction`, section.instruction);
-      checkMath(splitMath, `${at} example`, section.example);
-
-      (section.questions ?? []).forEach((question) => {
-        paperQuestions += 1;
-        const where = `${at} · ${question.id}`;
-        checkMath(splitMath, `${where} q.en`, question.q.en);
-        checkMath(splitMath, `${where} q.km`, question.q.km);
-        checkMath(splitMath, `${where} explanation`, question.explanation);
-        for (const opt of question.options ?? [])
-          checkMath(splitMath, `${where} option`, opt);
-        checkChoices(where, question.options, question.correct);
-      });
-
-      const gapFill = section.gapFill;
-      if (!gapFill) continue;
-      checkMath(splitMath, `${at} passage`, gapFill.body);
-      for (const gap of gapFill.gaps) {
-        // The bank prints one of each word, so an answer outside it is a gap
-        // no student can fill — the same class of error as `correct` not being
-        // among a question's options.
-        if (!gapFill.wordBank.includes(gap.correct)) {
-          fail(
-            `${at} · gap ${gap.number}`,
-            `answer ${JSON.stringify(gap.correct)} is not in the word bank`
-          );
-        }
-        checkMath(splitMath, `${at} · gap ${gap.number}`, gap.explanation);
-      }
-    }
-  }
 
   // ── game match questions ────────────────────────────────────────────────
   const { GAME_QUESTIONS } = await server.ssrLoadModule("/src/data/game-questions.ts");
@@ -210,63 +157,6 @@ try {
     });
   }
 
-  // ── authored section content ──────────────────────────────────
-  //
-  // Added the day a section first carried LaTeX (math-1-1-1). Until then
-  // SECTION_CONTENT was prose, and tsc, oxlint and check:digits between them saw
-  // everything that could go wrong in it. None of the three can see an unclosed
-  // `$`, a mistyped command, or Khmer inside a math span where KaTeX has no
-  // glyphs and draws a row of empty boxes — and KaTeX renders broken TeX in red
-  // rather than throwing, so it does not show up by eye either.
-  //
-  // Every block's intro and outro, every item label, body and nested item, both
-  // halves of every misconception, and the quiz once one is authored.
-  const { SECTION_CONTENT } = await server.ssrLoadModule("/src/data/sections.ts");
-  const sectionKeys = Object.keys(SECTION_CONTENT);
-  let sectionQuestions = 0;
-
-  const checkBlock = (where, block) => {
-    if (!block) return;
-    if (block.intro) checkMath(splitMath, `${where} intro`, block.intro);
-    if (block.outro) checkMath(splitMath, `${where} outro`, block.outro);
-    (block.items ?? []).forEach((item, i) => {
-      if (item.label) checkMath(splitMath, `${where} item ${i + 1} label`, item.label);
-      if (item.body) checkMath(splitMath, `${where} item ${i + 1} body`, item.body);
-      for (const sub of item.items ?? [])
-        checkMath(splitMath, `${where} item ${i + 1} sub`, sub);
-    });
-  };
-
-  for (const key of sectionKeys) {
-    const section = SECTION_CONTENT[key];
-    checkMath(splitMath, `${key} title`, section.title);
-    for (const name of ["intro", "lesson", "examples", "notes"])
-      checkBlock(`${key} · ${name}`, section[name]);
-
-    (section.mistakes ?? []).forEach((m, mi) => {
-      checkMath(splitMath, `${key} · mistake ${mi + 1} wrong`, m.wrong);
-      checkMath(splitMath, `${key} · mistake ${mi + 1} right`, m.right);
-    });
-
-    // BOTH quizzes. `quizHarder` renders on step 1 and is authored exactly like
-    // `quiz`, so leaving it out would mean the checker silently covered half a
-    // section — the same "the check and the screen disagree" gap that let raw
-    // LaTeX ship on the misconception cards.
-    const allQuestions = [
-      ...(section.quiz ?? []).map((q, i) => [`quiz ${i + 1}`, q]),
-      ...(section.quizHarder ?? []).map((q, i) => [`quizHarder ${i + 1}`, q]),
-    ];
-    allQuestions.forEach(([label, question]) => {
-      sectionQuestions += 1;
-      const where = `${key} · ${label}`;
-      checkMath(splitMath, `${where} q`, question.q);
-      checkMath(splitMath, `${where} explanation`, question.explanation);
-      if (question.scenario) checkMath(splitMath, `${where} scenario`, question.scenario);
-      for (const opt of question.options ?? []) checkMath(splitMath, `${where} option`, opt);
-      checkChoices(where, question.options, question.correct);
-    });
-  }
-
   if (problems.length) {
     console.error(`\ncheck:quiz — ${problems.length} problem(s):\n`);
     for (const p of problems) console.error("  " + p + "\n");
@@ -274,9 +164,7 @@ try {
   } else {
     console.log(
       `check:quiz — ok. ` +
-        `${paperQuestions} question(s) across ${paperKeys.length} past paper(s), ` +
-        `${gameQuestions} across ${gameKeys.length} game subject(s), ` +
-        `${sectionQuestions} across ${sectionKeys.length} section(s); ` +
+        `${gameQuestions} question(s) across ${gameKeys.length} game subject(s); ` +
         `${checked} string(s) with math typeset cleanly.`
     );
   }

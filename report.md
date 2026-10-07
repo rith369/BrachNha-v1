@@ -15,6 +15,96 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 7 Oct 2026 — Lessons and Past Papers Now Come from the Content Editor (Part 2 of 2)
+
+Commit: not committed yet. No database step: the migration was run and the 7 lesson sections
+and 2 past papers were imported today (all 9 checked against the database and identical).
+
+**Why.** Part 1 gave lesson sections and past papers an editor, but students still saw the copy
+written into the app. Now they see what is published on Admin → Content, the same as
+flashcards and quizzes, so a mistake in a lesson or a paper can be fixed without a new version
+of the app.
+
+**What changed for students:**
+
+- **The app opens faster again.** It no longer downloads the lesson sections and the two past
+  papers before the first screen. Each downloads when it is opened. The first screen
+  downloads about 30 KB less.
+- **A lesson section or paper opened once works without internet** afterwards. The first
+  time needs a connection; with none, the screen says so and offers Try again.
+- **Old exam results stay correct.** Reopening an earlier attempt at a past paper shows the
+  questions as they were when it was taken, even if the paper was edited since.
+- **One small wording fix on the results screen of a past paper:** the line under the writing
+  task used a long dash (—). It is now two sentences (… មិនគិតពិន្ទុក្នុងកម្មវិធី។
+  ពិនិត្យដោយខ្លួនឯងខាងក្រោម។). Please check the Khmer reads well.
+- Everything else looks and works as before: the Study path, the lesson pages, the exam tab,
+  sitting a paper and its practice drills.
+
+**What changed for the team:**
+
+- On Admin → Mistake reports, a question from a lesson section or a past paper now has an
+  **Edit** button that opens it in the Content editor, like quiz questions. Fix it there, the
+  owner publishes, then press Fixed. Reports sent before today still open on the right
+  question.
+- KruAI now reads the lesson sections from the database too, at the same time as the
+  flashcard decks, so students don't wait longer for an answer.
+- The copy of the lesson sections and past papers inside the app's code is deleted. **The
+  database is the only copy now**, for all four kinds of content.
+
+**What to re-test:**
+
+- open the Study path for biology and for maths: the sections that have content can be
+  opened, and each shows the right text, video picture and questions;
+- open a lesson section, turn on airplane mode, close and reopen the app, open the same
+  section: it still works;
+- open the exam tab, the 2025 maths paper and the 2025 English paper, and sit one to the end:
+  the results and the practice drills under wrong answers appear as before;
+- edit a section or paper question on Admin → Content and publish, then reopen the app as a
+  student: the change shows;
+- reopen an old paper result from before the edit: it shows the old question;
+- report a mistake on a lesson question, then open it on Admin → Mistake reports and press
+  Edit: the editor opens on that question.
+
+## 4 Oct 2026 — Lessons and Past Papers Get an Editor Too (Part 1 of 2)
+
+Commit: not committed yet. **Database step needed:** the owner runs
+`20261003000002_sections_and_papers.sql` in the Supabase SQL editor, then imports
+`content/sections-papers.json` on Admin → Content with "publish items never published"
+ticked (see `supabase/README.md`). Done on 7 Oct 2026.
+
+**Why.** Flashcards and quizzes can now be fixed on Admin → Content without a new version of
+the app. Lesson sections (the pages behind the Study path) and the past exam papers could
+not: a mistake in one still needed a developer. This is the first half of moving them too.
+
+**What changed for the team (Admin → Content):**
+
+- **Two new tabs: Lesson sections and Past papers.** They work like the Flashcard and Quiz
+  tabs: save a draft (anyone on the team), publish (the owner only), every old version kept,
+  Restore as draft to undo.
+- **A lesson section** can be fixed or written from empty: the title, the video's picture and
+  YouTube id, the four parts (introduction, examples, lesson, key notes), the 3D model, the
+  common mistakes and both sets of questions. Preview shows each part exactly as students
+  see it. **New** offers the places on the Study path that have nothing written yet.
+- **A past paper** can be fixed and extended: every question, option, answer and
+  explanation, the reading passage and its word box, the writing task and the practice
+  drills. Questions can be added, removed and moved inside a part. A whole new paper still
+  comes as a file the developer prepares from photos.
+- The checks work as before, with new ones: a word-box answer that is not in the box, a gap
+  missing from the passage, a YouTube link pasted instead of its id. Tap a problem to jump
+  to it.
+
+**What changed for students:**
+
+- **Nothing yet**, on purpose. Students keep seeing lessons and papers from the app itself
+  until part 2, after the import.
+- **One small fix they will see now:** 11 explanations in the 2025 maths paper used a long
+  dash (—), which the app's writing rules ban. Each became a full stop (។), a colon (៖) or
+  brackets. The words are unchanged.
+
+**What to re-test:** after the database step, open Admin → Content → Lesson sections and Past
+papers and check 7 sections and 2 papers are listed as "Live: version 1". Open a lesson section
+on the Study path and the 2025 maths paper, and check both still look right.
+
 ## 3 Oct 2026 — Flashcards and Quizzes Now Come from the Content Editor (Part 2 of 2)
 
 Commit `5e95715`. No database step: the migration was run and the content was

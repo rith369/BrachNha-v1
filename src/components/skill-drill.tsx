@@ -10,10 +10,11 @@ import { cn } from "@/utils/cn";
  *
  * MOVED HERE FROM features/exam/ the moment a second caller appeared, which is
  * the same lift shell/wordmark.tsx and shell/stat-bar.tsx got. It takes the
- * `help` OBJECT rather than a skill id now: it used to reach into
- * data/papers/english-drills.ts itself, and a shared component importing one
- * subject's drill corpus would drag the whole of it into every chunk that
- * renders a question. The caller does the lookup.
+ * `help` OBJECT rather than a skill id now: it used to reach into the English
+ * paper's drill file itself, and a shared component importing one subject's
+ * drill corpus would drag the whole of it into every chunk that renders a
+ * question. The caller does the lookup (a past paper carries its own drills in
+ * PastPaperContent.skills since papers moved into the database).
  *
  * WHEN it is shown differs per caller, and that is deliberate. The English paper
  * shows it only under a WRONG answer — a student who has just proved the skill

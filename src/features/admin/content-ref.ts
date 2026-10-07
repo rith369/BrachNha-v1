@@ -1,8 +1,6 @@
-import { SECTION_CONTENT } from "@/data/sections";
-import { PAST_PAPERS } from "@/data/past-papers";
-import type { QuizQuestionBody } from "@/types";
+import type { PaperBody, QuizQuestionBody, SectionBody } from "@/types";
 import { scorePaper } from "@/features/exam/paper-scoring";
-import { pastPaperByKey } from "@/features/exam/papers";
+import { paperTitle, parsePaperKey, toPastPaperContent } from "@/features/exam/papers";
 import { findSubject } from "@/features/lessons/subjects";
 import { parseContentRef, type ContentRefKind } from "@/utils/content-ref";
 
@@ -11,17 +9,19 @@ import { parseContentRef, type ContentRefKind } from "@/utils/content-ref";
  * /admin/mistakes shows the real prompt, options, marked answer and
  * explanation instead of a code.
  *
- * Reached ONLY from the lazy /admin/mistakes chunk. It imports the sections
- * and past papers still written in code, which must never be pulled into the
- * entry chunk; the student-side button builds refs with utils/content-ref.ts
- * alone. Practice QUIZZES live in the database, so the page passes them in
- * (lib/content.ts's useAllBodies), and a quiz question also gets an Edit link
- * to /admin/content.
+ * Every kind a report can name lives in the DATABASE now (practice quizzes
+ * since stage 1, lesson sections and past papers since step B of
+ * docs/plans/sections-and-papers-in-database.md), so the page passes the
+ * published bodies in (lib/content.ts's useAllBodies) and every resolved
+ * question gets an Edit link to /admin/content, opened at that question.
+ * "Fixed" on the mistakes page then means fixed there.
+ *
+ * Reached ONLY from the lazy /admin/mistakes chunk.
  *
  * EVERY LOOKUP IS GUARDED with Object.hasOwn, never `in` or a truthiness test:
- * these are plain object literals, so "constructor" is `in` them and
- * "toString" resolves to a function. A ref comes from a student's device, so
- * it is untrusted input even after the database's shape check.
+ * these are plain objects, so "constructor" is `in` them and "toString"
+ * resolves to a function. A ref comes from a student's device, so it is
+ * untrusted input even after the database's shape check.
  *
  * Returns null when the question no longer exists (renumbered, moved, removed),
  * which the page says plainly rather than guessing.
@@ -45,27 +45,44 @@ export interface ResolvedQuestion {
   explanation: string;
   /** Where the question lives in the app, for "Open it in the app". */
   link: string;
-  /** Practice quizzes only: the question in the content editor. */
+  /** The question in the content editor. */
   edit?: string;
 }
 
-export function resolveContentRef(
-  ref: string,
-  quizzes: Record<string, QuizQuestionBody[]>
-): ResolvedQuestion | null {
+/** The published bodies of each kind a report can name, keyed by content key. */
+export interface ContentSets {
+  quiz: Record<string, QuizQuestionBody[]>;
+  section: Record<string, SectionBody>;
+  paper: Record<string, PaperBody>;
+}
+
+export function resolveContentRef(ref: string, sets: ContentSets): ResolvedQuestion | null {
   const parsed = parseContentRef(ref);
   if (!parsed) return null;
   const { kind, key, item } = parsed;
 
   if (kind === "section") {
-    if (!Object.hasOwn(SECTION_CONTENT, key)) return null;
-    const m = /^([01])-(\d{1,3})$/.exec(item);
-    if (!m) return null;
-    const step = Number(m[1]);
-    const index = Number(m[2]);
-    const content = SECTION_CONTENT[key];
-    const list = (step === 0 ? content.quiz : content.quizHarder) ?? [];
-    const q = list[index];
+    if (!Object.hasOwn(sets.section, key)) return null;
+    const content = sets.section[key];
+    const lists = [content.quiz ?? [], content.quizHarder ?? []];
+    // A question's own id ("q3", unique across both quizzes) since sections
+    // moved into the database; an older report names it by step and position.
+    let step = -1;
+    let index = -1;
+    const old = /^([01])-(\d{1,3})$/.exec(item);
+    if (old) {
+      step = Number(old[1]);
+      index = Number(old[2]);
+    } else {
+      for (let s = 0; s < lists.length && step === -1; s++) {
+        const at = lists[s].findIndex((x) => x.id === item);
+        if (at !== -1) {
+          step = s;
+          index = at;
+        }
+      }
+    }
+    const q = step >= 0 ? lists[step][index] : undefined;
     if (!q) return null;
     return {
       kind,
@@ -78,12 +95,13 @@ export function resolveContentRef(
       correct: q.correct,
       explanation: q.explanation,
       link: `/sections/${key}`,
+      edit: `/admin/content/section/${key}?q=${encodeURIComponent(q.id)}`,
     };
   }
 
   if (kind === "quiz") {
-    if (!Object.hasOwn(quizzes, key)) return null;
-    const list = quizzes[key];
+    if (!Object.hasOwn(sets.quiz, key)) return null;
+    const list = sets.quiz[key];
     // A question's own id ("q4") since quizzes moved into the database; an
     // older report names it by position ("3").
     const index = /^\d{1,3}$/.test(item) ? Number(item) : list.findIndex((x) => x.id === item);
@@ -108,8 +126,9 @@ export function resolveContentRef(
 
   // A past paper. scorePaper with no answers lists every question with its
   // prompt, marked answer and explanation, in the review's own words.
-  if (!Object.hasOwn(PAST_PAPERS, key)) return null;
-  const content = PAST_PAPERS[key];
+  if (!Object.hasOwn(sets.paper, key)) return null;
+  const content = toPastPaperContent(sets.paper[key]);
+  const meta = parsePaperKey(key);
   const scored = scorePaper(content, {});
   for (const section of scored.sections) {
     const at = section.items.findIndex((i) => i.id === item);
@@ -122,7 +141,7 @@ export function resolveContentRef(
       [];
     return {
       kind,
-      title: pastPaperByKey(key)?.title ?? key,
+      title: meta ? `${paperTitle(meta.subject)} ${meta.year}` : key,
       number: at + 1,
       statement: section.statement,
       prompt: reviewItem.prompt,
@@ -130,6 +149,7 @@ export function resolveContentRef(
       correct: reviewItem.correct,
       explanation: reviewItem.explanation,
       link: `/exam/subjects/${key}`,
+      edit: `/admin/content/paper/${key}?q=${encodeURIComponent(item)}`,
     };
   }
   return null;

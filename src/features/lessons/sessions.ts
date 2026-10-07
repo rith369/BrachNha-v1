@@ -1,5 +1,5 @@
 import { LESSONS } from "@/data/lessons";
-import { hasSectionContent } from "@/data/sections";
+import { sectionPublished, type ContentManifest } from "@/utils/content-manifest";
 import type { SubjectId, SubjectTab } from "./subjects";
 
 /**
@@ -15,10 +15,13 @@ import type { SubjectId, SubjectTab } from "./subjects";
  * KHMER-ONLY, like the rest of the Study feature. See LESSONS_PAGE_LANG in
  * ./subjects for why.
  *
- * NOTHING HERE IS AUTHORED CONTENT. Titles are the curriculum; the lessons
- * behind them are not written yet, which is why every authored session below
- * has no `href`. This module exists so the page renders *whatever
- * structure it is given*, and filling content in later needs no page change.
+ * NOTHING HERE IS AUTHORED CONTENT. Titles are the curriculum; what is written
+ * behind a section lives in the DATABASE (lib/content.ts) since stage 2 of
+ * docs/plans/sections-and-papers-in-database.md. So the structure below carries
+ * no `href` on an authored section: chaptersFor() adds one to each section the
+ * manifest says is published, and chaptersShape() is the bare structure for the
+ * callers that only need names and numbers. Publishing a section on
+ * /admin/content turns its node on with no code change.
  */
 
 export type SessionStatus = "done" | "current" | "locked";
@@ -163,8 +166,8 @@ function sectionsFor(
   // about a level that is deliberately never drawn.
   //
   // THE ID IS UNCHANGED and still carries the chapter
-  // (`math-1-2-1`), because `completedSessions` persists it and
-  // SECTION_CONTENT is keyed by it. Only the visible label moves.
+  // (`math-1-2-1`), because `completedSessions` persists it and the
+  // database keys the section by it. Only the visible label moves.
   flat = false
 ): Session[] {
   return [...titles, ...tail].map((title, i) => {
@@ -175,18 +178,19 @@ function sectionsFor(
         ? `${lesson}.${i + 1}`
         : `${chapter}.${lesson}.${i + 1}`,
       title,
-      // DERIVED, never authored: a node is playable if and only if content
-      // exists for its id. Writing "this one is unlocked" by hand beside the
-      // content is exactly how the two fall out of step.
-      href: hasSectionContent(id) ? `/sections/${id}` : null,
+      // Set by chaptersFor() from the manifest. Never here: this is the
+      // shape. A node is playable if and only if a section is published for
+      // its id; writing "this one is unlocked" by hand beside the content is
+      // exactly how the two fall out of step.
+      href: null,
     };
   });
 }
 
 /**
  * Authored chapter structure, keyed by subject. Most subjects are absent, and
- * that is the normal state — exactly like PAST_PAPERS in
- * data/past-papers.ts. Adding an entry turns a real path on for that subject.
+ * that is the normal state. Adding an entry turns a real path on for that
+ * subject; publishing a section on /admin/content turns its node on.
  *
  * Biology is the first real curriculum in the app, entered from the Grade 12
  * table of contents. Chapter 1's name and its two lessons' names are real
@@ -251,8 +255,8 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
         //
         // `PLACEHOLDER_SECTIONS` is three, so the count is passed explicitly.
         // Each section carries `title: ""` too, so a node shows its number and
-        // nothing else, and every one is locked because hasSectionContent() is
-        // false for all of them. Naming a lesson later is one string here; the
+        // nothing else, and every one is locked because nothing is published
+        // for any of them. Naming a lesson later is one string here; the
         // nodes need no other edit.
         ...[2, 3, 4].map((lesson) => ({
           number: lesson,
@@ -561,15 +565,18 @@ const PLACEHOLDER_SESSIONS = 6;
 const DEFAULT_CHAPTER = 1;
 
 /**
- * The path for a subject.
+ * The path for a subject, as STRUCTURE: names, numbers and ids, with no
+ * authored section linked. For the callers that only need what a lesson is
+ * called (the practice lesson list, a runner's title, the admin's places).
  *
  * Falls back to a DERIVED path when nothing is authored: one session per lesson
  * that genuinely exists in data/lessons.ts, followed by locked placeholders,
  * wrapped in a single chapter and a single lesson so the shape matches. Derived
  * rather than authored for the same reason lessonCountFor() is — a number on
- * screen can then never claim content the app does not have.
+ * screen can then never claim content the app does not have. Those legacy
+ * lessons are still in code, so their /lessons/ links are part of the shape.
  */
-export function chaptersFor(subjectId: SubjectId): Chapter[] {
+export function chaptersShape(subjectId: SubjectId): Chapter[] {
   const authored = SUBJECT_SESSIONS[subjectId];
   if (authored?.length) return authored;
 
@@ -604,6 +611,23 @@ export function chaptersFor(subjectId: SubjectId): Chapter[] {
       ],
     },
   ];
+}
+
+/**
+ * The path for a subject with a link on every section the manifest says is
+ * published (lib/content.ts). A section with no questions still counts: it is
+ * still something to read. The quiz path's quizPathFor() is the same move.
+ */
+export function chaptersFor(subjectId: SubjectId, manifest: ContentManifest): Chapter[] {
+  return chaptersShape(subjectId).map((chapter) => ({
+    ...chapter,
+    lessons: chapter.lessons.map((lesson) => ({
+      ...lesson,
+      sessions: lesson.sessions.map((s) =>
+        !s.href && sectionPublished(manifest, s.id) ? { ...s, href: `/sections/${s.id}` } : s
+      ),
+    })),
+  }));
 }
 
 /** Every section on a path, in order. */

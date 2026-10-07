@@ -2,14 +2,15 @@ import type { ContentKind, DeckCardBody, PracticeCard, QuizQuestionBody } from "
 
 /**
  * WHAT IS PUBLISHED: the small list a student's phone downloads once per app
- * load (lib/content.ts), one entry per flashcard deck and practice quiz. It is
- * the database's `content_items` table (supabase/migrations/20261003000001),
- * published rows only.
+ * load (lib/content.ts), one entry per flashcard deck, practice quiz, lesson
+ * section and past paper. It is the database's `content_items` table
+ * (supabase/migrations/20261003000001 and 20261003000002), published rows only.
  *
  * Everything that decides what EXISTS (a lesson row's count, a quiz node's
- * link, Home's study feed, the prediction's playable sections) reads this
- * rather than a body, so those screens never download a single lesson. A body
- * is fetched only when a deck or quiz is opened.
+ * link, a Study-path node's link, an exam card, Home's study feed, the
+ * prediction's playable sections) reads this rather than a body, so those
+ * screens never download a single lesson. A body is fetched only when a deck,
+ * quiz, section or paper is opened.
  *
  * PURE, and passed in as an ARGUMENT to every function that reads it. The
  * React Compiler memoises a component on what it reads; a helper that reached
@@ -17,18 +18,23 @@ import type { ContentKind, DeckCardBody, PracticeCard, QuizQuestionBody } from "
  * old answer after the manifest arrived.
  */
 
-export interface DeckEntry {
+export interface ContentEntry {
   version: number;
+  /** Cards, questions, a section's questions (may be 0: a section need not
+   *  ask any), or a paper's scored questions and gaps. The database's
+   *  content_count(). */
   count: number;
+}
+
+export interface DeckEntry extends ContentEntry {
   /** The card ids, in order. Review history is keyed by them, so Home and
    *  Progress can count due cards without the cards themselves. */
   ids: string[];
 }
 
-export interface QuizEntry {
-  version: number;
-  count: number;
-}
+export type QuizEntry = ContentEntry;
+export type SectionEntry = ContentEntry;
+export type PaperEntry = ContentEntry;
 
 export interface ContentManifest {
   /**
@@ -39,23 +45,53 @@ export interface ContentManifest {
   status: "loading" | "ready" | "failed";
   deck: Record<string, DeckEntry>;
   quiz: Record<string, QuizEntry>;
+  section: Record<string, SectionEntry>;
+  paper: Record<string, PaperEntry>;
 }
 
 /** For callers that need the curriculum's SHAPE and not what is published
  *  (the admin's list of places, a path's structure). */
-export const EMPTY_MANIFEST: ContentManifest = { status: "ready", deck: {}, quiz: {} };
+export const EMPTY_MANIFEST: ContentManifest = {
+  status: "ready",
+  deck: {},
+  quiz: {},
+  section: {},
+  paper: {},
+};
 
-/** A key as the database stores it: "biology-1-1", "math-1-1-1". */
-export const CONTENT_KEY = /^[a-z]+-\d{1,3}-\d{1,3}(-\d{1,3})?$/;
+/** A key as the database stores it, per kind (content_key_ok() in SQL, with
+ *  the subject checked separately where it matters): "biology-1-1",
+ *  "math-1-1-1", "biology-3-1-1", "2025-math". */
+export const CONTENT_KEY: Record<ContentKind, RegExp> = {
+  deck: /^[a-z]+-\d{1,3}-\d{1,3}$/,
+  quiz: /^[a-z]+-\d{1,3}-\d{1,3}(-\d{1,3})?$/,
+  section: /^[a-z]+-\d{1,3}-\d{1,3}-\d{1,3}$/,
+  paper: /^20\d{2}-[a-z]+$/,
+};
 
-/** The published entry for a deck, or null. `Object.hasOwn`, never `in`: the
- *  key can come from a URL, and "constructor" is `in` every object. */
+/** The published entry for one item, or null. `Object.hasOwn`, never `in`:
+ *  the key can come from a URL, and "constructor" is `in` every object. */
+export function contentEntry(
+  manifest: ContentManifest,
+  kind: ContentKind,
+  key: string
+): ContentEntry | null {
+  const map: Record<string, ContentEntry> = manifest[kind];
+  return Object.hasOwn(map, key) ? map[key] : null;
+}
+
 export function deckEntry(manifest: ContentManifest, key: string): DeckEntry | null {
   return Object.hasOwn(manifest.deck, key) ? manifest.deck[key] : null;
 }
 
 export function quizEntry(manifest: ContentManifest, key: string): QuizEntry | null {
-  return Object.hasOwn(manifest.quiz, key) ? manifest.quiz[key] : null;
+  return contentEntry(manifest, "quiz", key);
+}
+
+/** Whether a lesson section is published. NOT its count: a section with no
+ *  questions is still a section a student can read. */
+export function sectionPublished(manifest: ContentManifest, id: string): boolean {
+  return contentEntry(manifest, "section", id) !== null;
 }
 
 /** Cards in a published deck, 0 when there is none. */
@@ -73,7 +109,24 @@ export function entryVersion(
   kind: ContentKind,
   key: string
 ): number | null {
-  return (kind === "deck" ? deckEntry(manifest, key) : quizEntry(manifest, key))?.version ?? null;
+  return contentEntry(manifest, kind, key)?.version ?? null;
+}
+
+/**
+ * A body's count, the same rule as the database's content_count(): for the
+ * development fixture, which has bodies and no manifest of its own.
+ */
+export function bodyCount(kind: ContentKind, body: unknown): number {
+  if (kind === "deck" || kind === "quiz") return Array.isArray(body) ? body.length : 0;
+  if (typeof body !== "object" || body === null) return 0;
+  const b = body as Record<string, unknown>;
+  const len = (v: unknown) => (Array.isArray(v) ? v.length : 0);
+  if (kind === "section") return len(b.quiz) + len(b.quizHarder);
+  const parts = Array.isArray(b.sections) ? (b.sections as Record<string, unknown>[]) : [];
+  return parts.reduce((n, p) => {
+    const gaps = (p?.gapFill as { gaps?: { example?: boolean }[] } | undefined)?.gaps;
+    return n + len(p?.questions) + (Array.isArray(gaps) ? gaps.filter((g) => !g?.example).length : 0);
+  }, 0);
 }
 
 /**

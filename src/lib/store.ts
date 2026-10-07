@@ -159,8 +159,15 @@ export interface ExamResult {
  * attempt they made last week. A paper is ~20 keys, and the list is capped.
  */
 export interface PaperResult {
-  /** `"{year}-{subjectId}"` — the key PAST_PAPERS is keyed by. */
+  /** `"{year}-{subjectId}"` — the key the database stores the paper under. */
   paperKey: string;
+  /**
+   * The published version this attempt was sat on (lib/content.ts), so
+   * reopening it shows the explanations the student actually had. Absent on
+   * attempts from before papers moved into the database: those were sat on
+   * what became version 1.
+   */
+  version?: number;
   /** ISO instant, so it sorts and formats without a second field. */
   date: string;
   score: number;

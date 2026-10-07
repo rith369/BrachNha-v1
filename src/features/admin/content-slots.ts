@@ -1,14 +1,15 @@
-import { chaptersFor, lessonHeading } from "@/features/lessons/sessions";
+import { PAST_PAPER_YEARS } from "@/data/past-papers";
+import { chaptersShape, lessonHeading } from "@/features/lessons/sessions";
 import { SUBJECTS, findSubject, type SubjectId } from "@/features/lessons/subjects";
 import { FLASHCARD_SUBJECTS, lessonRef, practiceKey } from "@/features/practice/practice";
 import { quizPathShape } from "@/features/practice/quiz-path";
 import type { ContentKind } from "@/types";
 
 /**
- * Every place a deck or quiz can live, named the way the app names it, for the
- * content editor (/admin/content).
+ * Every place a deck, quiz, lesson section or past paper can live, named the
+ * way the app names it, for the content editor (/admin/content).
  *
- * THE SLOTS COME FROM THE SAME CURRICULUM THE APP RENDERS: chaptersFor() for
+ * THE SLOTS COME FROM THE SAME CURRICULUM THE APP RENDERS: chaptersShape() for
  * the Study and flashcard lessons, quizPathShape() for the Bac II quiz paths.
  * So "New" can only offer a key a student can actually reach, and the editor
  * names an item exactly as the student sees it. A key is never typed by hand.
@@ -24,11 +25,16 @@ export interface ContentSlot {
   title: string;
   /** Where a student opens it. */
   link: string;
+  /** A section's own name, which a new section starts with as its title. */
+  name?: string;
 }
+
+/** A section id the Study path generates: subject, chapter, lesson, section. */
+const SECTION_ID = /^[a-z]+-[1-9][0-9]?-[1-9][0-9]?-[1-9][0-9]?$/;
 
 function deckSlots(): ContentSlot[] {
   return FLASHCARD_SUBJECTS.flatMap((subject) =>
-    chaptersFor(subject).flatMap((chapter) =>
+    chaptersShape(subject).flatMap((chapter) =>
       chapter.lessons.map((lesson) => ({
         kind: "deck" as const,
         key: practiceKey(subject, chapter.number, lesson.number),
@@ -68,7 +74,7 @@ function quizSlots(): ContentSlot[] {
       );
     }
     // Otherwise one quiz per LESSON, the plain lesson list's shape.
-    return chaptersFor(subject).flatMap((chapter) =>
+    return chaptersShape(subject).flatMap((chapter) =>
       chapter.lessons.map((lesson) => ({
         kind: "quiz" as const,
         key: practiceKey(subject, chapter.number, lesson.number),
@@ -82,8 +88,54 @@ function quizSlots(): ContentSlot[] {
   });
 }
 
+/** Every node on an authored Study path (chapter, lesson, section). A path
+ *  derived from the legacy lessons has no such ids, so it offers nothing. */
+function sectionSlots(): ContentSlot[] {
+  return SUBJECTS.flatMap((meta) =>
+    chaptersShape(meta.id).flatMap((chapter) =>
+      chapter.lessons.flatMap((lesson) =>
+        lesson.sessions
+          .filter((s) => SECTION_ID.test(s.id))
+          .map((s) => ({
+            kind: "section" as const,
+            key: s.id,
+            subject: meta.id,
+            title:
+              (chapter.flat ? "" : `ជំពូក ${chapter.number} · `) +
+              lessonHeading(lesson.number, lesson.title) +
+              ` · ${s.label}${s.title ? ` ${s.title}` : ""}`,
+            link: `/sections/${s.id}`,
+            name: s.title,
+          }))
+      )
+    )
+  );
+}
+
+/** One per exam session and subject, the exam tab's own cards. */
+function paperSlots(): ContentSlot[] {
+  return PAST_PAPER_YEARS.flatMap((year) =>
+    SUBJECTS.map((meta) => ({
+      kind: "paper" as const,
+      key: `${year}-${meta.id}`,
+      subject: meta.id,
+      title: `វិញ្ញាសារ${meta.name} ${year}`,
+      link: `/exam/subjects/${year}-${meta.id}`,
+    }))
+  );
+}
+
 export function contentSlots(kind: ContentKind): ContentSlot[] {
-  return kind === "deck" ? deckSlots() : quizSlots();
+  switch (kind) {
+    case "deck":
+      return deckSlots();
+    case "quiz":
+      return quizSlots();
+    case "section":
+      return sectionSlots();
+    case "paper":
+      return paperSlots();
+  }
 }
 
 /**
@@ -94,6 +146,17 @@ export function contentSlots(kind: ContentKind): ContentSlot[] {
 export function slotFor(kind: ContentKind, key: string): ContentSlot {
   const found = contentSlots(kind).find((s) => s.key === key);
   if (found) return found;
+  if (kind === "paper") {
+    const [year, subjectId = ""] = key.split("-");
+    const subject = findSubject(subjectId);
+    return {
+      kind,
+      key,
+      subject: (subject?.id ?? "math") as SubjectId,
+      title: `វិញ្ញាសារ${subject?.name ?? subjectId} ${year}`,
+      link: `/exam/subjects/${key}`,
+    };
+  }
   const [subjectId, ...numbers] = key.split("-");
   const subject = findSubject(subjectId);
   return {
@@ -101,7 +164,10 @@ export function slotFor(kind: ContentKind, key: string): ContentSlot {
     key,
     subject: (subject?.id ?? "math") as SubjectId,
     title: `${subject?.name ?? subjectId} ${numbers.join(".")}`,
-    link: `/practice/${kind === "deck" ? "flashcards" : "quiz"}/${subjectId}/${numbers.join("-")}`,
+    link:
+      kind === "section"
+        ? `/sections/${key}`
+        : `/practice/${kind === "deck" ? "flashcards" : "quiz"}/${subjectId}/${numbers.join("-")}`,
   };
 }
 

@@ -219,7 +219,7 @@ export function lessonDataFor(lessonId: string): Lesson | null {
   //
   // Reachable from a typed URL, and the id also reaches utils/chat-prompt.ts
   // now, which is what surfaced it. Same trap, and same guard, as
-  // pinnedContextFor's lookups into SECTION_CONTENT.
+  // pinnedContextFor's lookups into the published sections.
   if (!Object.hasOwn(LESSONS, cat)) return null;
   const topics = LESSONS[cat];
   return Object.hasOwn(topics, topic) ? topics[topic] : null;

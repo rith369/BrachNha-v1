@@ -54,7 +54,7 @@ warning it carried still stands: do not copy Next.js-specific patterns back in.
 | **Lucide React** | ✅ Use | Replaced emoji icons (inconsistent rendering across phones) |
 | **Framer Motion** | ✅ Use | Chat overlay slide-up; CSS keyframes still used for simple fixed animations (fab pulse, shimmer) |
 | **Recharts** | ✅ Use | Score trend line + subject bar chart on Progress. Sparklines and the score donut are still hand-coded |
-| **KaTeX** | ✅ Use | Typesets both sides of the KruAI conversation AND the maths in a practice quiz. Reached only through `components/shell/math-text.tsx`, which two lazy routes import — so it builds its own shared chunk and stays out of the entry chunk. That chunk is named **`math-render-*.js`** since 3 Oct 2026 (utils/content-check.ts imports KaTeX too; it was `math-text-*.js`), so check it by content, not name. **Verify that after any build**; it is one eager import away from first paint |
+| **KaTeX** | ✅ Use | Typesets both sides of the KruAI conversation AND the maths in a practice quiz. Reached only through `components/shell/math-text.tsx`, which two lazy routes import — so it builds its own shared chunk and stays out of the entry chunk. That chunk is named **`sanitize-svg-*.js`** since 4 Oct 2026 (utils/content-check.ts imports KaTeX and the SVG sanitizer too; it was `math-render-*.js`, and before that `math-text-*.js`), so check it by content (`renderToString`), not name. **Verify that after any build**; it is one eager import away from first paint |
 | **MathLive** | ✅ Use | The math keyboard and formula editor in the chat composer, replacing ~570 lines of hand-built Unicode keyboard. Lazy-imported one level deeper than KaTeX — see the mentor section below, the boundary is load-bearing |
 | **Zustand (+ persist)** | ✅ Use | Single global store; replaces scattered `useState` + manual localStorage |
 | **Supabase** (`@supabase/supabase-js`) | ✅ Use | Postgres + auth behind the store. A durable SECOND copy — the app still reads localStorage first and works with Supabase absent. Lazily imported so it stays out of the entry chunk; see its own section below |
@@ -152,9 +152,9 @@ landed.
 - **Product terms**, on the user's earlier instruction: `KruAI`, `BrachNha`,
   `XP`, `Streak`, `Flashcard`, `Quiz`, `Bac II`. `translations.ts`'s own `km`
   column already spells these in Latin.
-- **The English exam paper and its drills** (`data/papers/english-2025.ts`,
-  `english-drills.ts`). Its content is English by definition; only the Khmer
-  EXPLANATIONS around it follow these rules. The same goes for text quoting a
+- **The English exam paper and its drills** (the `2025-english` paper on
+  Admin → Content, which carries its own drills). Its content is English by
+  definition; only the Khmer EXPLANATIONS around it follow these rules. The same goes for text quoting a
   phone's own UI, such as `«Add to Home Screen»` in `features/install/copy.ts`,
   which has to match what the student actually sees on their device.
 
@@ -649,7 +649,7 @@ and none put it into Khmer letters.
 explanation alone ended in a one-line "ចម្លើយ៖ … = 6", and the user pointed out that a
 student never saw the answer as it must be WRITTEN on the exam paper. Skeleton step 4 is now
 **"ចម្លើយ (សរសេរលើក្រដាសប្រឡង)៖"**, the whole solution again from start to end, in the
-answer key's own style (`data/papers/math-2025.ts`):
+answer key's own style (the 2025 maths paper, `2025-math` on Admin → Content):
 - one line naming the form or formula, e.g. មានរាងមិនកំណត់ $\frac{0}{0}$;
 - ONE chain of equalities from the question to the result;
 - a closing "ដូចនេះ …" line;
@@ -1049,10 +1049,11 @@ covers a case the others cannot:
   before the lookup). It deliberately does NOT use `clean()`: that makes a
   string safe to *display*, and nothing here is ever interpolated.
 - `Object.hasOwn`, never `in` and never a truthiness test — these are plain
-  object literals, so `"constructor" in SECTION_CONTENT` is true and
-  `SECTION_CONTENT["toString"]` is a function.
+  object literals, so `"constructor" in sections` is true and
+  `sections["toString"]` is a function (`sections` is the published-section map
+  the server passes in; it was `SECTION_CONTENT` in code until 7 Oct 2026).
 - `isLookupKey()`, which is **not redundant with the above**: a single-element
-  ARRAY stringifies to its element, so `Object.hasOwn(SECTION_CONTENT,
+  ARRAY stringifies to its element, so `Object.hasOwn(sections,
   ["biology-3-1-1"])` is TRUE and the next line calls `.split()` on an array.
   Measured, not theorised.
 
@@ -1178,7 +1179,7 @@ changes exactly one thing: *where the non-pinned chunks come from*.
 7. Connect and test on real Bac II exam questions with structured format.
 
 **The Khmer spike can run BEFORE the OCR, and should.** It needs Khmer curriculum
-text, not the textbooks — `data/sections.ts` already has some. If it fails, the
+text, not the textbooks — the published lesson sections already have some. If it fails, the
 OCR is not wasted (the text can still be pinned by lesson), but the index is.
 
 **Textbook text must only be reachable from server code.** Where the checked
@@ -1447,8 +1448,12 @@ make every content edit a migration. Revisit when content settles, not before.
 **Revisited for flashcards and practice quizzes (3 Oct 2026, the user's call)**:
 they now LIVE in the database, so the team fixes them without a code change, and
 `data/practice.ts` and `data/quizzes/` are deleted. See "Flashcards and quizzes
-move into the database" near the end of this file. Sections and past papers stay
-here until their own stage.
+move into the database" near the end of this file. **Lesson sections and past
+papers followed on 7 Oct 2026** (stages 2 and 3): `data/sections.ts` and
+`data/papers/` are deleted too. What stays in code is STRUCTURE (subjects, the
+path shapes in `features/lessons/sessions.ts` and `quiz-path.ts`,
+`PAST_PAPER_YEARS`) plus the legacy 7-step lessons (`data/lessons.ts`) and the
+game questions (`data/game-questions.ts`).
 
 ### Keeping the three copies in step
 
@@ -2255,6 +2260,13 @@ hang under. Banner separation is `mt-8 first:mt-0`.
 
 ### Section content — the curriculum shape, and why it is not `Lesson`
 
+> **Since 7 Oct 2026 sections live in the DATABASE**, not in `data/sections.ts`
+> (deleted). The shape and the reasoning below still hold; where this section and
+> the ones near it say `SECTION_CONTENT[id]`, read "the section is published" (the
+> manifest) or "the loaded body". How a section reaches a phone is "Step B:
+> students read sections and papers from the database" near the end of this file;
+> how to write one is Admin → Content and `content/README.md`.
+
 A SECTION is one node on a path and the unit real content is written in five
 blocks — **សេចក្ដីផ្ដើម, មេរៀន, ឧទាហរណ៍, ចំណាំសំខាន់ៗ, កំហុស** — optionally then a
 quiz.
@@ -2515,7 +2527,8 @@ stripe separating it from the surface it sits on.
 different places, so the field answering "is this playable, and where does it go"
 had to stop being lesson-specific — ONE field rather than two that drift:
 
-- authored section → `/sections/{id}` **iff `SECTION_CONTENT[id]` exists**
+- authored section → `/sections/{id}` **iff the manifest lists it as published**
+  (`sectionPublished()`; `SECTION_CONTENT[id]` existing, before 7 Oct 2026)
 - derived fallback → `/lessons/{subject}-{topic}`
 
 That `iff` is the rule: playability is DERIVED from content existing, never
@@ -2803,6 +2816,13 @@ end to end and labels the paper, and `MockExamSubject` cannot express a Khmer or
 History paper — which the catalog has cards for.
 
 ### The 2025 English paper — the first REAL past paper, and the shape one takes
+
+> **Since 7 Oct 2026 past papers live in the DATABASE**, not in `data/papers/` or
+> `PAST_PAPERS` (both deleted; `PAST_PAPER_YEARS` stays). This section, the maths
+> paper's after it and the Mock Exam page's before it still hold for the screens and
+> the reasoning; where they name a file under `data/papers/`, `PAST_PAPERS` or
+> `SKILLS`, read "the paper's body" (its drills travel in it as `skills`). See
+> "Step B: students read sections and papers from the database".
 
 `PAST_PAPER_QUESTIONS` was empty for as long as Tab A existed. The MoEYS **Bac II
 English paper, 28 សីហា 2025** (50 points, 60 minutes) is the first real one in the
@@ -6676,7 +6696,10 @@ guest, when unconfigured, and for a ref that would fail the database's check.
   the app has it TODAY: prompt, options with the marked one, explanation, a
   link to it, and the students' notes. A ref that no longer resolves says so.
   "Fixed" and "Not a mistake" close every open report on that question. **The
-  fix itself is a code edit** that goes through `check:quiz`.
+  fix itself is a code edit** that goes through `check:quiz`. (No longer: since
+  the content moved into the database, quiz, section and paper reports resolve
+  against the PUBLISHED copies and carry an Edit link to `/admin/content`. See
+  "Step 1b" and "Step B" near the end of this file.)
 - **The resolver imports the whole question corpus**, so it is reached only
   from the lazy `admin-mistakes` chunk. The student button imports
   `utils/content-ref.ts` alone.
@@ -6780,8 +6803,9 @@ distribution rule). KaTeX answers are cached per formula, so re-checking a long 
 every keystroke stays fast.
 
 **KaTeX's chunk changed NAME because of this.** content-check imports KaTeX directly, so
-Rolldown now emits the shared KaTeX chunk as **`math-render-*.js`** (≈261 KB raw, 78 KB gzip),
-not `math-text-*.js` (now 4 KB, the component only). It is still lazy and still absent from
+Rolldown emitted the shared KaTeX chunk as **`math-render-*.js`** (≈261 KB raw, 78 KB gzip),
+not `math-text-*.js` (now 4 KB, the component only). Since 4 Oct 2026 it is
+**`sanitize-svg-*.js`**, because content-check imports the SVG sanitizer as well. It is still lazy and still absent from
 `index.html`'s preloads. **Check the KaTeX chunk by content (`renderToString`), not by name.**
 
 ### The editor: `/admin/content`
@@ -6932,10 +6956,12 @@ retry a minute after a failure, 3s timeout). `buildSystemPrompt`, `buildCatalogB
 **Unreachable means no deck list, never no answer.** The client still sends only a key.
 
 **The deck request starts the moment a question arrives** (`decksPromise` in
-`handleChat`, right after the body is validated) and is awaited only where the prompt is
+`handleChat`, right after the body is validated; since stages 2 and 3 it is
+`contentPromise`, fetching decks AND sections) and is awaited only where the prompt is
 built, so a cold copy's round trip (measured 0.7 to 1.6 s for the whole 75 KB of decks)
 runs in the shadow of the sign-in and daily-limit checks instead of after them. Safe
-because `publishedDecks()` never rejects: a request refused before the await leaves no
+because `publishedDecks()` (now `publishedContent()`) never rejects: a request refused
+before the await leaves no
 unhandled rejection, and a refused or curated question just warms the copy for the next
 one. Don't move the call back down beside `pinnedContextFor`.
 
@@ -6977,6 +7003,264 @@ preloads; the entry grew about 3.5 KB for the loader. The SDK is still its own l
   and KruAI still answers with the deck request failing.
 - A dev server with Supabase blanked opens a quiz and a deck from the fixture with no
   database request (4 checks).
+
+## Lesson sections and past papers move into the database (stages 2 and 3)
+
+The plan is `docs/plans/sections-and-papers-in-database.md`. **Both steps are built.**
+- **Step A (4 Oct 2026):** the database, the checks and the editor.
+- **The move (7 Oct 2026):** the owner applied the migration and imported the 7 sections and
+  2 papers (9 of 9 exact).
+- **Step B (7 Oct 2026):** students read sections and papers from the database, and the
+  code copies are deleted.
+
+### The database: `20261003000002_sections_and_papers.sql`
+
+Two more kinds in stage 1's three tables, `section` (key `biology-3-1-1`, the Study path
+node) and `paper` (key `2025-math`). Apply AFTER `20261003000001`. The functions keep their
+names and arguments, so the app's calls did not change.
+
+- **Bodies are OBJECTS for these two kinds.** Everything that measured a body with
+  `jsonb_array_length` now asks two helpers:
+  - `content_count(kind, body)`: cards; questions; a section's questions (MAY BE 0); a
+    paper's scored questions and gaps (the example gap is not scored);
+  - `content_item_ids(kind, body)`: a section's question ids (`quiz` then `quizHarder`), a
+    paper's question and gap ids, part by part.
+
+  The one-argument stage 1 helpers are dropped.
+- **Draft vs publish, as in stage 1.** A draft needs the right type and unique ids
+  (`content_draft_problem(kind, body)`). Publish and import run `content_section_problem` or
+  `content_paper_problem`:
+  - a section: four blocks with at least one point between them, a poster matching
+    `^/sections/….webp$`, a model matching `^/models/….glb$` with its credit, an 11-character
+    YouTube id, question ids unique across both quizzes;
+  - a paper: each part holds questions OR a gap-fill, a gap's answer is in the word box and
+    its `{n}` is in the passage, a named skill exists in `skills`, at least one scored item.
+
+  The SQL cannot see an SVG; the editor can (below).
+- The kind CHECK on the three tables is replaced, found by its text, so the file re-runs.
+- **Decks and quizzes behave exactly as before**: stage 1's 95 database checks and the
+  real-fixture check pass with this migration applied twice on top.
+- **A section's `item_count` can be 0.** The students' manifest reader (`toManifest()`)
+  accepts that for a section and requires at least 1 for a deck or quiz.
+
+### What is stored
+
+- **A section** is `SectionContent` with an `id` on every quiz question (`q1…`, across
+  `quiz` then `quizHarder`, never repeated between them). `SectionBody` in `types/index.ts`.
+- **A paper** is `PastPaperContent` with two changes (`PaperBody` and its parts in
+  `types/index.ts`):
+  - `q` is ONE string. Both papers carry the same text in `en` and `km`, and the export
+    refuses if they ever differ;
+  - it carries `skills`, the drills its questions name. The English paper carries its 8
+    (once `data/papers/english-drills.ts`); the maths paper names none. `skill` is a plain
+    string key.
+
+### The checks: `utils/content-check.ts`
+
+`checkSection` and `checkPaper`, on the same text rules as stage 1.
+
+- A problem in a section or a paper has `item: -1` and its WHOLE path in `field`
+  (`lesson.items.2.body`, `sections.0.gapFill.gaps.3.correct`). `locationLabel()` in
+  `features/admin/content-copy.ts` names a path in words, in both languages.
+- New codes, each with an `issueHelp` sentence: `badNumber`, `badPoster`, `badModel`,
+  `badVideoId`, `svgChanged`, `partShape`, `notInBank`, `gapMissing`, `duplicateGap`,
+  `sameWords`, `unknownSkill`.
+- **An SVG the sanitizer would change is an error** (`svgChanged`): anything
+  `sanitizeSvg` strips was not meant to be there. It needs `DOMParser`, so it runs in the
+  editor and in the import's browser-side check, and is skipped in the Node scripts. The
+  maths paper's graphs pass it.
+- **The checker found 11 em dashes in the maths paper's explanations**, inside `String.raw`
+  strings the 28 Sep sweep missed. They were rewritten before the move (the code copy is
+  gone, so they live in the database now): `។`
+  between two sentences, `៖` before an explanation, parentheses for an aside. The user has
+  not reviewed the Khmer of those 11 lines yet.
+
+### The editor: `/admin/content`
+
+- **Two more tabs**, "Lesson sections" / "ផ្នែកមេរៀន" and "Past papers" / "វិញ្ញាសារឆ្នាំចាស់".
+  Below 360px the four labels drop a size, or "Flashcard" broke mid-word.
+- **Past papers have no New.** The panel says a new paper arrives as a file to import.
+- **`content-editor-view.tsx` is the SHELL for all four kinds** (load, save, publish,
+  versions, checks). The body is drawn by `section-editor.tsx`, `paper-editor.tsx` or stage
+  1's card and question lists. Shared parts live in `content-item-editors.tsx` (`TextField`,
+  `NumberField`, `SelectField`, `ChoiceFields`, `HelpEditor`, …); class strings live in
+  `editor-styles.ts` (a `.ts` for oxlint's only-export-components rule).
+- **The section editor**, in the student's order (step 1, then step 2):
+  - title, and the video: a poster picked from `SECTION_POSTERS`, a length, a YouTube id;
+  - the four blocks: a lead, points (bold words, text, sub-points), a closing;
+  - the 3D model, picked from `SECTION_MODELS`, with its credit prefilled;
+  - the mistakes, and the two quizzes through stage 1's `QuestionEditor`.
+
+  **Preview draws with the REAL renderer.** `SectionBlockBody` and `MisconceptionCard`
+  moved out of `section-detail.tsx` into `features/lessons/components/section-blocks.tsx`,
+  unchanged.
+- **New** offers each authored Study-path node with nothing published (an id shaped
+  `{subject}-n-n-n` in `chaptersShape()`), and a new section starts with the node's name as
+  its title.
+- **The paper editor**: minutes, points, note; then per part:
+  - the title, instruction, exercise and example (the paper's own words);
+  - its questions (add, remove, move). A new id takes the part's letter and the next number
+    never used (`newPaperItemId`);
+  - or its passage, word box and gaps. Renaming a word carries every gap that used it, and
+    a gap's answer is picked from the box.
+
+  Then the writing task, and the skills (a new one by id).
+- **`section-media.ts`** lists the posters and models. `check:content` fails when it differs
+  from `public/sections/` and `public/models/`, or when a file names one that is missing.
+- **Tapping a problem in the Checks card opens its question and scrolls to it**
+  (`jumpToField`); `?q=l4` does the same for a section or paper question.
+- **The Checks card says "Working…" until the loaded body has been checked once**, and
+  Publish waits. Before that the deferred copy is still the empty placeholder, and a big
+  paper read "The paper: is empty" for as long as checking it took.
+
+### Verified (step A)
+
+- **PGlite: 79 checks.** The migration applied twice; keys; the real file imports as version
+  1 and reads back identical, with the right counts and ids; guests read the manifest;
+  drafts, publish, restore, unpublish and used ids; an empty new section saves but cannot
+  publish; 21 publish refusals; import all or nothing; no client can call a helper. Stage
+  1's 95 + 5 still pass.
+- **Browser, the database faked: 59 checks** at 1280 owner, 390 admin and 320 dark Khmer
+  owner:
+  - the import file checked in the browser; the lists and their names;
+  - an em dash in a lesson blocks Publish, and its problem scrolls to the block;
+  - a YouTube link caught; a new question takes q16, after both quizzes;
+  - a save keeps every field; a section written from empty publishes with count 0;
+  - renaming a word carries its gap; a gap missing from the passage scrolls to the gap;
+  - a new paper question takes its part's letter;
+  - the maths paper's graphs pass the SVG check and draw; `?q=c5` opens and scrolls;
+  - an admin saves without Publish; no sideways scroll; no page error.
+
+  Stage 1's 46 + 40 browser checks still pass, and the student's section page renders as
+  before.
+
+### The move
+
+- Done once. `content:export --from-code` wrote `content/sections-papers.json` (the 7
+  sections and 2 papers ONLY; the 26 decks and quizzes would have come back as needless
+  drafts), the owner imported it with "publish items never published" on 7 Oct 2026, and
+  `check:content --live` confirmed **9 of 9** exact.
+- The export refused a file with an error, or one the editor's Save would change:
+  `tidyBody` must keep every field, or the first save would lose it.
+- The one warning left is the English paper's grammar part (3 of 5 answers on one letter).
+  That is the real answer key, not ours to move.
+- `--from-code` and `sections-papers.json` went with the code copy. `content:export` now only
+  DOWNLOADS what is published, all four kinds, into `content/fixture.json` (35 items).
+
+### Step B: students read sections and papers from the database (7 Oct 2026)
+
+**`lib/content.ts` covers four kinds.**
+- The manifest has `deck`, `quiz`, `section` and `paper`. Each kind's key is checked
+  against its own pattern (`CONTENT_KEY` in `utils/content-manifest.ts`).
+- A section's count may be 0; a deck or quiz needs at least 1.
+- A phone's stored manifest from before (no section or paper) still reads.
+- `isBody(kind, value)` checks a downloaded body by kind: a list with ids; a section with a
+  title, the four blocks and `mistakes`; a paper with `minutes` and parts.
+- `useContentBody`, `useAllBodies`, `prefetchBody` and the Cache Storage keys take all four.
+  `LoadKind` is gone.
+
+**The Study path is shape plus links, like the quiz path.**
+- `chaptersShape(subject)` is the structure, every section's `href` null.
+- `chaptersFor(subject, manifest)` links each section the manifest lists
+  (`sectionPublished()`). It tests that the ENTRY exists, never its count: a section with no
+  quiz is still a section to read.
+- `hasSectionContent()` is deleted.
+- Structure only: `practice.ts`, `practice-run.tsx`, `content-slots.ts`. With the manifest:
+  `subject-path-view.tsx`, `study-feed.ts`, `real-prediction.ts`.
+- **`subject-path-view.tsx` keys its lesson refs by a STRING** (`lessonKey()`, the lesson's
+  first session id), not by the lesson object. The path is rebuilt from the manifest on
+  every render, so an object key is new each time and the landing scroll would fire on
+  every render.
+- It shows a `ContentNotice` above the path while the manifest first loads.
+
+**`/sections/:sectionId`** (`pages/section-detail.tsx`):
+- downloads that one section (by its published version) and hands it to `SectionDetail` as
+  a prop;
+- shows `ContentWaitingScreen` (a FocusLayout whose X goes back to the subject's path) while
+  it loads, or offline on a first open;
+- redirects to `/subjects/{subject}` only once the manifest has ANSWERED that the section is
+  not published.
+
+**A section report names its question by id**: `sectionRef(id, question, step, index)` gives
+`section:biology-3-1-1#q3`. Older `#0-2` reports still resolve.
+
+**Past papers** (`features/exam/papers.ts`):
+- `PAST_PAPER_YEARS` stays in `data/past-papers.ts` (it is structure). `PAST_PAPERS` and
+  `data/papers/` are deleted.
+- A card comes from the manifest alone: `pastPaperCard(key, manifest)` gives the title,
+  blurb, `count` and `version`, no body. `papersForYear(year, lang, manifest)` builds the
+  tab, and `ExamPaperCard` is ready when `count > 0`.
+- `/exam/subjects/:paperKey` downloads the paper and builds the full `PastPaper` with
+  `withContent()`. `toPastPaperContent()` turns the stored one-string `q` back into
+  `{ en, km }`, so the detail screen, runner and results are unchanged.
+- **`PaperResult.version`** (optional; absent = 1, which is what the code copy became). An
+  old attempt reopens on the version that was sat (`OlderVersionReview` in
+  `paper-screen.tsx`), as a quiz attempt does, because answers are keyed to its questions.
+- `past-paper-results.tsx` takes a drill from the paper's own `skills` (`Object.hasOwn`).
+  `SkillId` is a plain string now.
+- Generated papers (Tab B) are `GeneratedPaper` and did not change.
+- The past-papers tab shows a `ContentNotice` while the manifest first loads.
+
+**Admin mistakes**: `resolveContentRef(ref, sets)` takes the quizzes, sections and papers
+(`useAllBodies` for each, one request a kind). Every section and paper report that resolves
+has **Edit**, to `/admin/content/{section|paper}/{key}?q={id}`. A paper ref resolves through
+`toPastPaperContent` and `scorePaper`.
+
+**KruAI reads the sections too.**
+- `publishedContent()` in `server/content-source.ts` replaced `publishedDecks()`. It fetches
+  decks and sections IN PARALLEL, each with its own 10-minute copy, and never rejects.
+- `contentPromise` in `handleChat` (it was `decksPromise`) starts it the moment a question
+  arrives, as before.
+- `buildSystemPrompt`, `buildCatalogBlock` and `pinnedContextFor` take a `SectionMap` beside
+  the `DeckMap`. `chat-prompt.ts` no longer imports `data/sections`.
+- A section whose body is malformed is dropped (`toSections`). Unreachable still means no
+  section text, never no answer.
+- Past papers never reached KruAI and still do not.
+
+**Home** prefetches a top section as well as decks and quizzes, and never a paper: a paper
+is larger and is fetched when opened.
+
+**Dev without Supabase** reads sections and papers from `content/fixture.json` too.
+
+**Deleted:** `src/data/sections.ts`, `src/data/papers/math-2025.ts`, `english-2025.ts`,
+`english-drills.ts`, `content/sections-papers.json` and `content:export --from-code`.
+`check:quiz` checks game questions only; `check:content` and the editor check sections and
+papers.
+
+**Bundle, measured on the same machine:** the first screen (entry + every modulepreload,
+gzip) went **268 KB → 238 KB** (268,400 → 237,998 bytes). The 17 KB `sections-*.js` preload
+is gone, and the entry shrank about 15 KB (the papers). No section or paper text is in any
+chunk of `dist/` (checked).
+
+### Verified (step B)
+
+- **Browser, the database faked with the real fixture: 36 checks** at 390 light, 320 dark
+  Khmer and 1280:
+  - the Study path links the 4 published biology sections and nothing else, downloading no
+    section, and a guest never downloads the SDK;
+  - opening a section downloads only it; reopened with downloads blocked it comes from
+    Cache Storage; an unpublished one goes back to its path; a first open offline shows the
+    notice and Try again recovers;
+  - the exam tab downloads no paper; a paper with nothing published says coming soon;
+  - the English paper's screen downloads only it, is sat end to end, and a wrong answer
+    offers its own drill; the attempt stores version 1;
+  - after a republish, an old attempt downloads v1 and shows v1's explanation, not the edit;
+  - a section report names `#q1`; the owner's mistakes page resolves `#q2`, an old `#1-0`,
+    a maths and an English paper ref, each with Edit, in one request a kind;
+  - Home prefetches at most 3 items and never a paper; no sideways scroll; no page error.
+- Stage 1b's 34 checks, the two editor runs (46 and 59) and the explanations run (40) still
+  pass.
+- **KruAI through `ssrLoadModule`, a fake `content_current`: 12 checks.** 17 decks and 7
+  sections (a malformed one dropped), one request a kind and both reused; the catalog lists
+  the sections; an open section's prose reaches the prompt and its quiz does not; untrusted
+  and array keys give nothing; unreachable gives nothing in 9ms and the prompt still builds.
+  Prompt: 18,835 characters on Home, 23,656 on `biology-3-1-1`.
+- **The real `handleChat`, with the deck, section and quota requests each taking 600ms: 11
+  checks.** Both content requests start together before the quota answers, and the model is
+  reached at 661ms (one wait). An open section reaches the prompt; a warm instance makes no
+  content request; KruAI still answers with both failing; no unhandled rejection.
+- A dev server with Supabase blanked opens a quiz, a deck, a section and a paper from the
+  fixture with no database request (7 checks).
 
 ## Installable app: "add to home screen" and the two pop-ups
 
@@ -8091,15 +8375,20 @@ npx tsc -b            # NOT `tsc --noEmit -p tsconfig.json` — this is a soluti
 npx oxlint            # NOT eslint — there is no eslint config in this repo
 npm run check:digits  # no Khmer numerals — see "Digits are Latin everywhere"
 npm run check:quiz    # authored quiz content — see below
-npm run check:content # content files under content/ (decks and quizzes moving to the database)
+npm run check:content # content files under content/ (the database's four kinds)
 ```
 
 The third is there because the first two cannot see it: to `tsc` and to oxlint,
 `"១២"` and `"12"` are both just strings. It is instant and has no dependencies,
 so there is no reason to skip it on a change that "obviously" touches no copy.
 
+**Since 7 Oct 2026 `check:quiz` checks the GAME QUESTIONS only**: every other
+kind of content lives in the database, and `check:content` and the editor run the
+same rules on it (`utils/content-check.ts`). The history below is why those rules
+exist.
+
 **`check:quiz` is the same argument for authored QUIZ AND PAST-PAPER content**
-(`scripts/check-quiz.mjs`). It covers `PAST_PAPERS`,
+(`scripts/check-quiz.mjs`). It covered `PAST_PAPERS`,
 `GAME_QUESTIONS` and — since a section first carried LaTeX (`math-1-1-1`) —
 `SECTION_CONTENT`, walking every block's intro and outro, every item label, body
 and nested item, both halves of every misconception, and the quiz when one is
@@ -8122,8 +8411,7 @@ since `data/*.ts` uses `.js` specifiers that only resolve under a bundler.
 
 What it cannot catch, and no mechanical check can short of a CAS, is **two
 options that are the same VALUE in different forms** — `\frac{1}{4}` beside
-`0.25`. That is why `data/quizzes/math-1-1-1.ts` states a canonical-form rule
-instead: fractions are always `\frac{a}{b}` and a decimal is never a legal
+`0.25`. That is why `content/README.md` states a canonical-form rule instead: fractions are always `\frac{a}{b}` and a decimal is never a legal
 option, which makes the largest family of those collisions unwriteable rather
 than merely discouraged.
 
@@ -8194,6 +8482,14 @@ answers `200`. **Since step 1b students read content ONLY from here**: the impor
 on 3 Oct 2026 (26 of 26 exact). On a NEW project, import `content/fixture.json` before
 deploying, or every deck and quiz shows as coming soon; `npm run check:content -- --live
 content/fixture.json` is the proof it is safe.
+
+**`20261003000002_sections_and_papers.sql`** (lesson sections and past papers) must be
+applied AFTER `20261003000001`, and can ship before or after step A's code: without it the
+two new tabs list nothing and saving a section or paper is refused (`key`). `db:check`
+sees no new table; `/rest/v1/rpc/content_current?p_kind=section` answers `200`. **Since
+step B students read sections and papers ONLY from here**: the import was done on 7 Oct
+2026 (9 of 9 exact). On a NEW project, import `content/fixture.json` (all four kinds)
+before deploying, or every section and paper shows as coming soon.
 
 **The Game feature needs BOTH its migrations applied before db:check passes** —
 `20260913000001_competitions.sql` and

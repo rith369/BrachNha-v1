@@ -5,7 +5,6 @@ import { MathText } from "@/components/shell/math-text";
 import { useBrachNhaStore } from "@/lib/store";
 import { useAllBodies, useContentManifest } from "@/lib/content";
 import { parseContentRef } from "@/utils/content-ref";
-import type { QuizQuestionBody } from "@/types";
 import { setOpenMistakes } from "@/lib/admin-status";
 import {
   listMistakes,
@@ -15,7 +14,7 @@ import {
 } from "@/lib/admin-tools";
 import type { Lang } from "@/types";
 import { ADMIN_COPY, whenLabel } from "../copy";
-import { resolveContentRef } from "../content-ref";
+import { resolveContentRef, type ContentSets } from "../content-ref";
 
 /**
  * /admin/mistakes: questions students flagged as wrong, mistyped or unclear
@@ -26,11 +25,11 @@ import { resolveContentRef } from "../content-ref";
  * the report's content_ref by ../content-ref.ts: the prompt, every option, the
  * one marked correct and the explanation, with a link to where it lives.
  *
- * A PRACTICE-QUIZ question is fixed on /admin/content: its card carries an
- * Edit link that opens the editor at that question, and the owner publishes the
- * fix. Section and past-paper questions are still code edits (they move to the
- * database in later stages). Either way this page only records the outcome:
- * "Fixed" or "Not a mistake", each closing every open report on that question.
+ * EVERY QUESTION IS FIXED ON /admin/content: practice quizzes, lesson sections
+ * and past papers all live in the database, so a card carries an Edit link that
+ * opens the editor at that question, and the owner publishes the fix. This page
+ * only records the outcome: "Fixed" or "Not a mistake", each closing every open
+ * report on that question.
  *
  * KaTeX comes with MathText, from its own shared chunk; this page is lazy, so
  * neither it nor the question corpus reaches a student.
@@ -41,18 +40,23 @@ const CARD = "rounded-2xl border border-border bg-surface p-4 shadow-panel-sm";
 function MistakeCard({
   group,
   lang,
-  quizzes,
+  sets,
   onDone,
 }: {
   group: MistakeGroup;
   lang: Lang;
-  /** Every published quiz, or null while they download. */
-  quizzes: Record<string, QuizQuestionBody[]> | null;
+  /** Every published body of each kind, or null for a kind still downloading. */
+  sets: { [K in keyof ContentSets]: ContentSets[K] | null };
   onDone: (ref: string) => void;
 }) {
   const c = ADMIN_COPY[lang];
-  const waiting = quizzes === null && parseContentRef(group.ref)?.kind === "quiz";
-  const q = resolveContentRef(group.ref, quizzes ?? {});
+  const refKind = parseContentRef(group.ref)?.kind;
+  const waiting = refKind !== undefined && sets[refKind] === null;
+  const q = resolveContentRef(group.ref, {
+    quiz: sets.quiz ?? {},
+    section: sets.section ?? {},
+    paper: sets.paper ?? {},
+  });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<AdminFail | null>(null);
 
@@ -227,11 +231,17 @@ export function MistakesView() {
   const lang = useBrachNhaStore((s) => s.lang);
   const c = ADMIN_COPY[lang];
   const [load, setLoad] = useState<Load>({ state: "loading" });
-  // Practice quizzes come from the database, all of them in one request (or
-  // from this device, if already held), to show a quiz report's question.
+  // Every kind a report names comes from the database, each kind in one
+  // request (or from this device, if already held), to show its question.
   const manifest = useContentManifest();
   const quizSet = useAllBodies("quiz", manifest);
-  const quizzes = quizSet.status === "ready" ? quizSet.bodies : null;
+  const sectionSet = useAllBodies("section", manifest);
+  const paperSet = useAllBodies("paper", manifest);
+  const sets = {
+    quiz: quizSet.status === "ready" ? quizSet.bodies : null,
+    section: sectionSet.status === "ready" ? sectionSet.bodies : null,
+    paper: paperSet.status === "ready" ? paperSet.bodies : null,
+  };
 
   // setState only from the async callback (react(set-state-in-effect)).
   useEffect(() => {
@@ -273,7 +283,7 @@ export function MistakesView() {
               key={g.ref}
               group={g}
               lang={lang}
-              quizzes={quizzes}
+              sets={sets}
               onDone={(ref) => {
                 const rest = items.filter((x) => x.ref !== ref);
                 setLoad({ state: "ready", items: rest });

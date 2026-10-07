@@ -1,6 +1,6 @@
 import { Navigate, useNavigate, useParams } from "react-router";
 import { findSubject } from "@/features/lessons/subjects";
-import { chaptersFor, lessonHeading } from "@/features/lessons/sessions";
+import { chaptersShape, lessonHeading } from "@/features/lessons/sessions";
 import { isQuizSubjectActive, keyFromRef, parseMode } from "@/features/practice/practice";
 import { findQuizSection } from "@/features/practice/quiz-path";
 import { FlashcardRunner } from "@/features/practice/components/flashcard-runner";
@@ -94,15 +94,15 @@ export default function PracticeRunPage() {
   //
   // TWO SOURCES, and which one is right depends on the SUBJECT, not on the
   // shape of the ref. A subject with a quiz path (math, physics) has its own
-  // curriculum in features/practice/quiz-path.ts, and reading chaptersFor() for
+  // curriculum in features/practice/quiz-path.ts, and reading chaptersShape() for
   // math returns the FOUNDATION review path instead — which is how a Bac II
   // limits quiz came to be captioned "មេរៀនទី 1 · ប្រមាណវិធីបូក ដក គុណ ចែក".
   // Biology's future lesson quiz has no quiz path and must keep the
-  // chaptersFor() lookup, so the branch cannot key on "the ref has three
+  // chaptersShape() lookup, so the branch cannot key on "the ref has three
   // numbers".
   const onQuizPath = parsed === "quiz" ? findQuizSection(subject.id, key) : null;
   const [chapterNo, lessonNo] = key.slice(subject.id.length + 1).split("-").map(Number);
-  const foundLesson = chaptersFor(subject.id)
+  const foundLesson = chaptersShape(subject.id)
     .find((c) => c.number === chapterNo)
     ?.lessons.find((l) => l.number === lessonNo);
 

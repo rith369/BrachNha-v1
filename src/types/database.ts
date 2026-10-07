@@ -41,9 +41,10 @@ export type Json =
  *  Teacher role later is one more member here and one wider CHECK there. */
 export type AppRole = "admin" | "owner";
 
-/** Which kind of content a row holds (20261003000001). The same union the
- *  app uses, restated so this file keeps importing nothing from the app. */
-export type ContentKind = "deck" | "quiz";
+/** Which kind of content a row holds (20261003000001; section and paper since
+ *  20261003000002). The same union the app uses, restated so this file keeps
+ *  importing nothing from the app. */
+export type ContentKind = "deck" | "quiz" | "section" | "paper";
 
 /** announcements.tone (20261002000005): which neo fill the banner wears. */
 export type AnnouncementTone = "info" | "success" | "warning";

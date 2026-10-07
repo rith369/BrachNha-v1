@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useBrachNhaStore } from "@/lib/store";
+import { retryContent, useContentManifest } from "@/lib/content";
 import { PAST_PAPER_YEARS } from "@/data/past-papers";
+import { ContentNotice } from "@/features/practice/components/content-waiting";
 import { cn } from "@/utils/cn";
 import { ExamPaperCard } from "./exam-paper-card";
 import { papersForYear, type PastPaper } from "../papers";
@@ -15,6 +17,11 @@ import { papersForYear, type PastPaper } from "../papers";
  * papersForYear() re-derives on every render. That is free at seven items and is
  * what stops the chips, the heading and the cards from ever disagreeing. No
  * useMemo: React Compiler is on, and hand-adding one can defeat it.
+ *
+ * WHICH CARDS HAVE A PAPER comes from the manifest (lib/content.ts): the list
+ * downloads no paper, and a paper is fetched on its own screen. On a first
+ * ever open the list has not arrived yet, so a quiet line says so rather than
+ * every card claiming "coming soon".
  */
 export function PastPapersPanel({
   onStartPaper,
@@ -22,17 +29,18 @@ export function PastPapersPanel({
   onStartPaper: (paper: PastPaper) => void;
 }) {
   const userLanguage = useBrachNhaStore((s) => s.userLanguage);
+  const manifest = useContentManifest();
 
   const [year, setYear] = useState(PAST_PAPER_YEARS[0]);
   const [notice, setNotice] = useState<string | null>(null);
 
-  const papers = papersForYear(year, userLanguage);
+  const papers = papersForYear(year, userLanguage, manifest);
 
   // THE line that flips when content lands. It reads the content rather than a
   // hand-authored "available" flag, so a card's behaviour cannot drift from what
   // is actually behind it.
   function handleTest(paper: PastPaper) {
-    if (paper.questions.length === 0) {
+    if (paper.count === 0) {
       setNotice(paper.key);
       return;
     }
@@ -76,6 +84,15 @@ export function PastPapersPanel({
       <div className="font-heading mb-3 text-base font-extrabold">
         សម័យប្រឡង {year}
       </div>
+
+      {manifest.status !== "ready" && (
+        <div className="mb-3">
+          <ContentNotice
+            state={manifest.status === "failed" ? "offline" : "loading"}
+            onRetry={retryContent}
+          />
+        </div>
+      )}
 
       <div>
         {papers.map((p) => (

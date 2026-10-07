@@ -69,7 +69,7 @@ export function ExamPaperCard({
   notice: boolean;
   onTest: () => void;
 }) {
-  const ready = paper.questions.length > 0;
+  const ready = paper.count > 0;
   const style = SUBJECT_STYLE[paper.subject.id];
 
   return (

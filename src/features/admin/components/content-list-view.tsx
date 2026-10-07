@@ -24,8 +24,10 @@ import { CONTENT_COPY } from "../content-copy";
 import { contentSlots, slotFor, subjectName } from "../content-slots";
 
 /**
- * /admin/content: every flashcard deck and practice quiz in the database
- * (supabase/migrations/20261003000001), with New and, for the owner, Import.
+ * /admin/content: every flashcard deck, practice quiz, lesson section and
+ * past paper in the database (supabase/migrations/20261003000001 and
+ * 20261003000002), with New and, for the owner, Import. A past paper has no
+ * New: a new paper arrives as a file the developer prepares from the photos.
  *
  * A row names the item the way a student sees it (../content-slots.ts), says
  * which version students get and whether a draft is waiting, and opens the
@@ -57,7 +59,7 @@ function Row({ row, lang }: { row: ContentRow; lang: Lang }) {
             <span className="font-mono">{row.key}</span>
             {row.publishedVersion !== null && row.publishedCount !== null ? (
               <span className="rounded-full bg-neo-mint px-2 py-0.5 text-ink">
-                {c.live(row.publishedVersion, row.publishedCount, row.kind === "deck")}
+                {c.live(row.publishedVersion, row.publishedCount, row.kind)}
               </span>
             ) : (
               <span className="rounded-full bg-control px-2 py-0.5">{c.notPublished}</span>
@@ -317,9 +319,15 @@ export function ContentListView() {
       <p className="mb-4 text-xs font-semibold text-muted">{c.blurb}</p>
 
       <UnderlineTabs
+        // Four tabs at 320px: a long Khmer label wraps inside its own tab
+        // rather than pushing the row past the screen, and below 360px the
+        // labels drop a size so "Flashcard" is not broken mid-word.
+        className="[&>button]:min-w-0 [&>button]:px-1 [&>button]:text-xs [&>button]:[overflow-wrap:anywhere] min-[360px]:[&>button]:text-sm md:[&>button]:text-base"
         tabs={[
           { id: "quiz", label: c.tabs.quiz },
           { id: "deck", label: c.tabs.deck },
+          { id: "section", label: c.tabs.section },
+          { id: "paper", label: c.tabs.paper },
         ]}
         value={kind}
         onChange={(k) => {
@@ -351,7 +359,10 @@ export function ContentListView() {
         )}
       </div>
 
-      {panel === "new" && load.state === "ready" && (
+      {panel === "new" && kind === "paper" && (
+        <p className={cn(CARD, "mb-4 text-xs font-bold")}>{c.paperNewNote}</p>
+      )}
+      {panel === "new" && kind !== "paper" && load.state === "ready" && (
         <NewPanel key={kind} kind={kind} taken={taken} lang={lang} />
       )}
       {panel === "import" && isOwner && (

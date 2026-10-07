@@ -475,12 +475,15 @@ export interface PracticeCard {
 }
 
 /**
- * Content stored in the database (supabase/migrations/20261003000001,
- * docs/plans/content-in-database.md): flashcard decks and practice quizzes,
- * one row per deck or quiz, keyed like the code they replace ("biology-1-1",
- * "math-1-1-1").
+ * Content stored in the database (supabase/migrations/20261003000001 and
+ * 20261003000002, docs/plans/content-in-database.md and
+ * sections-and-papers-in-database.md): flashcard decks, practice quizzes,
+ * lesson sections and past papers, one row per item, keyed like the code they
+ * replace ("biology-1-1", "math-1-1-1", "biology-3-1-1", "2025-math").
+ *
+ * A deck or quiz body is a LIST; a section or paper body is one OBJECT.
  */
-export type ContentKind = "deck" | "quiz";
+export type ContentKind = "deck" | "quiz" | "section" | "paper";
 
 /** One card as stored. The app adds `source` and the timestamps when it turns
  *  a stored card into a PracticeCard. The id is kept for ever: review history
@@ -494,9 +497,80 @@ export interface DeckCardBody {
 /** One quiz question as stored: a SectionQuestion with its id required. */
 export type QuizQuestionBody = SectionQuestion & { id: string };
 
+/**
+ * A lesson section as stored: SectionContent, with every question's id
+ * required ("q1", "q2", … across `quiz` then `quizHarder`, never reused), so a
+ * mistake report (section:biology-3-1-1#q3) survives the questions moving.
+ */
+export type SectionBody = Omit<SectionContent, "quiz" | "quizHarder"> & {
+  quiz?: QuizQuestionBody[];
+  quizHarder?: QuizQuestionBody[];
+};
+
+/**
+ * One scored question on a past paper, as stored. Like PaperQuestion, except
+ * that `q` is ONE string (every paper so far carries the same text in its `en`
+ * and `km`, and the loader rebuilds the pair) and `skill` names an entry of
+ * the paper's own `skills`.
+ */
+export interface PaperQuestionBody {
+  id: string;
+  q: string;
+  options: string[];
+  correct: string;
+  explanation: string;
+  points?: number;
+  skill?: string;
+}
+
+export interface PaperGapBody {
+  id: string;
+  number: number;
+  correct: string;
+  example?: boolean;
+  skill?: string;
+  explanation: string;
+}
+
+export interface PaperGapFillBody {
+  title: string;
+  body: string;
+  wordBank: string[];
+  gaps: PaperGapBody[];
+}
+
+export interface PaperSectionBody {
+  id: string;
+  title: string;
+  instruction: string;
+  statement?: string;
+  example?: string;
+  questions?: PaperQuestionBody[];
+  gapFill?: PaperGapFillBody;
+}
+
+/**
+ * A whole past paper as stored. PastPaperContent, plus `skills`: the study
+ * notes and drills a wrong answer offers, keyed by the `skill` its questions
+ * and gaps name. They travel WITH the paper, so a paper is one download and
+ * one edit; only the skills it uses are kept.
+ */
+export interface PaperBody {
+  minutes: number;
+  points?: number;
+  note?: string;
+  sections: PaperSectionBody[];
+  writing?: PaperWriting;
+  skills?: Record<string, SkillHelp>;
+}
+
 export type ContentBody<K extends ContentKind> = K extends "deck"
   ? DeckCardBody[]
-  : QuizQuestionBody[];
+  : K extends "quiz"
+    ? QuizQuestionBody[]
+    : K extends "section"
+      ? SectionBody
+      : PaperBody;
 
 export type MockExamSubject = "math" | "biology" | "chemistry" | "physics";
 
@@ -550,21 +624,13 @@ export interface MockExamQuestion extends ExamQuestion {
 
 /**
  * What a question tests, and therefore which study note and drill a student who
- * got it wrong is offered. Keyed into SKILLS in data/papers/english-drills.ts.
- *
- * English-specific today because the 2025 English paper is the only real paper
- * in the app. A maths paper would add its own ids here rather than reusing
- * these; nothing derives a subject from a skill.
+ * got it wrong is offered: a key into the paper's OWN `skills` (see
+ * PastPaperContent). A plain string since past papers moved into the database
+ * (docs/plans/sections-and-papers-in-database.md): each paper carries the drills
+ * its questions name, so a maths paper can bring its own without a type change
+ * here. The database refuses a skill the paper does not carry.
  */
-export type SkillId =
-  | "quantifiers"
-  | "past-simple"
-  | "future-passive"
-  | "because-of"
-  | "conditional-2"
-  | "collocation"
-  | "word-choice"
-  | "gap-context";
+export type SkillId = string;
 
 /** One scored question on a past paper. */
 export interface PaperQuestion extends ExamQuestion {
@@ -577,10 +643,8 @@ export interface PaperQuestion extends ExamQuestion {
   /**
    * What this question tests, which is what a wrong answer offers a drill on.
    *
-   * OPTIONAL, because `SkillId` is the ENGLISH paper's vocabulary and a maths
-   * paper has none of those skills. A question with no skill simply shows its
-   * explanation and no drill — absent rather than empty, and the honest state
-   * until maths drills are written.
+   * OPTIONAL: the maths paper carries no drills yet. A question with no skill
+   * simply shows its explanation and no drill — absent rather than empty.
    */
   skill?: SkillId;
   /**
@@ -605,7 +669,7 @@ export interface PaperGap {
   correct: string;
   /** True for the gap the paper prints already filled in as an example. */
   example?: boolean;
-  skill: SkillId;
+  skill?: SkillId;
   explanation: string;
 }
 
@@ -693,6 +757,12 @@ export interface PastPaperContent {
   points?: number;
   sections: PaperSection[];
   writing?: PaperWriting;
+  /**
+   * The drills this paper's questions name, keyed by SkillId: the rule and a
+   * few similar exercises a wrong answer offers. Carried WITH the paper, so a
+   * review needs nothing but the paper. Absent when no question names one.
+   */
+  skills?: Record<SkillId, SkillHelp>;
 }
 
 /** One practice question offered alongside an answer. */
@@ -711,8 +781,8 @@ export interface DrillQuestion {
  * answer, because practice is not measurement). The component renders whatever
  * it is handed; WHEN to hand it over is the caller's decision.
  *
- * `mistake` and `foundation` are OPTIONAL so the eight English entries in
- * data/papers/english-drills.ts stay valid untouched. A record that means to
+ * `mistake` and `foundation` are OPTIONAL so the English paper's eight
+ * skills (stored with the paper) stay valid as written. A record that means to
  * carry all four should type itself `Record<Id, Required<SkillHelp>>`, which is
  * what makes forgetting one of ten a compile error rather than a missing line
  * on question 7.

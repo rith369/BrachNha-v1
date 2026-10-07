@@ -8,17 +8,15 @@ import { isQuizSubjectActive, practiceKey, lessonRef } from "@/features/practice
 import { deckProgress, deckStates } from "@/features/practice/review";
 import { isDue } from "@/utils/spaced-repetition";
 import { lessonKeyOf } from "@/features/progress/content-keys";
-import { PAST_PAPERS } from "@/data/past-papers";
-import { pastPaperByKey } from "@/features/exam/papers";
+import { pastPaperCard } from "@/features/exam/papers";
 
 /**
  * Home's Study card — "continue where you left off", or a recommendation for a
  * student who has not started anything yet.
  *
  * THE CATALOG IS DERIVED FROM WHAT EXISTS, never authored beside it. An item is
- * here because its content is: a section with SECTION_CONTENT behind it, a
- * published flashcard deck, a quiz-path node with a published quiz behind it,
- * a past paper in PAST_PAPERS. Decks and quizzes are read off the MANIFEST
+ * here because its content is published: a lesson section, a flashcard deck, a
+ * quiz-path node's quiz, a past paper. All four are read off the MANIFEST
  * (lib/content.ts), which carries each deck's card ids, so Home downloads no
  * lesson to draw this card. So writing new content adds it to Home with no
  * edit here, and Home can never point at something that is not written — the
@@ -90,7 +88,7 @@ function catalogFor(subject: SubjectId, input: StudyFeedInput): StudyItem[] {
 
   // Sections and decks, lesson by lesson: a lesson's reading comes before its
   // flashcards, which is the order a student would take them in.
-  for (const chapter of chaptersFor(subject)) {
+  for (const chapter of chaptersFor(subject, input.manifest)) {
     for (const lesson of chapter.lessons) {
       const heading = lessonHeading(lesson.number, lesson.title);
       for (const s of lesson.sessions) {
@@ -159,8 +157,8 @@ function catalogFor(subject: SubjectId, input: StudyFeedInput): StudyItem[] {
     }
   }
 
-  for (const key of Object.keys(PAST_PAPERS)) {
-    const paper = pastPaperByKey(key);
+  for (const key of Object.keys(input.manifest.paper).sort().reverse()) {
+    const paper = pastPaperCard(key, input.manifest);
     if (!paper || paper.subject.id !== subject) continue;
     items.push({
       id: `paper:${key}`,

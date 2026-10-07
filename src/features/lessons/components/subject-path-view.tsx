@@ -9,6 +9,8 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
+import { retryContent, useContentManifest } from "@/lib/content";
+import { ContentNotice } from "@/features/practice/components/content-waiting";
 import { cn } from "@/utils/cn";
 import { SubjectArt } from "./subject-art";
 import { SessionNode } from "./session-node";
@@ -256,11 +258,22 @@ function ChapterJumpList({
   );
 }
 
+/** A lesson's identity on this screen: its first section's id, unique across
+ *  the path and the same on every render. The path is rebuilt from the
+ *  manifest each render (chaptersFor), so a lesson OBJECT is not. */
+function lessonKey(lesson: PathLesson): string {
+  return lesson.sessions[0]?.id ?? String(lesson.number);
+}
+
 export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
   const completedSessions = useBrachNhaStore((s) => s.completedSessions);
   const c = SUBJECT_STYLE[subject.id];
+  // What is published (lib/content.ts): a node links only when its section is.
+  // A returning device has the list already; a first open shows the path
+  // locked under a quiet "downloading" line until it arrives.
+  const manifest = useContentManifest();
 
-  const chapters = chaptersFor(subject.id);
+  const chapters = chaptersFor(subject.id, manifest);
   const progress = pathProgress(chapters, completedSessions);
 
   // The one session the START bubble points at: the first that is playable and
@@ -301,14 +314,13 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
     lessons.find((l) => l.openHere) ??
     null;
 
+  const landingKey = landingLesson ? lessonKey(landingLesson) : null;
+
   const scrollerRef = useRef<HTMLDivElement>(null);
-  // Keyed by PathLesson object identity rather than a composed string: for an
-  // authored subject chaptersFor() returns the exact SUBJECT_SESSIONS array
-  // (stable references across renders), and within any single render this map
-  // is only ever read using lesson objects drawn from that SAME `chapters`, so
-  // identity is a safe key and sidesteps needing "which chapter is this lesson
-  // in" just to look a node back up.
-  const lessonNodeRefs = useRef(new Map<PathLesson, HTMLDivElement>());
+  // Keyed by lessonKey() (a section id), NOT by the lesson object: chaptersFor()
+  // builds a fresh path from the manifest, so an object key would differ on
+  // every render and the landing effect below would re-scroll each time.
+  const lessonNodeRefs = useRef(new Map<string, HTMLDivElement>());
 
   // Two ways to land on a specific lesson's banner: on mount/subject-change,
   // automatically (below); or on demand, via the jump list (mode/onJumpPick
@@ -316,7 +328,7 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
   // animation — see each site for why.
   useEffect(() => {
     const scroller = scrollerRef.current;
-    const target = landingLesson && lessonNodeRefs.current.get(landingLesson);
+    const target = landingKey && lessonNodeRefs.current.get(landingKey);
     if (!scroller || !target) return;
     // Instant, never smooth: an animated scroll on first paint reads as the page
     // glitching rather than as a deliberate position. Measured from bounding
@@ -326,7 +338,7 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
       target.getBoundingClientRect().top -
       scroller.getBoundingClientRect().top -
       8;
-  }, [subject.id, landingLesson]);
+  }, [subject.id, landingKey]);
 
   // "path" is the winding trail (the normal screen); "jump" swaps the SAME
   // scroller's content for a flat chapter/lesson table of contents — see
@@ -362,10 +374,10 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
   // to be a dependency this effect can react to, and picking the exact same
   // lesson twice in a row (the only case that would miss a re-fire) is
   // already sitting at that scroll position, so there is nothing to redo.
-  const [jumpTarget, setJumpTarget] = useState<PathLesson | null>(null);
+  const [jumpTarget, setJumpTarget] = useState<string | null>(null);
   function handleJumpPick(lesson: PathLesson) {
     setMode("path");
-    setJumpTarget(lesson);
+    setJumpTarget(lessonKey(lesson));
   }
   useEffect(() => {
     if (!jumpTarget) return;
@@ -457,6 +469,14 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
             wide column would fling the nodes far apart and break the trail into
             disconnected islands. This is a path, not a reading column. */
         <div className="mx-auto w-full max-w-md">
+          {manifest.status !== "ready" && (
+            <div className="mb-4">
+              <ContentNotice
+                state={manifest.status === "failed" ? "offline" : "loading"}
+                onRetry={retryContent}
+              />
+            </div>
+          )}
           {chapters.flatMap((chapter) =>
             chapter.lessons.map((lesson) => {
               // Per-LESSON. Each widening of this scope hid the bug one level
@@ -472,8 +492,8 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
                 <div
                   key={`${chapter.number}.${lesson.number}`}
                   ref={(el) => {
-                    if (el) lessonNodeRefs.current.set(lesson, el);
-                    else lessonNodeRefs.current.delete(lesson);
+                    if (el) lessonNodeRefs.current.set(lessonKey(lesson), el);
+                    else lessonNodeRefs.current.delete(lessonKey(lesson));
                   }}
                 >
                   {/* A filled banner rather than a hairline divider, which is

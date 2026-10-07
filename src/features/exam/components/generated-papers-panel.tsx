@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useBrachNhaStore } from "@/lib/store";
 import { ExamPaperCard } from "./exam-paper-card";
-import { generatedPapers, type ExamPaper } from "../papers";
+import { generatedPapers, type GeneratedPaper } from "../papers";
 
 /**
  * Tab B: newly-generated papers, one per subject — no exam session to choose,
@@ -18,7 +18,7 @@ import { generatedPapers, type ExamPaper } from "../papers";
 export function GeneratedPapersPanel({
   onStartPaper,
 }: {
-  onStartPaper: (paper: ExamPaper) => void;
+  onStartPaper: (paper: GeneratedPaper) => void;
 }) {
   const userLanguage = useBrachNhaStore((s) => s.userLanguage);
 
@@ -26,7 +26,7 @@ export function GeneratedPapersPanel({
 
   const papers = generatedPapers(userLanguage);
 
-  function handleTest(paper: ExamPaper) {
+  function handleTest(paper: GeneratedPaper) {
     if (paper.questions.length === 0) {
       setNotice(paper.key);
       return;

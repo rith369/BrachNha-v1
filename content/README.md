@@ -1,7 +1,9 @@
-# Flashcards and practice quizzes: how to write them
+# Content: how to write it
 
-Flashcard decks and practice quizzes live in the **database**, not in the code
-(since 3 Oct 2026, `docs/plans/content-in-database.md`). The team edits them on
+Flashcard decks, practice quizzes, lesson sections and past papers live in the
+**database**, not in the code (decks and quizzes since 3 Oct 2026,
+`docs/plans/content-in-database.md`; sections and papers since 7 Oct 2026,
+`docs/plans/sections-and-papers-in-database.md`). The team edits everything on
 **Admin → Content** and only the owner publishes. This folder holds content as
 JSON files on their way in, plus `fixture.json`.
 
@@ -9,10 +11,11 @@ JSON files on their way in, plus `fixture.json`.
 
 | file | what it is |
 | --- | --- |
-| `fixture.json` | Everything that was moved out of the code on 3 Oct 2026 (17 decks, 9 quizzes). It is what the database was filled from, and the content a development server shows when Supabase is not configured. `npm run content:export` refreshes it from what is published now. |
-| `new/*.json` | New decks or quizzes, waiting to be imported. Delete each file once its content is published: the database is the only copy. |
+| `fixture.json` | A copy of everything published (17 decks, 9 quizzes, 7 lesson sections, 2 past papers on 7 Oct 2026). It is the content a development server shows when Supabase is not configured, and what a NEW project is filled from. `npm run content:export` refreshes it from what is published now. |
+| `new/*.json` | New content waiting to be imported (a new past paper arrives this way). Delete each file once its content is published: the database is the only copy. |
 
-A file is `{ "format": 1, "items": [ { "kind": "deck" | "quiz", "key": "...", "body": [...] } ] }`.
+A file is `{ "format": 1, "items": [ { "kind": "deck" | "quiz" | "section" | "paper", "key": "...", "body": ... } ] }`.
+A deck's or a quiz's body is a list; a section's or a paper's is an object.
 
 ## Adding content
 
@@ -26,15 +29,22 @@ A file is `{ "format": 1, "items": [ { "kind": "deck" | "quiz", "key": "...", "b
 ## Keys and ids
 
 - **A key** names where the content sits in the app:
-  `"{subject}-{chapter}-{lesson}"` for a deck (`biology-1-1`), and
+  `"{subject}-{chapter}-{lesson}"` for a deck (`biology-1-1`),
   `"{subject}-{chapter}-{lesson}-{section}"` for a quiz on a quiz path
-  (`math-1-1-1`). New on Admin → Content only offers keys a student can reach.
+  (`math-1-1-1`) and for a lesson section (`biology-3-1-1`, the node on the
+  Study path), and `"{year}-{subject}"` for a past paper (`2025-math`). New
+  on Admin → Content only offers keys a student can reach.
 - **A card id is kept for ever** (`biology-1-1-3`). Each student's review
   history is filed under it, so an id is never changed and never given to
   another card, even after the card is deleted.
 - **A question id is `q1`, `q2`…**, never reused within one quiz. Mistake
   reports name a question by it, so a report still points at the right
-  question after the questions are reordered.
+  question after the questions are reordered. In a section, the ids run across
+  BOTH quizzes (`quiz` then `quizHarder`) and never repeat between them.
+- **A past paper's question and gap ids** are a letter and a number (`l1`,
+  `g4`, `r7`), unique across the whole paper: a student's saved answers are
+  kept under them. A new question takes its part's letter and the next number
+  never used.
 
 ## Writing a card
 
@@ -56,6 +66,50 @@ A file is `{ "format": 1, "items": [ { "kind": "deck" | "quiz", "key": "...", "b
   2 to 4 lines), `mistake` (the usual mistake, one sentence), `questions`
   (similar exercises) and `foundation` (easier exercises). Exercise options
   have no ក. prefix.
+
+## Writing a lesson section
+
+`{ "title", "video"?, "intro", "examples", "lesson", "notes", "mistakes", "model3d"?, "quiz"?, "quizHarder"? }`
+
+- **A student sees it in two steps, and the order is the teaching.** Step 1:
+  the video, `intro`, `examples`, the 3D model and `quiz`. Step 2: `lesson`,
+  `notes`, `mistakes` and `quizHarder`. A question on step 1 may only ask what
+  the video and the examples have already shown; anything that needs the rules
+  belongs in `quizHarder`. Re-check the ក ខ គ ឃ spread in EACH quiz.
+- **Each block** is `{ "intro"?, "items": [ { "label"?, "body", "items"? } ], "outro"? }`:
+  a lead paragraph, a bulleted list of points, a closing paragraph. A point's
+  `label` is bold words before its text (the app adds the ៖ after them), and
+  its own `items` are sub-points.
+- **A mistake** is `{ "wrong", "right" }`: what students wrongly think, and
+  what is true. The pairing is the teaching, so neither half stands alone.
+- **The video poster and the 3D model are files the app ships**
+  (`/sections/{id}.webp`, `/models/{name}.glb`); the editor offers only those.
+  A new picture has to be added to the app first. `youtubeId` is the 11
+  characters after `watch?v=`, never a link, and only once the video exists.
+- A model's `credit` is required: its licence asks for it.
+
+## Writing a past paper
+
+`{ "minutes", "points"?, "note"?, "sections": [part, …], "writing"?, "skills"? }`
+
+- **The paper's own words are COPIED, never paraphrased**: each part's `title`,
+  `instruction` and `statement` (the whole exercise, printed before its
+  sub-questions). Only the multiple-choice options and the explanations are
+  ours. A rewritten statement is our sentence wearing MoEYS's authority.
+- **A part holds `questions` OR a `gapFill`**, never both. A question is
+  `{ "id", "q", "options", "correct", "explanation", "points"?, "skill"? }`,
+  where `points` is what the printed paper marks it out of (shown, never
+  scored).
+- **A gap-fill** is `{ "title", "body", "wordBank", "gaps" }`. Write each gap in
+  the passage as `{n}`; each gap's `correct` is one of the words in the box,
+  copied exactly. The gap the paper fills in for students has `"example": true`
+  and is not scored.
+- **`skills`** holds the drills a wrong answer offers, keyed by the id a
+  question or gap names in `skill`: `{ "label", "note", "mistake"?, "questions",
+  "foundation"? }`, the same shape as a quiz question's `help`.
+- **`writing`** is the essay task: `{ "title", "prompt", "minWords", "modelEssay": [paragraphs], "checklist": [lines] }`.
+  The model essay is written for BrachNha, not the paper's printed sample.
+- **`minutes` comes off the paper's own header**; students get that long.
 
 ### Distractors (the wrong options) are rules, not taste
 

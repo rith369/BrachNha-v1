@@ -13,7 +13,6 @@ import {
 } from "../paper-scoring";
 import { MAX_EXAM_LEAVES } from "@/hooks/use-leave-guard";
 import { SkillDrill } from "@/components/skill-drill";
-import { SKILLS } from "@/data/papers/english-drills";
 import { MathText } from "@/components/shell/math-text";
 
 /**
@@ -137,7 +136,7 @@ export function PastPaperResults({
 
         {content.writing && (
           <div className="mt-3 border-t border-border pt-3 text-xs font-bold text-muted md:text-sm">
-            {content.writing.title} · មិនគិតពិន្ទុក្នុងកម្មវិធី —
+            {content.writing.title} · មិនគិតពិន្ទុក្នុងកម្មវិធី។
             ពិនិត្យដោយខ្លួនឯងខាងក្រោម។
           </div>
         )}
@@ -158,7 +157,7 @@ export function PastPaperResults({
             </div>
           )}
           {section.items.map((item) => (
-            <ReviewRow key={item.id} item={item} paperKey={paperKey} />
+            <ReviewRow key={item.id} item={item} paperKey={paperKey} skills={content.skills} />
           ))}
         </div>
       ))}
@@ -196,7 +195,17 @@ function pctOf(score: number, total: number): number {
  * An unanswered question reads "មិនបានឆ្លើយ" rather than showing an empty chip:
  * the clock running out and a wrong guess are different things.
  */
-function ReviewRow({ item, paperKey }: { item: ReviewItem; paperKey: string }) {
+function ReviewRow({
+  item,
+  paperKey,
+  skills,
+}: {
+  item: ReviewItem;
+  paperKey: string;
+  /** The paper's own drills, keyed by skill id (PastPaperContent.skills). */
+  skills: PastPaperContent["skills"];
+}) {
+  const help = item.skill && skills && Object.hasOwn(skills, item.skill) ? skills[item.skill] : null;
   return (
     <div
       className={cn(
@@ -258,10 +267,10 @@ function ReviewRow({ item, paperKey }: { item: ReviewItem; paperKey: string }) {
         <MathText text={item.explanation} />
       </div>
 
-      {/* The lookup is the CALLER's job now that SkillDrill is shared —
-          a component under src/components/ importing this paper's drill corpus
-          would drag the whole of it into every chunk that renders a question. */}
-      {!item.ok && item.skill && <SkillDrill help={SKILLS[item.skill]} />}
+      {/* The drills travel WITH the paper (PastPaperContent.skills), so the
+          lookup is a key into the paper's own record and nothing else is
+          imported. A skill the paper does not carry shows no drill. */}
+      {!item.ok && help && <SkillDrill help={help} />}
       <ReportMistake contentRef={paperRef(paperKey, item.id)} className="mt-2" />
     </div>
   );

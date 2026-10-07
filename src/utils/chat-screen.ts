@@ -42,7 +42,7 @@ export interface ScreenRef {
    *  cannot disagree with them; only `/subjects/:subjectId` supplies it alone. */
   subjectId?: string;
   /** `/practice/:mode/:subjectId/:lessonRef` — the deck or quiz being worked
-   *  through, keyed the way data/practice.ts keys it: "biology-1-1". */
+   *  through, keyed the way the database keys a deck: "biology-1-1". */
   practiceKey?: string;
 }
 
@@ -81,7 +81,7 @@ export function screenRefFor(pathname: string): ScreenRef {
   const [head, ...rest] = parts;
 
   // /sections/:sectionId — one section of the real curriculum. The richest
-  // signal there is, since SECTION_CONTENT holds the full authored prose.
+  // signal there is, since the published section holds the full authored prose.
   if (head === "sections" && rest[0]) {
     return { sectionId: rest[0], subjectId: subjectOf(rest[0]) };
   }

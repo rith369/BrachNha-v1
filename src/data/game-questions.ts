@@ -4,8 +4,8 @@ import type { ExamQuestion } from "@/types";
  * Questions for a Game match — one subject per match, keyed by SubjectId
  * ("math", "biology", …), the same keying GENERATED_EXAM_QUESTIONS uses.
  *
- * EMPTY TODAY, AND THAT IS THE NORMAL STATE — the same discipline
- * PAST_PAPERS and PRACTICE_QUIZZES ship with. features/game/game.ts
+ * EMPTY TODAY, AND THAT IS THE NORMAL STATE — the same discipline the past
+ * papers and practice quizzes shipped with before they moved into the database. features/game/game.ts
  * derives one card per subject from the catalog regardless of what is in here,
  * so a subject with no entry below renders ឆាប់ៗនេះ and is not tappable. Adding
  * one entry turns that card on; there is no other code change.

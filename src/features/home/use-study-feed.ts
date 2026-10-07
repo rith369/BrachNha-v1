@@ -35,10 +35,11 @@ export function useStudyFeed(): StudyFeed {
     strengths: userData.strengths ?? [],
   });
 
-  // THE LIKELY NEXT TAP, downloaded while the phone is idle: the top decks and
-  // quizzes on the card (lib/content.ts keeps them for good, so this is paid
-  // once per version). One string, so the effect runs when the top items
-  // change rather than on every render. Both cards call this hook; a body
+  // THE LIKELY NEXT TAP, downloaded while the phone is idle: the top decks,
+  // quizzes and lesson sections on the card. Not a past paper, which is larger
+  // and fetched when its own screen opens. lib/content.ts keeps them for good,
+  // so this is paid once per version. One string, so the effect runs when the
+  // top items change rather than on every render. Both cards call this hook; a body
   // already loading or held is not asked for twice.
   const ahead = feed.items
     .slice(0, PREFETCH_TOP)
@@ -47,14 +48,16 @@ export function useStudyFeed(): StudyFeed {
         ? [`deck ${item.lessonKey}`]
         : item.kind === "quiz"
           ? [`quiz ${item.id.replace(/^quiz:quiz-/, "")}`]
-          : []
+          : item.kind === "section"
+            ? [`section ${item.id.replace(/^section:/, "")}`]
+            : []
     )
     .join(",");
   useEffect(() => {
     if (!ahead) return;
     const run = () => {
       for (const entry of ahead.split(",")) {
-        const [kind, key] = entry.split(" ") as ["deck" | "quiz", string];
+        const [kind, key] = entry.split(" ") as ["deck" | "quiz" | "section", string];
         const version = entryVersion(manifest, kind, key);
         if (version !== null) prefetchBody(kind, key, version);
       }

@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useState } from "react";
+import { useDeferredValue, useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { ArrowLeft, ExternalLink, EyeOff, History, Plus, Save, Send, Undo2 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
@@ -15,14 +15,22 @@ import {
   type ContentFail,
 } from "@/lib/admin-content";
 import { checkContent, type ContentIssue } from "@/utils/content-check";
-import type { ContentKind, DeckCardBody, Lang, QuizQuestionBody } from "@/types";
+import type {
+  ContentKind,
+  DeckCardBody,
+  Lang,
+  PaperBody,
+  QuizQuestionBody,
+  SectionBody,
+} from "@/types";
 import { cn } from "@/utils/cn";
 import { InfoTip } from "@/components/ui/info-tip";
 import { TitleWithTip } from "@/components/title-with-tip";
 import { whenLabel } from "../copy";
-import { CONTENT_COPY, fieldLabel } from "../content-copy";
+import { CONTENT_COPY, fieldLabel, locationLabel } from "../content-copy";
 import { slotFor } from "../content-slots";
 import {
+  emptyBody,
   emptyQuestion,
   moveItem,
   newCardId,
@@ -31,9 +39,14 @@ import {
   tidyBody,
 } from "../content-edit";
 import { CardEditor, QuestionEditor } from "./content-item-editors";
+import { PaperEditor } from "./paper-editor";
+import { SectionEditor } from "./section-editor";
 
 /**
- * /admin/content/:kind/:key: edit one flashcard deck or practice quiz.
+ * /admin/content/:kind/:key: edit one flashcard deck, practice quiz, lesson
+ * section or past paper. This is the SHELL every kind shares (load, save,
+ * publish, versions, the checks); the body is drawn by the kind's own editor:
+ * the card and question lists here, section-editor.tsx, paper-editor.tsx.
  *
  * THE WORKING COPY lives here, starting from the draft if there is one and
  * otherwise from what students see. Nothing reaches the database until Save
@@ -125,9 +138,14 @@ export function ContentEditorView({
   const slot = slotFor(kind, contentKey);
 
   const [load, setLoad] = useState<Load>({ state: "loading" });
-  const [body, setBody] = useState<AnyBody>([]);
+  // Started as an empty body OF THIS KIND, never [], because the checks and
+  // tidyBody run on it while the page loads, and a section or a paper is an
+  // object. The page keys this view on kind and key, so the kind cannot change
+  // under it.
+  const [placeholder] = useState<AnyBody>(() => emptyBody(kind, ""));
+  const [body, setBody] = useState<AnyBody>(placeholder);
   /** The body as last saved or loaded, tidied; "unsaved" compares against it. */
-  const [saved, setSaved] = useState<AnyBody>([]);
+  const [saved, setSaved] = useState<AnyBody>(() => emptyBody(kind, ""));
   /** The draft's updated_at as this page knows it; null = no draft. */
   const [expected, setExpected] = useState<string | null>(null);
   const [reload, setReload] = useState(0);
@@ -146,7 +164,10 @@ export function ContentEditorView({
         return;
       }
       const d = result.data;
-      const start = d.draft?.body ?? d.published?.body ?? [];
+      // Nothing yet: a new deck or quiz is an empty list, a new section starts
+      // with its node's own name as the title.
+      const start =
+        d.draft?.body ?? d.published?.body ?? emptyBody(kind, slotFor(kind, contentKey).name ?? "");
       setBody(start);
       setSaved(tidyBody(kind, start));
       setExpected(d.draft?.updatedAt ?? null);
@@ -156,6 +177,17 @@ export function ContentEditorView({
       alive = false;
     };
   }, [kind, contentKey, reload]);
+
+  // Arriving with ?q= (a mistake report's Edit link): bring that question
+  // into view once, the first time the item is on screen.
+  const arrived = useRef(false);
+  useEffect(() => {
+    if (load.state !== "ready" || !initialOpen || arrived.current) return;
+    arrived.current = true;
+    requestAnimationFrame(() =>
+      document.getElementById(`item-${initialOpen}`)?.scrollIntoView({ block: "start" })
+    );
+  }, [load.state, initialOpen]);
 
   const tidy = tidyBody(kind, body);
   const dirty = load.state === "ready" && !sameBody(tidy, saved);
@@ -169,7 +201,11 @@ export function ContentEditorView({
   }, [dirty]);
 
   const deferred = useDeferredValue(body);
-  const issues = checkContent(kind, tidyBody(kind, deferred));
+  // Until the loaded body has been checked once, the deferred copy is still
+  // the empty placeholder, and its result ("the paper is empty") would be a
+  // false alarm for as long as checking a long paper takes.
+  const checked = deferred !== placeholder;
+  const issues = checked ? checkContent(kind, tidyBody(kind, deferred)) : [];
   const errorCount = issues.filter((i) => i.level === "error").length;
   const byItem = new Map<number, ContentIssue[]>();
   for (const issue of issues) {
@@ -225,7 +261,7 @@ export function ContentEditorView({
   }
 
   async function publish() {
-    if (errorCount > 0) return;
+    if (errorCount > 0 || !checked) return;
     let at = expected;
     if (dirty || at === null) {
       if (!dirty && at === null) {
@@ -286,12 +322,68 @@ export function ContentEditorView({
   }
 
   function jumpTo(index: number) {
-    const item = body[index];
+    const item = (body as DeckCardBody[] | QuizQuestionBody[])[index];
     if (!item) return;
     setOpen(item.id);
     requestAnimationFrame(() =>
       document.getElementById(`item-${item.id}`)?.scrollIntoView({ block: "start" })
     );
+  }
+
+  /** A section or a paper names a problem by its path: open the question it
+   *  is in, if any, and scroll to the nearest part of the editor. */
+  function jumpToField(field: string) {
+    const p = field.split(".");
+    const head = p[0] ?? "";
+    let anchor = "";
+    let openId: string | null = null;
+    if (kind === "section") {
+      const s = body as SectionBody;
+      if (head === "quiz" || head === "quizHarder") {
+        const q = p[1] !== undefined ? s[head]?.[Number(p[1])] : undefined;
+        if (q) {
+          openId = q.id;
+          anchor = `item-${q.id}`;
+        } else {
+          anchor = `sec-${head}`;
+        }
+      } else if (["intro", "examples", "lesson", "notes", "video", "model3d", "mistakes"].includes(head)) {
+        anchor = `sec-${head}`;
+      } else {
+        anchor = "sec-title";
+      }
+    } else {
+      const b = body as PaperBody;
+      if (head === "sections" && p[1] !== undefined) {
+        const part = b.sections[Number(p[1])];
+        const q = p[2] === "questions" && p[3] !== undefined ? part?.questions?.[Number(p[3])] : undefined;
+        const gap =
+          p[2] === "gapFill" && p[3] === "gaps" && p[4] !== undefined
+            ? part?.gapFill?.gaps[Number(p[4])]
+            : undefined;
+        if (q) {
+          openId = q.id;
+          anchor = `item-${q.id}`;
+        } else if (gap) {
+          anchor = `item-${gap.id}`;
+        } else {
+          anchor = `part-${p[1]}`;
+        }
+      } else if (head === "writing") {
+        anchor = "paper-writing";
+      } else if (head === "skills") {
+        anchor = p[1] ? `paper-skill-${p[1]}` : "paper-skills";
+      } else {
+        anchor = "paper-head";
+      }
+    }
+    if (openId) setOpen(openId);
+    requestAnimationFrame(() => document.getElementById(anchor)?.scrollIntoView({ block: "start" }));
+  }
+
+  /** Open a question, or close it if it is the one open. */
+  function toggle(id: string) {
+    setOpen(open === id ? null : id);
   }
 
   function addItem() {
@@ -350,6 +442,7 @@ export function ContentEditorView({
   }
 
   const warnings = issues.length - errorCount;
+  const isList = kind === "deck" || kind === "quiz";
 
   return (
     <>
@@ -380,10 +473,10 @@ export function ContentEditorView({
           <span
             className={cn(
               "rounded-full border border-border px-2 py-0.5 text-[10px] font-extrabold text-ink",
-              errorCount ? "bg-neo-pink" : warnings ? "bg-neo-yellow" : "bg-neo-mint"
+              !checked ? "bg-control text-muted" : errorCount ? "bg-neo-pink" : warnings ? "bg-neo-yellow" : "bg-neo-mint"
             )}
           >
-            {issues.length ? c.checksCount(errorCount, warnings) : c.checksNone}
+            {!checked ? c.working : issues.length ? c.checksCount(errorCount, warnings) : c.checksNone}
           </span>
         </div>
         {issues.length > 0 && (
@@ -392,20 +485,22 @@ export function ContentEditorView({
               <li key={i}>
                 <button
                   type="button"
-                  disabled={issue.item < 0}
-                  onClick={() => jumpTo(issue.item)}
+                  disabled={isList && issue.item < 0}
+                  onClick={() => (isList ? jumpTo(issue.item) : jumpToField(issue.field))}
                   className={cn(
                     "text-left text-[11px] font-bold [overflow-wrap:anywhere] enabled:hover:underline",
                     issue.level === "error" ? "text-pink" : "text-muted"
                   )}
                 >
                   {issue.level === "error" ? "✕ " : "! "}
-                  {issue.item < 0
-                    ? c.wholeList
-                    : kind === "deck"
-                      ? c.card(issue.item + 1)
-                      : c.question(issue.item + 1)}
-                  {issue.field ? ` · ${fieldLabel(issue.field, lang)}` : ""}: {c.issues[issue.code]}
+                  {!isList
+                    ? locationLabel(kind, issue.field, lang)
+                    : issue.item < 0
+                      ? c.wholeList
+                      : kind === "deck"
+                        ? c.card(issue.item + 1)
+                        : c.question(issue.item + 1)}
+                  {isList && issue.field ? ` · ${fieldLabel(issue.field, lang)}` : ""}: {c.issues[issue.code]}
                   {issue.detail ? ` (${issue.detail})` : ""}
                 </button>
               </li>
@@ -414,7 +509,27 @@ export function ContentEditorView({
         )}
       </div>
 
-      {kind === "deck" ? (
+      {kind === "section" ? (
+        <SectionEditor
+          body={body as SectionBody}
+          issues={issues}
+          usedIds={usedIds}
+          open={open}
+          lang={lang}
+          onToggle={toggle}
+          onChange={setBody}
+        />
+      ) : kind === "paper" ? (
+        <PaperEditor
+          body={body as PaperBody}
+          issues={issues}
+          usedIds={usedIds}
+          open={open}
+          lang={lang}
+          onToggle={toggle}
+          onChange={setBody}
+        />
+      ) : kind === "deck" ? (
         <ol className="flex flex-col gap-3">
           {(body as DeckCardBody[]).map((card, i, cards) => (
             <CardEditor
@@ -441,7 +556,7 @@ export function ContentEditorView({
               issues={byItem.get(i) ?? []}
               open={open === question.id}
               lang={lang}
-              onToggle={() => setOpen(open === question.id ? null : question.id)}
+              onToggle={() => toggle(question.id)}
               onChange={(next) => setBody(questions.map((x, j) => (j === i ? next : x)))}
               onMove={(d) => setBody(moveItem(questions, i, d))}
               onRemove={() => setBody(questions.filter((_, j) => j !== i))}
@@ -450,10 +565,12 @@ export function ContentEditorView({
         </ol>
       )}
 
-      <button type="button" onClick={addItem} className={cn(BTN, "mt-3 bg-surface")}>
-        <Plus className="size-3.5" strokeWidth={2.5} />
-        {kind === "deck" ? c.addCard : c.addQuestion}
-      </button>
+      {isList && (
+        <button type="button" onClick={addItem} className={cn(BTN, "mt-3 bg-surface")}>
+          <Plus className="size-3.5" strokeWidth={2.5} />
+          {kind === "deck" ? c.addCard : c.addQuestion}
+        </button>
+      )}
 
       <div className={cn(CARD, "mt-6")}>
         <h3 className="mb-2 flex items-center gap-1.5 font-heading text-sm font-extrabold">
@@ -537,7 +654,7 @@ export function ContentEditorView({
           {isOwner ? (
             <button
               type="button"
-              disabled={busy || errorCount > 0 || (!dirty && expected === null)}
+              disabled={busy || !checked || errorCount > 0 || (!dirty && expected === null)}
               onClick={() => void publish()}
               className={cn(BTN, "bg-brand text-on-brand")}
             >

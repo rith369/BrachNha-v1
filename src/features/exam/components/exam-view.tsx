@@ -5,7 +5,7 @@ import { ChevronLeft } from "lucide-react";
 import { useBrachNhaStore, type ExamResult } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { UnderlineTabs } from "@/components/ui/underline-tabs";
-import { EXAM_TABS, type ExamPaper, type ExamTab } from "../papers";
+import { EXAM_TABS, type ExamTab, type GeneratedPaper } from "../papers";
 import { ExamRunner, type ExamScore } from "./exam-runner";
 import { ExamResults } from "./exam-results";
 import { GeneratedPapersPanel } from "./generated-papers-panel";
@@ -20,7 +20,7 @@ import { PastPapersPanel } from "./past-papers-panel";
  * at /exam/subjects/:paperKey (pages/exam-paper.tsx), which shows what the paper
  * is and its history before anything starts a 60-minute clock.
  */
-type Run = { kind: "generated"; paper: ExamPaper };
+type Run = { kind: "generated"; paper: GeneratedPaper };
 
 /**
  * The /exam/subjects screen: two tabs over one exam catalog, plus the runner

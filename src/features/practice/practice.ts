@@ -1,4 +1,4 @@
-import { chaptersFor } from "@/features/lessons/sessions";
+import { chaptersShape } from "@/features/lessons/sessions";
 import { deckCount, quizCount, type ContentManifest } from "@/utils/content-manifest";
 import { quizPathFor } from "./quiz-path";
 import { SUBJECTS, allSubjects, type SubjectId, type SubjectMeta } from "@/features/lessons/subjects";
@@ -139,10 +139,10 @@ export interface PracticeLesson {
 /**
  * A subject's lessons, flattened from its chapters, for one mode.
  *
- * THE LIST COMES FROM chaptersFor(), the same function the Study path renders
+ * THE LIST COMES FROM chaptersShape(), the same structure the Study path renders
  * from, so this screen and /subjects/:id can never disagree about what lessons a
  * subject has. Biology yields its real 7 lessons across 3 chapters; every other
- * subject yields the single-lesson fallback chaptersFor() builds when nothing is
+ * subject yields the single-lesson fallback chaptersShape() builds when nothing is
  * authored, which is one row. That thinness is the honest state today, not a
  * bug — it fills in by itself the moment a curriculum is entered.
  *
@@ -156,7 +156,7 @@ export function practiceLessonsFor(
   mode: PracticeMode,
   manifest: ContentManifest
 ): PracticeLesson[] {
-  return chaptersFor(subjectId).flatMap((chapter) =>
+  return chaptersShape(subjectId).flatMap((chapter) =>
     chapter.lessons.map((lesson) => {
       const key = practiceKey(subjectId, chapter.number, lesson.number);
       const count =
@@ -192,7 +192,7 @@ export function readyLessonCount(
  * Sections with a quiz actually written, on a subject rendered as a quiz path.
  *
  * readyLessonCount() cannot answer this. It counts LESSONS, and it derives them
- * from chaptersFor() — which for math is the foundation-review path, a different
+ * from chaptersShape() — which for math is the foundation-review path, a different
  * curriculum from the Bac II one the quiz path shows. So authoring
  * PRACTICE_QUIZZES["math-1-1-1"] moved that count by exactly nothing, and the
  * hub tile kept calling itself a design sample on the day it stopped being one.

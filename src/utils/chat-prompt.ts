@@ -1,7 +1,7 @@
 // Relative imports, not the @/ alias: this module is reachable from the Vercel
 // serverless function (api/chat.ts -> server/chat-handler.ts -> here), and that
 // bundler cannot resolve the alias. Keep it alias-free.
-import type { Lang } from "../types/index.js";
+import type { Lang, SectionContent } from "../types/index.js";
 import type { ScreenRef } from "./chat-screen.js";
 import {
   LESSONS,
@@ -11,7 +11,6 @@ import {
   lessonDataFor,
 } from "../data/lessons.js";
 import { MOCK_QS } from "../data/questions.js";
-import { SECTION_CONTENT } from "../data/sections.js";
 import {
   BAC2_ANSWER_RULES,
   BAC2_EXAMPLES,
@@ -219,7 +218,7 @@ export interface RetrievedChunk {
  *
  * IT IS NOT REDUNDANT WITH `Object.hasOwn`, and the case that proves it is not
  * obvious: a single-element ARRAY stringifies to its element, so
- * `Object.hasOwn(SECTION_CONTENT, ["biology-3-1-1"])` is TRUE — the key is
+ * `Object.hasOwn(sections, ["biology-3-1-1"])` is TRUE — the key is
  * coerced before the lookup. The guard passes, and the next line calls
  * `.split()` on an array and throws. Measured, not theorised.
  *
@@ -241,7 +240,7 @@ function isLookupKey(value: unknown): value is string {
  * there is nothing else separating one item from the next, and the model has
  * exactly the same problem a reader does.
  */
-function renderBlock(block: (typeof SECTION_CONTENT)[string]["intro"]): string {
+function renderBlock(block: SectionContent["intro"]): string {
   const lines: string[] = [];
   if (block.intro) lines.push(block.intro);
   for (const item of block.items) {
@@ -276,10 +275,10 @@ const SECTION_BLOCKS = [
  * answer key to the exercise in front of the student. This preserves a choice
  * the old skeleton made by accident and this function now makes on purpose.
  */
-export function sectionChunks(sectionId: string): RetrievedChunk[] {
+export function sectionChunks(sectionId: string, sections: SectionMap): RetrievedChunk[] {
   if (!isLookupKey(sectionId)) return [];
-  if (!Object.hasOwn(SECTION_CONTENT, sectionId)) return [];
-  const section = SECTION_CONTENT[sectionId];
+  if (!Object.hasOwn(sections, sectionId)) return [];
+  const section = sections[sectionId];
   // "biology-3-1-1" -> subject "biology", node label "3.1.1". Arabic digits
   // match the numbering the path's own node labels use.
   const [subject, ...node] = sectionId.split("-");
@@ -355,6 +354,15 @@ function lessonChunk(lessonId: string): RetrievedChunk | null {
  */
 export type DeckMap = Record<string, readonly { front: string; back: string }[]>;
 
+/**
+ * The published lesson sections, keyed by section id ("biology-3-1-1"). They
+ * live in the database since step B of docs/plans/sections-and-papers-in-database.md,
+ * fetched by the server beside the decks (server/content-source.ts) and passed
+ * in, so this module stays pure. Empty when the database could not be reached:
+ * KruAI then answers without the section list rather than not at all.
+ */
+export type SectionMap = Record<string, SectionContent>;
+
 /** A practice deck's flashcards, as one chunk. Khmer-only content, so no bi(). */
 function deckChunk(deckKey: string, decks: DeckMap): RetrievedChunk | null {
   if (!isLookupKey(deckKey)) return null;
@@ -382,13 +390,17 @@ function deckChunk(deckKey: string, decks: DeckMap): RetrievedChunk | null {
  *
  * `Object.hasOwn` rather than `in`, and rather than a truthiness test on the
  * lookup: these are plain object literals, so they inherit from
- * Object.prototype — `"constructor" in SECTION_CONTENT` is true and
- * `SECTION_CONTENT["toString"]` is a function. An untrusted string used as a key
+ * Object.prototype — `"constructor" in sections` is true and
+ * `sections["toString"]` is a function. An untrusted string used as a key
  * on an inherited-from object is exactly how that becomes a bug.
  */
-export function pinnedContextFor(screen: ScreenRef, decks: DeckMap = {}): RetrievedChunk[] {
+export function pinnedContextFor(
+  screen: ScreenRef,
+  decks: DeckMap = {},
+  sections: SectionMap = {}
+): RetrievedChunk[] {
   if (screen.sectionId) {
-    const chunks = sectionChunks(screen.sectionId);
+    const chunks = sectionChunks(screen.sectionId, sections);
     if (chunks.length) return chunks;
   }
 
@@ -482,7 +494,7 @@ ${rendered}`;
  * No `bi()` — SectionContent is Khmer-only by design (see types/index.ts), so
  * there is no English column to render and nothing to choose between.
  */
-function sectionLine(id: string, section: (typeof SECTION_CONTENT)[string]): string {
+function sectionLine(id: string, section: SectionContent): string {
   const labels = [section.intro, section.lesson, section.examples, section.notes]
     .flatMap((block) => block.items.map((item) => item.label))
     .filter(Boolean);
@@ -534,7 +546,12 @@ const CATALOG_BUDGET_CHARS = 3_500;
  * forces some entries down to their titles, the ones nearest the question keep
  * their detail. Every item appears either way.
  */
-export function buildCatalogBlock(lang: Lang, focusSubject?: string, decks: DeckMap = {}): string {
+export function buildCatalogBlock(
+  lang: Lang,
+  focusSubject?: string,
+  decks: DeckMap = {},
+  sections: SectionMap = {}
+): string {
   const entries: CatalogEntry[] = [];
 
   for (const [subject, lesson] of Object.entries(FOUNDATION)) {
@@ -592,7 +609,7 @@ export function buildCatalogBlock(lang: Lang, focusSubject?: string, decks: Deck
     });
   }
 
-  for (const [id, section] of Object.entries(SECTION_CONTENT)) {
+  for (const [id, section] of Object.entries(sections)) {
     entries.push({
       subject: id.split("-")[0],
       brief: `[section:${id}] ${section.title}`,
@@ -636,7 +653,7 @@ export function buildCatalogBlock(lang: Lang, focusSubject?: string, decks: Deck
     // is the first segment. Without this, a subject whose only content is
     // authored sections would still be announced as having none — and the
     // model would tell a student the lesson they are reading does not exist.
-    ...Object.keys(SECTION_CONTENT).map((id) => id.split("-")[0]),
+    ...Object.keys(sections).map((id) => id.split("-")[0]),
   ]);
   const missing = BAC2_SUBJECTS.filter((s) => !covered.has(s));
 
@@ -775,11 +792,15 @@ export function buildSystemPrompt({
   context = [],
   focusSubject,
   decks = {},
+  sections = {},
 }: {
   profile: ChatProfile;
   /** The published flashcard decks, for the catalog. Empty when the server
    *  could not fetch them: KruAI then answers without the deck list. */
   decks?: DeckMap;
+  /** The published lesson sections, for the catalog. Empty when the server
+   *  could not fetch them, the same as the decks. */
+  sections?: SectionMap;
   /**
    * Content to send in full, assembled by the caller.
    *
@@ -846,7 +867,7 @@ HONESTY. This matters more than sounding confident:
     BAC2_ANSWER_RULES[ANSWER_LANG],
     buildSocraticExampleBlock(ANSWER_LANG),
     buildExamplesBlock(ANSWER_LANG),
-    buildCatalogBlock(ANSWER_LANG, focusSubject, decks),
+    buildCatalogBlock(ANSWER_LANG, focusSubject, decks, sections),
     buildContextBlock(context),
     buildStudentBlock(profile),
     `LENGTH: this is a chat bubble on a phone. A guided reply (🧭) stays under 80 words and ends

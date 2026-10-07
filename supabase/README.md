@@ -50,6 +50,10 @@ supabase/migrations/
                                    flashcards and practice quizzes stored here,
                                    edited on /admin/content, published by the
                                    owner only
+  20261003000002_sections_and_papers.sql
+                                   lesson sections and past papers join them
+                                   (two more kinds in the same tables). Apply
+                                   after 20261003000001
 ```
 
 **Changing KruAI's daily limits:** since `20261002000004`, the owner changes
@@ -451,8 +455,10 @@ Any admin can save a draft. **Only the owner can publish, hide or import.**
    must say "26 of 26 item(s) published exactly as in the file".
 
 Since step 1b (3 Oct 2026) students read decks and quizzes ONLY from here: a
-new publish reaches them the next time they open the app. On a new project, do
-steps 1 to 3 before deploying, or every deck and quiz shows as coming soon.
+new publish reaches them the next time they open the app. **On a new project**,
+apply this migration AND `20261003000002` below first: `fixture.json` now holds
+all four kinds (35 items), so one import fills everything. Do it before
+deploying, or every deck, quiz, section and paper shows as coming soon.
 
 `db:check` lists the three tables but cannot see the functions. Check those with
 a publishable-key-only call to `/rest/v1/rpc/admin_content_list`, which must be
@@ -463,3 +469,26 @@ What is live, by hand:
 ```sql
 select kind, key, version, item_count from public.content_items order by kind, key;
 ```
+
+## `20261003000002`: lesson sections and past papers
+
+Two more kinds in the same three tables, `section` (key `biology-3-1-1`) and
+`paper` (key `2025-math`), so the team can fix a lesson or a past paper on
+**/admin/content** too (`docs/plans/sections-and-papers-in-database.md`). The
+functions keep their names and arguments; decks and quizzes behave as before.
+
+**The one-time move (done 7 Oct 2026):**
+
+1. Run the migration in the SQL editor, in one go, AFTER `20261003000001`.
+2. Import the 7 sections and 2 papers on `/admin/content` with **Publish items
+   that have never been published** ticked (it said 9 published). The file,
+   `content/sections-papers.json`, was deleted afterwards with the code copy;
+   a new project imports `content/fixture.json` instead (see above).
+3. `npm run check:content -- --live` confirmed 9 of 9 exactly.
+
+Since step B (7 Oct 2026) students read sections and papers ONLY from here: a
+new publish reaches them the next time they open the app.
+
+`db:check` sees no new table. Check the migration with
+`/rest/v1/rpc/content_current?p_kind=section` (publishable key), which answers
+200 (`[]` before the import).

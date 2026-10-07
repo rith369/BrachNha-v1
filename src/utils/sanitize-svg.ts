@@ -2,7 +2,7 @@
  * Makes an SVG string safe to put through `dangerouslySetInnerHTML`.
  *
  * WHY THIS EXISTS: `MathText` renders `<svg>…</svg>` blocks raw so an authored
- * paper can draw a graph (data/papers/math-2025.ts). But `MathText` also renders
+ * paper can draw a graph (the 2025 maths paper). But `MathText` also renders
  * text that ANOTHER STUDENT wrote — a Game competition's questions are frozen on
  * a world-readable row by the creator's own device — and stripping `<script>`
  * was the only guard. An SVG runs JavaScript without one (`onload`, an `<a>`
