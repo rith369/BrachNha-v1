@@ -19,12 +19,12 @@ export interface ExamScore {
 
 /**
  * The question flow, shared by the generated mock exam and any past paper that
- * has content. Takes its questions as a prop rather than reaching for MOCK_QS,
- * which is what lets one runner serve both tabs.
+ * has content. Takes its questions as a prop, which is what lets one runner
+ * serve both tabs.
  *
  * IT PERFORMS NO STORE WRITES. It reports out through onSubmit and the parent
- * decides what an attempt counts as - the same shape as PlacementTestRunner's
- * onComplete, and what keeps "which attempts land in examResults" a single
+ * decides what an attempt counts as, which is what keeps "which attempts
+ * land in examResults" a single
  * readable branch rather than a property buried in here.
  *
  * The copy in here is lang-driven, not Khmer-only: see the two carve-outs on

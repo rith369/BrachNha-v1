@@ -40,8 +40,8 @@ import { useFocusScrollTop } from "@/hooks/use-focus-scroll-top";
  *    as they are given, so there is no attempt to lose.
  *  - The result NEVER reaches addExamResult. `examResults` captions Home's stat
  *    pill "from mock exams" and feeds chat-prompt.ts an average mock-exam
- *    percentage it states to KruAI as fact, which is why past-paper and
- *    placement-test attempts are already kept out. A practice quiz is the same
+ *    percentage it states to KruAI as fact, which is why past-paper attempts
+ *    are already kept out. A practice quiz is the same
  *    case; when practice deserves a history it should be a separate persisted
  *    field, not a widening of this one.
  *

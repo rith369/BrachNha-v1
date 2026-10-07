@@ -8,8 +8,8 @@ import { StatBar } from "./stat-bar";
  * shape: a close button and progress bar pinned on top, the exercise centred in
  * whatever space is left, and one action button pinned to the bottom.
  *
- * Deliberately ONE component shared by the lesson flow, the mock exam and the
- * placement test. They previously each hand-rolled their own progress bar and
+ * Deliberately ONE component shared by the lesson flow, the mock exam, past
+ * papers, practice and the game. Task screens once each hand-rolled a progress bar and
  * inline buttons, which is how they drifted apart; a change to the task
  * experience should now be a change to this file.
  *

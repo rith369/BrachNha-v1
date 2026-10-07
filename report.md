@@ -15,6 +15,31 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 7 Oct 2026 — The 10 Old Mock-Exam Questions and the Placement Test Are Removed
+
+Commit: not committed yet. No database step.
+
+**Why.** The app still carried 10 old sample questions (5 maths, 5 biology) from its first
+version. No screen showed them any more, and the only thing still using them was a
+placement test that a student could reach only from an old roadmap card. They also showed
+up in KruAI's list of app content as exams a student could not open.
+
+**What changed:**
+
+- **The 10 sample questions are gone**, and so is the placement test that used them. The
+  address `/placement-test/...` now shows "This page isn't here".
+- **The roadmap no longer has a "Pending Placement Tests" card.** Only accounts that booked a
+  test before late September ever saw it.
+- **KruAI no longer lists the sample questions** as app content, and no longer mentions
+  placement tests.
+- Nothing else changes: the survey still asks about weak subjects the same way, the Study
+  page's Foundation tab is the same, and the "newly generated" exam papers still say
+  "coming soon".
+
+**What to re-test:** open the roadmap (it should look the same, minus the old card), and
+ask KruAI what the app has for maths: it should list lesson sections and flashcards, not
+"mock exam" questions.
+
 ## 7 Oct 2026 — Game Questions Are Khmer Only
 
 Commit `7ba13dd`. No database step left: the owner ran

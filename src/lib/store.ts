@@ -4,7 +4,6 @@ import type {
   Lang,
   UserData,
   Tasks,
-  PendingPlacementTest,
   ChatMsg,
   Conversation,
   Commitment,
@@ -35,7 +34,6 @@ export type {
   Lang,
   UserData,
   Tasks,
-  PendingPlacementTest,
   ChatMsg,
   Conversation,
   Commitment,
@@ -286,7 +284,6 @@ interface BrachNhaState {
   userLanguage: "" | "english" | "french";
   surveyed: boolean;
   userData: UserData;
-  pendingPlacementTests: PendingPlacementTest[];
   /** null until the student signs their roadmap pledge. Skippable, so a
    *  surveyed student can stay null indefinitely. */
   commitment: Commitment | null;
@@ -457,7 +454,7 @@ interface BrachNhaState {
    *  content instead of the app frame. Same reasoning as chatOpen. */
   pledgeOpen: boolean;
   /** True while the student is mid-question in the mock exam, which hides every
-   *  navigation affordance. Route-based tasks (a lesson, a placement test) are
+   *  navigation affordance. Route-based tasks (a lesson section, a game) are
    *  detected from the pathname instead — see utils/focus-routes.ts — because
    *  they have no equivalent "started" state. useFocusMode() ORs the two.
    *
@@ -495,8 +492,6 @@ interface BrachNhaState {
   /** Profile's name edit. Ignores a blank name — see the action body. */
   setUserName: (name: string) => void;
   completeSurvey: (data: UserData) => void;
-  schedulePlacementTest: (subject: string, scheduledDate: string) => void;
-  resolvePlacementTest: (subject: string, isWeak: boolean) => void;
   signCommitment: (commitment: Commitment) => void;
   /** `coins` overrides the default XP→coins ratio; see `award`. */
   addXp: (amount: number, coins?: number) => void;
@@ -817,7 +812,6 @@ const partializeState = (state: BrachNhaState) => ({
   userLanguage: state.userLanguage,
   surveyed: state.surveyed,
   userData: state.userData,
-  pendingPlacementTests: state.pendingPlacementTests,
   commitment: state.commitment,
   pledgeSeen: state.pledgeSeen,
   xp: state.xp,
@@ -869,7 +863,6 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       userLanguage: "",
       surveyed: false,
       userData: emptyUserData,
-      pendingPlacementTests: [],
       commitment: null,
       pledgeSeen: false,
 
@@ -952,29 +945,6 @@ export const useBrachNhaStore = create<BrachNhaState>()(
 
       completeSurvey: (data) =>
         set({ userData: data, surveyed: true }),
-
-      schedulePlacementTest: (subject, scheduledDate) =>
-        set((state) => ({
-          pendingPlacementTests: [
-            ...state.pendingPlacementTests.filter(
-              (p) => p.subject !== subject
-            ),
-            { subject, scheduledDate },
-          ],
-        })),
-
-      resolvePlacementTest: (subject, isWeak) =>
-        set((state) => {
-          const weaknesses = isWeak
-            ? Array.from(new Set([...state.userData.weaknesses, subject]))
-            : state.userData.weaknesses.filter((s) => s !== subject);
-          return {
-            pendingPlacementTests: state.pendingPlacementTests.filter(
-              (p) => p.subject !== subject
-            ),
-            userData: { ...state.userData, weaknesses },
-          };
-        }),
 
       // Re-signing overwrites: there's only ever one live pledge, and the new
       // one re-snapshots whatever the plan says today.
@@ -1403,7 +1373,6 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           userLanguage: "",
           surveyed: false,
           userData: emptyUserData,
-          pendingPlacementTests: [],
           commitment: null,
           pledgeSeen: false,
           xp: 0,

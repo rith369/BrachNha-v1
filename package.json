@@ -10,7 +10,6 @@
     "preview": "vite preview",
     "db:check": "node scripts/supabase-check.mjs",
     "check:digits": "node scripts/check-digits.mjs",
-    "check:quiz": "node scripts/check-quiz.mjs",
     "check:content": "node scripts/check-content.mjs",
     "content:export": "node scripts/content-export.mjs"
   },

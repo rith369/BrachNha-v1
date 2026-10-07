@@ -1,6 +1,6 @@
 /**
- * Shared sizing for the focus-mode task screens (lesson, mock exam, placement
- * test). Pure string constants — no state, no JSX.
+ * Shared sizing for the focus-mode task screens (lesson section, mock exam,
+ * past paper). Pure string constants — no state, no JSX.
  *
  * They live here rather than in focus-layout.tsx because a non-component export
  * from a .tsx file trips oxlint's `only-export-components` fast-refresh rule,

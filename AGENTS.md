@@ -158,9 +158,9 @@ landed.
   phone's own UI, such as `«Add to Home Screen»` in `features/install/copy.ts`,
   which has to match what the student actually sees on their device.
 
-**Neither rule is machine-checked.** `check:digits` catches Khmer numerals and
-`check:quiz` catches broken TeX; nothing catches an em dash or a stray English
-word, so both are a matter of writing them correctly the first time. To audit by
+**Neither rule is machine-checked in code.** `check:digits` catches Khmer numerals
+(and the content editor and `check:content` catch broken TeX and em dashes in content);
+nothing catches an em dash or a stray English word in the app's own strings, so both are a matter of writing them correctly the first time. To audit by
 hand: search user-visible strings for `—`, and for Latin words inside strings
 containing Khmer.
 
@@ -1077,7 +1077,10 @@ that anything NOT quoted does not exist, and would tell students the app lacks a
 lesson whenever grounding missed it. The catalog is the inventory; the excerpts
 are a sample.
 
-**`bi()` leads with KHMER now, and the English is the fallback.** It used to
+**`bi()` and `KM_STUB_RATIO` are DELETED (7 Oct 2026)**: the last pairs that went through
+them were the 10 mock-exam questions (`MOCK_QS`), deleted that day. Every content kind in
+the catalog is one language now, so there is nothing to choose between. What it did:
+**`bi()` led with KHMER, and the English was the fallback.** It used to
 emit `en [KH: km]` for every field — 5,999 Latin characters in a 12,595-char
 block, for a mentor forbidden to reply in English (`ANSWER_LANG`). The English
 is not dropped outright because some Khmer entries in `data/lessons.ts` really
@@ -1453,7 +1456,7 @@ move into the database" near the end of this file. **Lesson sections and past
 papers followed on 7 Oct 2026** (stages 2 and 3): `data/sections.ts` and
 `data/papers/` are deleted too. What stays in code is STRUCTURE (subjects, the
 path shapes in `features/lessons/sessions.ts` and `quiz-path.ts`,
-`PAST_PAPER_YEARS`) plus the mock-exam questions (`data/questions.ts`, `MOCK_QS`). The
+`PAST_PAPER_YEARS`). The 10 mock-exam questions (`MOCK_QS`) were deleted on 7 Oct 2026. The
 game questions moved into the database the same day ("Game questions move into the
 database"), and the legacy 7-step lessons (`data/lessons.ts`) were deleted ("The old
 7-step lessons are deleted").
@@ -1732,7 +1735,8 @@ middle of a laptop screen while a long one still scrolls from the top.
 differently:
 
 - **Route** — `utils/focus-routes.ts`'s `isFocusRoute()` for screens that are
-  nothing but a task from the moment you land: `/sections/:id`, `/placement-test/:subject`.
+  nothing but a task from the moment you land: `/sections/:id` (and, until 7 Oct 2026,
+  `/placement-test/:subject`).
   (It tested `startsWith("/lessons/")` with the trailing slash for the old 7-step
   lessons, so the `/lessons` LIST stayed an ordinary page; that path only redirects
   now.)
@@ -1761,13 +1765,14 @@ hooks in `hooks/use-focus-mode.ts`:
 | --- | --- | --- |
 | Lesson section (`/sections/:id`) | hidden | **available** |
 | Mock exam, while answering | hidden | blocked |
-| Placement test (`/placement-test/:subject`) | hidden | blocked |
+| Game match (`/game/create`, `/game/play/:id`) | hidden | blocked |
 | Roadmap onboarding lock | hidden | blocked |
 | Everything else, incl. `/exam` intro and results | shown | available |
 
 `useFocusMode()` answers "hide the navigation"; `useMentorBlocked()` answers "is
 the student being measured". The second is a strict subset — `isAssessmentRoute`
-in `utils/focus-routes.ts` is the placement test only, ORed with the store's
+in `utils/focus-routes.ts` is the game match only (the placement test, its first
+route, was deleted on 7 Oct 2026), ORed with the store's
 `focusMode` flag (which nothing but `MockExam` sets; if that ever changes, this
 rule needs its own flag rather than borrowing that one).
 
@@ -1856,7 +1861,8 @@ none before this — survivable only because the nav was still there to escape
 through. It now passes `confirmExit`, which shows a two-tap confirm first,
 because leaving discards the attempt.
 
-`PlacementTestRunner` takes an opt-in `focus` prop that **defaults to false**:
+(`PlacementTestRunner` and its route were deleted on 7 Oct 2026; the next two
+paragraphs about it are history.) `PlacementTestRunner` took an opt-in `focus` prop that **defaulted to false**:
 the survey's `WeaknessStep` renders the same component inline inside a step card,
 where a full-screen takeover would swallow the survey itself. Only the
 `/placement-test/:subject` route passes `focus`.
@@ -4395,19 +4401,9 @@ grown past a phone screen. Note the onboarding lock made a nav row nearly
 pointless here anyway — `ShellLayout` hides all chrome on `/roadmap` until the
 pledge has been seen, so the student who most needs a way back never had one.
 
-**Nothing books a placement test any more**, so `pendingPlacementTests` is only
-ever non-empty for an account that scheduled one before that was removed. The
-pending card, `schedulePlacementTest`/`resolvePlacementTest`,
-`/placement-test/:subject` and `PlacementTestRunner` all still work and were left
-in place — the route is reachable by URL and by that card. Its `scheduledTests`
-filter (entries with a truthy `scheduledDate`) stays as a guard: undated entries
-can no longer be created, but one left in a browser from the scrapped scheduling
-work would otherwise render `Invalid Date`.
-
-`PlacementTestRunner`'s `focus={false}` mode now has no caller —
-`placement-test-page.tsx` always passes `focus`. The dual-mode branch is kept
-rather than collapsed, so the inline mode is there if a test returns to the
-survey.
+**The placement test and its "Pending Placement Tests" card are DELETED (7 Oct
+2026)**, with the 10 mock-exam questions it drew from. See "The 10 mock-exam
+questions and the placement test are deleted" near the end of this file.
 
 **Progress dashboard** (`features/progress`) — score hero (SVG donut), Recharts
 trend line + bar chart, subject breakdown w/ sparklines, focus areas, activity
@@ -7227,8 +7223,8 @@ is larger and is fetched when opened.
 
 **Deleted:** `src/data/sections.ts`, `src/data/papers/math-2025.ts`, `english-2025.ts`,
 `english-drills.ts`, `content/sections-papers.json` and `content:export --from-code`.
-`check:quiz` checked game questions only (since the game move, the mock-exam questions);
-`check:content` and the editor check sections and papers.
+`check:quiz` checked game questions only (then the mock-exam questions, until it was
+deleted with them); `check:content` and the editor check sections and papers.
 
 **Bundle, measured on the same machine:** the first screen (entry + every modulepreload,
 gzip) went **268 KB → 238 KB** (268,400 → 237,998 bytes). The 17 KB `sections-*.js` preload
@@ -7326,9 +7322,8 @@ subject, like every kind. The page explains the pool's rule above the list (`tip
 `gameQuestionsFor()` and its fallback to the mock-exam questions are gone: every subject the
 fallback covered has a pool.
 
-**Deleted:** `src/data/game-questions.ts`. **`check:quiz` now checks `MOCK_QS`**
-(`data/questions.ts`, the generated papers, placement test and KruAI's catalog), the last
-question content in code; `check:content` covers the five database kinds.
+**Deleted:** `src/data/game-questions.ts`. `check:quiz` then checked `MOCK_QS` alone,
+until both were deleted the same day; `check:content` covers the five database kinds.
 
 **The move (done 7 Oct 2026)**: `content/game-questions.json` (4 pools, 120 questions, 0
 errors, 0 warnings, and nothing the editor's Save would change) was imported by the owner with
@@ -7405,7 +7400,8 @@ What changed around them:
   soon". Today that is biology and maths, exactly as before.
 - **KruAI's catalog** lost the old lessons, their flashcards and practice questions, and
   the `/lessons/` screen chunk. The prompt went **18,835 → 17,587** characters on Home and
-  **23,656 → 22,229** on a section page (budget 24,000). `bi()` stays for `MOCK_QS`.
+  **23,656 → 22,229** on a section page (budget 24,000). (`bi()` stayed for `MOCK_QS`
+  until both were deleted the same day.)
 - **The 3D brain model lives on** in section `biology-3-1-1`; the `brain-model-viewer` chunk is
   still its own, reached from `section-detail.tsx`.
 - **`completedSessions` and `contentLog` may still hold old ids** (`biology-brain`…) on a
@@ -7419,6 +7415,66 @@ links land on the Study page; on the roadmap biology's month links to Study and 
 to the exam tab, at 320 dark; section 3.1.1 still loads the 3D viewer; no sideways scroll;
 no page error), and step B's 36 still pass. KruAI: 14 checks (no old lesson, flashcard or
 practice line in the catalog; an old `lessonId` screen ref gives nothing).
+
+## The 10 mock-exam questions and the placement test are deleted (7 Oct 2026)
+
+The user's call ("Delete them"), after asking where the 10 mock-exam questions were and
+finding they appeared nowhere. `MOCK_QS` (`data/questions.ts`) was 10 prototype
+questions, 5 maths and 5 biology, with an English and a Khmer text each. Since 29 Sep no
+screen showed them: the generated papers (Tab B) had been emptied, and the survey's
+placement test had been removed. They were still read in three places nobody saw:
+
+- **the placement test** at `/placement-test/:subject`, reachable only from the roadmap's
+  "Pending Placement Tests" card, which only an account that booked a test before 29 Sep
+  could see;
+- **the old one-paper exam panel** (`generated-exam-panel.tsx`), kept unreferenced at the
+  user's earlier request;
+- **KruAI's catalog**, which listed them as "mock exam" items the student could not open.
+
+**Deleted:**
+- `MOCK_QS` and the `MockExamQuestion` type. `data/questions.ts` keeps `QUOTES` (Home's
+  daily quote);
+- `features/survey/components/placement-test-runner.tsx`, `placement-test-page.tsx`,
+  `pages/placement-test.tsx` and the route. `/placement-test/math` is now "not found";
+- `features/exam/components/generated-exam-panel.tsx`;
+- the roadmap's pending-tests card;
+- from the store: `pendingPlacementTests`, `schedulePlacementTest`,
+  `resolvePlacementTest` and the `PendingPlacementTest` type. An old payload carrying the
+  key is harmless: `merge()` spreads it into state where nothing reads it, and
+  `partializeState` drops it on the next write (checked in the browser). No `version` bump;
+- from sync: the push and pull of `pending_placement_tests`. **The table and any old rows
+  stay**: nothing reads or writes them, and dropping the table would be a migration for no
+  gain. `types/database.ts` and `db:check` still list it;
+- from KruAI: the catalog's mock-exam lines, `bi()` and `KM_STUB_RATIO` (nothing bilingual
+  is left in the catalog), the profile's `pendingPlacementTests` and its prompt line.
+  `buildCatalogBlock` lost its `lang` argument. A stale client still sending the field is
+  ignored;
+- from the route rules: `isAssessmentRoute` is the game match alone, and `isStudyRoute` no
+  longer counts the placement path;
+- `scripts/check-quiz.mjs` and `npm run check:quiz`: nothing is left for it to check;
+- 10 translation keys only that code used (`placementTest`, `yourScore`, `seeResult`,
+  `pendingTests`, `scheduledFor`, `overdue`, `takeTestNow`, and the already-unused
+  `testMeNow`, `scheduleForLater`, `confirmSchedule`).
+
+**Kept:** `FOUNDATION_SUBJECTS` in `utils/placement.ts` (the survey and the Study page's
+Foundation tab), the survey's "Not sure" note (`testComingSoon`), `ExamRunner` and the
+generated-papers tab (`GENERATED_EXAM_QUESTIONS` is empty; every card is "coming soon"),
+and `MockExamSubject` (`ExamQuestion.subj`). Earlier sections that describe the placement
+test, `MOCK_QS`, `bi()` or `check:quiz` are history.
+
+**Measured:** the first screen is **229,519 bytes gzip** (JS and CSS; it was 231,255 before).
+KruAI's prompt with the fixture's content: **17,409** characters on Home and **21,361** on
+`/sections/biology-3-1-1` (budget 24,000).
+
+**Verified:** `tsc -b`, oxlint (the one known warning), `check:digits`, `check:content` and
+the build clean; no chunk in `dist/` holds the old question text. Browser, Supabase blanked,
+13 checks at 390, 320 dark and 1280: with an old dated pending test stored, the roadmap shows
+no pending card and no placement link and still renders its mission; the old key is dropped
+from storage; `/placement-test/math` is "not found"; a generated paper says "coming soon"
+and opens no runner; Home renders; no sideways scroll; no page error. KruAI through
+`ssrLoadModule`, 6 checks: no mock-exam lines, a stale `pendingPlacementTests` never
+reaches the prompt, sections and decks still listed, physics still "no content", maths
+still covered, the section prompt under budget.
 
 ## Installable app: "add to home screen" and the two pop-ups
 
@@ -7728,7 +7784,7 @@ normally. `partialize` is a named function purely so `merge` can borrow its type
 
 **Survey persists across reloads**, same as Login — `surveyed` and `userData`
 are in `lib/store.ts`'s `partialize` (`lang`, `userName`/`userEmail`/`userAge`/
-`userLocation`, `userLanguage`, `surveyed`, `userData`, `pendingPlacementTests`,
+`userLocation`, `userLanguage`, `surveyed`, `userData`,
 `commitment`, `pledgeSeen`, `xp`, `level`, `streak`, `activityLog`, `tasks`,
 `tasksDate`, `examResults`,
 `conversations`, `activeConversationId`; `chatOpen`/`drawerOpen`/`pledgeOpen` deliberately
@@ -7754,15 +7810,13 @@ frozen at signing time and must not become a live read. And `monthsUntilExam()`
 is floored at 1 because callers divide by it. Rolling the app to the next cohort
 is a one-line edit to `BAC2_EXAM_DATE`.
 
-**Placement testing (math/physics/chemistry only) is a deliberate scope
-choice**, not a content oversight — biology has question data in `MOCK_QS` too,
-but the user scoped test-backed weakness detection to the 3 foundation subjects,
-so biology stays on the plain self-report toggle. Both test-backed paths — the
-inline test and scheduling one for later — have since been pulled out of the
-survey entirely (see the Survey section), so today the scope note is academic:
-**no subject gets test-backed weakness detection**, all three foundation subjects
-self-report. The scoring layer in `utils/placement.ts` is untouched and correct
-for when questions exist.
+**There is no placement test (deleted 7 Oct 2026).** It was scoped to the 3
+foundation subjects (math/physics/chemistry), and both of its paths, the inline
+test in the survey and scheduling one for later, had already been pulled out of
+the survey. **No subject gets test-backed weakness detection**; all three
+foundation subjects self-report. `utils/placement.ts` keeps only
+`FOUNDATION_SUBJECTS`. A future test would be written as database content, not
+brought back from git.
 
 Placement-test attempts
 never write into `examResults`/`addExamResult` — that array feeds Home's stat
@@ -8535,7 +8589,6 @@ considered done:
 npx tsc -b            # NOT `tsc --noEmit -p tsconfig.json` — this is a solution build
 npx oxlint            # NOT eslint — there is no eslint config in this repo
 npm run check:digits  # no Khmer numerals — see "Digits are Latin everywhere"
-npm run check:quiz    # authored quiz content — see below
 npm run check:content # content files under content/ (the database's five kinds)
 ```
 
@@ -8543,12 +8596,12 @@ The third is there because the first two cannot see it: to `tsc` and to oxlint,
 `"១២"` and `"12"` are both just strings. It is instant and has no dependencies,
 so there is no reason to skip it on a change that "obviously" touches no copy.
 
-**Since 7 Oct 2026 `check:quiz` checks the MOCK-EXAM questions only** (`MOCK_QS`,
-`data/questions.ts`): every other kind of question lives in the database, the game
-questions included, and `check:content` and the editor run the same rules on it
+**`check:quiz` IS DELETED (7 Oct 2026).** Its last job was the 10 mock-exam
+questions (`MOCK_QS`), deleted that day. Every question now lives in the
+database, and `check:content` and the editor run the same rules on it
 (`utils/content-check.ts`). The history below is why those rules exist.
 
-**`check:quiz` is the same argument for authored QUIZ AND PAST-PAPER content**
+**`check:quiz` was the same argument for authored QUIZ AND PAST-PAPER content**
 (`scripts/check-quiz.mjs`). It covered `PAST_PAPERS`,
 `GAME_QUESTIONS` and — since a section first carried LaTeX (`math-1-1-1`) —
 `SECTION_CONTENT`, walking every block's intro and outro, every item label, body

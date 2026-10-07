@@ -72,8 +72,8 @@ export const DIFFICULTIES: {
  *
  * ONE TEXT, shown whatever the app's language: content is Khmer (English for
  * the English subject) and is never translated. ExamQuestion keeps its
- * { en, km } pair because the mock exam and placement test share it, so the
- * one text fills both. A version from before 20261007000002 still holds a
+ * { en, km } pair because the generated mock exam shares it, so the one text
+ * fills both. A version from before 20261007000002 still holds a
  * pair; its Khmer is used.
  */
 export function toGameQuestions(body: readonly GameQuestionBody[]): ExamQuestion[] {

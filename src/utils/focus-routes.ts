@@ -1,6 +1,6 @@
 /**
- * Routes that ARE a task rather than a place — a lesson you're working through,
- * a placement test you're sitting. Focus mode strips every navigation affordance
+ * Routes that ARE a task rather than a place — a lesson section you're working
+ * through, a practice deck or quiz, a game match. Focus mode strips every navigation affordance
  * on these so the screen is the exercise and nothing else, the way Duolingo
  * treats a lesson.
  *
@@ -22,8 +22,8 @@ export function isFocusRoute(pathname: string): boolean {
     // The game review is a focus screen but NOT an assessment, so it has to be
     // named here rather than arriving through isAssessmentRoute below.
     isGameReviewRoute(pathname) ||
-    // A game match arrives here through isAssessmentRoute below, the same way the
-    // placement test does — it is measured, not merely a task.
+    // A game match arrives here through isAssessmentRoute below — it is
+    // measured, not merely a task.
     isAssessmentRoute(pathname)
   );
 }
@@ -117,23 +117,21 @@ export function isPracticeRunRoute(pathname: string): boolean {
  * "why is this step true?" mid-lesson is the product working as intended. An
  * assessment hides both.
  *
- * The placement test counts for a reason that's easy to miss — it is not graded,
- * it decides which subjects get marked weak. A student who looks up answers here
- * is marked strong in a subject they're weak in, and every phase of the roadmap
- * built from that is wrong, with nothing downstream to catch it.
+ * The placement test (/placement-test/:subject) was the first route here; it
+ * was deleted on 7 Oct 2026 with the mock-exam questions it drew from.
  *
  * The mock exam is absent for the same reason it's absent above: it isn't
  * identifiable by URL. use-focus-mode.ts ORs the store flag in.
  *
- * A GAME MATCH COUNTS, which is why this is no longer the placement test alone.
- * A timed duel against a scored opponent is a competition, not a lesson — "a
+ * A GAME MATCH COUNTS. A timed duel against a scored opponent is a
+ * competition, not a lesson — "a
  * mentor on tap measures the mentor" applies exactly, and unlike a lesson or a
  * practice quiz there is nothing being taught mid-match to ask about. Note this
  * widens the rule by PATHNAME, so the warning about borrowing the store's
  * focusMode flag for a second meaning stays satisfied.
  */
 export function isAssessmentRoute(pathname: string): boolean {
-  return pathname.startsWith("/placement-test/") || isGameRunRoute(pathname);
+  return isGameRunRoute(pathname);
 }
 
 /**
@@ -161,8 +159,7 @@ export function isStudyRoute(pathname: string): boolean {
   return (
     pathname.startsWith("/sections/") ||
     pathname === "/practice/review" ||
-    isPracticeRunRoute(pathname) ||
-    pathname.startsWith("/placement-test/")
+    isPracticeRunRoute(pathname)
   );
 }
 

@@ -213,8 +213,7 @@ export function AppShell({
                 menu button in one row (see app-header.tsx). XP/streak/coins are
                 the app's gamification loop, so it is on every ordinary page.
                 Gated on `!hideChrome` like the Sidebar: focus tasks, the mock
-                exam and placement test (a live counter there turns a test into
-                a scoreboard; FocusLayout's own `showStats` covers the lessons)
+                exam (a live counter there turns a test into a scoreboard; FocusLayout's own `showStats` covers the lessons)
                 and the roadmap's one-way onboarding lock all stay clear of it.
                 It is in normal flow, ABOVE the relative wrapper below, so the
                 page content starts under it and no page reserves room for a

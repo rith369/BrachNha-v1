@@ -145,15 +145,10 @@ export interface ContentDay {
  */
 export type ContentLog = Record<string, Record<string, ContentDay>>;
 
-export interface PendingPlacementTest {
-  subject: string;
-  scheduledDate: string;
-}
-
 // The pledge a student signs after seeing their roadmap. The grade/months/
 // hours/mission fields are a SNAPSHOT taken at signing time, not live reads of
 // userData — the promise has to keep saying what they actually agreed to even
-// if they later re-do a placement test or their plan shifts.
+// if their plan shifts later.
 export interface Commitment {
   /** "drawn" → `signature` is SVG path data; "typed" → it's the name itself. */
   kind: "drawn" | "typed";
@@ -594,11 +589,6 @@ export interface ExamQuestion {
   explanation?: string;
 }
 
-/** A question in the generated mock exam, where the subject is always known. */
-export interface MockExamQuestion extends ExamQuestion {
-  subj: MockExamSubject;
-}
-
 /**
  * ── A REAL MoEYS PAST PAPER ──────────────────────────────────────────────────
  *
@@ -607,7 +597,7 @@ export interface MockExamQuestion extends ExamQuestion {
  * shared passage, and a writing task nothing can mark automatically.
  *
  * These types sit BESIDE `ExamQuestion` rather than widening it. That type is
- * shared with MOCK_QS, the placement test and the Game feature, and a `skill` or
+ * shared with the generated mock exam and the Game feature, and a `skill` or
  * an `explanation` means nothing to any of them. `PaperQuestion` extends it
  * instead, so one flattened `ExamQuestion[]` can still be derived for the card's
  * readiness rule (see features/exam/papers.ts) with nothing authored twice.
@@ -837,8 +827,8 @@ export interface Competition {
   id: string;
   creatorId: string;
   creatorName: string;
-  /** A SubjectId, held as a plain string: lib/ never imports from features/,
-   *  the same reason PendingPlacementTest.subject is one. */
+  /** A SubjectId, held as a plain string: lib/ never imports from
+   *  features/. */
   subject: string;
   difficulty: GameDifficulty;
   /** The whole-quiz budget the creator chose. */

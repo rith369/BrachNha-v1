@@ -23,8 +23,7 @@ import {
  * TWO CARVE-OUTS, stated plainly so nobody "fixes" them into line:
  *
  *  1. QUESTION TEXT and the runner's subject kicker stay bilingual (`q.q[lang]`,
- *     `t[q.subj]`). That is authored data, shared with the placement test, and
- *     MOCK_QS's km column is visibly abbreviated against its en column —
+ *     `t[q.subj]`). That is authored data, shared with the Game feature;
  *     degrading content to satisfy a decision about chrome is a real cost.
  *  2. FocusLayout's own copy (the exit confirm) stays lang-driven. It is shared
  *     with the lesson flow, and it must not read Khmer on the exam and English
@@ -67,7 +66,7 @@ export interface ExamPaper {
   count: number;
 }
 
-/** A Tab B paper: its questions are in code (derived from MOCK_QS). */
+/** A Tab B paper: its questions are in code (data/generated-exams.ts). */
 export interface GeneratedPaper extends ExamPaper {
   questions: ExamQuestion[];
 }
@@ -225,20 +224,15 @@ export function papersForYear(
 
 /**
  * The newly-generated papers, one per subject — Tab B's replacement for the old
- * single fixed 10-question MOCK_QS test. SAME SHAPE as papersForYear(), just
+ * single fixed 10-question test. SAME SHAPE as papersForYear(), just
  * with no year to choose: there is one paper per subject rather than one per
  * subject per session, so the tab renders straight into the card list with no
  * "ជ្រើសរើសសម័យប្រឡង" chip row above it — the user asked for the identical card
  * style minus that section specifically.
  *
- * `GENERATED_EXAM_QUESTIONS` is DERIVED from MOCK_QS (grouped by subject), not
- * empty — math and biology therefore start live, and every other subject shows
- * ឆាប់ៗនេះ until real per-subject content lands in that file. See that file's
- * own header for why: retiring the old mixed-subject UI must not also retire
- * the only way a student could take an exam through this screen. The OLD
- * MOCK_QS test's intro/history UI (`components/generated-exam-panel.tsx`) is
- * kept in the codebase, unreferenced by ExamView, rather than deleted — see
- * that file's own header.
+ * `GENERATED_EXAM_QUESTIONS` is EMPTY today, so every subject shows ឆាប់ៗនេះ
+ * until real per-subject content lands in that file. The old 10-question test
+ * (MOCK_QS) and its intro/history panel were deleted on 7 Oct 2026.
  */
 export function generatedPapers(userLanguage: string | undefined): GeneratedPaper[] {
   return allSubjects(userLanguage).map((subject) => {

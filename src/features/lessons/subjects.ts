@@ -138,7 +138,7 @@ export const MINUTES_PER_LESSON = 3;
 
 /**
  * The two tabs. Foundation is derived from FOUNDATION_SUBJECTS (already exactly
- * math/physics/chemistry, and shared with the survey and placement flow) rather
+ * math/physics/chemistry, and shared with the survey) rather
  * than hardcoded again here, so the two lists cannot drift apart.
  */
 export function foundationSubjects(): SubjectMeta[] {

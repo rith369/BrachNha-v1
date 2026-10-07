@@ -231,7 +231,6 @@ export function ChatOverlay() {
     level,
     streak,
     examResults,
-    pendingPlacementTests,
   } = useBrachNhaStore(
     useShallow((s) => ({
       addChatMsg: s.addChatMsg,
@@ -248,7 +247,6 @@ export function ChatOverlay() {
       level: s.level,
       streak: s.streak,
       examResults: s.examResults,
-      pendingPlacementTests: s.pendingPlacementTests,
     }))
   );
 
@@ -456,7 +454,6 @@ export function ChatOverlay() {
           )
         : null,
       examCount: examResults.length,
-      pendingPlacementTests: pendingPlacementTests.map((p) => p.subject),
     };
 
     setLoading(true);

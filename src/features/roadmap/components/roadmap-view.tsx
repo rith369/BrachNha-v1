@@ -94,7 +94,6 @@ export function RoadmapView() {
     lang,
     userData,
     tasks,
-    pendingPlacementTests,
     commitment,
     setPledgeOpen,
   } = useBrachNhaStore(
@@ -102,7 +101,6 @@ export function RoadmapView() {
       lang: s.lang,
       userData: s.userData,
       tasks: s.tasks,
-      pendingPlacementTests: s.pendingPlacementTests,
       commitment: s.commitment,
       setPledgeOpen: s.setPledgeOpen,
     }))
@@ -110,11 +108,6 @@ export function RoadmapView() {
   const t = useT(lang);
   const navigate = useNavigate();
   const manifest = useContentManifest();
-
-  // Nothing in the survey books a placement test any more, so this is only ever
-  // non-empty for an account that scheduled one before that changed. Undated
-  // entries are dropped rather than rendered — `new Date("")` is Invalid Date.
-  const scheduledTests = pendingPlacementTests.filter((p) => p.scheduledDate);
 
   const hrs = GRADE_HOURS[userData.grade] || 2;
 
@@ -220,47 +213,6 @@ export function RoadmapView() {
           <div className="mt-1 text-[11px] text-muted">{t.basedOn}</div>
         </div>
       </div>
-
-      {/* Pending placement tests. Undated entries are filtered out rather than
-          rendered — `new Date("")` is Invalid Date, and a test with no day has
-          nothing useful to say here anyway. */}
-      {scheduledTests.length > 0 && (
-        <div className="mb-4 rounded-2xl border border-border bg-surface p-4 shadow-panel">
-          <div className="mb-3 flex items-center gap-1.5 font-heading text-sm font-extrabold">
-            📅 {t.pendingTests}
-          </div>
-          <div className="flex flex-col gap-2">
-            {scheduledTests.map((p) => {
-              const overdue = new Date(p.scheduledDate) <= new Date();
-              return (
-                <div
-                  key={p.subject}
-                  className="flex items-center gap-3 rounded-xl bg-purple/5 px-3 py-2.5"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-extrabold">
-                      {t[p.subject as TranslationKey] ?? p.subject}
-                    </div>
-                    <div
-                      className={`text-xs font-bold ${overdue ? "text-pink" : "text-muted"}`}
-                    >
-                      {overdue
-                        ? t.overdue
-                        : `${t.scheduledFor} ${new Date(p.scheduledDate).toLocaleDateString("en-GB")}`}
-                    </div>
-                  </div>
-                  <Link
-                    to={`/placement-test/${p.subject}`}
-                    className="shrink-0 rounded-full bg-brand px-2.5 py-1 text-[11px] font-extrabold text-white"
-                  >
-                    {t.takeTestNow}
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       {/* Daily Mission */}
       <div className="mb-4 rounded-2xl border border-border bg-surface p-4 shadow-panel">

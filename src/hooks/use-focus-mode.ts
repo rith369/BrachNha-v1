@@ -11,7 +11,7 @@ import {
  *
  * Two sources, because the two kinds of task announce themselves differently:
  *  • the ROUTE, for screens that are nothing but a task from the moment you land
- *    on them (a lesson, a placement test)
+ *    on them (a lesson section, a game match)
  *  • the STORE flag, for the mock exam, where /exam is an ordinary destination
  *    until you actually start answering
  *

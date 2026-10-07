@@ -8,7 +8,6 @@ import type {
   ContentLog,
   Commitment,
   Conversation,
-  PendingPlacementTest,
 } from "@/types";
 import type { InsertOf, Tables } from "@/types/database";
 // The local-calendar day key. This used to be a private helper here, carrying
@@ -177,30 +176,8 @@ export async function pushLocalState(userId: string, s: StoreState) {
     db.from("profiles").upsert(profileRow(userId, s), { onConflict: "id" })
   );
 
-  // ── pending placement tests: replace the set ──
-  // resolvePlacementTest() REMOVES an entry, so an upsert alone would leave a
-  // resolved test on the server forever. Delete-then-insert is correct here
-  // precisely because the local list is the complete authoritative set.
-  const pendingRows: InsertOf<"pending_placement_tests">[] =
-    s.pendingPlacementTests.map((p: PendingPlacementTest) => ({
-      user_id: userId,
-      subject: p.subject,
-      scheduled_date: p.scheduledDate || null,
-    }));
-  const keepSubjects = s.pendingPlacementTests.map((p) => p.subject);
-  await attempt("pending_placement_tests: prune", () => {
-    const q = db.from("pending_placement_tests").delete().eq("user_id", userId);
-    return keepSubjects.length
-      ? q.not("subject", "in", `(${keepSubjects.map(quoteIn).join(",")})`)
-      : q;
-  });
-  if (pendingRows.length) {
-    await attempt("pending_placement_tests: upsert", () =>
-      db
-        .from("pending_placement_tests")
-        .upsert(pendingRows, { onConflict: "user_id,subject" })
-    );
-  }
+  // pending_placement_tests is no longer written or read: the placement test
+  // was deleted on 7 Oct 2026. The table and any old rows stay (see AGENTS.md).
 
   // ── commitment: append-only history, newest is live ──
   if (s.commitment) {
@@ -500,7 +477,6 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
   if (!profile || !profile.display_name) return false;
 
   const [
-    pending,
     commitments,
     exams,
     sessions,
@@ -509,10 +485,6 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
     contentActivity,
     games,
   ] = await Promise.all([
-      db
-        .from("pending_placement_tests")
-        .select("*")
-        .eq("user_id", userId),
       db
         .from("commitments")
         .select("*")
@@ -630,10 +602,6 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
 
   useBrachNhaStore.setState({
     ...storeFromProfile(profile),
-    pendingPlacementTests: (pending.data ?? []).map((p) => ({
-      subject: p.subject,
-      scheduledDate: p.scheduled_date ?? "",
-    })),
     commitment: latestCommitment ? commitmentFromRow(latestCommitment) : null,
     examResults: (exams.data ?? []).map((r) => ({
       score: r.score,

@@ -11,7 +11,8 @@ import type { ExamQuestion } from "@/types";
  * so a subject with no entry below simply renders ឆាប់ៗនេះ (Coming Soon).
  *
  * All subjects currently start empty ("ឆាប់ៗនេះ" / Coming Soon) pending newly
- * authored curriculum-aligned generated papers. The old prototype math and biology
- * questions from MOCK_QS have been retired from this screen.
+ * authored curriculum-aligned generated papers. The 10 old prototype math and
+ * biology questions (MOCK_QS) were retired from this screen, then deleted on
+ * 7 Oct 2026.
  */
 export const GENERATED_EXAM_QUESTIONS: Record<string, ExamQuestion[]> = {};

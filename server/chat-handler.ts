@@ -993,7 +993,6 @@ export async function handleChat(req: Request): Promise<Response> {
     streak: 0,
     avgExamPct: null,
     examCount: 0,
-    pendingPlacementTests: [],
     ...(body.profile ?? {}),
   };
 

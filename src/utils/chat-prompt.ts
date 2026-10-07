@@ -3,7 +3,6 @@
 // bundler cannot resolve the alias. Keep it alias-free.
 import type { Lang, SectionContent } from "../types/index.js";
 import type { ScreenRef } from "./chat-screen.js";
-import { MOCK_QS } from "../data/questions.js";
 import {
   BAC2_ANSWER_RULES,
   BAC2_EXAMPLES,
@@ -83,8 +82,6 @@ export interface ChatProfile {
   /** Average mock-exam percentage, or null if they've never sat one. */
   avgExamPct: number | null;
   examCount: number;
-  /** Subjects with a placement test the student deferred. */
-  pendingPlacementTests: string[];
 }
 
 /** Strips control characters and caps length. Everything in ChatProfile is
@@ -124,34 +121,6 @@ function cleanList(values: unknown): string[] {
 function cleanNumber(value: unknown, min: number, max: number): number | null {
   if (typeof value !== "number" || !Number.isFinite(value)) return null;
   return Math.min(max, Math.max(min, Math.round(value)));
-}
-
-/**
- * Renders a bilingual content pair for a mentor that always answers in Khmer.
- *
- * KHMER LEADS, and the English is a fallback rather than the other way round.
- * This reversed once the prompt was measured: the old version emitted
- * `en [KH: km]` for every field, which put 5,999 Latin characters into a
- * 12,595-character block — roughly half the app's entire content library spent
- * on a language the mentor is forbidden to reply in (see ANSWER_LANG).
- *
- * The English is not dropped outright, because some Khmer entries are
- * abbreviated against their English, so deleting it would lose content rather
- * than duplication. The ratio was measured on the old 7-step lessons (57 pairs,
- * Khmer at a median 0.71x the English length, which is a COMPLETE rendering
- * since Khmer is denser per character); those were deleted on 7 Oct 2026, and
- * the mock-exam questions (MOCK_QS) are what still go through here.
- *
- * Tighten the ratio and full Khmer entries start dragging their English along
- * again; loosen it and a genuinely abbreviated entry loses the detail only the
- * English carries.
- */
-const KM_STUB_RATIO = 0.6;
-
-function bi(pair: { en: string; km: string }, lang: Lang): string {
-  if (lang !== "km") return pair.en;
-  if (pair.km.length >= pair.en.length * KM_STUB_RATIO) return pair.km;
-  return `${pair.km} [EN: ${pair.en}]`;
 }
 
 /**
@@ -322,7 +291,7 @@ export type DeckMap = Record<string, readonly { front: string; back: string }[]>
  */
 export type SectionMap = Record<string, SectionContent>;
 
-/** A practice deck's flashcards, as one chunk. Khmer-only content, so no bi(). */
+/** A practice deck's flashcards, as one chunk. */
 function deckChunk(deckKey: string, decks: DeckMap): RetrievedChunk | null {
   if (!isLookupKey(deckKey)) return null;
   if (!Object.hasOwn(decks, deckKey)) return null;
@@ -444,9 +413,6 @@ ${rendered}`;
  * The prose the skeleton drops is no longer simply lost, which is the change
  * this file was reorganised for: when the student is ON the section, the whole
  * thing arrives as pinned context instead. See sectionChunks().
- *
- * No `bi()` — SectionContent is Khmer-only by design (see types/index.ts), so
- * there is no English column to render and nothing to choose between.
  */
 function sectionLine(id: string, section: SectionContent): string {
   const labels = [section.intro, section.lesson, section.examples, section.notes]
@@ -501,20 +467,11 @@ const CATALOG_BUDGET_CHARS = 3_500;
  * their detail. Every item appears either way.
  */
 export function buildCatalogBlock(
-  lang: Lang,
   focusSubject?: string,
   decks: DeckMap = {},
   sections: SectionMap = {}
 ): string {
   const entries: CatalogEntry[] = [];
-
-  for (const question of MOCK_QS) {
-    entries.push({
-      subject: question.subj,
-      brief: `[${question.subj} · mock exam] ${bi(question.q, lang)}`,
-      full: `[${question.subj} · mock exam] Q: ${bi(question.q, lang)} Options: ${question.options.join(" / ")}. Correct: ${question.correct}`,
-    });
-  }
 
   for (const [deckKey, cards] of Object.entries(decks)) {
     if (!cards.length) continue;
@@ -559,7 +516,6 @@ export function buildCatalogBlock(
   // derived from whatever happened to be selected for one turn, the mentor would
   // deny the existence of a lesson on any question that did not surface it.
   const covered = new Set([
-    ...MOCK_QS.map((q) => q.subj),
     ...Object.keys(decks).map((key) => key.split("-")[0]),
     // Section ids are `{subject}-{chapter}-{lesson}-{section}`, so the subject
     // is the first segment. Without this, a subject whose only content is
@@ -627,11 +583,6 @@ export function buildStudentBlock(profile: ChatProfile): string {
     lines.push(`Mock exams sat: ${examCount}, averaging ${avgPct}%.`);
   } else {
     lines.push("They have not sat a mock exam in the app yet.");
-  }
-
-  const pending = cleanList(profile.pendingPlacementTests);
-  if (pending.length) {
-    lines.push(`Placement tests still not taken: ${pending.join(", ")}.`);
   }
 
   return `THE STUDENT
@@ -779,7 +730,7 @@ HONESTY. This matters more than sounding confident:
     BAC2_ANSWER_RULES[ANSWER_LANG],
     buildSocraticExampleBlock(ANSWER_LANG),
     buildExamplesBlock(ANSWER_LANG),
-    buildCatalogBlock(ANSWER_LANG, focusSubject, decks, sections),
+    buildCatalogBlock(focusSubject, decks, sections),
     buildContextBlock(context),
     buildStudentBlock(profile),
     `LENGTH: this is a chat bubble on a phone. A guided reply (🧭) stays under 80 words and ends

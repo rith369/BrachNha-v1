@@ -39,7 +39,6 @@ const routeModules = {
   lessons: () => import("@/pages/lessons"),
   sectionDetail: () => import("@/pages/section-detail"),
   subjectPath: () => import("@/pages/subject-path"),
-  placementTest: () => import("@/pages/placement-test"),
   practice: () => import("@/pages/practice"),
   practiceSubject: () => import("@/pages/practice-subject"),
   practiceRun: () => import("@/pages/practice-run"),
@@ -65,7 +64,6 @@ const LeaderboardPage = lazy(routeModules.leaderboard);
 const LessonsPage = lazy(routeModules.lessons);
 const SectionDetailPage = lazy(routeModules.sectionDetail);
 const SubjectPathPage = lazy(routeModules.subjectPath);
-const PlacementTestRoute = lazy(routeModules.placementTest);
 const PracticePage = lazy(routeModules.practice);
 const PracticeSubjectPage = lazy(routeModules.practiceSubject);
 const PracticeRunPage = lazy(routeModules.practiceRun);
@@ -254,10 +252,6 @@ export default function App() {
           <Route path="lessons/:lessonId" element={<Navigate to="/lessons" replace />} />
           <Route path="sections/:sectionId" element={<SectionDetailPage />} />
           <Route path="subjects/:subjectId" element={<SubjectPathPage />} />
-          <Route
-            path="placement-test/:subject"
-            element={<PlacementTestRoute />}
-          />
           {/* Four segments for the runner, not three, so it cannot collide with
               the lesson-list pattern above it — see pages/practice-run.tsx. */}
           <Route path="practice" element={<PracticePage />} />

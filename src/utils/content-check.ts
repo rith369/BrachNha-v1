@@ -29,7 +29,8 @@ import type {
  *   - scripts/check-content.mjs, on an import file and on what is published;
  *   - scripts/content-export.mjs, on the content leaving the code.
  *
- * They are the rules check:quiz and check:digits enforced while this content
+ * They are the rules check:quiz (deleted on 7 Oct 2026, once nothing was left
+ * for it to check) and check:digits enforced while this content
  * lived in src/: every `$…$` typeset for real with KaTeX, no Khmer inside a
  * formula, no stray `$`, `correct` one of the options, no two options alike,
  * no Khmer numerals, no em dashes. Neither script can see the database, so
@@ -246,7 +247,8 @@ function checkText(
 
   for (const segment of splitMath(text)) {
     if (segment.type === "text") {
-      // "$20" is money, not a broken formula; see scripts/check-quiz.mjs.
+      // "$20" is money, not a broken formula: the English paper says "The
+      // room costs $20", and a plain string cannot escape a dollar.
       const dollars = (segment.value.match(/\$/g) ?? []).length;
       const prices = (segment.value.match(/\$\d/g) ?? []).length;
       if (dollars > prices) {

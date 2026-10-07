@@ -118,10 +118,9 @@ const ROUTES = [
       'button:has-text("បន្ត")',
     ],
   },
-  // Tab B's math card specifically: GENERATED_EXAM_QUESTIONS derives from the
-  // old MOCK_QS test, so math (and biology) are the only two subjects with
-  // guaranteed content to click into — see data/generated-exams.ts. Tab B still
-  // runs its papers in place, so this is a two-click chain from the tab list.
+  // Tab B's math card. GENERATED_EXAM_QUESTIONS is empty, so every generated
+  // paper is "coming soon" and this photographs the notice a tap shows; once a
+  // generated paper has questions, the same two clicks reach the runner.
   {
     name: "focus-exam",
     path: "/exam/subjects",
@@ -150,7 +149,6 @@ const ROUTES = [
   // sections render nothing at all (by design, see work-photo.tsx), so this is a
   // layout check on the answer list.
   { name: "focus-game-review", path: "/game/review/seed-comp-2" },
-  { name: "focus-placement", path: "/placement-test/math" },
 ];
 
 // Five questions shared by the seeded competition and the seeded attempt, so
@@ -237,7 +235,6 @@ const seeded = (theme) => ({
       // No `months` — the timeline is derived from the fixed exam date now
       // (src/utils/exam-date.ts), not stored per student.
     },
-    pendingPlacementTests: [],
     commitment: null,
     // true so /roadmap is an ordinary page: ShellLayout hides all chrome there
     // while the pledge is unseen, which would make the nav screenshots useless.

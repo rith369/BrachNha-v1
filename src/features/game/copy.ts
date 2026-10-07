@@ -18,10 +18,9 @@ import type { Lang } from "@/types";
  *
  * THE QUESTIONS THEMSELVES ARE NOT TRANSLATED, on the user's explicit
  * instruction: competition content renders exactly as supplied. ExamQuestion
- * still carries an {en, km} pair because it is shared with MOCK_QS and the
- * placement test; game content may simply carry the same string in both, which
- * is what "no need to translate" means in practice — nobody is asked for a
- * second version.
+ * still carries an {en, km} pair because it is shared with the generated mock
+ * exam; game content carries the same one text in both, which is what "no need
+ * to translate" means in practice — nobody is asked for a second version.
  */
 export const GAME_COPY = {
   en: {

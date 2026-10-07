@@ -120,7 +120,6 @@ function syncRelevantChange(a: StoreState, b: StoreState): boolean {
     a.theme !== b.theme ||
     a.surveyed !== b.surveyed ||
     a.userData !== b.userData ||
-    a.pendingPlacementTests !== b.pendingPlacementTests ||
     a.commitment !== b.commitment ||
     a.pledgeSeen !== b.pledgeSeen ||
     a.xp !== b.xp ||

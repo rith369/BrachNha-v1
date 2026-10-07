@@ -74,8 +74,8 @@ const BrainModelViewer = lazy(() =>
  * have been a permanent fork down the middle of every step.
  *
  * What it does NOT re-invent: the task frame. FocusLayout, FocusButton and the
- * focus-styles size ladder are shared with the lesson flow, the mock exam and
- * the placement test, which is the whole reason those exist — three screens
+ * focus-styles size ladder are shared with the mock exam, the past papers and
+ * practice, which is the whole reason those exist — screens
  * hand-rolling their own progress bar is how they drifted apart the first time.
  *
  * KHMER-ONLY, like the rest of the Study feature. The content itself only exists

@@ -38,8 +38,7 @@ import { useLayoutEffect } from "react";
  * landing scroll.
  *
  * It is deliberately a no-op when nothing is found: a caller rendered outside a
- * `FocusLayout` (the survey's inline `PlacementTestRunner`, say) simply does
- * nothing rather than throwing.
+ * `FocusLayout` simply does nothing rather than throwing.
  */
 export function useFocusScrollTop(step: unknown) {
   useLayoutEffect(() => {
