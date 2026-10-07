@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 7 Oct 2026 — The 10 Old Mock-Exam Questions and the Placement Test Are Removed
 
-Commit: not committed yet. No database step.
+Commit: `9d94387`. No database step.
 
 **Why.** The app still carried 10 old sample questions (5 maths, 5 biology) from its first
 version. No screen showed them any more, and the only thing still using them was a
