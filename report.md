@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 13 Oct 2026: New Page Titles, No Sparkle Icons, Fewer Dashes
 
-Commit: `(pending)`. No database step.
+Commit: `2a60b93`. No database step.
 
 **Why.** On the Progress page the 📈 emoji showed as a solid purple square, because the
 title was painted with the purple colour and the emoji got painted too. Separately, the team
