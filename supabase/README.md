@@ -526,3 +526,18 @@ twice. Afterwards each game pool is at version 2:
 ```sql
 select key, version, item_count from public.content_items where kind = 'game' order by key;
 ```
+
+## `20261013000002`: the errors page
+
+Adds `client_error_fixes` (when the team marked an error message fixed) and
+three admin-only functions behind **/admin/errors**: the page's data, the
+menu badge's count, and "Mark fixed". An error that happens again after being
+marked fixed reopens on its own.
+
+Run it in the SQL editor, in one go, AFTER `20261001000001` and
+`20261002000001`. It is safe to run twice. Afterwards `npm run db:check` lists
+`client_error_fixes`, and this must be refused with only the publishable key:
+
+```
+POST {VITE_SUPABASE_URL}/rest/v1/rpc/admin_client_errors
+```

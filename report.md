@@ -15,6 +15,36 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 13 Oct 2026: Errors Page for the Team
+
+Commit: (filled in below). **Database step:** done. `20261013000002_error_review.sql` was
+applied to the live project on 13 Oct 2026.
+
+**Why.** When the app breaks on a student's phone, it already sends us an error report. But
+the only place to see them was a small "most frequent crashes" card on the Admin dashboard,
+with no way to say "this one is fixed" and nothing to tell you a new one had arrived. This
+was chosen instead of an outside service like Sentry, so student data stays in our own
+database.
+
+**What changed (admin accounts only, students see nothing new):**
+
+- **A new page, Admin → Errors.** One card per error, last 30 days: how many times it
+  happened, how many students hit it, and when it was first and last seen. It never shows
+  WHO.
+- **Mark fixed.** Once a fix is live, press it and the error moves down to "Marked fixed". If
+  the same error happens again later, it comes back to the top on its own with a "Back again"
+  label, so a fix that did not work cannot hide.
+- **Details and "Copy for the developer".** Opens which pages it happened on, the app
+  version, the phone's browser and the technical trace, and copies them as one block to send.
+- **A chart of errors per day**, last 14 days. A sudden jump usually means the latest update
+  broke something.
+- **The red number on the Admin menu now counts open errors too**, next to photo and mistake
+  reports.
+- The dashboard's crash card has a "See all errors" link.
+
+**Please re-test:** open Admin → Errors as an admin; mark
+one fixed and check the menu number drops; check the Khmer wording on the page.
+
 ## 13 Oct 2026: New Page Titles, No Sparkle Icons, Fewer Dashes
 
 Commit: `2a60b93`. No database step.

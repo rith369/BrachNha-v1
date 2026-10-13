@@ -71,6 +71,9 @@ const TABLES = [
   // publishable key answers 200 [] when it exists. Its functions are invisible
   // to this check.
   "friendships",
+  // The team's error review (20261013000002). RLS with no client policies, so
+  // a select answers 200 [] when it exists. Its functions are invisible here.
+  "client_error_fixes",
 ];
 
 /**

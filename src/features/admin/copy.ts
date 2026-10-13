@@ -182,6 +182,47 @@ const en = {
   endsAtLabel: (when: string) => `Ends ${when}`,
   noEnd: "No end date",
 
+  // ── /admin/errors ─────────────────────────────────────────────────────────
+  toolErrors: "Errors",
+  toolErrorsBlurb: "Errors students' phones reported. Mark them fixed.",
+  crashesAll: "See all errors",
+  errorsTitle: "Errors",
+  errorsBlurb:
+    "Errors students' phones reported in the last 30 days, one card per message. When the fix is live, press Mark fixed. If the same error happens again, it comes back here on its own.",
+  errorsDailyTitle: "Errors per day, last 14 days",
+  errorsDailyTip:
+    "How many errors were reported each day, and how many different signed-in students they came from. A sudden jump usually means the latest update broke something.",
+  errorsDailyErrors: "Errors",
+  errorsDailyStudents: "Students",
+  errorsOpenTitle: "Open",
+  errorsOpenTip:
+    "Errors not marked fixed yet, or that happened again after being marked fixed. Fix the ones that hit the most students first.",
+  errorsFixedTitle: "Marked fixed",
+  errorsFixedTip:
+    "Errors the team marked fixed that have not happened since. Each one leaves this list 30 days after it last happened.",
+  errorsEmpty: "No errors in the last 30 days. 🎉",
+  errorsOpenEmpty: "Nothing open. 🎉",
+  errorCount: (n: number) => `${n} ${n === 1 ? "time" : "times"}`,
+  errorWho: (students: number, guests: number) =>
+    `${students} ${students === 1 ? "student" : "students"}` +
+    (guests > 0 ? ` · ${guests} from guests` : ""),
+  errorWeek: (n: number) => `${n} in the last 7 days`,
+  errorSeen: (first: string, last: string) => `First ${first} · Last ${last}`,
+  errorBack: "Back again",
+  errorFixedOn: (when: string, since: number) =>
+    since > 0
+      ? `Marked fixed ${when}, happened ${since} more ${since === 1 ? "time" : "times"} since`
+      : `Marked fixed ${when}`,
+  errorPages: "Pages",
+  errorVersion: "App version",
+  errorBrowser: "Browser",
+  errorStack: "Where in the code",
+  errorDetails: "Details",
+  errorHide: "Hide details",
+  markFixed: "Mark fixed",
+  copyForDev: "Copy for the developer",
+  copiedForDev: "Copied",
+
   // ── /admin/mistakes ───────────────────────────────────────────────────────
   mistakesTitle: "Mistake reports",
   mistakesBlurb:
@@ -432,6 +473,45 @@ const km: AdminCopy = {
   publishedBy: (name: string, when: string) => (name ? `ដោយ ${name} ${when}` : when),
   endsAtLabel: (when: string) => `បញ្ចប់ ${when}`,
   noEnd: "គ្មានថ្ងៃបញ្ចប់",
+
+  toolErrors: "កំហុសកម្មវិធី",
+  toolErrorsBlurb: "កំហុសដែលទូរស័ព្ទសិស្សបានរាយការណ៍។ សម្គាល់ថាបានកែ។",
+  crashesAll: "មើលកំហុសទាំងអស់",
+  errorsTitle: "កំហុសកម្មវិធី",
+  errorsBlurb:
+    "កំហុសដែលទូរស័ព្ទសិស្សបានរាយការណ៍ក្នុង 30 ថ្ងៃចុងក្រោយ មួយកាតសម្រាប់សារនីមួយៗ។ ពេលការកែបានដាក់ឱ្យប្រើហើយ សូមចុច «សម្គាល់ថាបានកែ»។ បើកំហុសដដែលកើតឡើងម្តងទៀត វានឹងត្រឡប់មកទីនេះវិញដោយខ្លួនឯង។",
+  errorsDailyTitle: "កំហុសក្នុងមួយថ្ងៃ 14 ថ្ងៃចុងក្រោយ",
+  errorsDailyTip:
+    "ចំនួនកំហុសដែលបានរាយការណ៍ក្នុងមួយថ្ងៃ និងចំនួនសិស្សខុសៗគ្នាដែលបានចូលគណនី ហើយបានជួបវា។ បើលោតឡើងភ្លាមៗ ជាធម្មតាមានន័យថាកំណែចុងក្រោយបានធ្វើឱ្យខូចអ្វីមួយ។",
+  errorsDailyErrors: "កំហុស",
+  errorsDailyStudents: "សិស្ស",
+  errorsOpenTitle: "មិនទាន់កែ",
+  errorsOpenTip:
+    "កំហុសដែលមិនទាន់សម្គាល់ថាបានកែ ឬកើតឡើងម្តងទៀតក្រោយពេលសម្គាល់ថាបានកែ។ សូមកែកំហុសដែលសិស្សជួបច្រើនជាងគេមុន។",
+  errorsFixedTitle: "បានសម្គាល់ថាកែហើយ",
+  errorsFixedTip:
+    "កំហុសដែលក្រុមការងារបានសម្គាល់ថាកែហើយ ហើយមិនទាន់កើតឡើងម្តងទៀតទេ។ កំហុសនីមួយៗចេញពីបញ្ជីនេះ 30 ថ្ងៃក្រោយពេលវាកើតឡើងចុងក្រោយ។",
+  errorsEmpty: "គ្មានកំហុសក្នុង 30 ថ្ងៃចុងក្រោយទេ។ 🎉",
+  errorsOpenEmpty: "គ្មានកំហុសដែលមិនទាន់កែទេ។ 🎉",
+  errorCount: (n: number) => `${n} ដង`,
+  errorWho: (students: number, guests: number) =>
+    `សិស្ស ${students} នាក់` + (guests > 0 ? ` · ភ្ញៀវ ${guests} ដង` : ""),
+  errorWeek: (n: number) => `${n} ដងក្នុង 7 ថ្ងៃចុងក្រោយ`,
+  errorSeen: (first: string, last: string) => `លើកដំបូង ${first} · ចុងក្រោយ ${last}`,
+  errorBack: "កើតឡើងម្តងទៀត",
+  errorFixedOn: (when: string, since: number) =>
+    since > 0
+      ? `សម្គាល់ថាបានកែ ${when} ប៉ុន្តែកើតឡើង ${since} ដងទៀតក្រោយមក`
+      : `សម្គាល់ថាបានកែ ${when}`,
+  errorPages: "ទំព័រ",
+  errorVersion: "កំណែកម្មវិធី",
+  errorBrowser: "កម្មវិធីរុករក",
+  errorStack: "ទីតាំងក្នុងកូដ",
+  errorDetails: "ព័ត៌មានលម្អិត",
+  errorHide: "លាក់ព័ត៌មានលម្អិត",
+  markFixed: "សម្គាល់ថាបានកែ",
+  copyForDev: "ចម្លងសម្រាប់អ្នកអភិវឌ្ឍន៍",
+  copiedForDev: "បានចម្លង",
 
   mistakesTitle: "របាយការណ៍កំហុស",
   mistakesBlurb:

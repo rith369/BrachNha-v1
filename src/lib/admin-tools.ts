@@ -3,7 +3,7 @@ import { clearPhotoFolders } from "./account-deletion";
 import type { AnnouncementTone } from "@/types/database";
 
 /**
- * The admin area's calls (/admin and /admin/students), over
+ * The admin area's calls (/admin, /admin/students, /admin/errors and more), over
  * supabase/migrations/20261002000001_roles_and_admin_tools.sql.
  *
  * NOTHING HERE IS THE SECURITY. Every function it calls checks is_app_admin()
@@ -564,6 +564,103 @@ function toKruaiOverview(raw: unknown): KruaiOverview | null {
       blockedByName: str(b.blocked_by_name),
     })),
   };
+}
+
+// ── Error review (/admin/errors) ────────────────────────────────────────────
+
+export interface ErrorDay {
+  day: string;
+  count: number;
+  students: number;
+}
+
+export interface ErrorGroup {
+  message: string;
+  /** Occurrences in the last 30 days. */
+  count: number;
+  count7d: number;
+  /** Signed-in students who hit it, and occurrences from guests. Never who. */
+  students: number;
+  guests: number;
+  firstSeen: string;
+  lastSeen: string;
+  /** When the team marked it fixed, or null if never. */
+  fixedAt: string | null;
+  /** Occurrences after fixedAt; null when never marked. */
+  sinceFix: number | null;
+  /** Happened after it was marked fixed, or was never marked. */
+  open: boolean;
+  /** The latest occurrence's details. */
+  route: string | null;
+  version: string | null;
+  stack: string | null;
+  userAgent: string | null;
+  /** Up to 5 pages it happened on, most frequent first. */
+  routes: string[];
+}
+
+export interface ErrorReview {
+  today: string;
+  daily: ErrorDay[];
+  groups: ErrorGroup[];
+}
+
+/** Checks admin_client_errors()'s jsonb field by field, like toDashboard. */
+function toErrorReview(raw: unknown): ErrorReview | null {
+  if (!isObj(raw)) return null;
+  return {
+    today: str(raw.today),
+    daily: list(raw.daily).map((d) => ({
+      day: str(d.day),
+      count: num(d.count),
+      students: num(d.students),
+    })),
+    groups: list(raw.groups)
+      .map((g) => ({
+        message: str(g.message),
+        count: num(g.count),
+        count7d: num(g.count_7d),
+        students: num(g.students),
+        guests: num(g.guests),
+        firstSeen: str(g.first_seen),
+        lastSeen: str(g.last_seen),
+        fixedAt: strOrNull(g.fixed_at),
+        sinceFix: g.since_fix === null || g.since_fix === undefined ? null : num(g.since_fix),
+        open: g.open === true,
+        route: strOrNull(g.route),
+        version: strOrNull(g.version),
+        stack: strOrNull(g.stack),
+        userAgent: strOrNull(g.user_agent),
+        routes: Array.isArray(g.routes)
+          ? g.routes.filter((r): r is string => typeof r === "string")
+          : [],
+      }))
+      .filter((g) => g.message !== ""),
+  };
+}
+
+export async function loadErrors(): Promise<AdminResult<ErrorReview>> {
+  const db = await client();
+  if (!db) return { ok: false, reason: "unconfigured" };
+  const { data, error } = await db.rpc("admin_client_errors");
+  if (error) {
+    devReport("admin_client_errors", error);
+    return { ok: false, reason: reasonOf(error) };
+  }
+  const review = toErrorReview(data);
+  return review ? { ok: true, data: review } : { ok: false, reason: "failed" };
+}
+
+/** Mark one error fixed as of now. It reopens on its own if it happens again. */
+export async function fixError(message: string): Promise<AdminResult<null>> {
+  const db = await client();
+  if (!db) return { ok: false, reason: "unconfigured" };
+  const { error } = await db.rpc("admin_fix_client_error", { p_message: message });
+  if (error) {
+    devReport("admin_fix_client_error", error);
+    return { ok: false, reason: reasonOf(error) };
+  }
+  return { ok: true, data: null };
 }
 
 export async function loadDashboard(): Promise<AdminResult<AdminDashboard>> {

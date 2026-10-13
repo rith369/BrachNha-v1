@@ -474,6 +474,23 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["client_errors"]["Insert"]>;
         Relationships: [];
       };
+      // 20261013000002_error_review.sql. When the team marked an error message
+      // fixed; it reopens if it happens again after that. No client policies:
+      // written by admin_fix_client_error() only.
+      client_error_fixes: {
+        Row: {
+          message: string;
+          fixed_at: string;
+          fixed_by: string | null;
+        };
+        Insert: {
+          message: string;
+          fixed_at?: string;
+          fixed_by?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["client_error_fixes"]["Insert"]>;
+        Relationships: [];
+      };
       app_events: {
         Row: {
           id: number;
@@ -803,6 +820,20 @@ export type Database = {
       admin_dashboard: {
         Args: Record<string, never>;
         Returns: Json;
+      };
+      // 20261013000002. The error review page, one jsonb document checked in
+      // lib/admin-tools.ts (toErrorReview); the badge count; mark one fixed.
+      admin_client_errors: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      admin_open_client_errors: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
+      admin_fix_client_error: {
+        Args: { p_message: string };
+        Returns: undefined;
       };
       admin_photo_reports: {
         Args: Record<string, never>;

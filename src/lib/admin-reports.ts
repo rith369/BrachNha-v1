@@ -83,6 +83,18 @@ export async function countOpenMistakes(): Promise<number | null> {
   return error ? null : (data ?? []).length;
 }
 
+/** How many error MESSAGES are open (happened after being marked fixed, or
+ *  never marked) in the last 30 days (20261013000002), for the menu badge.
+ *  Here for the same reason as countOpenMistakes. Null on failure, including
+ *  before the migration is applied, which leaves the badge without it. */
+export async function countOpenErrors(): Promise<number | null> {
+  const db = await client();
+  if (!db) return null;
+  const { data, error } = await db.rpc("admin_open_client_errors");
+  devReport("count errors", error);
+  return error || typeof data !== "number" ? null : data;
+}
+
 /** Open reports, one entry per photo, newest report first, each with a link. */
 export async function listReportedPhotos(): Promise<Result<ReportedPhoto[]>> {
   const db = await client();

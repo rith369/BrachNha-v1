@@ -20,8 +20,8 @@ import { useIncomingRequests } from "@/lib/friend-requests";
 /** The team's row, into the /admin hub (its Students and Photo reports pages
  *  light it too, by prefix). Not in lib/nav-items.ts: it is not a destination
  *  every student has, and only an admin account (decided by the database, see
- *  lib/admin-status.ts) ever renders it. The badge counts open photo reports plus
- *  questions with open mistake reports. */
+ *  lib/admin-status.ts) ever renders it. The badge counts open photo reports,
+ *  questions with open mistake reports, and open errors (/admin/errors). */
 const ADMIN_ITEM: NavItem = {
   id: "admin",
   href: "/admin",
@@ -151,7 +151,9 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
               <NavRow
                 item={ADMIN_ITEM}
                 onNavigate={onNavigate}
-                badge={(admin.openReports ?? 0) + (admin.openMistakes ?? 0)}
+                badge={
+                  (admin.openReports ?? 0) + (admin.openMistakes ?? 0) + (admin.openErrors ?? 0)
+                }
               />
             </div>
           </>

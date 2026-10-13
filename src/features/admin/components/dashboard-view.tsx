@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { BookOpen, Bot, ChevronRight, Flag, Megaphone, ShieldAlert, Users } from "lucide-react";
+import {
+  BookOpen,
+  Bot,
+  Bug,
+  ChevronRight,
+  Flag,
+  Megaphone,
+  ShieldAlert,
+  Users,
+} from "lucide-react";
 import {
   CartesianGrid,
   Legend,
@@ -101,6 +110,7 @@ function ToolLink({
   title,
   blurb,
   count,
+  className = "",
 }: {
   to: string;
   icon: typeof Users;
@@ -108,9 +118,10 @@ function ToolLink({
   title: string;
   blurb: string;
   count: string | null;
+  className?: string;
 }) {
   return (
-    <Link to={to} className={`flex items-center gap-3 ${CARD} ${PRESS}`}>
+    <Link to={to} className={`flex items-center gap-3 ${CARD} ${PRESS} ${className}`}>
       <span
         className={`flex size-11 shrink-0 items-center justify-center rounded-xl border border-border text-ink ${fill}`}
       >
@@ -201,12 +212,13 @@ function DailyChart({ data, lang }: { data: AdminDashboard["daily"]; lang: Lang 
  *  (say, its migration not applied yet), each tool must still be one tap from
  *  the menu.
  *
- *  SIX CARDS and none spans, so neither grid ever holes: md is three rows of
- *  2, xl two rows of 3. (With five, Students spanned two columns to make the
- *  rows come out even; the Content card made that unnecessary.) */
+ *  SEVEN CARDS: the first six never span, so md is three rows of 2 and xl two
+ *  rows of 3, and the seventh (Errors) spans the whole row below them at both,
+ *  so neither grid ever holes. (With five, Students spanned two columns; the
+ *  Content card made that unnecessary.) */
 function Tools({ lang }: { lang: Lang }) {
   const c = ADMIN_COPY[lang];
-  const { openReports, openMistakes } = useAdminStatus();
+  const { openReports, openMistakes, openErrors } = useAdminStatus();
   return (
     <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
       <ToolLink
@@ -256,6 +268,17 @@ function Tools({ lang }: { lang: Lang }) {
         title={c.toolMistakes}
         blurb={c.toolMistakesBlurb}
         count={openMistakes ? c.openCount(openMistakes) : null}
+      />
+      {/* The seventh card spans the whole row (two columns at md, three at
+          xl), so neither grid holes. */}
+      <ToolLink
+        to="/admin/errors"
+        icon={Bug}
+        fill="bg-neo-red"
+        title={c.toolErrors}
+        blurb={c.toolErrorsBlurb}
+        count={openErrors ? c.openCount(openErrors) : null}
+        className="md:col-span-2 xl:col-span-3"
       />
     </div>
   );
@@ -383,6 +406,13 @@ function Dashboard({ data, lang }: { data: AdminDashboard; lang: Lang }) {
             ))}
           </ul>
         )}
+        <Link
+          to="/admin/errors"
+          className="mt-3 inline-flex items-center gap-1 text-xs font-extrabold text-purple"
+        >
+          {c.crashesAll}
+          <ChevronRight className="size-3.5" strokeWidth={2.5} />
+        </Link>
       </div>
     </div>
   );

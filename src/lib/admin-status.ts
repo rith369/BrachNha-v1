@@ -1,10 +1,16 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { useBrachNhaStore } from "./store";
-import { countOpenMistakes, countOpenReports, isAdmin, isOwner } from "./admin-reports";
+import {
+  countOpenErrors,
+  countOpenMistakes,
+  countOpenReports,
+  isAdmin,
+  isOwner,
+} from "./admin-reports";
 
 /**
- * Whether the signed-in account is an admin, and how many photo reports are
- * waiting, for the Admin row in the menu (sidebar-nav.tsx) and the /admin hub.
+ * Whether the signed-in account is an admin, and how many photo reports,
+ * mistake reports and errors are waiting, for the Admin row in the menu (sidebar-nav.tsx) and the /admin hub.
  *
  * THE DATABASE DECIDES. The app never compares an email: it asks
  * is_app_admin(), which since 20261002000001 is has_role('admin') over
@@ -29,6 +35,8 @@ interface AdminStatus {
   openReports: number | null;
   /** Questions with open mistake reports (20261002000005), or null. */
   openMistakes: number | null;
+  /** Open error messages, last 30 days (20261013000002), or null. */
+  openErrors: number | null;
 }
 
 const NOT_ADMIN: AdminStatus = {
@@ -36,6 +44,7 @@ const NOT_ADMIN: AdminStatus = {
   isOwner: false,
   openReports: null,
   openMistakes: null,
+  openErrors: null,
 };
 
 let status: AdminStatus = NOT_ADMIN;
@@ -65,10 +74,20 @@ function load(userId: string | null) {
     if (askedFor !== userId || !admin) return;
     const owner = await isOwner();
     if (askedFor !== userId) return;
-    emit({ isAdmin: true, isOwner: owner, openReports: null, openMistakes: null });
-    const [count, mistakes] = await Promise.all([countOpenReports(), countOpenMistakes()]);
+    emit({ isAdmin: true, isOwner: owner, openReports: null, openMistakes: null, openErrors: null });
+    const [count, mistakes, errors] = await Promise.all([
+      countOpenReports(),
+      countOpenMistakes(),
+      countOpenErrors(),
+    ]);
     if (askedFor !== userId) return;
-    emit({ isAdmin: true, isOwner: owner, openReports: count, openMistakes: mistakes });
+    emit({
+      isAdmin: true,
+      isOwner: owner,
+      openReports: count,
+      openMistakes: mistakes,
+      openErrors: errors,
+    });
   })();
 }
 
@@ -85,6 +104,13 @@ export function setOpenReports(count: number) {
 export function setOpenMistakes(count: number) {
   if (status.isAdmin && status.openMistakes !== count) {
     emit({ ...status, openMistakes: count });
+  }
+}
+
+/** The errors page reports the count it loaded, and every Fixed after that. */
+export function setOpenErrors(count: number) {
+  if (status.isAdmin && status.openErrors !== count) {
+    emit({ ...status, openErrors: count });
   }
 }
 

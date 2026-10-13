@@ -6383,8 +6383,9 @@ usage reporting, and add the two safety pieces an app for minors needs.
 
 OUR OWN SUPABASE, no vendor (the user's call). `20261001000001_telemetry.sql`:
 `client_errors` and `app_events`, RLS on with NO client policies, written only
-by two `security definer` functions. Nothing in the app reads them back; the
-owner reads them in the SQL editor (queries in `supabase/README.md`).
+by two `security definer` functions. The team reads errors on `/admin/errors` (see
+"Errors page" below) and events on the `/admin` dashboard; the SQL editor queries in
+`supabase/README.md` still work.
 
 - `reportError(err, context)` — production only, deduped by message, at most
   10 per page load. `log_client_error` is granted to `anon` TOO (a guest's crash
@@ -6781,6 +6782,45 @@ the badge, publishing with the em-dash and bad-link refusals, End now, the
 mistakes card and Fixed, no sideways scroll, no page error). The entry chunk is
 about 182KB gzip, with no SDK, KaTeX or question corpus.
 
+
+### Errors page (13 Oct 2026)
+
+`/admin/errors` (`features/admin/components/errors-view.tsx`, migration
+`20261013000002_error_review.sql`). `client_errors` had been filling since Phase 0, and the
+hub showed its top 20 messages of 7 days, but nobody could close one or notice a new one
+without opening the hub. The user chose this over Sentry, so no student data leaves Supabase.
+
+- **One card per MESSAGE**, the dashboard's own grouping, over the last 30 days (at most 100):
+  times, last 7 days, students (distinct signed-in) and guest reports, first and last seen.
+  **Nobody is named**: a count says how bad it is.
+- **"Fixed" is a TIMESTAMP, not a flag.** `client_error_fixes` (message, `fixed_at`,
+  `fixed_by`; RLS, no client policies) records when it was marked. An error is OPEN if it
+  happened after that, or was never marked, so a fix that did not work, or a bug that comes
+  back, reopens itself with a "Back again" chip and "happened N more times since". Marking
+  again moves the stamp.
+- **Details** (folded): pages (top 5), app version, browser, the stack, all of the LATEST
+  occurrence, plus "Copy for the developer", one text block. The stack is the minified
+  build's; no source-map decoding (deliberately skipped).
+- A 14-day bar chart (errors and students per day, Phnom Penh days).
+- **The menu badge adds open errors** to photo and mistake reports (`admin_open_client_errors()`,
+  the same rule and window as the page's `open`, so the two cannot disagree; in
+  `lib/admin-reports.ts` for the reason `countOpenMistakes` is). The page reports its count
+  back with `setOpenErrors()`, so a fix moves the badge with no second request.
+- **The hub has seven tool cards**: Errors spans the whole row below the six (`md:col-span-2
+  xl:col-span-3`), so neither grid holes. The dashboard's crash card links "See all errors".
+- Three functions, each admin only (42501) and granted to `authenticated` only:
+  `admin_client_errors()` (one jsonb, checked by `toErrorReview()`),
+  `admin_fix_client_error(message)` (22023 for an empty or over-500 message),
+  `admin_open_client_errors()`. An index on `(message, created_at desc)` serves the
+  per-message lookups.
+
+**Verified:** PGlite, the migration twice after `20261001000001`: 36 checks (refusals, the
+30-day window, counts, guests, latest details, route order, the 14 days, fix and reopen and
+re-mark, bad messages, grants, RLS, empty). **PGlite 0.3.x crashes on Windows** on any plpgsql
+`raise` ("table index is out of bounds"); use 0.2.17. Browser, Supabase faked through
+Playwright `route`: 35 checks at 390, 1280 and 320 dark Khmer (cards, chips, details, copy,
+Mark fixed and the badge following it, the hub card spanning, the link, a student refused
+with no error or count request, the empty state, no sideways scroll, no page error).
 
 ## Flashcards and quizzes move into the database (stage 1, 3 Oct 2026)
 
@@ -8769,6 +8809,14 @@ before deploying, or every subject's game says it has no questions.
 `20261007000001`; the code reads either shape, so it can ship before or after. Afterwards
 every game pool's current version holds one text per question:
 `select key, version from content_items where kind = 'game'` shows version 2 for each.
+
+**`20261013000002_error_review.sql`** (the Errors page) is APPLIED to the live project (13 Oct
+2026, checked: `db:check` lists `client_error_fixes` and all three functions refuse the
+publishable key). On a new project it must be applied AFTER
+`20261001000001` and `20261002000001`; the code can ship before or after it. Without it
+`/admin/errors` says it could not load and the badge leaves errors out (nothing else
+changes). Afterwards `db:check` lists `client_error_fixes`, and a publishable-key-only call
+to `/rest/v1/rpc/admin_client_errors` must be refused.
 
 **`20261013000001_friends.sql`** (Streak with Friends) is APPLIED to the live project
 (13 Oct 2026, checked: `db:check` passes, and all five functions plus the helpers refuse
