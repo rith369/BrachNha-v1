@@ -67,6 +67,10 @@ const TABLES = [
   "content_items",
   "content_versions",
   "content_drafts",
+  // Streak with Friends (20261013000001). Read-own, so a select with only the
+  // publishable key answers 200 [] when it exists. Its functions are invisible
+  // to this check.
+  "friendships",
 ];
 
 /**

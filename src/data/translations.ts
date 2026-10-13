@@ -211,6 +211,8 @@ export const T = {
       "KruAI is your personal tutor, so it needs an account to remember your questions.",
     loginRequiredGame:
       "A competition is played against other students, so it needs an account for them to find you.",
+    loginRequiredFriends:
+      "A shared streak is kept with a friend, so it needs an account for your friend to find you.",
     maybeLater: "Maybe later",
     signInToUnlock: "Sign in to unlock",
 
@@ -438,6 +440,8 @@ export const T = {
       "KruAI ជាគ្រូផ្ទាល់ខ្លួនរបស់អ្នក ដូច្នេះត្រូវមានគណនីដើម្បីចងចាំសំណួររបស់អ្នក។",
     loginRequiredGame:
       "ការប្រកួតគឺលេងជាមួយសិស្សដទៃ ដូច្នេះត្រូវមានគណនីដើម្បីឱ្យគេឃើញអ្នក។",
+    loginRequiredFriends:
+      "Streak រួមគ្នាត្រូវរក្សាជាមួយមិត្តភក្តិ ដូច្នេះត្រូវមានគណនីដើម្បីឱ្យមិត្តរកឃើញអ្នក។",
     maybeLater: "ទុកសិន",
     signInToUnlock: "ចូលគណនីដើម្បីបើកប្រើ",
 

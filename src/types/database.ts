@@ -522,6 +522,28 @@ export type Database = {
         Relationships: [];
       };
 
+      // 20261013000001_friends.sql. Read-own only; every write goes through
+      // the friend functions below.
+      friendships: {
+        Row: {
+          id: string;
+          requester_id: string;
+          addressee_id: string;
+          status: "pending" | "accepted";
+          created_at: string;
+          accepted_at: string | null;
+        };
+        Insert: {
+          requester_id: string;
+          addressee_id: string;
+          status?: "pending" | "accepted";
+          created_at?: string;
+          accepted_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["friendships"]["Insert"]>;
+        Relationships: [];
+      };
+
       // 20261002000001_roles_and_admin_tools.sql (it replaced app_admins). Who
       // has which role. No client policies: read only through has_role() and
       // the admin_* functions, written by admin_set_role() or the SQL editor.
@@ -936,6 +958,39 @@ export type Database = {
       admin_import_content: {
         Args: { p_items: Json; p_publish: boolean };
         Returns: { item_kind: ContentKind; item_key: string; outcome: "published" | "draft" | "skipped" }[];
+      };
+      // 20261013000001_friends.sql. Signed-in (Google) students only.
+      search_students: {
+        Args: { p_query: string };
+        Returns: {
+          id: string;
+          display_name: string;
+          relation: "none" | "sent" | "received" | "friends";
+        }[];
+      };
+      send_friend_request: {
+        Args: { p_user: string };
+        Returns: "sent" | "accepted";
+      };
+      respond_friend_request: {
+        Args: { p_id: string; p_accept: boolean };
+        Returns: undefined;
+      };
+      remove_friendship: {
+        Args: { p_id: string };
+        Returns: undefined;
+      };
+      my_friends: {
+        Args: { p_today: string };
+        Returns: {
+          id: string;
+          other_id: string;
+          display_name: string;
+          status: "pending" | "accepted";
+          outgoing: boolean;
+          since: string | null;
+          goal_days: string[];
+        }[];
       };
       // supabase/migrations/20260916000004_leaderboard.sql. Returns real
       // students only (never the caller) with public-safe columns.

@@ -15,6 +15,43 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 13 Oct 2026 — Streak with Friends Is Real
+
+Commit: not committed yet. No database step left: the owner ran
+`20261013000001_friends.sql` today, and the live project was checked (the new table is
+there, and every friend function refuses a caller who is not signed in).
+
+**Why.** The Streak with Friends page was a demo: one invented friend called "Dara", a
+made-up week, and a "Simulate friend completion" button. The app had no way to know who
+your friends are. Now it does.
+
+**What changed:**
+
+- **Students can add real friends.** On Streak with Friends, type a classmate's name (at
+  least 2 letters), tap Add, and they get a request. Nothing happens until they tap
+  Accept. Either of you can remove the other at any time.
+- **Each friend has their own shared streak.** A day counts only when BOTH of you finish
+  the daily goal (lesson + practice + flashcards). Every pair starts at 0 on the day you
+  became friends.
+- **The friends list** shows requests waiting for you, each friend with your shared streak
+  and whether they finished today, the search box, and the requests you sent.
+- **Tapping a friend** opens the shared page: the streak, today's goal for both of you
+  (with a link to your next task if you haven't finished), the last 7 days, your best
+  streak, and the date you became friends.
+- **The menu shows a number** on "Streak with Friends" when someone has asked to be your
+  friend.
+- **Gone:** the fake friend, the Simulate button, the Remind button (the app can't send
+  notifications yet) and the "Preview" tag.
+- Guests see a "sign in" panel instead. The privacy page now says who can see what.
+
+**Privacy, so the team knows:** any signed-in student can find another by name. They see
+only the name and a cartoon avatar, never an email or photo. A friend sees only which days
+you finished the goal since you became friends. At most 20 friends and 20 requests a day.
+
+**What to re-test (needs two Google accounts):** search for the other account by name and
+send a request; accept it on the other phone; finish the daily goal on both and check the
+streak goes up for both; remove the friend.
+
 ## 7 Oct 2026 — The 10 Old Mock-Exam Questions and the Placement Test Are Removed
 
 Commit: `9d94387`. No database step.

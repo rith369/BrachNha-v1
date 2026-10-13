@@ -7,6 +7,7 @@ import { useBrachNhaStore } from "@/lib/store";
 import { mainNavItems, featureNavItems, type NavItem } from "@/lib/nav-items";
 import { cn } from "@/utils/cn";
 import { useAdminStatus } from "@/lib/admin-status";
+import { useIncomingRequests } from "@/lib/friend-requests";
 
 /**
  * The nav list itself, with no shell around it. Rendered in two places and it
@@ -92,6 +93,7 @@ function NavRow({
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const lang = useBrachNhaStore((s) => s.lang);
   const admin = useAdminStatus();
+  const friendRequests = useIncomingRequests();
 
   return (
     <>
@@ -127,7 +129,13 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
         </div>
         <div className="flex flex-col gap-1">
           {featureNavItems.map((item) => (
-            <NavRow key={item.id} item={item} onNavigate={onNavigate} />
+            <NavRow
+              key={item.id}
+              item={item}
+              onNavigate={onNavigate}
+              // Friend requests waiting for this student (lib/friend-requests.ts).
+              badge={item.id === "friends" ? friendRequests : undefined}
+            />
           ))}
         </div>
 

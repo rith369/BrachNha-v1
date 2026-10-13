@@ -49,6 +49,7 @@ const routeModules = {
   roadmap: () => import("@/pages/roadmap"),
   streak: () => import("@/pages/streak"),
   streakFriends: () => import("@/pages/streak-friends"),
+  streakFriend: () => import("@/pages/streak-friend"),
 };
 
 const GamePage = lazy(routeModules.game);
@@ -85,6 +86,7 @@ const ProgressPage = lazy(routeModules.progress);
 const RoadmapPage = lazy(routeModules.roadmap);
 const StreakPage = lazy(routeModules.streak);
 const StreakFriendsPage = lazy(routeModules.streakFriends);
+const StreakFriendPage = lazy(routeModules.streakFriend);
 
 /**
  * Warms every split chunk once the browser is idle.
@@ -276,6 +278,7 @@ export default function App() {
           <Route path="roadmap" element={<RoadmapPage />} />
           <Route path="streak" element={<StreakPage />} />
           <Route path="streak/friends" element={<StreakFriendsPage />} />
+          <Route path="streak/friends/:friendId" element={<StreakFriendPage />} />
           {/* The team's admin area. Only admins see its menu row; access is
               decided by the database (user_roles, 20261002000001), see
               features/admin/components/admin-gate.tsx. */}

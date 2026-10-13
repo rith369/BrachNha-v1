@@ -32,11 +32,12 @@ import { GoogleButton } from "./google-button";
  *  worse than one that is simply unavailable. */
 const REASON: Record<
   AuthFeature,
-  "loginRequiredRoadmap" | "loginRequiredChat" | "loginRequiredGame"
+  "loginRequiredRoadmap" | "loginRequiredChat" | "loginRequiredGame" | "loginRequiredFriends"
 > = {
   roadmap: "loginRequiredRoadmap",
   chat: "loginRequiredChat",
   game: "loginRequiredGame",
+  friends: "loginRequiredFriends",
 };
 
 export function AuthPromptOverlay() {

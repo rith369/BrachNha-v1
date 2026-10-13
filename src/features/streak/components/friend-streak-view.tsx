@@ -1,16 +1,36 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import { useShallow } from "zustand/react/shallow";
+import { Trash2 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
+import { celebratedOn, markCelebrated } from "@/lib/streak-celebrated";
+import { removeFriendship, type FriendFail, type FriendRow } from "@/lib/friends";
 import { milestoneProgress, rankMilestones } from "@/utils/streak";
-import { sharedStreakToday, sharedToday } from "@/utils/streak-friends";
-import { useStreakCopy } from "../copy";
 import {
-  FRIEND,
-  SHARED_WEEK,
-  TODAY_ID,
-  TODAY_START,
-  YOU,
-} from "../friend-streak-demo-data";
+  myGoalOn,
+  pairStreak,
+  sharedDayStatus,
+  sharedToday,
+} from "@/utils/streak-friends";
+import { avatarSeedFor } from "@/utils/avatar-seed";
+import { addDaysKey, parseDayKey, todayKey } from "@/utils/day";
+import { cn } from "@/utils/cn";
+import { useStudyFeed } from "@/features/home/use-study-feed";
+import { taskHref } from "@/features/home/task-links";
+import {
+  bestStreakLabel,
+  dailyTaskLabel,
+  friendFailLabel,
+  friendsSinceLabel,
+  useStreakCopy,
+} from "../copy";
 import { SHARED_MILESTONES } from "../shared-milestones";
+import {
+  WEEKDAY_BY_INDEX,
+  type DailyTaskId,
+  type Participant,
+  type SharedWeekDay,
+} from "../types";
 import { FriendStreakHeader } from "./friend-streak-header";
 import { MilestoneCard } from "./milestone-card";
 import { MilestoneProgress } from "./milestone-progress";
@@ -20,86 +40,120 @@ import { SharedWeek } from "./shared-week";
 /** Matches the solo page: the 1.1s confetti keyframe plus its longest stagger. */
 const CELEBRATION_MS = 1400;
 
+const GOAL: DailyTaskId[] = ["lesson", "practice", "flashcards"];
+
 /**
- * The whole page's state: two booleans for today, one for the reminder, one for
- * the burst.
+ * One friend's shared streak: whose it is, whether today counted, the week
+ * behind it and the milestones ahead.
  *
- * EVERYTHING VISIBLE IS DERIVED FROM THE FIRST TWO — the count, the header
- * rings, the week's last cell, the goal rows, the milestone bar and the
- * milestone grid — so nothing on the page can disagree about whether today
- * counted. `sharedStreakToday()` is where the product rule actually lives: it
- * adds a day only when both are true, which is why finishing your own goal
- * leaves the number where it was.
+ * REAL since 13 Oct 2026 (it was a prototype with an invented "Dara" and a
+ * Simulate button). Two sources, and which is which matters:
  *
- * `finishDay` TAKES BOTH NEXT VALUES rather than each control flipping its own
- * flag, so the celebration fires on the transition into "both done" whichever
- * button got there second. The two can legitimately be pressed in either order,
- * and an `onComplete` that only knew about its own half would miss the case
- * where the friend was simulated first.
+ *  - YOUR days are this device's `activityLog`, which `completeTask()` writes
+ *    the moment the last goal task lands, so finishing a lesson shows here at
+ *    once rather than after a sync;
+ *  - YOUR FRIEND'S days are `friend.goalDays` from my_friends, which reach the
+ *    server a few seconds after their phone records them (and only once it is
+ *    online). useFriends() asks again whenever the app comes back to the front.
  *
- * NOTHING HERE TOUCHES THE STORE. The brief asked for a static prototype, and
- * `completeTask()` awards real XP and coins — wiring the button to it would pay
- * a student for pressing a demo. See ../friend-streak-demo-data.ts for what a
- * real version needs.
+ * The count is `pairStreak()`: the days both finished, from the day you became
+ * friends, counted with the solo streak's own rule.
+ *
+ * The parent keys this on the friend's id, so the once-a-day celebration check
+ * (a lazy initial state, the solo page's pattern) runs per friend.
  */
-export function FriendStreakView() {
-  const lang = useBrachNhaStore((s) => s.lang);
+export function FriendStreakView({
+  friend,
+  onRemoved,
+}: {
+  /** An ACCEPTED friendship (`since` set). */
+  friend: FriendRow & { since: string };
+  onRemoved: () => void;
+}) {
+  const { lang, userName, myId, activityLog, tasks, tasksDate } = useBrachNhaStore(
+    useShallow((s) => ({
+      lang: s.lang,
+      userName: s.userName,
+      myId: s.authUser?.id ?? "",
+      activityLog: s.activityLog,
+      tasks: s.tasks,
+      tasksDate: s.tasksDate,
+    }))
+  );
   const c = useStreakCopy(lang);
-  // Days already banked, read off the store so this page opens on the same
-  // number Home's stat pill, the StatBar and /streak show — see
-  // ../friend-streak-demo-data.ts.
-  const base = useBrachNhaStore((s) => s.streak);
+  const feed = useStudyFeed();
+  const today = todayKey();
 
-  const [day, setDay] = useState(TODAY_START);
-  const [reminded, setReminded] = useState(false);
-  const [celebrating, setCelebrating] = useState(false);
-  const timer = useRef<number | undefined>(undefined);
-
-  // Clears a pending timer if the student navigates away mid-burst, so the
-  // callback cannot fire against an unmounted component.
-  useEffect(() => () => window.clearTimeout(timer.current), []);
-
-  const finishDay = (you: boolean, friend: boolean) => {
-    const wasKept = day.you && day.friend;
-    setDay({ you, friend });
-    if (!wasKept && you && friend) {
-      setCelebrating(true);
-      window.clearTimeout(timer.current);
-      timer.current = window.setTimeout(() => setCelebrating(false), CELEBRATION_MS);
-    }
+  const you: Participant = {
+    name: userName || c.noName,
+    // The same face your friend sees for you: derived from your account id.
+    avatarSeed: avatarSeedFor(myId),
+  };
+  const them: Participant = {
+    name: friend.name || c.noName,
+    avatarSeed: avatarSeedFor(friend.otherId),
   };
 
-  const today = sharedToday(day);
-  const streak = sharedStreakToday(base, today);
+  const friendDays = new Set(friend.goalDays);
+  const day = { you: myGoalOn(activityLog, today), friend: friendDays.has(today) };
+  const todayState = sharedToday(day);
+  const streak = pairStreak(activityLog, friend.goalDays, friend.since, today);
 
-  // Today's cell in the week comes from live state, not the authored row, so
-  // the tracker and the goal card cannot drift apart.
-  const week = SHARED_WEEK.map((d) => (d.id === TODAY_ID ? { ...d, day } : d));
+  const [celebrating, setCelebrating] = useState(
+    () => todayState.kept && !celebratedOn(today, friend.id)
+  );
+  useEffect(() => {
+    if (!celebrating) return;
+    markCelebrated(today, friend.id);
+    const timer = window.setTimeout(() => setCelebrating(false), CELEBRATION_MS);
+    return () => window.clearTimeout(timer);
+  }, [celebrating, today, friend.id]);
 
-  const milestones = rankMilestones(SHARED_MILESTONES, streak);
-  const progress = milestoneProgress(SHARED_MILESTONES, streak);
+  const base = parseDayKey(today);
+  const week: SharedWeekDay[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const key = addDaysKey(base, -i);
+    const cell = { you: myGoalOn(activityLog, key), friend: friendDays.has(key) };
+    week.push({
+      id: WEEKDAY_BY_INDEX[parseDayKey(key).getDay()],
+      key,
+      day: cell,
+      status: sharedDayStatus(cell, {
+        isToday: key === today,
+        beforeStart: key < friend.since,
+      }),
+    });
+  }
+
+  // Your next open goal task, while your half of today is still open.
+  const todayTasks = tasksDate === today ? tasks : null;
+  const nextId = day.you ? undefined : GOAL.find((id) => !todayTasks?.[id]);
+  const next = nextId
+    ? { label: dailyTaskLabel(nextId, lang), href: taskHref(nextId, feed.items) }
+    : null;
+
+  const milestones = rankMilestones(SHARED_MILESTONES, streak.current);
+  const progress = milestoneProgress(SHARED_MILESTONES, streak.current);
 
   return (
     <div className="flex flex-col gap-4">
       <FriendStreakHeader
-        streak={streak}
-        today={today}
-        you={YOU}
-        friend={FRIEND}
+        streak={streak.current}
+        today={todayState}
+        you={you}
+        friend={them}
         celebrating={celebrating}
       />
 
-      <SharedGoalCard
-        today={today}
-        you={YOU}
-        friend={FRIEND}
-        reminded={reminded}
-        onComplete={() => finishDay(true, day.friend)}
-        onRemind={() => setReminded(true)}
-        onSimulateFriend={() => finishDay(day.you, true)}
-      />
+      <div className="-mt-1 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] font-bold text-muted">
+        <span>{bestStreakLabel(streak.best, lang)}</span>
+        <span aria-hidden>·</span>
+        <span>{friendsSinceLabel(friend.since, lang)}</span>
+      </div>
 
-      <SharedWeek week={week} todayId={TODAY_ID} you={YOU} friend={FRIEND} />
+      <SharedGoalCard today={todayState} you={you} friend={them} next={next} />
+
+      <SharedWeek week={week} todayKey={today} you={you} friend={them} />
 
       {/* Absent, not empty, once every rung is behind the pair. */}
       {progress && <MilestoneProgress progress={progress} />}
@@ -114,6 +168,68 @@ export function FriendStreakView() {
           ))}
         </div>
       </section>
+
+      <RemoveFriend friendshipId={friend.id} onRemoved={onRemoved} />
+    </div>
+  );
+}
+
+/** Two taps: the first arms it and says what is lost, the second removes. */
+function RemoveFriend({
+  friendshipId,
+  onRemoved,
+}: {
+  friendshipId: string;
+  onRemoved: () => void;
+}) {
+  const lang = useBrachNhaStore((s) => s.lang);
+  const c = useStreakCopy(lang);
+  const navigate = useNavigate();
+  const [armed, setArmed] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<FriendFail | null>(null);
+
+  async function remove() {
+    if (!armed) {
+      setArmed(true);
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    const r = await removeFriendship(friendshipId);
+    setBusy(false);
+    if (!r.ok) {
+      setError(r.reason);
+      return;
+    }
+    onRemoved();
+    navigate("/streak/friends", { replace: true });
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-1.5 pt-2">
+      <button
+        type="button"
+        onClick={() => void remove()}
+        disabled={busy}
+        className={cn(
+          "flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-extrabold transition",
+          armed
+            ? "border border-border bg-pink/30 text-text"
+            : "text-muted hover:text-text"
+        )}
+      >
+        <Trash2 className="size-3.5 shrink-0" strokeWidth={2.5} aria-hidden />
+        {c.removeFriend}
+      </button>
+      {armed && !error && (
+        <p className="text-center text-[11px] font-bold text-muted">{c.removeConfirm}</p>
+      )}
+      {error && (
+        <p role="alert" className="text-center text-[11px] font-bold text-muted">
+          {friendFailLabel(error, lang)}
+        </p>
+      )}
     </div>
   );
 }

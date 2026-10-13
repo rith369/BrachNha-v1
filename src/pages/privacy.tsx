@@ -34,6 +34,7 @@ import { Wordmark } from "@/components/shell/wordmark";
  *   error logs / events → lib/telemetry.ts (+ the 20261001000001 migration)
  *   battle photos       → lib/competition-photos.ts, lib/photo-reports.ts
  *   leaderboard name    → the leaderboard() function, 20260916000004
+ *   friends             → search_students() / my_friends() in 20261013000001
  *   account deletion    → lib/account-deletion.ts (+ 20261001000002)
  *   what admins see     → admin_students() in 20261002000001
  *   pausing KruAI       → admin_set_kruai_block() in 20261002000004
@@ -188,11 +189,14 @@ export default function PrivacyPage() {
             other devices, and to build a study plan that matches the subjects
             you said you find hard. We do not sell your data, we do not use it
             for advertising, and we do not share it with other students, with
-            two exceptions you can see in the app: your display name and study
-            numbers (XP, streak, study time) appear on the Leaderboard, and in a
+            three exceptions you can see in the app: your display name and study
+            numbers (XP, streak, study time) appear on the Leaderboard; in a
             Game battle the other student sees your score and any photos of
-            your working you add. You can report a photo that should not be
-            there, and we review every report.
+            your working you add; and in Streak with Friends, any signed-in
+            student can find you by your display name, and a friend you have
+            accepted sees which days you finished your daily goal since you
+            became friends. You can report a photo that should not be there,
+            and we review every report. You can remove a friend at any time.
           </p>
           <p>
             ដើម្បីរក្សាទុកវឌ្ឍនភាពរបស់អ្នក
@@ -201,8 +205,11 @@ export default function PrivacyPage() {
             និងមិនចែករំលែកជាមួយសិស្សដទៃទេ លើកលែងតែ៖
             ឈ្មោះ និងលេខសិក្សា (XP, Streak, ពេលរៀន) របស់អ្នកបង្ហាញលើតារាងចំណាត់ថ្នាក់
             ហើយក្នុងការប្រកួត សិស្សម្នាក់ទៀតឃើញពិន្ទុ
-            និងរូបថតការគណនាដែលអ្នកបន្ថែម។ អ្នកអាចរាយការណ៍រូបថតដែលមិនសមរម្យ
-            ហើយយើងពិនិត្យរាល់របាយការណ៍។
+            និងរូបថតការគណនាដែលអ្នកបន្ថែម។ ក្នុង Streak ជាមួយមិត្តភក្តិ
+            សិស្សដែលចូលគណនីអាចស្វែងរកអ្នកតាមឈ្មោះបាន
+            ហើយមិត្តដែលអ្នកបានទទួលយក ឃើញថ្ងៃដែលអ្នកបានបញ្ចប់គោលដៅប្រចាំថ្ងៃ
+            ចាប់តាំងពីថ្ងៃដែលអ្នកក្លាយជាមិត្តនឹងគ្នា។ អ្នកអាចរាយការណ៍រូបថតដែលមិនសមរម្យ
+            ហើយយើងពិនិត្យរាល់របាយការណ៍។ អ្នកអាចដកមិត្តចេញបានគ្រប់ពេល។
           </p>
         </Section>
 

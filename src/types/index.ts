@@ -25,7 +25,7 @@ export interface AuthUser {
 /** Which locked feature raised the login prompt. A union rather than a free
  *  string so the modal's copy table has to cover every case that can reach it —
  *  adding a feature here is a type error until its wording exists. */
-export type AuthFeature = "roadmap" | "chat" | "game";
+export type AuthFeature = "roadmap" | "chat" | "game" | "friends";
 
 /** One side of the sign-in conflict: enough to tell the two apart on screen
  *  without pulling either one down first. */

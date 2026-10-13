@@ -25,11 +25,12 @@ import { GoogleButton } from "./google-button";
 
 const REASON: Record<
   AuthFeature,
-  "loginRequiredRoadmap" | "loginRequiredChat" | "loginRequiredGame"
+  "loginRequiredRoadmap" | "loginRequiredChat" | "loginRequiredGame" | "loginRequiredFriends"
 > = {
   roadmap: "loginRequiredRoadmap",
   chat: "loginRequiredChat",
   game: "loginRequiredGame",
+  friends: "loginRequiredFriends",
 };
 
 export function LockedFeature({

@@ -1,16 +1,17 @@
-import { Bell, Check, Clock, Sparkles } from "lucide-react";
+import { Link } from "react-router";
+import { Check, Clock } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { useBrachNhaStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
 import type { SharedToday } from "@/utils/streak-friends";
 import {
+  continueTaskLabel,
   friendNeedsToFinishLabel,
-  remindLabel,
   useStreakCopy,
   waitingForLabel,
 } from "../copy";
-import type { Participant } from "../friend-streak-demo-data";
+import type { Participant } from "../types";
 
 /**
  * Today's goal, told as two rows rather than one progress bar.
@@ -21,44 +22,27 @@ import type { Participant } from "../friend-streak-demo-data";
  * rule has to prevent. Two independent states, each either done or not, and the
  * streak moves only when both say done.
  *
- * THREE CONTROLS, and they are deliberately three different weights:
- *   • "Complete Today's Goal" is the real primary — bg-brand, the app's
- *     established CTA. It is the only one a shipped version would keep.
- *   • "Remind Dara" is secondary and is the mechanic worth keeping from the
- *     ranked-list version this page replaced: it turns waiting into something
- *     the student can act on. Local state, forgets on reload — a real reminder
- *     is a notification the app does not send.
- *   • "Simulate friend completion" is DASHED AND LABELLED AS A PROTOTYPE
- *     CONTROL, because it stands in for another human being. Dressing it as an
- *     ordinary button would be the one genuinely dishonest thing on the page —
- *     a student could press it and believe they had made Dara do something.
- *
- * Each disappears rather than sitting disabled once it has nothing left to do,
- * the rule subject-card.tsx's zero-lesson tile and sidebar-nav.tsx's
- * `href: null` rows already follow.
+ * REAL since 13 Oct 2026. Your row is your own `tasks` (this device); your
+ * friend's is whether their goal day has reached the server. There is no
+ * button that completes anything: while your goal is open the card links to
+ * your next task, through the same features/home/task-links.ts the solo
+ * Streak page uses. The prototype's Remind and Simulate buttons are gone: the
+ * app sends no notifications, and nothing here may stand in for another person.
  */
 export function SharedGoalCard({
   today,
   you,
   friend,
-  reminded,
-  onComplete,
-  onRemind,
-  onSimulateFriend,
+  next,
 }: {
   today: SharedToday;
   you: Participant;
   friend: Participant;
-  reminded: boolean;
-  onComplete: () => void;
-  onRemind: () => void;
-  onSimulateFriend: () => void;
+  /** Your next open goal task, or null once yours is done. */
+  next: { label: string; href: string } | null;
 }) {
   const lang = useBrachNhaStore((s) => s.lang);
-  const userName = useBrachNhaStore((s) => s.userName);
   const c = useStreakCopy(lang);
-
-  const yourName = userName || you.name;
 
   return (
     <Card className="gap-3">
@@ -68,7 +52,7 @@ export function SharedGoalCard({
 
       <div className="flex flex-col gap-2">
         <GoalRow
-          name={yourName}
+          name={you.name}
           seed={you.avatarSeed}
           done={today.you}
           badge={c.youLabel}
@@ -86,9 +70,9 @@ export function SharedGoalCard({
         />
       </div>
 
-      {/* Only while the friend is outstanding. Once both are done the card has
-          nothing to wait for and the header is already celebrating. */}
-      {today.waitingOnFriend && (
+      {/* Only once you are done and the friend is not: before that, the thing
+          to do is your own goal, which the link below is for. */}
+      {today.you && today.waitingOnFriend && (
         <div className="rounded-xl border border-border bg-yellow/30 p-3">
           <div className="flex items-center gap-1.5 text-xs font-extrabold text-yellow">
             <Clock className="size-3.5 shrink-0" strokeWidth={2.5} aria-hidden />
@@ -100,53 +84,13 @@ export function SharedGoalCard({
         </div>
       )}
 
-      <div className="flex flex-col gap-2">
-        {!today.you && (
-          <button
-            type="button"
-            onClick={onComplete}
-            className="w-full rounded-2xl bg-brand px-4 py-3 text-sm font-extrabold text-white shadow-cta transition hover:brightness-105 active:scale-[0.98]"
-          >
-            {c.completeYours}
-          </button>
-        )}
-
-        {today.waitingOnFriend && (
-          <button
-            type="button"
-            onClick={onRemind}
-            disabled={reminded}
-            className={cn(
-              "flex w-full items-center justify-center gap-1.5 rounded-2xl px-4 py-2.5 text-sm font-extrabold transition active:scale-[0.98]",
-              reminded
-                ? "cursor-default border border-border bg-mint/30 text-text"
-                : "border border-border bg-surface text-purple hover:bg-purple/8"
-            )}
-          >
-            {reminded ? (
-              <Check className="size-4 shrink-0" strokeWidth={3} aria-hidden />
-            ) : (
-              <Bell className="size-4 shrink-0" strokeWidth={2.5} aria-hidden />
-            )}
-            {reminded ? c.reminded : remindLabel(friend.name, lang)}
-          </button>
-        )}
-      </div>
-
-      {today.waitingOnFriend && (
-        <div className="border-t border-border pt-3">
-          <button
-            type="button"
-            onClick={onSimulateFriend}
-            className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-border px-3 py-2 text-[11px] font-extrabold text-muted transition hover:text-purple"
-          >
-            <Sparkles className="size-3.5 shrink-0" strokeWidth={2.5} aria-hidden />
-            {c.simulateFriend}
-          </button>
-          <div className="mt-1.5 text-center text-[10px] font-bold text-muted">
-            {c.simulateNote}
-          </div>
-        </div>
+      {next && (
+        <Link
+          to={next.href}
+          className="w-full rounded-2xl bg-brand px-4 py-3 text-center text-sm font-extrabold text-white shadow-cta transition hover:brightness-105 active:scale-[0.98]"
+        >
+          {continueTaskLabel(next.label, lang)}
+        </Link>
       )}
 
       {/* The rule, restated where the decision is actually made. */}

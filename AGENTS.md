@@ -1433,15 +1433,13 @@ display name and numbers only — **not** a "profiles are readable by everyone"
 policy, which hands out email, age and location with it. Granted to
 `authenticated` only. See the Leaderboard section.
 
-**`/streak/friends` is now a SECOND screen waiting on that same function**, and
-it needs two things more. A **friendship model** — a one-sided "following" turns
-a SHARED streak into a stranger's progress bar you cannot influence, so it wants
-an invite/accept pair, which nothing in the schema has. And a **pair-owned
-streak row**, because the number belongs to neither student individually: it is
-a property of the relationship, and storing it on one side means two rows that
-can disagree. Build the read path once for both screens rather than twice — the
-friends board needs display name, avatar seed and today's goal-met flag, which
-is a superset of what the leaderboard asks for.
+**`/streak/friends` has its own cross-user read now** (13 Oct 2026,
+`20261013000001_friends.sql`): a `friendships` table with a request/accept
+pair, read-own RLS and no write policy, and `security definer` functions for
+search, requests and `my_friends()`, which returns a friend's name and goal days
+only. **There is no pair-owned streak row**: the pair streak is DERIVED on the
+device from both students' goal days, so it cannot disagree with them. See the
+Streak with Friends section.
 
 ### Content stays in `src/data/`
 
@@ -4809,10 +4807,9 @@ ranked together by `utils/leaderboard.ts`. Its own section follows.
 
 **Streak** (`features/streak`) — TWO routes measuring TWO DIFFERENT THINGS.
 `/streak` is the student's own solo streak (all store data since 1 Oct 2026 +
-the milestone maths in `utils/streak.ts`); `/streak/friends` is a SHARED streak with one friend,
-which only advances on days BOTH of them finish (`friend-streak-demo-data.ts` +
-`utils/streak-friends.ts`). Both take the COUNT itself from the store rather
-than authoring one; the surrounding state is demo data. Their own sections
+the milestone maths in `utils/streak.ts`); `/streak/friends` is a SHARED streak with each
+friend, which only advances on days BOTH of them finish (real since 13 Oct 2026:
+`friendships` in the database + `utils/streak-friends.ts`). Their own sections
 follow.
 
 **Profile** (`features/profile`) — identity row (Google photo, editable name),
@@ -5977,128 +5974,134 @@ sat near each other, and it still distinguishes the social half.
 `featureNavItems[0]`, still index 0, and Game by id — which is exactly why that
 lookup is by id rather than position. See its own comment.
 
-### Streak with Friends — a SHARED streak, and the rule is the whole feature
+### Streak with Friends — a SHARED streak, and it is REAL now (13 Oct 2026)
 
 `/streak/friends` fills the `friends` nav item that had sat as a disabled "Soon"
-placeholder since the beginning — the same way `/practice` filled `flashcards`.
+placeholder since the beginning. It was a prototype (an invented "Dara", a fake
+week, a Simulate button) until 13 Oct 2026, because the app had no idea what a
+friend is. **The one thing added to make it real is a friendship model**;
+everything the streak needs already existed in `daily_activity`.
 
-**IT SHIPPED ONCE AS SOMETHING ELSE AND WAS REPLACED WHOLESALE.** The first
-version ranked seven friends by their individual streaks — a small leaderboard.
-The user asked for the TikTok/Snapchat mechanic instead: one friend, one streak
-held jointly, which **advances only on days BOTH people finish their daily
-goal**. Those are opposite products. A leaderboard of separate streaks says
-"beat your friends"; this says "carry each other", and one person doing the work
-earns the pair nothing. `utils/streak-friends.ts`, the demo data and every
-component under it were rewritten rather than adapted; `friend-row.tsx`,
-`friends-summary.tsx`, `friends-view.tsx` and `friends-demo-data.ts` are
-deleted. **Don't reintroduce ranking here** — that is what `/leaderboard` is.
+**The rule is the whole feature: a day counts only when BOTH finished their
+daily goal.** One person doing the work earns the pair nothing. **Don't
+reintroduce ranking here**: an earlier version ranked friends by their own
+streaks, and "beat your friends" is what `/leaderboard` is for.
 
-**`sharedStreakToday(base, today)` is where the product rule actually lives**,
-and it is one line: `today.kept ? base + 1 : base`, where `kept` means both.
-Everything visible derives from it, so the count, the header rings, the week's
-last cell, the goal rows, the milestone bar and the grid cannot disagree about
-whether today counted.
+**The user's decisions (13 Oct 2026):**
+- **Many friends, one streak each**, capped at 20.
+- **Found by searching their NAME**, then the other student must Accept. (An
+  invite link + QR was offered as the safer option and declined.)
+- **No Remind button.** The app sends no notifications; it was removed rather
+  than faked.
+- **A new pair starts at 0** on the day they became friends. Earlier days both
+  happened to finish do not count.
 
-**`SharedDayStatus` is `kept | atRisk | broken`, and `atRisk` is only honest for
-TODAY.** The day is not over, so one person outstanding is a warning. On a PAST
-day the same combination means the streak actually broke. The demo week
-deliberately contains no such day, so the distinction never has to be drawn on
-screen — but a real implementation has to make it, and splitting that value in
-two is the first thing the type should grow.
+#### The database: `20261013000001_friends.sql`
 
-**`waitingOnFriend` and `waitingOnYou` are separate booleans, not one "who are
-we waiting for" enum**, because both can be true at once and an enum would force
-that case to pick a side.
+`friendships` (`requester_id`, `addressee_id`, `status` pending/accepted,
+`created_at`, `accepted_at`), one row per PAIR (a unique index on
+`least/greatest`). Both ids cascade from `profiles`, so account deletion needs
+no new code. **RLS: read-own only, no write policy.** Every write is a SECURITY
+DEFINER function that refuses with a `hint` (mapped to a sentence by
+`friendFailLabel()` in `features/streak/copy.ts`):
 
-**FOUR STATUS BRANCHES, NOT THREE** (`sharedStatusLine` in `copy.ts`). "Neither
-of us has started" and "I'm done, they aren't" are different situations and only
-one is the friend's fault; always naming the friend would tell a student who has
-not opened a lesson today that Dara is the problem. The brief's own two lines are
-branches 2 and 4 verbatim. Nothing scolds in any state — the same forward-only
-rule the leaderboard applies to the current user.
-
-**The brief contradicted itself, same as the solo page's did.** Its data section
-says today starts "Panha ✅ / Dara ⏳"; its interaction section then asks for a
-"Complete Today's Goal" button that changes Panha to completed — which cannot do
-anything if Panha is already done, and a button dead on arrival is the pattern
-this codebase avoids everywhere. **Today opens with BOTH outstanding**, which
-makes both prototype controls live, walks the whole loop, and still shows every
-line of the brief's copy, just sequenced. The at-risk framing is true from first
-paint either way, because the streak is at risk while anyone is outstanding.
-
-**THREE CONTROLS AT THREE DELIBERATE WEIGHTS:**
-
-| control | weight | why |
+| function | does | hints |
 | --- | --- | --- |
-| Complete Today's Goal | `bg-brand`, the app's real CTA | the only one a shipped version keeps |
-| Remind Dara | outlined secondary | the nudge mechanic kept from the deleted version at the user's request — it turns waiting into something the student can act on |
-| Simulate friend completion | **dashed, muted, labelled "Prototype only"** | it stands in for another human being |
+| `search_students(p_query)` | 2+ letters, at most 10 real (non-anonymous, named) students, not yourself; `%`/`_` escaped; name-starts-with first; returns id, name, relation (none/sent/received/friends) | |
+| `send_friend_request(p_user)` | `'sent'`, or `'accepted'` when they had already asked YOU. Advisory lock per pair | self, unknown, exists, limit, their_limit, too_many (20 a day or 20 waiting) |
+| `respond_friend_request(p_id, p_accept)` | addressee only; decline DELETES (they may ask again) | missing, limit, their_limit |
+| `remove_friendship(p_id)` | remove a friend (either side) or cancel a request you sent | missing |
+| `my_friends(p_today)` | every row you are in, with the other's name, `since` (acceptance as a Phnom Penh date) and THEIR goal days since then (max 400). `p_today` clamped like `leaderboard()` | |
 
-That third one is the one to not tidy. Dressing it as an ordinary button would be
-the single genuinely dishonest thing on the page — a student could press it and
-believe they had made Dara do something. Each control unmounts rather than
-sitting disabled once it has nothing left to do.
+`friend_count()` and `friend_eligible()` are helpers revoked from every client
+role. Only signed-in Google accounts can search or be found.
 
-**`finishDay(you, friend)` takes BOTH next values** rather than each control
-flipping its own flag, so the celebration fires on the transition into "both
-done" whichever button got there second. The two can legitimately be pressed in
-either order, and an `onComplete` that only knew its own half would miss
-friend-first. Both orders are covered by the verification standard below.
+**Safety, because search lets any signed-in student find any other** (they are
+mostly under 18): a result is a name and an id, never email, age, location or a
+photo (the avatar is `avatarSeedFor(id)`); nothing is shared before Accept; a
+friend sees only which days you met the goal since you became friends; anyone
+can remove a friend. The list page and `pages/privacy.tsx` both say who can see
+what. **Not built, and the obvious next step if this worries anyone:** a "don't
+let others find me by name" switch.
 
-**The header layout IS the argument.** The solo page centres one flame with the
-count under it; here the flame sits BETWEEN two avatars on a gradient rail that
-passes under both, so the number reads as a pair's before it reads as a number.
-The rail is a `z-0` bar behind the row rather than a border, because a border
-would stop at each edge instead of connecting them. Each avatar carries its own
-ring — mint once that person is done, amber while not — which is why the header
-needs no separate "who is outstanding" row. The badge slot under each face is
-always rendered even for the friend who has no badge, or the two columns differ
-in height and the flame drifts off the rail.
+**Verified in PGlite: 51 checks** (the migration twice; search escaping, limit
+and relations; every refusal and cap; reverse-request auto-accept; decline,
+cancel, remove; a stranger reads nothing; direct insert/update/delete change
+nothing; goal days only from `since`; the `p_today` clamp; `anon` refused
+everything; helpers not callable; cascade on account deletion). **Applied to the
+live project on 13 Oct 2026**; `db:check` lists `friendships`, and cannot see the
+functions.
 
-**The week is SHARED outcomes plus a two-dot strip**, not two rows of ticks. The
-brief sketched a table with a column each and then said it need not look like
-one. Each day is one indicator carrying the day's verdict — filled flame for
-both, outlined amber flame for one, cross for neither — with 4px dots underneath
-saying which of the pair finished, left-you right-friend, matching the header's
-avatar order. The dots read as texture at a glance, which is the intent; the full
-sentence is on each cell's `aria-label`, since neither a glyph nor two dots says
-anything out loud. **`broken` is muted, not red** — a day nobody managed is
-already a loss, and the destructive colour would turn a quiet week into a
-telling-off.
+#### The client
 
-**Every state is icon + words, never colour alone.** The whole page is one
-distinction repeated in four places, and it has to survive not being able to tell
-mint from amber.
+- **`lib/friends.ts`**: the five calls, each a `FriendResult<T>` with a reason
+  (`lib/competitions.ts`'s shape), checked field by field. NOT the sync layer.
+- **`lib/friend-requests.ts`**: the menu badge (requests waiting for you), a
+  module like `lib/admin-status.ts`. It does its own head-only count rather than
+  importing `lib/friends.ts`, because the menu is in the entry chunk and the rest
+  of the friend calls are not (checked in `dist/`).
+- **`features/streak/use-friends.ts`**: a module cache of `my_friends`, keyed by
+  user id, shared by both pages, refetched on every visit and when the app comes
+  back to the front (the friend's "done today" changes on THEIR phone).
+- **`utils/streak-friends.ts`**: `pairLog()` is the intersection of the two
+  students' goal days from `since`, shaped as an `ActivityLog`, and
+  `pairStreak()` runs the SOLO `currentStreak()`/`bestStreak()` on it, so the
+  pair streak follows exactly the solo rule (alive until today is over).
+  `SharedDayStatus` is `kept | atRisk | broken | before`: `atRisk` is TODAY only,
+  a past day not kept by both is `broken` (one or neither), `before` is a day
+  before the friendship.
+- **Your own days come from this device's `activityLog`** (fresher than the
+  server: `completeTask()` writes the goal the moment it lands). **The friend's
+  come from the server**, a few seconds after their phone syncs, and only once it
+  is online.
 
-**`SHARED_MILESTONES` is a SECOND ladder, not the solo one relabelled.** Same
-thresholds, different names — the solo rungs describe one student becoming
-something ("Beginner", "Monthly Master"), these describe a pair ("Study
-Partners", "Dedicated Duo"). Sharing one array and swapping labels was rejected:
-the two ladders are free to diverge the moment either page's rewards are tuned.
-It costs one file because `rankMilestones()` and `milestoneProgress()` take the
-array as an argument, and `MilestoneCard` / `MilestoneProgress` render whatever
-they are handed — that argument existed for exactly this.
+#### The screens
 
-**A CHILD PATH OF `/streak`, not a top-level `/friends`,** because it is the same
-idea seen a different way. No collision risk — the two differ by a static
-segment, unlike the `/lessons/:lessonId` versus bare `/lessons/:subjectId`
-ambiguity `pages/subject-path.tsx` documents. It is the one page in the pair that
-carries a **back link**, because it is reached from another page and its nav item
-is buried in the drawer; `/streak` is a destination and has nothing to go back
-from. A `<Link to="/streak">` rather than `navigate(-1)`: history could have come
-from anywhere, and this always means "up to my own streak".
+| route | screen |
+| --- | --- |
+| `/streak/friends` | requests for you (Accept/Decline), your friends (pair streak + their today), Add a friend (debounced name search), requests you sent (Cancel), who-sees-what |
+| `/streak/friends/:friendId` | one friend's shared streak; the id is the FRIEND'S account id, looked up in your own friendships, and an unknown one redirects to the list |
 
-**The count is the store's `streak`, not a third copy.** The two pages measure
-different things and are not required by logic to agree, but starting level is
-what makes the shared rule legible — the student sees the same number Home's
-pill and the StatBar show, and learns that HERE it moves only when Dara moves
-too. See the solo section for the bug that authoring a second number caused.
+Both share `components/friends-frame.tsx` (scroller, back link, title, bottom
+nav, and the gate): no Supabase at all shows one line ("needs an account") and
+fetches nothing, a guest gets `LockedFeature` (new `AuthFeature` `"friends"`)
+with the nav kept, and the children mount only for a signed-in student.
 
-**Reminders are local state and forget on reload, deliberately.** A real one is a
-notification: the app sends none, and sending the first needs a consent story
-nobody has designed. `friend-streak-demo-data.ts` carries the rest of what a real
-version needs, including the one that is genuinely hard — two people in two
-timezones have two "todays" and the pair needs one.
+The friend page keeps the prototype's design, fed real values:
+- **The header layout IS the argument**: the flame BETWEEN two avatars on a rail,
+  so the number reads as a pair's; each avatar ringed mint when done.
+- Under it, "Best: N days · Friends since …" (`formatKmDate` in Khmer).
+- **The goal card is two rows, never one bar**: "one of us finished" must not
+  read as half-way. While YOUR goal is open it links to your next task
+  (`features/home/task-links.ts`, as the solo page); once you are done and they
+  are not, "Waiting for …". There is no button that completes anything.
+- **The week is shared outcomes plus a two-dot strip** (left you, right friend).
+  `broken` is muted, not red. The "Before you were friends" legend shows only
+  when a cell uses it.
+- **`SHARED_MILESTONES` is a second ladder**, not the solo one relabelled.
+- **Celebration once per day PER PAIR**: `lib/streak-celebrated.ts` takes an
+  optional scope (`brachnha-streak-celebrated:{friendshipId}`).
+- **Remove friend** at the bottom, two taps.
+- **FOUR status lines** (`sharedStatusLine`): "neither started" and "I'm done,
+  they aren't" are different, and only one is the friend's doing. Nothing scolds.
+
+**Deleted:** `friend-streak-demo-data.ts` (`Participant` and `SharedWeekDay`
+moved to `features/streak/types.ts`), the page's `PreviewTag`, the Remind and
+Simulate buttons and their strings, and `sharedStreakToday()` (the count is
+derived from both logs now, not "store streak + 1").
+
+**Known limits:** two devices of the friend that have not synced make their day
+appear late (it still counts once it arrives, so a past "missed" cell can turn
+into a flame); everyone is assumed to be in Cambodia's day (`daily_activity`
+dates are device-local). Nothing is cheat-proof: like the leaderboard, every
+goal flag was written by the student's own device.
+
+**Verified in the browser** with the friend functions faked in memory and two
+accounts: 48 checks at 1280, 390 and 320 dark Khmer (guest panel with no fetch,
+the badge and accepting, search and send, the other side accepting, a pair of 3
+with today open, then 4 and one celebration, an unknown id redirecting, remove
+in two taps, no Khmer numerals, no sideways scroll, no page error), and
+`scripts/shots.mjs` on `streak-friends` at all nine widths.
 
 ### Profile's study calendar — and where the streak comes from now
 
@@ -6302,7 +6305,9 @@ they approved (the leaderboard explicitly EXCLUDED, they want it kept as is):
 replace every remaining demo screen with the student's own data, add error and
 usage reporting, and add the two safety pieces an app for minors needs.
 
-### No more invented numbers (except the leaderboard and Streak with Friends)
+### No more invented numbers (except the leaderboard)
+
+(Streak with Friends was the other exception until 13 Oct 2026; it is real now.)
 
 - **Grade Prediction** — `features/grade-prediction/real-prediction.ts`,
   `buildRealPrediction(input, today)`, a TOTAL object (the React Compiler rule
@@ -7650,11 +7655,10 @@ reads worse than a blank one.
 Document Library — the last disabled "Soon" item in the nav
 (`lib/nav-items.ts`), with no route or feature folder.
 
-**Streak-w/-Friends has left this list.** It is `/streak/friends` now, a real
-screen — see its section above. What is missing there is a BACKEND, not code:
-there is no friendship model, cross-user reads are the same blocker the
-leaderboard is waiting on, and a reminder has nowhere to go. Same state the
-past-papers tab and the practice decks were in, and by design.
+**Streak-w/-Friends has left this list**, backend included (13 Oct 2026): real
+friends, found by name, with a shared streak each. Still not built there:
+reminders (the app sends no notifications) and a "don't let others find me"
+switch.
 
 **Flashcards/Quiz has left this list.** It is `/practice` now, a real feature —
 see its section above. Its decks and quizzes are published from Admin → Content
@@ -7830,7 +7834,7 @@ past papers deserve a history of their own it should be a separate persisted
 field, not a widening of this one.
 
 **SUPERSEDED 1 Oct 2026: of the screens below, only the Leaderboard's sample
-cohort and Streak with Friends are still demo.** Grade Prediction, all of
+cohort is still demo** (Streak with Friends went real on 13 Oct 2026). Grade Prediction, all of
 Progress, the Streak page and the Game hero run on real data now (see "Phase 0"
 near the end of this file). The original decision, kept as history:
 **Grade Prediction, Leaderboard and Streak intentionally use fake, fixed demo
@@ -7872,9 +7876,9 @@ authored. **A new demo screen that displays XP, level, coins or streak has this
 same problem** and should read the store rather than invent one.
 
 **Every screen still on demo data carries `PreviewTag`** —
-`components/preview-tag.tsx`, a dashed "Preview · sample data" pill — on its own
-line under the title on Streak with Friends. (Grade Prediction lost it on
-1 Oct 2026, when it went real.) **Game and
+`components/preview-tag.tsx`, a dashed "Preview · sample data" pill. **No screen
+carries it now**: Streak with Friends, the last, lost it on 13 Oct 2026 when it
+went real, and Grade Prediction on 1 Oct 2026. **Game and
 Progress no longer carry it** — both removed at the user's request (17 Sep 2026)
 although Game's hero card and three Progress cards are still demo; those are the
 two recorded exceptions. Added
@@ -8716,6 +8720,15 @@ before deploying, or every subject's game says it has no questions.
 `20261007000001`; the code reads either shape, so it can ship before or after. Afterwards
 every game pool's current version holds one text per question:
 `select key, version from content_items where kind = 'game'` shows version 2 for each.
+
+**`20261013000001_friends.sql`** (Streak with Friends) is APPLIED to the live project
+(13 Oct 2026, checked: `db:check` passes, and all five functions plus the helpers refuse
+the publishable key). On a new project it must be applied BEFORE the code that uses it
+ships: without it the friends list says it could not load, search fails and
+the menu badge stays empty (nothing else breaks). Apply it in ONE run (it is one
+transaction). Afterwards `db:check` lists `friendships`, and a publishable-key-only call
+to `/rest/v1/rpc/search_students` must be refused. Then try it with two real Google
+accounts: search, request, accept, both finish the goal, remove.
 
 **The Game feature needs BOTH its migrations applied before db:check passes** —
 `20260913000001_competitions.sql` and

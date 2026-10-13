@@ -1,4 +1,7 @@
 import type { Lang } from "@/types";
+import type { FriendFail } from "@/lib/friends";
+import { parseDayKey } from "@/utils/day";
+import { formatKmDate } from "@/utils/khmer-dates";
 import type { DailyTaskId, WeekdayId } from "./types";
 
 /**
@@ -69,22 +72,56 @@ export const STREAK_COPY = {
     dailyGoal: "Daily goal",
     statusDone: "Completed",
     statusWaiting: "Not completed yet",
-    completeYours: "Complete Today's Goal",
-    yoursComplete: "Your goal is done",
-    remind: "Remind",
-    reminded: "Reminder sent",
-    // Marked as a demo control in the UI too — it is the one button on either
-    // streak page that stands in for another human being.
-    simulateFriend: "Simulate friend completion",
-    simulateNote: "Prototype only. Stands in for Dara finishing on her own device.",
 
     sharedWeek: "This Week Together",
     legendKept: "Both done",
-    legendAtRisk: "One left",
-    legendBroken: "Neither",
+    legendAtRisk: "Today, not done yet",
+    legendBroken: "Missed",
+    legendBefore: "Before you were friends",
 
     sharedMilestones: "Shared Streak Milestones",
     youLabel: "You",
+
+    // ── The friends list (/streak/friends) ──
+    friendsIntro:
+      "Keep a streak with each friend. A day counts only when you both finish your daily goal.",
+    requestsTitle: "Friend requests",
+    accept: "Accept",
+    decline: "Decline",
+    yourFriends: "Your friends",
+    noFriends: "No friends yet. Search for a classmate by name to start a shared streak.",
+    addFriend: "Add a friend",
+    searchPlaceholder: "Search by name",
+    searchHint: "Type at least 2 letters of their name.",
+    searchEmpty: "No student with that name.",
+    searching: "Searching...",
+    add: "Add",
+    requestSent: "Request sent",
+    cancel: "Cancel",
+    alreadyFriends: "Friends",
+    sentTitle: "Requests you sent",
+    waitingAccept: "Waiting for them to accept",
+    whoSees:
+      "Anyone signed in can find you by name. A friend sees only your name and the days you finished your goal.",
+    loading: "Loading...",
+    loadFailed: "Could not load your friends. Check your connection.",
+    retry: "Try again",
+    needsAccount: "Streak with Friends needs an account, and this copy of the app has none.",
+    removeFriend: "Remove friend",
+    removeConfirm: "Tap again to remove. Your shared streak will be lost.",
+    nowFriends: "They had already asked you. You are friends now!",
+    noName: "Student",
+    yourFriendsBack: "Your friends",
+
+    failSelf: "That is you.",
+    failUnknown: "That student can't be added.",
+    failExists: "You are already friends, or a request is waiting.",
+    failLimit: "You already have 20 friends. Remove one to add another.",
+    failTheirLimit: "They already have 20 friends.",
+    failTooMany: "You've sent a lot of requests. Try again tomorrow.",
+    failMissing: "That request is no longer there.",
+    failSignIn: "Sign in again to continue.",
+    failGeneric: "Something went wrong. Try again.",
   },
   km: {
     title: "Streak",
@@ -123,20 +160,56 @@ export const STREAK_COPY = {
     dailyGoal: "គោលដៅប្រចាំថ្ងៃ",
     statusDone: "បានបញ្ចប់",
     statusWaiting: "មិនទាន់បញ្ចប់",
-    completeYours: "បញ្ចប់គោលដៅថ្ងៃនេះ",
-    yoursComplete: "គោលដៅរបស់អ្នកបានបញ្ចប់",
-    remind: "រំលឹក",
-    reminded: "បានផ្ញើការរំលឹក",
-    simulateFriend: "សាកល្បងឲ្យមិត្តបញ្ចប់",
-    simulateNote: "សម្រាប់សាកល្បងតែប៉ុណ្ណោះ។ តំណាងឲ្យ Dara បញ្ចប់នៅលើទូរស័ព្ទរបស់គេ។",
 
     sharedWeek: "សប្តាហ៍នេះជាមួយគ្នា",
     legendKept: "បញ្ចប់ទាំងពីរ",
-    legendAtRisk: "នៅសល់ម្នាក់",
-    legendBroken: "គ្មាននរណា",
+    legendAtRisk: "ថ្ងៃនេះ មិនទាន់រួច",
+    legendBroken: "ខកខាន",
+    legendBefore: "មុនពេលជាមិត្ត",
 
     sharedMilestones: "ចំណុចសំខាន់ៗនៃ Streak រួមគ្នា",
     youLabel: "អ្នក",
+
+    // ── The friends list (/streak/friends) ──
+    friendsIntro:
+      "រក្សា Streak ជាមួយមិត្តម្នាក់ៗ។ ថ្ងៃមួយត្រូវបានរាប់ លុះត្រាតែអ្នកទាំងពីរបញ្ចប់គោលដៅប្រចាំថ្ងៃ។",
+    requestsTitle: "សំណើធ្វើជាមិត្ត",
+    accept: "ទទួលយក",
+    decline: "បដិសេធ",
+    yourFriends: "មិត្តភក្តិរបស់អ្នក",
+    noFriends: "មិនទាន់មានមិត្តភក្តិនៅឡើយទេ។ ស្វែងរកមិត្តរួមថ្នាក់តាមឈ្មោះ ដើម្បីចាប់ផ្ដើម Streak រួមគ្នា។",
+    addFriend: "បន្ថែមមិត្តភក្តិ",
+    searchPlaceholder: "ស្វែងរកតាមឈ្មោះ",
+    searchHint: "វាយឈ្មោះយ៉ាងហោចណាស់ 2 តួអក្សរ។",
+    searchEmpty: "រកមិនឃើញសិស្សដែលមានឈ្មោះនេះទេ។",
+    searching: "កំពុងស្វែងរក...",
+    add: "បន្ថែម",
+    requestSent: "បានផ្ញើសំណើ",
+    cancel: "បោះបង់",
+    alreadyFriends: "ជាមិត្តហើយ",
+    sentTitle: "សំណើដែលអ្នកបានផ្ញើ",
+    waitingAccept: "កំពុងរង់ចាំការទទួលយក",
+    whoSees:
+      "អ្នកដែលចូលគណនីអាចស្វែងរកអ្នកតាមឈ្មោះបាន។ មិត្តភក្តិឃើញតែឈ្មោះ និងថ្ងៃដែលអ្នកបានបញ្ចប់គោលដៅប៉ុណ្ណោះ។",
+    loading: "កំពុងទាញយក...",
+    loadFailed: "មិនអាចទាញយកមិត្តភក្តិបានទេ។ សូមពិនិត្យការភ្ជាប់អ៊ីនធឺណិត។",
+    retry: "ព្យាយាមម្តងទៀត",
+    needsAccount: "Streak ជាមួយមិត្តភក្តិ ត្រូវការគណនី ហើយកម្មវិធីនេះមិនទាន់មានទេ។",
+    removeFriend: "ដកចេញពីមិត្តភក្តិ",
+    removeConfirm: "ចុចម្តងទៀតដើម្បីដកចេញ។ Streak រួមគ្នានឹងបាត់។",
+    nowFriends: "គេបានស្នើមកអ្នករួចហើយ។ ឥឡូវអ្នកជាមិត្តនឹងគ្នាហើយ!",
+    noName: "សិស្ស",
+    yourFriendsBack: "មិត្តភក្តិរបស់អ្នក",
+
+    failSelf: "នោះគឺជាអ្នកផ្ទាល់។",
+    failUnknown: "មិនអាចបន្ថែមសិស្សនេះបានទេ។",
+    failExists: "អ្នកជាមិត្តនឹងគ្នារួចហើយ ឬមានសំណើកំពុងរង់ចាំ។",
+    failLimit: "អ្នកមានមិត្ត 20 នាក់ហើយ។ ដកម្នាក់ចេញ ដើម្បីបន្ថែមម្នាក់ទៀត។",
+    failTheirLimit: "គេមានមិត្ត 20 នាក់ហើយ។",
+    failTooMany: "អ្នកបានផ្ញើសំណើច្រើនពេកហើយ។ សូមព្យាយាមម្តងទៀតនៅថ្ងៃស្អែក។",
+    failMissing: "សំណើនោះលែងមានទៀតហើយ។",
+    failSignIn: "សូមចូលគណនីម្តងទៀត ដើម្បីបន្ត។",
+    failGeneric: "មានបញ្ហាអ្វីមួយ។ សូមព្យាយាមម្តងទៀត។",
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 
@@ -265,10 +338,41 @@ export function friendNeedsToFinishLabel(friendName: string, lang: Lang): string
   return `${friendName} needs to complete today's goal to keep the streak alive.`;
 }
 
-/** The reminder button: "Remind Dara". Kept short — it sits in a crowded row. */
-export function remindLabel(friendName: string, lang: Lang): string {
-  if (lang === "km") return `រំលឹក ${friendName}`;
-  return `Remind ${friendName}`;
+/** A friend refusal, as a sentence. One per hint the friend functions raise
+ *  (lib/friends.ts), so a new reason fails to compile until it has words. */
+export function friendFailLabel(reason: FriendFail, lang: Lang): string {
+  const c = STREAK_COPY[lang];
+  const byReason: Record<FriendFail, string> = {
+    self: c.failSelf,
+    unknown: c.failUnknown,
+    exists: c.failExists,
+    limit: c.failLimit,
+    their_limit: c.failTheirLimit,
+    too_many: c.failTooMany,
+    missing: c.failMissing,
+    unauthenticated: c.failSignIn,
+    unconfigured: c.failGeneric,
+    failed: c.failGeneric,
+  };
+  return byReason[reason];
+}
+
+/** "Best: 9 days", under a friend's count. */
+export function bestStreakLabel(days: number, lang: Lang): string {
+  if (lang === "km") return `ល្អបំផុត៖ ${days} ថ្ងៃ`;
+  return `Best: ${days} ${days === 1 ? "day" : "days"}`;
+}
+
+/** "Friends since 13 Oct 2026". Khmer dates are built by hand (utils/khmer-dates.ts):
+ *  a device's own km-KH formatting can print Khmer numerals, or English. */
+export function friendsSinceLabel(since: string, lang: Lang): string {
+  const date = parseDayKey(since);
+  if (lang === "km") return `ជាមិត្តតាំងពី ${formatKmDate(date)}`;
+  return `Friends since ${date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  })}`;
 }
 
 /** One day cell's accessible name — the dots and the glyph alone say nothing. */

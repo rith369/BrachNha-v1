@@ -4,7 +4,7 @@ import { useBrachNhaStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
 import type { SharedToday } from "@/utils/streak-friends";
 import { sharedStatusLine, useStreakCopy } from "../copy";
-import type { Participant } from "../friend-streak-demo-data";
+import type { Participant } from "../types";
 import { CelebrationAnimation } from "./celebration-animation";
 import { StreakFlame } from "./streak-flame";
 import { useCountUp } from "../use-count-up";
@@ -45,13 +45,8 @@ export function FriendStreakHeader({
   celebrating: boolean;
 }) {
   const lang = useBrachNhaStore((s) => s.lang);
-  const userName = useBrachNhaStore((s) => s.userName);
   const c = useStreakCopy(lang);
   const shown = useCountUp(streak);
-
-  // The one live value on the page, exactly as on the leaderboard — the demo
-  // roster's own name is only a fallback for a logged-out render.
-  const yourName = userName || you.name;
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-border bg-surface px-4 py-6 text-center shadow-panel md:py-8">
@@ -65,7 +60,7 @@ export function FriendStreakHeader({
           className="bg-flame absolute inset-x-6 top-1/2 z-0 h-1 -translate-y-1/2 rounded-full opacity-30"
         />
         <ParticipantFace
-          name={yourName}
+          name={you.name}
           seed={you.avatarSeed}
           done={today.you}
           badge={c.youLabel}
