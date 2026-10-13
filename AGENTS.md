@@ -131,6 +131,47 @@ value yet" glyph on an empty score, an unset grade, a blank prediction
 should change too it is a design decision about what "no value" looks like, not
 this rule.
 
+### No dashes between words, no sparkle icons (13 Oct 2026)
+
+The user widened the rule above, from a guideline they brought from another app
+and asked to be applied flexibly. The reason is the same: these read as
+machine-written to the students and parents who see them.
+
+**1. No dash BETWEEN WORDS in a sentence**, on top of the em dash: `(SNC -
+Supreme National Council)`, `(Estrogen - ជំរុញ…)`, `Hard - try again`. Use a
+comma, a full stop, parentheses or a colon, and in Khmer `។` or `៖`. A
+translation goes in parentheses, Khmer first: `ការថប់បារម្ភ (Anxiety)`,
+`ក្រុមប្រឹក្សាជាតិជាន់ខ្ពស់ (SNC)`.
+
+**A dash is still correct in these, and they must NOT be "fixed"** (the user's
+correction the same day: "not everything don't use -, sometime use too"):
+
+- **a range of numbers**: `1975 – 1979`, `pH = 1.5 - 2`, `45°C - 60°C`,
+  `07:30 - 08:30`, a scoreline `3 – 4`;
+- **`- ` starting a list line**, as in the maths help notes;
+- a minus sign (`$x - 3$`, `-2`), a hyphen inside one word (`e-mail`), ids
+  like `biology-3-1-1`, code, URLs and comments;
+- the bare `"—"` placeholders listed above.
+
+A first pass on 13 Oct 2026 rewrote the time slots and scorelines as `ដល់` and
+`:`; that was reverted for this reason. KruAI is told the same, in both
+languages of `BAC2_ANSWER_RULES` next to the em dash line, with the range
+examples spelled out so it does not avoid them.
+
+**Still to fix in the database content** (Admin → Content, not code): the SNC
+option in the History game questions, `(Estrogen - …)` on a biology flashcard
+and `(Sympathetic - …)` in section `biology-3-1-1`. Neither `check:content`
+nor the editor catches a dash between words yet.
+
+**2. No sparkle or four-point star icon anywhere**: not Lucide's `Sparkles`,
+`Sparkle` or `WandSparkles`, not the ✨ emoji, not a hand-drawn star of the same
+shape. Students read it as "this is AI". Pick an icon that says what the spot
+means: Grade Prediction is `Target`, a recommendation is `Lightbulb`, a
+greeting is `Sun`. Every one in the app was replaced on 13 Oct 2026, and KruAI
+is told never to use ✨. An ordinary five-point star (⭐, Lucide `Star`, the
+leaderboard's XP and the flashcard "important" mark) is a different symbol and
+stays.
+
 ### Student-visible Khmer stays Khmer, with three exceptions
 
 **Casual English does not belong in a Khmer string.** `Tip 1` is `គន្លឹះទី 1`,
@@ -256,6 +297,14 @@ fonts and weights, the user's call). Almost all of it is token-level in
   identical in both themes, ALWAYS with `text-ink` (near-black in both themes,
   never `text-text`, which turns cream in dark). Home's hero is `bg-neo-yellow`;
   the active bottom-nav tab is a yellow sticker.
+- **Page titles with a mark use `components/page-title.tsx`** (13 Oct 2026): a
+  Lucide icon on a neo fill tile, the title in ink, an optional subtitle.
+  Progress (mint), Grade Prediction (pink), Leaderboard (yellow), Profile
+  (blue) and Roadmap (orange). They were `bg-brand-tri bg-clip-text
+  text-transparent` titles with an emoji, and **clipped text paints an emoji
+  with the gradient too**, so "📈" drew a solid purple square. Never put an
+  emoji inside a clipped-text title. Two still have one: KruAI's "🤖" in
+  `chat-overlay.tsx` and "✍️" in `commitment-overlay.tsx`.
 - **Page and surfaces:** cream `#fff7e8` page, white cards; dark `#16131f` /
   `#221e2e`. Corners one step tighter (`--radius-xl/2xl/3xl` overridden), pills
   (`rounded-full`) unchanged.

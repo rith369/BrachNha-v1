@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { ChevronRight, BookOpen, Sparkles, type LucideIcon } from "lucide-react";
+import { ChevronRight, BookOpen, Lightbulb, type LucideIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useBrachNhaStore } from "@/lib/store";
 import { T } from "@/data/translations";
@@ -85,7 +85,7 @@ export function LessonPreviewList() {
       <div className="mb-2 flex items-center justify-between gap-2">
         <div className="font-heading flex min-w-0 items-center gap-1.5 text-sm font-extrabold">
           {recommending ? (
-            <Sparkles className="size-4 shrink-0 text-purple" strokeWidth={2.5} />
+            <Lightbulb className="size-4 shrink-0 text-purple" strokeWidth={2.5} />
           ) : (
             <BookOpen className="size-4 shrink-0 text-purple" strokeWidth={2.5} />
           )}

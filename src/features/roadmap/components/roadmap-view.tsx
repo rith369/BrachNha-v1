@@ -19,6 +19,8 @@ import { PLEDGE_COPY } from "@/features/commitment/copy";
 import { CommitmentBanner } from "./commitment-banner";
 import { useContentManifest } from "@/lib/content";
 import { subjectHasSections } from "@/utils/content-manifest";
+import { PageTitle } from "@/components/page-title";
+import { Map as MapIcon } from "lucide-react";
 
 function PathConnector({ flip }: { flip: boolean }) {
   return (
@@ -161,12 +163,13 @@ export function RoadmapView() {
     // sequential path through phases, and reading it as one top-to-bottom
     // journey is the point. Two columns would break that order.
     <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-36 lg:pb-10">
-      <div className="mb-5">
-        <div className="font-heading bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
-          {t.yourRoadmap} 🗺️
-        </div>
-        <div className="text-xs font-bold text-muted">{t.bacStudy}</div>
-      </div>
+      <PageTitle
+        icon={MapIcon}
+        fill="orange"
+        title={t.yourRoadmap}
+        subtitle={t.bacStudy}
+        className="mb-5"
+      />
 
       {commitment && (
         <CommitmentBanner

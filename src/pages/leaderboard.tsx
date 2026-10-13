@@ -3,6 +3,8 @@ import { COHORT_LABEL } from "@/features/leaderboard/demo-data";
 import { BottomNav } from "@/components/shell/bottom-nav";
 import { useBrachNhaStore } from "@/lib/store";
 import { useT } from "@/data/translations";
+import { PageTitle } from "@/components/page-title";
+import { Trophy } from "lucide-react";
 
 export default function LeaderboardPage() {
   const lang = useBrachNhaStore((s) => s.lang);
@@ -16,14 +18,14 @@ export default function LeaderboardPage() {
             the title lines up with the cards rather than floating off to the
             left of them on a laptop. */}
         <div className="mx-auto w-full max-w-2xl">
-          <div className="font-heading mb-0.5 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
-            🏆 {t.leaderboard}
-          </div>
           {/* No PreviewTag, page-level or per row: the per-row "Sample" mark
               was removed at the user's request (29 Sep 2026). */}
-          <div className="mb-4 text-xs font-bold text-muted">
-            {COHORT_LABEL[lang]} · {t.leaderboardSubtitle}
-          </div>
+          <PageTitle
+            icon={Trophy}
+            fill="yellow"
+            title={t.leaderboard}
+            subtitle={`${COHORT_LABEL[lang]} · ${t.leaderboardSubtitle}`}
+          />
           <LeaderboardView />
         </div>
       </div>

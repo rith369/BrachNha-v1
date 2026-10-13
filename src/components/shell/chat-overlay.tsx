@@ -386,8 +386,8 @@ export function ChatOverlay() {
   const name = userName.trim();
   const greeting =
     lang === "en"
-      ? `👋 Hi${name ? ` ${name}` : ""}! I'm KruAI, your study buddy. What shall we learn today? ✨`
-      : `👋 សួស្ដី${name ? ` ${name}` : ""}! បងគឺ KruAI ជាគ្រូជំនួយសិក្សារបស់ប្អូន។ ថ្ងៃនេះចង់រៀនអ្វីដែរ? ✨`;
+      ? `👋 Hi${name ? ` ${name}` : ""}! I'm KruAI, your study buddy. What shall we learn today? 📚`
+      : `👋 សួស្ដី${name ? ` ${name}` : ""}! បងគឺ KruAI ជាគ្រូជំនួយសិក្សារបស់ប្អូន។ ថ្ងៃនេះចង់រៀនអ្វីដែរ? 📚`;
 
   async function send(question?: string) {
     const typed = (question ?? input).trim();

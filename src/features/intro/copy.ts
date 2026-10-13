@@ -15,7 +15,6 @@ import {
   Rocket,
   School,
   Search,
-  Sparkles,
   Wrench,
   type LucideIcon,
 } from "lucide-react";
@@ -85,7 +84,7 @@ export const INTRO_SLIDES: IntroSlide[] = [
     orbit: [
       [Rocket, "pink"],
       [Atom, "blue"],
-      [Sparkles, "yellow"],
+      [Lightbulb, "yellow"],
       [FlaskConical, "mint"],
     ],
     accent: "ocean",

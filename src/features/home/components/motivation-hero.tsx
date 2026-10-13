@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { Sparkles, Map, ClipboardList, LineChart, Gamepad2 } from "lucide-react";
+import { Sun, Map, ClipboardList, LineChart, Gamepad2 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { QUOTES } from "@/data/questions";
 import { daysUntilExam } from "@/utils/exam-date";
@@ -32,7 +32,7 @@ export function MotivationHero() {
   return (
     <div className="relative overflow-hidden rounded-3xl border border-border bg-neo-yellow p-5 text-ink shadow-panel">
       <div className="flex items-center gap-1 text-xs font-extrabold">
-        <Sparkles className="size-3.5" strokeWidth={2.5} />
+        <Sun className="size-3.5" strokeWidth={2.5} />
         {lang === "en" ? `Good Day, ${userName}!` : `ថ្ងៃល្អ, ${userName}!`}
       </div>
       <div className="font-heading mt-1 text-2xl font-extrabold">

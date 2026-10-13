@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { LucideIcon } from "lucide-react";
-import { ArrowDownRight, ArrowUpRight, Clock, Sparkles, Zap } from "lucide-react";
+import { Activity, ArrowDownRight, ArrowUpRight, Clock, Zap } from "lucide-react";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -145,7 +145,7 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
               so it needs the identical-in-both-themes gradient — same rule as
               the FAB and the wordmark. */}
           <div className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-border bg-[var(--brand-purple)] shadow-cta">
-            <Sparkles className="size-4.5 text-white" strokeWidth={2.25} />
+            <Activity className="size-4.5 text-white" strokeWidth={2.25} />
           </div>
           <div className="min-w-0">
             <div className="font-heading text-sm font-extrabold">

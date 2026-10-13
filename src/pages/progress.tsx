@@ -9,6 +9,9 @@ import { BottomNav } from "@/components/shell/bottom-nav";
 import { useProgressSummary } from "@/features/progress/use-progress-summary";
 import { useBrachNhaStore } from "@/lib/store";
 import { T } from "@/data/translations";
+import { PROGRESS_COPY } from "@/features/progress/copy";
+import { TrendingUp } from "lucide-react";
+import { PageTitle } from "@/components/page-title";
 
 export default function ProgressPage() {
   // Computed ONCE here and threaded down, rather than each card reading the
@@ -28,9 +31,12 @@ export default function ProgressPage() {
         {/* Every card on this page runs on the student's own data. The last
             three (Focus Areas, Study Activity, Study tips) were demo until
             1 Oct 2026. */}
-        <div className="font-heading mb-4 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
-          📈 {T[lang].progress}
-        </div>
+        <PageTitle
+          icon={TrendingUp}
+          fill="mint"
+          title={T[lang].progress}
+          subtitle={PROGRESS_COPY[lang].pageSubtitle}
+        />
         {/* One column on a phone, two from md (tablet) and no further. Columns
             land at ~352px on a tablet and ~470–620px on a laptop, all
             comfortably inside the range these cards already handle — a 320px

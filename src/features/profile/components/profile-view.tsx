@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { LogOut } from "lucide-react";
+import { GraduationCap, LogOut } from "lucide-react";
+import { PageTitle } from "@/components/page-title";
 import { Link, useNavigate } from "react-router";
 import { Card } from "@/components/ui/card";
 import { StatPills } from "@/features/home/components/stat-pills";
@@ -59,11 +60,7 @@ export function ProfileView() {
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-36 lg:pb-10">
-      <div className="mb-4">
-        <div className="font-heading bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
-          {t.yourProfile} 🎓
-        </div>
-      </div>
+      <PageTitle icon={GraduationCap} fill="blue" title={t.yourProfile} />
 
       <div className="mb-5">
         <ProfileIdentity />

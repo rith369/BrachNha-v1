@@ -32,6 +32,8 @@ interface Term {
 }
 
 const en = {
+  // ── Page header ─────────────────────────────────────────────────────────
+  pageSubtitle: "See how far you've come and what to study next.",
   // ── Score hero ──────────────────────────────────────────────────────────
   overallReadiness: "Overall Readiness",
   readinessAbout: "What is Overall Readiness?",
@@ -210,6 +212,8 @@ const en = {
 export type ProgressCopy = typeof en;
 
 const km: ProgressCopy = {
+  // ── Page header ─────────────────────────────────────────────────────────
+  pageSubtitle: "មើលថាអ្នករៀនបានដល់ណាហើយ និងគួររៀនអ្វីបន្ទាប់។",
   // ── Score hero ──────────────────────────────────────────────────────────
   overallReadiness: "ភាពត្រៀមខ្លួនសរុប",
   readinessAbout: "តើភាពត្រៀមខ្លួនសរុបជាអ្វី?",

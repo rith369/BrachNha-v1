@@ -7,7 +7,6 @@ import {
   ClipboardCheck,
   GraduationCap,
   Library,
-  Sparkles,
   Target,
 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
@@ -192,7 +191,7 @@ export function ExamHub() {
                 />
               </GlassIcon>
               <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-extrabold text-[var(--brand-yellow)] md:text-xs">
-                <Sparkles className="size-3 shrink-0" strokeWidth={2.75} />
+                <CalendarDays className="size-3 shrink-0" strokeWidth={2.75} />
                 2 ថ្ងៃពេញ
               </span>
             </div>

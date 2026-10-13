@@ -15,6 +15,37 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 13 Oct 2026: New Page Titles, No Sparkle Icons, Fewer Dashes
+
+Commit: `(pending)`. No database step.
+
+**Why.** On the Progress page the 📈 emoji showed as a solid purple square, because the
+title was painted with the purple colour and the emoji got painted too. Separately, the team
+set a rule against two things that make an app read as machine-written: dashes between words
+in a sentence, and the sparkle (✨) icon.
+
+**What changed:**
+
+- **New page titles** on Progress, Grade Prediction, Leaderboard, Profile and Roadmap: a
+  coloured icon tile (mint, pink, yellow, blue, orange), the title in black, and a short
+  line underneath. No more purple squares.
+- **Grade Prediction's title now follows the app language.** It was always in English.
+- **Progress and Grade Prediction have a new line under the title** (for example "See how
+  far you've come and what to study next."). Please check the Khmer wording.
+- **Every sparkle icon was replaced** with one that fits the spot: the Home greeting is a
+  sun, "recommended for you" is a lightbulb, Grade Prediction is a target, the weekly
+  activity chart is an activity line, the exam chips are a calendar and a clipboard, and
+  one intro screen tile is a lightbulb. KruAI's opening greeting ends with 📚 instead of ✨.
+- **KruAI is told not to use a dash between words or the ✨ emoji.** A dash in a number
+  range (1975 – 1979, pH 1.5 - 2) is still fine.
+
+**Still to do, in Admin → Content:** three lines in the content have a dash between words:
+the SNC answer in the History game questions, "(Estrogen - …)" on a biology flashcard, and
+"(Sympathetic - …)" in lesson section 3.1.1.
+
+**What to re-test:** open the five pages above in both languages and both themes and check
+the title; open Home and the Mock Exam page and check the small icons.
+
 ## 13 Oct 2026 — Streak with Friends Is Real
 
 Commit: `488a63e`. No database step left: the owner ran
