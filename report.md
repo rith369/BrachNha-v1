@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 13 Oct 2026: Errors Page for the Team
 
-Commit: (filled in below). **Database step:** done. `20261013000002_error_review.sql` was
+Commit: `39f064c`. **Database step:** done. `20261013000002_error_review.sql` was
 applied to the live project on 13 Oct 2026.
 
 **Why.** When the app breaks on a student's phone, it already sends us an error report. But
