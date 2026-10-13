@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 13 Oct 2026 — Streak with Friends Is Real
 
-Commit: not committed yet. No database step left: the owner ran
+Commit: `488a63e`. No database step left: the owner ran
 `20261013000001_friends.sql` today, and the live project was checked (the new table is
 there, and every friend function refuses a caller who is not signed in).
 
