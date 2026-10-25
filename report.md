@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 26 Oct 2026: Audit Log for the Team
 
-Commit: not committed yet. **Database step:** apply
+Commit: `59886de`. **Database step:** apply
 `20261026000001_admin_audit_log.sql` in the Supabase SQL editor (one run). Until then the
 new page says it could not load, and everything else works as before.
 
