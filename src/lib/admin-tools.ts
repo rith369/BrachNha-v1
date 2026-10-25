@@ -663,6 +663,95 @@ export async function fixError(message: string): Promise<AdminResult<null>> {
   return { ok: true, data: null };
 }
 
+// ── Audit log ───────────────────────────────────────────────────────────────
+
+/** Every action admin_audit() can record (the table's CHECK list). */
+export const AUDIT_ACTIONS = [
+  "role_grant",
+  "role_revoke",
+  "student_delete",
+  "kruai_limits",
+  "kruai_pause",
+  "kruai_resume",
+  "announcement_publish",
+  "announcement_end",
+  "photo_kept",
+  "photo_deleted",
+  "mistake_fixed",
+  "mistake_not_mistake",
+  "error_fixed",
+  "content_publish",
+  "content_unpublish",
+  "content_restore",
+  "content_discard",
+  "content_import",
+] as const;
+export type AuditAction = (typeof AUDIT_ACTIONS)[number];
+
+export interface AuditEntry {
+  id: number;
+  at: string;
+  actorId: string | null;
+  actorName: string | null;
+  action: AuditAction;
+  targetKind: string | null;
+  targetId: string | null;
+  targetLabel: string | null;
+  details: Record<string, unknown>;
+}
+
+/** How many rows one request asks for; fewer back means the end. */
+export const AUDIT_PAGE = 100;
+
+function toAuditEntry(row: unknown): AuditEntry | null {
+  if (!row || typeof row !== "object") return null;
+  const r = row as Record<string, unknown>;
+  const str = (v: unknown) => (typeof v === "string" ? v : null);
+  if (typeof r.id !== "number" || typeof r.at !== "string") return null;
+  if (!(AUDIT_ACTIONS as readonly unknown[]).includes(r.action)) return null;
+  return {
+    id: r.id,
+    at: r.at,
+    actorId: str(r.actor_id),
+    actorName: str(r.actor_name),
+    action: r.action as AuditAction,
+    targetKind: str(r.target_kind),
+    targetId: str(r.target_id),
+    targetLabel: str(r.target_label),
+    details:
+      r.details && typeof r.details === "object" && !Array.isArray(r.details)
+        ? (r.details as Record<string, unknown>)
+        : {},
+  };
+}
+
+/** Newest first, AUDIT_PAGE at a time, older than `before` (an id). Role
+ *  changes come back for the owner only; the database decides that. */
+export async function loadAuditLog(
+  before: number | null
+): Promise<AdminResult<{ entries: AuditEntry[]; more: boolean }>> {
+  const db = await client();
+  if (!db) return { ok: false, reason: "unconfigured" };
+  const { data, error } = await db.rpc("admin_audit_log", {
+    p_before: before,
+    p_limit: AUDIT_PAGE,
+  });
+  if (error) {
+    devReport("admin_audit_log", error);
+    return { ok: false, reason: reasonOf(error) };
+  }
+  if (!Array.isArray(data)) return { ok: false, reason: "failed" };
+  return {
+    ok: true,
+    data: {
+      entries: data.map(toAuditEntry).filter((e): e is AuditEntry => e !== null),
+      // Counted on the raw rows, so a row this build cannot read does not end
+      // the list early.
+      more: data.length === AUDIT_PAGE,
+    },
+  };
+}
+
 export async function loadDashboard(): Promise<AdminResult<AdminDashboard>> {
   const db = await client();
   if (!db) return { ok: false, reason: "unconfigured" };

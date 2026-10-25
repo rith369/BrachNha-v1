@@ -74,6 +74,9 @@ const TABLES = [
   // The team's error review (20261013000002). RLS with no client policies, so
   // a select answers 200 [] when it exists. Its functions are invisible here.
   "client_error_fixes",
+  // The admin audit log (20261026000001). RLS with no client policies, so a
+  // select answers 200 [] when it exists. Its functions are invisible here.
+  "audit_log",
 ];
 
 /**

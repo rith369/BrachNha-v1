@@ -82,6 +82,7 @@ const AdminContentPage = lazy(() => import("@/pages/admin-content"));
 const AdminContentEditPage = lazy(() => import("@/pages/admin-content-edit"));
 const AdminReportsPage = lazy(() => import("@/pages/admin-reports"));
 const AdminErrorsPage = lazy(() => import("@/pages/admin-errors"));
+const AdminAuditPage = lazy(() => import("@/pages/admin-audit"));
 const ProfilePage = lazy(routeModules.profile);
 const ProgressPage = lazy(routeModules.progress);
 const RoadmapPage = lazy(routeModules.roadmap);
@@ -292,6 +293,7 @@ export default function App() {
           <Route path="admin/content/:kind/:key" element={<AdminContentEditPage />} />
           <Route path="admin/reports" element={<AdminReportsPage />} />
           <Route path="admin/errors" element={<AdminErrorsPage />} />
+          <Route path="admin/audit" element={<AdminAuditPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

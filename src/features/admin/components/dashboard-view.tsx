@@ -6,6 +6,7 @@ import {
   Bug,
   ChevronRight,
   Flag,
+  History,
   Megaphone,
   ShieldAlert,
   Users,
@@ -27,6 +28,7 @@ import { useAdminStatus } from "@/lib/admin-status";
 import { loadDashboard, type AdminDashboard } from "@/lib/admin-tools";
 import type { Lang } from "@/types";
 import { ADMIN_COPY, dayLabel, whenLabel } from "../copy";
+import { AUDIT_COPY } from "../audit-copy";
 
 /**
  * /admin: the team's hub. Six numbers, students per day, what students did,
@@ -212,10 +214,9 @@ function DailyChart({ data, lang }: { data: AdminDashboard["daily"]; lang: Lang 
  *  (say, its migration not applied yet), each tool must still be one tap from
  *  the menu.
  *
- *  SEVEN CARDS: the first six never span, so md is three rows of 2 and xl two
- *  rows of 3, and the seventh (Errors) spans the whole row below them at both,
- *  so neither grid ever holes. (With five, Students spanned two columns; the
- *  Content card made that unnecessary.) */
+ *  EIGHT CARDS: at md none spans, four rows of 2. At xl the first six are two
+ *  rows of 3 and Errors spans two columns beside Audit log, so neither grid
+ *  ever holes. (Seven cards had Errors spanning the whole row.) */
 function Tools({ lang }: { lang: Lang }) {
   const c = ADMIN_COPY[lang];
   const { openReports, openMistakes, openErrors } = useAdminStatus();
@@ -269,8 +270,8 @@ function Tools({ lang }: { lang: Lang }) {
         blurb={c.toolMistakesBlurb}
         count={openMistakes ? c.openCount(openMistakes) : null}
       />
-      {/* The seventh card spans the whole row (two columns at md, three at
-          xl), so neither grid holes. */}
+      {/* Errors spans two columns at xl only, so the last row there is
+          Errors + Audit log; at md the eight cards are four even rows. */}
       <ToolLink
         to="/admin/errors"
         icon={Bug}
@@ -278,7 +279,15 @@ function Tools({ lang }: { lang: Lang }) {
         title={c.toolErrors}
         blurb={c.toolErrorsBlurb}
         count={openErrors ? c.openCount(openErrors) : null}
-        className="md:col-span-2 xl:col-span-3"
+        className="xl:col-span-2"
+      />
+      <ToolLink
+        to="/admin/audit"
+        icon={History}
+        fill="bg-neo-blue"
+        title={AUDIT_COPY[lang].tool}
+        blurb={AUDIT_COPY[lang].toolBlurb}
+        count={null}
       />
     </div>
   );

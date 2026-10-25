@@ -30,10 +30,13 @@ export function AdminGate({
   icon: Icon,
   back = false,
   wide = false,
+  kicker,
   children,
 }: {
   title: string;
   icon: LucideIcon;
+  /** A small line above the title, e.g. "Administration history". */
+  kicker?: string;
   /** Show a link back to /admin above the title (every page but the hub). */
   back?: boolean;
   wide?: boolean;
@@ -77,6 +80,7 @@ export function AdminGate({
             {c.backToAdmin}
           </Link>
         )}
+        {kicker && <p className="text-xs font-extrabold text-purple">{kicker}</p>}
         <div className="mb-1 flex items-center gap-2">
           <Icon className="size-5 text-purple" strokeWidth={2.5} />
           <h1 className="font-heading text-xl font-extrabold">{title}</h1>

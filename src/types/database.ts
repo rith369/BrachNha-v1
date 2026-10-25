@@ -474,6 +474,35 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["client_errors"]["Insert"]>;
         Relationships: [];
       };
+      // 20261026000001_admin_audit_log.sql. One row per admin action, written
+      // inside the action's own function. No client policies: read through
+      // admin_audit_log() only.
+      audit_log: {
+        Row: {
+          id: number;
+          at: string;
+          actor_id: string | null;
+          actor_name: string | null;
+          action: string;
+          target_kind: string | null;
+          target_id: string | null;
+          target_label: string | null;
+          details: Json;
+        };
+        Insert: {
+          id?: never;
+          at?: string;
+          actor_id?: string | null;
+          actor_name?: string | null;
+          action: string;
+          target_kind?: string | null;
+          target_id?: string | null;
+          target_label?: string | null;
+          details?: Json;
+        };
+        Update: Partial<Database["public"]["Tables"]["audit_log"]["Insert"]>;
+        Relationships: [];
+      };
       // 20261013000002_error_review.sql. When the team marked an error message
       // fixed; it reopens if it happens again after that. No client policies:
       // written by admin_fix_client_error() only.
@@ -834,6 +863,20 @@ export type Database = {
       admin_fix_client_error: {
         Args: { p_message: string };
         Returns: undefined;
+      };
+      admin_audit_log: {
+        Args: { p_before?: number | null; p_limit?: number };
+        Returns: {
+          id: number;
+          at: string;
+          actor_id: string | null;
+          actor_name: string | null;
+          action: string;
+          target_kind: string | null;
+          target_id: string | null;
+          target_label: string | null;
+          details: Json;
+        }[];
       };
       admin_photo_reports: {
         Args: Record<string, never>;

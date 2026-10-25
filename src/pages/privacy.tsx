@@ -248,7 +248,9 @@ export default function PrivacyPage() {
             study numbers (XP, level, streak) and how many KruAI questions you
             asked. They use this to help you when something goes wrong and to
             keep the app safe, and they can pause KruAI for an account that
-            misuses it.
+            misuses it. Every change they make is written in a record only the
+            team can see, with the name of the student it was about. If the team
+            deletes an account, that record keeps the name.
           </p>
           <p>
             សេវាកម្មបីៈ Google សម្រាប់ការចូលគណនី, Supabase
@@ -262,6 +264,9 @@ export default function PrivacyPage() {
             និងចំនួនសំណួរដែលអ្នកសួរ KruAI។
             ពួកគេប្រើវាដើម្បីជួយអ្នកពេលមានបញ្ហា និងរក្សាសុវត្ថិភាពកម្មវិធី
             ហើយអាចផ្អាក KruAI សម្រាប់គណនីដែលប្រើវាមិនត្រឹមត្រូវ។
+            រាល់ការកែប្រែរបស់ពួកគេត្រូវបានកត់ត្រាទុក ដែលមានតែក្រុមទេអាចមើលឃើញ
+            រួមទាំងឈ្មោះសិស្សដែលពាក់ព័ន្ធ។
+            បើក្រុមលុបគណនីណាមួយ កំណត់ត្រានោះនៅតែរក្សាឈ្មោះ។
           </p>
         </Section>
 

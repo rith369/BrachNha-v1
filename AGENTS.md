@@ -6829,6 +6829,57 @@ Playwright `route`: 35 checks at 390, 1280 and 320 dark Khmer (cards, chips, det
 Mark fixed and the badge following it, the hub card spanning, the link, a student refused
 with no error or count request, the empty state, no sideways scroll, no page error).
 
+### Audit log (26 Oct 2026)
+
+`/admin/audit` (`features/admin/components/audit-view.tsx`, words in
+`features/admin/audit-copy.ts`, migration `20261026000001_admin_audit_log.sql`): who changed
+what, and when. The user's decisions: every admin sees it, EXCEPT role changes (make or
+remove an admin), which the owner alone sees; it starts empty (no backfill); admin actions
+only, never a student's own (Delete my account is not logged).
+
+- **One row per admin action, written INSIDE the action's own function**, in the same
+  transaction, so a row exists if and only if the action happened: a refusal or a rollback
+  (a stale restore, say) leaves nothing. `audit_log` has RLS and no client policies; the
+  writer `admin_audit()` is revoked from every client role; the reader
+  `admin_audit_log(p_before, p_limit)` is admin only, newest first, at most 200 a call,
+  paged by id, and filters the role rows out for anyone but the owner.
+- **The 14 functions were COPIED BY SCRIPT**, verbatim from the migration that last defined
+  each, with only the `perform public.admin_audit(...)` call inserted at an exact anchor
+  (the generator refused any anchor found 0 or 2+ times). `create or replace` keeps their
+  grants. **A later migration that redefines any of them must keep that call**, or the action
+  silently stops being logged. They are: `admin_set_role`, `admin_delete_user`,
+  `admin_set_kruai_limits`, `admin_set_kruai_block`, `admin_publish_announcement`,
+  `admin_end_announcement`, `admin_resolve_photo`, `admin_resolve_content`,
+  `admin_fix_client_error`, `admin_publish_content`, `admin_unpublish_content`,
+  `admin_restore_content_version`, `admin_discard_content_draft`, `admin_import_content`.
+- **Logged only when something changed**: granting a role someone has, resuming KruAI for
+  someone not paused, ending a missing announcement or closing reports already closed log
+  nothing. A delete is logged BEFORE the delete runs, while the name still exists.
+- **Names are COPIED onto the row** (`actor_name`, `target_label`), so a deleted student is
+  still named, and `actor_id` goes null if the admin's own account goes. The privacy page
+  says so in both languages. Limits record `from` and `to`; a pause its reason; content its
+  kind, key and version; a mistake report its ref and how many reports closed.
+- **Not logged, deliberately: draft saves** (frequent, never seen by students; the draft
+  keeps `updated_by`). An import is ONE row with the item count.
+- **The page**: sentences per action in both languages (`{a}`/`{t}`/`{c}`/`{n}` templates,
+  names bold, typed `satisfies Record<AuditAction, string>`), grouped by the admin's own day,
+  filter chips by kind of change and a "Who" select, both over what is loaded (no request),
+  Show older 100 at a time. A content or mistake row links to its editor; content is named
+  through `slotFor()`. `AdminGate` gained an optional `kicker` ("Administration history").
+- **The hub has eight tool cards**: none spans at md (four rows of 2); at xl Errors spans two
+  columns beside Audit log.
+
+**Verified:** PGlite 0.2.17, all 26 migrations in order and this one twice: 58 checks (each
+action logged with the right actor, target, label and details; each refusal and each no-op
+logging nothing; a stale restore's row rolled back; a deleted student's name kept; owner sees
+role rows and an admin does not; paging and the 200 cap; a student, no session and `anon`
+refused; `authenticated` cannot call the writer, insert, or read the table directly). Browser,
+Supabase faked through Playwright `route`: 31 checks at 1280 owner, 390 admin and 320 dark
+Khmer (every sentence and detail line, bold names, the Open link, both filters, Show older
+with the right cursor, the end line, the hub grid at xl and md, the owner-only note, no Khmer
+numerals, empty state, a student refused with no log request, no sideways scroll, no page
+error).
+
 ## Flashcards and quizzes move into the database (stage 1, 3 Oct 2026)
 
 The plan is `docs/plans/content-in-database.md`; this records what is built. **Stage 1 is
@@ -8853,6 +8904,12 @@ publishable key). On a new project it must be applied AFTER
 `/admin/errors` says it could not load and the badge leaves errors out (nothing else
 changes). Afterwards `db:check` lists `client_error_fixes`, and a publishable-key-only call
 to `/rest/v1/rpc/admin_client_errors` must be refused.
+
+**`20261026000001_admin_audit_log.sql`** (the audit log) must be applied AFTER every earlier
+migration, in ONE run (one transaction), because it redefines 14 admin functions. The code
+can ship before or after it: without it `/admin/audit` says it could not load and every admin
+action works as before, unlogged. Afterwards `db:check` lists `audit_log`, and a
+publishable-key-only call to `/rest/v1/rpc/admin_audit_log` must be refused.
 
 **`20261013000001_friends.sql`** (Streak with Friends) is APPLIED to the live project
 (13 Oct 2026, checked: `db:check` passes, and all five functions plus the helpers refuse

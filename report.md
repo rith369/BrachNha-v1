@@ -15,6 +15,33 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 26 Oct 2026: Audit Log for the Team
+
+Commit: not committed yet. **Database step:** apply
+`20261026000001_admin_audit_log.sql` in the Supabase SQL editor (one run). Until then the
+new page says it could not load, and everything else works as before.
+
+**Why.** Several admins can change things: delete accounts, pause KruAI, publish content,
+post announcements. Until now some of those left no trace at all, so nobody could tell who
+did what.
+
+**What changed (admin accounts only, students see nothing new):**
+
+- **A new page, Admin → Audit log.** Every change an admin makes, newest first, one line
+  each: "Dara paused KruAI for Vann", "Rith published Flashcard deck: …, version 3", with
+  the time, grouped by day. Filter by kind of change, or by which admin did it. "Show older"
+  loads more.
+- **Every admin can see it, except changes to who is an admin**, which only the owner sees.
+- **It starts empty today.** Changes made before it was switched on are not in it.
+- **Saving a draft is not listed**, only publishing, hiding, restoring and discarding.
+  Students' own actions (like deleting their own account) are not listed either.
+- **The privacy page** now says the team keeps this record, including the name of a student
+  whose account the team deletes.
+
+**What to re-test.** After applying the database step, do one small admin action (for
+example pause and resume KruAI for a test account) and check it appears on Admin → Audit
+log. Then open the page with a non-owner admin account and check role changes are not shown.
+
 ## 26 Oct 2026: Each Level Takes a Little Longer
 
 Commit: `26ce659`. **Database step:** none.
