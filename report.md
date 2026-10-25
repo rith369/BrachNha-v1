@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 25 Oct 2026: No More Error Screen After an Update
 
-Commit: not committed yet. **Database step:** none.
+Commit: `fa47034`. **Database step:** none.
 
 **Why.** Students keep the app open on their phone for days. When we put out a new
 version, the parts of the app they had not opened yet are renamed on the site. So when
