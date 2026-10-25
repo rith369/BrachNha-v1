@@ -15,6 +15,25 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 25 Oct 2026: No More Error Screen After an Update
+
+Commit: not committed yet. **Database step:** none.
+
+**Why.** Students keep the app open on their phone for days. When we put out a new
+version, the parts of the app they had not opened yet are renamed on the site. So when
+they later tapped one of those pages (Progress, Exam, Admin…), they got the
+"Something went wrong" screen until they pressed Reload.
+
+**What changed.** In that case the app now reloads itself once, quietly, and opens the
+page they tapped on the new version. They never see the error screen. If the reload does
+not help (no internet, or a broken update), the normal error screen with its Reload button
+shows as before, so it can never keep reloading in a loop. These reloads are not sent to
+the Admin → Errors page, because they are not real crashes.
+
+**What to re-test.** Open the live site on a phone, leave it open, deploy a new version,
+then come back and tap a page you had not opened yet. It should open normally, perhaps
+after a quick reload.
+
 ## 13 Oct 2026: Errors Page for the Team
 
 Commit: `39f064c`. **Database step:** done. `20261013000002_error_review.sql` was

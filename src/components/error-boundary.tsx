@@ -1,4 +1,5 @@
 import { reportError } from "@/lib/telemetry";
+import { isChunkLoadError, reloadForNewBuild } from "@/lib/stale-build";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { AlertTriangle, RotateCw, Trash2 } from "lucide-react";
 
@@ -39,6 +40,14 @@ import { AlertTriangle, RotateCw, Trash2 } from "lucide-react";
  * has to be readable at the one moment the app cannot tell you what language
  * the student chose — the store may be exactly what is broken. So both
  * languages are shown at once rather than picked between.
+ *
+ * ONE ERROR IS NOT A CRASH: a chunk that failed to download because the page
+ * outlived a deploy (lib/stale-build.ts). For that the boundary paints the
+ * plain page background and reloads once, so the student never sees this
+ * screen. `staleChunk` is decided in getDerivedStateFromError so the very first
+ * paint is already the blank one; the reload itself is a side effect and waits
+ * for componentDidCatch. If reloading is not safe (offline, or it already
+ * failed once just now), `staleChunk` is cleared and the ordinary screen shows.
  */
 
 const STORE_KEY = "brachnha";
@@ -50,16 +59,22 @@ interface Props {
 interface State {
   error: Error | null;
   confirmingClear: boolean;
+  staleChunk: boolean;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-  state: State = { error: null, confirmingClear: false };
+  state: State = { error: null, confirmingClear: false, staleChunk: false };
 
   static getDerivedStateFromError(error: Error): Partial<State> {
-    return { error };
+    return { error, staleChunk: isChunkLoadError(error) };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
+    if (isChunkLoadError(error)) {
+      if (reloadForNewBuild()) return;
+      this.setState({ staleChunk: false });
+    }
+
     // Sent to client_errors in production (lib/telemetry.ts), with the
     // component stack appended so a report says WHICH component threw.
     console.error("[app] render failed:", error, info.componentStack);
@@ -86,6 +101,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (!this.state.error) return this.props.children;
+    if (this.state.staleChunk) return <div className="min-h-dvh w-full bg-bg" />;
 
     return (
       <div className="flex min-h-dvh w-full items-center justify-center bg-bg p-6">

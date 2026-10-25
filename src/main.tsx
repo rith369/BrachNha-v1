@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router";
 import App from "./app";
 import { registerServiceWorker } from "@/lib/install-prompt";
 import { installGlobalErrorHandlers } from "@/lib/telemetry";
+import { installStaleBuildReload } from "@/lib/stale-build";
 import "@/styles/globals.css";
 
 // Imported here, in the entry, rather than first reached from a component:
@@ -12,6 +13,8 @@ import "@/styles/globals.css";
 registerServiceWorker();
 // Production only, and it pulls nothing until an error actually happens.
 installGlobalErrorHandlers();
+// A tab open across a deploy asks for chunks that are gone; reload once.
+installStaleBuildReload();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

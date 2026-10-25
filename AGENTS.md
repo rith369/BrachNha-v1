@@ -7739,6 +7739,35 @@ described in the mentor section and a stray static import undoes it silently.
 prefetch means it almost never renders, and a spinner that flashes for a frame
 reads worse than a blank one.
 
+### A tab open across a deploy reloads itself (25 Oct 2026)
+
+A deploy renames every hashed chunk and the old names stop being served, so a
+student who opened the app before it and then taps a screen not yet loaded got
+"Failed to fetch dynamically imported module" on the error boundary's crash
+screen. The same happens on `vite dev` when the server restarts under a sleeping
+tab (that is how the user hit it). `lib/stale-build.ts` reloads the page ONCE
+instead, so they land on the new build:
+
+- **Three callers.** `installStaleBuildReload()` (from `main.tsx`) listens for
+  `vite:preloadError`, which Vite fires for EVERY dynamic import in a build
+  (React.lazy or not, the Supabase SDK too), WITHOUT `preventDefault`, so the
+  import still rejects normally rather than handing `lazy()` an undefined module.
+  `ErrorBoundary` catches the same failure in dev, where there is no preload
+  helper: `getDerivedStateFromError` sets `staleChunk` so the first paint is a
+  blank page, not the crash screen, and `componentDidCatch` reloads.
+  `reportError` stays silent while that reload is under way.
+- **Two guards, because it must never loop.** Offline: no reload (the network is
+  the problem, and a reload only swaps in `offline.html`). And at most once per
+  30s, stamped in sessionStorage: a deploy that is really broken fails again
+  after the reload and the ordinary error screen shows. No storage, no reload.
+- **Side effect worth knowing:** the idle prefetch (`usePrefetchRoutes`) goes
+  through the same preload helper, so a page loaded just before a deploy can
+  reload itself at idle before the student taps anything. Intended.
+
+Verified in Chrome by making a chunk 404 (7 checks): missing once → one reload
+and the page opens with no error screen, in the build and on the dev server;
+missing always → exactly one reload, then the error screen, no loop.
+
 ## Still not built
 
 Document Library — the last disabled "Soon" item in the nav

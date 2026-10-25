@@ -1,5 +1,6 @@
 import { getSupabase, isSupabaseConfigured } from "./supabase";
 import { useBrachNhaStore } from "./store";
+import { isReloadingForNewBuild } from "./stale-build";
 
 /**
  * Error reports and usage events, written to our own Supabase project
@@ -52,6 +53,8 @@ function messageOf(err: unknown): { message: string; stack: string } {
 
 export function reportError(err: unknown, context?: string): void {
   if (!ENABLED) return;
+  // A missing chunk the page is already reloading to fix is not a crash.
+  if (isReloadingForNewBuild()) return;
   const { message, stack } = messageOf(err);
   const text = context ? `[${context}] ${message}` : message;
   if (reported.has(text) || reported.size >= MAX_ERRORS_PER_LOAD) return;
