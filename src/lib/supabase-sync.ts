@@ -17,6 +17,7 @@ import type { InsertOf, Tables } from "@/types/database";
 import { addDaysKey, todayKey as today } from "@/utils/day";
 import { TASK_XP } from "@/utils/rewards";
 import { currentStreak } from "@/utils/streak";
+import { levelForXp } from "@/utils/level";
 
 /** How many past days of the study log each push re-sends. See the push. */
 const ACTIVITY_PUSH_DAYS = 14;
@@ -126,7 +127,8 @@ function storeFromProfile(row: Tables<"profiles">) {
     lang: row.ui_lang,
     theme: row.theme,
     xp: row.xp,
-    level: row.level,
+    // Derived, not trusted: a row pushed under the old rule holds an old level.
+    level: levelForXp(row.xp),
     coins: row.coins,
     streak: row.streak,
     surveyed: row.surveyed,
@@ -686,7 +688,7 @@ export async function fetchRemoteSnapshot(
 
   return {
     name: data.display_name,
-    level: data.level,
+    level: levelForXp(data.xp),
     xp: data.xp,
     streak: data.streak,
   };

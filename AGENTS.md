@@ -1578,11 +1578,18 @@ XP"), repeating two of those numbers. `TopBar` and `HomeHeader` are deleted; the
 logo and name now live only in the sidebar and drawer.
 
 - **Level and XP are ONE element**: a ring around the level number that fills with
-  the XP earned inside the current level, plus "Level N", a thin bar and "30 / 100
-  XP". The level rule is `award()`'s in `lib/store.ts` (the level goes up once XP
-  reaches `level * 100`), so a level spans the 100 XP below that threshold; the
-  share is clamped because one large award can overshoot while the level moves by
-  one. If the rule changes, `XP_PER_LEVEL` in the header changes with it.
+  the XP earned inside the current level, plus "Level N", a thin bar and "30 / 120
+  XP". **The level rule is `utils/level.ts`** (26 Oct 2026, the user's rule, which
+  replaced a flat 100 XP a level): each level costs 20 XP more than the one before
+  (1 → 2 is 100, 2 → 3 is 120, 3 → 4 is 140…), so reaching level L takes
+  `100(L-1) + 10(L-1)(L-2)` XP. **The level is DERIVED from total XP**, never
+  counted up: `levelForXp()` writes the store's `level` in `award()`, in the
+  persist `merge` on every load and on a pull, and the header and Home's "to next"
+  pill read `levelProgress()` / `xpToReachLevel()`. Re-deriving on load moved every
+  existing student onto the new rule, including the ones it moved DOWN (1,000 XP
+  was level 11 and is level 7), which the user chose. No persist version bump was
+  needed for that. `profiles.level` on the server catches up on the student's next
+  push; nothing ranks by it (the leaderboard uses XP).
 - **The streak pill links to `/streak`** (the same doorway as Home's Flame pill);
   coins are a plain div, since there is no page behind them.
 - **The menu button is in normal flow**, `lg:hidden` (the sidebar replaces it), and

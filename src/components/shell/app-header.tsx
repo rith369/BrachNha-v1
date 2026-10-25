@@ -4,6 +4,7 @@ import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
 import { T } from "@/data/translations";
 import { cn } from "@/utils/cn";
+import { levelProgress } from "@/utils/level";
 
 /**
  * The app bar on every ordinary screen: a level ring with XP progress, the
@@ -16,18 +17,14 @@ import { cn } from "@/utils/cn";
  * The menu button is in normal flow now, so no page reserves space for it.
  *
  * Level and XP are ONE element because they are one fact: how far through the
- * current level the student is. The level rule lives in `award()` in
- * lib/store.ts (the level goes up once XP reaches `level * 100`), so a level
- * spans the 100 XP below that threshold. The bar is clamped, because a single
- * large award can carry XP past the threshold while the level only moves by
- * one.
+ * current level the student is. The level rule is utils/level.ts (each level
+ * costs 20 XP more than the last), and both the level and the bar are worked
+ * out from total XP there, so they cannot disagree.
  *
  * The streak counter links to /streak, the same doorway Home's Flame pill is.
  * Coins have no page, so that pill is a plain div: a control that answers a
  * tap with nothing reads as broken.
  */
-const XP_PER_LEVEL = 100;
-
 /** Ring geometry, in viewBox units. */
 const R = 18;
 const CIRC = 2 * Math.PI * R;
@@ -47,15 +44,12 @@ export function AppHeader() {
     );
   const t = T[lang];
 
-  const into = Math.min(
-    Math.max(xp - (level - 1) * XP_PER_LEVEL, 0),
-    XP_PER_LEVEL
-  );
-  const share = into / XP_PER_LEVEL;
+  const { into, needed } = levelProgress(xp);
+  const share = Math.min(into / needed, 1);
   const label =
     lang === "en"
-      ? `Level ${level}, ${into} of ${XP_PER_LEVEL} XP`
-      : `${t.level} ${level}, ${into} ក្នុងចំណោម ${XP_PER_LEVEL} XP`;
+      ? `Level ${level}, ${into} of ${needed} XP`
+      : `${t.level} ${level}, ${into} ក្នុងចំណោម ${needed} XP`;
 
   return (
     <div className="flex shrink-0 items-center gap-2 px-4 pt-3 md:px-6 md:pt-4 lg:px-8">
@@ -102,7 +96,7 @@ export function AppHeader() {
             />
           </div>
           <div className="mt-0.5 text-[11px] font-bold text-muted tabular-nums">
-            {into} / {XP_PER_LEVEL} XP
+            {into} / {needed} XP
           </div>
         </div>
       </div>

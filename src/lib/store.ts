@@ -29,6 +29,7 @@ import {
 import { FLASHCARD_XP, FLASHCARD_COINS, TASK_XP } from "@/utils/rewards";
 import { addDaysKey, parseDayKey, todayKey } from "@/utils/day";
 import { currentStreak, isGoalComplete } from "@/utils/streak";
+import { levelForXp } from "@/utils/level";
 
 export type {
   Lang,
@@ -767,7 +768,7 @@ function award(
   const xp = state.xp + amount;
   return {
     xp,
-    level: xp >= state.level * 100 ? state.level + 1 : state.level,
+    level: levelForXp(xp),
     coins: state.coins + (coins ?? Math.floor(amount * COINS_PER_XP)),
     activityLog: logXp(state.activityLog, todayKey(), amount),
   };
@@ -1447,6 +1448,11 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           chatMsgs?: ChatMsg[];
         };
         const merged = { ...current, ...rest };
+
+        // The level is derived from XP (utils/level.ts). Re-deriving it on
+        // every load is what moved stored levels onto the +20-per-level rule,
+        // and keeps any stale number from surviving.
+        merged.level = levelForXp(merged.xp);
 
         // v0 → v1: one flat `chatMsgs` array becomes a single Conversation, so
         // a student who already had a chat saved doesn't silently lose it.

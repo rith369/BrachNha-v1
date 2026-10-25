@@ -5,6 +5,7 @@ import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { todayKey } from "@/utils/day";
 import { bestStreak } from "@/utils/streak";
+import { xpToReachLevel } from "@/utils/level";
 
 /**
  * The four headline numbers on Home (and reused as-is on Profile).
@@ -34,7 +35,7 @@ export function StatPills() {
       }))
     );
 
-  const toNextLevel = Math.max(level * 100 - xp, 0);
+  const toNextLevel = Math.max(xpToReachLevel(level + 1) - xp, 0);
   const questionsAnswered = examResults.reduce((sum, r) => sum + r.total, 0);
 
   // Both notes were string literals — "▲ +20 today" and "Best!" — which every

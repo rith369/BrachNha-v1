@@ -15,6 +15,26 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 26 Oct 2026: Each Level Takes a Little Longer
+
+Commit: not committed yet. **Database step:** none.
+
+**Why.** Every level used to cost the same 100 XP, so levels came fast and stopped
+meaning much.
+
+**What changed.** Each level now costs 20 XP more than the one before: level 1 to 2 is
+100 XP, 2 to 3 is 120, 3 to 4 is 140, and so on. Reaching level 10 takes 1,620 XP in
+total, level 20 takes 5,320 and level 30 takes 11,020. The bar at the top of the screen
+and the "to next level" number on Home follow the new rule.
+
+**Students who already had a level** were worked out again from their XP, as decided.
+Most students with little XP see no change, but some will see their level go DOWN: for
+example, 1,000 XP was level 11 and is now level 7. Their XP and coins are untouched.
+
+**What to re-test.** Open the app with an account that has some XP and check the level
+and the "XX / YYY XP" under it. Earning XP should fill the bar and move to the next level
+at the new amounts.
+
 ## 25 Oct 2026: No More Error Screen After an Update
 
 Commit: `fa47034`. **Database step:** none.
