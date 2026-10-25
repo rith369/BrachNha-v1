@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 26 Oct 2026: Each Level Takes a Little Longer
 
-Commit: not committed yet. **Database step:** none.
+Commit: `26ce659`. **Database step:** none.
 
 **Why.** Every level used to cost the same 100 XP, so levels came fast and stopped
 meaning much.
