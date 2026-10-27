@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 27 Oct 2026: A New "Section Finished" Screen
 
-Commit: _pending_. No database step.
+Commit: `26f5d62`. No database step.
 
 **Why.** After a lesson section the screen showed a trophy, a fixed "+20 XP" and one button
 back. The XP number was often wrong, and the screen did not say what to do next.
