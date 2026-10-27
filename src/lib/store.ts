@@ -20,8 +20,6 @@ import type {
 } from "@/types";
 import { makeConversationTitle } from "@/utils/chat-history";
 import {
-  schedule,
-  initialReviewState,
   repairReviewState,
   type ReviewGrade,
   type ReviewResult,
@@ -519,10 +517,21 @@ interface BrachNhaState {
    * write loop rather than a measurement.
    */
   addStudyMinutes: (minutes: number) => void;
-  /** Grade one flashcard, advance its schedule (see utils/spaced-repetition.ts)
-   *  and award the flat per-card reward. Works for a card never graded before —
-   *  it starts from a fresh state rather than requiring one to exist. */
-  gradeCard: (cardId: string, grade: ReviewGrade) => void;
+  /**
+   * Record one flashcard grade: the card's NEXT state, an entry in the review
+   * log, and the flat per-card reward.
+   *
+   * The caller computes `next` with `schedule()` from utils/fsrs.ts. The store
+   * does not, on purpose: the FSRS library is ~13 KB gzipped and the store is in
+   * the entry chunk every student downloads first, while the only caller (the
+   * review screen) is a lazy route. The log entry takes its time from
+   * `next.lastReviewedAt`, so the two agree to the millisecond and a replay of
+   * the log rebuilds the same state.
+   */
+  gradeCard: (cardId: string, grade: ReviewGrade, next: ReviewState) => void;
+  /** Replace the review states wholesale. Only for `upgradeReviews()` in
+   *  utils/fsrs.ts, which gives cards graded before FSRS a memory model. */
+  setCardReviews: (reviews: Record<string, ReviewState>) => void;
   addStudentCard: (deckKey: string, front: string, back: string) => void;
   updateStudentCard: (
     deckKey: string,
@@ -1023,17 +1032,13 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           return next === state.activityLog ? state : { activityLog: next };
         }),
 
-      // A card with no prior record starts from a fresh ReviewState rather
-      // than requiring one to already exist — this is what lets a "new" card
-      // (never graded) be scheduled the first time it's shown.
-      gradeCard: (cardId, grade) =>
+      gradeCard: (cardId, grade, next) =>
         set((state) => {
-          const prev = state.cardReviews[cardId] ?? initialReviewState();
-          const reviewedAt = new Date().toISOString();
+          const reviewedAt = next.lastReviewedAt ?? new Date().toISOString();
           return {
             cardReviews: {
               ...state.cardReviews,
-              [cardId]: schedule(prev, grade),
+              [cardId]: next,
             },
             // The event log — see reviewHistory's own doc comment for how
             // this differs from cardReviews above. Oldest dropped first, the
@@ -1045,6 +1050,8 @@ export const useBrachNhaStore = create<BrachNhaState>()(
             ...award(state, FLASHCARD_XP, FLASHCARD_COINS),
           };
         }),
+
+      setCardReviews: (reviews) => set({ cardReviews: reviews }),
 
       addStudentCard: (deckKey, front, back) =>
         set((state) => {

@@ -3481,6 +3481,9 @@ delay; Hard/Good/Easy graduate a new card to a short 1/3/7-day interval or
 scale an existing one ×1.2/×2/×2.5) — see the file's own header for the full
 reasoning. Replacing this with real FSRS later means rewriting the body of
 `schedule` and possibly widening `ReviewState`; no caller changes shape.
+(History: FSRS replaced it on 27 Oct 2026, and `schedule` MOVED to
+`utils/fsrs.ts` so the library stays out of the entry chunk; `gradeCard` now
+takes the next state from its caller. See "Flashcards are scheduled by FSRS".)
 
 **Due-ness PRIORITISES, it never GATES — this took two passes to land on.**
 "0 due, 0 new" is correct once every card has been graded (a card rated
@@ -4001,7 +4004,9 @@ the same). A REAL "chance you remember this today" needs a memory model: the
 plan, if wanted, is FSRS (`ts-fsrs`) behind `schedule()` in
 `utils/spaced-repetition.ts`, which is the swap boundary built for it, plus
 stability/difficulty columns on `card_reviews`. Bring a percentage back only
-from that, never from a formula.
+from that, never from a formula. **Built the same day** (the line reads
+"ថ្ងៃនេះ អ្នកចាំបានប្រហែល N%"): see "Flashcards are scheduled by FSRS" near the
+end of this file.
 
 ### A pile opens its LIST first, and a single question is reviewable on its own
 
@@ -7647,6 +7652,77 @@ and opens no runner; Home renders; no sideways scroll; no page error. KruAI thro
 reaches the prompt, sections and decks still listed, physics still "no content", maths
 still covered, the section prompt under budget.
 
+## Flashcards are scheduled by FSRS (27 Oct 2026)
+
+The user's call, after the made-up "~N%" retention line was removed: a REAL "chance
+you remember this today", which needs a memory model. The scheduler is now **FSRS**
+(the model Anki uses), through `ts-fsrs` 5.4.2 (MIT, no dependencies). The user's
+choices: **90% target retention**, and the percentage shown as the **lesson total**
+(not per card, yet).
+
+**`utils/fsrs.ts` is the scheduler**: `schedule`, `retrievability`,
+`averageRetrievability`, `upgradeReviews`. Settings, each a decision:
+- `request_retention` 0.9; `enable_short_term` false (no same-day learning steps, so
+  every graded card is FSRS state Review); `enable_fuzz` false (one history, one date,
+  on every phone); `maximum_interval` 365, ALSO clamped in code because FSRS reports
+  366 at its own cap.
+- **"Again" is always tomorrow** (`AGAIN_INTERVAL_DAYS`), overriding the 2 days FSRS
+  gives a lapsed card it knew well.
+- **Default parameters, not fitted ones**: the figure is an estimate for an average
+  learner. Fitting FSRS to a student needs hundreds of reviews and an optimiser.
+
+**Bytes: the library is ~13.8 KB gzipped and is NOT in the entry chunk.** The store
+and Home's study feed (both entry) import `utils/spaced-repetition.ts`, which keeps
+only the state type, `isDue`, `initialReviewState`, `repairReviewState` and the two
+constants. So:
+- `gradeCard(cardId, grade, next)`: the CALLER (review-session) computes `next`
+  with `schedule()`, from the card's LIVE store state, not the session's snapshot.
+  The log entry takes `next.lastReviewedAt`, so a replay rebuilds the same state.
+- Old cards are upgraded by `useFsrsUpgrade()` (`features/practice/`) when a
+  flashcard screen opens (the lesson's runner and Daily Review), NOT in the persist
+  `merge`, which would pull FSRS into the entry chunk.
+- Check after a build: `request_retention` appears in one lazy chunk
+  (`use-fsrs-upgrade-*.js`), never in `index-*.js` or `index.html`'s preloads.
+
+**`ReviewState` gained optional `stability` and `difficulty`.** A card graded before
+FSRS has neither:
+- if the review log holds its WHOLE history (as many entries as `reviewCount`), it is
+  REPLAYED through FSRS;
+- otherwise it keeps its date and gets an estimate (stability = its current wait,
+  difficulty 5 + lapses).
+
+`schedule()` estimates on the spot too, so a card graded before the upgrade runs
+still works, and `retrievability()` returns null for a card with no model.
+
+**A last review "in the future" made FSRS throw** (`Invalid delta_t`): a phone clock
+set back, or a card synced from a phone that runs ahead. In the review screen that
+would have swallowed the grade silently. `toCard()` treats it as "reviewed just now";
+`retrievability()` also returns null rather than throw. Found by a test, not by a
+student.
+
+**Early reviews no longer inflate a card**: 20 "good" grades in 20 minutes stay at a
+few days, where the old ×2 scheduler doubled each time.
+
+**The screen**: under the three piles, "ថ្ងៃនេះ អ្នកចាំបានប្រហែល N% នៃកាតដែលបានរៀន"
+with an ⓘ saying what it counts. It is absent until a card has a model. It is a
+DIFFERENT number from the ring: the ring is how you answered last time, this is how
+much is likely still remembered today.
+
+**Sync**: `card_reviews` gained `stability` and `difficulty` (double precision, both
+or neither, checked) in `20261027000002_fsrs_memory.sql`; the push sends them
+(explicit null when absent), the pull reads them back, and the review signature
+includes them, so upgrading a card re-uploads it once.
+
+**Verified:** 29 checks on `utils/fsrs.ts` through `ssrLoadModule` (intervals,
+"again" tomorrow, the cap on the due day, early grades, a legacy card, the future
+clock, a NaN model, retrievability ≈90% on the due day and falling, exact replay,
+estimate, null when nothing to do); the cap/repair test (14) and the sync test (40,
+the model round-tripping to a "new phone") still pass; PGlite 11 checks on the new
+migration (twice, old rows kept, exact round trip, every refusal); and 20 browser
+checks at 390 light and 320 dark Khmer (old cards upgraded on open, one replayed and
+one estimated; the line and its ⓘ; a ✓ grade stores an FSRS state whose time matches
+the log; no sideways scroll; no page error).
+
 ## Study progress syncs across phones (27 Oct 2026)
 
 Six persisted store fields never left the device, so a student who signed in on
@@ -9011,6 +9087,14 @@ review log, quiz and paper history) can be applied before or after the code ship
 run. Without it each of the six pushes fails quietly and the work stays on the phone; once
 it lands, the next push uploads everything. Afterwards `db:check` lists the six tables, each
 answering `200 []` to the publishable key.
+
+**`20261027000002_fsrs_memory.sql`** (FSRS's `stability` and `difficulty` on
+`card_reviews`) must be applied AFTER `20261027000001`. Apply it BEFORE the FSRS code
+deploys: the app sends both columns on every card, so until it lands the
+`card_reviews` push fails (quietly, nothing lost; it uploads once applied). `db:check`
+cannot see a column; check with a publishable-key
+`GET /rest/v1/card_reviews?select=stability&limit=0`, which answers `200` once it
+exists and `400` before.
 
 **`20261013000001_friends.sql`** (Streak with Friends) is APPLIED to the live project
 (13 Oct 2026, checked: `db:check` passes, and all five functions plus the helpers refuse

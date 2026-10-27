@@ -300,6 +300,10 @@ export type Database = {
           lapses: number;
           last_grade: ReviewGradeColumn | null;
           last_reviewed_at: string | null;
+          /** FSRS's memory model (20261027000002). Null on a row written
+           *  before it; both or neither. */
+          stability: number | null;
+          difficulty: number | null;
           updated_at: string;
         };
         Insert: {
@@ -312,6 +316,8 @@ export type Database = {
           lapses?: number;
           last_grade?: ReviewGradeColumn | null;
           last_reviewed_at?: string | null;
+          stability?: number | null;
+          difficulty?: number | null;
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["card_reviews"]["Insert"]>;

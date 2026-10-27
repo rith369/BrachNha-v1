@@ -25,6 +25,9 @@ import {
   rememberedCards,
   type QueueCard,
 } from "../review";
+import { InfoTip } from "@/components/ui/info-tip";
+import { averageRetrievability } from "@/utils/fsrs";
+import { useFsrsUpgrade } from "../use-fsrs-upgrade";
 import { DeckProgressRing } from "./deck-progress-ring";
 import { ReviewSession } from "./review-session";
 import { FlashcardForm } from "./flashcard-form";
@@ -263,6 +266,11 @@ export function FlashcardRunner({
   title: string;
 }) {
   const navigate = useNavigate();
+  useFsrsUpgrade();
+  // The moment the screen opened, for the "remember today" line. Read once, in
+  // a lazy initialiser (calling the clock in render is impure), and minutes of
+  // drift while the screen stays open change nothing a percentage shows.
+  const [openedAt] = useState(() => new Date());
   const {
     studentCards,
     cardReviews,
@@ -307,6 +315,13 @@ export function FlashcardRunner({
   const all = cardsFor(deckKey, cards, studentCards, cardReviews);
   const due = dueCardsFor(deckKey, cards, studentCards, cardReviews);
   const mine = all.filter((qc) => qc.card.source === "student");
+  // FSRS's chance of remembering, averaged over the cards already studied
+  // (utils/fsrs.ts). Null until at least one has a memory model, and then the
+  // line is simply absent: a new deck has nothing to estimate.
+  const recall = averageRetrievability(
+    all.map((qc) => qc.state),
+    openedAt
+  );
 
   // The three piles the buttons below open. Derived on every render off the
   // same `all` the counts are read from, so a pile's number and the cards its
@@ -430,6 +445,25 @@ export function FlashcardRunner({
             onOpen={() => setPile("important")}
           />
         </div>
+
+        {/* The real "remember today" figure (FSRS), replacing the made-up
+            "~N%" line removed on 27 Oct 2026. Different from the ring: the
+            ring is what you answered last time, this is how much of it is
+            likely still in your head today. */}
+        {recall !== null && (
+          <div className="mt-3 text-xs font-bold text-muted">
+            ថ្ងៃនេះ អ្នកចាំបានប្រហែល{" "}
+            <span className="font-extrabold text-text">
+              {Math.round(recall * 100)}%
+            </span>{" "}
+            នៃកាតដែលបានរៀន{" "}
+            <InfoTip label="ពន្យល់">
+              គណនាពីពេលដែលអ្នកបានពិនិត្យកាតនីមួយៗចុងក្រោយ
+              និងចំនួនដងដែលអ្នកចាំបាន។ គិតតែកាតដែលអ្នកបានរៀនរួច។
+              កាតមួយត្រឡប់មកវិញ នៅពេលឱកាសចាំបានធ្លាក់ដល់ប្រហែល 90%។
+            </InfoTip>
+          </div>
+        )}
       </div>
 
       {/* This student's own cards for this lesson — separate from the official

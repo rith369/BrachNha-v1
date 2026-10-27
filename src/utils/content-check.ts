@@ -107,7 +107,7 @@ const EM_DASH = "—";
  * WARNING, not an error: some are judgement calls (a term's own name, a chain
  * like «A – B – C»), and a wrong guess must not block Publish.
  */
-const WORD_DASH = /[\p{L}\p{M}][)\]»"']?[ \t ]+[-–][ \t ]+["'«(\[]?[\p{L}\p{M}]/u;
+const WORD_DASH = /[\p{L}\p{M}][)\]»"']?[ \t ]+[-–][ \t ]+["'«([]?[\p{L}\p{M}]/u;
 
 export const LIMITS = {
   front: 2000,

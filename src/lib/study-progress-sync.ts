@@ -126,7 +126,14 @@ function validReview(cardId: string, r: ReviewState): boolean {
     count(r.reviewCount) &&
     count(r.lapses) &&
     (r.lastGrade === null || GRADES.has(r.lastGrade)) &&
-    (r.lastReviewedAt === null || instant(r.lastReviewedAt))
+    (r.lastReviewedAt === null || instant(r.lastReviewedAt)) &&
+    // FSRS's memory model (20261027000002): both or neither, in the ranges the
+    // columns check.
+    (r.stability === undefined) === (r.difficulty === undefined) &&
+    (r.stability === undefined ||
+      (Number.isFinite(r.stability) && r.stability > 0 && r.stability <= 1_000_000)) &&
+    (r.difficulty === undefined ||
+      (Number.isFinite(r.difficulty) && r.difficulty >= 1 && r.difficulty <= 10))
   );
 }
 
@@ -139,6 +146,8 @@ function reviewSignature(r: ReviewState): string {
     r.lapses,
     r.lastGrade ?? "",
     r.lastReviewedAt ?? "",
+    r.stability ?? "",
+    r.difficulty ?? "",
   ].join("|");
 }
 
@@ -246,6 +255,10 @@ async function pushReviews(db: Db, userId: string, s: StoreState, marks: SyncMar
       lapses: r.lapses,
       last_grade: r.lastGrade,
       last_reviewed_at: r.lastReviewedAt,
+      // Explicit null, never omitted: postgrest sends the union of a batch's
+      // keys and would null the column for a row that lacked it anyway.
+      stability: r.stability ?? null,
+      difficulty: r.difficulty ?? null,
       updated_at: new Date().toISOString(),
     });
   }
@@ -562,6 +575,11 @@ export async function pullStudyProgress(userId: string): Promise<StudyProgress> 
       lapses: r.lapses,
       lastGrade: r.last_grade,
       lastReviewedAt: r.last_reviewed_at ? iso(r.last_reviewed_at) : null,
+      // A row written before FSRS has neither; the flashcard screen rebuilds
+      // it from the pulled review log (features/practice/use-fsrs-upgrade.ts).
+      ...(r.stability !== null && r.difficulty !== null
+        ? { stability: Number(r.stability), difficulty: Number(r.difficulty) }
+        : {}),
     };
   }
 

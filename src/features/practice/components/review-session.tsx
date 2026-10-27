@@ -4,7 +4,12 @@ import { Check, X } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
 import { FocusLayout, FocusButton } from "@/components/shell/focus-layout";
-import type { ReviewGrade, ReviewResult } from "@/utils/spaced-repetition";
+import {
+  initialReviewState,
+  type ReviewGrade,
+  type ReviewResult,
+} from "@/utils/spaced-repetition";
+import { schedule } from "@/utils/fsrs";
 import type { DeckProgress, QueueCard } from "../review";
 import { SwipeableFlashcard } from "./swipeable-flashcard";
 import { FlashcardSummary } from "./flashcard-summary";
@@ -156,7 +161,14 @@ export function ReviewSession({
   }
 
   function rate(grade: ReviewGrade) {
-    gradeCard(current.card.id, grade);
+    // Scheduled from the card's LIVE state, read at the moment of the grade,
+    // not from `current.state`: the queue is a snapshot taken when the session
+    // opened. FSRS runs here rather than in the store so the library stays out
+    // of the entry chunk (see gradeCard in lib/store.ts).
+    const prev =
+      useBrachNhaStore.getState().cardReviews[current.card.id] ??
+      initialReviewState();
+    gradeCard(current.card.id, grade, schedule(prev, grade));
     // `deckKey` IS already a lesson key ("biology-1-1"), so there is nothing to
     // derive here — and deriving it ABOVE, next to `current`, is precisely the
     // crash the comment above describes: the compiler would memoize it with

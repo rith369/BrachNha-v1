@@ -10,6 +10,7 @@ import {
   deckProgress,
 } from "@/features/practice/review";
 import { ReviewSession } from "@/features/practice/components/review-session";
+import { useFsrsUpgrade } from "@/features/practice/use-fsrs-upgrade";
 import { ContentWaitingScreen } from "@/features/practice/components/content-waiting";
 
 /**
@@ -36,6 +37,8 @@ import { ContentWaitingScreen } from "@/features/practice/components/content-wai
  */
 export default function PracticeReviewPage() {
   const navigate = useNavigate();
+  // Cards graded before FSRS get their memory model (features/practice/use-fsrs-upgrade.ts).
+  useFsrsUpgrade();
   const manifest = useContentManifest();
   const decks = useAllBodies("deck", manifest);
   const { studentCards, cardReviews } = useBrachNhaStore(

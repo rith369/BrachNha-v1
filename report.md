@@ -15,6 +15,39 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 27 Oct 2026: Smarter Flashcards, and a Real "Remember Today" Figure
+
+Commit: (filled in after commit). **Database step:** apply
+`20261027000002_fsrs_memory.sql` in the Supabase SQL editor (one run) BEFORE this is
+deployed. Until it is, flashcard progress stops saving to the account (nothing is lost:
+it stays on the phone and uploads once the step is done).
+
+**Why.** Flashcards used a simple rule: each "remember" doubled the wait. It ignored time,
+so reviewing a card several times in one sitting pushed it months away, and the app could
+not say how much a student actually still remembers.
+
+**What changed:**
+
+- **Flashcards now use FSRS**, the memory model the Anki app uses. For each card it
+  learns how well the student knows it and how hard it is for them, and brings it back
+  just before they are likely to forget it (when the chance of remembering drops to about
+  90%).
+- **Reviewing a card many times in a row no longer sends it months away.**
+- **A card you forget still comes back tomorrow**, as before. The longest wait is still one
+  year.
+- **New line on a lesson's flashcard screen**, under the three piles: "ថ្ងៃនេះ
+  អ្នកចាំបានប្រហែល 89% នៃកាតដែលបានរៀន" (today you remember about 89% of the cards you
+  have studied), with an ⓘ that explains it. It is a different number from the ring: the
+  ring is how you answered last time, this is how much is likely still in your head today.
+- **Cards studied before today are converted automatically** the first time a flashcard
+  screen opens, using each card's past answers.
+- **Due dates will shift a little**: easy cards come back later, hard ones sooner.
+
+**What to re-test:** open a flashcard lesson you have studied before; the new line should
+appear with a percentage. Review a few cards, then check that the piles and the ring still
+update. Open it on a second phone (same account) after the database step: the same cards
+should come back on the same days.
+
 ## 27 Oct 2026: One "Remembered" Number on the Flashcard Screen, Not Two
 
 Commit: `3259fa8`. No database step.

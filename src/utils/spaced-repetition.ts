@@ -1,20 +1,19 @@
 /**
- * A deliberately SIMPLIFIED spaced-repetition scheduler — day-interval math,
- * not a memory model. This is a prototype, and the brief for it is explicit:
- * don't build FSRS/SM-2 now, but structure the code so a real one can replace
- * this file later without touching the UI.
+ * The flashcard review STATE and the cheap questions about it: is a card due,
+ * what does a fresh one look like, and the one-year repair.
  *
- * THAT SWAP BOUNDARY IS THIS FILE. Every caller — the review runner, the
- * due-card queries in features/practice/review.ts — only ever calls
- * `schedule(state, grade, now)` and reads `ReviewState`/`isDue`. A future FSRS
- * integration means replacing the body of `schedule` (and, if FSRS's own state
- * shape needs more fields, extending `ReviewState`) — the call sites do not
- * change, because they already only depend on this narrow interface rather than
- * reaching into scheduling internals.
+ * THE SCHEDULER ITSELF IS NOT HERE ANY MORE. Since 27 Oct 2026 the next state
+ * after a grade comes from FSRS (the memory model Anki uses), in
+ * utils/fsrs.ts. The split is about BYTES: this file is imported by the store
+ * and by Home's study feed, both in the entry chunk every student downloads
+ * first, and the FSRS library is ~13 KB gzipped. utils/fsrs.ts is reached only
+ * from the flashcard screens, which are lazy routes, so the library downloads
+ * when a student opens flashcards and never before. Do not import utils/fsrs.ts
+ * from anything the entry chunk reaches; check `dist/assets/index-*.js` for
+ * "request_retention" after touching either file.
  *
  * Pure, no React and no store import — same shape as utils/rewards.ts and
- * utils/focus-styles.ts. The store (lib/store.ts) is what wires this to
- * `cardReviews`; this file has no idea a store exists.
+ * utils/focus-styles.ts.
  */
 
 import { addDaysKey, todayKey } from "@/utils/day";
@@ -22,29 +21,34 @@ import { addDaysKey, todayKey } from "@/utils/day";
 export type ReviewGrade = "again" | "hard" | "good" | "easy";
 
 /**
- * Where a card sits in the learning cycle:
- *  - "new"        never graded
- *  - "learning"   graded at least once, still working toward its first real
- *                 interval (only reachable by grading a "new" card "again")
- *  - "review"     graduated — has a real multi-day interval
- *  - "relearning" a REVIEW card that lapsed ("again"), stepping back down
- *                 before it re-enters "review"
+ * FSRS's card states. With the settings in utils/fsrs.ts (no same-day learning
+ * steps) a graded card is always "review"; "learning" and "relearning" survive
+ * only on cards graded by the old scheduler, and nothing reads the phase to
+ * decide anything on screen.
  */
 export type CardPhase = "new" | "learning" | "review" | "relearning";
 
 export interface ReviewState {
   phase: CardPhase;
-  /** Current interval in days. 0 while "new"/"learning"/just-lapsed. */
+  /** Days from the last grade to `dueAt`. */
   intervalDays: number;
   /** ISO calendar date ("yyyy-mm-dd") this card is next due. Compared by date
    *  only, not exact time — a card due today is due the whole day. */
   dueAt: string;
   reviewCount: number;
-  /** Times a REVIEW card has been graded "again". Not incremented for a "new"
-   *  card's first "again" — that is normal first-pass forgetting, not a lapse. */
+  /** Times a card the student knew was then graded "again". */
   lapses: number;
   lastGrade: ReviewGrade | null;
   lastReviewedAt: string | null;
+  /**
+   * FSRS's memory model (utils/fsrs.ts). STABILITY is how many days until the
+   * chance of remembering falls to 90%; DIFFICULTY is 1 (easy) to 10 (hard).
+   * OPTIONAL because cards graded before FSRS have neither: utils/fsrs.ts
+   * rebuilds them from the review log the first time a flashcard screen opens
+   * (`upgradeReviews`).
+   */
+  stability?: number;
+  difficulty?: number;
 }
 
 /** One graded card during a session — kept locally by the runner to build the
@@ -66,8 +70,12 @@ export interface ReviewResult {
  * asked for those cards to come back LATER instead. They are not stranded until
  * tomorrow either; the intro screen's មិនទាន់ចងចាំ pile opens exactly this set
  * on demand, whenever the student wants another pass (see flashcard-runner.tsx).
+ *
+ * FSRS would sometimes say 2 days for a lapsed card it knew well; utils/fsrs.ts
+ * overrides that to this, because "a card you forgot comes back tomorrow" is the
+ * rule the students were told.
  */
-const AGAIN_INTERVAL_DAYS = 1;
+export const AGAIN_INTERVAL_DAYS = 1;
 
 /**
  * The longest a card may wait: a year, which is past the Bac II for any
@@ -99,75 +107,6 @@ export function initialReviewState(now: Date = new Date()): ReviewState {
     lapses: 0,
     lastGrade: null,
     lastReviewedAt: null,
-  };
-}
-
-/**
- * Grade a card and return its next state.
- *
- * The interval table, deterministic on purpose:
- *
- *  - "again" on ANY card schedules it AGAIN_INTERVAL_DAYS out (phase
- *    "learning"/"relearning", interval reset to 0 so the next good grade
- *    graduates it from the bottom of the ladder rather than scaling a stale
- *    number). See that constant for why it is a day rather than "later in
- *    this same session," which is what it used to be.
- *  - "again" on a REVIEW card additionally counts as a lapse and resets its
- *    interval — it was going to be trusted with a multi-day gap and wasn't
- *    ready.
- *  - Grading a new/learning/relearning card anything OTHER than "again"
- *    graduates it straight into "review" with a short first interval
- *    (1 / 3 / 7 days for hard / good / easy). No multi-step learning ladder —
- *    "do not over-engineer this" is the instruction this follows.
- *  - Grading an established REVIEW card scales its existing interval
- *    (×1.2 / ×2 / ×2.5 for hard / good / easy), floored at 1 day.
- */
-export function schedule(
-  state: ReviewState,
-  grade: ReviewGrade,
-  now: Date = new Date()
-): ReviewState {
-  const base = {
-    reviewCount: state.reviewCount + 1,
-    lastGrade: grade,
-    lastReviewedAt: now.toISOString(),
-  };
-
-  if (grade === "again") {
-    const wasReview = state.phase === "review" || state.phase === "relearning";
-    return {
-      ...state,
-      ...base,
-      phase: wasReview ? "relearning" : "learning",
-      intervalDays: 0,
-      dueAt: addDays(now, AGAIN_INTERVAL_DAYS),
-      lapses: wasReview ? state.lapses + 1 : state.lapses,
-    };
-  }
-
-  const graduating = state.phase !== "review";
-  if (graduating) {
-    const days = grade === "hard" ? 1 : grade === "good" ? 3 : 7;
-    return {
-      ...state,
-      ...base,
-      phase: "review",
-      intervalDays: days,
-      dueAt: addDays(now, days),
-    };
-  }
-
-  const multiplier = grade === "hard" ? 1.2 : grade === "good" ? 2 : 2.5;
-  const days = Math.min(
-    MAX_INTERVAL_DAYS,
-    Math.max(1, Math.round(state.intervalDays * multiplier))
-  );
-  return {
-    ...state,
-    ...base,
-    phase: "review",
-    intervalDays: days,
-    dueAt: addDays(now, days),
   };
 }
 
