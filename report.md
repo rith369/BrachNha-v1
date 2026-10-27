@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 27 Oct 2026: Battle Photos Turned Off
 
-Commit: _pending_. No database step.
+Commit: `ad8434f`. No database step.
 
 **Why.** After a Battle, students could photograph their working for each question, and those
 photos were filling up the app's storage.
