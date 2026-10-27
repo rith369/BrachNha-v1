@@ -15,6 +15,25 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 27 Oct 2026: Quiz "Try Again" Repeats Only the Wrong Questions
+
+Commit: _pending_. No database step.
+
+**Why.** After a quiz, "Try again" made the student answer all 10 questions again, even the
+ones they already got right, to reach the few they missed.
+
+**What changed:**
+- The button on the results screen is now **ធ្វើសំណួរខុសម្តងទៀត (N)**: it runs only the
+  questions answered wrong (or left unanswered). The results after it keep the real question
+  numbers (សំណួរ 2, 3, 5…), and if some are still wrong the button offers those again.
+- When nothing is wrong, the button is the usual **ធ្វើម្តងទៀត** (the whole quiz). The whole
+  quiz is also always on the section's own screen.
+- A wrong-only retry does not count as a new attempt: it is not added to the quiz history or
+  the best score, and it does not tick the daily practice task. Correct answers still earn XP.
+
+**Re-test:** finish a maths quiz with a few wrong, press the new button, check only those
+questions come back, then check the history on the section's screen shows one attempt.
+
 ## 27 Oct 2026: Smarter Flashcards, and a Real "Remember Today" Figure
 
 Commit: `a5e222b`. **Database step:** apply

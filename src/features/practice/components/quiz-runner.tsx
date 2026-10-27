@@ -84,9 +84,13 @@ export function QuizRunner({
   subjectId,
   contentKey,
   mode,
+  numbers,
   onSubmit,
 }: {
   questions: SectionQuestion[];
+  /** Each question's position in the WHOLE quiz, when this sitting is only
+   *  part of it (retrying the wrong ones). Absent = the whole quiz. */
+  numbers?: number[];
   subjectId: string;
   /** The lesson key this quiz belongs to ("biology-3-1"), for the content log
    *  Progress reads. Passed in rather than rebuilt from subjectId + lessonRef,
@@ -316,7 +320,7 @@ export function QuizRunner({
           {answer && (
             <ReportMistake
               key={`report-${index}`}
-              contentRef={quizRef(contentKey, question, index)}
+              contentRef={quizRef(contentKey, question, numbers?.[index] ?? index)}
               className="mt-3"
             />
           )}

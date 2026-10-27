@@ -4324,6 +4324,19 @@ from the questions** rather than trusting the attempt's stored numbers — the r
 `PastPaperResults` follows — which is also what lets a row from last week reopen
 the real explanations instead of a remembered percentage.
 
+**The review's main button retries ONLY THE WRONG ONES** (27 Oct 2026, the user's
+call): ធ្វើសំណួរខុសម្តងទៀត (N), unanswered counting as wrong. With nothing wrong it
+is ធ្វើម្តងទៀត, the whole quiz; the detail screen always offers the whole quiz too.
+- `QuizScreen`'s `run` and `result` modes carry optional `indexes` (positions in
+  TODAY's quiz). The wrong questions are found there by id, so retrying from an
+  older version's review works; one no longer in the quiz is dropped.
+- **A retry is NOT an attempt**: no history row, no daily task, no path node, no
+  `quiz_done`. Three re-answered questions at 100% would read as a perfect sitting
+  and become the best score. Per-question XP and the content log are still paid by
+  the runner, as on any full retake.
+- `numbers` on `QuizRunner` and `QuizResults` keeps each question's number in the
+  whole quiz, so rows read សំណួរ 2, 3, 5 and a report's index fallback stays right.
+
 **`quizResults` is a new persisted field, and it is NOT a widening of anything.**
 `examResults` captions Home's "from mock exams" pill and feeds KruAI an average
 it states as fact; `paperResults` is a paper, with parts and a clock budget. It

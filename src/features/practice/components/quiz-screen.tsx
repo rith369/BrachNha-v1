@@ -16,8 +16,15 @@ import { retryBody, useContentBody } from "@/lib/content";
  *  it was taken on, which may be older than the one published now. */
 type Mode =
   | { kind: "detail" }
-  | { kind: "run" }
-  | { kind: "result"; attempt: QuizAttempt; version: number };
+  /** `indexes` = a retry of only these questions (positions in today's quiz);
+   *  absent = the whole quiz. */
+  | { kind: "run"; indexes?: number[] }
+  | {
+      kind: "result";
+      attempt: QuizAttempt;
+      version: number;
+      indexes?: number[];
+    };
 
 /**
  * The review of an attempt taken on an OLDER version of this quiz. Its answers
@@ -31,7 +38,8 @@ function OlderVersionResults({
   fallback,
   attempt,
   title,
-  onRetake,
+  onRetryWrong,
+  onRetakeAll,
   onBack,
 }: {
   contentKey: string;
@@ -40,7 +48,8 @@ function OlderVersionResults({
   fallback: SectionQuestion[];
   attempt: QuizAttempt;
   title: string;
-  onRetake: () => void;
+  onRetryWrong: (wrong: SectionQuestion[]) => void;
+  onRetakeAll: () => void;
   onBack: () => void;
 }) {
   const old = useContentBody("quiz", contentKey, version);
@@ -58,7 +67,8 @@ function OlderVersionResults({
       questions={old.status === "ready" ? old.body : fallback}
       attempt={attempt}
       title={title}
-      onRetake={onRetake}
+      onRetryWrong={onRetryWrong}
+      onRetakeAll={onRetakeAll}
       onBack={onBack}
     />
   );
@@ -128,7 +138,31 @@ export function QuizScreen({
     navigate(`/practice/quiz/${subjectId}`);
   }
 
-  function handleSubmit(attempt: QuizAttempt) {
+  /**
+   * Retry only the questions answered wrong. They may come from an OLDER
+   * version's review, so each is found in TODAY's quiz by its id (ids are kept
+   * for ever, so an edited question keeps its id); a question with no id can
+   * only be today's own object. Anything no longer in the quiz is dropped, and
+   * if nothing is left the whole quiz runs.
+   */
+  function retryWrong(wrong: SectionQuestion[]) {
+    const indexes = wrong
+      .map((w) =>
+        w.id ? questions.findIndex((q) => q.id === w.id) : questions.indexOf(w)
+      )
+      .filter((i) => i >= 0);
+    setMode(indexes.length ? { kind: "run", indexes } : { kind: "run" });
+  }
+
+  function handleSubmit(attempt: QuizAttempt, indexes?: number[]) {
+    // A retry of the wrong ones is NOT an attempt at the quiz: the history
+    // row, best score, daily task and path node are about the whole section,
+    // and three questions re-answered at 100% would read as a perfect sitting.
+    // Per-question XP and the content log were already paid by the runner.
+    if (indexes) {
+      setMode({ kind: "result", attempt, version, indexes });
+      return;
+    }
     // The SAME `tasks.practice` field Home's daily checklist and Roadmap's
     // Daily Mission read, so a finished quiz is one real completion rather than
     // a second tracker beside the self-reported one.
@@ -175,13 +209,18 @@ export function QuizScreen({
   }
 
   if (mode.kind === "run") {
+    const { indexes } = mode;
     return (
       <QuizRunner
-        questions={questions}
+        // Keyed so a second retry straight after the first starts fresh
+        // rather than reusing the runner's answers and clocks.
+        key={indexes ? indexes.join(",") : "all"}
+        questions={indexes ? indexes.map((i) => questions[i]) : questions}
+        numbers={indexes}
         subjectId={subjectId}
         contentKey={contentKey}
         mode="quiz"
-        onSubmit={handleSubmit}
+        onSubmit={(attempt) => handleSubmit(attempt, indexes)}
       />
     );
   }
@@ -194,19 +233,26 @@ export function QuizScreen({
         fallback={questions}
         attempt={mode.attempt}
         title={title}
-        onRetake={() => setMode({ kind: "run" })}
+        onRetryWrong={retryWrong}
+        onRetakeAll={() => setMode({ kind: "run" })}
         onBack={exit}
       />
     );
   }
 
   if (mode.kind === "result") {
+    const { indexes } = mode;
     return (
       <QuizResults
-        questions={questions}
+        // A new review per sitting, so rows open/closed state does not carry
+        // over from the review before the retry.
+        key={indexes ? `retry-${indexes.join(",")}` : "all"}
+        questions={indexes ? indexes.map((i) => questions[i]) : questions}
+        numbers={indexes}
         attempt={mode.attempt}
         title={title}
-        onRetake={() => setMode({ kind: "run" })}
+        onRetryWrong={retryWrong}
+        onRetakeAll={() => setMode({ kind: "run" })}
         onBack={exit}
       />
     );

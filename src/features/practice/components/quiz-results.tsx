@@ -26,18 +26,30 @@ import type { QuizAttempt } from "./quiz-runner";
  * the rule PastPaperResults follows: the headline and the rows are then one
  * derivation, so they cannot disagree. That is also what lets a history row from
  * last week reopen the real explanations instead of a remembered percentage.
+ *
+ * THE MAIN BUTTON RETRIES ONLY THE WRONG ONES (the user's call, 27 Oct 2026).
+ * Re-answering seven questions you already got right to reach the three you
+ * missed is busywork. With nothing wrong it retakes the whole quiz; a full
+ * retake is also always on the section's detail screen.
  */
 export function QuizResults({
   questions,
   attempt,
   title,
-  onRetake,
+  numbers,
+  onRetryWrong,
+  onRetakeAll,
   onBack,
 }: {
   questions: SectionQuestion[];
   attempt: QuizAttempt;
   title: string;
-  onRetake: () => void;
+  /** Each row's number in the whole quiz, for a sitting that was only part of
+   *  it. Absent = the rows ARE the whole quiz. */
+  numbers?: number[];
+  /** Handed the questions answered wrong (or left unanswered). */
+  onRetryWrong: (wrong: SectionQuestion[]) => void;
+  onRetakeAll: () => void;
   onBack: () => void;
 }) {
   const marked = questions.map((q, i) => ({
@@ -59,6 +71,8 @@ export function QuizResults({
   // whole seconds, so on a very fast sitting every question reads 0:00 and
   // "slowest: question 1 (0:00)" is noise dressed as a finding.
   const showSlowest = questions.length > 1 && marked[slowest].ms >= 1000;
+  const wrong = marked.filter((m) => !m.ok).map((m) => m.q);
+  const numberOf = (i: number) => (numbers?.[i] ?? i) + 1;
 
   return (
     <FocusLayout
@@ -69,7 +83,13 @@ export function QuizResults({
           <FocusButton variant="secondary" onClick={onBack}>
             ← ត្រឡប់ក្រោយ
           </FocusButton>
-          <FocusButton onClick={onRetake}>ធ្វើម្តងទៀត →</FocusButton>
+          {wrong.length > 0 ? (
+            <FocusButton onClick={() => onRetryWrong(wrong)}>
+              ធ្វើសំណួរខុសម្តងទៀត ({wrong.length}) →
+            </FocusButton>
+          ) : (
+            <FocusButton onClick={onRetakeAll}>ធ្វើម្តងទៀត →</FocusButton>
+          )}
         </div>
       }
     >
@@ -104,7 +124,7 @@ export function QuizResults({
             {showSlowest && (
               <span>
                 {" "}
-                · យឺតបំផុត សំណួរ {slowest + 1} ({clockLabel(marked[slowest].ms)})
+                · យឺតបំផុត សំណួរ {numberOf(slowest)} ({clockLabel(marked[slowest].ms)})
               </span>
             )}
           </div>
@@ -112,7 +132,7 @@ export function QuizResults({
 
         <div className="flex flex-col gap-2.5">
           {marked.map((m, i) => (
-            <ReviewRow key={i} index={i} {...m} />
+            <ReviewRow key={i} number={numberOf(i)} {...m} />
           ))}
         </div>
       </div>
@@ -129,13 +149,14 @@ export function QuizResults({
  */
 function ReviewRow({
   q,
-  index,
+  number,
   answer,
   ms,
   ok,
 }: {
   q: SectionQuestion;
-  index: number;
+  /** 1-based, its number in the whole quiz. */
+  number: number;
   answer: string | null;
   ms: number;
   ok: boolean;
@@ -173,7 +194,7 @@ function ReviewRow({
 
         <span className="min-w-0 flex-1">
           <span className="mb-0.5 flex items-center gap-2 text-[11px] font-extrabold text-muted md:text-xs">
-            សំណួរ {index + 1}
+            សំណួរ {number}
             <span className="inline-flex items-center gap-1 tabular-nums">
               <Timer className="size-3 shrink-0" strokeWidth={2.5} />
               {clockLabel(ms)}
