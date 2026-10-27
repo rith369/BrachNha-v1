@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 27 Oct 2026: Quiz "Try Again" Repeats Only the Wrong Questions
 
-Commit: _pending_. No database step.
+Commit: `7639a99`. No database step.
 
 **Why.** After a quiz, "Try again" made the student answer all 10 questions again, even the
 ones they already got right, to reach the few they missed.
