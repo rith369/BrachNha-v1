@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 27 Oct 2026: Small Look Fixes and a New Browser Tab Icon
 
-Commit: (filled in after commit). No database step.
+Commit: `132d617`. No database step.
 
 **What changed:**
 
