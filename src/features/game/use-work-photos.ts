@@ -16,6 +16,16 @@ import {
  * export from a `.tsx` trips oxlint's only-export-components rule.
  */
 
+/**
+ * THE SWITCH FOR THE WHOLE FEATURE. Off since 27 Oct 2026 (the user's call):
+ * the photos were using up Supabase storage. Off, the review goes straight to
+ * the answers, no photo strip or report flag shows, and NOTHING is listed,
+ * signed or uploaded. The code, the bucket and its policies stay, so turning
+ * this back on is the whole change. Account deletion still clears any photos
+ * left in the bucket (lib/account-deletion.ts does not read this).
+ */
+export const WORK_PHOTOS_ENABLED = false;
+
 export type PhotoLoad = "idle" | "loading" | "ready" | "failed";
 
 export interface PhotoList {
@@ -48,7 +58,8 @@ export function usePhotoList(
   // without the caller having to change anything else.
   const [attempt, setAttempt] = useState(0);
 
-  const active = enabled && isSupabaseConfigured && Boolean(userId);
+  const active =
+    WORK_PHOTOS_ENABLED && enabled && isSupabaseConfigured && Boolean(userId);
 
   useEffect(() => {
     if (!active) return;
@@ -125,7 +136,7 @@ export function useMyWorkPhotos(
   alreadyTaken: boolean
 ): MyWorkPhotos {
   const setWorkPhoto = useBrachNhaStore((s) => s.setWorkPhoto);
-  const available = isSupabaseConfigured && Boolean(userId);
+  const available = WORK_PHOTOS_ENABLED && isSupabaseConfigured && Boolean(userId);
   const listed = usePhotoList(competitionId, userId, available);
 
   const [added, setAdded] = useState<WorkPhoto[]>([]);

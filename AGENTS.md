@@ -5395,6 +5395,25 @@ said no row may ever link because the only thing behind a competition is playing
 it and playing your own is a race against yourself. True until the review
 existed; what a row leads to now is specifically the creator's, never the quiz.
 
+##### THE PHOTO FEATURE IS OFF (27 Oct 2026)
+
+The user turned it off because the photos were filling Supabase storage.
+`WORK_PHOTOS_ENABLED = false` in `features/game/use-work-photos.ts` is the only
+change: both hooks AND it in, so `mine.available` is false and every photo part of
+the review disappears through the gates that already existed (no photo step, no
+strips, no lock note, no report flag), and nothing is listed, signed or uploaded.
+The review opens straight on the answers.
+- **Kept on purpose:** the code, the `competition-work` bucket and its policies,
+  `/admin/reports`, and the photo cleanup in account deletion, which does not read
+  the switch, so leftover photos are still removed with an account.
+- **No migration.** Uploads are still allowed by the policies, so a tab already
+  open before the deploy, or a hand-made request, could still add a photo.
+  Accepted, the user's call. Dropping `"competition work: insert own"` would close it.
+- **Storage is only freed by deleting the existing files** (Supabase → Storage →
+  `competition-work`). Turning the switch off frees nothing by itself.
+
+Everything below describes the feature as it works when switched on.
+
 ##### Photos are PER QUESTION, several per question — and the step is ONE screen
 
 **It began as one photo per student per competition, and that was the wrong

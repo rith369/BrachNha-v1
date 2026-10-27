@@ -15,6 +15,25 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 27 Oct 2026: Battle Photos Turned Off
+
+Commit: _pending_. No database step.
+
+**Why.** After a Battle, students could photograph their working for each question, and those
+photos were filling up the app's storage.
+
+**What changed:**
+- After a Battle the review goes straight to the answers. There is no "photograph your
+  working" step, no photos under the questions, and no "Report photo" button.
+- Nothing is uploaded or downloaded any more.
+- The feature is switched off, not deleted, so it can come back with a one-line change.
+
+**To actually free the space:** the photos already uploaded are still stored. Delete them in
+Supabase → Storage → `competition-work` (select all, delete). Nothing in the app needs them.
+
+**Re-test:** finish a Battle: after the result, "See the answers" should open the answers
+directly, with no photo step.
+
 ## 27 Oct 2026: A New "Section Finished" Screen
 
 Commit: `26f5d62`. No database step.
