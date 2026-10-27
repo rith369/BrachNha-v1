@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 27 Oct 2026: Smarter Flashcards, and a Real "Remember Today" Figure
 
-Commit: (filled in after commit). **Database step:** apply
+Commit: `a5e222b`. **Database step:** apply
 `20261027000002_fsrs_memory.sql` in the Supabase SQL editor (one run) BEFORE this is
 deployed. Until it is, flashcard progress stops saving to the account (nothing is lost:
 it stays on the phone and uploads once the step is done).
