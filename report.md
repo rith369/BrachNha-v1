@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 27 Oct 2026: A Flashcard Never Waits More Than a Year
 
-Commit: (filled in after commit). No database step.
+Commit: `aeab3db`. No database step.
 
 **Why.** Each time a card is marked "remember", the wait before it comes back doubles.
 There was no limit, so a card marked many times could be scheduled thousands of years
