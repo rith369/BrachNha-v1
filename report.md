@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 27 Oct 2026: One "Remembered" Number on the Flashcard Screen, Not Two
 
-Commit: (filled in after commit). No database step.
+Commit: `3259fa8`. No database step.
 
 **What changed:** a lesson's flashcard screen showed two percentages. The ring (the share
 of cards you marked "remember") is real and stays. The line under the piles,
