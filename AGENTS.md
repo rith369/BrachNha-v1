@@ -158,10 +158,17 @@ A first pass on 13 Oct 2026 rewrote the time slots and scorelines as `ដល់`
 languages of `BAC2_ANSWER_RULES` next to the em dash line, with the range
 examples spelled out so it does not avoid them.
 
-**Still to fix in the database content** (Admin → Content, not code): the SNC
-option in the History game questions, `(Estrogen - …)` on a biology flashcard
-and `(Sympathetic - …)` in section `biology-3-1-1`. Neither `check:content`
-nor the editor catches a dash between words yet.
+**The editor and `check:content` catch it in database content (27 Oct 2026)**:
+`wordDash` in `utils/content-check.ts`, a dash with spaces and a LETTER on both
+sides, outside `$…$`, never across a line break, so ranges, minus signs, list
+lines and hyphenated words pass. A WARNING, not an error: some are judgement
+calls, and a wrong guess must not block Publish. On that day it found 7, still
+to fix in Admin → Content (not code): deck `biology-3-3` cards 8 (Cortisol) and
+10 (Estrogen), deck `biology-5-2` card 1 (One gene - one enzyme), section
+`biology-3-1-4` (Sympathetic; this list used to say 3-1-1, wrongly), game
+`biology` question 27 (the «… – … – …» axis), and game `history` question 29
+(the SNC option, which is also its correct answer). The app's own strings in
+code are still not checked.
 
 **2. No sparkle or four-point star icon anywhere**: not Lucide's `Sparkles`,
 `Sparkle` or `WandSparkles`, not the ✨ emoji, not a hand-drawn star of the same
@@ -200,7 +207,8 @@ landed.
   which has to match what the student actually sees on their device.
 
 **Neither rule is machine-checked in code.** `check:digits` catches Khmer numerals
-(and the content editor and `check:content` catch broken TeX and em dashes in content);
+(and the content editor and `check:content` catch broken TeX, em dashes and, as a
+warning, dashes between words in content);
 nothing catches an em dash or a stray English word in the app's own strings, so both are a matter of writing them correctly the first time. To audit by
 hand: search user-visible strings for `—`, and for Latin words inside strings
 containing Khmer.

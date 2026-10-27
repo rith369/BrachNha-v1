@@ -15,6 +15,23 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 27 Oct 2026: The Content Editor Warns About a Dash Between Words
+
+Commit: (filled in after commit). No database step. Admin accounts only.
+
+**Why.** The app's rule is no dash between words in text students read, for example
+"(SNC - Supreme National Council)". Students read it as machine-written. Nothing
+checked for it, so it slipped into lessons and questions.
+
+**What changed:** in Admin → Content, a text with a dash between words now shows a yellow
+warning under it, with a tip on how to fix it. It is a warning, not a block: Publish still
+works, because a few dashes are right (for example part of a term's own name). A dash
+between numbers, like 1975 – 1979 or 45°C - 60°C, and maths are not flagged.
+
+**To fix now (7 places, in Admin → Content):** Flashcards biology 3.3 cards 8 and 10;
+Flashcards biology 5.2 card 1; lesson section 3.1.4 (biology); Game questions biology
+question 27; Game questions history question 29.
+
 ## 27 Oct 2026: A Flashcard Never Waits More Than a Year
 
 Commit: `aeab3db`. No database step.

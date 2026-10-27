@@ -57,6 +57,7 @@ export type IssueCode =
   | "strayDollar"
   | "khmerDigits"
   | "emDash"
+  | "wordDash"
   | "tooFewOptions"
   | "tooManyOptions"
   | "sameOptions"
@@ -97,6 +98,16 @@ const KHMER = /[ក-៿]/;
 /** Khmer numerals. Every number the app shows is in Latin digits (AGENTS.md). */
 const KHMER_DIGIT = /[\u17E0-\u17E9]/;
 const EM_DASH = "—";
+/**
+ * A dash BETWEEN WORDS ("SNC - Supreme National Council"), the 13 Oct 2026
+ * rule in AGENTS.md: spaces on both sides and a LETTER on both sides, so a
+ * range of numbers ("1975 – 1979", "45°C - 60°C", "pH = 1.5 - 2") is left
+ * alone. Spaces only, never a line break, so a list line ("- " at the start of
+ * a line) is left alone too; maths between $ signs is never looked at. A
+ * WARNING, not an error: some are judgement calls (a term's own name, a chain
+ * like «A – B – C»), and a wrong guess must not block Publish.
+ */
+const WORD_DASH = /[\p{L}\p{M}][)\]»"']?[ \t ]+[-–][ \t ]+["'«(\[]?[\p{L}\p{M}]/u;
 
 export const LIMITS = {
   front: 2000,
@@ -241,6 +252,18 @@ function checkText(
   }
   if (text.includes(EM_DASH)) {
     issues.push({ level: "error", code: "emDash", item, field, detail: snippet(text) });
+  }
+  const prose = text.includes("$")
+    ? splitMath(text).flatMap((s) => (s.type === "text" ? [s.value] : []))
+    : [text];
+  for (const part of prose) {
+    const at = part.search(WORD_DASH);
+    if (at === -1) continue;
+    // The words around the dash, not the start of the field: the dash can sit
+    // deep inside a long flashcard back.
+    const near = part.slice(Math.max(0, at - 15), at + 25).trim();
+    issues.push({ level: "warning", code: "wordDash", item, field, detail: near });
+    break;
   }
   if (text.includes("<svg")) checkSvg(issues, item, field, text);
   if (!text.includes("$")) return;
@@ -742,6 +765,7 @@ export function describeIssue(issue: ContentIssue): string {
     strayDollar: "has a $ that is not closed, padded, or split across a line",
     khmerDigits: "has Khmer numerals (use 0-9)",
     emDash: "has an em dash (use a comma or a full stop)",
+    wordDash: "has a dash between words (use a comma, a colon, ៖ or brackets)",
     tooFewOptions: "needs at least 2 options",
     tooManyOptions: "has more than 6 options",
     sameOptions: "has two options spelled the same",

@@ -100,6 +100,7 @@ const en = {
     strayDollar: "has a $ that is not closed",
     khmerDigits: "has Khmer numerals; use 0-9",
     emDash: "has a long dash; use a comma or a full stop",
+    wordDash: "has a dash between words",
     tooFewOptions: "needs at least 2 options",
     tooManyOptions: "has more than 6 options",
     sameOptions: "has two options that are the same",
@@ -344,6 +345,8 @@ const en = {
     strayDollar: "Every $ needs a closing $ on the same line, with no space just inside either one.",
     khmerDigits: "Write numbers with 0-9, the way the exam paper does.",
     emDash: "Use a comma or a full stop instead of the long dash.",
+    wordDash:
+      "Students read a dash between words as machine-written. Use a comma, a colon, ៖ or brackets: (SNC - Supreme National Council) becomes (SNC). A dash between numbers, like 1975 – 1979, is fine. This is a warning, so you can still publish if the dash is right here.",
     tooFewOptions: "Add another option.",
     tooManyOptions: "Remove options until there are 6 or fewer.",
     sameOptions: "Change one of the two options so they are different.",
@@ -468,6 +471,7 @@ const km: ContentCopy = {
     strayDollar: "មានសញ្ញា $ មិនបានបិទ",
     khmerDigits: "មានលេខខ្មែរ សូមប្រើ 0-9",
     emDash: "មានសញ្ញាដាច់វែង សូមប្រើក្បៀស ឬខណ្ឌ",
+    wordDash: "មានសញ្ញា - នៅចន្លោះពាក្យ",
     tooFewOptions: "ត្រូវការជម្រើសយ៉ាងតិច 2",
     tooManyOptions: "មានជម្រើសលើសពី 6",
     sameOptions: "មានជម្រើសពីរដូចគ្នា",
@@ -705,6 +709,8 @@ const km: ContentCopy = {
     strayDollar: "សញ្ញា $ នីមួយៗត្រូវការ $ បិទនៅបន្ទាត់ដដែល ដោយគ្មានដកឃ្លានៅខាងក្នុង។",
     khmerDigits: "សរសេរលេខដោយ 0-9 ដូចក្នុងវិញ្ញាសាប្រឡង។",
     emDash: "ប្រើក្បៀស ឬខណ្ឌ ជំនួសសញ្ញាដាច់វែង។",
+    wordDash:
+      "សិស្សមើលឃើញសញ្ញា - នៅចន្លោះពាក្យ ដូចជាអត្ថបទសរសេរដោយម៉ាស៊ីន។ ប្រើក្បៀស ៖ ឬវង់ក្រចក ជំនួសវិញ៖ (SNC - Supreme National Council) ក្លាយជា (SNC)។ សញ្ញា - នៅចន្លោះលេខ ដូចជា 1975 – 1979 គឺត្រឹមត្រូវ។ នេះជាការព្រមាន ដូច្នេះអ្នកនៅតែអាចផ្សព្វផ្សាយបាន ប្រសិនបើសញ្ញា - នៅទីនេះត្រឹមត្រូវ។",
     tooFewOptions: "បន្ថែមជម្រើសមួយទៀត។",
     tooManyOptions: "លុបជម្រើសរហូតដល់នៅសល់ 6 ឬតិចជាង។",
     sameOptions: "ប្តូរជម្រើសមួយក្នុងចំណោមពីរ ដើម្បីកុំឱ្យដូចគ្នា។",
