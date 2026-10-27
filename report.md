@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 27 Oct 2026: The Content Editor Warns About a Dash Between Words
 
-Commit: (filled in after commit). No database step. Admin accounts only.
+Commit: `6fc8464`. No database step. Admin accounts only.
 
 **Why.** The app's rule is no dash between words in text students read, for example
 "(SNC - Supreme National Council)". Students read it as machine-written. Nothing
