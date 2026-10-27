@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 27 Oct 2026: Grade Prediction Can Say F, and Is Fairer to Beginners
 
-Commit: `PENDING`. No database step.
+Commit: `dc6c351`. No database step.
 
 **Why.** Two problems with the predicted grade:
 - It could never say F. A student getting 20% of answers right was told E, which is a pass.
