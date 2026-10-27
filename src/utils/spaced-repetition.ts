@@ -69,6 +69,16 @@ export interface ReviewResult {
  */
 const AGAIN_INTERVAL_DAYS = 1;
 
+/**
+ * The longest a card may wait: a year, which is past the Bac II for any
+ * student using the app. Without it a card graded "good" over and over (a
+ * student may review early as often as they like) doubled its wait each time,
+ * until the due date stopped being a real date: "NaN-NaN-NaN" after about 20
+ * grades, and a card that never came due again, which the sync also refuses to
+ * upload. `repairReviewState` fixes cards stored before this cap existed.
+ */
+export const MAX_INTERVAL_DAYS = 365;
+
 // LOCAL calendar dates, from the app's one day helper — never
 // toISOString().slice(0, 10). Both of these used to be UTC-derived (and
 // `addDays` did its arithmetic locally and then formatted in UTC, which is
@@ -148,13 +158,42 @@ export function schedule(
   }
 
   const multiplier = grade === "hard" ? 1.2 : grade === "good" ? 2 : 2.5;
-  const days = Math.max(1, Math.round(state.intervalDays * multiplier));
+  const days = Math.min(
+    MAX_INTERVAL_DAYS,
+    Math.max(1, Math.round(state.intervalDays * multiplier))
+  );
   return {
     ...state,
     ...base,
     phase: "review",
     intervalDays: days,
     dueAt: addDays(now, days),
+  };
+}
+
+/**
+ * A stored state from before MAX_INTERVAL_DAYS, brought back inside it: the
+ * interval capped, and the due date at most a year after the card was last
+ * graded (or from today, if that date is unreadable). Returns the SAME object
+ * when nothing is wrong, so a load with no broken cards changes nothing.
+ */
+export function repairReviewState(
+  state: ReviewState,
+  now: Date = new Date()
+): ReviewState {
+  const validDue = /^\d{4}-\d{2}-\d{2}$/.test(state.dueAt);
+  const last = state.lastReviewedAt ? new Date(state.lastReviewedAt) : null;
+  const base = last && !Number.isNaN(last.getTime()) ? last : now;
+  const latest = addDays(base, MAX_INTERVAL_DAYS);
+  const intervalOk =
+    Number.isFinite(state.intervalDays) &&
+    state.intervalDays >= 0 &&
+    state.intervalDays <= MAX_INTERVAL_DAYS;
+  if (validDue && intervalOk && state.dueAt <= latest) return state;
+  return {
+    ...state,
+    intervalDays: intervalOk ? state.intervalDays : MAX_INTERVAL_DAYS,
+    dueAt: validDue && state.dueAt <= latest ? state.dueAt : latest,
   };
 }
 

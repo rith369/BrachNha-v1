@@ -7668,8 +7668,12 @@ what the screen's warning already promised.
 Smaller decisions:
 - A row the database would refuse is LEFT ON THE DEVICE, not sent, because one
   bad row fails its whole batch (`validReview`, `validCard`, `validAttempt`).
-  The scheduler has no interval cap, so a card re-graded "good" many times can
-  reach a `dueAt` that is not a date; such a card stays local.
+  The scheduler had no interval cap, so a card re-graded "good" many times
+  reached a `dueAt` that is not a date. Fixed the same day: `MAX_INTERVAL_DAYS`
+  (365) in `utils/spaced-repetition.ts` caps every interval, and
+  `repairReviewState()` runs in the store's persist `merge` to bring cards saved
+  before the cap back within a year of their last grade (the map is replaced
+  only if a card changed, so an ordinary load arms no push). 14 checks.
 - The review log is pushed by time (`logUntil`): a device clock set BACKWARDS
   between two grades leaves the later one unsent. Accepted; nothing reads the
   log yet.

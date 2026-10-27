@@ -15,6 +15,21 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 27 Oct 2026: A Flashcard Never Waits More Than a Year
+
+Commit: (filled in after commit). No database step.
+
+**Why.** Each time a card is marked "remember", the wait before it comes back doubles.
+There was no limit, so a card marked many times could be scheduled thousands of years
+away, or on a broken date, and never came back at all.
+
+**What changed:** the longest wait is now one year. Cards already scheduled too far away
+are fixed automatically the next time the app opens: they come back at most a year after
+they were last reviewed (straight away, if that year has already passed).
+
+**What to re-test:** nothing visible should change for normal use. Flashcard reviews and
+the "remember / not yet" piles should work as before.
+
 ## 27 Oct 2026: Flashcard and Quiz Progress Follows You to a New Phone
 
 Commit: `fc6580b`. **Database step:** apply

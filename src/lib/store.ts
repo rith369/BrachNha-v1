@@ -22,6 +22,7 @@ import { makeConversationTitle } from "@/utils/chat-history";
 import {
   schedule,
   initialReviewState,
+  repairReviewState,
   type ReviewGrade,
   type ReviewResult,
   type ReviewState,
@@ -1444,6 +1445,18 @@ export const useBrachNhaStore = create<BrachNhaState>()(
         // every load is what moved stored levels onto the +20-per-level rule,
         // and keeps any stale number from surviving.
         merged.level = levelForXp(merged.xp);
+
+        // Cards scheduled before MAX_INTERVAL_DAYS existed could be due in
+        // thousands of years, or on a date that is not a date. Brought back
+        // inside a year; the map is replaced only if a card actually changed,
+        // so an ordinary load does not arm a sync push.
+        const reviews = merged.cardReviews ?? {};
+        let repaired: typeof reviews | null = null;
+        for (const [id, r] of Object.entries(reviews)) {
+          const fixed = repairReviewState(r);
+          if (fixed !== r) (repaired ??= { ...reviews })[id] = fixed;
+        }
+        if (repaired) merged.cardReviews = repaired;
 
         // v0 → v1: one flat `chatMsgs` array becomes a single Conversation, so
         // a student who already had a chat saved doesn't silently lose it.
