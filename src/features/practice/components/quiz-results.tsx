@@ -147,7 +147,9 @@ function ReviewRow({
     <div
       className={cn(
         "overflow-hidden rounded-2xl border",
-        ok ? "border-mint/25 bg-mint/8" : "border-pink/20 bg-pink/8"
+        // Ink outline; right/wrong lives in the fill (the neobrutalism rule),
+        // matching the past-paper review's rows.
+        ok ? "border-border bg-mint/8" : "border-border bg-pink/8"
       )}
     >
       <button

@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, lazy, Suspense } from "react";
 import { useLocation } from "react-router";
 import { motion } from "framer-motion";
 import {
+  Bot,
   X,
   Send,
   Plus,
@@ -597,9 +598,15 @@ export function ChatOverlay() {
           same cap so their left edges line up. */}
       <div className="mx-auto flex w-full max-w-2xl shrink-0 items-start justify-between px-5.5 pt-4 pb-3">
         <div>
-          <div className="font-heading bg-brand-tri bg-clip-text text-lg font-extrabold text-transparent">
-            {/* Brand name — deliberately identical in both languages. */}
-            🤖 KruAI
+          {/* The mark is a Lucide icon OUTSIDE the clipped text, never an emoji
+              inside it: bg-clip-text paints an emoji with the gradient too, so
+              it drew as a solid purple blob. Same Bot as the KruAI button. */}
+          <div className="flex items-center gap-1.5">
+            <Bot className="size-5 shrink-0 text-purple" strokeWidth={2.5} aria-hidden />
+            <span className="font-heading bg-brand-tri bg-clip-text text-lg font-extrabold text-transparent">
+              {/* Brand name — deliberately identical in both languages. */}
+              KruAI
+            </span>
           </div>
           {/* No vendor attribution here by product decision — the model behind
               the mentor is deliberately not named anywhere the student can see.

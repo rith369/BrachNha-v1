@@ -311,8 +311,9 @@ fonts and weights, the user's call). Almost all of it is token-level in
   (blue) and Roadmap (orange). They were `bg-brand-tri bg-clip-text
   text-transparent` titles with an emoji, and **clipped text paints an emoji
   with the gradient too**, so "📈" drew a solid purple square. Never put an
-  emoji inside a clipped-text title. Two still have one: KruAI's "🤖" in
-  `chat-overlay.tsx` and "✍️" in `commitment-overlay.tsx`.
+  emoji inside a clipped-text title. The last two (KruAI's "🤖" in
+  `chat-overlay.tsx`, "✍️" in `commitment-overlay.tsx`) became Lucide `Bot`
+  and `PenLine` icons beside the clipped text on 27 Oct 2026.
 - **Page and surfaces:** cream `#fff7e8` page, white cards; dark `#16131f` /
   `#221e2e`. Corners one step tighter (`--radius-xl/2xl/3xl` overridden), pills
   (`rounded-full`) unchanged.
@@ -1725,8 +1726,9 @@ things about it:
 lands — without them the name beside it shifts on first paint.
 
 The big centred `⚔️` on the login and survey screens is a separate illustration
-and was deliberately not touched. `public/favicon.ico` is still the OLD icon —
-it does not come from this file and was left alone.
+and was deliberately not touched. `public/favicon.ico` was the OLD icon until
+27 Oct 2026; it is now rendered from this artwork by `scripts/app-icons.mjs`
+(see the installable-app section).
 
 **Full-bleed is phone-only.** `AiInsights` uses `-mx-4 px-4` to cancel the page
 padding so its carousel reaches both screen edges. From `md` the card sits in a
@@ -4775,8 +4777,8 @@ Four things that look arbitrary and are not:
   `font-body` utility.** `--font-body` carries no generic fallback — `body` adds
   `sans-serif` itself in `globals.css` — so before Nunito arrives on a slow
   connection the utility renders in the browser's default SERIF. Seen in a real
-  screenshot, not theorised. `study-calendar.tsx` still uses `font-body` on its
-  Today button and has the same latent flash.
+  screenshot, not theorised. `study-calendar.tsx`'s Today button had the same
+  latent flash and uses the same arbitrary class since 27 Oct 2026.
 
 **THE COPY IS A CLAIM ABOUT THE CODE, and goes stale silently.** Each tooltip
 states a rule — flashcards don't count toward questions or score, past papers
@@ -7780,7 +7782,10 @@ themselves, so shipping it would draw a tile inside a tile.
 `scripts/app-icons.mjs` whitens every low-chroma pixel (the drawing is all
 saturated colour and the tile edge is grey), and shrinks the maskable icon to
 0.8 so it survives any launcher mask. Re-run it if the artwork changes.
-`public/favicon.ico` is still the old icon and was left alone.
+**It also writes `public/favicon.ico`** (since 27 Oct 2026; it was the old icon
+before): 16, 32 and 48px PNGs packed into one .ico by hand, cropped tighter
+(`FAVICON_CROP` 0.78) so the drawing fills a 16px tab icon, 5.5KB against the
+old 26KB. Re-running it left the four PNGs byte-identical.
 
 **Verified** against the production build in real Chrome. The manifest reports
 no errors, and the only installability error was `in-incognito`, which comes

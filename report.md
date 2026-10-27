@@ -15,6 +15,28 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 27 Oct 2026: Small Look Fixes and a New Browser Tab Icon
+
+Commit: (filled in after commit). No database step.
+
+**What changed:**
+
+- **The browser tab icon** is now the BrachNha logo. It was still an old icon from
+  before the logo existed.
+- **KruAI's title** ("KruAI" at the top of the chat) and **the pledge screen's title**
+  had an emoji (🤖, ✍️) inside the purple title text, which could show as a purple blob.
+  They now have a small purple icon beside the title instead. The pledge button's ✍️ is
+  an icon too.
+- **The quiz review** (after a practice quiz, or from its history) now has the same solid
+  black outline around each question as the rest of the app. Right and wrong still show
+  as light green and light pink.
+- **The "Today" button** on Profile's study calendar no longer shows in a different font
+  for a moment on slow internet.
+
+**What to re-test:** open KruAI and the pledge screen (Roadmap, before signing) and check
+the titles; finish a practice quiz and look at the review; look at the browser tab icon
+(a hard refresh may be needed, browsers keep the old one for a while).
+
 ## 27 Oct 2026: The Content Editor Warns About a Dash Between Words
 
 Commit: `6fc8464`. No database step. Admin accounts only.

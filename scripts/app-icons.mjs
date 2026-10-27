@@ -11,6 +11,12 @@
 //   maskable-512.png             purpose "maskable" — logo shrunk into the safe
 //                                                     zone on a white ground
 //   apple-touch-icon.png (180)   iOS home screen, which ignores the manifest
+// and to public/:
+//   favicon.ico (16, 32, 48)     the browser tab. Cropped tighter than the
+//                                icons above (FAVICON_CROP), because at 16px
+//                                the full-bleed margin leaves a speck. An .ico
+//                                holding PNG images, which every browser since
+//                                IE9 reads; packed by hand below.
 //
 // PNG, not WebP: install surfaces (Android's launcher, iOS's springboard) are
 // the one place format support is not the browser's, and PNG is what every one
@@ -61,6 +67,34 @@ const TARGETS = [
   // 0.8 puts the drawing's corners inside the 80% safe circle.
   ["maskable-512.png", 512, 0.8],
 ];
+
+// The favicon keeps this fraction of the source, so the drawing (about three
+// quarters of the tile) fills the 16px square with a pixel of margin.
+const FAVICON_CROP = 0.78;
+const FAVICON_SIZES = [16, 32, 48];
+
+/** An .ico of PNG images: a 6-byte header, a 16-byte entry per image, then
+ *  the PNG files themselves, little-endian throughout. */
+function packIco(images) {
+  const header = Buffer.alloc(6 + 16 * images.length);
+  header.writeUInt16LE(0, 0); // reserved
+  header.writeUInt16LE(1, 2); // 1 = icon
+  header.writeUInt16LE(images.length, 4);
+  let offset = header.length;
+  images.forEach(({ size, png }, i) => {
+    const e = 6 + 16 * i;
+    header.writeUInt8(size >= 256 ? 0 : size, e); // width (0 means 256)
+    header.writeUInt8(size >= 256 ? 0 : size, e + 1); // height
+    header.writeUInt8(0, e + 2); // palette size
+    header.writeUInt8(0, e + 3); // reserved
+    header.writeUInt16LE(1, e + 4); // colour planes
+    header.writeUInt16LE(32, e + 6); // bits per pixel
+    header.writeUInt32LE(png.length, e + 8);
+    header.writeUInt32LE(offset, e + 12);
+    offset += png.length;
+  });
+  return Buffer.concat([header, ...images.map((i) => i.png)]);
+}
 
 const RENDER = async ({ svg, size, scale, crop, grey }) => {
   const img = new Image();
@@ -114,6 +148,15 @@ try {
     await writeFile(`${OUT}/${file}`, buf);
     console.log(`${OUT}/${file}  ${size}x${size}  ${(buf.length / 1024).toFixed(1)} KB`);
   }
+
+  const images = [];
+  for (const size of FAVICON_SIZES) {
+    const dataUrl = await page.evaluate(RENDER, { svg, size, scale: 1, crop: FAVICON_CROP, grey: GREY_CHROMA });
+    images.push({ size, png: Buffer.from(dataUrl.split(",")[1], "base64") });
+  }
+  const ico = packIco(images);
+  await writeFile("public/favicon.ico", ico);
+  console.log(`public/favicon.ico  ${FAVICON_SIZES.join("/")}  ${(ico.length / 1024).toFixed(1)} KB`);
 } finally {
   await browser.close();
 }

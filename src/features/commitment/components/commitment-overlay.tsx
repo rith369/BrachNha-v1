@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
-import { X, Check } from "lucide-react";
+import { X, Check, PenLine } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
 import { GRADE_HOURS, computeDailyMission } from "@/utils/roadmap";
@@ -129,8 +129,13 @@ export function CommitmentOverlay() {
         <>
           <div className="mx-auto flex w-full max-w-2xl shrink-0 items-start justify-between px-5 pt-4 pb-3">
             <div>
-              <div className="font-heading bg-brand-tri bg-clip-text text-lg font-extrabold text-transparent">
-                ✍️ {c.title}
+              {/* Icon outside the clipped text: an emoji inside bg-clip-text is
+                  painted with the gradient and shows as a purple blob. */}
+              <div className="flex items-center gap-1.5">
+                <PenLine className="size-5 shrink-0 text-purple" strokeWidth={2.5} aria-hidden />
+                <span className="font-heading bg-brand-tri bg-clip-text text-lg font-extrabold text-transparent">
+                  {c.title}
+                </span>
               </div>
               <div className="text-xs font-bold text-muted">{c.subtitle}</div>
             </div>
@@ -193,9 +198,10 @@ export function CommitmentOverlay() {
             <button
               onClick={commit}
               disabled={!canCommit}
-              className="w-full rounded-2xl bg-brand-tri bg-[length:200%_auto] px-6 py-3.5 text-sm font-extrabold text-white shadow-cta animate-shimmer disabled:opacity-40"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-tri bg-[length:200%_auto] px-6 py-3.5 text-sm font-extrabold text-white shadow-cta animate-shimmer disabled:opacity-40"
             >
-              {c.commit} ✍️
+              {c.commit}
+              <PenLine className="size-4 shrink-0" strokeWidth={2.5} aria-hidden />
             </button>
             <button
               onClick={close}

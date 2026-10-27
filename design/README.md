@@ -39,5 +39,6 @@ keep both output formats — `wordmark.tsx` uses a `<picture>`.
 tile's baked-in grey edge and shadow, because phones round the icon themselves;
 see the script's header. Re-run it whenever the artwork changes.
 
-`public/favicon.ico` is a **different, older** icon that does not come from this
-file, and was left alone.
+`public/favicon.ico` (the browser tab icon, 16/32/48px) is rendered from this
+file by the same script, cropped tighter so the drawing fills a 16px square.
+It was a different, older icon until 27 Oct 2026.
