@@ -3677,9 +3677,10 @@ traffic to it — same "stays reachable by URL for development" precedent the
 rest of this feature already sets for a screen with no authored entry point
 yet.
 
-**Retention is a MOCK, in its own file (`features/practice/
-mock-retention.ts`) specifically so it can never be mistaken for the real
-scheduler.** A small deterministic formula off `reviewCount`/`lapses` —
+**(DELETED 27 Oct 2026, with `mock-retention.ts`: see the NOTE under the
+progress ring below. History follows.) Retention was a MOCK, in its own file
+(`features/practice/mock-retention.ts`) specifically so it could never be
+mistaken for the real scheduler.** A small deterministic formula off `reviewCount`/`lapses` —
 not FSRS's own retrievability estimate, not scientifically calibrated to
 anything. Always labelled "ប្រហាក់ប្រហែល" (approximate) in the UI, and
 only shown once at least one card in view has actually been reviewed
@@ -3993,6 +3994,14 @@ explicitly a mock (its own file exists so it can never be mistaken for the
 scheduler) and is now the weaker of the two. It was LEFT IN rather than removed
 because nobody asked for it to go; if the doubling reads as confusing, deleting
 the retention line is the intended resolution, not reworking the ring.
+**That is what happened (27 Oct 2026, the user's call):** the line and
+`mock-retention.ts` are deleted, so the ring is the only percentage. Its formula
+ignored time entirely (a card seen yesterday and one seen six months ago scored
+the same). A REAL "chance you remember this today" needs a memory model: the
+plan, if wanted, is FSRS (`ts-fsrs`) behind `schedule()` in
+`utils/spaced-repetition.ts`, which is the swap boundary built for it, plus
+stability/difficulty columns on `card_reviews`. Bring a percentage back only
+from that, never from a formula.
 
 ### A pile opens its LIST first, and a single question is reviewable on its own
 

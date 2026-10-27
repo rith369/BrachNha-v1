@@ -15,6 +15,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 27 Oct 2026: One "Remembered" Number on the Flashcard Screen, Not Two
+
+Commit: (filled in after commit). No database step.
+
+**What changed:** a lesson's flashcard screen showed two percentages. The ring (the share
+of cards you marked "remember") is real and stays. The line under the piles,
+"ប្រូបាបចងចាំប្រហាក់ប្រហែល ~N%", came from a made-up formula that ignored how long ago
+you studied, so it is removed.
+
+**Later, if wanted:** a real "chance you remember this card today" needs a proper memory
+model (FSRS, as in Anki), which would also make the review schedule smarter. That is a
+bigger piece of work (about 2 to 3 days).
+
+**What to re-test:** open any flashcard lesson; the ring and the three piles show, the
+line under them is gone.
+
 ## 27 Oct 2026: Small Look Fixes and a New Browser Tab Icon
 
 Commit: `132d617`. No database step.

@@ -25,7 +25,6 @@ import {
   rememberedCards,
   type QueueCard,
 } from "../review";
-import { averageMockRetention } from "../mock-retention";
 import { DeckProgressRing } from "./deck-progress-ring";
 import { ReviewSession } from "./review-session";
 import { FlashcardForm } from "./flashcard-form";
@@ -222,7 +221,7 @@ function PileList({
  * A lesson's flashcard screen. THREE phases, one component:
  *
  *   "intro"  — the three piles, this student's own cards (add/edit/delete),
- *              a mock retention line, and the Start Review button
+ *              and the Start Review button
  *   "review" — delegates entirely to ReviewSession (shared with Daily Review)
  *   (exit)   — ReviewSession's own "done" screen handles the end
  *
@@ -308,7 +307,6 @@ export function FlashcardRunner({
   const all = cardsFor(deckKey, cards, studentCards, cardReviews);
   const due = dueCardsFor(deckKey, cards, studentCards, cardReviews);
   const mine = all.filter((qc) => qc.card.source === "student");
-  const retention = averageMockRetention(all.map((qc) => qc.state));
 
   // The three piles the buttons below open. Derived on every render off the
   // same `all` the counts are read from, so a pile's number and the cards its
@@ -432,15 +430,6 @@ export function FlashcardRunner({
             onOpen={() => setPile("important")}
           />
         </div>
-
-        {/* MOCK — see mock-retention.ts. Labelled "ប្រហាក់ប្រហែល" (approximate)
-            so it reads as an estimate, never a fact, and only shown once at
-            least one card in this deck has actually been reviewed. */}
-        {retention !== null && (
-          <div className="mt-3 text-xs font-bold text-muted">
-            ប្រូបាបចងចាំប្រហាក់ប្រហែល ~{retention}%
-          </div>
-        )}
       </div>
 
       {/* This student's own cards for this lesson — separate from the official
