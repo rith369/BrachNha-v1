@@ -15,6 +15,34 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 27 Oct 2026: Grade Prediction Can Say F, and Is Fairer to Beginners
+
+Commit: `PENDING`. No database step.
+
+**Why.** Two problems with the predicted grade:
+- It could never say F. A student getting 20% of answers right was told E, which is a pass.
+- It mixed "how well you answer" with "how much of the app you've finished". A beginner
+  answering 85% right was predicted an E because they had only finished a few lessons, and
+  every new lesson the team published made everyone's predicted grade go down.
+
+**What changed:**
+- Below 50% is now **F**. It shows on the big grade, in each subject's grade, as a sixth bar
+  in the chance chart, and as "Below your target". The survey still only offers A to E as a
+  target, since nobody aims for F.
+- The grade now comes from how well the student answers: quiz accuracy and exam results.
+  Studying regularly and improving lately add a few points (at most 8 together), and slacking
+  takes a few away. Finished lessons no longer count, so publishing new content no longer
+  lowers anyone's grade.
+- The chance bars are worked out more sensibly. A score of 45 now shows mostly F with some E,
+  not "100% E".
+
+**What students will notice:** strong beginners see a higher grade than before, and weak
+students may now see F.
+
+**Re-test:** with a few wrong answers in a row, Grade Prediction should show F and "Below your
+target", and Home's grade card should show the same letter. With mostly right answers it
+should show A or B even with only a few lessons done.
+
 ## 27 Oct 2026: Battle Photos Turned Off
 
 Commit: `ad8434f`. No database step.

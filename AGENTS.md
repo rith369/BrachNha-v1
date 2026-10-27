@@ -6444,12 +6444,28 @@ usage reporting, and add the two safety pieces an app for minors needs.
   `buildRealPrediction(input, today)`, a TOTAL object (the React Compiler rule
   from `summary.ts`). Per-subject scores come from `buildProgressSummary()`, so
   Progress and Prediction cannot disagree. Inputs: all-time accuracy from
-  `contentLog`, the last 10 exam + past-paper percentages, finished playable
-  sections over playable sections (Study paths + quiz paths), days studied in
-  the last 14, mean subject trend. `utils/gradeProbability.ts` now takes NULL
-  for the first three and re-normalises the weights of what is present.
-  `computeGradePrediction` only rows subjects that HAVE a score (a missing
-  subject read as 0% predicted an E in a subject not yet started).
+  `contentLog`, the last 10 exam + past-paper percentages, days studied in
+  the last 14, mean subject trend. `computeGradePrediction` only rows subjects
+  that HAVE a score (a missing subject read as 0% predicted an F in a subject
+  not yet started).
+  - **The score is how WELL the student answers (27 Oct 2026, the user's
+    call).** `utils/gradeProbability.ts`: quiz accuracy and the exam average,
+    weighted 30:35 (a missing one is left out), then two capped NUDGES in
+    points: trend ±5 (a quarter of the change) and consistency ±3 (half the
+    days is neutral). Before, all five inputs were averaged together, a flat
+    trend counted as 50, and finished-sections-over-published-sections was
+    15% of the grade, so a beginner answering 85% right was predicted an E,
+    and every lesson the team published lowered every student's grade.
+    Lesson completion is no longer an input at all, and `buildRealPrediction`
+    no longer takes the manifest or `completedSessions`.
+  - **There is an F** (below 50%, a fail): the last row of `GRADE_BANDS`, so the
+    subject grades, the chance bars and `compareToTarget` ("below your target")
+    all have it. It used to floor at E because the survey's TARGET grades stop at
+    E; nobody aims for F, so the survey still offers A to E.
+  - **The chance bars are a normal spread** (8 points either side of the score),
+    each grade getting the share inside its band. They used to be closeness to
+    each band's midpoint, which broke once F (0 to 50, midpoint 25) became a band:
+    a score of 45 came out 100% E.
   - `ready` needs 20 scored answers or 1 exam/paper; before that the page and
     the Home widget show how many answers are left (`prediction-empty.tsx`).
   - The trend chart is the COMPOSITE READINESS SCORE re-computed as of the end

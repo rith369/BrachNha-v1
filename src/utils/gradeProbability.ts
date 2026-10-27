@@ -1,58 +1,71 @@
-// Rule-based composite readiness model for the Grade Prediction prototype.
-// This is NOT machine learning — it's a transparent, hand-tuned weighted
-// average, deliberately simple so it can be swapped for a real model later
-// without the UI changing shape. Every weight/constant below is a prototype
-// assumption, not a scientifically validated figure.
+// Rule-based readiness model for Grade Prediction.
+// This is NOT machine learning — it's a transparent, hand-tuned formula,
+// deliberately simple so it can be swapped for a real model later without the
+// UI changing shape. Every constant below is a prototype assumption, not a
+// scientifically validated figure.
 //
 // This module is intentionally data-agnostic — it just takes numbers and
 // returns numbers, same convention as utils/gradePrediction.ts and
 // utils/roadmap.ts. The real inputs are assembled in
 // features/grade-prediction/real-prediction.ts.
 
-import { GRADE_BANDS, pctToGrade } from "./gradePrediction";
+import { GRADE_BANDS } from "./gradePrediction";
 
-// The first three are NULLABLE because a real student usually has not done
-// all three kinds of work yet: someone who has answered fifty questions and
-// sat no exam has no exam average, and 0 would claim they sat one and failed
-// it. A null input is left out and the weights of the inputs that ARE present
-// are scaled back up to 1, so the composite stays on the same 0-100 scale.
+// The first two are NULLABLE because a real student usually has not done both
+// kinds of work yet: someone who has answered fifty questions and sat no exam
+// has no exam average, and 0 would claim they sat one and failed it.
 export interface PredictionInputs {
   quizPct: number | null; // practice accuracy, 0-100
   mockExamPct: number | null; // avg mock-exam / past-paper score, 0-100
-  lessonCompletionPct: number | null; // % of written sections completed
   consistencyPct: number; // % of recent days with study activity
-  trendDeltaPct: number; // recent quiz-accuracy slope, roughly -20..+20
+  trendDeltaPct: number; // recent quiz-accuracy change in points, roughly -20..+20
 }
 
-// Prototype assumption from the spec: Quiz 30% / Mock Exam 35% /
-// Lesson Completion 15% / Study Consistency 10% / Recent Trend 10%.
+// THE SCORE IS HOW WELL THE STUDENT ANSWERS, and only that. Quiz accuracy and
+// exam results are the only evidence of it, weighted 30:35 as the original
+// spec had them. A missing one is left out and the other carries the score.
+//
+// Lesson completion used to be averaged in (15%) and is gone on purpose. It
+// measures how much of the app's content a student has finished, not how well
+// they know it, so a beginner answering 85% right was predicted an E. And its
+// denominator is everything published, so every new lesson the team published
+// lowered every student's predicted grade.
 export const PREDICTION_WEIGHTS = {
   quiz: 0.3,
   mockExam: 0.35,
-  lessonCompletion: 0.15,
-  consistency: 0.1,
-  trend: 0.1,
 } as const;
+
+// Trend and consistency used to be averaged in as 0-100 scores too, with a
+// flat trend counting as 50, which pulled every student toward 50. They are
+// NUDGES now, in points, each capped well under one 10-point grade band so
+// neither can outweigh what the student actually answered.
+export const TREND_POINTS_PER_POINT = 0.25;
+export const MAX_TREND_POINTS = 5;
+export const MAX_CONSISTENCY_POINTS = 3;
 
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
 }
 
-// A recent-trend delta (e.g. "-5%" vs a few weeks ago) is converted to a
-// 0-100 score centered on 50 (neutral) so it can be weighted alongside the
-// other 0-100 inputs. Each 1pt of delta moves the trend score 2pts — a
-// prototype assumption, not a validated conversion.
-export function trendDeltaToScore(trendDeltaPct: number): number {
-  return clamp(50 + trendDeltaPct * 2, 0, 100);
+/** Improving adds points, slipping takes them away, flat changes nothing. */
+export function trendAdjustment(trendDeltaPct: number): number {
+  return clamp(
+    trendDeltaPct * TREND_POINTS_PER_POINT,
+    -MAX_TREND_POINTS,
+    MAX_TREND_POINTS
+  );
+}
+
+/** Studying on half the recent days is neutral; every day adds up to +3,
+ *  none takes up to 3 away. */
+export function consistencyAdjustment(consistencyPct: number): number {
+  return ((clamp(consistencyPct, 0, 100) - 50) / 50) * MAX_CONSISTENCY_POINTS;
 }
 
 export function computeCompositeScore(inputs: PredictionInputs): number {
   const parts: [number | null, number][] = [
     [inputs.quizPct, PREDICTION_WEIGHTS.quiz],
     [inputs.mockExamPct, PREDICTION_WEIGHTS.mockExam],
-    [inputs.lessonCompletionPct, PREDICTION_WEIGHTS.lessonCompletion],
-    [inputs.consistencyPct, PREDICTION_WEIGHTS.consistency],
-    [trendDeltaToScore(inputs.trendDeltaPct), PREDICTION_WEIGHTS.trend],
   ];
   let raw = 0;
   let weight = 0;
@@ -61,43 +74,56 @@ export function computeCompositeScore(inputs: PredictionInputs): number {
     raw += value * w;
     weight += w;
   }
-  return Math.round(clamp(weight > 0 ? raw / weight : 0, 0, 100));
+  // No evidence at all. real-prediction.ts never shows a prediction in this
+  // state (it is not `ready`), so the number only has to be harmless.
+  if (weight === 0) return 0;
+  const score =
+    raw / weight +
+    trendAdjustment(inputs.trendDeltaPct) +
+    consistencyAdjustment(inputs.consistencyPct);
+  return Math.round(clamp(score, 0, 100));
 }
 
-// Distance from each grade band's midpoint, mapped to a probability weight
-// and normalized to sum to 100. Deterministic — the same composite score
-// always yields the same distribution — and reuses GRADE_BANDS so the
-// letter cutoffs never drift out of sync with utils/gradePrediction.ts.
-const SPREAD = 20;
+// The composite is an estimate, not a measurement: the real exam score lands
+// somewhere around it. That is modelled as a normal spread of SPREAD points
+// either side, and each grade gets the share of the spread inside its band.
+// A and F are open-ended, so the shares always add up to 100.
+//
+// This replaced "closeness to each band's midpoint", which stopped working
+// once F became a band: F runs from 0 to 50, its midpoint is 25, and a score
+// of 45 came out as 100% E. Deterministic either way, and it still reads the
+// cutoffs from GRADE_BANDS so they cannot drift from utils/gradePrediction.ts.
+const SPREAD = 8;
 
-function bandMidpoint(index: number): number {
-  const band = GRADE_BANDS[index];
-  const nextMin = index === 0 ? 100 : GRADE_BANDS[index - 1].min;
-  return (band.min + nextMin) / 2;
+// Abramowitz & Stegun 7.1.26, accurate to about 1e-7, which is far finer than
+// the whole percentages this feeds.
+function erf(x: number): number {
+  const sign = x < 0 ? -1 : 1;
+  const a = Math.abs(x);
+  const t = 1 / (1 + 0.3275911 * a);
+  const poly =
+    t *
+    (0.254829592 +
+      t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429))));
+  return sign * (1 - poly * Math.exp(-a * a));
+}
+
+function shareBelow(cutoff: number, score: number): number {
+  if (cutoff === Infinity) return 1;
+  if (cutoff === -Infinity) return 0;
+  return 0.5 * (1 + erf((cutoff - score) / (SPREAD * Math.SQRT2)));
 }
 
 export function computeGradeProbabilities(
   compositeScore: number
 ): Record<string, number> {
-  const weights = GRADE_BANDS.map((band, i) => {
-    const distance = Math.abs(compositeScore - bandMidpoint(i));
-    return { grade: band.grade, weight: Math.max(0, 1 - distance / SPREAD) };
+  const last = GRADE_BANDS.length - 1;
+  const rounded = GRADE_BANDS.map((band, i) => {
+    const upper = i === 0 ? Infinity : GRADE_BANDS[i - 1].min;
+    const lower = i === last ? -Infinity : band.min;
+    const share = shareBelow(upper, compositeScore) - shareBelow(lower, compositeScore);
+    return { grade: band.grade, pct: Math.round(share * 100) };
   });
-
-  const total = weights.reduce((sum, w) => sum + w.weight, 0);
-  if (total === 0) {
-    // Composite score fell outside every band's spread (shouldn't happen
-    // for 0-100 input, but fall back to the plain pctToGrade band).
-    const fallback = pctToGrade(compositeScore);
-    return Object.fromEntries(
-      GRADE_BANDS.map((b) => [b.grade, b.grade === fallback ? 100 : 0])
-    );
-  }
-
-  const rounded = weights.map((w) => ({
-    grade: w.grade,
-    pct: Math.round((w.weight / total) * 100),
-  }));
 
   // Rounding can drift the sum a point or two off 100 — correct it on the
   // largest entry so the bars always add up to exactly 100%.

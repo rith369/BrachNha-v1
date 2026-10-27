@@ -12,10 +12,6 @@ import {
   type SubjectPrediction,
 } from "@/utils/gradePrediction";
 import { buildProgressSummary } from "@/features/progress/summary";
-import { SUBJECTS, type SubjectId } from "@/features/lessons/subjects";
-import { chaptersFor, pathProgress } from "@/features/lessons/sessions";
-import { quizPathFor } from "@/features/practice/quiz-path";
-import type { ContentManifest } from "@/utils/content-manifest";
 
 /**
  * The Grade Prediction page, computed from the student's OWN work.
@@ -52,11 +48,7 @@ export interface PredictionInput {
   activityLog: ActivityLog;
   examResults: ExamResult[];
   paperResults: PaperResult[];
-  completedSessions: string[];
   userLanguage: string;
-  /** What is published (lib/content.ts): a quiz section counts as playable
-   *  only when its quiz is. */
-  manifest: ContentManifest;
 }
 
 export interface PredictionResult {
@@ -132,32 +124,6 @@ function consistencyUpTo(log: ActivityLog, upTo: string): number {
   return Math.round((active / CONSISTENCY_DAYS) * 100);
 }
 
-/**
- * Finished sections over sections that exist, across every subject's Study path
- * and quiz path. Null while the app has no playable content at all, rather than
- * a 0% that would drag every prediction down for a reason that is not the
- * student's. Not windowed by date: `completedSessions` records no dates, so the
- * history points reuse today's figure.
- */
-function lessonCompletion(completed: string[], manifest: ContentManifest): number | null {
-  let done = 0;
-  let total = 0;
-  for (const { id } of SUBJECTS) {
-    const study = pathProgress(chaptersFor(id as SubjectId, manifest), completed);
-    done += study.done;
-    total += study.playable;
-    const quiz = quizPathFor(id as SubjectId, manifest);
-    if (quiz) {
-      const playable = quiz.flatMap((c) =>
-        c.lessons.flatMap((l) => l.sessions.filter((s) => s.href))
-      );
-      done += playable.filter((s) => completed.includes(s.id)).length;
-      total += playable.length;
-    }
-  }
-  return total > 0 ? Math.round((done / total) * 100) : null;
-}
-
 interface Snapshot {
   ready: boolean;
   answered: number;
@@ -168,11 +134,7 @@ interface Snapshot {
   prediction: PredictionResult;
 }
 
-function snapshot(
-  input: PredictionInput,
-  day: string,
-  completionPct: number | null
-): Snapshot {
+function snapshot(input: PredictionInput, day: string): Snapshot {
   const summary = buildProgressSummary(
     input.contentLog,
     input.activityLog,
@@ -199,7 +161,6 @@ function snapshot(
   const inputs: PredictionInputs = {
     quizPct: answered > 0 ? Math.round((correct / answered) * 100) : null,
     mockExamPct: average(exams),
-    lessonCompletionPct: completionPct,
     consistencyPct,
     trendDeltaPct,
   };
@@ -225,8 +186,7 @@ export function buildRealPrediction(
   input: PredictionInput,
   today: string
 ): RealPrediction {
-  const completionPct = lessonCompletion(input.completedSessions, input.manifest);
-  const now = snapshot(input, today, completionPct);
+  const now = snapshot(input, today);
   const { subjects } = computeGradePrediction(
     now.performance,
     input.userLanguage
@@ -239,7 +199,7 @@ export function buildRealPrediction(
   const history: HistoryPoint[] = [];
   for (let w = HISTORY_WEEKS - 1; w >= 0; w--) {
     const snap =
-      w === 0 ? now : snapshot(input, addDaysKey(base, -7 * w), completionPct);
+      w === 0 ? now : snapshot(input, addDaysKey(base, -7 * w));
     if (!snap.ready) continue;
     history.push({
       weeksAgo: w,

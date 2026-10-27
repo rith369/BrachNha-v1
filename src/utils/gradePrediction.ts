@@ -35,13 +35,16 @@ export const GRADE_BANDS: { min: number; grade: string }[] = [
   { min: 70, grade: "C" },
   { min: 60, grade: "D" },
   { min: 50, grade: "E" },
+  // Below 50% is a FAIL on the real exam. It used to floor at E because the
+  // survey's target grades stop at E, which mixed up two things: nobody aims
+  // for F, but a prediction has to be able to say it, or a student at 20% is
+  // told they pass.
+  { min: 0, grade: "F" },
 ];
 
-// Below 50% floors at "E" — the app's target-grade scale doesn't offer
-// a fail grade, so there's nothing lower to predict into.
 export function pctToGrade(pct: number): string {
   const band = GRADE_BANDS.find((b) => pct >= b.min);
-  return band ? band.grade : "E";
+  return band ? band.grade : "F";
 }
 
 export interface SubjectPrediction {
@@ -105,7 +108,7 @@ export function computeGradePrediction(
   return { overallPct, overallGrade: pctToGrade(overallPct), subjects };
 }
 
-const GRADE_ORDER = ["A", "B", "C", "D", "E"];
+const GRADE_ORDER = GRADE_BANDS.map((b) => b.grade);
 
 export type TargetComparison = "ahead" | "on-track" | "behind";
 

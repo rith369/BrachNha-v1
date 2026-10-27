@@ -1,7 +1,8 @@
 import type { Lang } from "@/types";
 import { useT } from "@/data/translations";
+import { GRADE_BANDS } from "@/utils/gradePrediction";
 
-const GRADE_ORDER = ["A", "B", "C", "D", "E"];
+const GRADE_ORDER = GRADE_BANDS.map((b) => b.grade);
 
 function barColor(grade: string) {
   if (grade === "A" || grade === "B") return "bg-mint";
