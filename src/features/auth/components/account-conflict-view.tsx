@@ -4,6 +4,7 @@ import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
 import { useT } from "@/data/translations";
 import { pullRemoteState } from "@/lib/supabase-sync";
+import { markReplace } from "@/lib/sync-marks";
 import type { AccountSnapshot } from "@/types";
 import { Wordmark } from "@/components/shell/wordmark";
 
@@ -104,6 +105,10 @@ export function AccountConflictView() {
 
   function keepDevice() {
     setBusy(true);
+    // The snapshot push overwrites the profile on its own, but flashcard
+    // progress and quiz history are pushed row by row and would MERGE with the
+    // account's. This makes the next push replace them, as the warning says.
+    markReplace(userId);
     // No push here: clearing the conflict and claiming the account is enough,
     // and the sync hook's own effect takes it from there with fresher state
     // than this component could hand it.

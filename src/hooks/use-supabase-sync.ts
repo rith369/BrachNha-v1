@@ -102,12 +102,11 @@ async function runPush(userId: string): Promise<void> {
  *
  * Keep this in step with `partializeState` in lib/store.ts: a persisted field
  * missing here is a field that silently never reaches the server.
- * `syncedUserId` is deliberately absent, and so are `paperResults` and
- * `quizResults` — a
- * past-paper attempt could ride `exam_results.kind`, but that table has no
- * column saying WHICH paper, so a pulled row could not be told apart from
- * another year's paper in the same subject. Each field says why at its own
- * definition in lib/store.ts.
+ * `syncedUserId` is deliberately absent, and so are `competitions` and
+ * `competitionAttempts` (written once by lib/competitions.ts, never by a push).
+ * The last six fields below are pushed incrementally by
+ * lib/study-progress-sync.ts rather than as part of the snapshot, but a change
+ * to them still has to arm the push.
  */
 function syncRelevantChange(a: StoreState, b: StoreState): boolean {
   return (
@@ -137,7 +136,13 @@ function syncRelevantChange(a: StoreState, b: StoreState): boolean {
     a.examResults !== b.examResults ||
     a.completedSessions !== b.completedSessions ||
     a.conversations !== b.conversations ||
-    a.activeConversationId !== b.activeConversationId
+    a.activeConversationId !== b.activeConversationId ||
+    a.cardReviews !== b.cardReviews ||
+    a.studentCards !== b.studentCards ||
+    a.starredCards !== b.starredCards ||
+    a.reviewHistory !== b.reviewHistory ||
+    a.quizResults !== b.quizResults ||
+    a.paperResults !== b.paperResults
   );
 }
 
@@ -149,7 +154,11 @@ function deviceHasWork(s: StoreState): boolean {
     s.userName !== "" ||
     s.xp > 0 ||
     s.completedSessions.length > 0 ||
-    s.conversations.length > 0
+    s.conversations.length > 0 ||
+    Object.keys(s.cardReviews).length > 0 ||
+    Object.keys(s.studentCards).length > 0 ||
+    s.quizResults.length > 0 ||
+    s.paperResults.length > 0
   );
 }
 

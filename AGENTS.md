@@ -2989,11 +2989,10 @@ pill and feeds KruAI an average. It keeps the ANSWERS as well as the score, whic
 is what lets a history row REOPEN the real review (`PastPaperResults` re-marks
 from `content` + `answers`, so the explanations for a paper sat last week are
 still there) rather than showing a remembered percentage. Capped at
-`MAX_PAPER_RESULTS`, cleared by `logout()`, and **LOCAL-ONLY**: `exam_results`
-has a `kind` column that could carry these but no column saying WHICH paper, so a
-pulled row could not be told apart from another year's paper in the same subject.
-Syncing it needs a `paper_key` column first, and `syncRelevantChange` names it as
-a deliberate exception alongside `syncedUserId`.
+`MAX_PAPER_RESULTS` and cleared by `logout()`. It was LOCAL-ONLY until 27 Oct
+2026 (`exam_results` has no column saying WHICH paper); it now syncs to its own
+`paper_results` table. See "Study progress syncs across phones" near the end of
+this file.
 
 **Tab B is unchanged and still runs its papers in place.** A generated paper has
 no printed minutes, points or parts, so a detail screen for one could only invent
@@ -3554,8 +3553,8 @@ isn't one of the two faces themselves.
 **`starredCards: string[]` is a new store field** — a flat id list, not
 part of `ReviewState`, because importance is the student's own bookmark and
 has nothing to do with where a card sits in its review cycle. Works for
-official and student cards alike since both share one id space. Same
-local-only reasoning as `cardReviews`/`studentCards`; nothing reads it back
+official and student cards alike since both share one id space. Synced like
+`cardReviews`/`studentCards` (since 27 Oct 2026); nothing reads it back
 anywhere yet (no "show starred cards" filter was asked for) — marking and
 persisting is the whole feature today.
 
@@ -3585,8 +3584,10 @@ separate `OfficialFlashcard`/`StudentFlashcard` interfaces, which would
 carry an identical field list and be one more place for the two to drift.
 
 **`cardReviews` and `studentCards` are new store fields, LOCAL-ONLY.**
-Deliberately NOT added to `syncRelevantChange` in `use-supabase-sync.ts` or
-the push/pull mapping in `supabase-sync.ts` — that layer pushes a full
+(History: since 27 Oct 2026 both sync, through their own incremental path,
+`lib/study-progress-sync.ts`. See "Study progress syncs across phones" near
+the end of this file.) They were deliberately NOT added to the snapshot
+push in `supabase-sync.ts`, and still are not: that layer pushes a full
 snapshot of each table on every debounced change, which is justified there
 by small, capped data (20 conversations, a handful of exam results). A
 per-card table updated on every single grade is a different scale and access
@@ -3707,7 +3708,8 @@ correction supplied for one context (a title) can silently miss every
 OTHER place the same misread term appears — search the whole term across
 the codebase, not just the file the correction was mentioned for.
 
-**What a real backend would eventually need**, if/when this stops being
+**What a real backend would eventually need** (BUILT on 27 Oct 2026, close to
+this shape; see "Study progress syncs across phones"), if/when this stops being
 local-only: a `card_reviews` table (`user_id`, `card_id`, the `ReviewState`
 fields, `updated_at`), RLS'd the same "own rows only" way every other table
 is, PLUS an incremental push path — writing just the one row that changed
@@ -4302,11 +4304,9 @@ the real explanations instead of a remembered percentage.
 `examResults` captions Home's "from mock exams" pill and feeds KruAI an average
 it states as fact; `paperResults` is a paper, with parts and a clock budget. It
 keeps the ANSWERS and the PER-QUESTION TIMES, not just the score, because that is
-what makes a history row reopen a review. **LOCAL-ONLY**, listed beside
-`paperResults` as a deliberate exception in `syncRelevantChange`: `exam_results`
-has a `kind` column that could carry these but no column saying WHICH quiz, so a
-pulled row could not be told apart from another section's. Syncing it needs a
-`quiz_key` column first.
+what makes a history row reopen a review. It was LOCAL-ONLY until 27 Oct 2026
+(`exam_results` has no column saying WHICH quiz); it now syncs to its own
+`quiz_results` table. See "Study progress syncs across phones".
 
 **`QuizRunner` reports the attempt OUT now** (`onSubmit`), the shape
 `PastPaperRunner` and `ExamRunner` already use. Per-question XP stays in the
@@ -7628,6 +7628,75 @@ and opens no runner; Home renders; no sideways scroll; no page error. KruAI thro
 reaches the prompt, sections and decks still listed, physics still "no content", maths
 still covered, the section prompt under budget.
 
+## Study progress syncs across phones (27 Oct 2026)
+
+Six persisted store fields never left the device, so a student who signed in on
+a new phone (or cleared the browser) lost them even with an account:
+`cardReviews`, `studentCards`, `starredCards`, `reviewHistory`, `quizResults`
+and `paperResults`. They sync now, each to its own table
+(`20261027000001_study_progress_sync.sql`): `card_reviews`, `student_cards`,
+`starred_cards`, `card_review_log`, `quiz_results`, `paper_results`. Own rows
+only (read, insert, delete; update only on `card_reviews` and `student_cards`,
+since the other four are insert-once and written `on conflict do nothing`).
+
+**NOT through the snapshot push.** `lib/study-progress-sync.ts` sends only what
+changed since the last push. `lib/sync-marks.ts` is the record of what this
+device uploaded (`localStorage["brachnha-sync-marks"]`, a device fact keyed by
+account, like `lib/intro-seen.ts`): a signature per card review, `updatedAt` per
+own card, the starred ids, the newest review-log time, and a key per quiz/paper
+attempt. A grade costs one `card_reviews` row and one `card_review_log` row.
+A mark moves forward only for a request the server accepted, so a failed table
+just retries on the next push and the others are unaffected.
+`pushLocalState()` calls it last; `pullRemoteState()` reads it back.
+
+**Deletions are INFERRED from the marks**: a card or star in the marks but no
+longer on the device was deleted here, and the push deletes it on the server.
+That is only safe while the marks describe this device's data, hence two rules
+that must not be undone:
+- **`pullRemoteState()` clears the marks FIRST**, before anything can fail. A
+  pull that fails (or a table that fails inside it) must not leave old marks
+  over an emptier store, or the next push would delete the account's copy.
+- **Sign-out clears them** (`resetSyncCache()`).
+
+**Two devices on one account merge**: both upsert, the server holds the union,
+the last grade of a card wins. The one exception is **"Keep this device's
+work"** on the account-conflict screen, which calls `markReplace()`: the next
+push deletes the account's rows in all six tables (all six must succeed, or
+nothing is uploaded and the flag stays) and then uploads this device's. That is
+what the screen's warning already promised.
+
+Smaller decisions:
+- A row the database would refuse is LEFT ON THE DEVICE, not sent, because one
+  bad row fails its whole batch (`validReview`, `validCard`, `validAttempt`).
+  The scheduler has no interval cap, so a card re-graded "good" many times can
+  reach a `dueAt` that is not a date; such a card stays local.
+- The review log is pushed by time (`logUntil`): a device clock set BACKWARDS
+  between two grades leaves the later one unsent. Accepted; nothing reads the
+  log yet.
+- The pull reads back the store's own caps (1000 log entries, 50 quiz and 50
+  paper attempts) and normalises Postgres's `+00:00` times to the device's `Z`
+  spelling, so marks and the log's string comparison agree. A quiz or paper row
+  whose jsonb is not the shape the review indexes into is dropped.
+- `deviceHasWork()` counts these fields too, so a guest who only did flashcards
+  or a quiz still gets the conflict question rather than a silent pull.
+- **The code ships before or after the migration.** No column was added to an
+  existing table; a missing table fails only its own request and its marks stay
+  put, so everything uploads once the migration lands.
+
+**Verified:** PGlite 0.2.17, the migration twice: 34 checks (RLS per table and
+per role, `anon` reads nothing, insert-once duplicates ignored and no rewrites,
+every CHECK, the replace delete, the profile cascade). The REAL
+`study-progress-sync.ts` and `supabase-sync.ts` through `ssrLoadModule` with
+only `getSupabase()` faked by an in-memory client: 39 checks (first push uploads
+all six; an unchanged push writes nothing; one grade sends exactly two rows; a
+deleted card, its review and an un-star are deleted on the server; a failing
+table keeps its marks and retries; a malformed review is skipped while the rest
+go; a pull onto an empty store restores all six fields exactly and the push
+after it writes nothing; a partly failed pull deletes nothing; sign-out clears
+the marks; another account's marks are ignored; replace removes the other
+phone's rows and keeps its flag when a delete fails). **Not verified: two real
+phones on one Google account.**
+
 ## Installable app: "add to home screen" and the two pop-ups
 
 BrachNha is an installable web app (PWA). None of this touches Google sign-in:
@@ -8257,10 +8326,10 @@ describes is still exactly one wrong edit away:
 The push itself is unchanged — still a full destructive snapshot. What changed is
 that it can no longer run against an account this device has not claimed.
 
-**Still true, and still not addressed:**
-`cardReviews`/`studentCards`/`starredCards`/`reviewHistory` never leave the
-device, so roaming loses every student-authored card and the whole review
-schedule — which now matters, because roaming is real. `profiles.email` has no
+**Still true, and still not addressed:** (The first item here, that
+`cardReviews`/`studentCards`/`starredCards`/`reviewHistory` never left the
+device, was fixed on 27 Oct 2026; see "Study progress syncs across phones".)
+`profiles.email` has no
 unique constraint, and `profiles` has no DELETE policy, so a client can never
 clean up the losing side of an account merge. (`handle_new_user` being `after
 insert` only no longer bites: a Google user arrives WITH an email, so the trigger
@@ -8816,7 +8885,7 @@ dev server — with and without a key — since neither typecheck nor lint cover
 For anything touching Supabase, additionally:
 
 ```bash
-npm run db:check     # env → reachability → Google sign-in → all 11 tables
+npm run db:check     # env → reachability → Google sign-in → every table
 ```
 
 **The Leaderboard needs `20260916000004_leaderboard.sql` applied**, by hand, in the
@@ -8910,6 +8979,12 @@ migration, in ONE run (one transaction), because it redefines 14 admin functions
 can ship before or after it: without it `/admin/audit` says it could not load and every admin
 action works as before, unlogged. Afterwards `db:check` lists `audit_log`, and a
 publishable-key-only call to `/rest/v1/rpc/admin_audit_log` must be refused.
+
+**`20261027000001_study_progress_sync.sql`** (flashcard progress, own cards, stars, the
+review log, quiz and paper history) can be applied before or after the code ships, in ONE
+run. Without it each of the six pushes fails quietly and the work stays on the phone; once
+it lands, the next push uploads everything. Afterwards `db:check` lists the six tables, each
+answering `200 []` to the publishable key.
 
 **`20261013000001_friends.sql`** (Streak with Friends) is APPLIED to the live project
 (13 Oct 2026, checked: `db:check` passes, and all five functions plus the helpers refuse

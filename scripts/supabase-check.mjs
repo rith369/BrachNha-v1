@@ -77,6 +77,15 @@ const TABLES = [
   // The admin audit log (20261026000001). RLS with no client policies, so a
   // select answers 200 [] when it exists. Its functions are invisible here.
   "audit_log",
+  // Study progress that used to stay on one phone (20261027000001): flashcard
+  // review state, own cards, stars, the review log, quiz and paper history.
+  // Read-own, so a select with only the publishable key answers 200 [].
+  "card_reviews",
+  "student_cards",
+  "starred_cards",
+  "card_review_log",
+  "quiz_results",
+  "paper_results",
 ];
 
 /**

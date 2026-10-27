@@ -15,6 +15,32 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 27 Oct 2026: Flashcard and Quiz Progress Follows You to a New Phone
+
+Commit: (filled in after commit). **Database step:** apply
+`20261027000001_study_progress_sync.sql` in the Supabase SQL editor (one run). The app works
+before and after; until it is applied, this progress simply stays on the phone as before.
+
+**Why.** Signing in on a new phone brought back XP, the streak and lessons finished, but not
+flashcard progress or quiz history. Those were saved only on the phone, so changing phones
+or clearing the browser lost them even with an account.
+
+**What changed (signed-in students):**
+
+- **Now saved to the account and brought back on a new phone:** which flashcards you
+  remember and when each is due again, the flashcards you write yourself, the ones you
+  star, and your practice quiz and past paper history (with your answers, so an old
+  attempt still opens its review).
+- **Using two phones on one account** combines them; the latest grade of a card wins.
+- **"Keep this device's work"** on the "two sets of progress" screen now also replaces the
+  account's flashcard and quiz history with this phone's, as that screen already said.
+- **Guests:** nothing changes. Without an account, progress stays on the phone.
+- **The privacy page** now lists these as stored.
+
+**What to re-test:** sign in on phone A, grade some flashcards, write and star a card, do a
+quiz and a past paper. Then sign in with the same Google account on phone B (or a fresh
+browser): all of it should be there, and an old quiz attempt should open its review.
+
 ## 26 Oct 2026: Audit Log for the Team
 
 Commit: `59886de`. **Database step:** apply

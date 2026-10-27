@@ -30,6 +30,8 @@ import { Wordmark } from "@/components/shell/wordmark";
  *                         (the profile, plus WHICH SCREEN was open — see
  *                          screenRefFor in utils/chat-screen.ts)
  *   guest behaviour     → useSupabaseSync bails without a session
+ *   flashcard / quiz /  → lib/study-progress-sync.ts (+ 20261027000001)
+ *   paper history
  *   no AI retention     → `store: false` in server/chat-handler.ts
  *   error logs / events → lib/telemetry.ts (+ the 20261001000001 migration)
  *   battle photos       → lib/competition-photos.ts, lib/photo-reports.ts
@@ -149,6 +151,12 @@ export default function PrivacyPage() {
               your progress: XP, level, coins, streak, lessons finished, and
               mock exam scores
             </li>
+            <li>
+              your flashcard progress (which cards you remember and when each
+              is due again), the flashcards you write and the ones you star,
+              and your practice quiz and past paper attempts with the answers
+              you picked, so they are still there on a new phone
+            </li>
             <li>your conversations with KruAI</li>
             <li>
               photos of your working that you choose to add after a Game battle
@@ -171,7 +179,10 @@ export default function PrivacyPage() {
             យើងមិនទទួលបានពាក្យសម្ងាត់របស់អ្នកទេ
             ហើយមិនអាចអានGmail Drive ឬទិន្នន័យផ្សេងទៀតក្នុងគណនី Google
             របស់អ្នកបានទេ។ ក្រៅពីនេះ យើងរក្សាទុកព័ត៌មានដែលអ្នកបញ្ចូល
-            ចម្លើយកម្រងសំណួរ វឌ្ឍនភាពសិក្សា ការសន្ទនាជាមួយ KruAI
+            ចម្លើយកម្រងសំណួរ វឌ្ឍនភាពសិក្សា
+            វឌ្ឍនភាព Flashcard កាតដែលអ្នកសរសេរ និងកាតដែលអ្នកដាក់ផ្កាយ
+            លទ្ធផល Quiz និងវិញ្ញាសារឆ្នាំចាស់ (រួមទាំងចម្លើយដែលអ្នកជ្រើសរើស)
+            ការសន្ទនាជាមួយ KruAI
             រូបថតការគណនាដែលអ្នកជ្រើសបន្ថែមក្រោយការប្រកួត
             កំហុសក្នុងសំណួរដែលអ្នករាយការណ៍ (សំណួរណា ប្រភេទកំហុស និងកំណត់ចំណាំរបស់អ្នក)
             និងរបាយការណ៍កំហុស និងការប្រើប្រាស់សាមញ្ញ

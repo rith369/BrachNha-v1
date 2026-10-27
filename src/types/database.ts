@@ -46,6 +46,11 @@ export type AppRole = "admin" | "owner";
  *  restated so this file keeps importing nothing from the app. */
 export type ContentKind = "deck" | "quiz" | "section" | "paper" | "game";
 
+/** card_reviews.phase and the grade columns (20261027000001). The same unions
+ *  as utils/spaced-repetition.ts, restated so this file imports nothing. */
+export type CardPhaseColumn = "new" | "learning" | "review" | "relearning";
+export type ReviewGradeColumn = "again" | "hard" | "good" | "easy";
+
 /** announcements.tone (20261002000005): which neo fill the banner wears. */
 export type AnnouncementTone = "info" | "success" | "warning";
 
@@ -278,6 +283,155 @@ export type Database = {
           Database["public"]["Tables"]["completed_sessions"]["Insert"]
         >;
         Relationships: [ProfileFk<"completed_sessions_user_id_fkey">];
+      };
+
+      // ── study progress (20261027000001) ─────────────────────────────────
+      // The six store fields that used to stay on one phone. Pushed
+      // incrementally by lib/supabase-sync.ts; see lib/sync-marks.ts.
+      card_reviews: {
+        Row: {
+          user_id: string;
+          card_id: string;
+          phase: CardPhaseColumn;
+          interval_days: number;
+          /** 'yyyy-mm-dd'. */
+          due_at: string;
+          review_count: number;
+          lapses: number;
+          last_grade: ReviewGradeColumn | null;
+          last_reviewed_at: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          card_id: string;
+          phase: CardPhaseColumn;
+          interval_days?: number;
+          due_at: string;
+          review_count?: number;
+          lapses?: number;
+          last_grade?: ReviewGradeColumn | null;
+          last_reviewed_at?: string | null;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["card_reviews"]["Insert"]>;
+        Relationships: [ProfileFk<"card_reviews_user_id_fkey">];
+      };
+
+      student_cards: {
+        Row: {
+          user_id: string;
+          card_id: string;
+          deck_key: string;
+          front: string;
+          back: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          card_id: string;
+          deck_key: string;
+          front: string;
+          back: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["student_cards"]["Insert"]>;
+        Relationships: [ProfileFk<"student_cards_user_id_fkey">];
+      };
+
+      starred_cards: {
+        Row: {
+          user_id: string;
+          card_id: string;
+          created_at: string;
+        };
+        Insert: {
+          user_id: string;
+          card_id: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["starred_cards"]["Insert"]>;
+        Relationships: [ProfileFk<"starred_cards_user_id_fkey">];
+      };
+
+      card_review_log: {
+        Row: {
+          user_id: string;
+          card_id: string;
+          grade: ReviewGradeColumn;
+          reviewed_at: string;
+        };
+        Insert: {
+          user_id: string;
+          card_id: string;
+          grade: ReviewGradeColumn;
+          reviewed_at: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["card_review_log"]["Insert"]>;
+        Relationships: [ProfileFk<"card_review_log_user_id_fkey">];
+      };
+
+      quiz_results: {
+        Row: {
+          user_id: string;
+          quiz_key: string;
+          version: number | null;
+          taken_at: string;
+          score: number;
+          total: number;
+          pct: number;
+          ms: number;
+          /** number[], index-aligned with the quiz. Checked on the way in. */
+          question_ms: Json;
+          /** (string | null)[], index-aligned with the quiz. */
+          answers: Json;
+        };
+        Insert: {
+          user_id: string;
+          quiz_key: string;
+          version?: number | null;
+          taken_at: string;
+          score: number;
+          total: number;
+          pct: number;
+          ms: number;
+          question_ms?: Json;
+          answers?: Json;
+        };
+        Update: Partial<Database["public"]["Tables"]["quiz_results"]["Insert"]>;
+        Relationships: [ProfileFk<"quiz_results_user_id_fkey">];
+      };
+
+      paper_results: {
+        Row: {
+          user_id: string;
+          paper_key: string;
+          version: number | null;
+          taken_at: string;
+          score: number;
+          total: number;
+          pct: number;
+          ms: number;
+          /** Record<questionId, option>. Checked on the way in. */
+          answers: Json;
+          leaves: number | null;
+        };
+        Insert: {
+          user_id: string;
+          paper_key: string;
+          version?: number | null;
+          taken_at: string;
+          score: number;
+          total: number;
+          pct: number;
+          ms: number;
+          answers?: Json;
+          leaves?: number | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["paper_results"]["Insert"]>;
+        Relationships: [ProfileFk<"paper_results_user_id_fkey">];
       };
 
       // ── competitions (the Game feature) ────────────────────────────────

@@ -93,15 +93,15 @@ const MAX_COMPETITIONS = 50;
 // app by far. 1000 is generous (months of real daily use) while still
 // bounding localStorage; oldest entries drop first, same rule conversations
 // already follow.
-const MAX_REVIEW_HISTORY = 1000;
+export const MAX_REVIEW_HISTORY = 1000;
 
 // Past-paper attempts. Each carries its answers, so these are heavier than an
 // ExamResult but still tiny (~20 keys); 50 is years of real use on a catalog
 // this size, and oldest drop first like every other capped list here.
-const MAX_PAPER_RESULTS = 50;
+export const MAX_PAPER_RESULTS = 50;
 
 /** Kept per section, so this is generous — see MAX_PAPER_RESULTS. */
-const MAX_QUIZ_RESULTS = 50;
+export const MAX_QUIZ_RESULTS = 50;
 
 // activityLog gains at most one key per day studied, so this is roughly a
 // year and a month of history — longer than a Bac II cohort uses the app, and
@@ -202,10 +202,8 @@ export interface PaperResult {
  * therefore reopens the real review rather than a remembered percentage — the
  * same reasoning PaperResult records for storing its answers.
  *
- * LOCAL-ONLY, and deliberately absent from syncRelevantChange: `exam_results`
- * has a `kind` column that could carry these but no column saying WHICH quiz,
- * so a pulled row could not be told apart from another section's. Syncing it
- * needs a `quiz_key` column first.
+ * Synced to its own table, `quiz_results` (20261027000001), keyed by quiz and
+ * time; `exam_results` has no column saying WHICH quiz.
  */
 export interface QuizResult {
   /** The content key — `"math-1-1-1"`, what the database's quizzes are keyed by. */
@@ -356,17 +354,14 @@ interface BrachNhaState {
    * Attempts at real MoEYS past papers, oldest first, capped at
    * MAX_PAPER_RESULTS.
    *
-   * LOCAL-ONLY, and deliberately absent from `syncRelevantChange` in
-   * hooks/use-supabase-sync.ts — the same documented exception
-   * cardReviews/studentCards/reviewHistory already are, for a sharper reason
-   * here: `exam_results` has a `kind` column that could carry these, but no
-   * column for WHICH paper, so a pulled row could not be told apart from
-   * another year's paper in the same subject. Syncing this needs a
-   * `paper_key` column first; until then a student's paper history is this
-   * device's.
+   * Synced to its own table, `paper_results` (20261027000001), not to
+   * `exam_results`: that table has no column saying WHICH paper, and it feeds
+   * Home's "from mock exams" pill. Pushed row by row by
+   * lib/study-progress-sync.ts, like the five fields below that say so.
    */
   paperResults: PaperResult[];
-  /** Finished practice-quiz attempts, newest last. See QuizResult. */
+  /** Finished practice-quiz attempts, newest last. See QuizResult. Synced to
+   *  `quiz_results` by lib/study-progress-sync.ts. */
   quizResults: QuizResult[];
   /**
    * Competitions this student CREATED.
@@ -400,15 +395,10 @@ interface BrachNhaState {
    * that as a fresh `initialReviewState()` rather than requiring one to exist
    * up front, so this map only ever holds cards that have actually been seen.
    *
-   * LOCAL-ONLY for this prototype — deliberately NOT added to
-   * `syncRelevantChange` in use-supabase-sync.ts or the push/pull mapping in
-   * supabase-sync.ts. That layer pushes a full snapshot of each table on every
-   * debounced change, which suits the small, capped data it handles today
-   * (conversations, exam results); a per-card review table updated on every
-   * single grade is a different access pattern and scale, and deserves its own
-   * incremental sync path rather than being forced into the existing one. See
-   * CLAUDE.md's Supabase section for what a real `card_reviews` table would
-   * need to look like when that lands.
+   * Synced to `card_reviews` (20261027000001) by lib/study-progress-sync.ts,
+   * NOT through supabase-sync.ts's full snapshot: a grade changes one card, so
+   * only the cards that changed since the last push are sent (lib/sync-marks.ts
+   * remembers what was). The same holds for the next three fields.
    */
   cardReviews: Record<string, ReviewState>;
   /**
@@ -417,7 +407,7 @@ interface BrachNhaState {
    * features/practice/practice.ts) — a student's own cards live alongside the
    * official deck for that lesson rather than in a separate freeform deck
    * system, so the review queue, due-dates and UI stay one mechanism instead of
-   * two. Same local-only reasoning as `cardReviews` above.
+   * two. Synced to `student_cards`, the way `cardReviews` above is.
    */
   studentCards: Record<string, PracticeCard[]>;
   /**
@@ -426,7 +416,7 @@ interface BrachNhaState {
    * than living inside `ReviewState`: a card's importance to the student has
    * nothing to do with where it sits in the spaced-repetition cycle. Works
    * for both official and student-authored cards since both share one id
-   * space. Same local-only reasoning as `cardReviews` above.
+   * space. Synced to `starred_cards`, the way `cardReviews` above is.
    */
   starredCards: string[];
   /**
@@ -439,6 +429,7 @@ interface BrachNhaState {
    * here. Nothing reads this back yet — it exists so a future "how have you
    * done on this card over time" or "which cards keep coming back" view has
    * real data to read rather than needing a second capture pass added later.
+   * Synced to `card_review_log` (only entries newer than the last push).
    */
   reviewHistory: ReviewResult[];
 

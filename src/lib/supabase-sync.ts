@@ -1,5 +1,11 @@
 import { getSupabase } from "@/lib/supabase";
 import { fetchMyGameHistory } from "@/lib/competitions";
+import {
+  markStudyProgressPulled,
+  pullStudyProgress,
+  pushStudyProgress,
+} from "@/lib/study-progress-sync";
+import { clearMarks } from "@/lib/sync-marks";
 import { MAX_ACTIVITY_DAYS, useBrachNhaStore } from "@/lib/store";
 import type { ExamResult } from "@/lib/store";
 import type {
@@ -50,15 +56,12 @@ const ACTIVITY_PUSH_DAYS = 14;
  * back; a wrong push overwrites a server copy that is a backup of that same
  * device. The costs are not symmetrical, so the tie does not go to the middle.
  *
- * ── What this does NOT give you yet ───────────────────────────────────────
+ * ── Roaming ───────────────────────────────────────────────────────────────
  *
- * Multi-device sync. use-supabase-sync.ts signs students in ANONYMOUSLY, and an
- * anonymous session lives in one browser's localStorage — a second device gets
- * a different anonymous user and therefore a different, empty account. What
- * this layer buys today is durable backup and server-side history. Real
- * roaming needs the anonymous user linked to an email, which is a change in the
- * auth hook, not in here: every table is already keyed on auth.uid() and the
- * pull path below is exactly what a second device would run.
+ * Sign-in is Google now, so two devices share one account and the pull below
+ * is what a new phone runs. The flashcard progress, the student's own cards,
+ * stars and quiz/paper history are NOT part of this snapshot: they are pushed
+ * incrementally by lib/study-progress-sync.ts, called from both ends here.
  */
 
 const MAX_CHAT_MSGS = 40; // mirrors the cap in lib/store.ts
@@ -363,6 +366,7 @@ export async function pushLocalState(userId: string, s: StoreState) {
   }
 
   await pushConversations(userId, s.conversations);
+  await pushStudyProgress(userId, s);
 }
 
 /**
@@ -463,6 +467,10 @@ async function pushConversations(userId: string, conversations: Conversation[]) 
  * and it was right not to.)
  */
 export async function pullRemoteState(userId: string): Promise<boolean> {
+  // Before anything can fail: marks left over from an earlier session would
+  // describe data this device no longer holds, and the next push would read the
+  // difference as deletions. See lib/study-progress-sync.ts.
+  clearMarks();
   const db = await getSupabase();
   if (!db) return false;
 
@@ -486,6 +494,7 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
     activity,
     contentActivity,
     games,
+    progress,
   ] = await Promise.all([
       db
         .from("commitments")
@@ -534,6 +543,9 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
       // Written once by lib/competitions.ts rather than by the snapshot push,
       // so it is read back through that file too.
       fetchMyGameHistory(userId),
+      // Flashcard progress, own cards, stars, quiz and paper history. Never
+      // rejects: a table that fails comes back empty.
+      pullStudyProgress(userId),
     ]);
 
   const todayDate = today();
@@ -640,6 +652,7 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
     // whole pull: the profile and the study log matter more than the battles.
     competitions: games.ok ? games.data.competitions : [],
     competitionAttempts: games.ok ? games.data.attempts : [],
+    ...progress,
     // Re-derived, deliberately overriding the `streak` storeFromProfile() just
     // spread in: profiles.streak is only the last value some device pushed,
     // while the rows are the history it was computed from.
@@ -647,6 +660,7 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
   });
 
   for (const c of restored) lastPushedSignature.set(c.id, signatureOf(c));
+  markStudyProgressPulled(userId, progress);
   return true;
 }
 
@@ -655,6 +669,7 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
  *  bookkeeping and skip writing their first conversation. */
 export function resetSyncCache() {
   lastPushedSignature.clear();
+  clearMarks();
 }
 
 /**
