@@ -2582,6 +2582,25 @@ differently on every handset. The completion screen uses `Trophy` for the same
 reason. The icon is tinted to the stripe colour: one small glyph reinforces the
 stripe rather than competing with it the way the old tinted backgrounds did.
 
+**The completion screen is `section-complete.tsx`** (27 Oct 2026, the layout the
+user approved): a yellow hero (Trophy on an orange tile, the node label and
+title), three tiles, the lesson's progress, today's goal, and a footer of
+← ផ្លូវមេរៀន + ផ្នែកបន្ទាប់ → (the next PUBLISHED section in path order; with
+none, the path button alone). No confetti, no wrong-answer list (not asked for).
+- **Every figure is measured.** The old screen printed a fixed "+20 XP", which was
+  wrong whenever a quiz answer paid or the day's lesson task was already done.
+  XP and coins are the store's own difference between opening and finishing;
+  correct is out of both quizzes (the tile is absent with no questions); time is
+  from opening.
+- It REPLACES the runner: `SectionDetail` returns it from a `summary` state set in
+  `finish()`, as a one-line return above the closures (the React Compiler rule).
+  Back is therefore step 1 only.
+- Lesson progress counts like the path banner (finished playable over every node
+  of the lesson), so the two agree. The goal's open tasks link through
+  `taskHref()`, like Home's Missions card.
+- `elapsedSince()` sits outside the component because oxlint's react(purity)
+  flagged `Date.now()` inside `finish()`, a click handler.
+
 **The colour is the STRIPE and only the stripe.** Card body is `bg-surface` with a
 neutral `border-border` hairline, and the label is ordinary `text-text`. The first
 version tinted the background and the label as well; with four of these stacked on

@@ -15,6 +15,26 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 27 Oct 2026: A New "Section Finished" Screen
+
+Commit: _pending_. No database step.
+
+**Why.** After a lesson section the screen showed a trophy, a fixed "+20 XP" and one button
+back. The XP number was often wrong, and the screen did not say what to do next.
+
+**What changed:** the screen now shows, top to bottom:
+- a yellow card: "បញ្ចប់ផ្នែកនេះ!" with the section's number and name;
+- three numbers, all real: questions right (e.g. 4/5), XP and coins actually earned in the
+  section, and the time spent;
+- the lesson's progress (e.g. "1/7 ផ្នែក"), counted the same way as on the lesson path;
+- today's goal (lesson, Quiz, Flashcard): done ones ticked, open ones are links, and a line
+  saying how many are left to keep the Streak;
+- two buttons: back to the lesson path, and **ផ្នែកបន្ទាប់** (the next published section).
+  When there is no next section, only the path button shows.
+
+**Re-test:** finish a biology section with one answer wrong: check the numbers, tap Quiz or
+Flashcard in the goal card, and tap ផ្នែកបន្ទាប់ to land at the start of the next section.
+
 ## 27 Oct 2026: Quiz "Try Again" Repeats Only the Wrong Questions
 
 Commit: `7639a99`. No database step.

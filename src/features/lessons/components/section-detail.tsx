@@ -9,7 +9,6 @@ import {
   ClipboardCheck,
   Lightbulb,
   NotebookPen,
-  Trophy,
   TriangleAlert,
 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
@@ -32,6 +31,7 @@ import { SectionVideoPlayer } from "./section-video";
 import type { SectionContent, SectionQuestion } from "@/types";
 import { markLessonFinished } from "@/lib/install-prompt";
 import { useFocusScrollTop } from "@/hooks/use-focus-scroll-top";
+import { SectionComplete, type SectionSummary } from "./section-complete";
 
 // three.js + react-three-fiber + drei is a large dependency needed only by the
 // sections that carry a model. Behind React.lazy so it downloads on opening one
@@ -159,6 +159,12 @@ function QuizQuestion({
   );
 }
 
+/** Outside the component: oxlint's react(purity) reads Date.now() in finish()
+ *  as a render call (it is a click handler), so the clock read lives here. */
+function elapsedSince(at: number): number {
+  return Date.now() - at;
+}
+
 export function SectionDetail({
   sectionId,
   section,
@@ -219,6 +225,21 @@ export function SectionDetail({
   const quizDone = quiz.every((_, i) => answers[`0-${i}`]);
   const quizHarderDone = quizHarder.every((_, i) => answers[`1-${i}`]);
 
+  // What the completion screen reports. XP and coins are the store's own
+  // difference across the section (quiz answers plus the day's lesson task when
+  // it was still open), so the screen cannot claim a reward that did not land.
+  const [opened] = useState(() => {
+    const s = useBrachNhaStore.getState();
+    return { at: Date.now(), xp: s.xp, coins: s.coins };
+  });
+  const [summary, setSummary] = useState<SectionSummary | null>(null);
+
+  // Above every closure below, for the React Compiler reason quiz-runner.tsx
+  // documents: the finished screen is a one-line return, not a JSX branch.
+  if (summary) {
+    return <SectionComplete sectionId={sectionId} title={section.title} summary={summary} />;
+  }
+
   /**
    * The reward figures and the reasoning behind them live in utils/rewards.ts,
    * shared with the practice quiz.
@@ -261,7 +282,15 @@ export function SectionDetail({
     // Queues the "add to home screen" pop-up for when the student leaves the
     // completion screen — once per device. See lib/install-prompt.ts.
     markLessonFinished();
-    setStep(total);
+    const now = useBrachNhaStore.getState();
+    const all = [...quiz.map((q, i) => [q, `0-${i}`] as const), ...quizHarder.map((q, i) => [q, `1-${i}`] as const)];
+    setSummary({
+      correct: all.filter(([q, key]) => answers[key] === q.correct).length,
+      questions: all.length,
+      xp: Math.max(0, now.xp - opened.xp),
+      coins: Math.max(0, now.coins - opened.coins),
+      ms: elapsedSince(opened.at),
+    });
   }
 
   const cont = "បន្ត →";
@@ -272,20 +301,17 @@ export function SectionDetail({
       <FocusButton onClick={() => setStep(1)} disabled={!quizDone}>
         {cont}
       </FocusButton>
-    ) : step === 1 ? (
+    ) : (
       // Same rule as step 0: a quiz that can be walked past is not a quiz.
       <FocusButton onClick={finish} disabled={!quizHarderDone}>
         {cont}
       </FocusButton>
-    ) : (
-      <FocusButton onClick={exit}>← ត្រឡប់</FocusButton>
     );
 
-  // Back is available on every step except the first (where the X is the only
-  // way out) and the completion screen (where the section is already banked —
-  // stepping back into the quiz from there would let it be re-answered after
-  // the XP had been awarded).
-  const canGoBack = step > 0 && step < total;
+  // Back is available on step 1 only: the X is the only way out of step 0, and
+  // the completion screen (SectionComplete) has none, because the section is
+  // banked and stepping back would let the quiz be re-answered for XP again.
+  const canGoBack = step > 0;
 
   return (
     <FocusLayout
@@ -391,22 +417,6 @@ export function SectionDetail({
         )}
 
 
-        {step >= total && (
-          <div className="text-center">
-            <Trophy
-              className="mx-auto mb-3 size-14 text-yellow md:mb-5 md:size-20"
-              strokeWidth={2}
-            />
-            <div className="font-heading mb-2.5 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent md:text-3xl">
-              បញ្ចប់ផ្នែកនេះ!
-            </div>
-            <div className="mx-auto mb-3 w-fit rounded-2xl bg-brand px-6 py-3 text-center text-white">
-              <div className="text-lg font-extrabold">+20 XP</div>
-              <div className="text-xs font-bold opacity-90">ពិន្ទុទទួលបាន</div>
-            </div>
-            <div className="text-xs font-bold text-muted">{section.title}</div>
-          </div>
-        )}
       </div>
     </FocusLayout>
   );
