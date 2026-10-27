@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 27 Oct 2026: Flashcard and Quiz Progress Follows You to a New Phone
 
-Commit: (filled in after commit). **Database step:** apply
+Commit: `fc6580b`. **Database step:** apply
 `20261027000001_study_progress_sync.sql` in the Supabase SQL editor (one run). The app works
 before and after; until it is applied, this progress simply stays on the phone as before.
 
