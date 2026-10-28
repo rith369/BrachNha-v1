@@ -23,20 +23,27 @@ import { xpToReachLevel } from "@/utils/level";
  * string, so the linked one cannot drift visually from its three neighbours.
  */
 export function StatPills() {
-  const { lang, xp, level, streak, examResults, activityLog } =
+  const { lang, xp, level, streak, contentLog, activityLog } =
     useBrachNhaStore(
       useShallow((s) => ({
         lang: s.lang,
         xp: s.xp,
         level: s.level,
         streak: s.streak,
-        examResults: s.examResults,
+        contentLog: s.contentLog,
         activityLog: s.activityLog,
       }))
     );
 
   const toNextLevel = Math.max(xpToReachLevel(level + 1) - xp, 0);
-  const questionsAnswered = examResults.reduce((sum, r) => sum + r.total, 0);
+  // Every scored answer in the content log: sections, quizzes, mock exams and
+  // past papers. It counted mock exams alone (`examResults`) and read 0 for
+  // everyone, since no generated paper has questions. Same total as the
+  // Progress page, which sums the same log. Flashcard grades are not answers.
+  let questionsAnswered = 0;
+  for (const byKey of Object.values(contentLog)) {
+    for (const d of Object.values(byKey)) questionsAnswered += d.answered;
+  }
 
   // Both notes were string literals — "▲ +20 today" and "Best!" — which every
   // student saw whatever they had done. They read the activity log now, the
@@ -71,7 +78,8 @@ export function StatPills() {
     {
       icon: Flame,
       value: streak,
-      label: lang === "en" ? "Streak" : "ជួរ",
+      // A product term, kept in Latin in Khmer too.
+      label: "Streak",
       note: streakNote,
       // The trophy marks a record, so it only appears when this IS one.
       noteIcon: atBest ? Trophy : undefined,
@@ -92,7 +100,7 @@ export function StatPills() {
       icon: BookOpen,
       value: questionsAnswered,
       label: lang === "en" ? "Questions" : "សំណួរ",
-      note: lang === "en" ? "from mock exams" : "ពីការប្រឡងសាកល្បង",
+      note: lang === "en" ? "answered" : "បានឆ្លើយ",
       color: "text-blue",
     },
   ];
@@ -100,7 +108,7 @@ export function StatPills() {
   const cell = "flex flex-col items-center gap-1 p-2.5 text-center";
 
   return (
-    <Card className="grid grid-cols-4 divide-x divide-purple/10 p-0">
+    <Card className="grid grid-cols-4 divide-x divide-border p-0">
       {pills.map((p) => {
         const body = (
           <>

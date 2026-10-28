@@ -15,6 +15,25 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 28 Oct 2026: The Questions Count Is Real
+
+Commit: `PENDING`. No database step.
+
+**What changed:**
+
+- The four numbers at the top of **Home** and **Profile**: the last one, "Questions", was
+  stuck at 0 for every student. It only counted mock exams, and no mock exam has
+  questions yet. It now counts every question answered (lesson sections, quizzes, past
+  papers), the same number the Progress page shows. Flashcards don't count, since they
+  are not scored. The line under it now says "answered" (បានឆ្លើយ).
+- The Streak number is labelled **Streak** in Khmer too (it said ជួរ), on Home, Profile
+  and the Leaderboard's Streak tab, matching the rest of the app.
+- The lines between those four numbers are solid black now, like every other card.
+
+**To re-test:** answer a few quiz questions, then check the Questions number on Home and
+Profile goes up by that many and matches Progress. Switch to Khmer and check the label
+says Streak.
+
 ## 28 Oct 2026: Roadmap Is Back in the Menu
 
 Commit: `1b387af`. No database step.

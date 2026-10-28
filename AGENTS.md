@@ -1470,8 +1470,11 @@ and is deliberately left that way: its only consumer would be the Study Activity
 heatmap, which is still demo, and `contentLog` already carries the number.
 
 **`exam_results` has a `kind`.** The store's `examResults` holds generated mock
-exams ONLY, and three things depend on that: Home's "from mock exams" stat pill,
-the average `chat-prompt.ts` states to KruAI as fact, and the generated-exam
+exams ONLY, and three things depend on that: Home's "from mock exams" stat pill
+(no longer: since 28 Oct 2026 that pill counts every scored answer in
+`contentLog` and is captioned "answered", see the Profile entry; older mentions
+of the pill as a reason below are history), the average `chat-prompt.ts` states
+to KruAI as fact, and the generated-exam
 tab rendering the array unfiltered. `kind` lets past-paper and placement
 attempts be recorded without ever being mistaken for a mock — the client filters
 `kind = 'mock'` when it rebuilds the array. This is the "separate persisted
@@ -4926,7 +4929,10 @@ friend, which only advances on days BOTH of them finish (real since 13 Oct 2026:
 follow.
 
 **Profile** (`features/profile`) — identity row (Google photo, editable name),
-stats summary (reuses Home's `StatPills` as-is), a real **study calendar**,
+stats summary (reuses Home's `StatPills` as-is; its fourth pill counts every
+scored answer in `contentLog`, the same total Progress sums, flashcard grades
+excluded. It read `examResults` and said 0 for everyone until 28 Oct 2026, since
+no generated paper has questions), a real **study calendar**,
 grade/language card, and a Logout button that shows a Cancel/confirm step
 before calling the store's `logout()` (resets name, survey, XP, level, streak,
 the study log, tasks and exam history, sending the user back to the entry

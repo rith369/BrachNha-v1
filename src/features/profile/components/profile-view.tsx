@@ -150,9 +150,8 @@ export function ProfileView() {
             {/* The two branches are deliberately unequal. A signed-in student
                 gets a plain question: signing back in restores their progress,
                 and the old list of everything being cleared from the device
-                read as a threat of losing it. (All but the flashcard review
-                data, which never leaves the device — see CLAUDE.md. That gap
-                is fixed by syncing it, not by warning about it here.) A guest
+                read as a threat of losing it. (Flashcard progress and quiz and
+                paper history sync too, since 27 Oct 2026.) A guest
                 keeps the full warning, because for them it is not a threat:
                 there is no backup, and this is the last screen that can say so. */}
             {isGuest
