@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 28 Oct 2026: Roadmap Is Back in the Menu
 
-Commit: `pending`. No database step.
+Commit: `1b387af`. No database step.
 
 **What changed:** the menu (the drawer on a phone, the sidebar on a laptop) has a
 **Roadmap** row again, directly under **Streak with Friends**. Home's "Quest Map" chip
