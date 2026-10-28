@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 28 Oct 2026: The Questions Count Is Real
 
-Commit: `PENDING`. No database step.
+Commit: `1a40b5f`. No database step.
 
 **What changed:**
 
