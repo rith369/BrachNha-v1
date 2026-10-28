@@ -15,6 +15,17 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 28 Oct 2026: Roadmap Is Back in the Menu
+
+Commit: `pending`. No database step.
+
+**What changed:** the menu (the drawer on a phone, the sidebar on a laptop) has a
+**Roadmap** row again, directly under **Streak with Friends**. Home's "Quest Map" chip
+still opens it too.
+
+**To re-test:** open the menu, check Roadmap sits under Streak with Friends, tap it. A
+guest should see the "sign in" panel with the menu still there.
+
 ## 27 Oct 2026: Grade Prediction Can Say F, and Is Fairer to Beginners
 
 Commit: `dc6c351`. No database step.

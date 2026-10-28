@@ -1672,15 +1672,15 @@ second group. Keep using it rather than introducing a second number.
 *same* `SidebarNav` inside its Sheet, so the two navs are one component and
 cannot drift — add a route to `lib/nav-items.ts` and it appears in both.
 
-**A ROUTE DOES NOT HAVE TO BE IN THAT LIST, and two deliberately are not.**
-`/roadmap` and `/streak` were both removed from `featureNavItems` at the user's
-request: the list had grown past a phone screen, and each already has a doorway
-on Home that shows the very thing the page is about — the "Quest Map" chip in
-`motivation-hero.tsx` and the Flame stat pill in `stat-pills.tsx`. A nav row
-there is a second entrance to a screen the student is looking at the summary of.
-Before adding a row for a new route, check whether Home already points at it.
-The comment block where those two used to sit spells this out; don't quietly
-re-add them.
+**A ROUTE DOES NOT HAVE TO BE IN THAT LIST, and `/streak` deliberately is not.**
+It was removed from `featureNavItems` at the user's request: the list had grown
+past a phone screen, and Home's Flame stat pill (`stat-pills.tsx`) already shows
+that count and links to it. A nav row there is a second entrance to a screen the
+student is looking at the summary of. Before adding a row for a new route, check
+whether Home already points at it. `/roadmap` was removed with it for the same
+reason (the "Quest Map" chip) and was put BACK on 28 Oct 2026 at the user's
+request, directly under "Streak with Friends". The comment block in
+`nav-items.ts` spells this out; don't quietly re-add `/streak`.
 
 `BottomNav` and the app bar's menu button carry `lg:hidden` on their own roots rather than on the
 9 pages that render them. `FabChat` and page `pb-20`/`pb-36` both exist to clear
@@ -4503,13 +4503,14 @@ hard-clamped to 2–6/day regardless of budget; lessons/practice have a floor, n
 ceiling. Marking a mission row done calls the same `completeTask(key)` as Home's
 daily checklist, so the two views share one real completion state.
 
-**`/roadmap` HAS NO NAV ROW — reached from Home's "Quest Map" chip**
-(`features/home/components/motivation-hero.tsx`), and from the survey, which
-drops a fresh student straight onto it. Removed at the user's request for the
-same reason `/streak` was: Home already carries the doorway, and the drawer had
-grown past a phone screen. Note the onboarding lock made a nav row nearly
-pointless here anyway — `ShellLayout` hides all chrome on `/roadmap` until the
-pledge has been seen, so the student who most needs a way back never had one.
+**`/roadmap` HAS A NAV ROW AGAIN (28 Oct 2026, the user's request)**, directly
+under "Streak with Friends" (`Map` icon, "Roadmap" / "ផែនទី"). It is also reached
+from Home's "Quest Map" chip (`features/home/components/motivation-hero.tsx`) and
+from the survey, which drops a fresh student straight onto it. It had been removed
+for the same reason `/streak` was (Home already carries the doorway). The
+onboarding lock still hides all chrome on `/roadmap` until the pledge has been
+seen, so the row only helps once that is done; a guest tapping it gets the locked
+panel with the navigation kept.
 
 **The placement test and its "Pending Placement Tests" card are DELETED (7 Oct
 2026)**, with the 10 mock-exam questions it drew from. See "The 10 mock-exam

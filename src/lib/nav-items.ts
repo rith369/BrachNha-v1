@@ -11,6 +11,7 @@ import {
   Users,
   LineChart,
   Gauge,
+  Map as MapIcon,
 } from "lucide-react";
 
 export interface NavItem {
@@ -76,24 +77,17 @@ export const featureNavItems: NavItem[] = [
     label: { en: "Leaderboard", km: "ចំណាត់ថ្នាក់" },
     icon: Trophy,
   },
-  // ── TWO ROUTES ARE DELIBERATELY ABSENT FROM THIS LIST. DON'T ADD THEM BACK.
+  // ── /streak IS DELIBERATELY ABSENT FROM THIS LIST. DON'T ADD IT BACK.
   //
-  // The list was getting long, and both already have a doorway on Home that
-  // shows the very thing the page is about — a nav row would be a second
-  // entrance to a screen the student is looking at the summary of:
+  // The list was getting long, and Home's Flame stat pill
+  // (features/home/components/stat-pills.tsx) already renders that exact count
+  // and links to the page, so a nav row would be a second entrance to a screen
+  // the student is looking at the summary of.
   //
-  //   /roadmap  ← the "Quest Map" chip in features/home/components/
-  //               motivation-hero.tsx. It is also where a student lands
-  //               straight out of the survey, and ShellLayout's onboarding lock
-  //               (app.tsx) hides all chrome there until the pledge is seen —
-  //               so for the one student who most needs it, a nav row was never
-  //               visible in the first place.
-  //   /streak   ← the Flame stat pill in features/home/components/
-  //               stat-pills.tsx, which renders that exact count.
-  //
-  // "Streak with Friends" below keeps its row because nothing on Home hints
-  // that it exists. Neither removal touches `bottomNavItems`: it takes Progress
-  // by `featureNavItems[0]`, still index 0, and Game by id — which is precisely
+  // /roadmap was removed for the same reason (Home's "Quest Map" chip) and came
+  // BACK on 28 Oct 2026 at the user's request, under "Streak with Friends".
+  // Neither change touches `bottomNavItems`: it takes Progress by
+  // `featureNavItems[0]`, still index 0, and Game by id — which is precisely
   // the reason that lookup is by id rather than position.
   {
     id: "library",
@@ -115,6 +109,12 @@ export const featureNavItems: NavItem[] = [
     // a typo in a menu a student sees every day.
     label: { en: "Streak with Friends", km: "Streak ជាមួយមិត្តភក្តិ" },
     icon: Users,
+  },
+  {
+    id: "roadmap",
+    href: "/roadmap",
+    label: { en: "Roadmap", km: "ផែនទី" },
+    icon: MapIcon,
   },
   {
     id: "profile",
