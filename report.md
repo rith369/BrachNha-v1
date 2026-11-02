@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Nov 2026 — The lesson mission now says "sections"
 
-Commit: `PENDING`.
+Commit: `9dd117d`.
 
 **What changed.** The lesson row on Today's Missions now reads "Complete 2 sections"
 (`បញ្ចប់ 2 ផ្នែកមេរៀន`) instead of "Complete 2 lessons". When the target is one, it reads
