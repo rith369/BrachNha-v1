@@ -6,8 +6,8 @@ export const GRADE_HOURS: Record<string, number> = {
   E: 1,
 };
 
-/** The estimate the signed pledge quotes as a goal. The Roadmap itself no longer
- *  shows these: finishing one of each is what ticks the day. */
+/** The estimate the signed pledge quotes as a goal. No other screen shows these:
+ *  the missions ask for one of each. */
 export interface DailyMission {
   lessons: number;
   practice: number;
