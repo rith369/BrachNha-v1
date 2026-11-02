@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 2 Nov 2026: The Roadmap Is a Real Plan
 
-Commit: `PENDING`. No database step.
+Commit: `0524b8e`. No database step.
 
 **What changed:**
 
