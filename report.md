@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 2 Nov 2026: Add a Friend With a Link or QR Code
 
-Commit: `PENDING`. **Database step: run `20261102000001_friend_invite.sql` in the Supabase
+Commit: `7d3d84e`. **Database step: run `20261102000001_friend_invite.sql` in the Supabase
 SQL editor BEFORE this goes live.**
 
 **What changed:**
