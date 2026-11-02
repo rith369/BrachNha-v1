@@ -1,3 +1,5 @@
+import type { Tasks } from "@/types";
+
 export const GRADE_HOURS: Record<string, number> = {
   A: 3.5,
   B: 2.5,
@@ -6,8 +8,8 @@ export const GRADE_HOURS: Record<string, number> = {
   E: 1,
 };
 
-/** The estimate the signed pledge quotes as a goal. No other screen shows these:
- *  the missions ask for one of each. */
+/** The day's work: lessons, practice QUESTIONS and flashcards. The pledge quotes it
+ *  and dailyTargets() turns it into the missions. */
 export interface DailyMission {
   lessons: number;
   practice: number;
@@ -30,6 +32,45 @@ const URGENCY_MAX = 1.6;
 // regardless of how much time budget the grade/timeline math produces.
 const FLASHCARDS_MIN = 2;
 const FLASHCARDS_MAX = 6;
+// Grade A near the exam would otherwise reach 5.6 hours a day, on top of school.
+const MAX_MINUTES_PER_DAY = 240;
+// What the practice budget's questions come to as quizzes.
+const QUESTIONS_PER_QUIZ = 10;
+
+/** Minutes a day for this grade and time left. */
+function dailyMinutes(grade: string, monthsLeft: number): number {
+  const urgency = Math.min(
+    URGENCY_MAX,
+    Math.max(URGENCY_MIN, BASELINE_MONTHS / monthsLeft)
+  );
+  return Math.min(MAX_MINUTES_PER_DAY, (GRADE_HOURS[grade] ?? 2) * 60 * urgency);
+}
+
+/** The hours the Roadmap and the pledge show: the same budget the targets come
+ *  from, so the screen and the plan cannot disagree. To the nearest quarter hour. */
+export function dailyHours(grade: string, monthsLeft: number): number {
+  return Math.round((dailyMinutes(grade, monthsLeft) / 60) * 4) / 4;
+}
+
+/**
+ * How many of each activity make today's missions. Flashcards and the challenge
+ * are always one: a review already scales with the deck.
+ *
+ * A student with no target grade (a guest, or before the survey) has nothing to
+ * scale from, so one of each.
+ */
+export function dailyTargets(grade: string, monthsLeft: number): Record<keyof Tasks, number> {
+  if (!Object.hasOwn(GRADE_HOURS, grade)) {
+    return { lesson: 1, practice: 1, flashcards: 1, challenge: 1 };
+  }
+  const mission = computeDailyMission(grade, monthsLeft);
+  return {
+    lesson: mission.lessons,
+    practice: Math.max(1, Math.round(mission.practice / QUESTIONS_PER_QUIZ)),
+    flashcards: 1,
+    challenge: 1,
+  };
+}
 
 /** `monthsLeft` comes from monthsUntilExam() (utils/exam-date.ts), which
  *  guarantees >= 1 — this divides by it. */
@@ -37,12 +78,7 @@ export function computeDailyMission(
   grade: string,
   monthsLeft: number
 ): DailyMission {
-  const minutesPerDay = (GRADE_HOURS[grade] ?? 2) * 60;
-  const urgency = Math.min(
-    URGENCY_MAX,
-    Math.max(URGENCY_MIN, BASELINE_MONTHS / monthsLeft)
-  );
-  const budget = minutesPerDay * urgency;
+  const budget = dailyMinutes(grade, monthsLeft);
 
   return {
     lessons: Math.max(

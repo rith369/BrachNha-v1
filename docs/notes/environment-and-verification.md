@@ -213,6 +213,12 @@ cannot see a column; check with a publishable-key
 `GET /rest/v1/card_reviews?select=stability&limit=0`, which answers `200` once it
 exists and `400` before.
 
+**`20261103000001_daily_targets_and_gift.sql`** (daily targets, the streak rule, the gift) must be
+applied AFTER `20261013000001` and `20260916000004`, and BEFORE the code ships: without it the push
+of today's row is refused, so that day's progress stays on the phone until it lands. `db:check`
+cannot see a column; a publishable-key `GET /rest/v1/daily_activity?select=streak_day&limit=0`
+answers `200` once it exists and `400` before.
+
 **`20261102000001_friend_invite.sql`** (the friend invite link) must be applied AFTER
 `20261013000001` and BEFORE the code ships: without it every invite link says it could
 not open. It adds no table, so `db:check` cannot see it. A publishable-key-only call to

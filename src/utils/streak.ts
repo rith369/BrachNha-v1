@@ -11,29 +11,34 @@
  * stopped being a hardcoded seed. `currentStreak` / `bestStreak` are where that
  * number now comes FROM: the store's `activityLog`, one entry per day studied.
  *
- * THE RULE: A DAY COUNTS ONLY WHEN THE DAILY GOAL IS COMPLETE — the user's
- * decision, and what the Streak page has always told students ("just opening
- * the app doesn't count"). Studying without finishing the goal still fills the
- * day in on the Profile calendar, more faintly, but it does not extend a streak.
+ * THE RULE (the user's, 3 Nov 2026): A DAY COUNTS ONCE ANY 1 ACTIVITY IS FINISHED,
+ * a lesson, a quiz, a flashcard review or the daily challenge. Reaching all four
+ * of the day's targets opens a gift instead of being what keeps the streak, so a
+ * busy day still counts and a full one is still worth doing. Just opening the app
+ * doesn't count, and neither does answering part of something, which still fills
+ * the day in on the Profile calendar, more faintly.
+ *
+ * It used to need all of lesson, practice and flashcards. Days that met that
+ * remain streak days; days that did not stay as they were.
  */
 
 import type { ActivityLog, Tasks } from "@/types";
 import { addDaysKey, parseDayKey } from "@/utils/day";
 
-/**
- * The daily goal: the three tasks the Streak page's goal card and Roadmap's
- * Daily Mission already name. `challenge` is an extra row on Home's checklist,
- * not part of the goal.
- */
-export const DAILY_GOAL_TASKS = ["lesson", "practice", "flashcards"] as const;
+/** The day's four missions. Reaching all of them opens the gift. */
+export const MISSIONS = ["lesson", "practice", "flashcards", "challenge"] as const;
 
-export function isGoalComplete(tasks: Tasks): boolean {
-  return DAILY_GOAL_TASKS.every((key) => tasks[key]);
+/** A flashcard review counts with at least this many cards, or the whole deck if
+ *  it is smaller. Otherwise one card would keep a streak. */
+export const MIN_REVIEW_CARDS = 5;
+
+export function allMissionsDone(tasks: Tasks): boolean {
+  return MISSIONS.every((key) => tasks[key]);
 }
 
-/** How many of today's goal tasks are done — the "1 / 3" in the calendar. */
-export function goalTasksDone(tasks: Tasks): number {
-  return DAILY_GOAL_TASKS.filter((key) => tasks[key]).length;
+/** How many of today's missions are done: the "2 of 4". */
+export function missionsDone(tasks: Tasks): number {
+  return MISSIONS.filter((key) => tasks[key]).length;
 }
 
 // Optional chaining is load-bearing, not tidiness: an absent day is undefined,

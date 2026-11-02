@@ -1,14 +1,14 @@
 import { Link } from "react-router";
-import { BookOpen, Check, ChevronRight, Flame, Layers, PenLine } from "lucide-react";
+import { BookOpen, Check, ChevronRight, Flame, Layers, PenLine, Target } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { MissionGift } from "@/features/home/components/mission-gift";
 import { useBrachNhaStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
 import {
   continueTaskLabel,
   dailyTaskLabel,
   tasksCompletedLabel,
-  tasksLeftLabel,
   useStreakCopy,
 } from "../copy";
 import type { DailyTask, DailyTaskId } from "../types";
@@ -26,10 +26,13 @@ const TASK_ICON: Record<DailyTaskId, LucideIcon> = {
   lesson: BookOpen,
   practice: PenLine,
   flashcards: Layers,
+  challenge: Target,
 };
 
 /**
- * Today's goal: a ring, the three tasks behind it, and a link to the next one.
+ * Today's missions: a ring, the four behind it, and a link to the next one. The
+ * ring is the way to the gift; the line beside it is the streak, which any one
+ * finished activity keeps.
  *
  * REAL since 1 Oct 2026: the tasks are the store's own, and each one still open
  * is a link to where that work is done. There is no button that completes the
@@ -55,17 +58,19 @@ const TASK_ICON: Record<DailyTaskId, LucideIcon> = {
 export function DailyGoalCard({
   tasks,
   links,
+  streakKept,
 }: {
   tasks: readonly DailyTask[];
   /** Where each task is done (features/home/task-links.ts). */
   links: Record<DailyTaskId, string>;
+  /** Today already counts for the streak. */
+  streakKept: boolean;
 }) {
   const lang = useBrachNhaStore((s) => s.lang);
   const c = useStreakCopy(lang);
 
   const done = tasks.filter((t) => t.done).length;
   const total = tasks.length;
-  const complete = done === total;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
   const dash = (pct / 100) * CIRC;
   const next = tasks.find((t) => !t.done);
@@ -110,7 +115,7 @@ export function DailyGoalCard({
 
         <div className="min-w-0 flex-1">
           <div className="font-heading text-sm font-extrabold md:text-base">
-            {c.todaysGoal}
+            {c.todaysMissions}
           </div>
           <div className="mt-0.5 text-xs font-bold text-muted">
             {tasksCompletedLabel(done, total, lang)}
@@ -118,16 +123,14 @@ export function DailyGoalCard({
           <div
             className={cn(
               "mt-1.5 flex items-center gap-1.5 text-xs font-extrabold",
-              complete ? "text-mint" : "text-muted"
+              streakKept ? "text-mint" : "text-muted"
             )}
           >
-            {complete && (
+            {streakKept && (
               <Flame className="size-3.5 shrink-0" fill="currentColor" strokeWidth={1.5} aria-hidden />
             )}
             <span>
-              {complete
-                ? c.streakMaintained
-                : tasksLeftLabel(total - done, lang)}
+              {streakKept ? c.streakMaintained : c.streakHint}
             </span>
           </div>
         </div>
@@ -156,6 +159,11 @@ export function DailyGoalCard({
               >
                 {dailyTaskLabel(task.id, lang)}
               </span>
+              {!task.done && task.target > 1 && (
+                <span className="shrink-0 text-xs font-extrabold text-muted tabular-nums">
+                  {task.count}/{task.target}
+                </span>
+              )}
               {task.done ? (
                 <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-mint text-white">
                   <Check className="size-2.5" strokeWidth={4} aria-hidden />
@@ -183,6 +191,8 @@ export function DailyGoalCard({
           );
         })}
       </ul>
+
+      <MissionGift />
 
       {next ? (
         <Link

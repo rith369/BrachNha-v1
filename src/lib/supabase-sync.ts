@@ -223,6 +223,11 @@ export async function pushLocalState(userId: string, s: StoreState) {
         task_challenge: s.tasks.challenge,
         xp_earned: s.activityLog[todayDate]?.xp ?? 0,
         study_minutes: s.activityLog[todayDate]?.minutes ?? 0,
+        streak_day: s.activityLog[todayDate]?.goal === true,
+        lessons_done: s.dayCounts.lesson,
+        quizzes_done: s.dayCounts.practice,
+        reviews_done: s.dayCounts.flashcards,
+        gift_opened: s.giftOpened,
       },
       { onConflict: "user_id,activity_date" }
     )
@@ -266,16 +271,15 @@ export async function pushLocalState(userId: string, s: StoreState) {
     );
   }
 
-  // A goal day had all three goal tasks done by definition, so writing them
-  // true is exact — and it is what the pull reads the goal back from.
+  // What the pull, the leaderboard and a friend's page read a streak day back
+  // from. Not the task flags: a day with one quiz is a streak day with most of
+  // them false.
   const goalRows = recentDays
     .filter(([, d]) => d.goal)
     .map(([day]) => ({
       user_id: userId,
       activity_date: day,
-      task_lesson: true,
-      task_practice: true,
-      task_flashcards: true,
+      streak_day: true,
     }));
   if (goalRows.length) {
     await attempt("daily_activity: recent goals", () =>
@@ -523,7 +527,7 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
           // study_minutes must be NAMED here. This select lists columns
           // explicitly, so one left out comes back absent and every pulled day
           // silently rebuilds with no study time at all.
-          "activity_date, xp_earned, study_minutes, task_lesson, task_practice, task_flashcards, task_challenge"
+          "activity_date, xp_earned, study_minutes, task_lesson, task_practice, task_flashcards, task_challenge, streak_day, lessons_done, quizzes_done, reviews_done, gift_opened"
         )
         .eq("user_id", userId)
         .gt("activity_date", addDaysKey(new Date(), -MAX_ACTIVITY_DAYS)),
@@ -552,8 +556,8 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
   const activityRows = activity.data ?? [];
   const todayRow = activityRows.find((r) => r.activity_date === todayDate);
 
-  // The goal comes from the task flags — the same three DAILY_GOAL_TASKS the
-  // store checks. XP comes from xp_earned, except on rows written before that
+  // A streak day is `streak_day`, or all three of the flags on a day from before
+  // that column, when that was the rule. XP comes from xp_earned, except on rows written before that
   // column was filled in, which carry only flags: each ticked task paid exactly
   // TASK_XP, so that is rebuilt — a true lower bound for the day, not a guess.
   // A row with nothing was never a studied day (the push writes today's row even
@@ -567,7 +571,7 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
       r.task_challenge,
     ].filter(Boolean).length;
     const xp = r.xp_earned > 0 ? r.xp_earned : ticked * TASK_XP;
-    const goal = r.task_lesson && r.task_practice && r.task_flashcards;
+    const goal = r.streak_day || (r.task_lesson && r.task_practice && r.task_flashcards);
     const minutes = r.study_minutes ?? 0;
     if (xp > 0 || goal || minutes > 0) {
       // `minutes` is omitted rather than written as 0 when the row has none:
@@ -646,6 +650,13 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
     // checklist arrives with an empty tasksDate and AppShell's rollover
     // immediately wipes it, which looks like the pull silently failing.
     tasksDate: todayDate,
+    dayCounts: {
+      lesson: todayRow?.lessons_done ?? 0,
+      practice: todayRow?.quizzes_done ?? 0,
+      flashcards: todayRow?.reviews_done ?? 0,
+      challenge: todayRow?.task_challenge ? 1 : 0,
+    },
+    giftOpened: todayRow?.gift_opened ?? false,
     activityLog,
     contentLog,
     // A failed history read leaves both lists empty rather than failing the

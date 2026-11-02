@@ -58,6 +58,9 @@ export const FLASHCARD_COINS = 1;
  */
 export const TASK_XP = 20;
 
+/** The gift for reaching all four of the day's mission targets, paid once a day. */
+export const GIFT_XP = 50;
+
 /**
  * XP for one correct answer in a Game competition.
  *

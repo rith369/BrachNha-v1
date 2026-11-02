@@ -18,16 +18,19 @@ export interface StreakDay {
   id: WeekdayId;
   /** Local `YYYY-MM-DD` of this cell. */
   key: string;
-  /** Daily goal met — NOT "opened the app". */
+  /** A streak day: at least one activity finished, NOT "opened the app". */
   done: boolean;
 }
 
-/** The three daily-goal tasks, the store's real `Tasks` keys. */
-export type DailyTaskId = "lesson" | "practice" | "flashcards";
+/** The day's missions, the store's real `Tasks` keys. */
+export type DailyTaskId = "lesson" | "practice" | "flashcards" | "challenge";
 
 export interface DailyTask {
   id: DailyTaskId;
   done: boolean;
+  /** Finished today, and how many the mission asks for. */
+  count: number;
+  target: number;
 }
 
 /** One person on the shared streak screen. */

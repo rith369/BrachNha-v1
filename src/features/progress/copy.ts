@@ -176,16 +176,16 @@ const en = {
     body: "Finish your first lesson and your tips will appear here.",
   },
   tipGoalDone: (streak: number) => ({
-    title: "Goal done today",
+    title: "Streak kept today",
     body: `Your ${streak}-day streak is safe. Come back tomorrow to keep it going.`,
   }),
-  tipKeepStreak: (streak: number, done: number) => ({
+  tipKeepStreak: (streak: number) => ({
     title: "Keep your streak",
-    body: `${done} of 3 daily tasks done. Finish the rest to make it ${streak + 1} days.`,
+    body: `Finish any 1 activity today to make it ${streak + 1} days.`,
   }),
-  tipStartStreak: (done: number) => ({
+  tipStartStreak: () => ({
     title: "Start a streak",
-    body: `${done} of 3 daily tasks done. Finish a lesson, a quiz and flashcards today.`,
+    body: `Finish any 1 activity today to start one.`,
   }),
   tipWeakest: (subject: string, pct: number) => ({
     title: `Focus on ${subject}`,
@@ -345,16 +345,16 @@ const km: ProgressCopy = {
     body: "បញ្ចប់មេរៀនដំបូងរបស់អ្នក ហើយគន្លឹះនឹងបង្ហាញនៅទីនេះ។",
   },
   tipGoalDone: (streak) => ({
-    title: "បានបញ្ចប់គោលដៅថ្ងៃនេះ",
+    title: "បានរក្សា Streak ថ្ងៃនេះ",
     body: `Streak ${streak} ថ្ងៃរបស់អ្នកមានសុវត្ថិភាព។ ត្រឡប់មកវិញថ្ងៃស្អែក ដើម្បីបន្តវា។`,
   }),
-  tipKeepStreak: (streak, done) => ({
+  tipKeepStreak: (streak) => ({
     title: "រក្សា Streak របស់អ្នក",
-    body: `បានធ្វើកិច្ចការប្រចាំថ្ងៃ ${done} ក្នុងចំណោម 3។ បញ្ចប់កិច្ចការដែលនៅសល់ ដើម្បីឱ្យវាក្លាយជា ${streak + 1} ថ្ងៃ។`,
+    body: `បញ្ចប់សកម្មភាពណាមួយថ្ងៃនេះ ដើម្បីឲ្យវាក្លាយជា ${streak + 1} ថ្ងៃ។`,
   }),
-  tipStartStreak: (done) => ({
+  tipStartStreak: () => ({
     title: "ចាប់ផ្តើម Streak",
-    body: `បានធ្វើកិច្ចការប្រចាំថ្ងៃ ${done} ក្នុងចំណោម 3។ បញ្ចប់មេរៀន Quiz និង Flashcard ថ្ងៃនេះ។`,
+    body: `បញ្ចប់សកម្មភាពណាមួយថ្ងៃនេះ ដើម្បីចាប់ផ្តើម។`,
   }),
   tipWeakest: (subject, pct) => ({
     title: `ផ្តោតលើ${subject}`,

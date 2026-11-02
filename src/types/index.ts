@@ -73,12 +73,16 @@ export interface Tasks {
   challenge: boolean;
 }
 
+/** How many of each activity were finished today. A mission's tick is this count
+ *  reaching its target (utils/roadmap.ts's dailyTargets). */
+export type DayCounts = Record<keyof Tasks, number>;
+
 /** One local calendar day of study — the device's twin of a daily_activity row. */
 export interface DayActivity {
   /** XP earned that day. > 0 means the student studied. */
   xp: number;
-  /** All three daily-goal tasks (utils/streak.ts's DAILY_GOAL_TASKS) were done
-   *  that day. ONLY these days count toward the streak. */
+  /** The day counts toward the streak: since 3 Nov 2026, at least one activity was
+   *  finished; before that, all three goal tasks were. */
   goal: boolean;
   /**
    * ACTIVE study minutes that day — time on a study screen with the tab visible

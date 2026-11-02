@@ -1,6 +1,5 @@
-import type { ActivityLog, Lang, Tasks } from "@/types";
+import type { ActivityLog, Lang } from "@/types";
 import { T } from "@/data/translations";
-import { goalTasksDone, isGoalComplete } from "@/utils/streak";
 import { addDaysKey, parseDayKey } from "@/utils/day";
 import type { SubjectId } from "@/features/lessons/subjects";
 import { PROGRESS_COPY } from "./copy";
@@ -35,8 +34,6 @@ export interface TipsInput {
   summary: ProgressSummary;
   activityLog: ActivityLog;
   streak: number;
-  tasks: Tasks;
-  tasksDate: string;
   /** Flashcards the student has graded before that are due again. */
   cardsDue: number;
   today: string;
@@ -72,14 +69,12 @@ export function buildStudyTips(input: TipsInput): StudyTip[] {
     ];
   }
 
-  const todayTasks = input.tasksDate === input.today ? input.tasks : null;
-  const done = todayTasks ? goalTasksDone(todayTasks) : 0;
-  if (todayTasks && isGoalComplete(todayTasks)) {
+  if (input.activityLog[input.today]?.goal === true) {
     tips.push({ id: "goal", icon: "🔥", tone: "mint", ...c.tipGoalDone(input.streak), href: "/streak" });
   } else if (input.streak > 0) {
-    tips.push({ id: "goal", icon: "🔥", tone: "pink", ...c.tipKeepStreak(input.streak, done), href: "/streak" });
+    tips.push({ id: "goal", icon: "🔥", tone: "pink", ...c.tipKeepStreak(input.streak), href: "/streak" });
   } else {
-    tips.push({ id: "goal", icon: "🔥", tone: "purple", ...c.tipStartStreak(done), href: "/streak" });
+    tips.push({ id: "goal", icon: "🔥", tone: "purple", ...c.tipStartStreak(), href: "/streak" });
   }
 
   const scored = Object.entries(input.summary.subjects)

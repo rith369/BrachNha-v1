@@ -79,6 +79,7 @@ export default function PracticeReviewPage() {
       // draws its queue from. Recomputed each render, so grading during the
       // session is already reflected by the time the summary shows it.
       progress={deckProgress(everything)}
+      deckSize={everything.length}
       onExit={() => navigate("/practice")}
     />
   );

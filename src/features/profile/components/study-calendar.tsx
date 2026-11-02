@@ -17,7 +17,7 @@ import type { WeekdayId } from "@/features/streak/types";
 import type { Lang } from "@/types";
 import { addDaysKey, parseDayKey, todayKey } from "@/utils/day";
 import { BAC2_EXAM_DATE, daysUntilExam } from "@/utils/exam-date";
-import { DAILY_GOAL_TASKS, bestStreak, goalTasksDone } from "@/utils/streak";
+import { bestStreak } from "@/utils/streak";
 import {
   addMonths,
   buildMonthGrid,
@@ -51,8 +51,8 @@ function dayLabel(date: Date, lang: Lang): string {
 }
 
 function goalDaysLabel(days: number, lang: Lang): string {
-  if (lang === "km") return `បញ្ចប់គោលដៅ ${days} ថ្ងៃ`;
-  return `Goal done on ${days} ${days === 1 ? "day" : "days"}`;
+  if (lang === "km") return `រក្សា Streak បាន ${days} ថ្ងៃ`;
+  return `Streak kept on ${days} ${days === 1 ? "day" : "days"}`;
 }
 
 /** Under a FUTURE month's title, where "goal done on 0 days" would be true and
@@ -62,18 +62,16 @@ function examCountdownLabel(days: number, lang: Lang): string {
   return `${days} ${days === 1 ? "day" : "days"} until Bac II`;
 }
 
-/** Shown only while today's goal is still open — with how far along it is,
- *  because "finish your goal" means little without "you are 2 of 3 there". */
-function goalNudge(done: number, streak: number, lang: Lang): string {
-  const of = `${done} / ${DAILY_GOAL_TASKS.length}`;
+/** Shown only until today counts for the streak. */
+function goalNudge(streak: number, lang: Lang): string {
   if (lang === "km") {
     return streak > 0
-      ? `បញ្ចប់គោលដៅថ្ងៃនេះ (${of}) ដើម្បីរក្សា Streak របស់អ្នកកុំឲ្យដាច់។`
-      : `បញ្ចប់គោលដៅថ្ងៃនេះ (${of}) ដើម្បីចាប់ផ្តើម Streak របស់អ្នក។`;
+      ? `បញ្ចប់សកម្មភាពណាមួយថ្ងៃនេះ ដើម្បីរក្សា Streak របស់អ្នកកុំឲ្យដាច់។`
+      : `បញ្ចប់សកម្មភាពណាមួយថ្ងៃនេះ ដើម្បីចាប់ផ្តើម Streak របស់អ្នក។`;
   }
   return streak > 0
-    ? `Finish today's goal (${of}) to keep your streak going.`
-    : `Finish today's goal (${of}) to start your streak.`;
+    ? `Finish any 1 activity today to keep your streak going.`
+    : `Finish any 1 activity today to start your streak.`;
 }
 
 function Stat({
@@ -189,13 +187,11 @@ function FlameShape({
  * (sidebar-nav.tsx's `href: null` rows, subject-card.tsx's zero-lesson tile).
  */
 export function StudyCalendar() {
-  const { lang, streak, activityLog, tasks, tasksDate } = useBrachNhaStore(
+  const { lang, streak, activityLog } = useBrachNhaStore(
     useShallow((s) => ({
       lang: s.lang,
       streak: s.streak,
       activityLog: s.activityLog,
-      tasks: s.tasks,
-      tasksDate: s.tasksDate,
     }))
   );
   const t = useT(lang);
@@ -235,9 +231,6 @@ export function StudyCalendar() {
   ).length;
   const best = bestStreak(activityLog);
   const goalToday = activityLog[today]?.goal === true;
-  // `tasks` is only ever today's — but only once the rollover has stamped it,
-  // so a checklist from yesterday must read as nothing done yet.
-  const doneToday = tasksDate === today ? goalTasksDone(tasks) : 0;
 
   return (
     <Card className="gap-0">
@@ -427,7 +420,7 @@ export function StudyCalendar() {
 
       {!goalToday && (
         <p className="mt-3 text-center text-xs font-bold text-muted">
-          {goalNudge(doneToday, streak, lang)}
+          {goalNudge(streak, lang)}
         </p>
       )}
     </Card>

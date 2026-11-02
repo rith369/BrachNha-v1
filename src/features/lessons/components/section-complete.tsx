@@ -9,7 +9,8 @@ import { useStudyFeed } from "@/features/home/use-study-feed";
 import { taskHref } from "@/features/home/task-links";
 import { clockLabel } from "@/features/exam/paper-scoring";
 import { todayKey } from "@/utils/day";
-import { DAILY_GOAL_TASKS, goalTasksDone } from "@/utils/streak";
+import { MISSIONS, missionsDone } from "@/utils/streak";
+import { MissionGift } from "@/features/home/components/mission-gift";
 import type { Tasks } from "@/types";
 import { cn } from "@/utils/cn";
 import { chaptersFor, lessonHeading } from "../sessions";
@@ -29,10 +30,11 @@ export interface SectionSummary {
   ms: number;
 }
 
-const GOAL_LABEL: Record<(typeof DAILY_GOAL_TASKS)[number], string> = {
+const GOAL_LABEL: Record<(typeof MISSIONS)[number], string> = {
   lesson: "មេរៀន",
   practice: "Quiz",
   flashcards: "Flashcard",
+  challenge: "បញ្ហាប្រឈម",
 };
 
 /**
@@ -87,8 +89,7 @@ export function SectionComplete({
 
   // Today's ticks only: a checklist stamped on another day is yesterday's.
   const today: Tasks | null = tasksDate === todayKey() ? tasks : null;
-  const goalDone = today ? goalTasksDone(today) : 0;
-  const goalLeft = DAILY_GOAL_TASKS.length - goalDone;
+  const goalDone = today ? missionsDone(today) : 0;
 
   const footer = next?.s.href ? (
     <div className="flex gap-2.5">
@@ -168,13 +169,13 @@ export function SectionComplete({
 
         <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel-sm">
           <div className="mb-2.5 text-sm font-extrabold md:text-base">
-            គោលដៅថ្ងៃនេះ{" "}
+            ភារកិច្ចថ្ងៃនេះ{" "}
             <span className="text-muted tabular-nums">
-              {goalDone}/{DAILY_GOAL_TASKS.length}
+              {goalDone}/{MISSIONS.length}
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
-            {DAILY_GOAL_TASKS.map((key) =>
+            {MISSIONS.map((key) =>
               today?.[key] ? (
                 <span
                   key={key}
@@ -197,10 +198,10 @@ export function SectionComplete({
           </div>
           <div className="mt-3 flex items-center gap-1.5 text-xs font-bold text-muted md:text-sm">
             <Flame className="size-4 shrink-0 text-pink" strokeWidth={2.5} aria-hidden />
-            {goalLeft > 0
-              ? `ធ្វើ ${goalLeft} ទៀតដើម្បីរក្សា Streak`
-              : `បានរក្សា Streak ហើយ! Streak ${streak} ថ្ងៃ`}
+            {/* Finishing this section is itself what keeps the streak. */}
+            {`បានរក្សា Streak ហើយ! Streak ${streak} ថ្ងៃ`}
           </div>
+          <MissionGift className="mt-2" lang="km" />
         </div>
       </div>
     </FocusLayout>

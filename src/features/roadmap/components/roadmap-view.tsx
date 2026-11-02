@@ -3,8 +3,8 @@ import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { useT } from "@/data/translations";
 import type { TranslationKey } from "@/data/translations";
-import { GRADE_HOURS } from "@/utils/roadmap";
-import { daysUntilExam, formatExamDate } from "@/utils/exam-date";
+import { dailyHours } from "@/utils/roadmap";
+import { daysUntilExam, formatExamDate, monthsUntilExam } from "@/utils/exam-date";
 import { PLEDGE_COPY } from "@/features/commitment/copy";
 import { ContentNotice } from "@/features/practice/components/content-waiting";
 import { CommitmentBanner } from "./commitment-banner";
@@ -139,7 +139,7 @@ export function RoadmapView() {
   const navigate = useNavigate();
   const { plan, manifest, activityLog, today } = useStudyPlan();
 
-  const hrs = GRADE_HOURS[userData.grade] || 2;
+  const hrs = dailyHours(userData.grade, monthsUntilExam());
   const minutesToday = activityLog[today]?.minutes ?? 0;
 
   // Derived from the fixed exam date, so it counts down on its own instead of

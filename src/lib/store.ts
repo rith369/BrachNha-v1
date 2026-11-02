@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type {
+  DayCounts,
   Lang,
   UserData,
   Tasks,
@@ -25,9 +26,11 @@ import {
   type ReviewResult,
   type ReviewState,
 } from "@/utils/spaced-repetition";
-import { FLASHCARD_XP, FLASHCARD_COINS, TASK_XP } from "@/utils/rewards";
+import { FLASHCARD_XP, FLASHCARD_COINS, GIFT_XP, TASK_XP } from "@/utils/rewards";
+import { monthsUntilExam } from "@/utils/exam-date";
+import { dailyTargets } from "@/utils/roadmap";
 import { addDaysKey, parseDayKey, todayKey } from "@/utils/day";
-import { currentStreak, isGoalComplete } from "@/utils/streak";
+import { allMissionsDone, currentStreak } from "@/utils/streak";
 import { levelForXp } from "@/utils/level";
 
 export type {
@@ -348,6 +351,11 @@ interface BrachNhaState {
    * "no tasks have been completed yet", which needs no reset.
    */
   tasksDate: string;
+  /** Today's finished activities, reset with `tasks`. A mission ticks when its
+   *  count reaches its target, so this can pass a target and `tasks` cannot. */
+  dayCounts: DayCounts;
+  /** Today's gift has been opened. Reset with `tasks`. */
+  giftOpened: boolean;
   examResults: ExamResult[];
   /**
    * Attempts at real MoEYS past papers, oldest first, capped at
@@ -486,7 +494,14 @@ interface BrachNhaState {
   signCommitment: (commitment: Commitment) => void;
   /** `coins` overrides the default XP→coins ratio; see `award`. */
   addXp: (amount: number, coins?: number) => void;
+  /**
+   * One activity of this kind was finished. Any finished activity makes today a
+   * streak day; the mission ticks and pays TASK_XP when the count reaches today's
+   * target. Any lesson or quiz counts, not a particular one.
+   */
   completeTask: (task: keyof Tasks) => void;
+  /** Pays the gift, once a day, and only once all four missions are done. */
+  openGift: () => void;
   completeSession: (lessonId: string) => void;
   /**
    * Record scored questions against one piece of content, for today.
@@ -665,6 +680,9 @@ interface BrachNhaState {
  */
 const COINS_PER_XP = 0.25;
 
+/** What the gift pays in coins, at the ordinary ratio, for the screen to show. */
+export const GIFT_COINS = Math.floor(GIFT_XP * COINS_PER_XP);
+
 /** Drops anything older than MAX_ACTIVITY_DAYS. Day keys compare
  *  chronologically as plain strings. */
 function trimLog(log: ActivityLog, today: string): ActivityLog {
@@ -693,7 +711,7 @@ function logXp(log: ActivityLog, today: string, amount: number): ActivityLog {
   );
 }
 
-/** Marks today's goal done. Idempotent. */
+/** Marks today as a streak day. Idempotent. */
 function logGoal(log: ActivityLog, today: string): ActivityLog {
   const prev = log[today];
   if (prev?.goal === true) return log;
@@ -782,6 +800,29 @@ const emptyTasks: Tasks = {
   challenge: false,
 };
 
+const emptyCounts: DayCounts = { lesson: 0, practice: 0, flashcards: 0, challenge: 0 };
+
+/**
+ * What a new day resets. An unopened gift is paid here rather than lost: it was
+ * earned, and the last mission is often finished away from the card that opens it.
+ * Its XP is not logged against the new day, which would mark a day with no study.
+ */
+function newDay(state: BrachNhaState, today: string) {
+  const owed = allMissionsDone(state.tasks) && !state.giftOpened;
+  const { xp, level, coins } = owed
+    ? award(state, GIFT_XP)
+    : { xp: state.xp, level: state.level, coins: state.coins };
+  return {
+    xp,
+    level,
+    coins,
+    tasks: emptyTasks,
+    dayCounts: emptyCounts,
+    giftOpened: false,
+    tasksDate: today,
+  };
+}
+
 const emptyUserData: UserData = {
   strengths: [],
   weaknesses: [],
@@ -824,6 +865,8 @@ const partializeState = (state: BrachNhaState) => ({
   contentLog: state.contentLog,
   tasks: state.tasks,
   tasksDate: state.tasksDate,
+  dayCounts: state.dayCounts,
+  giftOpened: state.giftOpened,
   examResults: state.examResults,
   paperResults: state.paperResults,
   quizResults: state.quizResults,
@@ -878,6 +921,8 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       contentLog: {},
       tasks: emptyTasks,
       tasksDate: "",
+      dayCounts: emptyCounts,
+      giftOpened: false,
       examResults: [],
       paperResults: [],
       quizResults: [],
@@ -961,23 +1006,35 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           // student whose tab has been open since yesterday would find the
           // task already "done" and earn nothing for real work.
           const today = todayKey();
-          const rolled = state.tasksDate === today ? state.tasks : emptyTasks;
-          if (rolled[task]) return state; // already done today, no-op
-          const tasks = { ...rolled, [task]: true };
-          const rewarded = award(state, TASK_XP);
-          // THE ONLY PLACE A STREAK DAY IS MADE. The goal is complete the moment
-          // the last of its three tasks lands, whichever order they came in.
-          const activityLog = isGoalComplete(tasks)
-            ? logGoal(rewarded.activityLog, today)
-            : rewarded.activityLog;
+          const base =
+            state.tasksDate === today ? state : { ...state, ...newDay(state, today) };
+          const dayCounts = { ...base.dayCounts, [task]: base.dayCounts[task] + 1 };
+          const target = dailyTargets(base.userData.grade, monthsUntilExam())[task];
+          const reached = !base.tasks[task] && dayCounts[task] >= target;
+          const rewarded = reached
+            ? award(base, TASK_XP)
+            : { xp: base.xp, level: base.level, coins: base.coins, activityLog: base.activityLog };
+          // THE ONLY PLACE A STREAK DAY IS MADE: any finished activity makes one.
+          const activityLog = logGoal(rewarded.activityLog, today);
           return {
-            tasks,
-            tasksDate: today,
+            ...base,
             ...rewarded,
+            tasks: reached ? { ...base.tasks, [task]: true } : base.tasks,
+            dayCounts,
+            tasksDate: today,
             activityLog,
             streak: currentStreak(activityLog, today),
           };
         }),
+
+      openGift: () =>
+        set((state) =>
+          state.tasksDate === todayKey() &&
+          allMissionsDone(state.tasks) &&
+          !state.giftOpened
+            ? { ...award(state, GIFT_XP), giftOpened: true }
+            : state
+        ),
 
       // Idempotent: finishing a lesson a second time must not stack rewards,
       // and the path only needs to know that it is done.
@@ -1108,7 +1165,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
         ),
 
       resetDailyTasks: () =>
-        set({ tasks: emptyTasks, tasksDate: todayKey() }),
+        set({ tasks: emptyTasks, dayCounts: emptyCounts, giftOpened: false, tasksDate: todayKey() }),
 
       // The caller is AppShell, on mount and on every visibilitychange — a
       // phone left open overnight has to roll over too, and "hidden → visible"
@@ -1123,8 +1180,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           // empty) checklist alone, so a fresh install does not look like a
           // rollover that just happened.
           return {
-            tasks: emptyTasks,
-            tasksDate: today,
+            ...newDay(state, today),
             // A new day is the one moment a streak can BREAK with no task being
             // completed, so completeTask() alone would never notice. A run that
             // ended yesterday still counts today (see currentStreak); one that
@@ -1383,6 +1439,8 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           contentLog: {},
           tasks: emptyTasks,
           tasksDate: "",
+          dayCounts: emptyCounts,
+          giftOpened: false,
           examResults: [],
           paperResults: [],
           quizResults: [],

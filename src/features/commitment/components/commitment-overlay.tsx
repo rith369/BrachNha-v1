@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { X, Check, PenLine } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
-import { GRADE_HOURS, computeDailyMission } from "@/utils/roadmap";
+import { computeDailyMission, dailyHours } from "@/utils/roadmap";
 import { monthsUntilExam } from "@/utils/exam-date";
 import { isBlankSignature } from "@/utils/signature";
 import type { Commitment } from "@/types";
@@ -52,10 +52,10 @@ export function CommitmentOverlay() {
   });
   const [confirming, setConfirming] = useState(false);
 
-  const hours = GRADE_HOURS[userData.grade] || 2;
   // Read live for the pledge text the student is about to sign, then frozen
   // into the Commitment below — that snapshot is what they actually agreed to.
   const monthsLeft = monthsUntilExam();
+  const hours = dailyHours(userData.grade, monthsLeft);
   const mission = computeDailyMission(userData.grade, monthsLeft);
 
   const canCommit =

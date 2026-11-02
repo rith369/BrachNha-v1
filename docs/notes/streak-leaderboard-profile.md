@@ -307,7 +307,8 @@ friend is. **The one thing added to make it real is a friendship model**;
 everything the streak needs already existed in `daily_activity`.
 
 **The rule is the whole feature: a day counts only when BOTH finished their
-daily goal.** One person doing the work earns the pair nothing. **Don't
+daily goal** (since 3 Nov 2026, at least 1 activity each; see "Daily targets, the
+streak and the gift" at the end of this note). One person doing the work earns the pair nothing. **Don't
 reintroduce ranking here**: an earlier version ranked friends by their own
 streaks, and "beat your friends" is what `/leaderboard` is for.
 
@@ -495,6 +496,9 @@ calendar needed a real log first — and once that existed, the streak and the t
 string-literal labels under the stat pills ("▲ +20 today", "Best!") could be
 made TRUE rather than deleted.
 
+**SUPERSEDED 3 Nov 2026: any 1 finished activity now makes a streak day. See "Daily
+targets, the streak and the gift" at the end of this note. The next paragraph is history.**
+
 **THE RULE — A DAY COUNTS ONLY WHEN THE DAILY GOAL IS COMPLETE.** The user's
 decision, and what the Streak page had always told students. The goal is the
 three tasks the Streak page's goal card and Roadmap's Daily Mission name —
@@ -664,3 +668,85 @@ changing yet. When they come back: edit in place on Profile rather than a "Redo
 survey" button (the survey restarts all four steps blank, takes over the screen
 and has no cancel), and move `GRADES` / `FIXED_SUBJECTS` out of `survey-view.tsx`
 into a `.ts` so both screens share one list.
+
+### Daily targets, the streak and the gift (3 Nov 2026)
+
+The user's design, across several messages: the amount of daily work follows the target
+grade and the time left, **any 1 finished activity keeps the streak**, and **reaching all 4
+missions opens a gift**. A student who only does quizzes keeps their streak; the gift is the
+reason to do more. The user was told the published content cannot fill these targets yet (29
+items) and chose to build the logic regardless, for the content that is coming.
+
+**The targets are `dailyTargets(grade, monthsLeft)` in `utils/roadmap.ts`**, from
+`computeDailyMission`'s budget: `GRADE_HOURS` × urgency (0.7 with 9+ months, 1 at 6, up to 1.6)
+**capped at 240 minutes** (`MAX_MINUTES_PER_DAY`; grade A near the exam was 5.6 hours on top of
+school), split 35/40/25 at 20 min a lesson, 3 min a question, 10 questions a quiz. Flashcards and
+the challenge are always 1. **No grade (a guest, or before the survey) is 1 of each.**
+
+| Target grade | 9+ months | 6 months | 3 months or less |
+| --- | --- | --- | --- |
+| A | 3 lessons, 2 quizzes | 4, 3 | 4, 3 |
+| B | 2, 1 | 3, 2 | 4, 3 |
+| C | 1, 1 | 2, 1 | 3, 2 |
+| D | 1, 1 | 1, 1 | 2, 2 |
+| E | 1, 1 | 1, 1 | 2, 1 |
+
+The lengths are estimates, not measured from students. **`dailyHours()` is the same budget**, to
+a quarter hour, and is what the Roadmap card and a NEW pledge show, so the screen and the plan
+cannot disagree (grade A shows 2.5 today, not 3.5). A signed pledge keeps its frozen numbers.
+
+**`completeTask(task)` now means "one activity of this kind was finished"**, so its seven callers
+did not change. It adds to `dayCounts`, ALWAYS makes today a streak day, and ticks `tasks[task]`
+and pays `TASK_XP` only when the count reaches today's target. So `tasks` means "this mission's
+target is reached", and **`ActivityLog.goal` now means "a streak day"**: the name stayed so its
+many readers (calendar, friends, leaderboard, `currentStreak`) needed no change. What counts:
+- any section, any full quiz sitting, any battle or exam. Retrying only wrong answers still does
+  not count (it never reaches `completeTask`). Re-finishing a section DOES, accepted;
+- a flashcard review with at least `MIN_REVIEW_CARDS` (5), or the whole deck if it is smaller.
+  `ReviewSession` takes `deckSize` for this, and a shorter review pays its per-card XP, ticks
+  nothing, and **says so on the summary** rather than leaving the mission silently unticked.
+
+**The gift is `openGift()`**: `GIFT_XP` (50, `utils/rewards.ts`) at the ordinary coin ratio (12),
+once a day, only with all 4 ticked. `MissionGift` (`features/home/components/mission-gift.tsx`)
+shows how far off it is, the button, then what it paid, on Home's card, the Streak card and the
+section completion screen (with `lang="km"`, since that screen is Khmer-only). **An unopened gift
+is paid when the day rolls over** (`newDay()` in the store), because the last mission is often
+finished away from the card; that XP is NOT logged against the new day, which would mark a day
+with no study. Coins still spend on nothing.
+
+**Home's `DailyTasks` shows a target above 1 in its label and a count** ("Complete 3 lessons",
+0/3), plus the streak line and the gift. Any lesson or quiz counts, which is why no row names one.
+The Streak page's card is now the 4 missions with the streak status beside the ring; the ring is
+the way to the gift, not the streak.
+
+**Two store fields, `dayCounts` and `giftOpened`**, reset with `tasks` and listed in both
+`partializeState` and `syncRelevantChange`. No `version` bump: `merge()` covers new keys.
+
+**`20261103000001_daily_targets_and_gift.sql` adds `streak_day`, `lessons_done`, `quizzes_done`,
+`reviews_done` and `gift_opened` to `daily_activity`**, and redefines `leaderboard()` and
+`my_friends()` (copied verbatim, one condition changed) to read `streak_day or (all three flags)`.
+So **old days that met the old goal still count, days that did not stay as they were, and no
+backfill is needed**. The push writes `streak_day` for past days and NOT the task flags: it used to
+write all three true on a goal day, which would now claim a lesson on a quiz-only day. The pull
+reads the same rule back. **It must be applied BEFORE this code ships**, or the push of today's
+row is refused.
+
+**Not done:** a streak freeze (the user's alternative gift, for later). The two-phone same-day
+case is unchanged: only an empty store pulls, so a gift could be opened once per phone. Accepted,
+the same as `tasks`' XP today.
+
+**Verified:** PGlite 0.2.17, the migration twice on the real init, RLS, leaderboard and friends
+migrations: 15 checks (new columns, a negative refused, quiz-only days counted by the leaderboard
+and friends, old all-three days still counted, partial old days not, own-rows policies unchanged,
+`anon` still refused both functions). The REAL store and sync through `ssrLoadModule` with only
+`getSupabase()` faked: 72 checks (the whole table above, the cap, each activity making a streak
+day, 10 quizzes, below/at/past target, the gift's refusals and single payment, the new day paying
+an unopened gift without logging a study day, a quiet wake publishing nothing, old and new days
+chaining, a gap breaking it; what is pushed, with each batch keeping stable columns; what is
+pulled, including all-three old days and partial ones). Browser: 83 checks at 390, 320 dark Khmer
+(Home's card at 0, part way and all done; opening the gift and a reload not paying again; the next
+day paying; Streak, Roadmap, Profile and Progress wording; the pledge's numbers; a real whole-deck
+review ticking; a real one-card review not ticking and saying why; a real section through to its
+completion screen), and the Roadmap (59), friends (50) and plan (31) suites still pass.
+**Not verified: two real accounts on the friend page after the rule change, or a real gift on a
+real phone.**

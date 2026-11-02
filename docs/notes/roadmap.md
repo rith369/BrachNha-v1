@@ -68,9 +68,8 @@ All 4 missions, line icons, +20 XP. **Its rows name no lesson, on the user's rea
 finished lesson, quiz or review ticks its row and pays the XP, so naming one would suggest
 only that one counts. A tap still opens the suggested next item (`taskHref()`). The specific
 items are on Home's Study card and in the month's list, with no XP promise attached.
-`computeDailyMission` stays in `utils/roadmap.ts` **for the pledge only**, which still
-quotes "3 lessons, 20 questions" as a goal the student signs. No screen counts toward those
-numbers, and the published content could not fill them for long. Left open for the user.
+The rows' targets, and the hours on the Roadmap's card, come from the same budget: see
+"Daily targets, the streak and the gift" in `streak-leaderboard-profile.md`.
 
 **Nothing is drawn until the manifest is `ready`**: before that every month would read
 as empty and every weak subject as coming soon, and a new student lands here straight

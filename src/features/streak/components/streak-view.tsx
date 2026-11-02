@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore } from "@/lib/store";
 import { celebratedOn, markCelebrated } from "@/lib/streak-celebrated";
-import { isGoalComplete, milestoneProgress, rankMilestones } from "@/utils/streak";
+import { milestoneProgress, rankMilestones } from "@/utils/streak";
 import { addDaysKey, parseDayKey, todayKey } from "@/utils/day";
 import { useStudyFeed } from "@/features/home/use-study-feed";
 import { taskHref } from "@/features/home/task-links";
@@ -14,13 +14,15 @@ import { MilestoneCard } from "./milestone-card";
 import { MilestoneProgress } from "./milestone-progress";
 import { StreakHeader } from "./streak-header";
 import { WeeklyStreak } from "./weekly-streak";
+import { monthsUntilExam } from "@/utils/exam-date";
+import { dailyTargets } from "@/utils/roadmap";
 
 /** How long the confetti stays mounted. Matches the 1.1s keyframe plus the
  *  longest per-particle stagger (120ms), with a little slack so nothing is cut
  *  off mid-flight. */
 const CELEBRATION_MS = 1400;
 
-const GOAL: DailyTask["id"][] = ["lesson", "practice", "flashcards"];
+const GOAL: DailyTask["id"][] = ["lesson", "practice", "flashcards", "challenge"];
 
 /**
  * The student's own streak, today's real goal and the real last seven days.
@@ -40,13 +42,15 @@ const GOAL: DailyTask["id"][] = ["lesson", "practice", "flashcards"];
  * fires once per day on the first visit after that (lib/streak-celebrated.ts).
  */
 export function StreakView() {
-  const { lang, streak, activityLog, tasks, tasksDate } = useBrachNhaStore(
+  const { lang, streak, activityLog, tasks, tasksDate, dayCounts, grade } = useBrachNhaStore(
     useShallow((s) => ({
       lang: s.lang,
       streak: s.streak,
       activityLog: s.activityLog,
       tasks: s.tasks,
       tasksDate: s.tasksDate,
+      dayCounts: s.dayCounts,
+      grade: s.userData.grade,
     }))
   );
   const c = useStreakCopy(lang);
@@ -54,7 +58,9 @@ export function StreakView() {
   const today = todayKey();
 
   const todayTasks = tasksDate === today ? tasks : null;
-  const completed = todayTasks !== null && isGoalComplete(todayTasks);
+  // Any finished activity keeps the streak, so that is what is celebrated.
+  const completed = activityLog[today]?.goal === true;
+  const targets = dailyTargets(grade, monthsUntilExam());
 
   // Lazily, so the check runs once per mount rather than on every render.
   const [celebrating, setCelebrating] = useState(
@@ -70,6 +76,8 @@ export function StreakView() {
   const goal: DailyTask[] = GOAL.map((id) => ({
     id,
     done: todayTasks?.[id] ?? false,
+    count: todayTasks ? dayCounts[id] : 0,
+    target: targets[id],
   }));
   const links = Object.fromEntries(
     GOAL.map((id) => [id, taskHref(id, feed.items)])
@@ -99,7 +107,7 @@ export function StreakView() {
 
       <WeeklyStreak week={week} todayKey={today} />
 
-      <DailyGoalCard tasks={goal} links={links} />
+      <DailyGoalCard tasks={goal} links={links} streakKept={completed} />
 
       {/* Absent, not empty, once every rung is behind the student. */}
       {progress && <MilestoneProgress progress={progress} />}

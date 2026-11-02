@@ -563,3 +563,20 @@ POST {VITE_SUPABASE_URL}/rest/v1/rpc/friend_invite
 allow `/friend/...` on the production address (a wildcard such as
 `https://your-site.vercel.app/**` covers it). If it does not, a student who signs in
 from an invite link lands on the home page and has to open the link again.
+
+## `20261103000001`: daily targets, the streak and the gift
+
+Adds five columns to `daily_activity` (whether the day counts for the streak, how many
+lessons, quizzes and reviews were finished, whether the gift was opened), and updates
+`leaderboard()` and `my_friends()` so a day with one finished activity counts. Days that met
+the old goal still count, and nobody's history changes.
+
+Run it in the SQL editor, in one go, AFTER `20260916000004` and `20261013000001`, and BEFORE
+the app that uses it ships. It is safe to run twice. `npm run db:check` cannot see a column.
+Check it with only the publishable key:
+
+```
+GET {VITE_SUPABASE_URL}/rest/v1/daily_activity?select=streak_day&limit=0
+```
+
+`200` means it is there; `400` means it is missing.

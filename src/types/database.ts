@@ -183,6 +183,11 @@ export type Database = {
           questions_answered: number;
           xp_earned: number;
           study_minutes: number;
+          streak_day: boolean;
+          lessons_done: number;
+          quizzes_done: number;
+          reviews_done: number;
+          gift_opened: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -190,6 +195,11 @@ export type Database = {
           id?: string;
           user_id: string;
           activity_date?: string;
+          streak_day?: boolean;
+          lessons_done?: number;
+          quizzes_done?: number;
+          reviews_done?: number;
+          gift_opened?: boolean;
           task_lesson?: boolean;
           task_practice?: boolean;
           task_flashcards?: boolean;

@@ -13,6 +13,7 @@ import { schedule } from "@/utils/fsrs";
 import type { DeckProgress, QueueCard } from "../review";
 import { SwipeableFlashcard } from "./swipeable-flashcard";
 import { FlashcardSummary } from "./flashcard-summary";
+import { MIN_REVIEW_CARDS } from "@/utils/streak";
 import { useFocusScrollTop } from "@/hooks/use-focus-scroll-top";
 
 /**
@@ -91,6 +92,7 @@ export function ReviewSession({
   queue,
   title,
   progress,
+  deckSize,
   onExit,
 }: {
   queue: QueueCard[];
@@ -103,6 +105,9 @@ export function ReviewSession({
    *  The caller reads it live from the store, so it reflects the grades made
    *  during this very session. */
   progress?: DeckProgress;
+  /** How many cards the session's deck holds: a review counts with at least
+   *  MIN_REVIEW_CARDS, or all of them if there are fewer. */
+  deckSize: number;
   onExit: () => void;
 }) {
   const {
@@ -133,6 +138,7 @@ export function ReviewSession({
 
   const done = index >= liveQueue.length;
   const current = liveQueue[index];
+  const counted = liveQueue.length >= Math.min(MIN_REVIEW_CARDS, deckSize);
 
   // BOTH TERMINAL SCREENS RETURN BEFORE `rate` IS DEFINED, AND THAT ORDER IS
   // LOAD-BEARING UNDER THE REACT COMPILER — it is not just tidiness. `rate`
@@ -155,6 +161,7 @@ export function ReviewSession({
         title={title}
         results={results}
         progress={progress}
+        counted={counted}
         onExit={onExit}
       />
     );
@@ -183,10 +190,10 @@ export function ReviewSession({
     const nextIndex = index + 1;
 
     if (nextIndex >= liveQueue.length) {
-      // Ticks the SAME tasks.flashcards field Home's checklist and Roadmap's
-      // Daily Mission read — one real completion, whether this session came
-      // from a single lesson or the Daily Review aggregate.
-      completeTask("flashcards");
+      // Ticks the SAME tasks.flashcards field the missions card reads, whether
+      // this session came from a single lesson or the Daily Review aggregate. A
+      // shorter review earns its per-card XP and no more.
+      if (counted) completeTask("flashcards");
       recordSession(current.deckKey);
       track("flashcards_done", { cards: liveQueue.length });
     }

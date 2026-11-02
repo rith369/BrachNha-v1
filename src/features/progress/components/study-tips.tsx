@@ -25,14 +25,12 @@ function TipBody({ tip }: { tip: StudyTip }) {
 }
 
 export function StudyTips({ summary }: { summary: ProgressSummary }) {
-  const { lang, activityLog, streak, tasks, tasksDate, studentCards, cardReviews } =
+  const { lang, activityLog, streak, studentCards, cardReviews } =
     useBrachNhaStore(
       useShallow((s) => ({
         lang: s.lang,
         activityLog: s.activityLog,
         streak: s.streak,
-        tasks: s.tasks,
-        tasksDate: s.tasksDate,
         studentCards: s.studentCards,
         cardReviews: s.cardReviews,
       }))
@@ -54,8 +52,6 @@ export function StudyTips({ summary }: { summary: ProgressSummary }) {
     summary,
     activityLog,
     streak,
-    tasks,
-    tasksDate,
     cardsDue,
     today,
     lang,

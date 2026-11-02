@@ -41,10 +41,12 @@ export const STREAK_COPY = {
     // brief asked for this explicitly, and it echoes the wording the
     // leaderboard already uses for study time.
     countsNote:
-      "A day only counts when you finish your daily goal. Opening the app is not enough.",
+      "A day counts when you finish at least 1 activity: a lesson, a quiz, a flashcard review or the daily challenge. Opening the app is not enough.",
 
     todaysGoal: "Today's Goal",
-    goalComplete: "Goal complete",
+    todaysMissions: "Today's Missions",
+    streakHint: "Finish any 1 activity to keep your streak",
+    goalComplete: "All missions complete",
     streakMaintained: "Streak maintained!",
 
     milestones: "Streak Milestones",
@@ -56,6 +58,7 @@ export const STREAK_COPY = {
     taskLesson: "Lesson",
     taskPractice: "Practice",
     taskFlashcards: "Flashcards",
+    taskChallenge: "Daily challenge",
 
     // ── Friend Streak (the shared streak) ──
     friendsTitle: "Streak with Friends",
@@ -63,13 +66,13 @@ export const STREAK_COPY = {
     // The rule the whole page exists to teach. Repeated under the week row as
     // well as under the goal card, because it is the one thing a student who
     // reads nothing else has to come away with.
-    bothRule: "The streak only continues when BOTH of you finish your daily goal.",
+    bothRule: "The streak only continues when BOTH of you finish at least 1 activity each day.",
     atRisk: "Your streak is at risk",
     streakSafe: "Streak kept for today",
 
     // `todaysGoal` is shared with the solo page's card above — same heading,
     // same meaning, so it is not restated here.
-    dailyGoal: "Daily goal",
+    dailyGoal: "At least 1 activity",
     statusDone: "Completed",
     statusWaiting: "Not completed yet",
 
@@ -84,7 +87,7 @@ export const STREAK_COPY = {
 
     // ── The friends list (/streak/friends) ──
     friendsIntro:
-      "Keep a streak with each friend. A day counts only when you both finish your daily goal.",
+      "Keep a streak with each friend. A day counts when you both finish at least 1 activity.",
     requestsTitle: "Friend requests",
     accept: "Accept",
     decline: "Decline",
@@ -105,7 +108,7 @@ export const STREAK_COPY = {
     inviteHint: "Let your friend scan this, or send them the link. They tap Add, then you accept.",
     inviteShareText: "Keep a study streak with me on BrachNha!",
     invitePitch:
-      "A day counts only when you both finish your daily goal. They need to accept your request first.",
+      "A day counts when you both finish at least 1 activity. They need to accept your request first.",
     inviteReceived: "They have already asked you. Accept to start your shared streak.",
     inviteSelf: "This is your own invite link. Send it to a friend.",
     inviteGone: "This student could not be found. Ask your friend to send the link again.",
@@ -113,7 +116,7 @@ export const STREAK_COPY = {
     seeFriends: "See your friends",
     seeStreak: "See your shared streak",
     whoSees:
-      "Anyone signed in can find you by name or open your invite link. A friend sees only your name and the days you finished your goal.",
+      "Anyone signed in can find you by name or open your invite link. A friend sees only your name and the days you studied.",
     loading: "Loading...",
     loadFailed: "Could not load your friends. Check your connection.",
     retry: "Try again",
@@ -144,10 +147,12 @@ export const STREAK_COPY = {
     thisWeek: "7 ថ្ងៃចុងក្រោយ",
     today: "ថ្ងៃនេះ",
     countsNote:
-      "ថ្ងៃមួយត្រូវបានរាប់ លុះត្រាតែអ្នកបញ្ចប់គោលដៅប្រចាំថ្ងៃ។ ការបើកកម្មវិធីតែម្យ៉ាងមិនរាប់ទេ។",
+      "ថ្ងៃមួយត្រូវបានរាប់ នៅពេលអ្នកបញ្ចប់យ៉ាងហោចណាស់ 1 សកម្មភាព៖ មេរៀន Quiz ការពិនិត្យ Flashcard ឬបញ្ហាប្រឈម។ ការបើកកម្មវិធីតែម្យ៉ាងមិនរាប់ទេ។",
 
     todaysGoal: "គោលដៅថ្ងៃនេះ",
-    goalComplete: "បញ្ចប់គោលដៅរួចហើយ",
+    todaysMissions: "ភារកិច្ចថ្ងៃនេះ",
+    streakHint: "បញ្ចប់សកម្មភាពណាមួយ ដើម្បីរក្សា Streak",
+    goalComplete: "បញ្ចប់ភារកិច្ចទាំងអស់ហើយ",
     streakMaintained: "រក្សា Streak បានហើយ!",
 
     milestones: "ចំណុចសំខាន់ៗនៃ Streak",
@@ -160,15 +165,16 @@ export const STREAK_COPY = {
     taskPractice: "លំហាត់",
     // Latin, matching translations.ts's own km column for this word.
     taskFlashcards: "Flashcard",
+    taskChallenge: "បញ្ហាប្រឈម",
 
     // ── Friend Streak (the shared streak) ──
     friendsTitle: "Streak ជាមួយមិត្តភក្តិ",
     sharedTagline: "រៀនជាមួយគ្នា រក្សា Streak កុំឲ្យដាច់។",
-    bothRule: "Streak បន្តបានលុះត្រាតែអ្នកទាំងពីរបញ្ចប់គោលដៅប្រចាំថ្ងៃ។",
+    bothRule: "Streak បន្តបានលុះត្រាតែអ្នកទាំងពីរបញ្ចប់យ៉ាងហោចណាស់ 1 សកម្មភាពក្នុងមួយថ្ងៃ។",
     atRisk: "Streak របស់អ្នកជិតដាច់",
     streakSafe: "រក្សា Streak បានហើយថ្ងៃនេះ",
 
-    dailyGoal: "គោលដៅប្រចាំថ្ងៃ",
+    dailyGoal: "យ៉ាងហោចណាស់ 1 សកម្មភាព",
     statusDone: "បានបញ្ចប់",
     statusWaiting: "មិនទាន់បញ្ចប់",
 
@@ -183,7 +189,7 @@ export const STREAK_COPY = {
 
     // ── The friends list (/streak/friends) ──
     friendsIntro:
-      "រក្សា Streak ជាមួយមិត្តម្នាក់ៗ។ ថ្ងៃមួយត្រូវបានរាប់ លុះត្រាតែអ្នកទាំងពីរបញ្ចប់គោលដៅប្រចាំថ្ងៃ។",
+      "រក្សា Streak ជាមួយមិត្តម្នាក់ៗ។ ថ្ងៃមួយត្រូវបានរាប់ នៅពេលអ្នកទាំងពីរបញ្ចប់យ៉ាងហោចណាស់ 1 សកម្មភាព។",
     requestsTitle: "សំណើធ្វើជាមិត្ត",
     accept: "ទទួលយក",
     decline: "បដិសេធ",
@@ -204,7 +210,7 @@ export const STREAK_COPY = {
     inviteHint: "ឱ្យមិត្តភក្តិស្កេនកូដនេះ ឬផ្ញើតំណទៅគេ។ គេចុច បន្ថែម រួចអ្នកទទួលយក។",
     inviteShareText: "មករក្សា Streak រៀនជាមួយខ្ញុំនៅ BrachNha!",
     invitePitch:
-      "ថ្ងៃមួយត្រូវបានរាប់ លុះត្រាតែអ្នកទាំងពីរបញ្ចប់គោលដៅប្រចាំថ្ងៃ។ គេត្រូវទទួលយកសំណើរបស់អ្នកសិន។",
+      "ថ្ងៃមួយត្រូវបានរាប់ នៅពេលអ្នកទាំងពីរបញ្ចប់យ៉ាងហោចណាស់ 1 សកម្មភាព។ គេត្រូវទទួលយកសំណើរបស់អ្នកសិន។",
     inviteReceived: "គេបានស្នើមកអ្នករួចហើយ។ ទទួលយក ដើម្បីចាប់ផ្ដើម Streak រួមគ្នា។",
     inviteSelf: "នេះជាតំណអញ្ជើញរបស់អ្នកផ្ទាល់។ ផ្ញើវាទៅមិត្តភក្តិរបស់អ្នក។",
     inviteGone: "រកមិនឃើញសិស្សនេះទេ។ សូមឱ្យមិត្តភក្តិផ្ញើតំណម្តងទៀត។",
@@ -212,7 +218,7 @@ export const STREAK_COPY = {
     seeFriends: "មើលមិត្តភក្តិរបស់អ្នក",
     seeStreak: "មើល Streak រួមគ្នា",
     whoSees:
-      "អ្នកដែលចូលគណនីអាចស្វែងរកអ្នកតាមឈ្មោះ ឬបើកតំណអញ្ជើញរបស់អ្នកបាន។ មិត្តភក្តិឃើញតែឈ្មោះ និងថ្ងៃដែលអ្នកបានបញ្ចប់គោលដៅប៉ុណ្ណោះ។",
+      "អ្នកដែលចូលគណនីអាចស្វែងរកអ្នកតាមឈ្មោះ ឬបើកតំណអញ្ជើញរបស់អ្នកបាន។ មិត្តភក្តិឃើញតែឈ្មោះ និងថ្ងៃដែលអ្នកបានរៀនប៉ុណ្ណោះ។",
     loading: "កំពុងទាញយក...",
     loadFailed: "មិនអាចទាញយកមិត្តភក្តិបានទេ។ សូមពិនិត្យការភ្ជាប់អ៊ីនធឺណិត។",
     retry: "ព្យាយាមម្តងទៀត",
@@ -261,10 +267,11 @@ export function weekdayLabel(id: WeekdayId, lang: Lang): string {
   return WEEKDAY_LABELS[id][lang];
 }
 
-const TASK_KEYS: Record<DailyTaskId, "taskLesson" | "taskPractice" | "taskFlashcards"> = {
+const TASK_KEYS: Record<DailyTaskId, "taskLesson" | "taskPractice" | "taskFlashcards" | "taskChallenge"> = {
   lesson: "taskLesson",
   practice: "taskPractice",
   flashcards: "taskFlashcards",
+  challenge: "taskChallenge",
 };
 
 export function dailyTaskLabel(id: DailyTaskId, lang: Lang): string {
@@ -280,12 +287,6 @@ export function continueTaskLabel(task: string, lang: Lang): string {
 export function tasksCompletedLabel(done: number, total: number, lang: Lang): string {
   if (lang === "km") return `បានបញ្ចប់ ${done} / ${total} កិច្ចការ`;
   return `${done} / ${total} ${total === 1 ? "task" : "tasks"} completed`;
-}
-
-/** The status line under the goal ring while the day is still open. */
-export function tasksLeftLabel(left: number, lang: Lang): string {
-  if (lang === "km") return `នៅសល់ ${left} កិច្ចការទៀត ដើម្បីរក្សា Streak`;
-  return `${left} ${left === 1 ? "task" : "tasks"} left to keep your streak`;
 }
 
 /** "2 days until your next milestone". */
@@ -338,12 +339,12 @@ export function sharedStatusLine(
   }
   if (friend) {
     return lang === "km"
-      ? `${friendName} បញ្ចប់ហើយ។ បញ្ចប់គោលដៅរបស់អ្នក ដើម្បីរក្សា Streak។`
-      : `${friendName} is done. Finish your goal to keep the streak alive.`;
+      ? `${friendName} បញ្ចប់ហើយ។ បញ្ចប់ 1 សកម្មភាព ដើម្បីរក្សា Streak។`
+      : `${friendName} is done. Finish 1 activity to keep the streak alive.`;
   }
   return lang === "km"
-    ? `មិនទាន់មាននរណាបញ្ចប់គោលដៅថ្ងៃនេះទេ។`
-    : `Neither of you has finished today's goal yet.`;
+    ? `អ្នកទាំងពីរមិនទាន់បានរៀនថ្ងៃនេះទេ។`
+    : `Neither of you has studied today yet.`;
 }
 
 /** The invite page's headline, once per state. The name is the database's. */
@@ -371,9 +372,9 @@ export function waitingForLabel(friendName: string, lang: Lang): string {
 /** Why the wait matters, spelled out under it. */
 export function friendNeedsToFinishLabel(friendName: string, lang: Lang): string {
   if (lang === "km") {
-    return `${friendName} ត្រូវបញ្ចប់គោលដៅថ្ងៃនេះ ដើម្បីរក្សា Streak កុំឲ្យដាច់។`;
+    return `${friendName} ត្រូវបញ្ចប់ 1 សកម្មភាពថ្ងៃនេះ ដើម្បីរក្សា Streak កុំឲ្យដាច់។`;
   }
-  return `${friendName} needs to complete today's goal to keep the streak alive.`;
+  return `${friendName} needs to finish 1 activity today to keep the streak alive.`;
 }
 
 /** A friend refusal, as a sentence. One per hint the friend functions raise

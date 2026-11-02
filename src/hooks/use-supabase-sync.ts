@@ -133,6 +133,8 @@ function syncRelevantChange(a: StoreState, b: StoreState): boolean {
     // partializeState that the comment above promises, so the next person
     // auditing the two lists finds them the same length.
     a.tasksDate !== b.tasksDate ||
+    a.dayCounts !== b.dayCounts ||
+    a.giftOpened !== b.giftOpened ||
     a.examResults !== b.examResults ||
     a.completedSessions !== b.completedSessions ||
     a.conversations !== b.conversations ||

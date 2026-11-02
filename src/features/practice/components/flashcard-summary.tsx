@@ -4,6 +4,7 @@ import type { ReviewResult } from "@/utils/spaced-repetition";
 import { encouragementFor } from "../encouragement";
 import type { DeckProgress } from "../review";
 import { DeckProgressRing } from "./deck-progress-ring";
+import { MIN_REVIEW_CARDS } from "@/utils/streak";
 
 /**
  * End-of-session recap — shared by the per-lesson FlashcardRunner and the
@@ -42,11 +43,15 @@ export function FlashcardSummary({
   title,
   results,
   progress,
+  counted,
   onExit,
 }: {
   title: string;
   results: ReviewResult[];
   progress?: DeckProgress;
+  /** False for a review too short to count toward today's mission, which the
+   *  screen says rather than leaving the mission silently unticked. */
+  counted: boolean;
   onExit: () => void;
 }) {
   const counts = { again: 0, hard: 0, good: 0, easy: 0 };
@@ -98,6 +103,11 @@ export function FlashcardSummary({
           ))}
         </div>
 
+        {!counted && (
+          <p className="text-center text-xs font-bold text-muted">
+            ពិនិត្យយ៉ាងហោចណាស់ {MIN_REVIEW_CARDS} កាត ដើម្បីរាប់ក្នុងភារកិច្ចថ្ងៃនេះ។
+          </p>
+        )}
         {progress && progress.total > 0 && (
           <div className="mt-6">
             <DeckProgressRing progress={progress} label="វឌ្ឍនភាពរបស់អ្នក" />

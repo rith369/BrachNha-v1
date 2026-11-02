@@ -1,16 +1,23 @@
 import { Link } from "react-router";
-import { Check, ChevronRight, ListChecks, BookOpen, PencilLine, Layers, Target, PartyPopper, type LucideIcon } from "lucide-react";
+import { Check, ChevronRight, Flame, ListChecks, BookOpen, PencilLine, Layers, Target, PartyPopper, type LucideIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { T } from "@/data/translations";
 import type { Tasks } from "@/types";
+import { cn } from "@/utils/cn";
+import { todayKey } from "@/utils/day";
+import { monthsUntilExam } from "@/utils/exam-date";
+import { dailyTargets } from "@/utils/roadmap";
+import { missionCopy, missionTargetLabel } from "../mission-copy";
 import { useStudyFeed } from "../use-study-feed";
 import { taskHref } from "../task-links";
+import { MissionGift } from "./mission-gift";
 
 /**
- * Today's missions. A row is a LINK to where that work is done, never a
- * checkbox: it ticks only when the work is actually finished, because each
+ * Today's missions, on Home, the Roadmap and the current month's page. A row is a
+ * LINK to where that work is done, never a checkbox: it ticks only when its count
+ * reaches today's target (from the target grade and months left), because each
  * task has a real completion behind it now —
  *
  *   lesson      finishing a lesson section         (section-detail)
@@ -43,14 +50,19 @@ const TASK_LABEL_KEY: Record<keyof Tasks, "completeLesson" | "practice" | "revie
 };
 
 export function DailyTasks() {
-  const { lang, tasks } = useBrachNhaStore(
+  const { lang, tasks, dayCounts, grade, streakKept } = useBrachNhaStore(
     useShallow((s) => ({
       lang: s.lang,
       tasks: s.tasks,
+      dayCounts: s.dayCounts,
+      grade: s.userData.grade,
+      streakKept: s.activityLog[todayKey()]?.goal === true,
     }))
   );
   const feed = useStudyFeed();
   const t = T[lang];
+  const m = missionCopy(lang);
+  const targets = dailyTargets(grade, monthsUntilExam());
   const allDone = Object.values(tasks).every(Boolean);
 
   // The same next item the Study card shows (task-links.ts), so the mission,
@@ -71,7 +83,9 @@ export function DailyTasks() {
             </div>
             {TASK_META.map(({ key, icon: TaskIcon }) => {
               const done = tasks[key];
-              const label = t[TASK_LABEL_KEY[key]];
+              const target = targets[key];
+              const label =
+                missionTargetLabel(key, target, lang) ?? t[TASK_LABEL_KEY[key]];
               // Done is a plain row: there is nothing left to go and do.
               if (done) {
                 return (
@@ -98,6 +112,11 @@ export function DailyTasks() {
                     <TaskIcon className="size-3.5 text-purple" strokeWidth={2.25} />
                   </span>
                   <span className="flex-1 text-sm font-bold">{label}</span>
+                  {target > 1 && (
+                    <span className="text-xs font-extrabold text-muted tabular-nums">
+                      {dayCounts[key]}/{target}
+                    </span>
+                  )}
                   <span className="rounded-full bg-purple/15 px-2 py-1 text-[10px] font-extrabold text-purple">
                     +20 XP
                   </span>
@@ -114,6 +133,23 @@ export function DailyTasks() {
             </div>
           </div>
         )}
+        <div className="mt-2 flex flex-col gap-2 border-t border-border pt-3">
+          <p
+            className={cn(
+              "flex items-center gap-1.5 text-xs font-bold",
+              streakKept ? "text-mint" : "text-muted"
+            )}
+          >
+            <Flame
+              className="size-4 shrink-0"
+              fill={streakKept ? "currentColor" : "none"}
+              strokeWidth={2.5}
+              aria-hidden
+            />
+            {streakKept ? m.streakKept : m.streakHint}
+          </p>
+          <MissionGift />
+        </div>
       </Card>
     </div>
   );

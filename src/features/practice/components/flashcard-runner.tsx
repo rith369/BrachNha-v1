@@ -361,6 +361,7 @@ export function FlashcardRunner({
         // Recomputed on every render from the store, so by the time the
         // summary reads it, it already includes the grades just made.
         progress={deckProgress(all)}
+        deckSize={all.length}
         onExit={pile ? () => setSession(null) : exit}
       />
     );

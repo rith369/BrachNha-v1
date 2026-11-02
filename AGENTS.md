@@ -243,6 +243,10 @@ A `/*` catch-all renders `src/pages/not-found.tsx`, which Next used to provide.
 
 ## Standing decisions (don't relitigate)
 
+**A streak day is any 1 finished activity, and reaching all 4 missions opens a gift**
+(3 Nov 2026). `ActivityLog.goal` means "a streak day", and `tasks` means "this mission's
+target is reached". See `docs/notes/streak-leaderboard-profile.md`.
+
 There is no entry screen, guests land on Home. Donate is removed. KruAI is a global
 overlay rather than a route, available in lessons and blocked in assessments. It is a
 kind big sibling with no romantic persona. The exam countdown is derived from
