@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 2 Nov 2026: One Missions Card
 
-Commit: `PENDING`. No database step.
+Commit: `a042da4`. No database step.
 
 **What changed:**
 
