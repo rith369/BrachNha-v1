@@ -12,6 +12,8 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
+import { todayKey } from "@/utils/day";
+import { sectionsCountedToday } from "@/utils/streak";
 import { lessonKeyOf } from "@/features/progress/content-keys";
 import { useShallow } from "zustand/react/shallow";
 import { FocusLayout, FocusButton } from "@/components/shell/focus-layout";
@@ -273,7 +275,11 @@ export function SectionDetail({
   }
 
   function finish() {
-    completeTask("lesson");
+    const counted = !sectionsCountedToday(
+      useBrachNhaStore.getState().daySections,
+      todayKey()
+    ).includes(sectionId);
+    completeTask("lesson", sectionId);
     recordSession(contentKey);
     // completedSessions matches on the SECTION id, which is the same string the
     // path node carries — there is no second id to keep in step.
@@ -290,6 +296,7 @@ export function SectionDetail({
       xp: Math.max(0, now.xp - opened.xp),
       coins: Math.max(0, now.coins - opened.coins),
       ms: elapsedSince(opened.at),
+      counted,
     });
   }
 

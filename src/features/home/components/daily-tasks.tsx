@@ -20,7 +20,7 @@ import { MissionGift } from "./mission-gift";
  * reaches today's target (from the target grade and months left), because each
  * task has a real completion behind it now —
  *
- *   lesson      finishing a lesson section         (section-detail)
+ *   lesson      finishing a section, each once a day (section-detail)
  *   practice    finishing a practice quiz          (quiz-screen)
  *   flashcards  finishing a flashcard review       (review-session)
  *   challenge   finishing a Game battle or an exam (game-create/-play, exam-view, paper-screen)

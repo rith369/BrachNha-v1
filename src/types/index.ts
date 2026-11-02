@@ -77,6 +77,13 @@ export interface Tasks {
  *  reaching its target (utils/roadmap.ts's dailyTargets). */
 export type DayCounts = Record<keyof Tasks, number>;
 
+/** The sections that already counted toward one day's lesson mission. Dated rather
+ *  than cleared with `tasks`, because a pull can move `tasksDate` without it. */
+export interface DaySections {
+  date: string;
+  ids: string[];
+}
+
 /** One local calendar day of study — the device's twin of a daily_activity row. */
 export interface DayActivity {
   /** XP earned that day. > 0 means the student studied. */

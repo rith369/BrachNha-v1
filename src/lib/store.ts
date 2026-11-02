@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type {
   DayCounts,
+  DaySections,
   Lang,
   UserData,
   Tasks,
@@ -30,7 +31,7 @@ import { FLASHCARD_XP, FLASHCARD_COINS, GIFT_XP, TASK_XP } from "@/utils/rewards
 import { monthsUntilExam } from "@/utils/exam-date";
 import { dailyTargets } from "@/utils/roadmap";
 import { addDaysKey, parseDayKey, todayKey } from "@/utils/day";
-import { allMissionsDone, currentStreak, missionsDone } from "@/utils/streak";
+import { allMissionsDone, currentStreak, missionsDone, sectionsCountedToday } from "@/utils/streak";
 import { levelForXp } from "@/utils/level";
 
 export type {
@@ -412,6 +413,8 @@ interface BrachNhaState {
   /** Today's finished activities, reset with `tasks`. A mission ticks when its
    *  count reaches its target, so this can pass a target and `tasks` cannot. */
   dayCounts: DayCounts;
+  /** The sections that already counted toward today's lesson mission. */
+  daySections: DaySections;
   /** Today's gift has been opened. Reset with `tasks`. */
   giftOpened: boolean;
   examResults: ExamResult[];
@@ -557,9 +560,10 @@ interface BrachNhaState {
   /**
    * One activity of this kind was finished. The mission ticks and pays TASK_XP when
    * the count reaches today's target, and any ticked mission makes today a streak
-   * day. Any lesson or quiz counts, not a particular one.
+   * day. Any lesson or quiz counts, not a particular one. `sectionId` makes a repeat
+   * of the same section today count for nothing (the user's rule).
    */
-  completeTask: (task: keyof Tasks) => void;
+  completeTask: (task: keyof Tasks, sectionId?: string) => void;
   /** Pays the gift, once a day, and only once all four missions are done. */
   openGift: () => void;
   completeSession: (lessonId: string) => void;
@@ -910,6 +914,8 @@ const partializeState = (state: BrachNhaState) => ({
   // person auditing the two lists does not "fix" it:
   //
   //   syncedUserId — bookkeeping ABOUT the sync, so syncing it is circular.
+  //   daySections — only stops a repeat today. The worst a second device can do
+  //     is count one section twice, which is not worth a column.
   //
   // There is no guest flag: every signed-out student is a guest (see
   // hooks/use-auth.ts), so there is nothing about it to persist.
@@ -938,6 +944,7 @@ const partializeState = (state: BrachNhaState) => ({
   tasks: state.tasks,
   tasksDate: state.tasksDate,
   dayCounts: state.dayCounts,
+  daySections: state.daySections,
   giftOpened: state.giftOpened,
   examResults: state.examResults,
   paperResults: state.paperResults,
@@ -995,6 +1002,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       tasks: emptyTasks,
       tasksDate: "",
       dayCounts: emptyCounts,
+      daySections: { date: "", ids: [] },
       giftOpened: false,
       examResults: [],
       paperResults: [],
@@ -1073,7 +1081,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
 
       addXp: (amount, coins) => set((state) => award(state, amount, coins)),
 
-      completeTask: (task) =>
+      completeTask: (task, sectionId) =>
         set((state) => {
           // Roll the day over first, so finishing a task on a new day clears
           // yesterday's ticks rather than adding to them. Without this, a
@@ -1082,6 +1090,8 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           const today = todayKey();
           const base =
             state.tasksDate === today ? state : { ...state, ...newDay(state, today) };
+          const counted = sectionsCountedToday(base.daySections, today);
+          if (sectionId && counted.includes(sectionId)) return base;
           const dayCounts = { ...base.dayCounts, [task]: base.dayCounts[task] + 1 };
           const target = dailyTargets(base.userData.grade, monthsUntilExam())[task];
           const reached = !base.tasks[task] && dayCounts[task] >= target;
@@ -1101,6 +1111,9 @@ export const useBrachNhaStore = create<BrachNhaState>()(
             ...rewarded,
             tasks,
             dayCounts,
+            daySections: sectionId
+              ? { date: today, ids: [...counted, sectionId] }
+              : base.daySections,
             tasksDate: today,
             activityLog,
             streak: currentStreak(activityLog, today),
@@ -1581,6 +1594,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           tasks: emptyTasks,
           tasksDate: "",
           dayCounts: emptyCounts,
+          daySections: { date: "", ids: [] },
           giftOpened: false,
           examResults: [],
           paperResults: [],

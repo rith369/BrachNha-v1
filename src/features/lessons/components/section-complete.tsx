@@ -28,6 +28,8 @@ export interface SectionSummary {
   coins: number;
   /** From opening the section to finishing it. */
   ms: number;
+  /** False for a repeat today, which adds nothing to the lesson mission. */
+  counted: boolean;
 }
 
 const GOAL_LABEL: Record<(typeof MISSIONS)[number], string> = {
@@ -197,6 +199,11 @@ export function SectionComplete({
               )
             )}
           </div>
+          {!summary.counted && !today?.lesson && (
+            <p className="mt-3 text-xs font-bold text-muted md:text-sm">
+              ផ្នែកនេះបានរាប់រួចហើយនៅថ្ងៃនេះ។ រៀនផ្នែកផ្សេងទៀត ដើម្បីបំពេញភារកិច្ច។
+            </p>
+          )}
           <div className="mt-3 flex items-center gap-1.5 text-xs font-bold text-muted md:text-sm">
             <Flame className="size-4 shrink-0 text-pink" strokeWidth={2.5} aria-hidden />
             {streakKept

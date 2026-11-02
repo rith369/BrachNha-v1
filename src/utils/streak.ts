@@ -23,7 +23,7 @@
  * remain streak days; days that did not stay as they were.
  */
 
-import type { ActivityLog, Tasks } from "@/types";
+import type { ActivityLog, DaySections, Tasks } from "@/types";
 import { addDaysKey, parseDayKey } from "@/utils/day";
 
 /** The day's four missions. Reaching all of them opens the gift. */
@@ -32,6 +32,12 @@ export const MISSIONS = ["lesson", "practice", "flashcards", "challenge"] as con
 /** A flashcard review counts with at least this many cards, or the whole deck if
  *  it is smaller. Otherwise one card would keep a streak. */
 export const MIN_REVIEW_CARDS = 5;
+
+/** A section counts once a day, so a list stamped on another day is empty. The same
+ *  section counts again tomorrow: going back over old work is real study. */
+export function sectionsCountedToday(sections: DaySections, today: string): string[] {
+  return sections.date === today ? sections.ids : [];
+}
 
 export function allMissionsDone(tasks: Tasks): boolean {
   return MISSIONS.every((key) => tasks[key]);

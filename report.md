@@ -15,6 +15,26 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 3 Nov 2026 — A section counts once a day, and the pledge says sections
+
+Commit: `PENDING`.
+
+**What changed.**
+
+- **Finishing the same section twice in one day now counts once** toward the lesson mission.
+  Before, a student could repeat one easy section to tick the mission. It counts again the next
+  day, so going back over old sections still helps.
+- **A repeat says why.** If the mission is not done yet, the completion screen tells the student
+  this section has already counted today and to study a different one.
+- **The signed pledge now says "sections"** (`ផ្នែកមេរៀន`), to match the missions card.
+
+**Good to know.** The list of today's sections stays on the phone, so a student using two phones
+could still count one section twice. That was judged not worth a database change.
+
+**What to re-test.** With "Complete 2 sections" showing, finish a section, then finish the same
+one again: the count should stay at 1/2 and the note should appear. Finish a different section: it
+should reach 2/2. Please read the new Khmer note and check the wording.
+
 ## 3 Nov 2026 — The lesson mission now says "sections"
 
 Commit: `9dd117d`.

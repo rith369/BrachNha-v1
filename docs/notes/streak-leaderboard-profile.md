@@ -679,8 +679,14 @@ row's target; the gift is the reason to do more.
 **The row is named for SECTIONS: `Complete 2 sections`, `បញ្ចប់ 2 ផ្នែកមេរៀន`** (the user's wording,
 3 Nov 2026). The mission counts each finished section (`section-detail.tsx`), and the hierarchy is
 chapter, lesson, section, so "2 lessons" promised more than it asked. Any sections count, from one
-lesson or several. The pledge and the budget's `mission.lessons` still say lessons, and that budget
-assumes 20 minutes each, which nobody has measured against a real section.
+lesson or several, and the pledge says sections too. The field is still `mission.lessons`, and that
+budget assumes 20 minutes each, which nobody has measured against a real section.
+
+**Each section counts once a day** (the user's choice, 3 Nov 2026). Finishing the same one twice
+today adds nothing, and the completion screen says why; it counts again tomorrow, because going
+back over old work is real study and there is not much content yet. `daySections` is persisted but
+deliberately not synced: it only stops a repeat, and the worst a second device can do is count one
+section twice. It carries its own date because a pull can move `tasksDate` without it.
 
 **A mission, not an activity, was the user's explicit choice** the same day. An ACTIVITY is one
 finished thing (1 lesson); a MISSION is one row reaching its target (3 lessons for grade A). It
