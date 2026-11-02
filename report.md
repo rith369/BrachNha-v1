@@ -15,6 +15,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 2 Nov 2026: One Missions Card
+
+Commit: `PENDING`. No database step.
+
+**What changed:**
+
+- The Roadmap now shows the same **Today's Missions** card as Home: all 4 missions, line
+  icons and +20 XP. It replaces the Daily Mission card added earlier today. The current
+  month's page shows it too.
+- No lesson is named on a mission, because any lesson, quiz or flashcard review earns the
+  XP. Tapping a mission still opens a suggested next item.
+
+**What to re-test:**
+
+- Finish a mission and check it ticks on both Home and the Roadmap.
+
 ## 2 Nov 2026: The Roadmap Is a Real Plan
 
 Commit: `0524b8e`. No database step.

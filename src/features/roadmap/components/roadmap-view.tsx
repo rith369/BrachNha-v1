@@ -8,7 +8,7 @@ import { daysUntilExam, formatExamDate } from "@/utils/exam-date";
 import { PLEDGE_COPY } from "@/features/commitment/copy";
 import { ContentNotice } from "@/features/practice/components/content-waiting";
 import { CommitmentBanner } from "./commitment-banner";
-import { DailyMission } from "./daily-mission";
+import { DailyTasks } from "@/features/home/components/daily-tasks";
 import { retryContent } from "@/lib/content";
 import { PageTitle } from "@/components/page-title";
 import { cn } from "@/utils/cn";
@@ -220,7 +220,9 @@ export function RoadmapView() {
         </div>
       </div>
 
-      <DailyMission title={t.dailyMission} />
+      <div className="mb-4">
+        <DailyTasks />
+      </div>
 
       {/* Phases */}
       <div className="mb-4">

@@ -20,8 +20,12 @@ import { taskHref } from "../task-links";
  *
  * Tap-to-tick used to be the only way "practice" could ever complete, because
  * no practice quiz existed; math 1.1's quiz ended that, so the self-report went.
- * Roadmap's Daily Mission reads the same `tasks` and lost its Done button for
- * the same reason.
+ *
+ * THE ROWS STAY GENERAL, with no lesson named on them: ANY finished lesson, quiz or
+ * review ticks its row and pays the XP, so naming one would suggest only that one
+ * counts. A tap still opens the suggested next item; what to study is named on the
+ * Study card and in the Roadmap's month list. This one card is used on Home, the
+ * Roadmap and the current month's page, so they cannot drift apart.
  */
 
 const TASK_META: { key: keyof Tasks; icon: LucideIcon }[] = [

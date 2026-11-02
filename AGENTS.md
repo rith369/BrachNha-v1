@@ -4492,7 +4492,7 @@ card and its label stay on the tinted `--color-subj-*` scale, the same split
 `SUBJECT_STYLE` draws everywhere else.
 
 **Roadmap** (`features/roadmap`) — target grade and days left, recommended hours
-with the minutes really studied today, Daily Mission, and a path of real calendar
+with the minutes really studied today, Home's missions card, and a path of real calendar
 months, each opening its own page at `/roadmap/:month`. See "The Roadmap is a real
 plan" near the end of this file.
 
@@ -7815,11 +7815,15 @@ items, each going straight to its lesson, deck, quiz or paper. Nothing locks; a 
 may work ahead. A bad or out-of-range month redirects. **It is deliberately not a
 day-by-day calendar**: a fixed day's work is a day behind the moment one is missed.
 
-**`daily-mission.tsx`** names the next item per task and links through `taskHref()`, so
-it agrees with Home and the Streak page. The counts are gone from the screen.
+**One missions card: Home's `DailyTasks`**, on Home, the Roadmap and the current month's
+page (the user's call, the same day; the Roadmap had a separate 3-row card for a few hours).
+All 4 missions, line icons, +20 XP. **Its rows name no lesson, on the user's reasoning**: any
+finished lesson, quiz or review ticks its row and pays the XP, so naming one would suggest
+only that one counts. A tap still opens the suggested next item (`taskHref()`). The specific
+items are on Home's Study card and in the month's list, with no XP promise attached.
 `computeDailyMission` stays in `utils/roadmap.ts` **for the pledge only**, which still
-quotes "3 lessons, 20 questions" as a goal the student signs. That mismatch was left on
-purpose: changing signed wording was not asked for.
+quotes "3 lessons, 20 questions" as a goal the student signs. No screen counts toward those
+numbers, and the published content could not fill them for long. Left open for the user.
 
 **Nothing is drawn until the manifest is `ready`**: before that every month would read
 as empty and every weak subject as coming soon, and a new student lands here straight
@@ -7835,7 +7839,7 @@ item exactly once, an even spread, scores outranking the survey, finishing keeps
 month's size and later months unchanged, rolling forward from a later date, a past tick
 staying put, the last month, the exam month, after the exam, a year boundary, nothing
 published, duplicate and unknown weak subjects) and 55 browser checks at 390, 320 dark
-Khmer and 1280 (real month names, no invented numbers, specific Go links, every row
+Khmer and 1280 (real month names, no invented numbers, specific mission links, every row
 opening its month, items opening directly, the exam month's simulation, bad addresses,
 history with real minutes and ticks, Khmer labels, the loading and failed states with no
 false "coming soon", no sideways scroll, no page error). **Not verified: a real account
@@ -8473,7 +8477,7 @@ outside the grid's own ref rather than assuming any outside tap means "close".
 a deliberate improvement over the original, where exam history lived in
 component state and was lost on navigation.
 
-**Roadmap's Today's Mission and Home's daily-tasks checklist intentionally share
+**Roadmap's missions and Home's daily-tasks checklist are one component, and share
 the same `tasks` store fields** (lesson/practice/flashcards). Completing a
 mission row on Roadmap shows that item as done on Home, and vice versa — by
 design, one real completion, not a duplicate tracker.

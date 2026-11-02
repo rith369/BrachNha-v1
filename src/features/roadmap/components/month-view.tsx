@@ -19,7 +19,7 @@ import type { ContentManifest } from "@/utils/content-manifest";
 import { cn } from "@/utils/cn";
 import { activityLabel, monthLabel, monthProgressLabel, roadmapCopy } from "../copy";
 import { monthActivity, type PlanMonth } from "../study-plan";
-import { DailyMission } from "./daily-mission";
+import { DailyTasks } from "@/features/home/components/daily-tasks";
 
 const KIND: Record<
   StudyKind,
@@ -32,12 +32,12 @@ const KIND: Record<
 };
 
 /**
- * One month of the plan, opened from its row on the Roadmap: Today's goal if it is
- * this month, then the month's items in order, each going straight to its lesson,
+ * One month of the plan, opened from its row on the Roadmap: Today's Missions if
+ * it is this month, then the month's items in order, each going straight to its lesson,
  * deck, quiz or paper. Nothing is locked: a student may work ahead.
  *
  * NOT A DAY-BY-DAY CALENDAR, deliberately. A fixed day's work is a day behind the
- * moment one is missed, and "Today" here is only ever the next unfinished items.
+ * moment one is missed, and the missions ask only for one of each, of any lesson.
  *
  * `month` is resolved by the page, so a missing one never reaches a closure here
  * (the React Compiler rule in review-session.tsx).
@@ -79,7 +79,11 @@ export function MonthView({
         </div>
       </div>
 
-      {month.status === "current" && <DailyMission title={c.today} />}
+      {month.status === "current" && (
+        <div className="mb-4">
+          <DailyTasks />
+        </div>
+      )}
 
       {month.isExam && (
         <Link
