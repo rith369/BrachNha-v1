@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Nov 2026: Daily Targets, an Easier Streak and a Daily Gift
 
-Commit: `PENDING`. **Database step: run `20261103000001_daily_targets_and_gift.sql` in the
+Commit: `eb12fe8`. **Database step: run `20261103000001_daily_targets_and_gift.sql` in the
 Supabase SQL editor BEFORE this goes live.**
 
 **What changed:**
