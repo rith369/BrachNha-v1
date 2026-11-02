@@ -676,6 +676,12 @@ grade and the time left, **any 1 finished mission keeps the streak**, and **reac
 missions opens a gift**. A student who only does quizzes keeps their streak by reaching that
 row's target; the gift is the reason to do more.
 
+**The row is named for SECTIONS: `Complete 2 sections`, `បញ្ចប់ 2 ផ្នែកមេរៀន`** (the user's wording,
+3 Nov 2026). The mission counts each finished section (`section-detail.tsx`), and the hierarchy is
+chapter, lesson, section, so "2 lessons" promised more than it asked. Any sections count, from one
+lesson or several. The pledge and the budget's `mission.lessons` still say lessons, and that budget
+assumes 20 minutes each, which nobody has measured against a real section.
+
 **A mission, not an activity, was the user's explicit choice** the same day. An ACTIVITY is one
 finished thing (1 lesson); a MISSION is one row reaching its target (3 lessons for grade A). It
 was built first on 1 activity and offered back with the difference spelled out. So 1 lesson of

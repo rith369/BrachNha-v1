@@ -42,7 +42,7 @@ export function missionTargetLabel(
 ): string | null {
   if (target <= 1) return null;
   if (task === "lesson") {
-    return lang === "km" ? `បញ្ចប់ ${target} មេរៀន` : `Complete ${target} lessons`;
+    return lang === "km" ? `បញ្ចប់ ${target} ផ្នែកមេរៀន` : `Complete ${target} sections`;
   }
   if (task === "practice") {
     return lang === "km" ? `បញ្ចប់ ${target} Quiz` : `Complete ${target} quizzes`;

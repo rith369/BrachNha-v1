@@ -15,6 +15,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 3 Nov 2026 — The lesson mission now says "sections"
+
+Commit: `PENDING`.
+
+**What changed.** The lesson row on Today's Missions now reads "Complete 2 sections"
+(`បញ្ចប់ 2 ផ្នែកមេរៀន`) instead of "Complete 2 lessons". When the target is one, it reads
+"Complete a section" (`បញ្ចប់ផ្នែកមេរៀន`).
+
+**Why.** The mission has always counted finished sections, and a lesson is made of several
+sections. So the old name promised more than it asked. How it counts has not changed.
+
+**What to re-test.** Read the row on Home and on the Roadmap, in both languages and on a small
+phone, and check it still sits neatly on its line.
+
 ## 3 Nov 2026: The 2-Day Bac II Simulation Works, Waiting for Its Papers
 
 Commit: `dd6c44e`. **Database step: run `20261103000002_simulation_attempts.sql` in the
