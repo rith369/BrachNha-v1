@@ -155,8 +155,8 @@ export default function PrivacyPage() {
             <li>
               your flashcard progress (which cards you remember and when each
               is due again), the flashcards you write and the ones you star,
-              and your practice quiz and past paper attempts with the answers
-              you picked, so they are still there on a new phone
+              and your practice quiz, past paper and Bac II simulation attempts
+              with the answers you picked, so they are still there on a new phone
             </li>
             <li>your conversations with KruAI</li>
             <li>
@@ -182,7 +182,7 @@ export default function PrivacyPage() {
             របស់អ្នកបានទេ។ ក្រៅពីនេះ យើងរក្សាទុកព័ត៌មានដែលអ្នកបញ្ចូល
             ចម្លើយកម្រងសំណួរ វឌ្ឍនភាពសិក្សា
             វឌ្ឍនភាព Flashcard កាតដែលអ្នកសរសេរ និងកាតដែលអ្នកដាក់ផ្កាយ
-            លទ្ធផល Quiz និងវិញ្ញាសារឆ្នាំចាស់ (រួមទាំងចម្លើយដែលអ្នកជ្រើសរើស)
+            លទ្ធផល Quiz វិញ្ញាសារឆ្នាំចាស់ និងការប្រឡងសាកល្បង (រួមទាំងចម្លើយដែលអ្នកជ្រើសរើស)
             ការសន្ទនាជាមួយ KruAI
             រូបថតការគណនាដែលអ្នកជ្រើសបន្ថែមក្រោយការប្រកួត
             កំហុសក្នុងសំណួរដែលអ្នករាយការណ៍ (សំណួរណា ប្រភេទកំហុស និងកំណត់ចំណាំរបស់អ្នក)

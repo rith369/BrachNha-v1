@@ -15,6 +15,44 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 3 Nov 2026: The 2-Day Bac II Simulation Works, Waiting for Its Papers
+
+Commit: `HASH_HERE`. **Database step: run `20261103000002_simulation_attempts.sql` in the
+SQL editor.** It can be done before or after this deploys. Until it is, an attempt stays on
+the student's phone and is not saved to their account.
+
+The Simulation card used to lead to a briefing page whose button only opened the normal
+list of papers. The two-day exam itself now exists.
+
+**What it does**
+
+- A student sits all seven subjects in order, four on Day 1 and three on Day 2. Day 2 opens
+  once Day 1 is finished, on any date.
+- Each paper has its own timer that never stops, even if the app is closed. KruAI and the
+  menu are hidden while a paper is on screen.
+- Progress saves after every answer. Closing the app and coming back counts as leaving the
+  exam, and leaving too many times ends that paper, keeping what was answered.
+- At the end the student gets one grade (A to F), marks for each subject, and a review of
+  every question. Nothing is scored until then.
+
+**What students see today: "coming soon".** Only 2 of the 7 subjects have a paper, so the
+card says coming soon and there is no Start button. **It switches on by itself** when the
+last paper is published on Admin → Content, with no code change. Admins can already start a
+test run with the papers that exist, and it is marked as a test.
+
+**Good to know**
+
+- **The grade is an estimate, and the result screen says so.** The app can only mark tapped
+  answers, so it scales the share of questions right up to each subject's real marks.
+- **Please check the timetable** (subjects, times and points). It is what the briefing page
+  already said and has not been compared with the Ministry's.
+- **Please read the new Khmer wording.** The briefing page itself is still mostly in English.
+- The privacy page now mentions simulation attempts.
+
+**To re-test:** as an admin, open Mock Exam → the Simulation card and start a test run. Answer
+a question, close the app, come back, and check the timer kept running and the answer is
+still there. Finish it and open the review.
+
 ## 3 Nov 2026: Daily Targets, an Easier Streak and a Daily Gift
 
 Commit: `eb12fe8` and `457c65f`. **Database step: run `20261103000001_daily_targets_and_gift.sql` in the

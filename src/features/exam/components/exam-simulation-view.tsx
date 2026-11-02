@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import {
   ArrowRight,
   Atom,
@@ -27,6 +27,18 @@ import {
   Timer,
   X,
 } from "lucide-react";
+import { useAdminStatus } from "@/lib/admin-status";
+import { useContentManifest } from "@/lib/content";
+import { useBrachNhaStore, type SimulationSessionId } from "@/lib/store";
+import { formatKmDate } from "@/utils/khmer-dates";
+import {
+  SIMULATION_GRADES,
+  SIMULATION_SESSION_BY_ID,
+  SIMULATION_SESSIONS,
+  activeSimulation,
+  planSimulation,
+  simulationOutcome,
+} from "../simulation";
 
 /*
  * NEOBRUTALISM, like the rest of the app: 2px outlines in `border-border`, hard
@@ -55,6 +67,12 @@ import {
 const PRESS =
   "transition-[transform,box-shadow] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none";
 
+/** The timetable's own figures, so this page and the clock cannot disagree. */
+function slotOf(id: SimulationSessionId) {
+  const { timeSlot, minutes, points } = SIMULATION_SESSION_BY_ID[id];
+  return { id, timeSlot, duration: `${minutes} min`, weight: `${points} pts` };
+}
+
 interface SubjectScheduleItem {
   id: string;
   name: string;
@@ -71,49 +89,37 @@ interface SubjectScheduleItem {
 
 const DAY_1_SUBJECTS: SubjectScheduleItem[] = [
   {
-    id: "history",
+    ...slotOf("history"),
     name: "History",
     nameKm: "ប្រវត្តិវិទ្យា",
     sessionSlot: "ពេលព្រឹក (Morning)",
-    timeSlot: "07:30 - 08:30",
-    duration: "60 min",
-    weight: "50 pts",
     sessionLabel: "Morning Session 1",
     icon: Landmark,
     fill: "var(--subject-history)",
   },
   {
-    id: "biology",
+    ...slotOf("biology"),
     name: "Biology",
     nameKm: "ជីវវិទ្យា",
     sessionSlot: "ពេលព្រឹក (Morning)",
-    timeSlot: "09:00 - 10:30",
-    duration: "90 min",
-    weight: "75 pts",
     sessionLabel: "Morning Session 2",
     icon: Dna,
     fill: "var(--subject-biology)",
   },
   {
-    id: "chemistry",
+    ...slotOf("chemistry"),
     name: "Chemistry",
     nameKm: "គីមីវិទ្យា",
     sessionSlot: "ពេលរសៀល (Afternoon)",
-    timeSlot: "14:00 - 15:30",
-    duration: "90 min",
-    weight: "75 pts",
     sessionLabel: "Afternoon Session 1",
     icon: FlaskConical,
     fill: "var(--subject-chemistry)",
   },
   {
-    id: "language",
+    ...slotOf("language"),
     name: "Foreign Language",
     nameKm: "ភាសាបរទេស (English / French)",
     sessionSlot: "ពេលរសៀល (Afternoon)",
-    timeSlot: "16:00 - 17:00",
-    duration: "60 min",
-    weight: "50 pts",
     sessionLabel: "Afternoon Session 2",
     icon: Languages,
     fill: "var(--subject-english)",
@@ -122,50 +128,41 @@ const DAY_1_SUBJECTS: SubjectScheduleItem[] = [
 
 const DAY_2_SUBJECTS: SubjectScheduleItem[] = [
   {
-    id: "khmer",
+    ...slotOf("khmer"),
     name: "Khmer Literature",
     nameKm: "អក្សរសាស្ត្រខ្មែរ",
     sessionSlot: "ពេលព្រឹក (Morning)",
-    timeSlot: "07:30 - 09:00",
-    duration: "90 min",
-    weight: "75 pts",
     sessionLabel: "Morning Session 1",
     icon: BookOpenText,
     fill: "var(--subject-khmer)",
   },
   {
-    id: "physics",
+    ...slotOf("physics"),
     name: "Physics",
     nameKm: "រូបវិទ្យា",
     sessionSlot: "ពេលព្រឹក (Morning)",
-    timeSlot: "09:30 - 11:00",
-    duration: "90 min",
-    weight: "75 pts",
     sessionLabel: "Morning Session 2",
     icon: Atom,
     fill: "var(--subject-physics)",
   },
   {
-    id: "math",
+    ...slotOf("math"),
     name: "Mathematics",
     nameKm: "គណិតវិទ្យា",
     sessionSlot: "ពេលរសៀល (Afternoon)",
-    timeSlot: "14:00 - 16:30",
-    duration: "150 min",
-    weight: "125 pts",
     sessionLabel: "Afternoon Major Session",
     icon: Sigma,
     fill: "var(--subject-math)",
   },
 ];
 
-const GRADE_SCALE = [
-  { grade: "A", label: "និទ្ទេស A", minPct: "90%", minScore: "427 pts", fill: "bg-neo-mint" },
-  { grade: "B", label: "និទ្ទេស B", minPct: "80%", minScore: "380 pts", fill: "bg-neo-blue" },
-  { grade: "C", label: "និទ្ទេស C", minPct: "70%", minScore: "332 pts", fill: "bg-neo-yellow" },
-  { grade: "D", label: "និទ្ទេស D", minPct: "60%", minScore: "285 pts", fill: "bg-neo-orange" },
-  { grade: "E", label: "និទ្ទេស E", minPct: "50%", minScore: "237 pts", fill: "bg-neo-red" },
-];
+const GRADE_SCALE = SIMULATION_GRADES.filter((band) => band.grade !== "F").map((band) => ({
+  grade: band.grade,
+  label: `និទ្ទេស ${band.grade}`,
+  minPct: `${band.minPct}%`,
+  minScore: `${band.min} pts`,
+  fill: band.fill,
+}));
 
 const RULES = [
   {
@@ -201,6 +198,33 @@ const DAY_FILL = { 1: "bg-neo-yellow", 2: "bg-neo-mint" } as const;
 export function ExamSimulationView() {
   const [selectedDayTab, setSelectedDayTab] = useState<1 | 2>(1);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const navigate = useNavigate();
+  const manifest = useContentManifest();
+  const { isAdmin } = useAdminStatus();
+  const simulations = useBrachNhaStore((s) => s.simulations);
+  const userLanguage = useBrachNhaStore((s) => s.userLanguage);
+
+  const active = activeSimulation(simulations);
+  const plan = planSimulation(userLanguage, manifest, simulations);
+  const missing = plan.missing.length;
+  const finished = simulations
+    .filter((attempt) => attempt.finishedAt !== null)
+    .slice()
+    .reverse();
+  // Students start once every subject has a paper. Admins can run what exists,
+  // to test it, and that run is marked as a test all the way to its result.
+  const cta = active
+    ? "continue"
+    : manifest.status !== "ready"
+      ? null
+      : missing === 0 || (isAdmin && plan.sittings.length > 0)
+        ? "start"
+        : "soon";
+
+  function begin() {
+    useBrachNhaStore.getState().startSimulation(plan.sittings, missing > 0);
+    navigate("/exam/simulation/sit");
+  }
 
   return (
     <div className="relative min-h-0 flex-1 overflow-y-auto bg-bg text-text">
@@ -266,17 +290,31 @@ export function ExamSimulationView() {
 
               {/* Primary CTA Button: Full width on mobile for thumb accessibility */}
               <div className="mt-5 flex flex-col gap-2.5 sm:mt-7 sm:flex-row sm:items-center">
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmModal(true)}
-                  className={`group inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-brand px-6 py-3.5 text-sm font-extrabold text-white shadow-cta hover:brightness-110 sm:w-auto md:text-base ${PRESS}`}
-                >
-                  Start Simulation
-                  <ArrowRight
-                    className="size-4 transition-transform group-hover:translate-x-1"
-                    strokeWidth={3}
-                  />
-                </button>
+                {cta === "start" && (
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmModal(true)}
+                    className={`group inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-brand px-6 py-3.5 text-sm font-extrabold text-white shadow-cta hover:brightness-110 sm:w-auto md:text-base ${PRESS}`}
+                  >
+                    Start Simulation
+                    <ArrowRight
+                      className="size-4 transition-transform group-hover:translate-x-1"
+                      strokeWidth={3}
+                    />
+                  </button>
+                )}
+                {cta === "continue" && (
+                  <Link
+                    to="/exam/simulation/sit"
+                    className={`group inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-brand px-6 py-3.5 text-sm font-extrabold text-white shadow-cta hover:brightness-110 sm:w-auto md:text-base ${PRESS}`}
+                  >
+                    បន្តការប្រឡង
+                    <ArrowRight className="size-4" strokeWidth={3} />
+                  </Link>
+                )}
+                {cta === "soon" && (
+                  <ComingSoon ready={plan.sittings.length} />
+                )}
 
                 <div className="flex items-center justify-center gap-1.5 text-center text-[11px] font-bold text-muted sm:justify-start">
                   <FileCheck2 className="size-3.5 shrink-0 text-mint" />
@@ -367,6 +405,43 @@ export function ExamSimulationView() {
             </div>
           </div>
         </section>
+
+        {/* ── Earlier attempts. Absent until there is one. ── */}
+        {finished.length > 0 && (
+          <section className="mb-8 sm:mb-12">
+            <h3 className="font-heading mb-3 text-lg font-extrabold text-text sm:text-xl">
+              លទ្ធផលមុនៗ
+            </h3>
+            <div className="flex flex-col gap-2">
+              {finished.map((attempt) => {
+                const outcome = simulationOutcome(attempt);
+                return (
+                  <Link
+                    key={attempt.id}
+                    to={`/exam/simulation/result/${attempt.id}`}
+                    className={`flex items-center gap-3 rounded-xl border border-border bg-surface p-3 shadow-panel-sm ${PRESS}`}
+                  >
+                    <span
+                      className={`font-heading flex size-10 shrink-0 items-center justify-center rounded-lg border border-border text-lg font-extrabold text-ink ${outcome.band.fill}`}
+                    >
+                      {outcome.band.grade}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-extrabold text-text">
+                        {outcome.base} ពិន្ទុ · {outcome.pct}%
+                      </div>
+                      <div className="text-xs font-bold text-muted">
+                        {formatKmDate(new Date(attempt.finishedAt ?? attempt.startedAt))}
+                        {attempt.test && " · ការសាកល្បង"}
+                      </div>
+                    </div>
+                    <ArrowRight className="size-4 shrink-0 text-muted" strokeWidth={2.5} />
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* ── Official Examination Schedule (Day 1 & Day 2) ── */}
         <section className="mb-8 sm:mb-12">
@@ -517,18 +592,30 @@ export function ExamSimulationView() {
             </div>
 
             <div className="w-full shrink-0 sm:w-auto">
-              <button
-                type="button"
-                onClick={() => setShowConfirmModal(true)}
-                className={`group inline-flex w-full items-center justify-center gap-2.5 rounded-2xl border border-ink bg-[var(--brand-yellow)] px-6 py-3.5 text-sm font-extrabold text-[#1e1b4b] shadow-hard hover:brightness-105 sm:w-auto sm:text-base ${PRESS}`}
-              >
-                <Play className="size-4 fill-[#1e1b4b]" />
-                <span>Start Simulation</span>
-                <ArrowRight
-                  className="size-4 transition-transform group-hover:translate-x-1"
-                  strokeWidth={3}
-                />
-              </button>
+              {cta === "start" && (
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmModal(true)}
+                  className={`group inline-flex w-full items-center justify-center gap-2.5 rounded-2xl border border-ink bg-[var(--brand-yellow)] px-6 py-3.5 text-sm font-extrabold text-[#1e1b4b] shadow-hard hover:brightness-105 sm:w-auto sm:text-base ${PRESS}`}
+                >
+                  <Play className="size-4 fill-[#1e1b4b]" />
+                  <span>Start Simulation</span>
+                  <ArrowRight
+                    className="size-4 transition-transform group-hover:translate-x-1"
+                    strokeWidth={3}
+                  />
+                </button>
+              )}
+              {cta === "continue" && (
+                <Link
+                  to="/exam/simulation/sit"
+                  className={`inline-flex w-full items-center justify-center gap-2.5 rounded-2xl border border-ink bg-[var(--brand-yellow)] px-6 py-3.5 text-sm font-extrabold text-[#1e1b4b] shadow-hard hover:brightness-105 sm:w-auto sm:text-base ${PRESS}`}
+                >
+                  <span>បន្តការប្រឡង</span>
+                  <ArrowRight className="size-4" strokeWidth={3} />
+                </Link>
+              )}
+              {cta === "soon" && <ComingSoon ready={plan.sittings.length} onNight />}
             </div>
           </div>
         </section>
@@ -570,6 +657,14 @@ export function ExamSimulationView() {
               </button>
             </div>
 
+            {missing > 0 && (
+              <p className="mt-3 rounded-xl border border-border bg-neo-yellow p-3 text-xs font-bold text-ink">
+                Team test: only {plan.sittings.length} of {SIMULATION_SESSIONS.length} papers
+                are published, so the rest are skipped and the first paper may differ from the
+                one below. Students cannot start yet.
+              </p>
+            )}
+
             {/* Checklist items */}
             <div className="mt-3.5 space-y-2.5 sm:mt-4 sm:space-y-3">
               <div className="rounded-xl border border-border bg-secondary p-3 sm:rounded-2xl sm:p-3.5">
@@ -598,17 +693,36 @@ export function ExamSimulationView() {
                 Review Schedule
               </button>
 
-              <Link
-                to="/exam/subjects"
+              <button
+                type="button"
+                onClick={begin}
                 className={`order-1 inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-brand px-5 py-2.5 text-xs font-extrabold text-white shadow-cta hover:brightness-110 sm:order-2 ${PRESS}`}
               >
                 <span>Enter Day 1 Exam</span>
                 <ArrowRight className="size-4" strokeWidth={2.5} />
-              </Link>
+              </button>
             </div>
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/** Not a button: nothing happens until the papers are published, and it says so. */
+function ComingSoon({ ready, onNight = false }: { ready: number; onNight?: boolean }) {
+  return (
+    <div
+      className={`w-full rounded-2xl border border-dashed px-4 py-3 text-center text-sm font-extrabold sm:w-auto ${
+        onNight ? "border-white/60 text-white" : "border-border text-text"
+      }`}
+    >
+      ឆាប់ៗនេះ
+      <div
+        className={`mt-0.5 text-xs font-bold ${onNight ? "text-white/85" : "text-muted"}`}
+      >
+        មានវិញ្ញាសា {ready}/{SIMULATION_SESSIONS.length} មុខវិជ្ជា
+      </div>
     </div>
   );
 }

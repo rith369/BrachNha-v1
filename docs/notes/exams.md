@@ -552,3 +552,77 @@ guaranteed to have content, via the `MOCK_QS` derivation above. If math's
 subject with real content or it stops reaching the runner at all.
 
 **Practice** (`features/practice`) — Flashcards & Quiz; see its own section below.
+
+### The 2-day Simulation runs on real logic, with papers still to come (3 Nov 2026)
+
+`/exam/simulation` was a briefing whose "Enter Day 1 Exam" only opened the subject
+list. The user asked for the logic now and will supply the papers later. Their two
+choices: **students see "coming soon" until every subject has a paper** (admins can run
+what exists, to test it), and **Day 2 opens once Day 1 is done, on any date**.
+
+| route | screen |
+| --- | --- |
+| `/exam/simulation` | the briefing: Start, Continue or coming soon, plus earlier results |
+| `/exam/simulation/sit` | the attempt: the next paper, both days, and the runner |
+| `/exam/simulation/result/:attemptId` | the grade, each subject, each paper's review |
+
+- **`features/exam/simulation.ts` is the rules**, pure: the timetable, which paper fills
+  a session, the grade. The briefing's timetable and grade scale read from it, so the
+  page and the clock cannot disagree. **The timetable has not been checked against the
+  Ministry's**; it is what the briefing already said.
+- **No content in code.** `planSimulation()` takes each subject's published papers from
+  the manifest, so publishing the seventh paper turns the simulation on. Of several
+  years it takes the one this student has met least, newest first on a tie, so a second
+  attempt is not the same exam once there are several years.
+- **A paper and version are frozen when an attempt starts**, so a fix published mid-way
+  cannot change the exam, and the review marks against what was sat.
+- **THE CLOCK NEVER STOPS, and it is the timetable's minutes**, not the paper's header.
+  The start is saved (`startedAt`), so a reload gains nothing. Start stays off until the
+  paper has downloaded, so a slow connection cannot eat the time. A clock that ran out
+  while the student was away submits what they had answered.
+- **COMING BACK COUNTS AS LEAVING**, or closing the app to look something up would beat
+  the leave rule. A crash counts too, the accepted cost in `use-leave-guard.ts`, and the
+  answers are kept. Going past the limit submits on arrival, and the waiting card warns
+  first. `PastPaperRunner` gained optional `startedAt`, `initialAnswers`, `initialLeaves`,
+  `initialIndex`, `exitCopy` and `onProgress`; a paper on its own screen passes none and
+  behaves as before.
+- **The answers so far are a device fact** (`lib/simulation-draft.ts`): they change on
+  every tap, and a store write re-serialises the store and arms the sync. So a new phone
+  gets the attempt and the running clock back, without the answers on that one paper.
+- **No score until the end**, as in the real exam. A typed result address for an
+  unfinished attempt goes back to the papers.
+- **The grade is an ESTIMATE, and the result says so.** A subject's marks are its share
+  of questions right, scaled to what the real exam marks it out of. The foreign language
+  is extra and never counts toward the 475. Below 237 is F. Rows round to one decimal and
+  the total adds the rounded rows, so what is on screen adds up.
+- **Each paper also counts as an ordinary attempt** through `record-paper-attempt.ts`
+  (shared with `paper-screen.tsx`): XP, the content log, the paper's own history and the
+  daily challenge. So those can show a score mid-attempt to a student who goes looking.
+  Accepted.
+- **Giving up** takes two taps and removes the attempt, on the server too. Papers already
+  sat stay in their history.
+- **`simulation_attempts`** (`20261103000002`, own rows only) is pushed by
+  `lib/study-progress-sync.ts` only when `updatedAt` changes. **Its delete on "use this
+  device" sits outside the six-table gate on purpose**, so a project without this table
+  can still replace the rest. The code ships before or after the migration.
+- **A trap this hit: never read localStorage in a render body.** The React Compiler treats
+  a call in render as pure and keeps its first answer, so the waiting card's leave count
+  went stale and told a student they had more left than they did. Tests caught it. It is
+  read in a lazy `useState` now, on a card that remounts each time.
+- **Admins** get Start while papers are missing. Sessions with no paper are skipped, the
+  attempt carries `test: true`, and the sitting screen, result and history all say so.
+  The grade scales up from what was sat.
+
+**Not done:** the briefing is still mostly English, though the page is meant to be Khmer
+(`EXAM_PAGE_LANG`); only the new parts are Khmer. `scripts/shots.mjs` has no route for
+`/sit`, because its blanked-Supabase seed has only 2 papers and cannot reach one.
+
+**Verified:** 53 logic checks through the real modules (the timetable's totals, every
+grade's edge, paper choice, marks, the store's actions and caps). PGlite 0.2.17, the
+migration twice: 20 checks (own rows, anon nothing, upsert, shape, size, cascade). Browser
+with the database faked through Playwright `route`: 148 checks at 390 light, 320 dark and
+1280, including a reload mid-paper, all three returns, the clock running out while away,
+XP paid once, the result and a real maths review, an admin's test run, restoring on a new
+phone, giving up deleting the row, the table missing, and a paper on its own screen
+unchanged. **Not verified: real phones, two real accounts, the sync against the real
+database, or a run with seven real papers.**

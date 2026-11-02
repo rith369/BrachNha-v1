@@ -41,6 +41,8 @@ export interface SyncMarks {
   quizzes: string[];
   /** `${paperKey}|${date}` of every paper attempt uploaded. */
   papers: string[];
+  /** Simulation attempt id → its `updatedAt` when last uploaded. */
+  simulations: Record<string, string>;
 }
 
 export function emptyMarks(userId: string): SyncMarks {
@@ -53,6 +55,7 @@ export function emptyMarks(userId: string): SyncMarks {
     logUntil: "",
     quizzes: [],
     papers: [],
+    simulations: {},
   };
 }
 
@@ -71,6 +74,7 @@ export function readMarks(userId: string): SyncMarks {
       logUntil: typeof m.logUntil === "string" ? m.logUntil : "",
       quizzes: isStrings(m.quizzes) ? m.quizzes : [],
       papers: isStrings(m.papers) ? m.papers : [],
+      simulations: isRecord(m.simulations) ? m.simulations : {},
     };
   } catch {
     return emptyMarks(userId);

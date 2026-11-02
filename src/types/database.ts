@@ -450,6 +450,31 @@ export type Database = {
         Relationships: [ProfileFk<"paper_results_user_id_fkey">];
       };
 
+      // ── simulation_attempts — store field: simulations (20261103000002) ──
+      simulation_attempts: {
+        Row: {
+          user_id: string;
+          id: string;
+          started_at: string;
+          updated_at: string;
+          finished_at: string | null;
+          test: boolean;
+          /** SimulationSitting[]. Checked on the way in. */
+          sittings: Json;
+        };
+        Insert: {
+          user_id: string;
+          id: string;
+          started_at: string;
+          updated_at: string;
+          finished_at?: string | null;
+          test?: boolean;
+          sittings?: Json;
+        };
+        Update: Partial<Database["public"]["Tables"]["simulation_attempts"]["Insert"]>;
+        Relationships: [ProfileFk<"simulation_attempts_user_id_fkey">];
+      };
+
       // ── competitions (the Game feature) ────────────────────────────────
       // The first cross-user tables in the schema: a competition is readable by
       // every signed-in student. See 20260913000001_competitions.sql for why

@@ -52,7 +52,7 @@ those notes record decisions the user made and traps already hit.
 | `auth.md` | Google sign-in, guests, the gate, the OAuth callback, in-app browsers |
 | `shell-and-onboarding.md` | app bar, responsive layout, nav, focus mode, intro, login, survey, Home |
 | `lessons.md` | Study page, subject paths, section content and rendering, coins |
-| `exams.md` | Mock Exam, past papers, runners, the leave guard |
+| `exams.md` | Mock Exam, past papers, runners, the leave guard, the 2-day Simulation |
 | `practice.md` | flashcards, swipe gestures, FSRS, quizzes and the quiz path |
 | `roadmap.md` | the Roadmap and its monthly plan |
 | `progress.md` | Progress cards, content log, study timer, tooltips |

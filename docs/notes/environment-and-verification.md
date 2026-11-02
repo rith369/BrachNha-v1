@@ -219,6 +219,11 @@ of today's row is refused, so that day's progress stays on the phone until it la
 cannot see a column; a publishable-key `GET /rest/v1/daily_activity?select=streak_day&limit=0`
 answers `200` once it exists and `400` before.
 
+**`20261103000002_simulation_attempts.sql`** (the Simulation's saved attempts) can ship
+before or after the code. Without it each push of an attempt fails quietly and the attempt
+stays on the phone; once it lands, the next push uploads it. Afterwards `db:check` lists
+`simulation_attempts`, answering `200 []` to the publishable key.
+
 **`20261102000001_friend_invite.sql`** (the friend invite link) must be applied AFTER
 `20261013000001` and BEFORE the code ships: without it every invite link says it could
 not open. It adds no table, so `db:check` cannot see it. A publishable-key-only call to

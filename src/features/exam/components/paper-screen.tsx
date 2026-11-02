@@ -1,6 +1,4 @@
-import { track } from "@/lib/telemetry";
 import { useState } from "react";
-import { useShallow } from "zustand/react/shallow";
 import { useBrachNhaStore, type PaperResult } from "@/lib/store";
 import type { ReactNode } from "react";
 import type { PastPaperContent } from "@/types";
@@ -8,6 +6,7 @@ import { retryBody, useContentBody } from "@/lib/content";
 import { ContentNotice } from "@/features/practice/components/content-waiting";
 import { toPastPaperContent, type PastPaper } from "../papers";
 import { paperResultsFor, type PaperAnswers } from "../paper-scoring";
+import { recordPaperAttempt } from "../record-paper-attempt";
 import { PaperDetail } from "./paper-detail";
 import { PastPaperRunner, type PaperAttempt } from "./past-paper-runner";
 import { PastPaperResults } from "./past-paper-results";
@@ -53,18 +52,9 @@ function OlderVersionReview({
  * One paper, end to end: its detail screen, the run, and the review — the whole
  * of `/exam/subjects/:paperKey`.
  *
- * IT OWNS THE REWARDS, which used to live in exam-view.tsx's handlePaperSubmit.
- * The rules are unchanged and still the ones CLAUDE.md records: XP,
- * recordQuestions/recordSession for the content log, and deliberately NOT
- * addExamResult — that array captions Home's "from mock exams" pill and feeds
- * chat-prompt.ts an average it states to KruAI as fact, so a MoEYS past paper in
- * it would make both wrong.
- *
- * WHAT IS NEW IS `addPaperResult`. A past paper finally has a history of its
- * own, which is exactly the "separate persisted field, not a widening of
- * examResults" this file's predecessor promised. It stores the answers as well
- * as the score, so a row in that history reopens the real review rather than a
- * remembered percentage.
+ * What a finished attempt counts as is record-paper-attempt.ts, shared with the
+ * Simulation. A paper's history stores the answers as well as the score, so a row
+ * in it reopens the real review rather than a remembered percentage.
  *
  * THE THREE SCREENS ARE ONE ROUTE, not three. A run cannot be linked to — it
  * only exists while its clock is running — and a review belongs to an attempt
@@ -72,39 +62,15 @@ function OlderVersionReview({
  * detail → the tab list, which is the boundary that matters.
  */
 export function PaperScreen({ paper }: { paper: PastPaper }) {
-  const { addXp, addPaperResult, recordQuestions, recordSession, results } =
-    useBrachNhaStore(
-      useShallow((s) => ({
-        addXp: s.addXp,
-        addPaperResult: s.addPaperResult,
-        recordQuestions: s.recordQuestions,
-        recordSession: s.recordSession,
-        results: s.paperResults,
-      }))
-    );
+  const results = useBrachNhaStore((s) => s.paperResults);
 
   const [mode, setMode] = useState<Mode>({ kind: "detail" });
 
   function handleSubmit(attempt: PaperAttempt) {
-    // XP for the attempt, on the same 20-per-correct rule every other exam
-    // pays — the effort is the same whoever wrote the questions.
-    addXp(attempt.score * 20);
-    recordQuestions(paper.subject.id, attempt.total, attempt.score);
-    recordSession(paper.subject.id);
-    // A finished paper counts as the daily challenge, beside a Game battle —
-    // see pages/game-create.tsx.
-    useBrachNhaStore.getState().completeTask("challenge");
-    track("exam_done", { kind: "paper", paper: paper.key, score: attempt.score, total: attempt.total });
-    addPaperResult({
-      paperKey: paper.key,
-      version: paper.version ?? 1,
-      score: attempt.score,
-      total: attempt.total,
-      pct: attempt.pct,
-      ms: attempt.ms,
-      answers: attempt.answers,
-      leaves: attempt.leaves,
-    });
+    recordPaperAttempt(
+      { key: paper.key, subjectId: paper.subject.id, version: paper.version ?? 1 },
+      attempt
+    );
     setMode({
       kind: "result",
       answers: attempt.answers,

@@ -102,6 +102,10 @@ export const MAX_REVIEW_HISTORY = 1000;
 // this size, and oldest drop first like every other capped list here.
 export const MAX_PAPER_RESULTS = 50;
 
+// Finished Simulation attempts. Each holds up to seven papers' answers, and a
+// student sits very few, so this is plenty.
+export const MAX_SIMULATIONS = 10;
+
 /** Kept per section, so this is generous — see MAX_PAPER_RESULTS. */
 export const MAX_QUIZ_RESULTS = 50;
 
@@ -188,6 +192,60 @@ export interface PaperResult {
    * never disagree.
    */
   leaves?: number;
+}
+
+/** A session of the Simulation's timetable (features/exam/simulation.ts). */
+export type SimulationSessionId =
+  | "history"
+  | "biology"
+  | "chemistry"
+  | "language"
+  | "khmer"
+  | "physics"
+  | "math";
+
+/** A paper sat as part of the Simulation. Its answers keep the review possible. */
+export interface SimulationSittingResult {
+  finishedAt: string;
+  score: number;
+  total: number;
+  pct: number;
+  ms: number;
+  answers: Record<string, string>;
+  leaves: number;
+}
+
+/**
+ * One paper of a Simulation attempt.
+ *
+ * THE PAPER AND VERSION ARE FROZEN when the attempt starts, so publishing a fix or
+ * a newer paper part-way through cannot change the exam being sat, and the review
+ * marks against what was on screen.
+ */
+export interface SimulationSitting {
+  sessionId: SimulationSessionId;
+  paperKey: string;
+  version: number;
+  /** ISO instant the clock started. Saved so a reload cannot gain any time. */
+  startedAt?: string;
+  result?: SimulationSittingResult;
+}
+
+/**
+ * One attempt at the whole 2-day Simulation. `finishedAt` null means unfinished,
+ * and a student has at most one of those. Synced to `simulation_attempts`
+ * (20261103000002) by lib/study-progress-sync.ts; the answers on the paper being
+ * sat stay on the device (lib/simulation-draft.ts).
+ */
+export interface SimulationAttempt {
+  id: string;
+  startedAt: string;
+  /** What the sync compares, so only a changed attempt is sent. */
+  updatedAt: string;
+  finishedAt: string | null;
+  /** An admin's run with papers missing. Never a real result. */
+  test: boolean;
+  sittings: SimulationSitting[];
 }
 
 /**
@@ -370,6 +428,8 @@ interface BrachNhaState {
   /** Finished practice-quiz attempts, newest last. See QuizResult. Synced to
    *  `quiz_results` by lib/study-progress-sync.ts. */
   quizResults: QuizResult[];
+  /** Simulation attempts, oldest first. See SimulationAttempt. */
+  simulations: SimulationAttempt[];
   /**
    * Competitions this student CREATED.
    *
@@ -565,6 +625,18 @@ interface BrachNhaState {
    */
   addPaperResult: (result: Omit<PaperResult, "date">) => void;
   addQuizResult: (result: Omit<QuizResult, "date">) => void;
+  /** Begins an attempt, unless one is already unfinished. Mints the id and times. */
+  startSimulation: (sittings: SimulationSitting[], test: boolean) => void;
+  /** Starts a paper's clock. Only the next paper, and only once. */
+  startSimulationSitting: (attemptId: string, sessionId: SimulationSessionId) => void;
+  /** Records a paper once. The last one finishes the attempt. */
+  finishSimulationSitting: (
+    attemptId: string,
+    sessionId: SimulationSessionId,
+    result: Omit<SimulationSittingResult, "finishedAt">
+  ) => void;
+  /** Removes an unfinished attempt. A finished one cannot be given up. */
+  abandonSimulation: (attemptId: string) => void;
   /**
    * Posts a competition this student created, and pays for their own run.
    *
@@ -870,6 +942,7 @@ const partializeState = (state: BrachNhaState) => ({
   examResults: state.examResults,
   paperResults: state.paperResults,
   quizResults: state.quizResults,
+  simulations: state.simulations,
   competitions: state.competitions,
   competitionAttempts: state.competitionAttempts,
   completedSessions: state.completedSessions,
@@ -926,6 +999,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       examResults: [],
       paperResults: [],
       quizResults: [],
+      simulations: [],
       competitions: [],
       competitionAttempts: [],
       completedSessions: [],
@@ -1214,6 +1288,67 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           ].slice(-MAX_PAPER_RESULTS),
         })),
 
+      startSimulation: (sittings, test) =>
+        set((state) => {
+          if (state.simulations.some((a) => a.finishedAt === null)) return state;
+          const at = new Date().toISOString();
+          return {
+            simulations: [
+              ...state.simulations,
+              { id: newId(), startedAt: at, updatedAt: at, finishedAt: null, test, sittings },
+            ].slice(-MAX_SIMULATIONS),
+          };
+        }),
+
+      startSimulationSitting: (attemptId, sessionId) =>
+        set((state) => {
+          const at = new Date().toISOString();
+          let changed = false;
+          const simulations = state.simulations.map((a) => {
+            if (a.id !== attemptId) return a;
+            const next = a.sittings.find((s) => !s.result);
+            if (next?.sessionId !== sessionId || next.startedAt) return a;
+            changed = true;
+            return {
+              ...a,
+              updatedAt: at,
+              sittings: a.sittings.map((s) =>
+                s.sessionId === sessionId ? { ...s, startedAt: at } : s
+              ),
+            };
+          });
+          return changed ? { simulations } : state;
+        }),
+
+      finishSimulationSitting: (attemptId, sessionId, result) =>
+        set((state) => {
+          const at = new Date().toISOString();
+          let changed = false;
+          const simulations = state.simulations.map((a) => {
+            if (a.id !== attemptId) return a;
+            const target = a.sittings.find((s) => s.sessionId === sessionId);
+            if (!target || target.result) return a;
+            changed = true;
+            const sittings = a.sittings.map((s) =>
+              s.sessionId === sessionId ? { ...s, result: { ...result, finishedAt: at } } : s
+            );
+            return {
+              ...a,
+              updatedAt: at,
+              finishedAt: sittings.every((s) => s.result) ? at : null,
+              sittings,
+            };
+          });
+          return changed ? { simulations } : state;
+        }),
+
+      abandonSimulation: (attemptId) =>
+        set((state) => ({
+          simulations: state.simulations.filter(
+            (a) => a.id !== attemptId || a.finishedAt !== null
+          ),
+        })),
+
       addCompetition: (competition, xp) =>
         set((state) => ({
           competitions: [
@@ -1450,6 +1585,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           examResults: [],
           paperResults: [],
           quizResults: [],
+          simulations: [],
           competitions: [],
           competitionAttempts: [],
           completedSessions: [],

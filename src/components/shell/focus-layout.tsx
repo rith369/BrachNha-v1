@@ -22,6 +22,7 @@ export function FocusLayout({
   onBack,
   showStats = false,
   confirmExit = false,
+  exitCopy,
   meta,
   footer,
   children,
@@ -52,6 +53,8 @@ export function FocusLayout({
   showStats?: boolean;
   /** Ask before leaving. For screens where exiting discards work (the exam). */
   confirmExit?: boolean;
+  /** Replaces the confirm's "you will lose your answers", where that is not so. */
+  exitCopy?: { title: string; body: string };
   /** Optional right-hand status, e.g. "3 answered" or "Q2 / 10". */
   meta?: React.ReactNode;
   /** Pinned bottom action area. Render a disabled button rather than nothing
@@ -70,12 +73,12 @@ export function FocusLayout({
     return (
       <div className="flex h-full flex-col items-center justify-center px-6 text-center">
         <div className="font-heading mb-2 text-lg font-extrabold">
-          {lang === "en" ? "Leave and lose progress?" : "ចាកចេញ ហើយបាត់បង់វឌ្ឍនភាព?"}
+          {exitCopy?.title ?? (lang === "en" ? "Leave and lose progress?" : "ចាកចេញ ហើយបាត់បង់វឌ្ឍនភាព?")}
         </div>
         <p className="mb-6 max-w-xs text-sm font-bold text-muted">
-          {lang === "en"
+          {exitCopy?.body ?? (lang === "en"
             ? "Your answers on this attempt won't be saved."
-            : "ចម្លើយរបស់អ្នកនៅលើការប៉ុនប៉ងនេះនឹងមិនត្រូវបានរក្សាទុកទេ។"}
+            : "ចម្លើយរបស់អ្នកនៅលើការប៉ុនប៉ងនេះនឹងមិនត្រូវបានរក្សាទុកទេ។")}
         </p>
         <div className="flex w-full max-w-xs flex-col gap-2.5">
           <button

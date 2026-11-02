@@ -52,18 +52,22 @@ export const LEAVE_GRACE_MS = 2000;
 export function useLeaveGuard({
   active,
   limit = MAX_EXAM_LEAVES,
+  initialLeaves = 0,
   onExceeded,
 }: {
   /** False once the attempt is over — a submitted paper must stop counting. */
   active: boolean;
   limit?: number;
+  /** Absences already counted, for a paper being come back to. Greater than zero
+   *  opens on the warning, since coming back is itself the absence. */
+  initialLeaves?: number;
   /** Called ONCE, the moment the allowance is used up. */
   onExceeded: (leaves: number) => void;
 }) {
-  const [leaves, setLeaves] = useState(0);
-  const [warning, setWarning] = useState(false);
+  const [leaves, setLeaves] = useState(initialLeaves);
+  const [warning, setWarning] = useState(initialLeaves > 0 && initialLeaves <= limit);
 
-  const leavesRef = useRef(0);
+  const leavesRef = useRef(initialLeaves);
   const hiddenAt = useRef<number | null>(null);
   const exceeded = useRef(false);
   // The callback is a fresh closure on every parent render. Held in a ref so the

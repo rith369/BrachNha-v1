@@ -51,7 +51,8 @@ export function PastPaperResults({
    *  recorded before the rule existed — see hooks/use-leave-guard.ts. */
   leaves?: number;
   title: string;
-  onRetake: () => void;
+  /** Absent in the Simulation, where one paper cannot be sat again on its own. */
+  onRetake?: () => void;
   onBack: () => void;
 }) {
   const marked = scorePaper(content, answers);
@@ -164,12 +165,14 @@ export function PastPaperResults({
 
       {content.writing && <WritingReview writing={content.writing} />}
 
-      <button
-        onClick={onRetake}
-        className="mb-2.5 block w-full rounded-2xl bg-brand px-6 py-3 text-sm font-extrabold text-white shadow-cta"
-      >
-        ប្រឡងម្តងទៀត
-      </button>
+      {onRetake && (
+        <button
+          onClick={onRetake}
+          className="mb-2.5 block w-full rounded-2xl bg-brand px-6 py-3 text-sm font-extrabold text-white shadow-cta"
+        >
+          ប្រឡងម្តងទៀត
+        </button>
+      )}
       <button
         onClick={onBack}
         className="block w-full rounded-2xl border border-border bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"

@@ -71,6 +71,10 @@ type Step =
  * narrowed to a property path and checked where the closure is BUILT. See
  * competition-run.tsx for the fuller argument.
  *
+ * RESUMABLE WHEN THE SIMULATION ASKS. It passes the clock's real start and what
+ * was saved, so a paper can be left and come back to with its time still running.
+ * A paper on its own screen passes none of them and behaves as it always has.
+ *
  * Khmer chrome per EXAM_PAGE_LANG — only FocusLayout's shared exit confirm stays
  * lang-driven, since the lesson flow uses it too.
  */
@@ -79,24 +83,40 @@ export function PastPaperRunner({
   kicker,
   onExit,
   onSubmit,
+  startedAt: startedAtProp,
+  initialAnswers,
+  initialLeaves = 0,
+  initialIndex = 0,
+  exitCopy,
+  onProgress,
 }: {
   content: PastPaperContent;
   /** The paper's name, shown above every step. */
   kicker: string;
   onExit: () => void;
   onSubmit: (attempt: PaperAttempt) => void;
+  /** When the clock really started. Defaults to now. */
+  startedAt?: number;
+  initialAnswers?: PaperAnswers;
+  /** Absences already counted. Past the limit, the paper submits on arrival. */
+  initialLeaves?: number;
+  initialIndex?: number;
+  /** What the exit confirm says, where leaving does not discard the answers. */
+  exitCopy?: { title: string; body: string };
+  /** Told what to save, so a reload can come back to it. */
+  onProgress?: (progress: { answers: PaperAnswers; leaves: number; index: number }) => void;
 }) {
   const setFocusMode = useBrachNhaStore((s) => s.setFocusMode);
 
-  const [startedAt] = useState(() => Date.now());
+  const [startedAt] = useState(() => startedAtProp ?? Date.now());
   const [now, setNow] = useState(() => Date.now());
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(initialIndex);
   // This screen is where the scroll-to-top pattern started — its reading
   // passage is several screens tall. It now shares the hook with the other
   // multi-step focus screens rather than keeping its own copy.
   useFocusScrollTop(index);
-  const [answers, setAnswers] = useState<PaperAnswers>({});
-  const [submitted, setSubmitted] = useState(false);
+  const [answers, setAnswers] = useState<PaperAnswers>(initialAnswers ?? {});
+  const [submitted, setSubmitted] = useState(initialLeaves > MAX_EXAM_LEAVES);
   // Fires onSubmit exactly once: pressing ដាក់ស្នើ, the clock expiring and the
   // leave allowance running out can all land on the same render.
   const reported = useRef(false);
@@ -107,8 +127,15 @@ export function PastPaperRunner({
   // keeps whatever they had answered. See hooks/use-leave-guard.ts.
   const guard = useLeaveGuard({
     active: !submitted,
+    initialLeaves,
     onExceeded: () => setSubmitted(true),
   });
+
+  // An effect rather than in the setters: the leave count lives in the guard.
+  // Stops once reported, so nothing is saved back over the cleared draft.
+  useEffect(() => {
+    if (!reported.current) onProgress?.({ answers, leaves: guard.leaves, index });
+  }, [answers, guard.leaves, index, onProgress]);
 
   // Mount means focus on, unmount means focus off — copied from ExamRunner,
   // where the cleanup is the load-bearing half: a browser-back out of a running
@@ -184,6 +211,7 @@ export function PastPaperRunner({
       progressPct={((index + 1) / steps.length) * 100}
       onExit={onExit}
       confirmExit
+      exitCopy={exitCopy}
       meta={
         <span
           className={cn(

@@ -3,8 +3,15 @@ import {
   MAX_PAPER_RESULTS,
   MAX_QUIZ_RESULTS,
   MAX_REVIEW_HISTORY,
+  MAX_SIMULATIONS,
 } from "@/lib/store";
-import type { PaperResult, QuizResult, useBrachNhaStore } from "@/lib/store";
+import type {
+  PaperResult,
+  QuizResult,
+  SimulationAttempt,
+  SimulationSitting,
+  useBrachNhaStore,
+} from "@/lib/store";
 import {
   clearMarks,
   emptyMarks,
@@ -13,7 +20,7 @@ import {
   type SyncMarks,
 } from "@/lib/sync-marks";
 import type { PracticeCard } from "@/types";
-import type { InsertOf } from "@/types/database";
+import type { InsertOf, Json } from "@/types/database";
 import type { ReviewResult, ReviewState } from "@/utils/spaced-repetition";
 
 /**
@@ -55,6 +62,7 @@ export interface StudyProgress {
   reviewHistory: ReviewResult[];
   quizResults: QuizResult[];
   paperResults: PaperResult[];
+  simulations: SimulationAttempt[];
 }
 
 /** Rows per request. A first upload can be a thousand log entries; split so no
@@ -185,6 +193,55 @@ function validAttempt(r: {
 }
 
 const pct2 = (n: number) => Math.round(n * 100) / 100;
+const SESSIONS = new Set<string>([
+  "history",
+  "biology",
+  "chemistry",
+  "language",
+  "khmer",
+  "physics",
+  "math",
+]);
+
+/** The shape the Simulation's screens index into, checked both ways. */
+function validSitting(v: unknown): v is SimulationSitting {
+  if (typeof v !== "object" || v === null) return false;
+  const s = v as Partial<SimulationSitting>;
+  if (
+    !SESSIONS.has(s.sessionId as string) ||
+    typeof s.paperKey !== "string" ||
+    !/^20\d{2}-[a-z]+$/.test(s.paperKey) ||
+    !count(s.version) ||
+    (s.version as number) < 1 ||
+    (s.startedAt !== undefined && !instant(s.startedAt))
+  ) {
+    return false;
+  }
+  const r = s.result;
+  return (
+    r === undefined ||
+    (instant(r.finishedAt) &&
+      count(r.score) &&
+      count(r.total) &&
+      Number.isFinite(r.pct) &&
+      Number.isFinite(r.ms) &&
+      count(r.leaves) &&
+      isStringRecord(r.answers))
+  );
+}
+
+function validSimulation(a: SimulationAttempt): boolean {
+  return (
+    a.id.length >= 1 &&
+    a.id.length <= 100 &&
+    instant(a.startedAt) &&
+    instant(a.updatedAt) &&
+    (a.finishedAt === null || instant(a.finishedAt)) &&
+    a.sittings.length >= 1 &&
+    a.sittings.every(validSitting)
+  );
+}
+
 const quizMark = (r: QuizResult) => `${r.quizKey}|${r.date}`;
 const paperMark = (r: PaperResult) => `${r.paperKey}|${r.date}`;
 
@@ -221,6 +278,12 @@ export async function pushStudyProgress(userId: string, s: StoreState) {
       ),
     ];
     if (wiped.includes(false)) return;
+    // Outside the gate above on purpose: this table arrives in a later migration,
+    // and a project without it must not stop the other six from uploading. If it
+    // fails, the other device's attempts simply stay beside this device's.
+    await ok("simulation_attempts: replace", () =>
+      db.from("simulation_attempts").delete().eq("user_id", userId)
+    );
     marks = emptyMarks(userId);
     writeMarks(marks);
   }
@@ -231,6 +294,7 @@ export async function pushStudyProgress(userId: string, s: StoreState) {
   await pushLog(db, userId, s, marks);
   await pushQuizzes(db, userId, s, marks);
   await pushPapers(db, userId, s, marks);
+  await pushSimulations(db, userId, s, marks);
 
   writeMarks(marks);
 }
@@ -476,6 +540,46 @@ async function pushPapers(db: Db, userId: string, s: StoreState, marks: SyncMark
   marks.papers = [...sent].filter((k) => local.has(k));
 }
 
+async function pushSimulations(db: Db, userId: string, s: StoreState, marks: SyncMarks) {
+  const fresh = s.simulations.filter(
+    (a) => marks.simulations[a.id] !== a.updatedAt && validSimulation(a)
+  );
+  if (fresh.length) {
+    const rows: InsertOf<"simulation_attempts">[] = fresh.map((a) => ({
+      user_id: userId,
+      id: a.id,
+      started_at: a.startedAt,
+      updated_at: a.updatedAt,
+      finished_at: a.finishedAt,
+      test: a.test,
+      sittings: a.sittings as unknown as Json,
+    }));
+    if (
+      await allOk("simulation_attempts", rows, CHUNK, (part) =>
+        db.from("simulation_attempts").upsert(part, { onConflict: "user_id,id" })
+      )
+    ) {
+      const sent = { ...marks.simulations };
+      for (const a of fresh) sent[a.id] = a.updatedAt;
+      marks.simulations = sent;
+    }
+  }
+
+  // An attempt gone from the device was given up, or dropped off the cap.
+  const local = new Set(s.simulations.map((a) => a.id));
+  const gone = Object.keys(marks.simulations).filter((id) => !local.has(id));
+  if (
+    gone.length &&
+    (await allOk("simulation_attempts: delete", gone, ID_CHUNK, (part) =>
+      db.from("simulation_attempts").delete().eq("user_id", userId).in("id", part)
+    ))
+  ) {
+    const next = { ...marks.simulations };
+    for (const id of gone) delete next[id];
+    marks.simulations = next;
+  }
+}
+
 // ── pull ────────────────────────────────────────────────────────────────────
 
 /** Postgres answers `…+00:00`; the device writes `…Z`. One spelling, so the
@@ -514,6 +618,7 @@ export async function pullStudyProgress(userId: string): Promise<StudyProgress> 
     reviewHistory: [],
     quizResults: [],
     paperResults: [],
+    simulations: [],
   };
   const db = await getSupabase();
   if (!db) return empty;
@@ -546,12 +651,18 @@ export async function pullStudyProgress(userId: string): Promise<StudyProgress> 
       .eq("user_id", userId)
       .order("taken_at", { ascending: false })
       .limit(MAX_PAPER_RESULTS),
+    db
+      .from("simulation_attempts")
+      .select("*")
+      .eq("user_id", userId)
+      .order("started_at", { ascending: false })
+      .limit(MAX_SIMULATIONS),
     ]);
   } catch (err) {
     console.warn("[sync] pull study progress:", err);
     return empty;
   }
-  const [reviews, cards, starred, log, quizzes, papers] = results;
+  const [reviews, cards, starred, log, quizzes, papers, simulations] = results;
 
   for (const [label, res] of [
     ["card_reviews", reviews],
@@ -560,6 +671,7 @@ export async function pullStudyProgress(userId: string): Promise<StudyProgress> 
     ["card_review_log", log],
     ["quiz_results", quizzes],
     ["paper_results", papers],
+    ["simulation_attempts", simulations],
   ] as const) {
     if (res.error) console.warn(`[sync] pull ${label}: ${res.error.message}`);
   }
@@ -632,6 +744,23 @@ export async function pullStudyProgress(userId: string): Promise<StudyProgress> 
     }))
     .reverse();
 
+  // Oldest first, like the store. Same rule as above: a row out of shape stays
+  // out, since the screens index straight into it.
+  out.simulations = (simulations.data ?? [])
+    .filter(
+      (r) =>
+        Array.isArray(r.sittings) && r.sittings.length > 0 && r.sittings.every(validSitting)
+    )
+    .map((r) => ({
+      id: r.id,
+      startedAt: iso(r.started_at),
+      updatedAt: iso(r.updated_at),
+      finishedAt: r.finished_at ? iso(r.finished_at) : null,
+      test: r.test,
+      sittings: r.sittings as unknown as SimulationSitting[],
+    }))
+    .reverse();
+
   return out;
 }
 
@@ -656,5 +785,6 @@ export function markStudyProgressPulled(userId: string, p: StudyProgress) {
     ),
     quizzes: p.quizResults.map(quizMark),
     papers: p.paperResults.map(paperMark),
+    simulations: Object.fromEntries(p.simulations.map((a) => [a.id, a.updatedAt])),
   });
 }

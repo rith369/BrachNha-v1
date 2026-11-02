@@ -86,6 +86,8 @@ const TABLES = [
   "card_review_log",
   "quiz_results",
   "paper_results",
+  // The Simulation's attempts (20261103000002). Read-own, same answer.
+  "simulation_attempts",
 ];
 
 /**

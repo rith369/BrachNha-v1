@@ -10,10 +10,12 @@ import {
   Target,
 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
+import { useContentManifest } from "@/lib/content";
 import { allSubjects } from "@/features/lessons/subjects";
 import { SubjectArt } from "@/features/lessons/components/subject-art";
 import { BAC2_EXAM_DATE, daysUntilExam } from "@/utils/exam-date";
 import { KM_MONTHS } from "@/utils/khmer-dates";
+import { activeSimulation, planSimulation } from "../simulation";
 
 /**
  * `/exam` — the landing screen: pick HOW to sit an exam before picking WHAT.
@@ -60,6 +62,17 @@ const PRESS =
 export function ExamHub() {
   const userLanguage = useBrachNhaStore((s) => s.userLanguage);
   const examResults = useBrachNhaStore((s) => s.examResults);
+  const simulations = useBrachNhaStore((s) => s.simulations);
+  const manifest = useContentManifest();
+
+  // Still a link while papers are missing: the briefing's timetable is worth
+  // reading, and it says the same thing. The manifest loading says nothing yet.
+  const simulationLabel = activeSimulation(simulations)
+    ? "បន្តប្រឡង"
+    : manifest.status === "ready" &&
+        planSimulation(userLanguage, manifest, []).missing.length > 0
+      ? "ឆាប់ៗនេះ"
+      : "ព័ត៌មានលម្អិត";
 
   const subjects = allSubjects(userLanguage);
   const days = daysUntilExam();
@@ -220,7 +233,7 @@ export function ExamHub() {
               </div>
 
               <span className="flex shrink-0 items-center gap-1 rounded-full bg-[var(--brand-yellow)] px-3 py-1.5 text-xs font-extrabold text-[#1e1b4b] md:text-sm">
-                ព័ត៌មានលម្អិត
+                {simulationLabel}
                 <ArrowRight className="size-3.5 shrink-0" strokeWidth={3} />
               </span>
             </div>

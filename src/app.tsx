@@ -32,6 +32,8 @@ const routeModules = {
   gameReview: () => import("@/pages/game-review"),
   exam: () => import("@/pages/exam"),
   examSimulation: () => import("@/pages/exam-simulation"),
+  examSimulationSit: () => import("@/pages/exam-simulation-sit"),
+  examSimulationResult: () => import("@/pages/exam-simulation-result"),
   examSubjects: () => import("@/pages/exam-subjects"),
   examPaper: () => import("@/pages/exam-paper"),
   gradePrediction: () => import("@/pages/grade-prediction"),
@@ -59,6 +61,8 @@ const GamePlayPage = lazy(routeModules.gamePlay);
 const GameReviewPage = lazy(routeModules.gameReview);
 const ExamPage = lazy(routeModules.exam);
 const ExamSimulationPage = lazy(routeModules.examSimulation);
+const ExamSimulationSitPage = lazy(routeModules.examSimulationSit);
+const ExamSimulationResultPage = lazy(routeModules.examSimulationResult);
 const ExamSubjectsPage = lazy(routeModules.examSubjects);
 const ExamPaperPage = lazy(routeModules.examPaper);
 const GradePredictionPage = lazy(routeModules.gradePrediction);
@@ -244,6 +248,12 @@ export default function App() {
           <Route path="exam" element={<ExamPage />} />
           {/* 2-Day Bac II Simulation overview page */}
           <Route path="exam/simulation" element={<ExamSimulationPage />} />
+          {/* The attempt being sat, and a finished one's result. */}
+          <Route path="exam/simulation/sit" element={<ExamSimulationSitPage />} />
+          <Route
+            path="exam/simulation/result/:attemptId"
+            element={<ExamSimulationResultPage />}
+          />
           {/* The two-tab past/generated screen, one level under the chooser at
               /exam so the back button steps between them. */}
           <Route path="exam/subjects" element={<ExamSubjectsPage />} />
