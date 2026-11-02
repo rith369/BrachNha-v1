@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { ChevronLeft, ChevronRight, FlaskConical, Info, ShieldAlert } from "lucide-react";
+import { ChevronLeft, ChevronRight, FlaskConical, Hourglass, Info, ShieldAlert } from "lucide-react";
 import { retryBody, useContentBody } from "@/lib/content";
 import type { SimulationAttempt, SimulationSitting } from "@/lib/store";
 import { ContentNotice } from "@/features/practice/components/content-waiting";
@@ -53,6 +53,15 @@ export function SimulationResult({ attempt }: { attempt: SimulationAttempt }) {
               </div>
             )}
 
+            {outcome.missed > 0 && (
+              <div className="mt-3 flex items-start gap-2 rounded-2xl border border-border bg-pink/8 p-3 text-xs font-bold text-text">
+                <Hourglass className="mt-0.5 size-4 shrink-0 text-pink" strokeWidth={2.5} />
+                <span>
+                  អស់ពេល 2 ថ្ងៃ មុនពេលធ្វើគ្រប់វិញ្ញាសា។ វិញ្ញាសា {outcome.missed} ដែលមិនបានធ្វើ បាន 0 ពិន្ទុ។
+                </span>
+              </div>
+            )}
+
             <div
               className={cn(
                 "mt-3 rounded-2xl border border-border p-5 text-center text-ink shadow-panel",
@@ -83,7 +92,24 @@ export function SimulationResult({ attempt }: { attempt: SimulationAttempt }) {
                   <div key={day}>
                     <div className="mb-2 text-xs font-extrabold text-muted">ថ្ងៃទី {day}</div>
                     <div className="flex flex-col gap-2">
-                      {rows.map((row) => (
+                      {rows.map((row) =>
+                        row.missed ? (
+                          // Not a button: there are no answers to review.
+                          <div
+                            key={row.session.id}
+                            className="flex w-full items-center gap-2.5 rounded-xl border border-border bg-bg p-3"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate text-sm font-extrabold text-text">
+                                {row.subjectName}
+                              </div>
+                              <div className="text-xs font-bold text-muted">មិនបានធ្វើ</div>
+                            </div>
+                            <span className="font-heading shrink-0 text-sm font-extrabold text-text">
+                              0/{row.session.points}
+                            </span>
+                          </div>
+                        ) : (
                         <button
                           key={row.session.id}
                           type="button"
@@ -111,7 +137,8 @@ export function SimulationResult({ attempt }: { attempt: SimulationAttempt }) {
                           </span>
                           <ChevronRight className="size-4 shrink-0 text-muted" strokeWidth={2.5} />
                         </button>
-                      ))}
+                        )
+                      )}
                     </div>
                   </div>
                 );

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Link } from "react-router";
 import {
   ArrowRight,
@@ -64,6 +64,11 @@ export function ExamHub() {
   const examResults = useBrachNhaStore((s) => s.examResults);
   const simulations = useBrachNhaStore((s) => s.simulations);
   const manifest = useContentManifest();
+
+  // An attempt whose 2 days ran out while the app was closed must not offer Continue.
+  useEffect(() => {
+    useBrachNhaStore.getState().expireOverdueSimulations();
+  }, []);
 
   // Still a link while papers are missing: the briefing's timetable is worth
   // reading, and it says the same thing. The manifest loading says nothing yet.

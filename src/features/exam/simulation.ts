@@ -139,6 +139,8 @@ export interface SimulationRow {
   pct: number;
   /** The paper ended because the student left the screen too many times. */
   endedEarly: boolean;
+  /** Never sat, because the 2 days ran out. Scores 0, with nothing to review. */
+  missed: boolean;
 }
 
 export interface SimulationOutcome {
@@ -147,6 +149,8 @@ export interface SimulationOutcome {
   base: number;
   pct: number;
   band: (typeof SIMULATION_GRADES)[number];
+  /** Papers the 2 days ran out on. */
+  missed: number;
 }
 
 const oneDecimal = (n: number) => Math.round(n * 10) / 10;
@@ -157,21 +161,24 @@ const oneDecimal = (n: number) => Math.round(n * 10) / 10;
  * THE MARKS ARE AN ESTIMATE, and the result screen says so. The app marks tapped
  * answers, so a subject's marks are its share of questions correct, scaled to what
  * the real exam marks it out of, not marks a teacher gave. An admin's test run has
- * subjects missing, so it scales up from the ones it has.
+ * subjects missing, so it scales up from the ones it has. A paper the 2 days ran
+ * out on is different: the student had it and did not sit it, so it counts as 0.
  */
 export function simulationOutcome(attempt: SimulationAttempt): SimulationOutcome {
   const rows: SimulationRow[] = [];
   for (const sitting of attempt.sittings) {
     const { result } = sitting;
-    if (!result) continue;
     const session = SIMULATION_SESSION_BY_ID[sitting.sessionId];
     rows.push({
       sitting,
       session,
       subjectName: parsePaperKey(sitting.paperKey)?.subject.name ?? sitting.paperKey,
-      earned: oneDecimal(result.total === 0 ? 0 : (result.score / result.total) * session.points),
-      pct: result.pct,
-      endedEarly: result.leaves > MAX_EXAM_LEAVES,
+      earned: oneDecimal(
+        !result || result.total === 0 ? 0 : (result.score / result.total) * session.points
+      ),
+      pct: result?.pct ?? 0,
+      endedEarly: !!result && result.leaves > MAX_EXAM_LEAVES,
+      missed: !result,
     });
   }
 
@@ -185,5 +192,6 @@ export function simulationOutcome(attempt: SimulationAttempt): SimulationOutcome
     base,
     pct: Math.round((base / SIMULATION_BASE_POINTS) * 100),
     band: simulationGrade(base),
+    missed: rows.filter((row) => row.missed).length,
   };
 }

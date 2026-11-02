@@ -15,6 +15,7 @@ import {
 } from "@/lib/store";
 import { ContentNotice } from "@/features/practice/components/content-waiting";
 import { cn } from "@/utils/cn";
+import { SIMULATION_WINDOW_HOURS, simulationWindowEnd } from "@/utils/simulation-window";
 import { clockLabel, scorePaper, type PaperAnswers } from "../paper-scoring";
 import { paperTitle, parsePaperKey, toPastPaperContent } from "../papers";
 import { recordPaperAttempt } from "../record-paper-attempt";
@@ -54,8 +55,10 @@ function sittingTitle(sitting: SimulationSitting): string {
  * The same accepted cost as hooks/use-leave-guard.ts: a crash counts too. The
  * answers are kept (lib/simulation-draft.ts), so it never costs them their work.
  *
- * DAY 2 OPENS WHEN DAY 1 IS DONE, on any date (the user's call: many students will
- * not have two free days in a row).
+ * ANY HOURS, BUT ALL WITHIN 2 DAYS (the user's rule). The days are labels and an
+ * order, not dates: a student may sit all seven in one day. The limit runs from
+ * the first paper's start (utils/simulation-window.ts). A paper running when it
+ * ends keeps its own timer, then the attempt ends and what was not sat scores 0.
  *
  * NO SCORES UNTIL THE END, as in the real exam. The result screen has them.
  *
@@ -192,7 +195,7 @@ export function SimulationSit({
         </h1>
         {firstOfDay2 && (
           <p className="mt-1 text-sm font-bold text-muted">
-            ថ្ងៃទី 1 ចប់ហើយ។ ចាប់ផ្តើមថ្ងៃទី 2 ពេលណាដែលអ្នករួចរាល់។
+            ថ្ងៃទី 1 ចប់ហើយ។ ចាប់ផ្តើមថ្ងៃទី 2 ពេលណាក៏បាន ក្នុងពេលដែលនៅសល់។
           </p>
         )}
 
@@ -202,6 +205,8 @@ export function SimulationSit({
             <span>ការសាកល្បងសម្រាប់ក្រុមការងារ។ មិនទាន់មានវិញ្ញាសាគ្រប់មុខវិជ្ជាទេ។</span>
           </div>
         )}
+
+        <WindowCard attempt={attempt} />
 
         <div className="mt-4">
           {current.startedAt ? (
@@ -221,6 +226,8 @@ export function SimulationSit({
               title={sittingTitle(current)}
               session={session}
               ready={content !== null}
+              firstOfAll={simulationWindowEnd(attempt) === null}
+              paperCount={attempt.sittings.length}
               onStart={start}
             />
           )}
@@ -241,16 +248,55 @@ export function SimulationSit({
   );
 }
 
+/**
+ * How long is left of the 2 days, once they have started. It is also what ends
+ * the attempt when they run out: on the tick, or on arriving after they already
+ * have. The store decides, so a paper still running is left alone.
+ */
+function WindowCard({ attempt }: { attempt: SimulationAttempt }) {
+  const end = simulationWindowEnd(attempt);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const over = end !== null && now >= end;
+  // updatedAt too: handing in the paper that was running is what lets it end.
+  useEffect(() => {
+    if (over) useBrachNhaStore.getState().expireOverdueSimulations();
+  }, [over, attempt.updatedAt]);
+
+  if (end === null) return null;
+
+  const minutes = Math.ceil(Math.max(0, end - now) / 60_000);
+  return (
+    <div className="mt-3 flex items-start gap-2 rounded-2xl border border-border bg-surface p-3 text-xs font-bold text-text shadow-panel-sm">
+      <Hourglass className="mt-0.5 size-4 shrink-0 text-purple" strokeWidth={2.5} />
+      <span>
+        {over
+          ? "អស់ពេល 2 ថ្ងៃហើយ។ ដាក់ស្នើវិញ្ញាសានេះ ដើម្បីមើលលទ្ធផល។"
+          : `នៅសល់ ${Math.floor(minutes / 60)} ម៉ោង ${minutes % 60} នាទី ដើម្បីធ្វើគ្រប់វិញ្ញាសា។`}
+      </span>
+    </div>
+  );
+}
+
 /** The next paper, with the rule to agree to before its clock starts. */
 function StartCard({
   title,
   session,
   ready,
+  firstOfAll,
+  paperCount,
   onStart,
 }: {
   title: string;
   session: SimulationSession;
   ready: boolean;
+  /** No paper started yet, so this tap also starts the 2 days. */
+  firstOfAll: boolean;
+  paperCount: number;
   onStart: () => void;
 }) {
   const [agreed, setAgreed] = useState(false);
@@ -269,6 +315,16 @@ function StartCard({
           នឹងធ្វើឱ្យវិញ្ញាសានេះបញ្ចប់ភ្លាមៗ។
         </span>
       </div>
+
+      {firstOfAll && (
+        <div className="mt-2 flex items-start gap-2 rounded-xl border border-border bg-neo-yellow p-3 text-xs font-bold text-ink">
+          <Hourglass className="mt-0.5 size-4 shrink-0" strokeWidth={2.5} />
+          <span>
+            នៅពេលចាប់ផ្តើមវិញ្ញាសានេះ អ្នកមានពេល {SIMULATION_WINDOW_HOURS} ម៉ោង
+            ដើម្បីធ្វើទាំង {paperCount} វិញ្ញាសា នៅម៉ោងណាក៏បាន។ វិញ្ញាសាដែលមិនបានធ្វើទាន់ពេលនឹងបាន 0 ពិន្ទុ។
+          </span>
+        </div>
+      )}
 
       <label className="mt-3 flex cursor-pointer items-center gap-2.5">
         <input

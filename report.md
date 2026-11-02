@@ -49,6 +49,24 @@ sections. So the old name promised more than it asked. How it counts has not cha
 **What to re-test.** Read the row on Home and on the Roadmap, in both languages and on a small
 phone, and check it still sits neatly on its line.
 
+## 3 Nov 2026: The Simulation Must Be Finished Within 2 Days
+
+Commit: `HASH_HERE`. No database step.
+
+Students can sit the papers at any hours they like, but must finish them all within 48 hours
+of starting their first paper. Before this there was no limit, so an attempt could drag on
+for weeks.
+
+- **The 48 hours start with the first paper**, not when the screen opens. A countdown shows
+  how long is left.
+- **All seven in one day is allowed.** Day 1 and Day 2 are now just the order of the papers.
+- **If time runs out, the papers not sat score 0.** The student still gets a grade and can
+  review what they did sit.
+- **A paper running when the 48 hours end keeps its own timer**, so nobody is cut off mid-paper.
+
+**To re-test:** this needs a test run left for 2 days, or ask for the clock to be faked. The
+countdown can be checked straight away after starting a first paper.
+
 ## 3 Nov 2026: The 2-Day Bac II Simulation Works, Waiting for Its Papers
 
 Commit: `dd6c44e`. **Database step: run `20261103000002_simulation_attempts.sql` in the

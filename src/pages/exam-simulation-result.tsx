@@ -13,7 +13,9 @@ export default function ExamSimulationResultPage() {
   const attempt = useBrachNhaStore((s) => s.simulations.find((a) => a.id === attemptId));
 
   if (!attempt) return <Navigate to="/exam/simulation" replace />;
-  if (currentSitting(attempt)) return <Navigate to="/exam/simulation/sit" replace />;
+  if (attempt.finishedAt === null && currentSitting(attempt)) {
+    return <Navigate to="/exam/simulation/sit" replace />;
+  }
 
   return (
     <div className="flex h-full flex-col">

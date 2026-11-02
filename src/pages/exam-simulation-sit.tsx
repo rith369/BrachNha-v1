@@ -21,7 +21,8 @@ export default function ExamSimulationSitPage() {
 
   if (!attempt) return <Navigate to="/exam/simulation" replace />;
   const current = currentSitting(attempt);
-  if (!current) return <Navigate to={`/exam/simulation/result/${attempt.id}`} replace />;
+  // The second half is the 2 days running out with papers still unsat.
+  if (!current || attempt.finishedAt !== null) return <Navigate to={`/exam/simulation/result/${attempt.id}`} replace />;
 
   return (
     <div className="flex h-full flex-col">

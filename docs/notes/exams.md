@@ -626,3 +626,33 @@ XP paid once, the result and a real maths review, an admin's test run, restoring
 phone, giving up deleting the row, the table missing, and a paper on its own screen
 unchanged. **Not verified: real phones, two real accounts, the sync against the real
 database, or a run with seven real papers.**
+
+### The Simulation must be finished within 2 days (3 Nov 2026, later the same day)
+
+**This replaces "Day 2 opens on any date" above, which had no limit at all.** The user's
+rule: a student sits at any hours, but all the papers within 2 days. Day 1 and Day 2 are now
+labels and an order, not dates, so all seven may be sat in one day.
+
+- **`utils/simulation-window.ts`** holds it, in `utils/` because the store enforces it too.
+  48 hours from the **first paper's start**, derived from the sittings, so no new column or
+  migration. Pressing Enter starts nothing.
+- **A paper running when the 2 days end keeps its own timer.** The attempt ends once it is
+  handed in (`simulationOverdue` is false while one is running).
+- **Papers not sat keep no result and score 0**, and count against the grade. This is unlike
+  an admin's test run, where a paper with no content is simply left out. They show as "not
+  sat", with no review, and the result says how many.
+- **`startSimulationSitting` refuses a new paper after the 2 days**, so the rule does not rest
+  on the screen. **`expireOverdueSimulations`** ends the attempt, stamped with when the 2 days
+  ended rather than when the app was next opened. It runs on the sitting screen's tick and
+  when `/exam` or the briefing opens, so an attempt that ran out while the app was closed
+  does not offer Continue.
+- **`finishedAt !== null` is what makes an attempt finished now**, not "every sitting has a
+  result": both route pages check it.
+- **Device clock:** the limit trusts the phone's clock, like every timer here.
+
+**Verified:** 73 logic checks, including each edge of the 48 hours. 203 browser checks at 390
+light, 320 dark and 1280: the rule before the first paper, the countdown after it, Day 2 open
+the same day, arriving late (grade counting the zeros, no XP, only sat papers opening), a
+running paper not cut off and ending the attempt when handed in, both timers out while away
+(saved answers counted once), and the chooser and briefing noticing. **Not verified on a real
+phone.**

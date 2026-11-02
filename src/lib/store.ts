@@ -33,6 +33,7 @@ import { dailyTargets } from "@/utils/roadmap";
 import { addDaysKey, parseDayKey, todayKey } from "@/utils/day";
 import { allMissionsDone, currentStreak, missionsDone, sectionsCountedToday } from "@/utils/streak";
 import { levelForXp } from "@/utils/level";
+import { simulationOverdue, simulationWindowEnd } from "@/utils/simulation-window";
 
 export type {
   Lang,
@@ -631,7 +632,8 @@ interface BrachNhaState {
   addQuizResult: (result: Omit<QuizResult, "date">) => void;
   /** Begins an attempt, unless one is already unfinished. Mints the id and times. */
   startSimulation: (sittings: SimulationSitting[], test: boolean) => void;
-  /** Starts a paper's clock. Only the next paper, and only once. */
+  /** Starts a paper's clock. Only the next paper, only once, and only inside the
+   *  2 days (utils/simulation-window.ts). */
   startSimulationSitting: (attemptId: string, sessionId: SimulationSessionId) => void;
   /** Records a paper once. The last one finishes the attempt. */
   finishSimulationSitting: (
@@ -639,6 +641,9 @@ interface BrachNhaState {
     sessionId: SimulationSessionId,
     result: Omit<SimulationSittingResult, "finishedAt">
   ) => void;
+  /** Ends any attempt whose 2 days are over, with no paper still running. Papers
+   *  not sat keep no result, and score 0. Safe to call at any time. */
+  expireOverdueSimulations: () => void;
   /** Removes an unfinished attempt. A finished one cannot be given up. */
   abandonSimulation: (attemptId: string) => void;
   /**
@@ -1321,6 +1326,8 @@ export const useBrachNhaStore = create<BrachNhaState>()(
             if (a.id !== attemptId) return a;
             const next = a.sittings.find((s) => !s.result);
             if (next?.sessionId !== sessionId || next.startedAt) return a;
+            const end = simulationWindowEnd(a);
+            if (end !== null && Date.now() >= end) return a;
             changed = true;
             return {
               ...a,
@@ -1353,6 +1360,26 @@ export const useBrachNhaStore = create<BrachNhaState>()(
             };
           });
           return changed ? { simulations } : state;
+        }),
+
+      expireOverdueSimulations: () =>
+        set((state) => {
+          const now = Date.now();
+          if (!state.simulations.some((a) => a.finishedAt === null && simulationOverdue(a, now))) {
+            return state;
+          }
+          return {
+            simulations: state.simulations.map((a) =>
+              a.finishedAt === null && simulationOverdue(a, now)
+                ? {
+                    ...a,
+                    updatedAt: new Date(now).toISOString(),
+                    // When the 2 days ended, not when the app was next opened.
+                    finishedAt: new Date(simulationWindowEnd(a) ?? now).toISOString(),
+                  }
+                : a
+            ),
+          };
         }),
 
       abandonSimulation: (attemptId) =>

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router";
 import {
   ArrowRight,
@@ -31,6 +31,7 @@ import { useAdminStatus } from "@/lib/admin-status";
 import { useContentManifest } from "@/lib/content";
 import { useBrachNhaStore, type SimulationSessionId } from "@/lib/store";
 import { formatKmDate } from "@/utils/khmer-dates";
+import { SIMULATION_WINDOW_HOURS } from "@/utils/simulation-window";
 import {
   SIMULATION_GRADES,
   SIMULATION_SESSION_BY_ID,
@@ -185,9 +186,8 @@ const RULES = [
   },
   {
     icon: ShieldAlert,
-    title: "Exam Conditions",
-    description:
-      "Follow the simulated examination schedule and complete each session within the given time.",
+    title: "2 Days to Finish",
+    description: `Sit at any hours, but finish within ${SIMULATION_WINDOW_HOURS} hours of starting your first paper. Papers not sat by then score 0.`,
     fill: "bg-neo-mint",
   },
 ];
@@ -203,6 +203,11 @@ export function ExamSimulationView() {
   const { isAdmin } = useAdminStatus();
   const simulations = useBrachNhaStore((s) => s.simulations);
   const userLanguage = useBrachNhaStore((s) => s.userLanguage);
+
+  // An attempt whose 2 days ran out while the app was closed goes to its result.
+  useEffect(() => {
+    useBrachNhaStore.getState().expireOverdueSimulations();
+  }, []);
 
   const active = activeSimulation(simulations);
   const plan = planSimulation(userLanguage, manifest, simulations);
@@ -679,6 +684,7 @@ export function ExamSimulationView() {
               <div className="space-y-2 pt-1">
                 <ChecklistItem>Prepare scrap paper, blue/black pen, and a quiet room</ChecklistItem>
                 <ChecklistItem>Timer continues running if you leave the browser</ChecklistItem>
+                <ChecklistItem>{`Any hours, but finish within ${SIMULATION_WINDOW_HOURS} hours of your first paper`}</ChecklistItem>
                 <ChecklistItem>Full worked solutions provided after submission</ChecklistItem>
               </div>
             </div>
