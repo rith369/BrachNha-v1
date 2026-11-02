@@ -117,10 +117,6 @@ export const GAME_COPY = {
     inviteShort: "Invite",
     inviteBlurb: "Play this competition against me!",
     qrHint: "Let your friend scan this, or send them the link.",
-    copyLink: "Copy link",
-    copied: "Copied!",
-    copyFailed: "Could not copy. Select the link above instead.",
-    shareLink: "Share",
     // ── The review: what each side answered, and the working they showed ──
     //
     // THE QUESTIONS AND OPTIONS ARE STILL NEVER TRANSLATED. These are the labels
@@ -240,10 +236,6 @@ export const GAME_COPY = {
     inviteShort: "អញ្ជើញ",
     inviteBlurb: "មកប្រកួតនឹងខ្ញុំក្នុងការប្រកួតនេះ!",
     qrHint: "ឱ្យមិត្តភក្តិស្កេនកូដនេះ ឬផ្ញើតំណទៅគេ។",
-    copyLink: "ចម្លងតំណ",
-    copied: "បានចម្លង!",
-    copyFailed: "មិនអាចចម្លងបានទេ។ សូមជ្រើសរើសតំណខាងលើជំនួសវិញ។",
-    shareLink: "ចែករំលែក",
     reviewTitle: "ចម្លើយ 📝",
     seeAnswers: "មើលចម្លើយ",
     questionLabel: "សំណួរទី",

@@ -541,3 +541,25 @@ Run it in the SQL editor, in one go, AFTER `20261001000001` and
 ```
 POST {VITE_SUPABASE_URL}/rest/v1/rpc/admin_client_errors
 ```
+
+## `20261102000001`: the friend invite link
+
+Adds one read-only function, `friend_invite`, behind the page a friend's invite
+link or QR code opens. It says whose link it is. Nothing else changes: adding them
+still goes through the existing request, and they still have to accept.
+
+Run it in the SQL editor, in one go, AFTER `20261013000001` and BEFORE the app
+that uses it ships, or every invite link says it could not open. It is safe to run
+twice. It adds no table, so `npm run db:check` cannot see it. Check it with only the
+publishable key:
+
+```
+POST {VITE_SUPABASE_URL}/rest/v1/rpc/friend_invite
+```
+
+`PGRST202` means it is missing; `42501` means it is there, and signed-in only.
+
+**One dashboard check:** Authentication → URL Configuration → Redirect URLs must
+allow `/friend/...` on the production address (a wildcard such as
+`https://your-site.vercel.app/**` covers it). If it does not, a student who signs in
+from an invite link lands on the home page and has to open the link again.

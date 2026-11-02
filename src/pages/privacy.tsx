@@ -36,7 +36,8 @@ import { Wordmark } from "@/components/shell/wordmark";
  *   error logs / events → lib/telemetry.ts (+ the 20261001000001 migration)
  *   battle photos       → lib/competition-photos.ts, lib/photo-reports.ts
  *   leaderboard name    → the leaderboard() function, 20260916000004
- *   friends             → search_students() / my_friends() in 20261013000001
+ *   friends             → search_students() / my_friends() in 20261013000001,
+ *                         friend_invite() in 20261102000001
  *   account deletion    → lib/account-deletion.ts (+ 20261001000002)
  *   what admins see     → admin_students() in 20261002000001
  *   pausing KruAI       → admin_set_kruai_block() in 20261002000004
@@ -204,7 +205,8 @@ export default function PrivacyPage() {
             numbers (XP, streak, study time) appear on the Leaderboard; in a
             Game battle the other student sees your score and any photos of
             your working you add; and in Streak with Friends, any signed-in
-            student can find you by your display name, and a friend you have
+            student can find you by your display name or by opening your invite
+            link, and a friend you have
             accepted sees which days you finished your daily goal since you
             became friends. You can report a photo that should not be there,
             and we review every report. You can remove a friend at any time.
@@ -217,7 +219,7 @@ export default function PrivacyPage() {
             ឈ្មោះ និងលេខសិក្សា (XP, Streak, ពេលរៀន) របស់អ្នកបង្ហាញលើតារាងចំណាត់ថ្នាក់
             ហើយក្នុងការប្រកួត សិស្សម្នាក់ទៀតឃើញពិន្ទុ
             និងរូបថតការគណនាដែលអ្នកបន្ថែម។ ក្នុង Streak ជាមួយមិត្តភក្តិ
-            សិស្សដែលចូលគណនីអាចស្វែងរកអ្នកតាមឈ្មោះបាន
+            សិស្សដែលចូលគណនីអាចស្វែងរកអ្នកតាមឈ្មោះ ឬបើកតំណអញ្ជើញរបស់អ្នកបាន
             ហើយមិត្តដែលអ្នកបានទទួលយក ឃើញថ្ងៃដែលអ្នកបានបញ្ចប់គោលដៅប្រចាំថ្ងៃ
             ចាប់តាំងពីថ្ងៃដែលអ្នកក្លាយជាមិត្តនឹងគ្នា។ អ្នកអាចរាយការណ៍រូបថតដែលមិនសមរម្យ
             ហើយយើងពិនិត្យរាល់របាយការណ៍។ អ្នកអាចដកមិត្តចេញបានគ្រប់ពេល។

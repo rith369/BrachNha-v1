@@ -6128,7 +6128,8 @@ streaks, and "beat your friends" is what `/leaderboard` is for.
 **The user's decisions (13 Oct 2026):**
 - **Many friends, one streak each**, capped at 20.
 - **Found by searching their NAME**, then the other student must Accept. (An
-  invite link + QR was offered as the safer option and declined.)
+  invite link + QR was declined that day and added beside search on 2 Nov 2026,
+  at the user's request. See "Invite link and QR code" below.)
 - **No Remind button.** The app sends no notifications; it was removed rather
   than faked.
 - **A new pair starts at 0** on the day they became friends. Earlier days both
@@ -6227,6 +6228,65 @@ The friend page keeps the prototype's design, fed real values:
 moved to `features/streak/types.ts`), the page's `PreviewTag`, the Remind and
 Simulate buttons and their strings, and `sharedStreakToday()` (the count is
 derived from both logs now, not "store streak + 1").
+
+#### Invite link and QR code (2 Nov 2026)
+
+Search fails when a name is spelled differently from how it is stored (most Google
+names are Latin, and typing សុខ does not find "Sok"), and two students with one name
+look the same in the results. So **Add a friend** now also has **Invite with a link
+or QR code**, and the link is `/friend/{account id}`.
+
+- **`/friend/:userId`** (`pages/friend-invite.tsx`, `friend-invite-view.tsx`) shows
+  the owner's name and avatar and an Add button (Accept if they already asked you).
+  Its other states are: request sent, already friends, your own link, no such student.
+- **IT NEVER SENDS ANYTHING BY ITSELF.** Otherwise anyone could send you a link that
+  makes you ask them, then accept themselves into your goal days. **Accepting stays
+  too**, so a link forwarded to a stranger gives them nothing: two taps, one each.
+- **The name comes from the database** (`friend_invite(p_user)`,
+  `20261102000001_friend_invite.sql`), never from the link, so a link cannot claim to
+  be somebody else. It returns a display name and a relation, the pair
+  `search_students()` already hands out, and nothing for an account search could not
+  find. Unlike search, the CALLER needs no name yet: a new student can land here
+  before theirs has reached the server. `send_friend_request()` still requires one.
+- **The link is short on purpose**: a shorter link draws bigger squares. At the
+  production address it is 45x45 modules, 6.4px each at the 288px a 320px phone draws.
+  It is not secret and cannot be revoked; an account id is not a credential.
+- **A new student keeps the link through sign-in.** Google returns to the same path
+  (`signInWithGoogle` keeps the pathname), the gate shows the signup form and the
+  survey in place, and `survey-view.tsx` skips its `navigate("/roadmap")` on
+  `isFriendInvitePath()`. **That return needs the Supabase Redirect URLs list to
+  allow `/friend/*`**, the same as every other deep link; a probe cannot tell, because
+  `/auth/v1/authorize` echoes a disallowed address too. A Telegram webview gets Open in
+  Browser, and `externalUrl()` keeps the path.
+- **`useWatchFriends()` re-reads the list every 5s while the code is on screen**, for
+  10 minutes at most and only while the app is in front, because the friend is
+  standing beside you and nothing else tells this phone a request arrived. A new
+  request's card then scrolls into view, since it draws above the code.
+- **With no friends the "Your friends" card is not drawn**, so the page opens on Add a
+  friend, with the empty line under the search box. Only the card comes and goes:
+  `AddFriend` keeps its slot in the tree, so typed text survives the list arriving.
+- **The panel moved**: `components/invite-link-panel.tsx` and
+  `components/invite-qr.tsx` (the lazy boundary, chunk still `invite-qr-*.js`), lifted
+  when this became a second caller. `features/game/components/invite-panel.tsx` is now
+  a thin wrapper, so the Game's two call sites did not change.
+- **Not in `routeModules`**: the page is only ever arrived at from outside.
+- The privacy page and the `whoSees` line both say a signed-in student can open your
+  invite link.
+
+**Verified:** PGlite 0.2.17, the migration twice after `20261013000001`: 20 checks (the
+name trimmed, two columns only, self, ghost/anonymous/nameless give no row, no session
+and an anonymous caller refused, `anon` has no execute, a nameless caller may look but
+not send, a lookup writes nothing, sent/received/third party, accept through send,
+friends both ways, the `exists` hint). Browser, the database faked through Playwright
+`route`, against the dev server: 50 checks at 390, 320 dark Khmer and 1280 (the
+empty layout, the QR chunk fetched only on the tap, the code's label and the copied
+link, a request arriving under the open code and scrolled into view, typed text kept,
+watching stops on close, every state of the page, opening sends nothing, a cut-short
+link asks nothing, refusals, a guest on the same address with no lookup, a Telegram UA
+offered Open in Browser with the link kept, a new student walking the real survey and
+staying on the link, the Game's panel unchanged, no sideways scroll, no page error).
+The code generated at the production address decoded back exactly with `jsqr`.
+**Not verified: two real phones and a real camera scan**, which need the deployed site.
 
 **Known limits:** two devices of the friend that have not synced make their day
 appear late (it still counts once it arrives, so a past "missed" cell can turn
@@ -9169,6 +9229,12 @@ deploys: the app sends both columns on every card, so until it lands the
 cannot see a column; check with a publishable-key
 `GET /rest/v1/card_reviews?select=stability&limit=0`, which answers `200` once it
 exists and `400` before.
+
+**`20261102000001_friend_invite.sql`** (the friend invite link) must be applied AFTER
+`20261013000001` and BEFORE the code ships: without it every invite link says it could
+not open. It adds no table, so `db:check` cannot see it. A publishable-key-only call to
+`/rest/v1/rpc/friend_invite` answers `PGRST202` while it is missing and `42501` once it
+exists.
 
 **`20261013000001_friends.sql`** (Streak with Friends) is APPLIED to the live project
 (13 Oct 2026, checked: `db:check` passes, and all five functions plus the helpers refuse

@@ -1202,6 +1202,14 @@ export type Database = {
           relation: "none" | "sent" | "received" | "friends";
         }[];
       };
+      // 20261102000001_friend_invite.sql. Who an invite link belongs to.
+      friend_invite: {
+        Args: { p_user: string };
+        Returns: {
+          display_name: string;
+          relation: "self" | "none" | "sent" | "received" | "friends";
+        }[];
+      };
       send_friend_request: {
         Args: { p_user: string };
         Returns: "sent" | "accepted";

@@ -73,6 +73,7 @@ const PrivacyPage = lazy(routeModules.privacy);
 // The admin pages are NOT in routeModules on purpose: that map is also the
 // idle-prefetch list, and the team's screens have no business downloading on
 // every student's phone.
+const FriendInvitePage = lazy(() => import("@/pages/friend-invite"));
 const AdminPage = lazy(() => import("@/pages/admin"));
 const AdminStudentsPage = lazy(() => import("@/pages/admin-students"));
 const AdminKruaiPage = lazy(() => import("@/pages/admin-kruai"));
@@ -281,6 +282,7 @@ export default function App() {
           <Route path="streak" element={<StreakPage />} />
           <Route path="streak/friends" element={<StreakFriendsPage />} />
           <Route path="streak/friends/:friendId" element={<StreakFriendPage />} />
+          <Route path="friend/:userId" element={<FriendInvitePage />} />
           {/* The team's admin area. Only admins see its menu row; access is
               decided by the database (user_roles, 20261002000001), see
               features/admin/components/admin-gate.tsx. */}

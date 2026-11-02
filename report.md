@@ -15,6 +15,37 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 2 Nov 2026: Add a Friend With a Link or QR Code
+
+Commit: `PENDING`. **Database step: run `20261102000001_friend_invite.sql` in the Supabase
+SQL editor BEFORE this goes live.**
+
+**What changed:**
+
+- **Add a friend** has a new button, **Invite with a link or QR code** (អញ្ជើញតាមតំណ ឬកូដ
+  QR). It shows a QR code and a link you can copy or share to Telegram. Searching by name
+  still works; this is for when a name won't search, or two people share a name.
+- Opening someone's link shows their name and an **Add** button. Nothing is sent until you
+  tap Add, and they still have to accept, so a link passed on to a stranger gives the
+  stranger nothing.
+- While your QR code is on screen, a request from the friend beside you appears by itself
+  within about 5 seconds, ready to accept.
+- A classmate with no account can use the link too: they sign in, answer the survey, and
+  land back on your invite rather than on the Roadmap.
+- With no friends yet, the page now opens on **Add a friend**, without the empty "Your
+  friends" card above it.
+- The privacy page now says that a signed-in student can open your invite link.
+
+**What to re-test:**
+
+- With two phones on the live site: A opens the QR code, B scans it, B taps Add, A taps
+  Accept. This could not be tested without the live site and real cameras.
+- Send the link on Telegram to someone with no account, and check they end up back on the
+  invite after signing in. If they land on Home instead, Supabase's Redirect URLs list needs
+  to allow `/friend/` (see `supabase/README.md`).
+- The new Khmer wording, which nobody has read through yet.
+- The Game's Invite button, which now shares this panel. It should look the same as before.
+
 ## 28 Oct 2026: The Questions Count Is Real
 
 Commit: `1a40b5f`. No database step.

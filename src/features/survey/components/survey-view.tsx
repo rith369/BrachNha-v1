@@ -1,6 +1,7 @@
 import { track } from "@/lib/telemetry";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
+import { isFriendInvitePath } from "@/features/streak/friend-invite";
 import { Flag } from "@/components/ui/flag";
 import { Wordmark } from "@/components/shell/wordmark";
 import { useBrachNhaStore } from "@/lib/store";
@@ -47,6 +48,7 @@ export function SurveyView() {
   );
   const t = useT(lang);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormState>({
@@ -80,7 +82,9 @@ export function SurveyView() {
       studied: form.studied,
     });
     track("survey_done", { grade: form.grade });
-    navigate("/roadmap");
+    // Arrived on a friend's invite link: stay on it, or they answered four
+    // questions and lost the friend they came for. The Roadmap is still there.
+    if (!isFriendInvitePath(pathname)) navigate("/roadmap");
   }
 
   return (

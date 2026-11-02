@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
-import { Check, ChevronRight, Clock, Flame, Search, UserPlus } from "lucide-react";
+import { Check, ChevronRight, Clock, Flame, QrCode, Search, UserPlus } from "lucide-react";
+import { InviteLinkPanel } from "@/components/invite-link-panel";
 import { Avatar } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { useBrachNhaStore } from "@/lib/store";
@@ -18,14 +19,21 @@ import { cn } from "@/utils/cn";
 import { todayKey } from "@/utils/day";
 import { pairStreak } from "@/utils/streak-friends";
 import { friendFailLabel, useStreakCopy } from "../copy";
-import { useFriends } from "../use-friends";
+import { friendInviteUrl } from "../friend-invite";
+import { useFriends, useWatchFriends } from "../use-friends";
 
 const SEARCH_DELAY_MS = 300;
 const MIN_QUERY = 2;
 
 /**
  * /streak/friends: requests waiting for you, your friends (each with the
- * pair's streak), a name search to add one, and the requests you sent.
+ * pair's streak), a name search or an invite link to add one, and the requests
+ * you sent.
+ *
+ * WITH NO FRIENDS, THE "YOUR FRIENDS" CARD IS NOT DRAWN, so the page opens on the
+ * one thing a new student can do here. The empty line moves under the search box.
+ * Only the card comes and goes: AddFriend keeps its slot in the tree, so what a
+ * student has typed survives the list arriving.
  *
  * SEARCH BY NAME WAS THE USER'S CALL, and it means any signed-in student can
  * find any other. What keeps that small is in the database
@@ -47,6 +55,19 @@ export function FriendsView() {
   const incoming = rows.filter((r) => r.status === "pending" && !r.outgoing);
   const outgoing = rows.filter((r) => r.status === "pending" && r.outgoing);
   const friends = rows.filter((r) => r.status === "accepted");
+  const noFriends = !loading && !failed && friends.length === 0;
+
+  // A request landing while the student is looking at their QR code draws its
+  // card above the code, out of sight on a phone. Only ever on an increase, so
+  // accepting one, or the list re-reading, never moves the page.
+  const requestsRef = useRef<HTMLDivElement>(null);
+  const seenIncoming = useRef(0);
+  useEffect(() => {
+    if (incoming.length > seenIncoming.current) {
+      requestsRef.current?.scrollIntoView({ block: "nearest" });
+    }
+    seenIncoming.current = incoming.length;
+  }, [incoming.length]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -55,57 +76,59 @@ export function FriendsView() {
       </p>
 
       {incoming.length > 0 && (
+        <div ref={requestsRef}>
+          <Card className="gap-2">
+            <h2 className="font-heading text-sm font-extrabold md:text-base">
+              {c.requestsTitle}
+            </h2>
+            <ul className="flex flex-col gap-2">
+              {incoming.map((r) => (
+                <IncomingRow key={r.id} row={r} onDone={reload} />
+              ))}
+            </ul>
+          </Card>
+        </div>
+      )}
+
+      {!noFriends && (
         <Card className="gap-2">
           <h2 className="font-heading text-sm font-extrabold md:text-base">
-            {c.requestsTitle}
+            {c.yourFriends}
           </h2>
-          <ul className="flex flex-col gap-2">
-            {incoming.map((r) => (
-              <IncomingRow key={r.id} row={r} onDone={reload} />
-            ))}
-          </ul>
+          {loading ? (
+            <p className="text-xs font-bold text-muted">{c.loading}</p>
+          ) : failed ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-xs font-bold text-muted">{c.loadFailed}</p>
+              <button
+                type="button"
+                onClick={reload}
+                className="rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-extrabold text-purple"
+              >
+                {c.retry}
+              </button>
+            </div>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {friends.map((r) => {
+                const streak = r.since
+                  ? pairStreak(activityLog, r.goalDays, r.since, today).current
+                  : 0;
+                return (
+                  <FriendLink
+                    key={r.id}
+                    row={r}
+                    streak={streak}
+                    doneToday={r.goalDays.includes(today)}
+                  />
+                );
+              })}
+            </ul>
+          )}
         </Card>
       )}
 
-      <Card className="gap-2">
-        <h2 className="font-heading text-sm font-extrabold md:text-base">
-          {c.yourFriends}
-        </h2>
-        {loading ? (
-          <p className="text-xs font-bold text-muted">{c.loading}</p>
-        ) : failed ? (
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="text-xs font-bold text-muted">{c.loadFailed}</p>
-            <button
-              type="button"
-              onClick={reload}
-              className="rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-extrabold text-purple"
-            >
-              {c.retry}
-            </button>
-          </div>
-        ) : friends.length === 0 ? (
-          <p className="text-xs leading-relaxed font-bold text-muted">{c.noFriends}</p>
-        ) : (
-          <ul className="flex flex-col gap-2">
-            {friends.map((r) => {
-              const streak = r.since
-                ? pairStreak(activityLog, r.goalDays, r.since, today).current
-                : 0;
-              return (
-                <FriendLink
-                  key={r.id}
-                  row={r}
-                  streak={streak}
-                  doneToday={r.goalDays.includes(today)}
-                />
-              );
-            })}
-          </ul>
-        )}
-      </Card>
-
-      <AddFriend onChanged={reload} />
+      <AddFriend noFriends={noFriends} onChanged={reload} />
 
       {outgoing.length > 0 && (
         <Card className="gap-2">
@@ -301,7 +324,13 @@ type SearchState =
  * (react(set-state-in-effect)), the admin Students page's pattern. Results for
  * an older query stay on screen, dimmed, until the new answer arrives.
  */
-function AddFriend({ onChanged }: { onChanged: () => void }) {
+function AddFriend({
+  noFriends,
+  onChanged,
+}: {
+  noFriends: boolean;
+  onChanged: () => void;
+}) {
   const lang = useBrachNhaStore((s) => s.lang);
   const c = useStreakCopy(lang);
   const [query, setQuery] = useState("");
@@ -368,7 +397,9 @@ function AddFriend({ onChanged }: { onChanged: () => void }) {
       )}
 
       {!active ? (
-        <p className="text-[11px] font-bold text-muted">{c.searchHint}</p>
+        <p className="text-[11px] leading-relaxed font-bold text-muted">
+          {noFriends ? c.noFriends : c.searchHint}
+        </p>
       ) : shown === null ? (
         <p className="text-[11px] font-bold text-muted">{c.searching}</p>
       ) : shown.state === "failed" ? (
@@ -386,7 +417,56 @@ function AddFriend({ onChanged }: { onChanged: () => void }) {
           ))}
         </ul>
       )}
+
+      <InviteFriend />
     </Card>
+  );
+}
+
+/**
+ * The other way to add someone, for when their name will not search: a link, or
+ * a QR code to show across a desk. Collapsed, because the panel is what pulls in
+ * the QR encoder (components/invite-qr.tsx).
+ */
+function InviteFriend() {
+  const lang = useBrachNhaStore((s) => s.lang);
+  const c = useStreakCopy(lang);
+  const userId = useBrachNhaStore((s) => s.authUser?.id ?? null);
+  const [open, setOpen] = useState(false);
+
+  if (!userId) return null;
+
+  return (
+    <div className="mt-1 flex flex-col gap-3 border-t border-border pt-3">
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center justify-center gap-1.5 rounded-xl border border-border bg-purple/8 px-3 py-2.5 text-xs font-extrabold text-purple transition hover:bg-purple/15"
+      >
+        <QrCode className="size-4 shrink-0" strokeWidth={2.5} aria-hidden />
+        {c.inviteButton}
+      </button>
+      {open && <OpenInvite userId={userId} />}
+    </div>
+  );
+}
+
+/** Its own component so the list is only watched while the code is on screen. */
+function OpenInvite({ userId }: { userId: string }) {
+  const lang = useBrachNhaStore((s) => s.lang);
+  const c = useStreakCopy(lang);
+  useWatchFriends();
+
+  return (
+    <InviteLinkPanel
+      url={friendInviteUrl(window.location.origin, userId)}
+      hint={c.inviteHint}
+      shareTitle={c.friendsTitle}
+      shareText={c.inviteShareText}
+      // The card around it already IS one. cn() is twMerge, so these win.
+      className="border-0 bg-transparent p-0 shadow-none"
+    />
   );
 }
 

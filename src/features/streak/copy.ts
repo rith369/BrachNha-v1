@@ -89,7 +89,7 @@ export const STREAK_COPY = {
     accept: "Accept",
     decline: "Decline",
     yourFriends: "Your friends",
-    noFriends: "No friends yet. Search for a classmate by name to start a shared streak.",
+    noFriends: "No friends yet. Search for a classmate by name, or invite them with a link.",
     addFriend: "Add a friend",
     searchPlaceholder: "Search by name",
     searchHint: "Type at least 2 letters of their name.",
@@ -101,8 +101,19 @@ export const STREAK_COPY = {
     alreadyFriends: "Friends",
     sentTitle: "Requests you sent",
     waitingAccept: "Waiting for them to accept",
+    inviteButton: "Invite with a link or QR code",
+    inviteHint: "Let your friend scan this, or send them the link. They tap Add, then you accept.",
+    inviteShareText: "Keep a study streak with me on BrachNha!",
+    invitePitch:
+      "A day counts only when you both finish your daily goal. They need to accept your request first.",
+    inviteReceived: "They have already asked you. Accept to start your shared streak.",
+    inviteSelf: "This is your own invite link. Send it to a friend.",
+    inviteGone: "This student could not be found. Ask your friend to send the link again.",
+    inviteLoadFailed: "Could not open this invite. Check your connection.",
+    seeFriends: "See your friends",
+    seeStreak: "See your shared streak",
     whoSees:
-      "Anyone signed in can find you by name. A friend sees only your name and the days you finished your goal.",
+      "Anyone signed in can find you by name or open your invite link. A friend sees only your name and the days you finished your goal.",
     loading: "Loading...",
     loadFailed: "Could not load your friends. Check your connection.",
     retry: "Try again",
@@ -177,7 +188,7 @@ export const STREAK_COPY = {
     accept: "ទទួលយក",
     decline: "បដិសេធ",
     yourFriends: "មិត្តភក្តិរបស់អ្នក",
-    noFriends: "មិនទាន់មានមិត្តភក្តិនៅឡើយទេ។ ស្វែងរកមិត្តរួមថ្នាក់តាមឈ្មោះ ដើម្បីចាប់ផ្ដើម Streak រួមគ្នា។",
+    noFriends: "មិនទាន់មានមិត្តភក្តិនៅឡើយទេ។ ស្វែងរកមិត្តរួមថ្នាក់តាមឈ្មោះ ឬអញ្ជើញគេតាមតំណ។",
     addFriend: "បន្ថែមមិត្តភក្តិ",
     searchPlaceholder: "ស្វែងរកតាមឈ្មោះ",
     searchHint: "វាយឈ្មោះយ៉ាងហោចណាស់ 2 តួអក្សរ។",
@@ -189,8 +200,19 @@ export const STREAK_COPY = {
     alreadyFriends: "ជាមិត្តហើយ",
     sentTitle: "សំណើដែលអ្នកបានផ្ញើ",
     waitingAccept: "កំពុងរង់ចាំការទទួលយក",
+    inviteButton: "អញ្ជើញតាមតំណ ឬកូដ QR",
+    inviteHint: "ឱ្យមិត្តភក្តិស្កេនកូដនេះ ឬផ្ញើតំណទៅគេ។ គេចុច បន្ថែម រួចអ្នកទទួលយក។",
+    inviteShareText: "មករក្សា Streak រៀនជាមួយខ្ញុំនៅ BrachNha!",
+    invitePitch:
+      "ថ្ងៃមួយត្រូវបានរាប់ លុះត្រាតែអ្នកទាំងពីរបញ្ចប់គោលដៅប្រចាំថ្ងៃ។ គេត្រូវទទួលយកសំណើរបស់អ្នកសិន។",
+    inviteReceived: "គេបានស្នើមកអ្នករួចហើយ។ ទទួលយក ដើម្បីចាប់ផ្ដើម Streak រួមគ្នា។",
+    inviteSelf: "នេះជាតំណអញ្ជើញរបស់អ្នកផ្ទាល់។ ផ្ញើវាទៅមិត្តភក្តិរបស់អ្នក។",
+    inviteGone: "រកមិនឃើញសិស្សនេះទេ។ សូមឱ្យមិត្តភក្តិផ្ញើតំណម្តងទៀត។",
+    inviteLoadFailed: "មិនអាចបើកការអញ្ជើញនេះបានទេ។ សូមពិនិត្យការភ្ជាប់អ៊ីនធឺណិត។",
+    seeFriends: "មើលមិត្តភក្តិរបស់អ្នក",
+    seeStreak: "មើល Streak រួមគ្នា",
     whoSees:
-      "អ្នកដែលចូលគណនីអាចស្វែងរកអ្នកតាមឈ្មោះបាន។ មិត្តភក្តិឃើញតែឈ្មោះ និងថ្ងៃដែលអ្នកបានបញ្ចប់គោលដៅប៉ុណ្ណោះ។",
+      "អ្នកដែលចូលគណនីអាចស្វែងរកអ្នកតាមឈ្មោះ ឬបើកតំណអញ្ជើញរបស់អ្នកបាន។ មិត្តភក្តិឃើញតែឈ្មោះ និងថ្ងៃដែលអ្នកបានបញ្ចប់គោលដៅប៉ុណ្ណោះ។",
     loading: "កំពុងទាញយក...",
     loadFailed: "មិនអាចទាញយកមិត្តភក្តិបានទេ។ សូមពិនិត្យការភ្ជាប់អ៊ីនធឺណិត។",
     retry: "ព្យាយាមម្តងទៀត",
@@ -322,6 +344,22 @@ export function sharedStatusLine(
   return lang === "km"
     ? `មិនទាន់មាននរណាបញ្ចប់គោលដៅថ្ងៃនេះទេ។`
     : `Neither of you has finished today's goal yet.`;
+}
+
+/** The invite page's headline, once per state. The name is the database's. */
+export function inviteAskLabel(friendName: string, lang: Lang): string {
+  if (lang === "km") return `រក្សា Streak ជាមួយ ${friendName}?`;
+  return `Keep a streak with ${friendName}?`;
+}
+
+export function inviteSentLabel(friendName: string, lang: Lang): string {
+  if (lang === "km") return `បានផ្ញើសំណើទៅ ${friendName} ហើយ`;
+  return `Request sent to ${friendName}`;
+}
+
+export function inviteFriendsLabel(friendName: string, lang: Lang): string {
+  if (lang === "km") return `អ្នក និង ${friendName} ជាមិត្តនឹងគ្នាហើយ!`;
+  return `You and ${friendName} are friends!`;
 }
 
 /** "Waiting for Dara..." — the goal card's own encouragement line. */

@@ -1,9 +1,9 @@
 import { getSupabase, isSupabaseConfigured } from "./supabase";
 
 /**
- * The server side of Streak with Friends: search, requests, and the list of
- * friends with the days each one met the daily goal
- * (supabase/migrations/20261013000001_friends.sql).
+ * The server side of Streak with Friends: search, the invite link, requests, and
+ * the list of friends with the days each one met the daily goal
+ * (supabase/migrations/20261013000001_friends.sql, 20261102000001_friend_invite.sql).
  *
  * NOT PART OF lib/supabase-sync.ts, for the reasons lib/competitions.ts gives:
  * this reads OTHER students' rows and writes things a student is waiting on,
@@ -59,6 +59,12 @@ export interface SearchHit {
   relation: SearchRelation;
 }
 
+/** Who an invite link belongs to, from the database rather than from the link. */
+export interface FriendInvite {
+  name: string;
+  relation: SearchRelation | "self";
+}
+
 const HINTS: readonly FriendFail[] = [
   "self",
   "unknown",
@@ -91,6 +97,7 @@ async function client() {
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const RELATIONS: readonly SearchRelation[] = ["none", "sent", "received", "friends"];
+const INVITE_RELATIONS: readonly FriendInvite["relation"][] = [...RELATIONS, "self"];
 
 /** Every friendship the caller is in. `today` is the device's local day key. */
 export async function fetchFriends(today: string): Promise<FriendResult<FriendRow[]>> {
@@ -134,6 +141,21 @@ export async function searchStudents(query: string): Promise<FriendResult<Search
       .filter((r) => typeof r.id === "string" && RELATIONS.includes(r.relation))
       .map((r) => ({ id: r.id, name: r.display_name, relation: r.relation })),
   };
+}
+
+/** Who an invite link belongs to; null when there is no such student. */
+export async function lookupFriendInvite(
+  userId: string
+): Promise<FriendResult<FriendInvite | null>> {
+  const db = await client();
+  if (!db) return { ok: false, reason: "unconfigured" };
+  const { data, error } = await db.rpc("friend_invite", { p_user: userId });
+  if (error) return { ok: false, reason: reasonOf(error) };
+  const row = data?.[0];
+  if (!row || !row.display_name || !INVITE_RELATIONS.includes(row.relation)) {
+    return { ok: true, data: null };
+  }
+  return { ok: true, data: { name: row.display_name, relation: row.relation } };
 }
 
 /** "sent", or "accepted" when they had already asked you. */

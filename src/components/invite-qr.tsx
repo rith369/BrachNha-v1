@@ -1,7 +1,7 @@
 import { encode } from "uqr";
 
 /**
- * A scannable QR code for a competition's invite link.
+ * A scannable QR code for an invite link (a competition's, or a friend's).
  *
  * ── THIS FILE IS THE LAZY BOUNDARY ─────────────────────────────────────────
  *

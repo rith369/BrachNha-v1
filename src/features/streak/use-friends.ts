@@ -60,6 +60,35 @@ function refresh(userId: string) {
   });
 }
 
+/** How often the list is re-read while a student's invite is open. */
+const WATCH_EVERY_MS = 5_000;
+/** An invite left open on a desk stops asking after this long. */
+const WATCH_MAX_MS = 10 * 60_000;
+
+/**
+ * While a student's invite is on screen, keep re-reading the list.
+ *
+ * Their friend is standing beside them, scanning the code, and nothing else tells
+ * this phone that a request has arrived: without it they would both be staring at
+ * a screen that looks as though nothing happened.
+ */
+export function useWatchFriends() {
+  const userId = useBrachNhaStore((s) => s.authUser?.id ?? null);
+
+  useEffect(() => {
+    if (!userId) return;
+    const started = Date.now();
+    const timer = window.setInterval(() => {
+      if (Date.now() - started > WATCH_MAX_MS) {
+        window.clearInterval(timer);
+      } else if (document.visibilityState === "visible") {
+        refresh(userId);
+      }
+    }, WATCH_EVERY_MS);
+    return () => window.clearInterval(timer);
+  }, [userId]);
+}
+
 export interface FriendsState {
   /** Nothing has arrived yet (and nothing has failed). */
   loading: boolean;
