@@ -5,8 +5,9 @@ description: Runs BrachNha's verification checklist (typecheck, lint, build, laz
 
 # Verify BrachNha
 
-The single source of truth for what "done" means in this repo is CLAUDE.md's
-"Verification standard" section — this skill is that checklist made
+The single source of truth for what "done" means in this repo is the
+"Verification" section of AGENTS.md, with the full standard in
+`docs/notes/environment-and-verification.md` — this skill is that checklist made
 executable, so it runs the same way every time instead of depending on memory.
 
 Work out which sections below apply by checking `git status`/`git diff` for
@@ -99,7 +100,8 @@ appears in the matching `Row` type in `database.ts`.
 
 Anything touching `src/hooks/use-auth.ts`, `src/lib/auth.ts`,
 `server/verify-user.ts`, or `AppShell`'s gate chain needs the browser checks
-listed in CLAUDE.md's auth section — typecheck/lint cannot see a swallowed
+listed in `docs/notes/environment-and-verification.md` and
+`docs/notes/auth.md` — typecheck/lint cannot see a swallowed
 OAuth callback, a guest reaching the mentor, or the React Compiler crash
 pattern that only fires for a null `authUser`. At minimum, in a real browser:
 a fresh profile shows the entry screen and downloads NO Supabase chunk;
@@ -122,7 +124,7 @@ never a blanket process kill:
 
 ```bash
 # Blank the Supabase vars so the auth gate doesn't block a scripted/seeded
-# profile, and so nothing writes real rows to Supabase — see CLAUDE.md's
+# profile, and so nothing writes real rows to Supabase — see docs/notes/auth.md's
 # "hasFullAccess is true when Supabase is UNCONFIGURED" note.
 VITE_SUPABASE_URL= VITE_SUPABASE_ANON_KEY= npm run dev
 ```
