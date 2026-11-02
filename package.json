@@ -11,6 +11,7 @@
     "db:check": "node scripts/supabase-check.mjs",
     "check:digits": "node scripts/check-digits.mjs",
     "check:content": "node scripts/check-content.mjs",
+    "eval:kruai": "node scripts/kruai-eval/run.mjs",
     "content:export": "node scripts/content-export.mjs"
   },
   "dependencies": {

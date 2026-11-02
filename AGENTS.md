@@ -276,6 +276,8 @@ npm run check:content # content files under content/
 npm run build         # whenever the change ships
 ```
 
+After changing KruAI's prompt or model, run `npm run eval:kruai` (`docs/notes/kruai.md`).
+
 Then exercise the change. KruAI needs a request against a running dev server,
 Supabase work needs `npm run db:check`, and auth and UI need a real browser, where you
 measure rather than eyeball: a check on the data can pass while the render is broken.

@@ -947,3 +947,20 @@ single error.
 Other standing lint warning: `src/components/ui/button.tsx`
 `only-export-components` (the shadcn `buttonVariants` export). Cosmetic,
 fast-refresh only. It is now the ONLY warning oxlint reports.
+
+### The KruAI test set:  (3 Nov 2026)
+
+35 questions (39 model calls) through the real  and the real model, each reply checked against what a good answer must do, so a change to the prompt or the model is measured rather than guessed at. Files are in :  (the questions and answer keys),  (the rules, pure) and .
+
+- ** needs no model and no quota.** It proves each check catches what it claims to, that a right answer's first digit cannot pass a wrong one, and that every case is well formed. **** is 18 calls.  and  narrow it, and  spaces the calls (13000 suits the free tier).
+- **FREE KEYS ONLY.** It reads GEMINI_API_KEYS from .env.local and clears every other Gemini key, so a run cannot spend the prepaid credit.
+- **Sign-in is skipped the dev way:** no Supabase address during a question, set only while the real content module fills its 10-minute copy, so the prompt still carries the published decks and sections.
+- **The maths keys are the 2025 paper's, also worked by hand.** A failed  is worth checking against the paper before blaming the model.
+- **Results go to , git-ignored.**  holds every reply for a person to read, because no script can judge whether the Khmer reads well or the reasoning is sound. Each run compares itself with the last one.
+
+**The first run (18 calls, 13 of 15 cases passed) found, none of it fixed yet:**
+- **An answer can be silently cut off.** One reply stopped mid-formula with no usage report: the upstream stream ended with no error, the handler closes it as if finished ( in ), so the student sees half a solution with no warning and no Try again. The  check names it.
+- **Khmer numerals in a reply:** the stressed-student answer wrote the days left and months in Khmer digits, against the rule.
+- **The SHORT form after guiding is not held:** both guided solutions came back with numbered steps. A soft note, not a failure.
+- **A wrong answer was called nearly right** (the reply to a wrong "1" opened with "almost right"). A person read this; no check catches it.
+
