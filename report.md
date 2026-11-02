@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Nov 2026: The 2-Day Bac II Simulation Works, Waiting for Its Papers
 
-Commit: `HASH_HERE`. **Database step: run `20261103000002_simulation_attempts.sql` in the
+Commit: `dd6c44e`. **Database step: run `20261103000002_simulation_attempts.sql` in the
 SQL editor.** It can be done before or after this deploys. Until it is, an attempt stays on
 the student's phone and is not saved to their account.
 
