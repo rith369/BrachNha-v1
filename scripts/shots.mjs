@@ -87,6 +87,8 @@ const ROUTES = [
   { name: "grade-prediction", path: "/grade-prediction" },
   { name: "leaderboard", path: "/leaderboard" },
   { name: "roadmap", path: "/roadmap" },
+  // The exam month, because it is the one month every student's plan contains.
+  { name: "roadmap-month", path: "/roadmap/2027-08" },
   { name: "streak", path: "/streak" },
   { name: "streak-friends", path: "/streak/friends" },
   { name: "profile", path: "/profile" },

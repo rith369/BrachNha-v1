@@ -4491,20 +4491,10 @@ and the progress/banner fills take the raw `--subject-*` value; the summary
 card and its label stay on the tinted `--color-subj-*` scale, the same split
 `SUBJECT_STYLE` draws everywhere else.
 
-**Roadmap** (`features/roadmap`) — target grade/hours card, a "Pending Placement
-Tests" card (only rendered for pending tests that **have a date** — an undated
-one would render `Invalid Date`; flags "Overdue" once that date has passed), a "Daily Mission" quota card, and
-the phase path. The phase plan is dynamically generated from real
-`userData.weaknesses` plus `monthsUntilExam()` (`buildRoadmapPhases` in
-`utils/roadmap.ts`) rather than a fixed list; phases with real lesson content link to Lessons,
-others to Mock Exam. Daily Mission (`computeDailyMission`, same file) derives
-lesson/practice/flashcard counts from a time-budget model — `GRADE_HOURS` scaled
-by an urgency multiplier based on months left, split across the three activities
-by assumed minutes-per-unit — not from dividing the real (currently tiny)
-inventory by days left, which would produce near-zero counts. Flashcards are
-hard-clamped to 2–6/day regardless of budget; lessons/practice have a floor, no
-ceiling. Marking a mission row done calls the same `completeTask(key)` as Home's
-daily checklist, so the two views share one real completion state.
+**Roadmap** (`features/roadmap`) — target grade and days left, recommended hours
+with the minutes really studied today, Daily Mission, and a path of real calendar
+months, each opening its own page at `/roadmap/:month`. See "The Roadmap is a real
+plan" near the end of this file.
 
 **`/roadmap` HAS A NAV ROW AGAIN (28 Oct 2026, the user's request)**, directly
 under "Streak with Friends" (`Map` icon, "Roadmap" / "ផែនទី"). It is also reached
@@ -7786,6 +7776,71 @@ and opens no runner; Home renders; no sideways scroll; no page error. KruAI thro
 reaches the prompt, sections and decks still listed, physics still "no content", maths
 still covered, the section prompt under budget.
 
+## The Roadmap is a real plan (2 Nov 2026)
+
+It looked like a plan and tracked nothing: "Month 1 · Start now" sat at the top for
+ever, most of the path was "Mixed practice", and it said "20 Practice today" while
+one quiz ticked the row. The user's choices: real months, a page per month, weak
+subjects first and the rest spread evenly, and **the look left exactly as it was**
+(the glowing path, the discs, the emoji).
+
+**`features/roadmap/study-plan.ts` (`buildStudyPlan`) is the plan. Derived, never
+stored**, so there is no store field, no sync and no migration. It reads
+`studyCatalog()`, the same list as Home's Study card (`features/home/study-feed.ts`),
+so the two cannot disagree about what exists or what is finished.
+
+- **Months** run from the first month with any recorded study (or this month) to the
+  exam month, or to this month if the exam has passed.
+- **Order** is hardest subject first: one number per subject, the real score once
+  `buildProgressSummary` has one, else 30 / 70 / 50 for survey weak / liked / neither.
+  So a subject scored 40 sits ahead of one merely called weak. Within a subject,
+  curriculum order. **Past papers wait for the exam month.**
+- **UNFINISHED WORK ROLLS FORWARD.** Only what is left is shared out, from this month
+  to the month before the exam, so a missed week leaves no backlog. A past month
+  therefore shows what was finished, never a list of what was skipped; those items are
+  in the current month. (The user was first told a past month would list skipped items.
+  It cannot: see the next point.)
+- **A finished item sits in the last month its LESSON was worked on**, or the first
+  month with no log. Nothing records the day one section was finished, and the content
+  log is per lesson, so going back over a lesson moves its ticks. Accepted.
+- **THE CURRENT MONTH DOES NOT GROW.** Its size comes from the work left when the month
+  began (left now + finished this month), so finishing an item ticks it rather than
+  pulling in a replacement, and later months do not move.
+- **`waiting`**: weak subjects with nothing published, said once above the path. A
+  subject with no content cannot be in the plan, so a month never claims it.
+
+**Screens.** A row opens `/roadmap/:month` (`pages/roadmap-month.tsx`, `month-view.tsx`):
+Today's goal on the current month, the Simulation card on the exam month, then the
+items, each going straight to its lesson, deck, quiz or paper. Nothing locks; a student
+may work ahead. A bad or out-of-range month redirects. **It is deliberately not a
+day-by-day calendar**: a fixed day's work is a day behind the moment one is missed.
+
+**`daily-mission.tsx`** names the next item per task and links through `taskHref()`, so
+it agrees with Home and the Streak page. The counts are gone from the screen.
+`computeDailyMission` stays in `utils/roadmap.ts` **for the pledge only**, which still
+quotes "3 lessons, 20 questions" as a goal the student signs. That mismatch was left on
+purpose: changing signed wording was not asked for.
+
+**Nothing is drawn until the manifest is `ready`**: before that every month would read
+as empty and every weak subject as coming soon, and a new student lands here straight
+from the survey. **Wide capitals are English-only** on this page's labels, as on
+Progress: they turned "Bac II" into "BAC II" and pull Khmer clusters apart. **Finished
+rows are muted, not struck through**: a line through Khmer letters is hard to read.
+
+**The current month's row carries the pulse the first row used to** (`isFirst` on
+`PhaseNode`). `isBottomNavRoute` covers `/roadmap/*`, since neither page has a BottomNav.
+
+**Verified:** 31 checks on the real fixture through `ssrLoadModule` (10 months, every
+item exactly once, an even spread, scores outranking the survey, finishing keeps the
+month's size and later months unchanged, rolling forward from a later date, a past tick
+staying put, the last month, the exam month, after the exam, a year boundary, nothing
+published, duplicate and unknown weak subjects) and 55 browser checks at 390, 320 dark
+Khmer and 1280 (real month names, no invented numbers, specific Go links, every row
+opening its month, items opening directly, the exam month's simulation, bad addresses,
+history with real minutes and ticks, Khmer labels, the loading and failed states with no
+false "coming soon", no sideways scroll, no page error). **Not verified: a real account
+with real history.**
+
 ## Flashcards are scheduled by FSRS (27 Oct 2026)
 
 The user's call, after the made-up "~N%" retention line was removed: a REAL "chance
@@ -8050,7 +8105,7 @@ sits behind that element's own background instead of escaping behind an
 ancestor's.
 
 **Count the animating elements, not just the animation.** The Roadmap put the
-pulse on *every* phase node, and `buildRoadmapPhases` returns roughly one per
+pulse on *every* phase node, and it draws one per
 month until the exam — about twelve at once, on the screen a student lands on
 straight out of the survey. Only `isFirst`/`isLast` pulse now. The middle nodes
 never set `--glow-color` either, so they had been borrowing the FAB's purple by
@@ -8285,8 +8340,8 @@ in `userData.months`; that was both a guess and stale the next day — a student
 who answered "12" in August still read "12 months left" a year later. The field
 is gone from `UserData` (an old persisted copy is simply ignored, no migration
 needed), the survey step with it, and `parseMonthsLeft` is deleted.
-`computeDailyMission` and `buildRoadmapPhases` now take a `number`, so the daily
-quota tightens on its own as the exam nears. Home's hero and Grade Prediction
+`computeDailyMission` (now only the pledge's estimate) takes a `number`, so it
+tightens on its own as the exam nears. Home's hero and Grade Prediction
 show a real day count instead of the old `months × 30` approximation.
 
 Two things to keep straight. **`Commitment.months` is the one deliberate

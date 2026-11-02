@@ -1,5 +1,3 @@
-import type { Lang } from "@/types";
-
 export const GRADE_HOURS: Record<string, number> = {
   A: 3.5,
   B: 2.5,
@@ -8,6 +6,8 @@ export const GRADE_HOURS: Record<string, number> = {
   E: 1,
 };
 
+/** The estimate the signed pledge quotes as a goal. The Roadmap itself no longer
+ *  shows these: finishing one of each is what ticks the day. */
 export interface DailyMission {
   lessons: number;
   practice: number;
@@ -61,82 +61,4 @@ export function computeDailyMission(
       )
     ),
   };
-}
-
-export interface RoadmapPhase {
-  icon: string;
-  month: number;
-  title: string;
-  subjects: string[];
-  hasLessonContent: boolean;
-}
-
-const SUBJECT_ICONS: Record<string, string> = {
-  math: "📐",
-  physics: "⚛️",
-  chemistry: "🧪",
-  biology: "🧬",
-  history: "📜",
-  khmer: "📖",
-  english: "🗣️",
-  french: "🗣️",
-};
-
-function chunk<T>(items: T[], count: number): T[][] {
-  const buckets: T[][] = Array.from({ length: count }, () => []);
-  items.forEach((item, i) => buckets[i % count].push(item));
-  return buckets;
-}
-
-/**
- * `hasLessons` answers whether a subject has lessons to send a phase to. The
- * caller asks the published content (utils/ stays pure and does no I/O); it
- * read the old 7-step lessons in data/lessons.ts until they were deleted.
- */
-export function buildRoadmapPhases(
-  weaknesses: string[],
-  months: number,
-  subjectLabel: (subject: string) => string,
-  lang: Lang,
-  hasLessons: (subject: string) => boolean
-): RoadmapPhase[] {
-  const contentMonths = Math.max(1, months - 1);
-  const uniqueWeak = Array.from(new Set(weaknesses));
-
-  const mixedTitle = lang === "en" ? "Mixed practice" : "អនុវត្តចម្រុះ";
-  const focusOn = lang === "en" ? "Focus on" : "ផ្តោតលើ";
-
-  const monthGroups: string[][] =
-    uniqueWeak.length === 0
-      ? Array.from({ length: contentMonths }, () => [])
-      : uniqueWeak.length <= contentMonths
-        ? [
-            ...uniqueWeak.map((s) => [s]),
-            ...Array.from(
-              { length: contentMonths - uniqueWeak.length },
-              () => []
-            ),
-          ]
-        : chunk(uniqueWeak, contentMonths);
-
-  const phases: RoadmapPhase[] = monthGroups.map((subjects, i) => ({
-    icon: subjects.length ? SUBJECT_ICONS[subjects[0]] ?? "📚" : "📚",
-    month: i + 1,
-    title: subjects.length
-      ? `${focusOn} ${subjects.map(subjectLabel).join(" & ")}`
-      : mixedTitle,
-    subjects,
-    hasLessonContent: subjects.some(hasLessons),
-  }));
-
-  phases.push({
-    icon: "🎯",
-    month: months,
-    title:
-      lang === "en" ? "Exam simulation & weak areas" : "ប្រឡងពិសោធ & តំបន់ខ្សោយ",
-    subjects: [],
-    hasLessonContent: false,
-  });
-
-  return phases;
 }

@@ -47,6 +47,7 @@ const routeModules = {
   profile: () => import("@/pages/profile"),
   progress: () => import("@/pages/progress"),
   roadmap: () => import("@/pages/roadmap"),
+  roadmapMonth: () => import("@/pages/roadmap-month"),
   streak: () => import("@/pages/streak"),
   streakFriends: () => import("@/pages/streak-friends"),
   streakFriend: () => import("@/pages/streak-friend"),
@@ -87,6 +88,7 @@ const AdminAuditPage = lazy(() => import("@/pages/admin-audit"));
 const ProfilePage = lazy(routeModules.profile);
 const ProgressPage = lazy(routeModules.progress);
 const RoadmapPage = lazy(routeModules.roadmap);
+const RoadmapMonthPage = lazy(routeModules.roadmapMonth);
 const StreakPage = lazy(routeModules.streak);
 const StreakFriendsPage = lazy(routeModules.streakFriends);
 const StreakFriendPage = lazy(routeModules.streakFriend);
@@ -279,6 +281,7 @@ export default function App() {
           <Route path="profile" element={<ProfilePage />} />
           <Route path="progress" element={<ProgressPage />} />
           <Route path="roadmap" element={<RoadmapPage />} />
+          <Route path="roadmap/:month" element={<RoadmapMonthPage />} />
           <Route path="streak" element={<StreakPage />} />
           <Route path="streak/friends" element={<StreakFriendsPage />} />
           <Route path="streak/friends/:friendId" element={<StreakFriendPage />} />

@@ -175,8 +175,19 @@ function catalogFor(subject: SubjectId, input: StudyFeedInput): StudyItem[] {
   return items;
 }
 
+/**
+ * Everything with published content, subject by subject in curriculum order. Home's
+ * card and the Roadmap's plan (features/roadmap/study-plan.ts) both read this, so
+ * they cannot disagree about what exists or what is finished.
+ */
+export function studyCatalog(input: StudyFeedInput): Map<SubjectId, StudyItem[]> {
+  return new Map(
+    allSubjects(input.userLanguage).map((s) => [s.id, catalogFor(s.id, input)])
+  );
+}
+
 /** The most recent day anything under this lesson key was logged, or "". */
-function lastActive(log: ContentLog, lessonKey: string): string {
+export function lastActive(log: ContentLog, lessonKey: string): string {
   let latest = "";
   for (const [day, entries] of Object.entries(log)) {
     if (day > latest && Object.hasOwn(entries, lessonKey)) latest = day;
@@ -245,8 +256,8 @@ function prioritise(subjects: SubjectId[], input: StudyFeedInput): SubjectId[] {
 }
 
 export function buildStudyFeed(input: StudyFeedInput): StudyFeed {
-  const subjects = allSubjects(input.userLanguage).map((s) => s.id);
-  const bySubject = new Map(subjects.map((id) => [id, catalogFor(id, input)]));
+  const bySubject = studyCatalog(input);
+  const subjects = [...bySubject.keys()];
   const catalog = [...bySubject.values()].flat();
 
   const touched = catalog.some((i) => i.done || i.started);

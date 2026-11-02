@@ -3,24 +3,53 @@ import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { useT } from "@/data/translations";
 import type { TranslationKey } from "@/data/translations";
-import {
-  buildRoadmapPhases,
-  computeDailyMission,
-  GRADE_HOURS,
-  type RoadmapPhase,
-} from "@/utils/roadmap";
-import {
-  daysUntilExam,
-  formatExamDate,
-  monthsUntilExam,
-} from "@/utils/exam-date";
-import type { Tasks } from "@/types";
+import { GRADE_HOURS } from "@/utils/roadmap";
+import { daysUntilExam, formatExamDate } from "@/utils/exam-date";
 import { PLEDGE_COPY } from "@/features/commitment/copy";
+import { ContentNotice } from "@/features/practice/components/content-waiting";
 import { CommitmentBanner } from "./commitment-banner";
-import { useContentManifest } from "@/lib/content";
-import { subjectHasSections } from "@/utils/content-manifest";
+import { DailyMission } from "./daily-mission";
+import { retryContent } from "@/lib/content";
 import { PageTitle } from "@/components/page-title";
+import { cn } from "@/utils/cn";
 import { Map as MapIcon } from "lucide-react";
+import type { Lang } from "@/types";
+import {
+  monthLabel,
+  monthProgressLabel,
+  pastCountLabel,
+  roadmapCopy,
+  studiedTodayLabel,
+  toStudyLabel,
+  waitingLabel,
+} from "../copy";
+import type { PlanMonth } from "../study-plan";
+import { useStudyPlan } from "../use-study-plan";
+
+const SUBJECT_ICONS: Record<string, string> = {
+  math: "📐",
+  physics: "⚛️",
+  chemistry: "🧪",
+  biology: "🧬",
+  history: "📜",
+  khmer: "📖",
+  english: "🗣️",
+  french: "🗣️",
+};
+
+function monthIcon(month: PlanMonth): string {
+  if (month.isExam) return "🎯";
+  return SUBJECT_ICONS[month.subjects[0] ?? ""] ?? "📚";
+}
+
+/** The row's second line: what the month holds, in the month's own tense. */
+function monthProgress(month: PlanMonth, lang: Lang): string | null {
+  const total = month.items.length;
+  if (total === 0) return null;
+  if (month.status === "past") return pastCountLabel(month.done, lang);
+  if (month.status === "current") return monthProgressLabel(month.done, total, lang);
+  return toStudyLabel(total, lang);
+}
 
 function PathConnector({ flip }: { flip: boolean }) {
   return (
@@ -54,11 +83,11 @@ const GLOW_GOLD = {
 } as React.CSSProperties;
 
 function PhaseNode({
-  phase,
+  icon,
   isFirst,
   isLast,
 }: {
-  phase: RoadmapPhase;
+  icon: string;
   isFirst: boolean;
   isLast: boolean;
 }) {
@@ -86,7 +115,7 @@ function PhaseNode({
       // `relative` anchors .animate-fab-pulse's glow layer — see globals.css.
       className={`relative ring-4 ring-bg flex size-16 shrink-0 items-center justify-center rounded-full text-3xl ${nodeClasses}`}
     >
-      {phase.icon}
+      {icon}
     </div>
   );
 }
@@ -95,68 +124,45 @@ export function RoadmapView() {
   const {
     lang,
     userData,
-    tasks,
     commitment,
     setPledgeOpen,
   } = useBrachNhaStore(
     useShallow((s) => ({
       lang: s.lang,
       userData: s.userData,
-      tasks: s.tasks,
       commitment: s.commitment,
       setPledgeOpen: s.setPledgeOpen,
     }))
   );
   const t = useT(lang);
+  const c = roadmapCopy(lang);
   const navigate = useNavigate();
-  const manifest = useContentManifest();
+  const { plan, manifest, activityLog, today } = useStudyPlan();
 
   const hrs = GRADE_HOURS[userData.grade] || 2;
+  const minutesToday = activityLog[today]?.minutes ?? 0;
 
-  // Both derived from the fixed exam date, so the plan tightens on its own as
-  // the exam approaches instead of holding whatever the student once typed.
+  // Derived from the fixed exam date, so it counts down on its own instead of
+  // holding whatever the student once typed.
   const daysLeft = daysUntilExam();
-  const monthsLeft = monthsUntilExam();
 
-  const phases = buildRoadmapPhases(
-    userData.weaknesses,
-    monthsLeft,
-    (s) => t[s as TranslationKey] ?? s,
-    lang,
-    (s) => subjectHasSections(manifest, s)
+  // Khmer has no capitals, and wide letter spacing pulls a Khmer cluster apart.
+  const label = cn(
+    "text-[11px] font-extrabold text-muted",
+    lang === "en" && "tracking-widest uppercase"
   );
+  const subjectName = (s: string) => t[s as TranslationKey] ?? s;
 
-  const mission = computeDailyMission(userData.grade, monthsLeft);
-  const missionRows: {
-    key: keyof Tasks;
-    icon: string;
-    label: string;
-    count: number;
-    href: string;
-  }[] = [
-    {
-      key: "lesson",
-      icon: "📚",
-      label: lang === "en" ? "Lessons" : "មេរៀន",
-      count: mission.lessons,
-      href: "/lessons",
-    },
-    {
-      key: "practice",
-      icon: "✏️",
-      label: lang === "en" ? "Practice" : "អនុវត្ត",
-      count: mission.practice,
-      href: "/practice",
-    },
-    {
-      key: "flashcards",
-      icon: "🗂️",
-      label: lang === "en" ? "Flashcards" : "កាតទន្លាប់",
-      count: mission.flashcards,
-      href: "/practice",
-    },
-  ];
-  const allMissionsDone = missionRows.every((row) => tasks[row.key]);
+  // A month with nothing in it reads differently depending on when it is.
+  const monthTitle = (m: PlanMonth) => {
+    if (m.isExam) return c.examTitle;
+    if (m.subjects.length > 0) {
+      return `${c.focusOn} ${m.subjects.slice(0, 2).map(subjectName).join(" & ")}${
+        m.subjects.length > 2 ? ` +${m.subjects.length - 2}` : ""
+      }`;
+    }
+    return m.status === "past" ? c.nothingRecorded : c.mixedPractice;
+  };
 
   return (
     // Capped and centred rather than widened into columns: the roadmap is a
@@ -184,17 +190,13 @@ export function RoadmapView() {
         <div className="mb-3.5 flex items-center gap-2.5">
           <span className="text-xl">🎯</span>
           <div>
-            <div className="text-[11px] font-extrabold tracking-widest text-muted uppercase">
-              Target Grade
-            </div>
+            <div className={label}>{c.targetGrade}</div>
             <div className="font-heading text-xl font-extrabold text-yellow">
               {userData.grade || "—"}
             </div>
           </div>
           <div className="ml-auto text-right">
-            <div className="text-[11px] font-extrabold tracking-widest text-muted uppercase">
-              {t.examDate}
-            </div>
+            <div className={label}>{t.examDate}</div>
             {/* The count carries the emphasis and the words ride small beside
                 it — at 320px "350 Days Left" all at text-xl wraps mid-phrase. */}
             <div className="font-heading text-xl font-extrabold text-pink">
@@ -206,63 +208,19 @@ export function RoadmapView() {
           </div>
         </div>
         <div className="rounded-xl bg-purple/5 p-3.5 text-center">
-          <div className="mb-1.5 text-[11px] font-extrabold tracking-widest text-muted uppercase">
-            ⏰ {t.recommendedTime}
-          </div>
+          <div className={cn("mb-1.5", label)}>⏰ {t.recommendedTime}</div>
           <div className="font-heading text-4xl font-bold text-[var(--brand-flame-from)]">
             {hrs}
           </div>
           <div className="text-sm font-bold text-muted">{t.hoursPerDay}</div>
           <div className="mt-1 text-[11px] text-muted">{t.basedOn}</div>
+          <div className="mt-1 text-xs font-extrabold text-text">
+            {studiedTodayLabel(minutesToday, lang)}
+          </div>
         </div>
       </div>
 
-      {/* Daily Mission */}
-      <div className="mb-4 rounded-2xl border border-border bg-surface p-4 shadow-panel">
-        <div className="mb-3 flex items-center gap-1.5 font-heading text-sm font-extrabold">
-          🎯 {t.dailyMission}
-        </div>
-        {!allMissionsDone ? (
-          <div className="flex flex-col gap-2">
-            {missionRows.map((row) => {
-              const done = tasks[row.key];
-              return (
-                <div
-                  key={row.key}
-                  className="flex items-center gap-3 rounded-xl bg-purple/5 px-3 py-2.5"
-                >
-                  <span className="text-xl">{row.icon}</span>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-extrabold">{row.label}</div>
-                    <div className="text-xs font-bold text-muted">
-                      {done
-                        ? lang === "en"
-                          ? "Done ✓"
-                          : "ធ្វើរួច ✓"
-                        : `${row.count} ${lang === "en" ? "today" : "ថ្ងៃនេះ"}`}
-                    </div>
-                  </div>
-                  {/* No "Done" button: a mission ticks only when the work is
-                      actually finished (a lesson, a quiz, a flashcard review),
-                      never on a tap. The same `tasks` field Home reads. */}
-                  {!done && (
-                    <Link
-                      to={row.href}
-                      className="shrink-0 rounded-full bg-purple/10 px-2.5 py-1 text-[11px] font-extrabold text-purple"
-                    >
-                      {lang === "en" ? "Go →" : "ទៅ →"}
-                    </Link>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="py-2 text-center text-sm font-extrabold text-mint">
-            {t.missionDone}
-          </div>
-        )}
-      </div>
+      <DailyMission title={t.dailyMission} />
 
       {/* Phases */}
       <div className="mb-4">
@@ -278,38 +236,56 @@ export function RoadmapView() {
             </linearGradient>
           </defs>
         </svg>
-        <div className="flex flex-col">
-          {phases.map((p, i) => {
-            const isFirst = i === 0;
-            const isLast = i === phases.length - 1;
-            const isMissingContent = p.subjects.length > 0 && !p.hasLessonContent;
-            const onRight = i % 2 === 1;
+        {/* Not until the list of what exists has arrived: before that every month
+            would read as empty, and every weak subject as coming soon. */}
+        {manifest.status !== "ready" ? (
+          <ContentNotice
+            state={manifest.status === "failed" ? "offline" : "loading"}
+            onRetry={retryContent}
+          />
+        ) : (
+          <>
+            {plan.waiting.length > 0 && (
+              <p className="mb-3 text-xs leading-relaxed font-bold text-muted">
+                {waitingLabel(plan.waiting.map(subjectName).join(", "), lang)}
+              </p>
+            )}
+            <div className="flex flex-col">
+              {plan.months.map((m, i) => {
+                const isCurrent = m.status === "current";
+                const isLast = i === plan.months.length - 1;
+                const onRight = i % 2 === 1;
+                const progress = monthProgress(m, lang);
 
-            return (
-              <div key={i}>
-                {i > 0 && <PathConnector flip={i % 2 === 0} />}
-                <Link
-                  to={p.hasLessonContent ? "/lessons" : "/exam"}
-                  className={`flex items-center gap-3 ${onRight ? "flex-row-reverse" : ""}`}
-                >
-                  <PhaseNode phase={p} isFirst={isFirst} isLast={isLast} />
-                  <div className="max-w-[210px] rounded-2xl border border-border bg-surface p-3 shadow-panel-sm">
-                    <div className="text-[11px] font-extrabold text-muted">
-                      {t.month} {p.month}
-                      {isMissingContent && ` · ${t.comingSoon}`}
-                    </div>
-                    <div className="text-sm font-extrabold">{p.title}</div>
-                    {isFirst && (
-                      <div className="mt-1 inline-block rounded-full bg-pink/10 px-2 py-0.5 text-[10px] font-extrabold text-pink">
-                        {lang === "en" ? "Start now" : "ចាប់ផ្តើមឥឡូវនេះ"}
+                return (
+                  <div key={m.key}>
+                    {i > 0 && <PathConnector flip={i % 2 === 0} />}
+                    <Link
+                      to={`/roadmap/${m.key}`}
+                      className={`flex items-center gap-3 ${onRight ? "flex-row-reverse" : ""}`}
+                    >
+                      <PhaseNode icon={monthIcon(m)} isFirst={isCurrent} isLast={isLast} />
+                      <div className="max-w-[210px] rounded-2xl border border-border bg-surface p-3 shadow-panel-sm">
+                        <div className="text-[11px] font-extrabold text-muted">
+                          {monthLabel(m.key, lang)}
+                        </div>
+                        <div className="text-sm font-extrabold">{monthTitle(m)}</div>
+                        {progress && (
+                          <div className="mt-0.5 text-[10px] font-bold text-muted">{progress}</div>
+                        )}
+                        {isCurrent && (
+                          <div className="mt-1 inline-block rounded-full bg-pink/10 px-2 py-0.5 text-[10px] font-extrabold text-pink">
+                            {m.done === 0 ? c.startNow : c.thisMonth}
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </Link>
                   </div>
-                </Link>
-              </div>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Unsigned students are asked to commit to the plan they just read

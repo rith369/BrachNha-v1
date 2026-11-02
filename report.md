@@ -15,6 +15,38 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+## 2 Nov 2026: The Roadmap Is a Real Plan
+
+Commit: `PENDING`. No database step.
+
+**What changed:**
+
+- The path now shows **real months** (November 2026 to August 2027) instead of "Month 1,
+  Month 2", and marks the current one. It used to say "Month 1, Start now" for ever.
+- Months are filled with **real lessons, flashcard decks and quizzes**, hardest subject
+  first. That means real scores once a student has them, and the survey answers until
+  then. Past papers wait for the exam month.
+- **Tap a month** to see its list, with finished items ticked. Each item opens directly.
+  The current month also has a "Today" box, and the exam month has the Bac II Simulation.
+- **Missed work moves forward by itself**, so nobody falls behind. Past months show what
+  was finished. They don't list what was skipped, because those items are in the current
+  month.
+- **Daily Mission tells the truth**: it names the next lesson, quiz and flashcards and goes
+  straight to them, as Home does. It used to say "20 Practice today" when one quiz ticked it.
+- The recommended hours now show the **minutes really studied today**.
+- On the Khmer page, "Target Grade" is translated, "Flashcard" is spelled the usual way,
+  and "Bac II" no longer turns into "BAC II".
+- A weak subject with no lessons yet is mentioned once above the path.
+
+**What did not change:** the look of the path (the glow, discs and emoji), on request. The
+signed pledge still quotes "3 lessons, 20 questions" as its goal.
+
+**What to re-test:**
+
+- With a real account that has real history: do past months and ticks look right?
+- With a brand-new account: after the survey, does the plan start on the weak subjects?
+- The new Khmer wording, which nobody has read through yet.
+
 ## 2 Nov 2026: Add a Friend With a Link or QR Code
 
 Commit: `7d3d84e`. **Database step: run `20261102000001_friend_invite.sql` in the Supabase

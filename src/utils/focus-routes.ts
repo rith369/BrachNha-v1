@@ -166,7 +166,8 @@ export function isStudyRoute(pathname: string): boolean {
 /**
  * Routes whose page does NOT render BottomNav. Roadmap is a single sequential
  * journey rather than a tab destination, and Profile is a short settings page
- * — neither pages/roadmap.tsx nor pages/profile.tsx mount one.
+ * — neither pages/roadmap.tsx, pages/roadmap-month.tsx nor pages/profile.tsx
+ * mount one.
  *
  * FabChat needs to know this: its resting bottom offset is calibrated to float
  * just above BottomNav's reserved space (see fab-chat.tsx). Where BottomNav is
@@ -175,5 +176,5 @@ export function isStudyRoute(pathname: string): boolean {
  * directly on top of the Daily Mission list's Done button.
  */
 export function isBottomNavRoute(pathname: string): boolean {
-  return pathname !== "/roadmap" && pathname !== "/profile";
+  return !pathname.startsWith("/roadmap") && pathname !== "/profile";
 }
