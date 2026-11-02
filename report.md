@@ -51,7 +51,7 @@ phone, and check it still sits neatly on its line.
 
 ## 3 Nov 2026: The Simulation Must Be Finished Within 2 Days
 
-Commit: `HASH_HERE`. No database step.
+Commit: `7107e71`. No database step.
 
 Students can sit the papers at any hours they like, but must finish them all within 48 hours
 of starting their first paper. Before this there was no limit, so an attempt could drag on
