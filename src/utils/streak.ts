@@ -11,12 +11,13 @@
  * stopped being a hardcoded seed. `currentStreak` / `bestStreak` are where that
  * number now comes FROM: the store's `activityLog`, one entry per day studied.
  *
- * THE RULE (the user's, 3 Nov 2026): A DAY COUNTS ONCE ANY 1 ACTIVITY IS FINISHED,
- * a lesson, a quiz, a flashcard review or the daily challenge. Reaching all four
- * of the day's targets opens a gift instead of being what keeps the streak, so a
- * busy day still counts and a full one is still worth doing. Just opening the app
- * doesn't count, and neither does answering part of something, which still fills
- * the day in on the Profile calendar, more faintly.
+ * THE RULE (the user's, 3 Nov 2026): A DAY COUNTS ONCE ANY 1 MISSION IS FINISHED,
+ * that is, once one row of the card reaches today's target: the day's lessons, the
+ * day's quizzes, a flashcard review or the daily challenge. Reaching all four opens
+ * a gift instead of being what keeps the streak, so a busy day still counts and a
+ * full one is still worth doing. Just opening the app doesn't count, and neither
+ * does studying short of a target, which still fills the day in on the Profile
+ * calendar, more faintly.
  *
  * It used to need all of lesson, practice and flashcards. Days that met that
  * remain streak days; days that did not stay as they were.

@@ -66,12 +66,12 @@ function examCountdownLabel(days: number, lang: Lang): string {
 function goalNudge(streak: number, lang: Lang): string {
   if (lang === "km") {
     return streak > 0
-      ? `បញ្ចប់សកម្មភាពណាមួយថ្ងៃនេះ ដើម្បីរក្សា Streak របស់អ្នកកុំឲ្យដាច់។`
-      : `បញ្ចប់សកម្មភាពណាមួយថ្ងៃនេះ ដើម្បីចាប់ផ្តើម Streak របស់អ្នក។`;
+      ? `បញ្ចប់ភារកិច្ចណាមួយថ្ងៃនេះ ដើម្បីរក្សា Streak របស់អ្នកកុំឲ្យដាច់។`
+      : `បញ្ចប់ភារកិច្ចណាមួយថ្ងៃនេះ ដើម្បីចាប់ផ្តើម Streak របស់អ្នក។`;
   }
   return streak > 0
-    ? `Finish any 1 activity today to keep your streak going.`
-    : `Finish any 1 activity today to start your streak.`;
+    ? `Finish any 1 mission today to keep your streak going.`
+    : `Finish any 1 mission today to start your streak.`;
 }
 
 function Stat({

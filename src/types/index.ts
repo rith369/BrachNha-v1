@@ -81,7 +81,7 @@ export type DayCounts = Record<keyof Tasks, number>;
 export interface DayActivity {
   /** XP earned that day. > 0 means the student studied. */
   xp: number;
-  /** The day counts toward the streak: since 3 Nov 2026, at least one activity was
+  /** The day counts toward the streak: since 3 Nov 2026, at least one mission was
    *  finished; before that, all three goal tasks were. */
   goal: boolean;
   /**

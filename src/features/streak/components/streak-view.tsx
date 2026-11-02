@@ -58,7 +58,7 @@ export function StreakView() {
   const today = todayKey();
 
   const todayTasks = tasksDate === today ? tasks : null;
-  // Any finished activity keeps the streak, so that is what is celebrated.
+  // Any finished mission keeps the streak, so that is what is celebrated.
   const completed = activityLog[today]?.goal === true;
   const targets = dailyTargets(grade, monthsUntilExam());
 

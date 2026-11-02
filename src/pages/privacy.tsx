@@ -207,7 +207,7 @@ export default function PrivacyPage() {
             your working you add; and in Streak with Friends, any signed-in
             student can find you by your display name or by opening your invite
             link, and a friend you have
-            accepted sees which days you studied since you
+            accepted sees which days you finished a mission since you
             became friends. You can report a photo that should not be there,
             and we review every report. You can remove a friend at any time.
           </p>
@@ -220,7 +220,7 @@ export default function PrivacyPage() {
             ហើយក្នុងការប្រកួត សិស្សម្នាក់ទៀតឃើញពិន្ទុ
             និងរូបថតការគណនាដែលអ្នកបន្ថែម។ ក្នុង Streak ជាមួយមិត្តភក្តិ
             សិស្សដែលចូលគណនីអាចស្វែងរកអ្នកតាមឈ្មោះ ឬបើកតំណអញ្ជើញរបស់អ្នកបាន
-            ហើយមិត្តដែលអ្នកបានទទួលយក ឃើញថ្ងៃដែលអ្នកបានរៀន
+            ហើយមិត្តដែលអ្នកបានទទួលយក ឃើញថ្ងៃដែលអ្នកបានបញ្ចប់ភារកិច្ច
             ចាប់តាំងពីថ្ងៃដែលអ្នកក្លាយជាមិត្តនឹងគ្នា។ អ្នកអាចរាយការណ៍រូបថតដែលមិនសមរម្យ
             ហើយយើងពិនិត្យរាល់របាយការណ៍។ អ្នកអាចដកមិត្តចេញបានគ្រប់ពេល។
           </p>

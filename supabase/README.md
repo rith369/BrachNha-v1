@@ -568,7 +568,7 @@ from an invite link lands on the home page and has to open the link again.
 
 Adds five columns to `daily_activity` (whether the day counts for the streak, how many
 lessons, quizzes and reviews were finished, whether the gift was opened), and updates
-`leaderboard()` and `my_friends()` so a day with one finished activity counts. Days that met
+`leaderboard()` and `my_friends()` so a day with one finished mission counts. Days that met
 the old goal still count, and nobody's history changes.
 
 Run it in the SQL editor, in one go, AFTER `20260916000004` and `20261013000001`, and BEFORE

@@ -61,12 +61,13 @@ export function SectionComplete({
   const navigate = useNavigate();
   const manifest = useContentManifest();
   const feed = useStudyFeed();
-  const { completedSessions, tasks, tasksDate, streak } = useBrachNhaStore(
+  const { completedSessions, tasks, tasksDate, streak, streakKept } = useBrachNhaStore(
     useShallow((s) => ({
       completedSessions: s.completedSessions,
       tasks: s.tasks,
       tasksDate: s.tasksDate,
       streak: s.streak,
+      streakKept: s.activityLog[todayKey()]?.goal === true,
     }))
   );
 
@@ -198,8 +199,9 @@ export function SectionComplete({
           </div>
           <div className="mt-3 flex items-center gap-1.5 text-xs font-bold text-muted md:text-sm">
             <Flame className="size-4 shrink-0 text-pink" strokeWidth={2.5} aria-hidden />
-            {/* Finishing this section is itself what keeps the streak. */}
-            {`បានរក្សា Streak ហើយ! Streak ${streak} ថ្ងៃ`}
+            {streakKept
+              ? `បានរក្សា Streak ហើយ! Streak ${streak} ថ្ងៃ`
+              : "បញ្ចប់ភារកិច្ចណាមួយ ដើម្បីរក្សា Streak"}
           </div>
           <MissionGift className="mt-2" lang="km" />
         </div>

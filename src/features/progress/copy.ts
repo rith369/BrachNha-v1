@@ -181,11 +181,11 @@ const en = {
   }),
   tipKeepStreak: (streak: number) => ({
     title: "Keep your streak",
-    body: `Finish any 1 activity today to make it ${streak + 1} days.`,
+    body: `Finish any 1 mission today to make it ${streak + 1} days.`,
   }),
   tipStartStreak: () => ({
     title: "Start a streak",
-    body: `Finish any 1 activity today to start one.`,
+    body: `Finish any 1 mission today to start one.`,
   }),
   tipWeakest: (subject: string, pct: number) => ({
     title: `Focus on ${subject}`,
@@ -350,11 +350,11 @@ const km: ProgressCopy = {
   }),
   tipKeepStreak: (streak) => ({
     title: "រក្សា Streak របស់អ្នក",
-    body: `បញ្ចប់សកម្មភាពណាមួយថ្ងៃនេះ ដើម្បីឲ្យវាក្លាយជា ${streak + 1} ថ្ងៃ។`,
+    body: `បញ្ចប់ភារកិច្ចណាមួយថ្ងៃនេះ ដើម្បីឲ្យវាក្លាយជា ${streak + 1} ថ្ងៃ។`,
   }),
   tipStartStreak: () => ({
     title: "ចាប់ផ្តើម Streak",
-    body: `បញ្ចប់សកម្មភាពណាមួយថ្ងៃនេះ ដើម្បីចាប់ផ្តើម។`,
+    body: `បញ្ចប់ភារកិច្ចណាមួយថ្ងៃនេះ ដើម្បីចាប់ផ្តើម។`,
   }),
   tipWeakest: (subject, pct) => ({
     title: `ផ្តោតលើ${subject}`,

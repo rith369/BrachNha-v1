@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Nov 2026: Daily Targets, an Easier Streak and a Daily Gift
 
-Commit: `eb12fe8`. **Database step: run `20261103000001_daily_targets_and_gift.sql` in the
+Commit: `eb12fe8` and `PENDING`. **Database step: run `20261103000001_daily_targets_and_gift.sql` in the
 Supabase SQL editor BEFORE this goes live.**
 
 **What changed:**
@@ -25,9 +25,10 @@ Supabase SQL editor BEFORE this goes live.**
 - **Missions now have daily targets** from the student's target grade and the time left. A
   grade A student today sees "Complete 3 lessons" and "Complete 2 quizzes", with a count such
   as 1/3. Flashcards and the daily challenge stay at one. Any lesson or quiz counts.
-- **Finishing any 1 activity keeps the streak.** It used to need a lesson, a quiz and
-  flashcards on the same day, so a student who did ten quizzes got no streak. Streak with
-  Friends and the Leaderboard follow the same rule.
+- **Finishing any 1 mission keeps the streak.** That means one full row: for grade A, 3
+  lessons or 2 quizzes, or 1 flashcard review, or 1 daily challenge. It used to need a lesson,
+  a quiz and flashcards on the same day, so a student who did ten quizzes got no streak.
+  Streak with Friends and the Leaderboard follow the same rule.
 - **Reaching all 4 missions opens a gift**: +50 XP and 12 coins, once a day. A gift left
   unopened is paid the next day, so nobody loses it.
 - A flashcard review needs at least 5 cards, or the whole deck if it is smaller. A shorter
@@ -45,9 +46,10 @@ be spent on anything.
 
 **What to re-test:**
 
-- Do one quiz: the streak should light up, and the quiz mission should read 1/2 for grade A.
+- As grade A, do one quiz: it should read 1/2 with no streak yet. A second quiz should tick
+  the mission and light up the streak.
 - Finish all 4 missions and open the gift, on Home.
-- Two friends who each finish one activity: their shared streak should move.
+- Two friends who each finish one mission: their shared streak should move.
 - The new Khmer wording, which nobody has read through yet.
 
 ## 2 Nov 2026: One Missions Card

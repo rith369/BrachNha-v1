@@ -32,7 +32,7 @@ const TASK_ICON: Record<DailyTaskId, LucideIcon> = {
 /**
  * Today's missions: a ring, the four behind it, and a link to the next one. The
  * ring is the way to the gift; the line beside it is the streak, which any one
- * finished activity keeps.
+ * finished mission keeps.
  *
  * REAL since 1 Oct 2026: the tasks are the store's own, and each one still open
  * is a link to where that work is done. There is no button that completes the

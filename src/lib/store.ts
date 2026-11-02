@@ -30,7 +30,7 @@ import { FLASHCARD_XP, FLASHCARD_COINS, GIFT_XP, TASK_XP } from "@/utils/rewards
 import { monthsUntilExam } from "@/utils/exam-date";
 import { dailyTargets } from "@/utils/roadmap";
 import { addDaysKey, parseDayKey, todayKey } from "@/utils/day";
-import { allMissionsDone, currentStreak } from "@/utils/streak";
+import { allMissionsDone, currentStreak, missionsDone } from "@/utils/streak";
 import { levelForXp } from "@/utils/level";
 
 export type {
@@ -495,9 +495,9 @@ interface BrachNhaState {
   /** `coins` overrides the default XP→coins ratio; see `award`. */
   addXp: (amount: number, coins?: number) => void;
   /**
-   * One activity of this kind was finished. Any finished activity makes today a
-   * streak day; the mission ticks and pays TASK_XP when the count reaches today's
-   * target. Any lesson or quiz counts, not a particular one.
+   * One activity of this kind was finished. The mission ticks and pays TASK_XP when
+   * the count reaches today's target, and any ticked mission makes today a streak
+   * day. Any lesson or quiz counts, not a particular one.
    */
   completeTask: (task: keyof Tasks) => void;
   /** Pays the gift, once a day, and only once all four missions are done. */
@@ -1014,12 +1014,18 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           const rewarded = reached
             ? award(base, TASK_XP)
             : { xp: base.xp, level: base.level, coins: base.coins, activityLog: base.activityLog };
-          // THE ONLY PLACE A STREAK DAY IS MADE: any finished activity makes one.
-          const activityLog = logGoal(rewarded.activityLog, today);
+          const tasks = reached ? { ...base.tasks, [task]: true } : base.tasks;
+          // THE ONLY PLACE A STREAK DAY IS MADE: any finished mission makes one. Read
+          // from the ticks rather than from `reached`, so a mission ticked before this
+          // rule shipped still counts on that student's next activity.
+          const activityLog =
+            missionsDone(tasks) > 0
+              ? logGoal(rewarded.activityLog, today)
+              : rewarded.activityLog;
           return {
             ...base,
             ...rewarded,
-            tasks: reached ? { ...base.tasks, [task]: true } : base.tasks,
+            tasks,
             dayCounts,
             tasksDate: today,
             activityLog,

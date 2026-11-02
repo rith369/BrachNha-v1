@@ -5,13 +5,13 @@ import { MISSIONS } from "@/utils/streak";
 const COPY = {
   en: {
     streakKept: "Streak kept for today",
-    streakHint: "Finish any 1 activity to keep your streak",
+    streakHint: "Finish any 1 mission to keep your streak",
     openGift: "Open your gift",
     done: "Done",
   },
   km: {
     streakKept: "បានរក្សា Streak ថ្ងៃនេះហើយ",
-    streakHint: "បញ្ចប់សកម្មភាពណាមួយ ដើម្បីរក្សា Streak",
+    streakHint: "បញ្ចប់ភារកិច្ចណាមួយ ដើម្បីរក្សា Streak",
     openGift: "បើកអំណោយ",
     done: "រួច",
   },

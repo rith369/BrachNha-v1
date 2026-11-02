@@ -3,13 +3,13 @@
 -- ============================================================================
 --
 -- THE USER'S DECISIONS (3 Nov 2026):
---   * a day counts for the streak once the student finishes ANY 1 activity (a
---     lesson, a quiz, a flashcard review or the daily challenge);
---   * each mission has a daily target from the target grade and months left, and
---     reaching ALL FOUR opens a gift.
+--   * each mission has a daily target from the target grade and months left;
+--   * a day counts for the streak once the student finishes ANY 1 mission (the
+--     day's lessons, the day's quizzes, a flashcard review or the daily challenge);
+--   * reaching ALL FOUR opens a gift.
 --
--- SO A STREAK DAY NO LONGER MEANS "ALL THREE TASK FLAGS". A day with one quiz has
--- task_lesson false and still counts. `streak_day` says so directly.
+-- SO A STREAK DAY NO LONGER MEANS "ALL THREE TASK FLAGS". A day with only the quiz
+-- mission has task_lesson false and still counts. `streak_day` says so directly.
 --
 -- OLD DAYS KEEP COUNTING. The rule reads `streak_day or (all three flags)`, so a
 -- day that met the old goal still counts with no backfill, and a day that did not

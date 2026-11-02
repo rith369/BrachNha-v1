@@ -18,7 +18,7 @@ export interface StreakDay {
   id: WeekdayId;
   /** Local `YYYY-MM-DD` of this cell. */
   key: string;
-  /** A streak day: at least one activity finished, NOT "opened the app". */
+  /** A streak day: at least one mission finished, NOT "opened the app". */
   done: boolean;
 }
 

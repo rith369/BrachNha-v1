@@ -307,7 +307,7 @@ friend is. **The one thing added to make it real is a friendship model**;
 everything the streak needs already existed in `daily_activity`.
 
 **The rule is the whole feature: a day counts only when BOTH finished their
-daily goal** (since 3 Nov 2026, at least 1 activity each; see "Daily targets, the
+daily goal** (since 3 Nov 2026, at least 1 mission each; see "Daily targets, the
 streak and the gift" at the end of this note). One person doing the work earns the pair nothing. **Don't
 reintroduce ranking here**: an earlier version ranked friends by their own
 streaks, and "beat your friends" is what `/leaderboard` is for.
@@ -496,7 +496,7 @@ calendar needed a real log first — and once that existed, the streak and the t
 string-literal labels under the stat pills ("▲ +20 today", "Best!") could be
 made TRUE rather than deleted.
 
-**SUPERSEDED 3 Nov 2026: any 1 finished activity now makes a streak day. See "Daily
+**SUPERSEDED 3 Nov 2026: any 1 finished mission now makes a streak day. See "Daily
 targets, the streak and the gift" at the end of this note. The next paragraph is history.**
 
 **THE RULE — A DAY COUNTS ONLY WHEN THE DAILY GOAL IS COMPLETE.** The user's
@@ -672,9 +672,14 @@ into a `.ts` so both screens share one list.
 ### Daily targets, the streak and the gift (3 Nov 2026)
 
 The user's design, across several messages: the amount of daily work follows the target
-grade and the time left, **any 1 finished activity keeps the streak**, and **reaching all 4
-missions opens a gift**. A student who only does quizzes keeps their streak; the gift is the
-reason to do more. The user was told the published content cannot fill these targets yet (29
+grade and the time left, **any 1 finished mission keeps the streak**, and **reaching all 4
+missions opens a gift**. A student who only does quizzes keeps their streak by reaching that
+row's target; the gift is the reason to do more.
+
+**A mission, not an activity, was the user's explicit choice** the same day. An ACTIVITY is one
+finished thing (1 lesson); a MISSION is one row reaching its target (3 lessons for grade A). It
+was built first on 1 activity and offered back with the difference spelled out. So 1 lesson of
+3 keeps nothing, though 1 flashcard review or 1 challenge is always a whole mission. The user was told the published content cannot fill these targets yet (29
 items) and chose to build the logic regardless, for the content that is coming.
 
 **The targets are `dailyTargets(grade, monthsLeft)` in `utils/roadmap.ts`**, from
@@ -696,9 +701,10 @@ a quarter hour, and is what the Roadmap card and a NEW pledge show, so the scree
 cannot disagree (grade A shows 2.5 today, not 3.5). A signed pledge keeps its frozen numbers.
 
 **`completeTask(task)` now means "one activity of this kind was finished"**, so its seven callers
-did not change. It adds to `dayCounts`, ALWAYS makes today a streak day, and ticks `tasks[task]`
-and pays `TASK_XP` only when the count reaches today's target. So `tasks` means "this mission's
-target is reached", and **`ActivityLog.goal` now means "a streak day"**: the name stayed so its
+did not change. It adds to `dayCounts`, and ticks `tasks[task]` and pays `TASK_XP` when the count
+reaches today's target. Any ticked mission makes today a streak day, read from the ticks so one
+ticked before this shipped counts on the next activity. So `tasks` means "this mission's target
+is reached", and **`ActivityLog.goal` now means "a streak day"**: the name stayed so its
 many readers (calendar, friends, leaderboard, `currentStreak`) needed no change. What counts:
 - any section, any full quiz sitting, any battle or exam. Retrying only wrong answers still does
   not count (it never reaches `completeTask`). Re-finishing a section DOES, accepted;
@@ -727,7 +733,8 @@ the way to the gift, not the streak.
 `my_friends()` (copied verbatim, one condition changed) to read `streak_day or (all three flags)`.
 So **old days that met the old goal still count, days that did not stay as they were, and no
 backfill is needed**. The push writes `streak_day` for past days and NOT the task flags: it used to
-write all three true on a goal day, which would now claim a lesson on a quiz-only day. The pull
+write all three true on a goal day, which would now claim a lesson on a day with only the quiz
+mission. The pull
 reads the same rule back. **It must be applied BEFORE this code ships**, or the push of today's
 row is refused.
 
@@ -739,14 +746,14 @@ the same as `tasks`' XP today.
 migrations: 15 checks (new columns, a negative refused, quiz-only days counted by the leaderboard
 and friends, old all-three days still counted, partial old days not, own-rows policies unchanged,
 `anon` still refused both functions). The REAL store and sync through `ssrLoadModule` with only
-`getSupabase()` faked: 72 checks (the whole table above, the cap, each activity making a streak
-day, 10 quizzes, below/at/past target, the gift's refusals and single payment, the new day paying
+`getSupabase()` faked: 76 checks (the whole table above, the cap, each mission's target making a
+streak day and falling short of it not, an earlier tick counting, 10 quizzes, below/at/past target, the gift's refusals and single payment, the new day paying
 an unopened gift without logging a study day, a quiet wake publishing nothing, old and new days
 chaining, a gap breaking it; what is pushed, with each batch keeping stable columns; what is
-pulled, including all-three old days and partial ones). Browser: 83 checks at 390, 320 dark Khmer
+pulled, including all-three old days and partial ones). Browser: 86 checks at 390, 320 dark Khmer
 (Home's card at 0, part way and all done; opening the gift and a reload not paying again; the next
 day paying; Streak, Roadmap, Profile and Progress wording; the pledge's numbers; a real whole-deck
 review ticking; a real one-card review not ticking and saying why; a real section through to its
-completion screen), and the Roadmap (59), friends (50) and plan (31) suites still pass.
+completion screen, as 1 of 3 lessons with no streak yet, and as grade E's whole mission), and the Roadmap (59), friends (50) and plan (31) suites still pass.
 **Not verified: two real accounts on the friend page after the rule change, or a real gift on a
 real phone.**
