@@ -17,7 +17,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Nov 2026 — A section counts once a day, and the pledge says sections
 
-Commit: `PENDING`.
+Commit: `94894b2`.
 
 **What changed.**
 
