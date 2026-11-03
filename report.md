@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Nov 2026: Limits on Fake XP
 
-Commit: `HASH_HERE`. **Database step:** run `20261103000007_progress_number_limits.sql` in the Supabase
+Commit: `01c46e6`. **Database step:** run `20261103000007_progress_number_limits.sql` in the Supabase
 SQL editor. Nothing in the app changed, so it works before or after.
 
 Someone with technical skill could write any XP number or mark months of old days as studied, and go
