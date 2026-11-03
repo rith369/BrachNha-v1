@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Nov 2026: Limit on Rows per Student
 
-Commit: `HASH_HERE`. **Database step:** run `20261103000009_row_limits_per_student.sql` in the Supabase
+Commit: `c7c2db7`. **Database step:** run `20261103000009_row_limits_per_student.sql` in the Supabase
 SQL editor. Nothing in the app changed, so it works before or after.
 
 A script could keep adding rows to its own account until the database ran out of space. Now each student
