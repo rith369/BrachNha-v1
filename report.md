@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Nov 2026: Practice What I Got Wrong
 
-Commit: `HASH_HERE`. **Database step: run `20261103000004_question_mistakes.sql` in the SQL
+Commit: `f7bb3d8`. **Database step: run `20261103000004_question_mistakes.sql` in the SQL
 editor.** It can be done before or after this deploys. Until it is, the list stays on the
 student's phone and is not saved to their account.
 
