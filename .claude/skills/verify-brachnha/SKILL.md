@@ -22,6 +22,7 @@ npx tsc -b            # NOT tsc --noEmit -p tsconfig.json — this is a solution
 npx oxlint            # NOT eslint — there is no eslint config in this repo
 npm run check:digits  # no Khmer numerals in src/ or index.html
 npm run check:content # content files under content/
+npm test              # database rules on a real engine (tests/db/), about 10 seconds
 ```
 
 All four must report zero NEW issues. These warnings are known and are not

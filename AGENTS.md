@@ -206,6 +206,7 @@ composer's lazy panel, **Zustand + persist** as the single global store, and
 - `supabase/` = database schema as timestamped SQL migrations, plus how to
   apply them. Never edited from the dashboard's Table Editor — a change made
   there works and then nothing in the repo records that it happened
+- `tests/` = permanent tests, run by `npm test`. Keep a useful one-off test by moving it here
 - `design/` = master artwork, **never served and never bundled**. It is outside
   `public/` precisely so it can't be. Sources live here; what ships is the
   derived asset in `public/`. See `design/README.md`.
@@ -276,6 +277,7 @@ npx tsc -b            # NOT `tsc --noEmit -p tsconfig.json`: this is a solution 
 npx oxlint            # NOT eslint. One known warning: components/ui/button.tsx
 npm run check:digits  # no Khmer numerals
 npm run check:content # content files under content/
+npm test              # database rules on a real engine, about 10 seconds (tests/db/)
 npm run build         # whenever the change ships
 ```
 

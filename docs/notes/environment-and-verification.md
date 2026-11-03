@@ -301,3 +301,28 @@ FAB raises the prompt and fires no `/api/chat` request; a typed `/roadmap` shows
 the locked panel **with the navigation still on screen**; and loading with
 `?code=x` in the URL DOES pull the SDK (that last one is the callback-swallowing
 trap — see the auth section).
+
+## The permanent database tests (3 Nov 2026)
+
+`npm test` runs `tests/db/*.test.mjs` with Node's own runner, in about 10 seconds. It needs no network,
+no account and no keys, and it cannot reach the live project.
+
+- **`tests/db/setup.mjs` builds the real database:** every file in `supabase/migrations`, in order, on
+  PGlite. A migration that does not apply fails the whole suite. Only what Supabase itself provides is
+  stubbed: `auth.users`, `auth.uid()` and Storage. Its default privileges are copied, because they are
+  what makes a forgotten `revoke` a real hole.
+- **`security-audit.test.mjs` reads the catalog, so it covers what is added later:** RLS on every table,
+  `search_path` on every definer function, who may call what, every `admin_` function refusing a student,
+  every admin write keeping its `admin_audit` call, no policy querying its own table, and a row limit on
+  every table with a `user_id`. **When it fails on something new, add to its lists only with a reason.**
+- **`own-rows`, `battles`, `limits`, `gaps`** hold the rules themselves, with the real value checked
+  beside the forged one, since most of these limits cut rather than refuse.
+- **Each file gets its own database.** PGlite has ONE connection, so nothing here can test two requests at
+  the same moment: the advisory locks in `post_competition` and `keep_newest_rows` are not exercised.
+- **These replaced the one-off scripts for the database.** Checks of a migration's one-time cleanup of old
+  rows, and "the hole was there before", were not carried over, because they only mean something once.
+
+**Proved to fail:** 20 rules broken one at a time with a temporary last migration, including RLS off,
+profiles opened, the Battle cap removed, a limit dropped and hidden content opened. All 20 were caught.
+
+**Not covered yet:** the browser. Student journeys still have only one-off scripts.

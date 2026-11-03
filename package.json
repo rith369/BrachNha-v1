@@ -11,6 +11,7 @@
     "db:check": "node scripts/supabase-check.mjs",
     "check:digits": "node scripts/check-digits.mjs",
     "check:content": "node scripts/check-content.mjs",
+    "test": "node --test tests/db/*.test.mjs",
     "eval:kruai": "node scripts/kruai-eval/run.mjs",
     "content:export": "node scripts/content-export.mjs"
   },
@@ -41,6 +42,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
+    "@electric-sql/pglite": "^0.2.17",
     "@rolldown/plugin-babel": "^0.2.3",
     "@tailwindcss/vite": "^4.1.18",
     "@types/babel__core": "^7.20.5",
