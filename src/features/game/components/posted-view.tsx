@@ -25,6 +25,7 @@ export function PostedView({
   score,
   total,
   shared,
+  overLimit = false,
   competitionId,
   onExit,
   onNext,
@@ -42,6 +43,8 @@ export function PostedView({
    *  see is the whole point, so a failed publish must not be reported as
    *  "waiting for a friend to join" — nobody can join it. */
   shared: boolean;
+  /** Not shared because of today's limit, not because anything went wrong. */
+  overLimit?: boolean;
   onExit: () => void;
   /** Go on to the review — photograph the working, then see the answers. Same
    *  optional shape as ResultView's, and for the same reason. */
@@ -90,7 +93,7 @@ export function PostedView({
         </div>
 
         <p className="mx-auto max-w-xs text-sm font-bold text-muted">
-          {shared ? t.postedBlurb : t.postedOffline}
+          {shared ? t.postedBlurb : overLimit ? t.postedOverLimit : t.postedOffline}
         </p>
 
         {/* COLLAPSED BY DEFAULT, and not only for tidiness: the panel is what

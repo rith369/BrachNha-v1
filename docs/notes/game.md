@@ -908,10 +908,28 @@ pool stays unshared. That is honest, and costs one request a visit.
 
 **Still free text, on purpose:** a student's display name, which also shows on the leaderboard. That
 is not moderation of names. **Rows posted before this are not rechecked or deleted**, which is why
-`toQuestions()` still treats a stored row as untrusted. Size limits and a cap on posts per day are
-the review's separate item, not done here.
+`toQuestions()` still treats a stored row as untrusted. Size limits and a cap on posts per day came
+next: see "20 new Battles a day" below.
 
 **Verified:** the real table and policies on PGlite 0.2.17 with the real pool and questions built by
 the app's own `pickQuestions`/`toGameQuestions`: 43 checks, including the forged insert succeeding
 before and refused after. Browser, the database faked: 40 checks at 390 and 320 through the real
 create and join screens. **Not verified: a real account against the real database.**
+
+### 20 new Battles a day (3 Nov 2026)
+
+`post_competition` refuses a 21st new Battle in one Phnom Penh day with hint `too_many`
+(`20261103000006`), which `publishCompetition` reports as the reason `too_many`.
+
+- **The run is already played by then, and nothing is lost.** The Battle is on the phone, the XP and
+  mission are paid, and `PostedView` says it is today's limit rather than blaming the connection. It
+  waits as "Not shared yet" and `share-pending.ts` shares it on a later hub visit.
+- **The hub stops its pass at the first `too_many`**, since the next row would be refused too. Dev
+  shows two tries, because StrictMode runs that effect twice and the first row is in flight.
+- **The count skips a Battle that is already up there**, so re-sending one at the cap still gets the
+  duplicate error that the app reads as shared, and its label clears.
+- **An advisory lock per student** makes many posts sent at once take turns. Without it they would all
+  read the same count and all pass. **Not tested:** PGlite has one connection, so nothing ran at once.
+- **The count is of rows there now**, so deleting a Battle frees a place. A student can have 20 up from
+  one day, which is what protects the list, but post-and-delete is not capped.
+- **Attempts have no cap of their own:** one per student per Battle already holds them.

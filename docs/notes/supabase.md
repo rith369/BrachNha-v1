@@ -327,3 +327,39 @@ after it writes nothing; a partly failed pull deletes nothing; sign-out clears
 the marks; another account's marks are ignored; replace removes the other
 phone's rows and keeps its flag when a delete fails). **Not verified: two real
 phones on one Google account.**
+
+## Limits on what a student writes (3 Nov 2026, `20261103000006`)
+
+**Free text is CUT by a trigger, never refused, and this is the decision to keep.** Sync failures are
+silent (`attempt` in `lib/supabase-sync.ts` only logs), so a check refusing a long Google name would
+stop that student's whole profile saving, XP and streak included, with nothing on screen. Chat sync
+deletes a conversation's messages and re-inserts them, so one refused message would lose the
+conversation from the account.
+
+| column | limit |
+| --- | --- |
+| `profiles.display_name` | 40 (`MAX_NAME_LENGTH` in `lib/store.ts` and the name boxes match) |
+| `profiles.email` | 320 |
+| `profiles.location`, `grade`, `active_conversation_id` | 100 |
+| `profiles.strengths`, `weaknesses` | 50 items of 100 |
+| `commitments.signature` | 60000 (the longest real drawing is about 35000) |
+| `commitments.grade`, `months` | 100 |
+| `conversations.title` | 200 |
+| `chat_messages.content` | 30000 (a KruAI reply is at most 3000 tokens) |
+
+**Ids and keys are REFUSED**, with `not valid` checks so old rows cannot fail the migration: cutting
+one would point it at something else, and the app only makes short ones. `conversations.id` 100,
+`completed_sessions.lesson_id` and `daily_content_activity.content_key` 200, `exam_results.subject`
+and `pending_placement_tests.subject` 100.
+
+**A new free-text column needs a limit in the same migration:** a trigger clip if a real student can
+reach it, otherwise a check.
+
+**Not covered: how MANY rows a student can write to their own tables.** Nobody else reads those rows,
+so it can only grow storage. A script could still do that.
+
+**Verified:** the real tables, triggers and policies on PGlite 0.2.17, as the `authenticated` role: 49
+checks, including a 1,000,000-letter profile save keeping the XP in the same save, a 40-message batch
+with one giant message going in whole, and the Phnom Penh day boundary. Browser with the database faked:
+58 checks at 390 and 320. **Not verified: against the real database.** The migration's last statement
+returns `limits_in_place`, which `db:check` cannot read from outside.

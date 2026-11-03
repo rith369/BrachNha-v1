@@ -29,7 +29,11 @@ interface Draft {
 
 /** How the posting went, so the screen can say whether other students can
  *  actually see it — plus the id the review is reached by. */
-type Posted = RunResult & { shared: boolean; competitionId: string | null };
+type Posted = RunResult & {
+  shared: boolean;
+  competitionId: string | null;
+  overLimit?: boolean;
+};
 
 /**
  * `/game/create` — post a competition and take it yourself.
@@ -116,7 +120,12 @@ export default function GameCreatePage() {
     // labelled "not shared" forever.
     const shared = res.ok || res.reason === "duplicate";
     if (shared) markCompetitionShared(saved.id);
-    setPosted({ ...result, shared, competitionId: saved.id });
+    setPosted({
+      ...result,
+      shared,
+      competitionId: saved.id,
+      overLimit: !res.ok && res.reason === "too_many",
+    });
   }
 
   // THE GATE IS ON THE ROUTE, not only on the hub's Create button — a click
@@ -160,6 +169,7 @@ export default function GameCreatePage() {
         score={posted.score}
         total={posted.total}
         shared={posted.shared}
+        overLimit={posted.overLimit}
         // The invite link points here. `Posted` already carried the id for the
         // review, so nothing new had to be threaded through for the share.
         competitionId={posted.competitionId}

@@ -72,6 +72,8 @@ export const GAME_COPY = {
       "Waiting for a friend to join. You will see the result once someone plays.",
     postedOffline:
       "Saved on this device, but it could not be shared yet. Check your connection and your sign-in. Other students cannot see it until it is.",
+    postedOverLimit:
+      "You have shared the most Battles you can today. This one is saved on this device, and it will share by itself when you open Battles tomorrow.",
     done: "Done",
     // Result
     win: "You win!",
@@ -208,6 +210,8 @@ export const GAME_COPY = {
       "រង់ចាំមិត្តភក្តិចូលរួម។ នៅពេលមានគេលេង អ្នកនឹងឃើញលទ្ធផល។",
     postedOffline:
       "រក្សាទុកក្នុងឧបករណ៍នេះ ប៉ុន្តែមិនទាន់បានចែករំលែកទេ។ សូមពិនិត្យអ៊ីនធឺណិត និងគណនីរបស់អ្នក។",
+    postedOverLimit:
+      "ថ្ងៃនេះអ្នកបានចែករំលែកការប្រកួតគ្រប់ចំនួនហើយ។ ការប្រកួតនេះរក្សាទុកក្នុងឧបករណ៍នេះ ហើយនឹងចែករំលែកដោយខ្លួនឯង នៅពេលអ្នកបើកទំព័រការប្រកួតនៅថ្ងៃស្អែក។",
     done: "រួចរាល់",
     win: "អ្នកឈ្នះ!",
     loss: "អ្នកចាញ់",

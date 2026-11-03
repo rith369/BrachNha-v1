@@ -16,6 +16,24 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 3 Nov 2026: Limits on Long Text and Battles a Day
+
+Commit: `HASH_HERE`. **Database step:** run `20261103000006_text_limits_and_battle_cap.sql` in the
+Supabase SQL editor. The app and this step work in either order.
+
+Before this, someone with technical skill could skip the app's screens and save a name of a million
+letters, which everyone opening the leaderboard would then download, or post thousands of Battles to
+fill the list. Now a name stops at 40 letters and text elsewhere has limits far above real use. Text
+that is too long is cut rather than rejected, so a student's saving can never break because of it.
+
+A student can share 20 new Battles a day. The 21st is still played and kept on the phone, the screen
+says it is today's limit, and it shares by itself when they open Battles the next day.
+
+**Students should not notice any difference in normal use.** The name boxes now stop at 40 letters.
+
+**To re-test, please:** change your name on Profile and try typing more than 40 letters. Check your
+name still shows correctly on the leaderboard. The 20 a day limit is not worth testing by hand.
+
 ## 3 Nov 2026: Security Headers
 
 Commit: `465511e`. No database step.

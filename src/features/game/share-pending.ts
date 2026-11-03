@@ -81,7 +81,11 @@ async function sharePending(
       }
       // Nothing further will work on this pass. The rows stay pending and the
       // next visit tries again.
-      if (res.reason === "unconfigured" || res.reason === "unauthenticated") {
+      if (
+        res.reason === "unconfigured" ||
+        res.reason === "unauthenticated" ||
+        res.reason === "too_many"
+      ) {
         return;
       }
       // "failed" — a transient network error. Move on; this row retries later.

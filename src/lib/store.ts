@@ -106,6 +106,8 @@ function capChatThumbs(conversations: Conversation[]): Conversation[] {
 // persisted, so both need a bound like conversations and reviewHistory. 50 is
 // months of real use; oldest drop first.
 const MAX_COMPETITIONS = 50;
+/** The database cuts a name at this length too (20261103000006). */
+export const MAX_NAME_LENGTH = 40;
 
 // reviewHistory grows by one entry per grade, across every deck, for as long
 // as the student keeps studying — the fastest-growing persisted list in the
@@ -1149,7 +1151,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       setStudyLanguage: (language) => set({ userLanguage: language }),
       completeLogin: (data) =>
         set({
-          userName: data.name,
+          userName: data.name.slice(0, MAX_NAME_LENGTH),
           userLanguage: data.language,
           userEmail: data.email ?? "",
           userAge: data.age ?? "",
@@ -1161,7 +1163,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       // writing one would throw the student back onto the signup form.
       setUserName: (name) =>
         set((state) => {
-          const trimmed = name.trim();
+          const trimmed = name.trim().slice(0, MAX_NAME_LENGTH);
           return trimmed && trimmed !== state.userName
             ? { userName: trimmed }
             : state;

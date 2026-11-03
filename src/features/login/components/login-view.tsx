@@ -2,7 +2,7 @@ import { track } from "@/lib/telemetry";
 import { useState } from "react";
 import { Flag } from "@/components/ui/flag";
 import { Wordmark } from "@/components/shell/wordmark";
-import { useBrachNhaStore } from "@/lib/store";
+import { MAX_NAME_LENGTH, useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { useT } from "@/data/translations";
 import type { TranslationKey } from "@/data/translations";
@@ -143,6 +143,7 @@ export function LoginView() {
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
+            maxLength={MAX_NAME_LENGTH}
             onKeyDown={(e) => e.key === "Enter" && submit()}
             placeholder={t.namePlaceholder}
             autoFocus
@@ -210,6 +211,7 @@ export function LoginView() {
           {province === OTHER_LOCATION && (
             <input
               value={customLocation}
+              maxLength={100}
               onChange={(e) => setCustomLocation(e.target.value)}
               placeholder={t.otherLocationPlaceholder}
               className={`${inputClasses} mt-2`}

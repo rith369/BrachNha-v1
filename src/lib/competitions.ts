@@ -40,6 +40,8 @@ export type FailReason =
   | "unconfigured"
   | "unauthenticated"
   | "duplicate"
+  /** Today's limit on new Battles (20261103000006). Shares by itself tomorrow. */
+  | "too_many"
   | "failed";
 
 /** Every call reports success or a reason, never a bare throw. */
@@ -203,6 +205,7 @@ export async function publishCompetition(
     p_ms: competition.creatorMs,
   });
 
+  if (error?.hint === "too_many") return fail("too_many");
   if (error) return fail(error.code === UNIQUE_VIOLATION ? "duplicate" : "failed");
   return { ok: true, data: null };
 }
