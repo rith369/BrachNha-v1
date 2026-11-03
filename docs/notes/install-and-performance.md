@@ -205,3 +205,44 @@ instead, so they land on the new build:
 Verified in Chrome by making a chunk 404 (7 checks): missing once → one reload
 and the page opens with no error screen, in the build and on the dev server;
 missing always → exactly one reload, then the error screen, no loop.
+
+## Security headers (3 Nov 2026)
+
+`vercel.json` sends these on every response. `npm run dev` does not, so **a CSP problem only shows in
+production**. Test with the production build served with these headers, not the dev server.
+
+- **Content-Security-Policy**, the important one. Sign-in tokens live in localStorage, so a script-
+  injection bug would otherwise be a full account takeover. It is a safety net: no such bug is known.
+- **X-Frame-Options `DENY` and `frame-ancestors 'none'`**, so another site cannot embed the app and
+  trick a student into tapping it.
+- **X-Content-Type-Options, Referrer-Policy, Permissions-Policy** (no microphone, location, payment or
+  USB). Camera stays allowed, for photos. The Referrer-Policy is `strict-origin-when-cross-origin` and
+  not stricter, because YouTube's player refuses to play with no referrer at all.
+
+**The guest list, and why each is there:**
+
+| directive | allows | for |
+| --- | --- | --- |
+| `script-src` | self, one hash, `'wasm-unsafe-eval'` | the bundle; the theme guard in `index.html`; the 3D loader's WebAssembly |
+| `style-src` | self, `'unsafe-inline'`, Google Fonts | KaTeX, Framer Motion and React style props set inline styles. It cannot run code |
+| `font-src` | self, `data:`, `fonts.gstatic.com` | KaTeX and MathLive are bundled |
+| `img-src` | self, `data:`, `blob:`, `*.supabase.co`, `*.googleusercontent.com` | chat thumbnails, photos before upload, stored photos, Google profile photos |
+| `connect-src` | self, `data:`, `blob:`, `*.supabase.co` | a wildcard so no project address sits in a tracked file. Realtime is unused, so no `wss:` |
+| `frame-src` | `www.youtube-nocookie.com` | the video facade |
+| `worker-src` | self, `blob:` | the 3D loader and the Supabase SDK |
+
+- **A NEW OUTSIDE HOST MUST BE ADDED HERE, or it silently fails for students.**
+- **`'wasm-unsafe-eval'` allows compiling WebAssembly and nothing else**: `eval` stays blocked, and
+  the test checks that. drei's `useGLTF` starts a meshopt decoder even though `brain.glb` is not
+  compressed, and without this the model's page threw an error. Found by the test.
+- **The hash in `script-src` is of the inline script in `index.html`.** Changing one character would
+  make the browser refuse it, and the only symptom would be a dark-mode flash. So `scripts/check-csp.mjs`
+  runs at the end of `npm run build` and fails the build, printing the new hash to paste.
+- **Vercel's preview toolbar is blocked on preview deployments.** Harmless.
+
+**Verified:** the production build served with the real headers, in real Chrome: 77 checks. 29 routes in
+both themes (390 light, 1280 dark), plus what loads only when used: Google Fonts, KaTeX, MathLive, a
+photo, a Google profile photo, the 3D viewer, the real YouTube player, Recharts, the service worker and
+the theme guard. An injected inline script, an outside script, an event handler, `eval`, sending data
+to another site and framing were all blocked. The only blocks left were those attacks. **Not verified:
+real Google sign-in and a real phone**, which need the deployed site.

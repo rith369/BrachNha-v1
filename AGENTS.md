@@ -162,6 +162,8 @@ composer's lazy panel, **Zustand + persist** as the single global store, and
   the QR encoder, FSRS and the admin pages must stay out of the entry chunk. Reach the
   client through `await getSupabase()`. After a build, check by content, since chunk
   names move: `grep -l "GoTrueClient" dist/assets/*.js`, plus `renderToString` for KaTeX.
+- **A new outside host must be added to the Content-Security-Policy in `vercel.json`**, or it
+  silently fails in production only (`docs/notes/install-and-performance.md`).
 - **Another student's text is untrusted.** Never pass it to
   `dangerouslySetInnerHTML` without `utils/sanitize-svg.ts` in the path.
 - **The server:** `server/chat-handler.ts` and `src/utils/chat-prompt.ts` use relative

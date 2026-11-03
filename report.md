@@ -16,6 +16,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 3 Nov 2026: Security Headers
+
+Commit: `HASH_HERE`. No database step.
+
+The site now tells browsers what it is allowed to do. If a bug ever let someone sneak code onto a page,
+the browser would refuse to run it or send data elsewhere. Other websites also can no longer embed
+BrachNha and trick students into tapping it. No such bug is known: this is a safety net.
+
+**Students should not notice any difference.**
+
+**To re-test, please, on the live site:** sign in with Google, open a lesson with a video and play it,
+ask KruAI a maths question, open the maths keyboard, and check Khmer text looks right. If something
+that used to load has stopped loading, tell the developer which screen.
+
 ## 3 Nov 2026: Battles Can Only Hold Real Questions
 
 Commit: `79f6b82`. **Database step: run `20261103000005_competition_writes_checked.sql` in the
