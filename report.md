@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Nov 2026 — Streak protection, and a surprise gift
 
-Commit: `PENDING`. **Database step: run `20261103000003_streak_protection.sql` in the SQL editor
+Commit: `71d2be6`. **Database step: run `20261103000003_streak_protection.sql` in the SQL editor
 BEFORE this deploys.** Without it, the app cannot save students' progress to their accounts.
 
 **What changed.**
