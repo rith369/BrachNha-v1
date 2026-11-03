@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Nov 2026 — A streak protection now costs 200 coins
 
-Commit: `PENDING`.
+Commit: `55ed58c`.
 
 **What changed.** Buying a streak protection on the Streak page now costs 200 coins instead of 50,
 so it takes several days of study to save up for one.
