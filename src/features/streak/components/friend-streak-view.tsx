@@ -5,7 +5,7 @@ import { Trash2 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { celebratedOn, markCelebrated } from "@/lib/streak-celebrated";
 import { removeFriendship, type FriendFail, type FriendRow } from "@/lib/friends";
-import { milestoneProgress, rankMilestones } from "@/utils/streak";
+import { dayKept, milestoneProgress, rankMilestones } from "@/utils/streak";
 import {
   myGoalOn,
   pairStreak,
@@ -95,9 +95,16 @@ export function FriendStreakView({
   };
 
   const friendDays = new Set(friend.goalDays);
+  const friendProtected = new Set(friend.protectedDays);
   const day = { you: myGoalOn(activityLog, today), friend: friendDays.has(today) };
   const todayState = sharedToday(day);
-  const streak = pairStreak(activityLog, friend.goalDays, friend.since, today);
+  const streak = pairStreak(
+    activityLog,
+    friend.goalDays,
+    friend.protectedDays,
+    friend.since,
+    today
+  );
 
   const [celebrating, setCelebrating] = useState(
     () => todayState.kept && !celebratedOn(today, friend.id)
@@ -121,6 +128,8 @@ export function FriendStreakView({
       status: sharedDayStatus(cell, {
         isToday: key === today,
         beforeStart: key < friend.since,
+        covered:
+          dayKept(activityLog, key) && (cell.friend || friendProtected.has(key)),
       }),
     });
   }

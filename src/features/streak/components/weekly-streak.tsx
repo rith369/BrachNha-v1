@@ -1,4 +1,4 @@
-import { Flame } from "lucide-react";
+import { Flame, Shield } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useBrachNhaStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
@@ -63,7 +63,9 @@ export function WeeklyStreak({
                   "flex size-8 items-center justify-center rounded-full transition-colors md:size-10",
                   day.done
                     ? "bg-flame text-white"
-                    : "border-2 border-dashed border-border text-muted",
+                    : day.saved
+                      ? "border-2 border-purple text-purple"
+                      : "border-2 border-dashed border-border text-muted",
                   // ring-offset carries the page colour so the gap reads as a
                   // gap rather than a second, paler ring.
                   isToday && "ring-2 ring-purple ring-offset-2 ring-offset-surface"
@@ -80,6 +82,9 @@ export function WeeklyStreak({
                     aria-hidden
                   />
                 )}
+                {!day.done && day.saved && (
+                  <Shield className="size-4 md:size-5" strokeWidth={2.5} aria-hidden />
+                )}
               </div>
 
               {/* Only under today, in a fixed-height slot so the other six keep
@@ -93,6 +98,13 @@ export function WeeklyStreak({
           );
         })}
       </div>
+
+      {week.some((d) => d.saved && !d.done) && (
+        <div className="flex items-center gap-1.5 text-[11px] font-bold text-purple">
+          <Shield className="size-3.5 shrink-0" strokeWidth={2.5} aria-hidden />
+          {c.protectedDay}
+        </div>
+      )}
 
       <div className="text-[11px] leading-relaxed font-bold text-muted">
         {c.countsNote}

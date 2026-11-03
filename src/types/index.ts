@@ -84,6 +84,20 @@ export interface DaySections {
   ids: string[];
 }
 
+/** What today's gift held, to say so for the rest of the day. */
+export interface GiftResult {
+  date: string;
+  xp: number;
+  coins: number;
+  protection: boolean;
+}
+
+/** The streak protections used on `date`'s first visit, and how many days they covered. */
+export interface ProtectionNotice {
+  date: string;
+  days: number;
+}
+
 /** One local calendar day of study — the device's twin of a daily_activity row. */
 export interface DayActivity {
   /** XP earned that day. > 0 means the student studied. */
@@ -91,6 +105,9 @@ export interface DayActivity {
   /** The day counts toward the streak: since 3 Nov 2026, at least one mission was
    *  finished; before that, all three goal tasks were. */
   goal: boolean;
+  /** A missed day a streak protection covered. It holds the run together and adds
+   *  nothing to the count, because nobody studied. */
+  streakProtected?: boolean;
   /**
    * ACTIVE study minutes that day — time on a study screen with the tab visible
    * and the student actually touching it. See hooks/use-study-timer.ts for what

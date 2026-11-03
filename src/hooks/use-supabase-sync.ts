@@ -135,6 +135,7 @@ function syncRelevantChange(a: StoreState, b: StoreState): boolean {
     a.tasksDate !== b.tasksDate ||
     a.dayCounts !== b.dayCounts ||
     a.giftOpened !== b.giftOpened ||
+    a.streakProtections !== b.streakProtections ||
     a.examResults !== b.examResults ||
     a.completedSessions !== b.completedSessions ||
     a.conversations !== b.conversations ||

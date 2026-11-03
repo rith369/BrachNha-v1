@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { Gift } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
-import { GIFT_COINS, useBrachNhaStore } from "@/lib/store";
+import { useBrachNhaStore } from "@/lib/store";
 import type { Lang } from "@/types";
 import { cn } from "@/utils/cn";
 import { todayKey } from "@/utils/day";
-import { GIFT_XP } from "@/utils/rewards";
 import { allMissionsDone, missionsDone } from "@/utils/streak";
 import { giftLeftLabel, giftOpenedLabel, missionCopy } from "../mission-copy";
 
@@ -22,12 +21,13 @@ export function MissionGift({
   /** For a Khmer-only screen: without it the line follows the app's language. */
   lang?: Lang;
 }) {
-  const { lang: appLang, tasks, tasksDate, giftOpened, openGift } = useBrachNhaStore(
+  const { lang: appLang, tasks, tasksDate, giftOpened, giftResult, openGift } = useBrachNhaStore(
     useShallow((s) => ({
       lang: s.lang,
       tasks: s.tasks,
       tasksDate: s.tasksDate,
       giftOpened: s.giftOpened,
+      giftResult: s.giftResult,
       openGift: s.openGift,
     }))
   );
@@ -48,7 +48,7 @@ export function MissionGift({
         )}
       >
         <Gift className="size-4 shrink-0" strokeWidth={2.5} aria-hidden />
-        {giftOpenedLabel(GIFT_XP, GIFT_COINS, lang)}
+        {giftOpenedLabel(giftResult?.date === tasksDate ? giftResult : null, lang)}
       </p>
     );
   }

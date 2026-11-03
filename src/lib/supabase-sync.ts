@@ -108,6 +108,7 @@ function profileRow(userId: string, s: StoreState): InsertOf<"profiles"> {
     level: s.level,
     coins: s.coins,
     streak: s.streak,
+    streak_protections: s.streakProtections,
     surveyed: s.surveyed,
     studied: s.userData.studied,
     grade: s.userData.grade,
@@ -134,6 +135,7 @@ function storeFromProfile(row: Tables<"profiles">) {
     level: levelForXp(row.xp),
     coins: row.coins,
     streak: row.streak,
+    streakProtections: row.streak_protections,
     surveyed: row.surveyed,
     pledgeSeen: row.pledge_seen,
     activeConversationId: row.active_conversation_id,
@@ -286,6 +288,22 @@ export async function pushLocalState(userId: string, s: StoreState) {
       db
         .from("daily_activity")
         .upsert(goalRows, { onConflict: "user_id,activity_date" })
+    );
+  }
+
+  // A protected day usually has nothing else on its row, so it has its own batch.
+  const protectedRows = recentDays
+    .filter(([, d]) => d.streakProtected)
+    .map(([day]) => ({
+      user_id: userId,
+      activity_date: day,
+      streak_protected: true,
+    }));
+  if (protectedRows.length) {
+    await attempt("daily_activity: protected days", () =>
+      db
+        .from("daily_activity")
+        .upsert(protectedRows, { onConflict: "user_id,activity_date" })
     );
   }
 
@@ -527,7 +545,7 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
           // study_minutes must be NAMED here. This select lists columns
           // explicitly, so one left out comes back absent and every pulled day
           // silently rebuilds with no study time at all.
-          "activity_date, xp_earned, study_minutes, task_lesson, task_practice, task_flashcards, task_challenge, streak_day, lessons_done, quizzes_done, reviews_done, gift_opened"
+          "activity_date, xp_earned, study_minutes, task_lesson, task_practice, task_flashcards, task_challenge, streak_day, streak_protected, lessons_done, quizzes_done, reviews_done, gift_opened"
         )
         .eq("user_id", userId)
         .gt("activity_date", addDaysKey(new Date(), -MAX_ACTIVITY_DAYS)),
@@ -573,11 +591,14 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
     const xp = r.xp_earned > 0 ? r.xp_earned : ticked * TASK_XP;
     const goal = r.streak_day || (r.task_lesson && r.task_practice && r.task_flashcards);
     const minutes = r.study_minutes ?? 0;
-    if (xp > 0 || goal || minutes > 0) {
+    if (xp > 0 || goal || minutes > 0 || r.streak_protected) {
       // `minutes` is omitted rather than written as 0 when the row has none:
       // the field is optional precisely so "not measured" and "measured zero"
       // stay distinguishable, and a rebuilt 0 would erase that.
-      activityLog[r.activity_date] = minutes > 0 ? { xp, goal, minutes } : { xp, goal };
+      activityLog[r.activity_date] = {
+        ...(minutes > 0 ? { xp, goal, minutes } : { xp, goal }),
+        ...(r.streak_protected ? { streakProtected: true } : {}),
+      };
     }
   }
 
@@ -668,7 +689,10 @@ export async function pullRemoteState(userId: string): Promise<boolean> {
     // spread in: profiles.streak is only the last value some device pushed,
     // while the rows are the history it was computed from.
     streak: currentStreak(activityLog, todayDate),
+    // This device's look at protections was at the log it held before this pull.
+    protectionsCheckedOn: "",
   });
+  useBrachNhaStore.getState().rolloverDailyTasks();
 
   for (const c of restored) lastPushedSignature.set(c.id, signatureOf(c));
   markStudyProgressPulled(userId, progress);

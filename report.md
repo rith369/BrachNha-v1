@@ -16,6 +16,42 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 3 Nov 2026 — Streak protection, and a surprise gift
+
+Commit: `PENDING`. **Database step: run `20261103000003_streak_protection.sql` in the SQL editor
+BEFORE this deploys.** Without it, the app cannot save students' progress to their accounts.
+
+**What changed.**
+
+- **Streak protection is new.** It keeps a streak alive when a student misses a day. It works by
+  itself, and the next time they open the app it says "Your streak was protected yesterday".
+- **The streak stays the same on that day.** It does not go up, because nobody studied.
+- **A student can hold 2 at most.** The Streak page shows how many they have.
+- **Coins can now be spent.** One protection costs 50 coins on the Streak page. This is the first
+  thing coins can buy.
+- **The gift is now a surprise.** Instead of always 50 XP and 12 coins, it gives 30 to 100 XP with
+  coins to match, and about 1 gift in 5 also holds a protection.
+- **Friends are covered too.** If a friend misses a day and a protection covers it, the shared
+  streak survives.
+- **The calendars show it.** A protected day has a shield on the Streak page, the shared week and
+  the Profile calendar.
+
+**Good to know.**
+
+- Two missed days with only one protection uses none, and the streak breaks, because spending it
+  would not have saved anything.
+- Buying one after a streak has already broken does not bring it back. It only protects the days
+  ahead.
+- A friend can now see which days a protection covered. The privacy page says so.
+- The price, the gift amounts and the 1 in 5 chance are easy to change.
+
+**What to re-test.**
+
+- With 50 or more coins, buy one on the Streak page. Coins should drop by 50, and the count should
+  go up. At 2 the button should go away.
+- Finish all 4 missions and open the gift a few times over several days. The amount should change.
+- Please read the new Khmer wording on the Streak page card and the gift line.
+
 ## 3 Nov 2026: KruAI Fixes From Its First Test
 
 Commit: `a80df57`. No database step.

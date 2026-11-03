@@ -676,6 +676,43 @@ grade and the time left, **any 1 finished mission keeps the streak**, and **reac
 missions opens a gift**. A student who only does quizzes keeps their streak by reaching that
 row's target; the gift is the reason to do more.
 
+**Streak protection and the random gift** (the user's design, 3 Nov 2026, migration
+`20261103000003_streak_protection.sql`). What they chose: a student holds at most 2; a protection is
+used by itself on a missed day and the app says so next time; the streak stays the same on that day
+rather than going up; it can be bought with coins; the gift's amount is a surprise and only sometimes
+holds a protection; and a protection saves a shared streak with a friend too.
+
+What I picked, all named constants in `utils/rewards.ts` and easy to change: 50 coins to buy one (a
+full day earns very roughly that), a gift of 30 to 100 XP in steps of 10 with coins following at the
+usual rate, and a 1 in 5 chance of a protection inside. Buying is the first thing coins have ever
+been spent on, so before this `coins` only went up.
+
+The rules worth knowing before changing it:
+
+- **`DayActivity.streakProtected`, not `goal`.** A protected day has `goal: false`, because nobody
+  studied, and usually had no entry at all, so the store writes one with `xp: 0`. `dayKept()` is what
+  holds a run together; `goalMet()` is what adds to it. The SQL mirrors that: a protected day joins two
+  runs in `leaderboard()` and adds nothing, so `streak_month` is now a count of goal days in the window
+  rather than date arithmetic, which would have counted the protected day.
+- **Only a whole gap is covered.** Two missed days with one protection spends none and the streak
+  breaks, because spending it would save nothing.
+- **It cannot repair a streak already lost.** `protectionsCheckedOn` is the last day this ran, and that
+  run judged every day before it. Without it, a student could miss a day, see 0, buy a protection and
+  get the streak back, which is a different feature from the one the user asked for.
+- **It runs in `spendProtections()`, called by `rolloverDailyTasks()` and by `completeTask()`**, the second
+  for a tab left open overnight whose first act is finishing a mission. It is not tied to `tasksDate`: a
+  pull stamps that with today, so it would never have run on a new phone. A pull clears the mark and
+  calls the rollover, so a new phone the morning after a missed day uses the protection it just learned
+  about.
+- **What syncs:** `profiles.streak_protections` and `daily_activity.streak_protected`. `giftResult`,
+  `protectionNotice` and `protectionsCheckedOn` stay on the device, listed in `partializeState`'s comment. A
+  gift opened on another phone only says "Gift opened", without an amount. Two phones that both look at
+  the same missed day before either syncs could each spend one; that is rare and costs one protection.
+- **`my_friends()` returns `protected_days`**, which a friend can now see, and `pages/privacy.tsx` says so.
+  A friend's protection only ever spends from their own solo streak: with no streak of their own they
+  have nothing to protect, so the shared streak breaks with it.
+- **Today is never protected.** The day is not over, so `sharedDayStatus` stays `atRisk` until tomorrow.
+
 **The row is named for SECTIONS: `Complete 2 sections`, `បញ្ចប់ 2 ផ្នែកមេរៀន`** (the user's wording,
 3 Nov 2026). The mission counts each finished section (`section-detail.tsx`), and the hierarchy is
 chapter, lesson, section, so "2 lessons" promised more than it asked. Any sections count, from one

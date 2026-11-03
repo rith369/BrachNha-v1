@@ -7,6 +7,7 @@ import {
   GraduationCap,
   Trophy,
   type LucideIcon,
+  Shield,
 } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 import { Card } from "@/components/ui/card";
@@ -229,6 +230,9 @@ export function StudyCalendar() {
   const goalDaysInMonth = loggedDays.filter(
     (d) => d.startsWith(monthPrefix) && activityLog[d]?.goal === true
   ).length;
+  const savedShown = loggedDays.some(
+    (d) => d.startsWith(monthPrefix) && activityLog[d]?.streakProtected === true
+  );
   const best = bestStreak(activityLog);
   const goalToday = activityLog[today]?.goal === true;
 
@@ -315,6 +319,7 @@ export function StudyCalendar() {
             const entry = activityLog[day];
             const xp = entry?.xp ?? 0;
             const goal = entry?.goal === true;
+            const saved = !goal && entry?.streakProtected === true;
             const studied = xp > 0;
             const isToday = day === today;
             const isFuture = day > today;
@@ -322,7 +327,9 @@ export function StudyCalendar() {
             const date = parseDayKey(day);
             const status = goal
               ? `${t.calendarGoalDone} · ${xp} XP`
-              : studied
+              : saved
+                ? t.calendarProtected
+                : studied
                 ? `${t.calendarStudied} · ${xp} XP`
                 : isFuture
                   ? null
@@ -348,7 +355,7 @@ export function StudyCalendar() {
                   "relative mx-auto flex h-11 w-9 items-end justify-center pb-[9px] text-xs font-extrabold md:h-12 md:w-10 md:pb-2.5",
                   goal
                     ? "text-white"
-                    : studied
+                    : studied || saved
                       ? "text-purple"
                       : isExam
                         ? "text-pink"
@@ -362,7 +369,15 @@ export function StudyCalendar() {
                 {goal && <FlameShape fill={FLAME_FILL} />}
                 {/* Three quarters the size, inset in PERCENT so its body stays
                     centred on the number at both cell sizes. */}
-                {!goal && studied && (
+                {saved && (
+                  <Shield
+                    aria-hidden
+                    className="absolute top-1 left-1/2 size-8 -translate-x-1/2 text-purple/20"
+                    fill="currentColor"
+                    strokeWidth={0}
+                  />
+                )}
+                {!goal && !saved && studied && (
                   <FlameShape className="inset-x-[17%] top-[18%] bottom-[9%] bg-purple/20" />
                 )}
                 {/* Pink, the per-theme scale — a small mark, not a fill under
@@ -410,6 +425,12 @@ export function StudyCalendar() {
           </span>
           {t.calendarStudied}
         </span>
+        {savedShown && (
+          <span className="flex items-center gap-1.5">
+            <Shield className="size-4 text-purple" strokeWidth={2.5} aria-hidden />
+            {t.calendarProtected}
+          </span>
+        )}
         {examShown && (
           <span className="flex items-center gap-1.5 text-pink">
             <GraduationCap className="size-3.5" strokeWidth={2.5} aria-hidden />

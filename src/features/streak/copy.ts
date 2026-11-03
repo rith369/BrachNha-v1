@@ -55,6 +55,10 @@ export const STREAK_COPY = {
     next: "Next",
     locked: "Locked",
 
+    protectionTitle: "Streak protection",
+    protectionHelp: "Miss a day and it keeps your streak by itself. A gift sometimes holds one.",
+    protectionFull: "You have the most you can hold",
+    protectedDay: "Streak protected this day",
     taskLesson: "Lesson",
     taskPractice: "Practice",
     taskFlashcards: "Flashcards",
@@ -80,6 +84,7 @@ export const STREAK_COPY = {
     legendKept: "Both done",
     legendAtRisk: "Today, not done yet",
     legendBroken: "Missed",
+    legendProtected: "Streak protected",
     legendBefore: "Before you were friends",
 
     sharedMilestones: "Shared Streak Milestones",
@@ -161,6 +166,10 @@ export const STREAK_COPY = {
     next: "បន្ទាប់",
     locked: "នៅជាប់សោ",
 
+    protectionTitle: "ការការពារ Streak",
+    protectionHelp: "បើខកខានមួយថ្ងៃ វារក្សា Streak ឱ្យអ្នកដោយស្វ័យប្រវត្តិ។ អំណោយខ្លះមានវានៅខាងក្នុង។",
+    protectionFull: "អ្នកមានចំនួនច្រើនបំផុតហើយ",
+    protectedDay: "បានការពារ Streak នៅថ្ងៃនេះ",
     taskLesson: "មេរៀន",
     taskPractice: "លំហាត់",
     // Latin, matching translations.ts's own km column for this word.
@@ -182,6 +191,7 @@ export const STREAK_COPY = {
     legendKept: "បញ្ចប់ទាំងពីរ",
     legendAtRisk: "ថ្ងៃនេះ មិនទាន់រួច",
     legendBroken: "ខកខាន",
+    legendProtected: "បានការពារ Streak",
     legendBefore: "មុនពេលជាមិត្ត",
 
     sharedMilestones: "ចំណុចសំខាន់ៗនៃ Streak រួមគ្នា",
@@ -412,6 +422,16 @@ export function friendsSinceLabel(since: string, lang: Lang): string {
     month: "short",
     year: "numeric",
   })}`;
+}
+
+export function protectionBuyLabel(coins: number, lang: Lang): string {
+  if (lang === "km") return `ទិញ 1 ក្នុងតម្លៃ ${coins} កាក់`;
+  return `Buy 1 for ${coins} coins`;
+}
+
+export function protectionNeedLabel(coins: number, lang: Lang): string {
+  if (lang === "km") return `ត្រូវការ ${coins} កាក់ទៀត ដើម្បីទិញ`;
+  return `${coins} more ${coins === 1 ? "coin" : "coins"} to buy one`;
 }
 
 /** One day cell's accessible name — the dots and the glyph alone say nothing. */

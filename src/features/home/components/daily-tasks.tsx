@@ -13,6 +13,7 @@ import { missionCopy, missionTargetLabel } from "../mission-copy";
 import { useStudyFeed } from "../use-study-feed";
 import { taskHref } from "../task-links";
 import { MissionGift } from "./mission-gift";
+import { ProtectionNotice } from "./protection-notice";
 
 /**
  * Today's missions, on Home, the Roadmap and the current month's page. A row is a
@@ -148,6 +149,7 @@ export function DailyTasks() {
             />
             {streakKept ? m.streakKept : m.streakHint}
           </p>
+          <ProtectionNotice />
           <MissionGift />
         </div>
       </Card>

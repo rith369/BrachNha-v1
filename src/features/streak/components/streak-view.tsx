@@ -13,6 +13,7 @@ import { DailyGoalCard } from "./daily-goal-card";
 import { MilestoneCard } from "./milestone-card";
 import { MilestoneProgress } from "./milestone-progress";
 import { StreakHeader } from "./streak-header";
+import { StreakProtectionCard } from "./streak-protection-card";
 import { WeeklyStreak } from "./weekly-streak";
 import { monthsUntilExam } from "@/utils/exam-date";
 import { dailyTargets } from "@/utils/roadmap";
@@ -91,6 +92,7 @@ export function StreakView() {
       id: WEEKDAY_BY_INDEX[parseDayKey(key).getDay()],
       key,
       done: activityLog[key]?.goal === true,
+      saved: activityLog[key]?.streakProtected === true,
     });
   }
 
@@ -108,6 +110,8 @@ export function StreakView() {
       <WeeklyStreak week={week} todayKey={today} />
 
       <DailyGoalCard tasks={goal} links={links} streakKept={completed} />
+
+      <StreakProtectionCard />
 
       {/* Absent, not empty, once every rung is behind the student. */}
       {progress && <MilestoneProgress progress={progress} />}

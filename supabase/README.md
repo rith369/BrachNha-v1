@@ -564,6 +564,23 @@ allow `/friend/...` on the production address (a wildcard such as
 `https://your-site.vercel.app/**` covers it). If it does not, a student who signs in
 from an invite link lands on the home page and has to open the link again.
 
+## `20261103000003`: streak protection
+
+Adds `profiles.streak_protections` (how many a student holds) and
+`daily_activity.streak_protected` (a missed day one covered), and updates `leaderboard()` and
+`my_friends()` so a protected day holds a streak together without adding to it. A friend can now
+see which days a protection covered. Nobody's numbers change until they use one.
+
+Run it in the SQL editor, in one go, AFTER `20261103000001`, and BEFORE the app that uses it ships:
+until then the app's push of the profile is refused. It is safe to run twice. `npm run db:check`
+cannot see a column. Check it with only the publishable key:
+
+```
+GET {VITE_SUPABASE_URL}/rest/v1/profiles?select=streak_protections&limit=0
+```
+
+`200` means it is there; `400` means it is missing.
+
 ## `20261103000001`: daily targets, the streak and the gift
 
 Adds five columns to `daily_activity` (whether the day counts for the streak, how many

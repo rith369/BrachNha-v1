@@ -1,4 +1,4 @@
-import type { Lang, Tasks } from "@/types";
+import type { GiftResult, Lang, Tasks } from "@/types";
 import { MISSIONS } from "@/utils/streak";
 
 /** The words around the day's missions and the gift, in both languages. */
@@ -29,9 +29,25 @@ export function giftLeftLabel(done: number, lang: Lang): string {
   return `${done} of ${total} today. ${left} more for your gift.`;
 }
 
-export function giftOpenedLabel(xp: number, coins: number, lang: Lang): string {
-  if (lang === "km") return `បានបើកអំណោយ៖ +${xp} XP និង +${coins} កាក់`;
-  return `Gift opened: +${xp} XP and +${coins} coins`;
+/** No `gift` on a device that did not open it: only the fact that it was opened syncs. */
+export function giftOpenedLabel(gift: GiftResult | null, lang: Lang): string {
+  if (lang === "km") {
+    if (!gift) return "បានបើកអំណោយហើយ";
+    return `បានបើកអំណោយ៖ +${gift.xp} XP និង +${gift.coins} កាក់${gift.protection ? " និង +1 ការការពារ Streak" : ""}`;
+  }
+  if (!gift) return "Gift opened";
+  return `Gift opened: +${gift.xp} XP and +${gift.coins} coins${gift.protection ? " and +1 streak protection" : ""}`;
+}
+
+export function protectionSavedLabel(days: number, lang: Lang): string {
+  if (lang === "km") {
+    return days === 1
+      ? "ការការពារ Streak បានរក្សា Streak របស់អ្នកកាលពីម្សិលមិញ"
+      : `ការការពារ Streak បានរក្សា Streak របស់អ្នករយៈពេល ${days} ថ្ងៃ`;
+  }
+  return days === 1
+    ? "Your streak was protected yesterday"
+    : `Your streak was protected for ${days} days`;
 }
 
 /** A mission with a target above one says how many. One stays the usual wording. */

@@ -20,6 +20,8 @@ export interface StreakDay {
   key: string;
   /** A streak day: at least one mission finished, NOT "opened the app". */
   done: boolean;
+  /** A missed day a streak protection covered. */
+  saved: boolean;
 }
 
 /** The day's missions, the store's real `Tasks` keys. */

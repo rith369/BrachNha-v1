@@ -58,8 +58,32 @@ export const FLASHCARD_COINS = 1;
  */
 export const TASK_XP = 20;
 
-/** The gift for reaching all four of the day's mission targets, paid once a day. */
-export const GIFT_XP = 50;
+/**
+ * The gift for reaching all four of the day's mission targets, paid once a day. The
+ * amount is a surprise (the user's choice), and only sometimes is a streak protection
+ * inside. Coins follow the XP, at the usual rate.
+ */
+const GIFT_XP_MIN = 30;
+const GIFT_XP_MAX = 100;
+const GIFT_XP_STEP = 10;
+export const GIFT_PROTECTION_CHANCE = 0.2;
+
+/** How many a student can hold, and what buying one costs. */
+export const MAX_STREAK_PROTECTIONS = 2;
+export const STREAK_PROTECTION_COINS = 50;
+
+/** `random` is an argument so the odds can be tested. At the limit a gift holds
+ *  no protection, and still pays. */
+export function rollGift(
+  held: number,
+  random: () => number = Math.random
+): { xp: number; protection: boolean } {
+  const steps = (GIFT_XP_MAX - GIFT_XP_MIN) / GIFT_XP_STEP + 1;
+  return {
+    xp: GIFT_XP_MIN + Math.floor(random() * steps) * GIFT_XP_STEP,
+    protection: held < MAX_STREAK_PROTECTIONS && random() < GIFT_PROTECTION_CHANCE,
+  };
+}
 
 /**
  * XP for one correct answer in a Game competition.

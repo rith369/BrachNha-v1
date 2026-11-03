@@ -55,6 +55,11 @@ function goalMet(log: ActivityLog, day: string): boolean {
   return log[day]?.goal === true;
 }
 
+/** The day holds a streak together: a goal day, or a missed one a protection covered. */
+export function dayKept(log: ActivityLog, day: string): boolean {
+  return goalMet(log, day) || log[day]?.streakProtected === true;
+}
+
 function previousDay(day: string): string {
   return addDaysKey(parseDayKey(day), -1);
 }
@@ -71,15 +76,43 @@ function previousDay(day: string): string {
  *
  * `today` is an argument rather than a todayKey() call so the rule is testable
  * against a fixed date, and so the store computes it once per update.
+ *
+ * A protected day keeps the run going without adding to it.
  */
 export function currentStreak(log: ActivityLog, today: string): number {
   let day = goalMet(log, today) ? today : previousDay(today);
   let count = 0;
-  while (goalMet(log, day)) {
-    count += 1;
+  while (dayKept(log, day)) {
+    if (goalMet(log, day)) count += 1;
     day = previousDay(day);
   }
   return count;
+}
+
+/**
+ * The missed days to spend protections on, newest first, or none. Only a whole gap
+ * is worth covering: a protection spent on part of one would save nothing, so the
+ * student keeps them and the streak breaks.
+ *
+ * `checkedOn` is the last day this ran, which judged every day before it. A gap
+ * reaching further back was already lost, so buying a protection afterwards cannot
+ * bring an old streak back. It only protects the days ahead.
+ */
+export function protectableDays(
+  log: ActivityLog,
+  today: string,
+  held: number,
+  checkedOn: string
+): string[] {
+  const gap: string[] = [];
+  let day = previousDay(today);
+  while (!dayKept(log, day)) {
+    if (gap.length === held || day < checkedOn) return [];
+    gap.push(day);
+    day = previousDay(day);
+  }
+  // Nothing to save when the run behind the gap has no real day in it.
+  return gap.length > 0 && currentStreak(log, day) > 0 ? gap : [];
 }
 
 /** The longest run anywhere in the log. Always >= currentStreak, since the
@@ -90,14 +123,15 @@ export function bestStreak(log: ActivityLog, since?: string): number {
   // before it counts only its days inside the window — the leaderboard's
   // monthly board, matching streak_month in 20260916000004_leaderboard.sql.
   const days = Object.keys(log)
-    .filter((d) => goalMet(log, d) && (since === undefined || d >= since))
+    .filter((d) => dayKept(log, d) && (since === undefined || d >= since))
     .sort();
 
   let best = 0;
   let run = 0;
   let prev: string | null = null;
   for (const day of days) {
-    run = prev !== null && previousDay(day) === prev ? run + 1 : 1;
+    const joined = prev !== null && previousDay(day) === prev;
+    run = (joined ? run : 0) + (goalMet(log, day) ? 1 : 0);
     best = Math.max(best, run);
     prev = day;
   }

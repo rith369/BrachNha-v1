@@ -82,6 +82,7 @@ export type Database = {
           level: number;
           coins: number;
           streak: number;
+          streak_protections: number;
           surveyed: boolean;
           studied: boolean;
           grade: string;
@@ -105,6 +106,7 @@ export type Database = {
           level?: number;
           coins?: number;
           streak?: number;
+          streak_protections?: number;
           surveyed?: boolean;
           studied?: boolean;
           grade?: string;
@@ -188,6 +190,7 @@ export type Database = {
           quizzes_done: number;
           reviews_done: number;
           gift_opened: boolean;
+          streak_protected: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -196,6 +199,7 @@ export type Database = {
           user_id: string;
           activity_date?: string;
           streak_day?: boolean;
+          streak_protected?: boolean;
           lessons_done?: number;
           quizzes_done?: number;
           reviews_done?: number;
@@ -1267,6 +1271,7 @@ export type Database = {
           outgoing: boolean;
           since: string | null;
           goal_days: string[];
+          protected_days: string[];
         }[];
       };
       // supabase/migrations/20260916000004_leaderboard.sql. Returns real

@@ -18,6 +18,10 @@
  * broken only by a whole day that was not kept. A new pair starts at 0 (the
  * user's call): earlier days both happened to finish do not count.
  *
+ * A STREAK PROTECTION SAVES THE PAIR TOO (the user's call, 3 Nov 2026). A past day
+ * holds the run together when each of them either finished or was protected, and it
+ * adds to the count only when both finished, the same as the solo streak.
+ *
  * The student's own days come from their device's `activityLog` (fresher than
  * the server); the friend's from `my_friends` (lib/friends.ts).
  *
@@ -25,17 +29,18 @@
  */
 
 import type { ActivityLog } from "@/types";
-import { bestStreak, currentStreak } from "./streak";
+import { bestStreak, currentStreak, dayKept } from "./streak";
 
 /**
  * One day of the pair's week.
  *
  * `atRisk` is TODAY ONLY: the day is not over, so anyone still outstanding is a
  * warning rather than a verdict. A PAST day that was not kept by both is
- * `broken`, whether one of them or neither finished. `before` is a day before
- * the two became friends, which can never count either way.
+ * `broken`, whether one of them or neither finished, unless a protection covered
+ * whoever did not: that is `protected`. `before` is a day before the two became
+ * friends, which can never count either way.
  */
-export type SharedDayStatus = "kept" | "atRisk" | "broken" | "before";
+export type SharedDayStatus = "kept" | "protected" | "atRisk" | "broken" | "before";
 
 export interface SharedDay {
   /** The student's own goal, met. */
@@ -46,11 +51,12 @@ export interface SharedDay {
 
 export function sharedDayStatus(
   { you, friend }: SharedDay,
-  where: { isToday: boolean; beforeStart: boolean }
+  where: { isToday: boolean; beforeStart: boolean; covered: boolean }
 ): SharedDayStatus {
   if (where.beforeStart) return "before";
   if (you && friend) return "kept";
-  return where.isToday ? "atRisk" : "broken";
+  if (where.isToday) return "atRisk";
+  return where.covered ? "protected" : "broken";
 }
 
 /**
@@ -83,8 +89,9 @@ export function myGoalOn(log: ActivityLog, day: string): boolean {
 }
 
 /**
- * The days the PAIR kept: both met the goal, on or after `since`. Shaped as an
- * ActivityLog so the solo streak functions can count it unchanged.
+ * The days the PAIR kept, on or after `since`: goal days when both met the goal,
+ * protected days when each was at least covered. Shaped as an ActivityLog so the
+ * solo streak functions can count it unchanged.
  *
  * YYYY-MM-DD compares as a date when compared as a string, which is what makes
  * `day >= since` correct.
@@ -92,11 +99,17 @@ export function myGoalOn(log: ActivityLog, day: string): boolean {
 export function pairLog(
   myLog: ActivityLog,
   friendDays: readonly string[],
+  friendProtected: readonly string[],
   since: string
 ): ActivityLog {
+  const goal = new Set(friendDays);
   const log: ActivityLog = {};
-  for (const day of friendDays) {
-    if (day >= since && myGoalOn(myLog, day)) log[day] = { xp: 0, goal: true };
+  for (const day of [...friendDays, ...friendProtected]) {
+    if (day < since || !dayKept(myLog, day)) continue;
+    log[day] =
+      goal.has(day) && myGoalOn(myLog, day)
+        ? { xp: 0, goal: true }
+        : { xp: 0, goal: false, streakProtected: true };
   }
   return log;
 }
@@ -111,9 +124,10 @@ export interface PairStreak {
 export function pairStreak(
   myLog: ActivityLog,
   friendDays: readonly string[],
+  friendProtected: readonly string[],
   since: string,
   today: string
 ): PairStreak {
-  const log = pairLog(myLog, friendDays, since);
+  const log = pairLog(myLog, friendDays, friendProtected, since);
   return { current: currentStreak(log, today), best: bestStreak(log) };
 }

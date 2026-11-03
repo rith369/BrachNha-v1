@@ -112,7 +112,7 @@ export function FriendsView() {
             <ul className="flex flex-col gap-2">
               {friends.map((r) => {
                 const streak = r.since
-                  ? pairStreak(activityLog, r.goalDays, r.since, today).current
+                  ? pairStreak(activityLog, r.goalDays, r.protectedDays, r.since, today).current
                   : 0;
                 return (
                   <FriendLink

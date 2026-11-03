@@ -3,6 +3,8 @@ import { persist } from "zustand/middleware";
 import type {
   DayCounts,
   DaySections,
+  GiftResult,
+  ProtectionNotice,
   Lang,
   UserData,
   Tasks,
@@ -27,11 +29,24 @@ import {
   type ReviewResult,
   type ReviewState,
 } from "@/utils/spaced-repetition";
-import { FLASHCARD_XP, FLASHCARD_COINS, GIFT_XP, TASK_XP } from "@/utils/rewards";
+import {
+  FLASHCARD_XP,
+  FLASHCARD_COINS,
+  MAX_STREAK_PROTECTIONS,
+  rollGift,
+  STREAK_PROTECTION_COINS,
+  TASK_XP,
+} from "@/utils/rewards";
 import { monthsUntilExam } from "@/utils/exam-date";
 import { dailyTargets } from "@/utils/roadmap";
 import { addDaysKey, parseDayKey, todayKey } from "@/utils/day";
-import { allMissionsDone, currentStreak, missionsDone, sectionsCountedToday } from "@/utils/streak";
+import {
+  allMissionsDone,
+  currentStreak,
+  missionsDone,
+  protectableDays,
+  sectionsCountedToday,
+} from "@/utils/streak";
 import { levelForXp } from "@/utils/level";
 import { simulationOverdue, simulationWindowEnd } from "@/utils/simulation-window";
 
@@ -418,6 +433,14 @@ interface BrachNhaState {
   daySections: DaySections;
   /** Today's gift has been opened. Reset with `tasks`. */
   giftOpened: boolean;
+  /** What it held. Null on a device that did not open it: the flag syncs, this does not. */
+  giftResult: GiftResult | null;
+  /** Held now, up to MAX_STREAK_PROTECTIONS. One is used by itself on a missed day. */
+  streakProtections: number;
+  /** The day protections were last looked at; see protectableDays(). */
+  protectionsCheckedOn: string;
+  /** Tells the student one was used. Shown only on its own date. */
+  protectionNotice: ProtectionNotice | null;
   examResults: ExamResult[];
   /**
    * Attempts at real MoEYS past papers, oldest first, capped at
@@ -567,6 +590,8 @@ interface BrachNhaState {
   completeTask: (task: keyof Tasks, sectionId?: string) => void;
   /** Pays the gift, once a day, and only once all four missions are done. */
   openGift: () => void;
+  /** Spends coins on one streak protection. Does nothing when full or short of coins. */
+  buyStreakProtection: () => void;
   completeSession: (lessonId: string) => void;
   /**
    * Record scored questions against one piece of content, for today.
@@ -762,7 +787,6 @@ interface BrachNhaState {
 const COINS_PER_XP = 0.25;
 
 /** What the gift pays in coins, at the ordinary ratio, for the screen to show. */
-export const GIFT_COINS = Math.floor(GIFT_XP * COINS_PER_XP);
 
 /** Drops anything older than MAX_ACTIVITY_DAYS. Day keys compare
  *  chronologically as plain strings. */
@@ -890,17 +914,50 @@ const emptyCounts: DayCounts = { lesson: 0, practice: 0, flashcards: 0, challeng
  */
 function newDay(state: BrachNhaState, today: string) {
   const owed = allMissionsDone(state.tasks) && !state.giftOpened;
-  const { xp, level, coins } = owed
-    ? award(state, GIFT_XP)
+  const gift = owed ? rollGift(state.streakProtections) : null;
+  const { xp, level, coins } = gift
+    ? award(state, gift.xp)
     : { xp: state.xp, level: state.level, coins: state.coins };
   return {
     xp,
     level,
     coins,
+    streakProtections: state.streakProtections + (gift?.protection ? 1 : 0),
     tasks: emptyTasks,
     dayCounts: emptyCounts,
     giftOpened: false,
     tasksDate: today,
+  };
+}
+
+/**
+ * Uses protections on any days missed since the student was last here, once a day.
+ * A missed day usually has no entry at all, so this writes one. Call it after
+ * newDay(), whose gift can add a protection.
+ */
+function spendProtections(state: BrachNhaState, today: string) {
+  const { activityLog, streakProtections, protectionsCheckedOn, protectionNotice } = state;
+  if (protectionsCheckedOn === today) {
+    return { activityLog, streakProtections, protectionsCheckedOn, protectionNotice };
+  }
+  const missed = protectableDays(
+    activityLog,
+    today,
+    streakProtections,
+    protectionsCheckedOn
+  );
+  if (missed.length === 0) {
+    return { activityLog, streakProtections, protectionsCheckedOn: today, protectionNotice };
+  }
+  const next = { ...activityLog };
+  for (const day of missed) {
+    next[day] = { ...(next[day] ?? { xp: 0, goal: false }), streakProtected: true };
+  }
+  return {
+    activityLog: next,
+    streakProtections: streakProtections - missed.length,
+    protectionsCheckedOn: today,
+    protectionNotice: { date: today, days: missed.length },
   };
 }
 
@@ -921,6 +978,8 @@ const partializeState = (state: BrachNhaState) => ({
   //   syncedUserId — bookkeeping ABOUT the sync, so syncing it is circular.
   //   daySections — only stops a repeat today. The worst a second device can do
   //     is count one section twice, which is not worth a column.
+  //   giftResult, protectionNotice — only words for today, on this device.
+  //   protectionsCheckedOn — bookkeeping about this device's visits. A pull clears it.
   //
   // There is no guest flag: every signed-out student is a guest (see
   // hooks/use-auth.ts), so there is nothing about it to persist.
@@ -951,6 +1010,10 @@ const partializeState = (state: BrachNhaState) => ({
   dayCounts: state.dayCounts,
   daySections: state.daySections,
   giftOpened: state.giftOpened,
+  giftResult: state.giftResult,
+  streakProtections: state.streakProtections,
+  protectionsCheckedOn: state.protectionsCheckedOn,
+  protectionNotice: state.protectionNotice,
   examResults: state.examResults,
   paperResults: state.paperResults,
   quizResults: state.quizResults,
@@ -1009,6 +1072,10 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       dayCounts: emptyCounts,
       daySections: { date: "", ids: [] },
       giftOpened: false,
+      giftResult: null,
+      streakProtections: 0,
+      protectionsCheckedOn: "",
+      protectionNotice: null,
       examResults: [],
       paperResults: [],
       quizResults: [],
@@ -1093,8 +1160,9 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           // student whose tab has been open since yesterday would find the
           // task already "done" and earn nothing for real work.
           const today = todayKey();
-          const base =
+          const rolled =
             state.tasksDate === today ? state : { ...state, ...newDay(state, today) };
+          const base = { ...rolled, ...spendProtections(rolled, today) };
           const counted = sectionsCountedToday(base.daySections, today);
           if (sectionId && counted.includes(sectionId)) return base;
           const dayCounts = { ...base.dayCounts, [task]: base.dayCounts[task] + 1 };
@@ -1126,11 +1194,38 @@ export const useBrachNhaStore = create<BrachNhaState>()(
         }),
 
       openGift: () =>
+        set((state) => {
+          const today = todayKey();
+          if (
+            state.tasksDate !== today ||
+            !allMissionsDone(state.tasks) ||
+            state.giftOpened
+          ) {
+            return state;
+          }
+          const { xp, protection } = rollGift(state.streakProtections);
+          const rewarded = award(state, xp);
+          return {
+            ...rewarded,
+            giftOpened: true,
+            giftResult: {
+              date: today,
+              xp,
+              coins: rewarded.coins - state.coins,
+              protection,
+            },
+            streakProtections: state.streakProtections + (protection ? 1 : 0),
+          };
+        }),
+
+      buyStreakProtection: () =>
         set((state) =>
-          state.tasksDate === todayKey() &&
-          allMissionsDone(state.tasks) &&
-          !state.giftOpened
-            ? { ...award(state, GIFT_XP), giftOpened: true }
+          state.coins >= STREAK_PROTECTION_COINS &&
+          state.streakProtections < MAX_STREAK_PROTECTIONS
+            ? {
+                coins: state.coins - STREAK_PROTECTION_COINS,
+                streakProtections: state.streakProtections + 1,
+              }
             : state
         ),
 
@@ -1273,17 +1368,23 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       rolloverDailyTasks: () =>
         set((state) => {
           const today = todayKey();
-          if (state.tasksDate === today) return state;
+          if (state.tasksDate === today && state.protectionsCheckedOn === today) {
+            return state;
+          }
           // No tasks completed yet: stamp the day and leave the (already
           // empty) checklist alone, so a fresh install does not look like a
           // rollover that just happened.
+          const rolled =
+            state.tasksDate === today ? state : { ...state, ...newDay(state, today) };
+          const spent = spendProtections(rolled, today);
           return {
-            ...newDay(state, today),
+            ...rolled,
+            ...spent,
             // A new day is the one moment a streak can BREAK with no task being
             // completed, so completeTask() alone would never notice. A run that
             // ended yesterday still counts today (see currentStreak); one that
-            // ended the day before does not.
-            streak: currentStreak(state.activityLog, today),
+            // ended the day before does not, unless a protection just covered it.
+            streak: currentStreak(spent.activityLog, today),
           };
         }),
 
@@ -1623,6 +1724,10 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           dayCounts: emptyCounts,
           daySections: { date: "", ids: [] },
           giftOpened: false,
+          giftResult: null,
+          streakProtections: 0,
+          protectionsCheckedOn: "",
+          protectionNotice: null,
           examResults: [],
           paperResults: [],
           quizResults: [],

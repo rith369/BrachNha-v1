@@ -219,6 +219,13 @@ of today's row is refused, so that day's progress stays on the phone until it la
 cannot see a column; a publishable-key `GET /rest/v1/daily_activity?select=streak_day&limit=0`
 answers `200` once it exists and `400` before.
 
+**`20261103000003_streak_protection.sql`** (streak protection) must be applied AFTER
+`20261103000001`, and BEFORE the code ships: without it the push of the profile is refused, so coins,
+XP and the rest stay on the phone until it lands. It drops and recreates `my_friends()`, inside one
+transaction, because the function returns one more column. `db:check` cannot see a column; a
+publishable-key `GET /rest/v1/profiles?select=streak_protections&limit=0` answers `200` once it exists
+and `400` before.
+
 **`20261103000002_simulation_attempts.sql`** (the Simulation's saved attempts) can ship
 before or after the code. Without it each push of an attempt fails quietly and the attempt
 stays on the phone; once it lands, the next push uploads it. Afterwards `db:check` lists

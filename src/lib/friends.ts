@@ -49,6 +49,8 @@ export interface FriendRow {
   since: string | null;
   /** The days THEY met the goal since `since`, oldest first. */
   goalDays: string[];
+  /** The days a streak protection covered for them since `since`. */
+  protectedDays: string[];
 }
 
 export type SearchRelation = "none" | "sent" | "received" | "friends";
@@ -123,6 +125,10 @@ export async function fetchFriends(today: string): Promise<FriendResult<FriendRo
       since,
       goalDays: Array.isArray(r.goal_days)
         ? r.goal_days.filter((d): d is string => typeof d === "string" && DAY.test(d))
+        : [],
+      // Missing until 20261103000003 lands.
+      protectedDays: Array.isArray(r.protected_days)
+        ? r.protected_days.filter((d): d is string => typeof d === "string" && DAY.test(d))
         : [],
     });
   }

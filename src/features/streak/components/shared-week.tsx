@@ -1,4 +1,4 @@
-import { Flame, Minus, X } from "lucide-react";
+import { Flame, Minus, Shield, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useBrachNhaStore } from "@/lib/store";
 import { cn } from "@/utils/cn";
@@ -43,6 +43,7 @@ export function SharedWeek({
   // The "before" legend only when a cell actually shows it: a pair of a week
   // or more never sees one.
   const hasBefore = week.some((d) => d.status === "before");
+  const hasProtected = week.some((d) => d.status === "protected");
 
   return (
     <Card className="gap-3">
@@ -103,6 +104,7 @@ export function SharedWeek({
         <LegendItem status="kept" label={c.legendKept} />
         <LegendItem status="atRisk" label={c.legendAtRisk} />
         <LegendItem status="broken" label={c.legendBroken} />
+        {hasProtected && <LegendItem status="protected" label={c.legendProtected} />}
         {hasBefore && <LegendItem status="before" label={c.legendBefore} />}
       </div>
 
@@ -120,6 +122,7 @@ export function SharedWeek({
  */
 const STATUS_STYLE: Record<SharedDayStatus, string> = {
   kept: "bg-flame text-white",
+  protected: "border-2 border-purple text-purple",
   atRisk: "border-2 border-yellow/70 text-yellow",
   broken: "border-2 border-dashed border-border text-muted",
   before: "bg-control text-muted",
@@ -135,6 +138,9 @@ function StatusGlyph({ status }: { status: SharedDayStatus }) {
         aria-hidden
       />
     );
+  }
+  if (status === "protected") {
+    return <Shield className="size-4 md:size-5" strokeWidth={2.5} aria-hidden />;
   }
   if (status === "broken") {
     return <X className="size-3.5 md:size-4" strokeWidth={3} aria-hidden />;
