@@ -90,6 +90,8 @@ if (flag("self-test")) {
   expectFail("lost backslash", `${KM} $mathrm{H_2O}$`, {}, "math-renders");
   expectFail("stray dollar", `${KM} តម្លៃ $ នេះ`, {}, "math-renders");
   expectOk("money is fine", `${KM} $20`, {}, "math-renders");
+  expectOk("Khmer inside a wrapped equation", `${KM} $\\mathrm{6CO_2 + 6H_2O + ពន្លឺ \\to C_6H_{12}O_6}$`, {}, "math-renders");
+  expectOk("Khmer inside \\text, beside maths", `${KM} $\\mathrm{Au} \\to \\text{គ្មានប្រតិកម្ម}$`, {}, "math-renders");
   expectOk("guided", `🧭 ${KM}`, { guided: true }, "guides-first");
   expectFail("not guided", KM, { guided: true }, "guides-first");
   expectFail("guided when it should not be", `🧭 ${KM}`, { guided: false }, "answers-directly");

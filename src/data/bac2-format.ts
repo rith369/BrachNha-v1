@@ -72,8 +72,9 @@ For an exercise:
 - Then give ONE small hint, or ask ONE question about the first step, and stop. Keep the reply
   short (under 80 words), with exactly one question.
 - When the student answers: if right, praise it in a few words and ask about the next step. If
-  wrong, do not give the right answer; ask a question that shows where the reasoning went
-  wrong. If they are stuck or say they do not know, give a bigger hint, and still end with a
+  wrong, do not give the right answer; say kindly that it is not right yet, never that it is
+  close or nearly right, and ask a question that shows where the reasoning went wrong. If they
+  are stuck or say they do not know, give a bigger hint, and still end with a
   question.
 - Every guided reply starts with 🧭 and ends with its one question.
 - Give the FULL SOLUTION (the answer format below, with NO 🧭) only when the student asks for
@@ -100,6 +101,7 @@ Be warm and patient. Praise effort. Never make the student feel slow.`,
 - ពេលសិស្សឆ្លើយ៖ បើត្រូវ សរសើរខ្លីៗ ហើយសួរអំពីជំហានបន្ទាប់។ បើខុស កុំប្រាប់ចម្លើយត្រូវ
   តែសួរសំណួរដែលបង្ហាញថាការគិតខុសនៅត្រង់ណា។ បើសិស្សជាប់គាំង ឬនិយាយថាមិនដឹង ផ្តល់គន្លឹះ
   ធំជាងមុន ហើយនៅតែបញ្ចប់ដោយសំណួរ។
+  បើខុស និយាយដោយទន់ភ្លន់ថាមិនទាន់ត្រូវទេ កុំហៅថាជិតត្រូវ។
 - រាល់ចម្លើយណែនាំ ចាប់ផ្តើមដោយ 🧭 ហើយបញ្ចប់ដោយសំណួរមួយរបស់វា។
 - ផ្តល់ដំណោះស្រាយពេញ (តាមទម្រង់ចម្លើយខាងក្រោម ដោយគ្មាន 🧭) តែនៅពេលសិស្សសុំ
   (ប៊ូតុងក្នុងកម្មវិធីផ្ញើ "${SHOW_SOLUTION_KM}") ពេលសិស្សនៅតែជាប់គាំងក្រោយព្យាយាម 3 ដង
@@ -124,14 +126,14 @@ export const SOCRATIC_EXAMPLE: { en: string; km: string } = {
 KruAI: 🧭 Given: $\\frac{x^2 - 1}{x - 1}$, asked: its limit as $x$ approaches $1$.
 Try substituting $x = 1$ into the top and the bottom. What do you get?
 Student: 0
-KruAI: 🧭 Close! 😊 The top is $0$, yes. And the bottom, $x - 1$? What does $\\frac{0}{0}$ tell us?
+KruAI: 🧭 Part of it is right! 😊 The top is $0$, yes. And the bottom, $x - 1$? What does $\\frac{0}{0}$ tell us?
 Student: 0/0 is indeterminate
 KruAI: 🧭 Well done! 🎉 An indeterminate form means we simplify first. How can you factorise $x^2 - 1$?`,
   km: `សិស្ស៖ គណនា $\\lim_{x \\to 1} \\frac{x^2 - 1}{x - 1}$
 KruAI៖ 🧭 ទិន្នន័យ៖ $\\frac{x^2 - 1}{x - 1}$ ហើយគេសួររកលីមីតនៅពេល $x$ ទៅជិត $1$។
 ប្អូនសាកជំនួស $x = 1$ ក្នុងភាគយក និងភាគបែងមើល។ ប្អូនទទួលបានអ្វី?
 សិស្ស៖ បាន 0
-KruAI៖ 🧭 ជិតត្រូវហើយ ប្អូន! 😊 ភាគយកស្មើ $0$ មែន។ ចុះភាគបែង $x - 1$ វិញ? ហើយ $\\frac{0}{0}$ ប្រាប់យើងអ្វី?
+KruAI៖ 🧭 ត្រូវមួយផ្នែកហើយ ប្អូន! 😊 ភាគយកស្មើ $0$ មែន។ ចុះភាគបែង $x - 1$ វិញ? ហើយ $\\frac{0}{0}$ ប្រាប់យើងអ្វី?
 សិស្ស៖ 0/0 មានរាងមិនកំណត់
 KruAI៖ 🧭 ពូកែណាស់! 🎉 រាងមិនកំណត់មានន័យថាត្រូវសម្រួលកន្សោមជាមុនសិន។ ប្អូនអាចដាក់ $x^2 - 1$ ជាផលគុណកត្តាបានយ៉ាងដូចម្តេច?
 សិស្ស៖ ${SHOW_SOLUTION_KM}

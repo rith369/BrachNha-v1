@@ -62,8 +62,9 @@ export const CASES = [
     tags: ["math", "socratic"],
     turns: [
       { say: LIMIT_B, expect: { guided: true, leak: eq("4") } },
-      { say: "ខ្ញុំគិតថាចម្លើយគឺ 1", expect: { guided: true, leak: eq("4") } },
-      { say: SHOW_SOLUTION, expect: { guided: false, answer: eq("4"), formal: true } },
+      // Not "almost right": the prompt's own example used to teach that wording.
+      { say: "ខ្ញុំគិតថាចម្លើយគឺ 1", expect: { guided: true, leak: eq("4"), forbid: ["ជិតត្រូវ"] } },
+      { say: SHOW_SOLUTION, expect: { guided: false, answer: eq("4"), formal: true, steps: false } },
     ],
   },
   {

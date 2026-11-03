@@ -15,6 +15,29 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > `f8e6ef0`, `799a11b`) are from the old repo and no longer resolve — they are kept as a
 > record of the order things happened, not as something you can look up.
 
+
+## 3 Nov 2026: KruAI Fixes From Its First Test
+
+Commit: `HASH_HERE`. No database step.
+
+A new test set asks KruAI 35 real questions and checks the answers. It found these, now fixed:
+
+- **Answers that stopped halfway.** About 1 answer in 17 could end mid-sentence with no warning.
+  Now it says the connection dropped and offers a Try again button.
+- **Khmer numerals in answers.** Numbers are now always converted to 0-9.
+- **Long solutions after guiding.** If KruAI has already guided an exercise, the full solution is
+  now the short form: method, exam answer and tip.
+- **Calling a wrong answer "almost right".** KruAI now says kindly that it is not right yet.
+- **Formulas showing as raw code.** A Khmer word inside a chemical equation broke the whole
+  formula. It now displays properly.
+
+**Not fixed: KruAI can still occasionally get maths wrong.** On one limit from the 2025 paper it
+made a sign error once in 6 tries. Students should not treat every answer as certain.
+
+**To re-test:** ask KruAI an exercise, press "show full solution" and check it is short. Give a
+wrong answer and check it does not say "almost right". A cut-off answer is rare and cannot be
+triggered on purpose.
+
 ## 3 Nov 2026 — A section counts once a day, and the pledge says sections
 
 Commit: `94894b2`.

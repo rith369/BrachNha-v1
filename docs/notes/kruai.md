@@ -970,15 +970,42 @@ questions and answer keys), `checks.mjs` (the rules, pure) and `run.mjs`.
   read, because no script can judge whether the Khmer reads well or the reasoning is sound.
   Each run compares itself with the last one.
 
-**The first run (18 calls, 13 of 15 cases passed) found these, none fixed yet:**
+**What it found, and what became of it (3 Nov 2026).** First run 13 of 15; full run after the
+fixes 33 of 35.
 
-- **An answer can be silently cut off.** One reply stopped mid-formula with no usage report:
-  the upstream stream ended with no error, and the handler closes it as if finished
-  (`next.done` in `chat-handler.ts`), so the student sees half a solution with no warning and
-  no Try again. The `not-cut-off` check names it.
-- **Khmer numerals in a reply:** the stressed-student answer wrote the days and months left
-  in Khmer digits, against the rule.
-- **The SHORT form after guiding is not held:** both guided solutions came back with numbered
-  steps. A soft note, not a failure.
-- **A wrong answer was called nearly right:** the reply to a wrong "1" opened with "almost
-  right". A person read this; no check catches it.
+- **An answer could be silently cut off (1 in 17 calls). FIXED.** The stream ended with no
+  error and no `interaction.completed`, and the handler closed it as if finished, so a student
+  read half a solution with no warning. `finished` now tracks that event, and an `incomplete`
+  status counts as unfinished too. Every mid-answer failure ends in one line, `CUT_OFF_NOTE`
+  (`data/kruai-phrases.ts`), and `chat-overlay.tsx` looks for it at the end of a reply and marks
+  the bubble `failed: "retry"`: the status went out with the first word, so nothing else can
+  carry the signal. The words stay on screen, Try again replaces them, and they never reach the
+  model. **If Google ever stopped sending that event, every answer would get the note**: the
+  `[api/chat] the stream ended` log line is what would show it.
+- **Khmer numerals in replies. FIXED BY THE SERVER**, `latinDigits()` on every chunk. One digit
+  at a time is safe across chunk boundaries. The prompt's rule stays, but it only made it likely.
+- **Long solutions after guiding. FIXED BY THE SERVER**, `SHORT_FORM_NOTE`, added when "show full
+  solution" follows a guided reply. The rule and an example alone failed 2 of 2. **There are two
+  button phrases** (`SHOW_SOLUTION_KM` and `_EN`), and the first fix only knew the Khmer one.
+- **A wrong answer called "almost right". FIXED.** The prompt's own example opened with
+  ជិតត្រូវហើយ, and the model copied it: an example outweighs a rule. The example says
+  ត្រូវមួយផ្នែកហើយ now, and a rule forbids it. The case forbids that word too.
+- **Khmer inside a wrapped equation showed as raw LaTeX. FIXED IN THE RENDERER.**
+  `\mathrm{6CO_2 + ពន្លឺ \to …}` failed `liftKhmerText`, which refused any argument holding a
+  backslash. `splitAtKhmer()` cuts it at the Khmer and re-wraps each maths piece. Khmer in a group
+  (`\frac{ខ្មែរ}{2}`) is still refused, and KaTeX still never receives a Khmer glyph.
+- **A wrong answer on a real exam question. NOT FIXED, and no prompt can fix it.** The limit in
+  `math-limit-trig` came back as $-\frac{1}{2}$ once (a sign error rewriting the denominator)
+  and $\frac{1}{2}$ on the next 5 tries: 1 wrong in 6. `thinking_level` is `"minimal"` on purpose
+  (2.7s to first character against 11.2s on `"low"`). Raising it is the only lever left, a
+  speed and cost trade for the user to make. Re-measure with this test before deciding.
+
+**The test run's own quirk:** the first case of a run can read "0 decks" if the 3s content fetch
+times out, as it did once with other work running. It retries a minute later.
+
+**Verified, besides the runs above:** 23 checks of the real handler against a fake model (each
+way a stream can end, digits split across chunks, both button phrases); 45 browser checks of the
+chat screen at 390, 320 dark and 1280 (Try again, nothing sent back, no doubled question); 84
+`splitMath` checks including every earlier guard and all 62 saved replies; the failed table drawn
+by the real chat at 390 and 320 dark. **The helpline question is open:** a self-harm reply points
+to a parent, teacher or trusted adult and names no helpline, because no number has been supplied.

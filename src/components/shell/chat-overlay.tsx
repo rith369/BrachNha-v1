@@ -32,8 +32,10 @@ import { MathText } from "./math-text";
 import { AttachmentChip, PhotoButton } from "./chat-attach";
 import {
   GUIDE_MARK,
+  CUT_OFF_NOTE,
   KRUAI_LEFT_HEADER,
   KRUAI_LIMIT_HEADER,
+  SHOW_SOLUTION_EN,
   SHOW_SOLUTION_KM,
 } from "@/data/kruai-phrases";
 import { guidedAnchorIndex } from "@/utils/chat-anchor";
@@ -50,7 +52,7 @@ import type { ChatMsg, Conversation } from "@/types";
  * stripped and a mark split across stream chunks cannot glitch.
  */
 const SHOW_SOLUTION = {
-  en: "Please show the full solution",
+  en: SHOW_SOLUTION_EN,
   km: SHOW_SOLUTION_KM,
 } as const;
 
@@ -534,6 +536,7 @@ export function ChatOverlay() {
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
+      let streamed = "";
 
       for (;;) {
         const { done, value } = await reader.read();
@@ -541,8 +544,16 @@ export function ChatOverlay() {
         const chunk = decoder.decode(value, { stream: true });
         if (chunk) {
           received = true;
+          streamed += chunk;
           appendChatChunk(chunk);
         }
+      }
+
+      // The answer stopped part-way, after the status had already gone out. Like a
+      // dropped connection: half an answer stays out of what the model sees, and
+      // Try again asks afresh. The server's line is the only signal there can be.
+      if (streamed.endsWith(CUT_OFF_NOTE.km) || streamed.endsWith(CUT_OFF_NOTE.en)) {
+        failed = "retry";
       }
 
       if (!received) {

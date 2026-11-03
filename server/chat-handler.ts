@@ -18,7 +18,13 @@ import { getCachedAnswer, createCachedStreamResponse } from "./chat-cache.js";
 import { takeQuota } from "./kruai-quota.js";
 import { publishedContent } from "./content-source.js";
 import { guidedAnchorIndex } from "../src/utils/chat-anchor.js";
-import { KRUAI_LEFT_HEADER, KRUAI_LIMIT_HEADER } from "../src/data/kruai-phrases.js";
+import {
+  CUT_OFF_NOTE,
+  KRUAI_LEFT_HEADER,
+  KRUAI_LIMIT_HEADER,
+  SHOW_SOLUTION_EN,
+  SHOW_SOLUTION_KM,
+} from "../src/data/kruai-phrases.js";
 
 /**
  * KruAI endpoint. Started life as a Netlify function, then a Next.js route
@@ -472,6 +478,23 @@ const ANCHOR_NOTE =
   "[Earlier messages are left out to save space. The step-by-step guidance in this conversation started from this question:]\n\n";
 
 /**
+ * Added when the student presses "show full solution" on an exercise KruAI has been
+ * guiding. The prompt asks for the short form here and its example shows it, and the
+ * model still wrote the numbered steps every time: it could not tell from a rule
+ * that the guiding had already done the explaining. The handler can, so it says so.
+ */
+const SHORT_FORM_NOTE =
+  "[This exercise has already been guided, so use the SHORT form: one METHOD line, the FORMAL ANSWER and the EXAM TIP. No numbered explanation steps.]\n\n";
+
+/**
+ * Every number a student reads is in Latin digits. The prompt says so too, but a
+ * rule only makes it likely, and one digit at a time is safe across chunk boundaries.
+ */
+function latinDigits(text: string): string {
+  return text.replace(/[\u17E0-\u17E9]/g, (d) => String(d.charCodeAt(0) - 0x17e0));
+}
+
+/**
  * The content of one student turn, or null when it has nothing in it. Image
  * first, then the words about it: the order the model's own guidance gives for
  * a single-image prompt. A photo turn with no words still counts: the photo IS
@@ -798,7 +821,13 @@ export async function handleChat(req: Request): Promise<Response> {
       }
       continue;
     }
-    const content = userContent(m, images[i]);
+    // anchor >= 0 means the latest reply was a guided one.
+    const wantsSolution =
+      i === messages.length - 1 &&
+      anchor >= 0 &&
+      typeof m?.text === "string" &&
+      (m.text.trim().startsWith(SHOW_SOLUTION_KM) || m.text.trim().startsWith(SHOW_SOLUTION_EN));
+    const content = userContent(m, images[i], wantsSolution ? SHORT_FORM_NOTE : "");
     if (content) pushStep(input, { type: "user_input", content });
   }
 
@@ -1180,31 +1209,37 @@ export async function handleChat(req: Request): Promise<Response> {
   // Set when the student closes the chat or loses the connection. Reading on
   // after that would spend quota generating an answer nobody will receive.
   let cancelled = false;
+  // The model ends every answer with this event. A stream that closes without it
+  // stopped part-way with no error at all, and the student would read half a
+  // solution as if it were finished. Measured: 1 answer in 17 on the free tier.
+  let finished = false;
+  const cutOff = () => encoder.encode(`\n${CUT_OFF_NOTE[lang]}`);
 
   const out = new ReadableStream<Uint8Array>({
     async start(controller) {
       try {
-        controller.enqueue(encoder.encode(first));
+        controller.enqueue(encoder.encode(latinDigits(first)));
         for (;;) {
           const next = await it.next();
-          if (next.done || cancelled) break;
+          if (next.done || cancelled) {
+            if (!cancelled && !finished) {
+              console.error("[api/chat] the stream ended before the answer finished");
+              controller.enqueue(cutOff());
+            }
+            break;
+          }
           const event = next.value;
           if (event.event_type === "error") {
             // Log it: the student only sees a short apology, so without this
             // an upstream failure mid-stream is undiagnosable.
             console.error("[api/chat] upstream error event:", event.error);
-            controller.enqueue(
-              encoder.encode(
-                isQuotaError(event.error)
-                  ? `\n${busyMessage(lang)}`
-                  : lang === "km"
-                    ? "\n⚠️ មានបញ្ហាពេលឆ្លើយ។ សូមព្យាយាមម្ដងទៀត។"
-                    : "\n⚠️ Something went wrong mid-answer. Please try again."
-              )
-            );
+            controller.enqueue(cutOff());
             break;
           }
           if (event.event_type === "interaction.completed") {
+            // "incomplete" is the model stopping early too, at its length limit.
+            const status = event.interaction?.status;
+            finished = status === undefined || status === "completed";
             // What this answer actually cost, in tokens. This line is how the
             // price of one question is MEASURED rather than guessed when the
             // daily limits in kruai_take are tuned. Numbers only, never text.
@@ -1220,19 +1255,13 @@ export async function handleChat(req: Request): Promise<Response> {
             }
           }
           const text = deltaText(event);
-          if (text) controller.enqueue(encoder.encode(text));
+          if (text) controller.enqueue(encoder.encode(latinDigits(text)));
         }
       } catch (err) {
         if (cancelled) return;
         console.error("[api/chat] stream failed:", err);
         try {
-          controller.enqueue(
-            encoder.encode(
-              lang === "km"
-                ? "\n⚠️ ការតភ្ជាប់ដាច់។ សូមព្យាយាមម្ដងទៀត។"
-                : "\n⚠️ The connection dropped. Please try again."
-            )
-          );
+          controller.enqueue(cutOff());
         } catch {
           // The reader went away between the failure and this line.
         }

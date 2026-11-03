@@ -15,6 +15,9 @@
  */
 export const SHOW_SOLUTION_KM = "សូមបង្ហាញដំណោះស្រាយពេញ";
 
+/** The same button when the app is in English. */
+export const SHOW_SOLUTION_EN = "Please show the full solution";
+
 /**
  * The first character of every GUIDED reply (the Socratic rules tell the model
  * to start with it). Two readers: the chat screen shows "show full solution"
@@ -22,6 +25,16 @@ export const SHOW_SOLUTION_KM = "សូមបង្ហាញដំណោះស�
  * where the exercise being guided began.
  */
 export const GUIDE_MARK = "🧭";
+
+/**
+ * The line the server adds when an answer stops part-way. The chat screen looks for
+ * it at the end of a reply and offers Try again, because the status (200) went out
+ * with the first word and nothing else can say so. One string, so the two cannot drift.
+ */
+export const CUT_OFF_NOTE = {
+  km: "⚠️ ការតភ្ជាប់ដាច់។ សូមព្យាយាមម្ដងទៀត។",
+  en: "⚠️ The connection dropped. Please try again.",
+} as const;
 
 /**
  * Response headers the chat endpoint sets for the chat screen.

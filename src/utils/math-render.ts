@@ -183,6 +183,35 @@ function moveArrowLabelsOut(tex: string): string {
 }
 
 /**
+ * A text command's argument that holds maths AND Khmer, cut at the Khmer. The model
+ * wraps a whole equation this way: `\mathrm{6CO_2 + 6H_2O + ពន្លឺ \to C_6H_{12}O_6}`.
+ * Null when a piece would have unbalanced braces, which means the Khmer sits inside
+ * a group (`\frac{ខ្មែរ}{2}`) and cannot be cut out cleanly.
+ */
+function splitAtKhmer(words: string): { khmer: boolean; value: string }[] | null {
+  const pieces: { khmer: boolean; value: string }[] = [];
+  const run = /[\u1780-\u17FF]+(?:\s+[\u1780-\u17FF]+)*/g;
+  let last = 0;
+  for (const match of words.matchAll(run)) {
+    pieces.push({ khmer: false, value: words.slice(last, match.index) });
+    pieces.push({ khmer: true, value: match[0] });
+    last = match.index + match[0].length;
+  }
+  pieces.push({ khmer: false, value: words.slice(last) });
+
+  for (const piece of pieces) {
+    if (piece.khmer) continue;
+    let depth = 0;
+    for (const ch of piece.value) {
+      if (ch === "{") depth++;
+      if (ch === "}" && --depth < 0) return null;
+    }
+    if (depth !== 0) return null;
+  }
+  return pieces.filter((piece) => piece.value.trim());
+}
+
+/**
  * A formula with Khmer words inside `\text{…}`, split into math and plain text —
  * or null when it is anything less clear-cut than that.
  *
@@ -204,7 +233,7 @@ function moveArrowLabelsOut(tex: string): string {
  *     look exactly like that, and must stay text);
  *   - a text command nested inside a group, e.g. `\frac{\text{ខ្មែរ}}{2}` —
  *     cutting there would leave unbalanced braces;
- *   - a text argument holding a backslash or a dollar, which is not plain words;
+ *   - a text argument holding a dollar, or Khmer inside a group within it;
  *   - inline math spanning a newline, the same rule looksLikeMath applies.
  *
  * Every piece is emitted INLINE, even from a `$$…$$` block: a display formula
@@ -213,6 +242,9 @@ function moveArrowLabelsOut(tex: string): string {
  * A Khmer label on an ARROW is moved out to the top level first (see
  * moveArrowLabelsOut), so it is lifted like any other text instead of failing
  * the "nested in a group" rule.
+ *
+ * An argument that is maths as well as words is cut at the Khmer (splitAtKhmer),
+ * and a \mathrm wrapper goes back around each maths piece so it looks the same.
  */
 function liftKhmerText(source: string, display: boolean): MathSegment[] | null {
   if (!display && source.includes("\n")) return null;
@@ -243,9 +275,21 @@ function liftKhmerText(source: string, display: boolean): MathSegment[] | null {
         const words = tex.slice(open, close);
 
         if (KHMER.test(words)) {
-          if (words.includes("\\") || words.includes("$")) return null;
-          pushMath();
-          parts.push({ type: "text", value: words.trim() });
+          if (words.includes("$")) return null;
+          // Not plain words: without this, "6CO_2" reads as literal underscores.
+          const pieces = /[\\_^]/.test(words)
+            ? splitAtKhmer(words)
+            : [{ khmer: true, value: words }];
+          if (!pieces) return null;
+          const wrap = command[0].startsWith("\\mathrm");
+          for (const piece of pieces) {
+            if (piece.khmer) {
+              pushMath();
+              parts.push({ type: "text", value: piece.value.trim() });
+            } else {
+              math += wrap ? `\\mathrm{${piece.value.trim()}}` : piece.value;
+            }
+          }
           lifted = true;
         } else {
           // A text command with no Khmer in it is ordinary TeX. Keep it whole.
