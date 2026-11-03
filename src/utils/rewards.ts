@@ -26,6 +26,7 @@
  * Pure constants in utils/, no state and no JSX — the same shape as
  * utils/focus-styles.ts.
  */
+// The database cuts XP at 5000 a day (20261103000007). A much larger reward may mean raising it.
 export const QUIZ_XP = 10;
 export const QUIZ_COINS = 5;
 

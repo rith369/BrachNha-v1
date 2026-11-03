@@ -16,6 +16,25 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 3 Nov 2026: Limits on Fake XP
+
+Commit: `HASH_HERE`. **Database step:** run `20261103000007_progress_number_limits.sql` in the Supabase
+SQL editor. Nothing in the app changed, so it works before or after.
+
+Someone with technical skill could write any XP number or mark months of old days as studied, and go
+straight to the top of the leaderboard. Now the database holds these numbers to what is possible: 5000 XP
+a day, 16 study hours a day, no more total than the account's age allows, and no marking days from more
+than about two weeks ago.
+
+**This limits cheating, it does not end it.** A patient cheater who claims the most they can every day
+could still lead the board. If that happens, remove their account on the admin page.
+
+**Students should not notice any difference.** The limits are far above real study, and numbers on a
+student's own phone never go down.
+
+**To re-test, please:** after running the step, finish a quiz and check your XP goes up as usual, on your
+phone and on another account's leaderboard.
+
 ## 3 Nov 2026: Limits on Long Text and Battles a Day
 
 Commit: `c9bbcb6`. **Database step:** run `20261103000006_text_limits_and_battle_cap.sql` in the

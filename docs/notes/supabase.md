@@ -361,5 +361,43 @@ so it can only grow storage. A script could still do that.
 **Verified:** the real tables, triggers and policies on PGlite 0.2.17, as the `authenticated` role: 49
 checks, including a 1,000,000-letter profile save keeping the XP in the same save, a 40-message batch
 with one giant message going in whole, and the Phnom Penh day boundary. Browser with the database faked:
-58 checks at 390 and 320. **Not verified: against the real database.** The migration's last statement
-returns `limits_in_place`, which `db:check` cannot read from outside.
+58 checks at 390 and 320. **Applied to the live project on 3 Nov 2026:** its last statement returned `limits_in_place` true. Not
+exercised with a real account. `db:check` cannot read that result from outside.
+
+## Limits on progress numbers (3 Nov 2026, `20261103000007`)
+
+The phone works out XP, coins, streak and minutes and sends the result, so the database can only hold a
+number to what is possible. Cut, never refused, for the reason above. The phone keeps its own number,
+and the leaderboard shows a student their own row from the phone, so nobody sees their own go down.
+
+| what | limit |
+| --- | --- |
+| `daily_activity.xp_earned` | 5000 a day |
+| `daily_activity.study_minutes` | 960 a day (16 hours) |
+| `profiles.xp`, `coins` | 5000 for each day since the account was made, plus two |
+| `profiles.streak` | days since the account was made, plus 15 |
+| `profiles.streak_protections` | 2 |
+| a `daily_activity` row dated outside the last 15 days or more than a day ahead | skipped silently |
+
+- **5000 comes from the real rewards:** 20 XP for a right past-paper answer and about 45 questions a
+  paper makes about 900 XP. A Simulation Day 1 at full marks is about 3600. **Raising a reward in
+  `utils/rewards.ts` or adding a much larger paper may mean raising it.**
+- **The account's age is read from `auth.users`**, because a student can write `profiles.created_at`.
+- **The two extra days are for guests.** A guest's XP comes up all at once when they sign in. A part
+  that gets cut comes back as the account ages, because every push resends the full total.
+- **A row is skipped for old dates, not refused,** because the app's batch must not fail. The app only
+  sends 14 days back (`ACTIVITY_PUSH_DAYS`).
+
+**THIS DOES NOT STOP CHEATING, AND THE TEST SHOWED HOW MUCH.** A 30-day-old account that fakes the most
+it can reads 160,000 all-time XP on the real `leaderboard()`, beside a real student's 12,480, and a
+16-day streak at once. The limits end absurd numbers and hold down the week and month boards, but a
+patient cheater can still lead. Ending it means the server checking each reward, which means moving every
+award off the phone. Removing the account on the admin page is the answer until then.
+
+**Not covered:** `streak_protected` days cannot be checked, so a forged one holds a run together, and it
+adds no days. `daily_content_activity` feeds only a student's own Progress page.
+
+**Verified:** the real tables on PGlite 0.2.17 as the `authenticated` role, read back through the real
+`leaderboard()`: 39 checks, including a real student's numbers staying exact, the app's own 14-day
+batch, a guest's history on a new account, and the Phnom Penh day boundary. **Not verified: against the
+real database.**
