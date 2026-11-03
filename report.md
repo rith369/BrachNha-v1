@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Nov 2026: Limits on Long Text and Battles a Day
 
-Commit: `HASH_HERE`. **Database step:** run `20261103000006_text_limits_and_battle_cap.sql` in the
+Commit: `c9bbcb6`. **Database step:** run `20261103000006_text_limits_and_battle_cap.sql` in the
 Supabase SQL editor. The app and this step work in either order.
 
 Before this, someone with technical skill could skip the app's screens and save a name of a million
