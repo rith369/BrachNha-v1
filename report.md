@@ -16,6 +16,25 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 3 Nov 2026: Battles Can Only Hold Real Questions
+
+Commit: `HASH_HERE`. **Database step: run `20261103000005_competition_writes_checked.sql` in the
+SQL editor BEFORE this deploys.**
+
+A security review found that someone with technical skill could skip the app and post a Battle with
+any text and any creator name, which other students would then read. Most students are under 18, so
+this was a way to bully someone under an official-looking name.
+
+Now the database only accepts questions from your published pool. It takes the name from the
+student's account and works out the score itself, so faked Battle scores are closed too.
+
+**Students will not notice any difference.** Creating and joining Battles works as before.
+
+**Still open from the review:** display names are still free text, and there are no size limits yet.
+
+**To re-test:** create a Battle on one account, and join it from another. Both scores should appear
+as normal.
+
 ## 3 Nov 2026: Practice What I Got Wrong
 
 Commit: `f7bb3d8`. **Database step: run `20261103000004_question_mistakes.sql` in the SQL

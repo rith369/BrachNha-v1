@@ -1,4 +1,5 @@
 import { getSupabase, isSupabaseConfigured } from "./supabase";
+import type { Json } from "@/types/database";
 import type {
   Competition,
   CompetitionAttempt,
@@ -77,13 +78,14 @@ function isText(v: unknown): v is string {
 }
 
 /**
- * Checks the frozen question set a competition arrives with. It was written by
- * the CREATOR'S DEVICE and nothing on the server checks it, so it is untrusted
- * input from another student, not app content. A malformed question is
- * dropped rather than crashing the joiner's screen, and SVG is refused
- * outright: the app's own question pool never contains any, so a question
- * carrying one was not made by the app. (MathText sanitises SVG anyway — see
- * utils/sanitize-svg.ts — this is the second layer.)
+ * Checks the frozen question set a competition arrives with. Since
+ * 20261103000005 the database only stores questions from a published pool, but
+ * rows from before that were written by the CREATOR'S DEVICE with nothing checking
+ * them, so a stored row is still untrusted input. A malformed question is dropped
+ * rather than crashing the joiner's screen, and SVG is refused outright: the app's
+ * own question pool never contains any, so a question carrying one was not made by
+ * the app. (MathText sanitises SVG anyway — see utils/sanitize-svg.ts — this is the
+ * second layer.)
  */
 function toQuestions(value: unknown): ExamQuestion[] {
   if (!Array.isArray(value)) return [];
@@ -177,6 +179,10 @@ async function client() {
  * Called right after the creator finishes their own run. The local copy is
  * written first and unconditionally (see game-create.tsx), so a failure here
  * loses the sharing, never the student's own record of it.
+ *
+ * THROUGH A FUNCTION, not an insert (20261103000005). It refuses a question that is
+ * not from a published pool, and takes the name, score and time itself, so another
+ * student can only ever read app content under a real name.
  */
 export async function publishCompetition(
   competition: Competition
@@ -185,22 +191,16 @@ export async function publishCompetition(
   if (!db) return fail("unconfigured");
   if (!competition.creatorId) return fail("unauthenticated");
 
-  const { error } = await db.from("competitions").insert({
-    id: competition.id,
-    creator_id: competition.creatorId,
-    creator_name: competition.creatorName,
-    subject: competition.subject,
-    difficulty: competition.difficulty,
-    minutes: competition.minutes,
-    // The frozen set, stored whole — see the type's own comment.
-    questions: competition.questions as unknown as never,
-    // Written in the SAME insert as the score, which is what lets the table stay
+  const { error } = await db.rpc("post_competition", {
+    p_id: competition.id,
+    p_subject: competition.subject,
+    p_difficulty: competition.difficulty,
+    p_minutes: competition.minutes,
+    p_questions: competition.questions as unknown as Json,
+    // In the SAME write as the score, which is what lets the table stay
     // insert-only: there is no second write to permit later.
-    creator_answers: (competition.creatorAnswers ?? []) as unknown as never,
-    creator_score: competition.creatorScore,
-    creator_ms: competition.creatorMs,
-    total: competition.total,
-    created_at: competition.createdAt,
+    p_answers: (competition.creatorAnswers ?? []) as unknown as Json,
+    p_ms: competition.creatorMs,
   });
 
   if (error) return fail(error.code === UNIQUE_VIOLATION ? "duplicate" : "failed");
@@ -260,6 +260,9 @@ export async function fetchCompetition(
  * constraint is what stops a student re-rolling a bad run until they beat the
  * creator, so hitting it means "you already played this", which is a sentence
  * the UI can say.
+ *
+ * Through a function, like publishCompetition: the name, score and time are the
+ * server's, and an answer must be an option of the question.
  */
 export async function publishAttempt(
   attempt: CompetitionAttempt
@@ -268,16 +271,12 @@ export async function publishAttempt(
   if (!db) return fail("unconfigured");
   if (!attempt.userId) return fail("unauthenticated");
 
-  const { error } = await db.from("competition_attempts").insert({
-    competition_id: attempt.competitionId,
-    user_id: attempt.userId,
-    user_name: attempt.userName,
-    score: attempt.score,
-    ms: attempt.ms,
-    // Same insert as the score, for the same reason publishCompetition writes
-    // creator_answers inline: the table has no UPDATE policy and should not.
-    answers: (attempt.answers ?? []) as unknown as never,
-    played_at: attempt.playedAt,
+  const { error } = await db.rpc("post_competition_attempt", {
+    p_competition: attempt.competitionId,
+    // Same write as the score, for the same reason publishCompetition sends the
+    // creator's answers with it: the table has no UPDATE policy and should not.
+    p_answers: (attempt.answers ?? []) as unknown as Json,
+    p_ms: attempt.ms,
   });
 
   if (error) return fail(error.code === UNIQUE_VIOLATION ? "duplicate" : "failed");

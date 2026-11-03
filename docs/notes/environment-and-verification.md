@@ -226,6 +226,12 @@ transaction, because the function returns one more column. `db:check` cannot see
 publishable-key `GET /rest/v1/profiles?select=streak_protections&limit=0` answers `200` once it exists
 and `400` before.
 
+**`20261103000005_competition_writes_checked.sql`** (Battles written through checked functions) must
+be applied BEFORE the app that calls them. Without it, new Battles stay "Not shared yet" and joining
+records nothing on the server. `db:check` cannot see a function: a publishable-key-only call to
+`/rest/v1/rpc/post_competition`, sent with its real parameter names (an empty body answers `PGRST202` even when it exists), answers `PGRST202` while it is missing and a permission error once
+it exists.
+
 **`20261103000004_question_mistakes.sql`** (the "practice what I got wrong" list) can ship
 before or after the code. Without it each push fails quietly and the list stays on the phone; once
 it lands, the next push uploads it. Afterwards `db:check` lists `question_mistakes`, answering

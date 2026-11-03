@@ -994,6 +994,24 @@ export type Database = {
     };
     Views: { [_ in never]: never };
     Functions: {
+      // 20261103000005. The only way to write a Battle: the question must be from a
+      // published pool, and the name, score and time are the server's.
+      post_competition: {
+        Args: {
+          p_id: string;
+          p_subject: string;
+          p_difficulty: string;
+          p_minutes: number;
+          p_questions: Json;
+          p_answers: Json;
+          p_ms: number;
+        };
+        Returns: undefined;
+      };
+      post_competition_attempt: {
+        Args: { p_competition: string; p_answers: Json; p_ms: number };
+        Returns: undefined;
+      };
       // 20261001000001_telemetry.sql. Anyone (guests included) may report an
       // error; the function caps it per hour.
       log_client_error: {

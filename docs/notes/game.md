@@ -882,3 +882,36 @@ is derived from the session rather than pushed into state, and the opening
 "loading" comes from the initial value. Each effect also waits for
 `authStatus !== "loading"`: RLS gives an unauthenticated caller nothing, so
 firing early would show a failure and then fetch again a moment later.
+
+### Battles are written only through functions that check them (3 Nov 2026)
+
+**This replaces "nothing on the server checks it" above.** A security review found that a student
+calling the database directly could post any question text, any creator name and any score, and
+other students would read it. Most students are under 18, so that is a way to bully someone inside
+the app under an official-looking name. The test proved it on the old rules.
+
+`20261103000005` drops the insert policies on `competitions` and `competition_attempts`. The only
+way in is now:
+
+- **`post_competition`**: each question must match one from a PUBLISHED pool for that subject, in
+  any version (a Battle is played first and shared after, and a fix may land in between). What is
+  stored is the POOL's copy, so extra text on a real question is thrown away. Answers must be options
+  of the question, or null.
+- **`post_competition_attempt`**: answers must be options of that Battle's questions. Refuses your own.
+- **Both** take the name from the profile, work out the score themselves, hold the time inside the
+  budget and stamp the time from the server. So faked Battle scores are closed too. Both require
+  `friend_eligible`: a real account with a name.
+
+`lib/competitions.ts` still reports a duplicate (23505) the same way. A refused Battle stays "Not
+shared yet" on the student's phone and retries on hub visits, so one whose questions have left the
+pool stays unshared. That is honest, and costs one request a visit.
+
+**Still free text, on purpose:** a student's display name, which also shows on the leaderboard. That
+is not moderation of names. **Rows posted before this are not rechecked or deleted**, which is why
+`toQuestions()` still treats a stored row as untrusted. Size limits and a cap on posts per day are
+the review's separate item, not done here.
+
+**Verified:** the real table and policies on PGlite 0.2.17 with the real pool and questions built by
+the app's own `pickQuestions`/`toGameQuestions`: 43 checks, including the forged insert succeeding
+before and refused after. Browser, the database faked: 40 checks at 390 and 320 through the real
+create and join screens. **Not verified: a real account against the real database.**
