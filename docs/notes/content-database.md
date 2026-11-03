@@ -752,3 +752,24 @@ and opens no runner; Home renders; no sideways scroll; no page error. KruAI thro
 `ssrLoadModule`, 6 checks: no mock-exam lines, a stale `pendingPlacementTests` never
 reaches the prompt, sections and decks still listed, physics still "no content", maths
 still covered, the section prompt under budget.
+
+## Hidden content is really hidden (3 Nov 2026, `20261103000008`)
+
+Unpublishing only took an item off the manifest, and its versions stayed readable by anyone asking by
+name. `content_versions` is now readable only while the item is published
+(`"content_versions: read while published"`).
+
+- **Every version of a published item stays readable**, because reopening an old attempt loads the version
+  it was taken on.
+- **Admin screens and the Battle checks read through security definer functions**, so they still see hidden
+  versions. A Battle from a hidden pool still shares.
+- **No `is_app_admin()` in the policy:** anon may not call it, so every guest's read would fail.
+- **A phone keeps what it has already downloaded** (Cache Storage, `lib/content.ts`). Hiding stops new
+  downloads, and cannot reach those.
+- **A known wrong sentence:** hide a paper during a student's Simulation, and `simulation-sit.tsx` and
+  `simulation-result.tsx` show "needs internet" for it, with Try again, because `ContentNotice` has no
+  state for this. Give Up still works, and publishing it again restores it. Read in the code, not run.
+
+**Verified:** the real policy on PGlite 0.2.17 as `anon` and `authenticated`, including the read working
+before and refused after, listing everything, `content_current`, republishing, and a definer function
+still reading. **Not verified: against the real database.**

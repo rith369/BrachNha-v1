@@ -546,3 +546,20 @@ Khmer (every sentence and detail line, bold names, the Open link, both filters, 
 with the right cursor, the end line, the hub grid at xl and md, the owner-only note, no Khmer
 numerals, empty state, a student refused with no log request, no sideways scroll, no page
 error).
+
+## The error log is held down (3 Nov 2026, `20261103000008`)
+
+Rows were never deleted, and a script with no account could write 200 an hour. `log_client_error` now
+also stops at **300 a day from guests and 2000 a day from everyone**, and over a limit it still drops the
+call quietly. **Rows older than 45 days are deleted** on about 1 report in 50, and Admin → Errors reads at
+most 30 days back. There is no scheduled job, so no extension is needed, and the log only needs cleaning
+while it is being written to.
+
+- **Guests have their own smaller limit**, so a flood with no account cannot use up the room signed-in
+  students' errors need.
+- **Worst case:** a script with no account can hold about 70 MB (300 × 45 days × 5 KB).
+- **A crash hitting a whole class can reach 2000 in a day.** Later reports that day are lost, but the first
+  2000 already show the problem. Raise `everyone_day` if real numbers ever get close.
+- **`app_events` has no cleanup yet.** It is limited to 500 a day per signed-in student.
+
+**Verified:** PGlite 0.2.17, as `anon` and `authenticated`: 41 checks across the three fixes in this migration.

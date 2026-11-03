@@ -20,9 +20,10 @@ import {
  * THE SWITCH FOR THE WHOLE FEATURE. Off since 27 Oct 2026 (the user's call):
  * the photos were using up Supabase storage. Off, the review goes straight to
  * the answers, no photo strip or report flag shows, and NOTHING is listed,
- * signed or uploaded. The code, the bucket and its policies stay, so turning
- * this back on is the whole change. Account deletion still clears any photos
- * left in the bucket (lib/account-deletion.ts does not read this).
+ * signed or uploaded. The code and the bucket stay. Turning this back on also needs
+ * "competition work: upload own" restored from 20260916000003, which 20261103000008
+ * dropped. Account deletion still clears any photos left in the bucket
+ * (lib/account-deletion.ts does not read this).
  */
 export const WORK_PHOTOS_ENABLED = false;
 

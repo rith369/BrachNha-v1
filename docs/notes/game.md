@@ -933,3 +933,10 @@ create and join screens. **Not verified: a real account against the real databas
 - **The count is of rows there now**, so deleting a Battle frees a place. A student can have 20 up from
   one day, which is what protects the list, but post-and-delete is not capped.
 - **Attempts have no cap of their own:** one per student per Battle already holds them.
+
+### Photo uploads are closed in the database (3 Nov 2026, `20261103000008`)
+
+The feature was off only in the app, so the database still took uploads from anyone calling it directly.
+The upload policy is gone. Reading, reporting and deleting leftover photos still work, and so does account
+deletion. **Turning the feature back on needs `"competition work: upload own"` restored from
+`20260916000003` as well as `WORK_PHOTOS_ENABLED`.**

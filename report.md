@@ -16,6 +16,25 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 3 Nov 2026: Three Small Security Fixes
+
+Commit: `HASH_HERE`. **Database step:** run `20261103000008_close_small_gaps.sql` in the Supabase SQL
+editor. The app works before or after.
+
+- **Photo uploads closed.** The Battle photo feature was already off in the app, but the database still
+  accepted uploads from anyone calling it directly. Old photos can still be read and deleted.
+- **Hidden content is really hidden.** Content hidden on Admin → Content could still be downloaded by
+  someone asking for it by name. Now it cannot, until it is published again. A phone that already
+  downloaded it keeps its copy.
+- **The error log cannot grow forever.** Errors older than 45 days are deleted, and there is now a daily
+  limit on how many can be saved.
+
+**Students should not notice any difference.** One rare case: if a paper is hidden while a student is
+sitting a Simulation, that paper says it needs internet until it is published again.
+
+**To re-test, please:** open a lesson, a quiz and a past paper, and reopen an old attempt from a paper's
+history. Hide something on Admin → Content and check it is gone for a student, then publish it again.
+
 ## 3 Nov 2026: Limits on Fake XP
 
 Commit: `01c46e6`. **Database step:** run `20261103000007_progress_number_limits.sql` in the Supabase
