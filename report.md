@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Nov 2026: Battles Can Only Hold Real Questions
 
-Commit: `HASH_HERE`. **Database step: run `20261103000005_competition_writes_checked.sql` in the
+Commit: `79f6b82`. **Database step: run `20261103000005_competition_writes_checked.sql` in the
 SQL editor BEFORE this deploys.**
 
 A security review found that someone with technical skill could skip the app and post a Battle with
