@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Nov 2026: KruAI Fixes From Its First Test
 
-Commit: `HASH_HERE`. No database step.
+Commit: `a80df57`. No database step.
 
 A new test set asks KruAI 35 real questions and checks the answers. It found these, now fixed:
 
