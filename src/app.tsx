@@ -45,6 +45,8 @@ const routeModules = {
   practiceSubject: () => import("@/pages/practice-subject"),
   practiceRun: () => import("@/pages/practice-run"),
   practiceReview: () => import("@/pages/practice-review"),
+  practiceMistakes: () => import("@/pages/practice-mistakes"),
+  practiceMistakesRun: () => import("@/pages/practice-mistakes-run"),
   privacy: () => import("@/pages/privacy"),
   profile: () => import("@/pages/profile"),
   progress: () => import("@/pages/progress"),
@@ -74,6 +76,8 @@ const PracticePage = lazy(routeModules.practice);
 const PracticeSubjectPage = lazy(routeModules.practiceSubject);
 const PracticeRunPage = lazy(routeModules.practiceRun);
 const PracticeReviewPage = lazy(routeModules.practiceReview);
+const PracticeMistakesPage = lazy(routeModules.practiceMistakes);
+const PracticeMistakesRunPage = lazy(routeModules.practiceMistakesRun);
 const PrivacyPage = lazy(routeModules.privacy);
 // The admin pages are NOT in routeModules on purpose: that map is also the
 // idle-prefetch list, and the team's screens have no business downloading on
@@ -280,6 +284,9 @@ export default function App() {
               utils/focus-routes.ts for why segment count is what this feature
               already disambiguates on. */}
           <Route path="practice/review" element={<PracticeReviewPage />} />
+          {/* "Practice what I got wrong". Static, so `run` outranks :mode/:subjectId. */}
+          <Route path="practice/mistakes" element={<PracticeMistakesPage />} />
+          <Route path="practice/mistakes/run" element={<PracticeMistakesRunPage />} />
           <Route
             path="practice/:mode/:subjectId"
             element={<PracticeSubjectPage />}

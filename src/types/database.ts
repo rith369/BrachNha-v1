@@ -479,6 +479,25 @@ export type Database = {
         Relationships: [ProfileFk<"simulation_attempts_user_id_fkey">];
       };
 
+      // ── question_mistakes — store field: mistakes (20261103000004) ──
+      question_mistakes: {
+        Row: {
+          user_id: string;
+          /** utils/content-ref.ts: "quiz:math-1-1-1#q4". */
+          ref: string;
+          times: number;
+          last_wrong_at: string;
+        };
+        Insert: {
+          user_id: string;
+          ref: string;
+          times?: number;
+          last_wrong_at: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["question_mistakes"]["Insert"]>;
+        Relationships: [ProfileFk<"question_mistakes_user_id_fkey">];
+      };
+
       // ── competitions (the Game feature) ────────────────────────────────
       // The first cross-user tables in the schema: a competition is readable by
       // every signed-in student. See 20260913000001_competitions.sql for why

@@ -1288,3 +1288,48 @@ migration (twice, old rows kept, exact round trip, every refusal); and 20 browse
 checks at 390 light and 320 dark Khmer (old cards upgraded on open, one replayed and
 one estimated; the line and its ⓘ; a ✓ grade stores an FSRS state whose time matches
 the log; no sideways scroll; no page error).
+
+### Practice what I got wrong (3 Nov 2026)
+
+`/practice/mistakes` lists the questions a student got wrong and has not fixed, and
+`/practice/mistakes/run` practises them. `features/practice/mistakes.ts` is the rules, pure.
+
+- **A mistake is a REFERENCE, never a copy** (`utils/content-ref.ts`, the same refs mistake
+  reports use), so a fix published on Admin → Content reaches it. `QuestionMistake` holds only
+  the ref, a count and a time. Each question is fetched when it comes on screen (and the next
+  one warmed), so a round of 20 never downloads every paper first, and the list downloads none.
+- **`noteAnswers` is the one way in**: wrong adds or counts up, right removes. Written from the
+  section quiz, the practice quiz, `record-paper-attempt.ts` (so a paper and a Simulation paper)
+  and the round itself. A right answer to a question not on the list changes nothing, so an
+  ordinary quiz publishes no store update.
+- **One right answer clears it, anywhere** (the user's "ok" to my proposal, easy to change).
+- **Left out on purpose:** a question left BLANK (the clock running out would flood the list
+  with questions never reached), and Battles, whose frozen questions carry no id to point back to.
+- **A round is at most `MISTAKES_PER_SESSION` (20), most-missed first, then longest waiting**, and
+  is FIXED as it starts (`useState` in `pages/practice-mistakes-run.tsx`). Rebuilt on each render,
+  clearing the last mistake would bounce the student away before the summary. A wrong answer does
+  not return in the same round, the flashcards' reason.
+- **A round pays like any practice answer** (`QUIZ_XP`) and logs to Progress. It cannot be farmed,
+  because a right answer removes the question. It does not tick a daily mission or the streak.
+- **A question removed since it was missed** says so, and the tap takes it off the list. One whose
+  quiz or paper is unpublished is hidden but kept, since it may return.
+- **The "កំហុស" node on a lesson's Study path opens that lesson's list** (`?lesson=`). It is linked
+  in `subject-path-view.tsx`, NOT in the data: a real `href` would make it a section to finish,
+  which would stop the path's progress reaching the end and hold the START bubble on it for ever.
+- **That lesson filter leaves quizzes out for a subject with a quiz path.** Maths' Bac II quiz path
+  and its foundation Study path both use `math-1-1` for different lessons. They still show on the
+  main list.
+- **`resolveContentRef`** (`features/admin/content-ref.ts`) is shared with `/admin/mistakes`, and
+  gained `help`. It stays where it is, reached only from lazy chunks.
+- **`question_mistakes`** (`20261103000004`, own rows only) is pushed by
+  `lib/study-progress-sync.ts` when `lastWrongAt` changes, and a row gone from the device is deleted.
+  **Its delete on "use this device" sits outside the six-table gate**, like `simulation_attempts`.
+  **Two phones do not fully merge:** a fix on one leaves the other's local copy until it answers it.
+
+**Verified:** PGlite 0.2.17, the migration twice: 15 checks. Browser, the database faked with the
+real fixture: 98 checks at 390 light, 320 dark and 1280 (a real quiz, section and paper writing
+the list, blanks left out, the hub card, wrong staying and right clearing, a paper's exercise above
+its question, the summary after clearing the last, a removed and an unpublished question, the
+node's lesson filter with the path's progress unchanged, sync up and down and with the table
+missing, no sideways scroll, no page error). **Not verified: a real account against the real
+database.**

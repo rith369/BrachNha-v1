@@ -146,7 +146,8 @@ function syncRelevantChange(a: StoreState, b: StoreState): boolean {
     a.reviewHistory !== b.reviewHistory ||
     a.quizResults !== b.quizResults ||
     a.paperResults !== b.paperResults ||
-    a.simulations !== b.simulations
+    a.simulations !== b.simulations ||
+    a.mistakes !== b.mistakes
   );
 }
 
@@ -163,7 +164,8 @@ function deviceHasWork(s: StoreState): boolean {
     Object.keys(s.studentCards).length > 0 ||
     s.quizResults.length > 0 ||
     s.paperResults.length > 0 ||
-    s.simulations.length > 0
+    s.simulations.length > 0 ||
+    s.mistakes.length > 0
   );
 }
 

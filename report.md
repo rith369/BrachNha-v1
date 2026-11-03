@@ -16,6 +16,27 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 3 Nov 2026: Practice What I Got Wrong
+
+Commit: `HASH_HERE`. **Database step: run `20261103000004_question_mistakes.sql` in the SQL
+editor.** It can be done before or after this deploys. Until it is, the list stays on the
+student's phone and is not saved to their account.
+
+Students now have a list of the questions they got wrong, and can practise just those.
+
+- **How a question gets on the list:** answering it wrong in a practice quiz, a lesson section, a
+  past paper or the Simulation. Questions left blank do not count, and neither do Battles.
+- **How it comes off:** answering it right once, anywhere.
+- **Practising:** up to 20 questions at a time, the most-missed first, with the same explanations
+  as the original question. A right answer earns the usual XP.
+- **Where to find it:** a card at the top of Flashcards & Quiz, which only appears when there is
+  something on the list, and the "កំហុស" node on each lesson's path, which until now said "coming
+  soon".
+- The privacy page now says this list is saved.
+
+**To re-test:** get a quiz question wrong on purpose, then open Flashcards & Quiz. Practise it and
+get it right, and check it leaves the list.
+
 ## 3 Nov 2026 — A streak protection now costs 200 coins
 
 Commit: `55ed58c`.

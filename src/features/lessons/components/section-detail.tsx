@@ -268,6 +268,11 @@ export function SectionDetail({
     // count cannot be inflated by re-tapping. Progress reads this and nothing
     // else for its per-subject figures.
     recordQuestions(contentKey, 1, right ? 1 : 0);
+    // key is "{step}-{index}". See the "practice what I got wrong" list.
+    const [step, index] = key.split("-").map(Number);
+    useBrachNhaStore
+      .getState()
+      .noteAnswers([{ ref: sectionRef(sectionId, question, step, index), right }]);
   }
 
   function exit() {

@@ -119,6 +119,10 @@ export const MAX_REVIEW_HISTORY = 1000;
 // this size, and oldest drop first like every other capped list here.
 export const MAX_PAPER_RESULTS = 50;
 
+// Questions on the "practice what I got wrong" list. A reference and two small
+// values each, and oldest drop first. A student this far behind has more than enough.
+export const MAX_MISTAKES = 300;
+
 // Finished Simulation attempts. Each holds up to seven papers' answers, and a
 // student sits very few, so this is plenty.
 export const MAX_SIMULATIONS = 10;
@@ -209,6 +213,18 @@ export interface PaperResult {
    * never disagree.
    */
   leaves?: number;
+}
+
+/**
+ * A question this student got wrong and has not answered right since. A REFERENCE,
+ * never a copy (utils/content-ref.ts), so a published fix reaches it. Synced to
+ * `question_mistakes` (20261103000004) by lib/study-progress-sync.ts.
+ */
+export interface QuestionMistake {
+  ref: string;
+  /** How many times it has been answered wrong. The most-missed come first. */
+  times: number;
+  lastWrongAt: string;
 }
 
 /** A session of the Simulation's timetable (features/exam/simulation.ts). */
@@ -457,6 +473,8 @@ interface BrachNhaState {
   quizResults: QuizResult[];
   /** Simulation attempts, oldest first. See SimulationAttempt. */
   simulations: SimulationAttempt[];
+  /** The "practice what I got wrong" list, oldest first. See QuestionMistake. */
+  mistakes: QuestionMistake[];
   /**
    * Competitions this student CREATED.
    *
@@ -655,6 +673,9 @@ interface BrachNhaState {
    */
   addPaperResult: (result: Omit<PaperResult, "date">) => void;
   addQuizResult: (result: Omit<QuizResult, "date">) => void;
+  /** Answers to questions, from anywhere: a wrong one goes on the list, and a right
+   *  one comes off it. Mints the time itself, like addPaperResult. */
+  noteAnswers: (results: { ref: string; right: boolean }[]) => void;
   /** Begins an attempt, unless one is already unfinished. Mints the id and times. */
   startSimulation: (sittings: SimulationSitting[], test: boolean) => void;
   /** Starts a paper's clock. Only the next paper, only once, and only inside the
@@ -1018,6 +1039,7 @@ const partializeState = (state: BrachNhaState) => ({
   paperResults: state.paperResults,
   quizResults: state.quizResults,
   simulations: state.simulations,
+  mistakes: state.mistakes,
   competitions: state.competitions,
   competitionAttempts: state.competitionAttempts,
   completedSessions: state.completedSessions,
@@ -1080,6 +1102,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
       paperResults: [],
       quizResults: [],
       simulations: [],
+      mistakes: [],
       competitions: [],
       competitionAttempts: [],
       completedSessions: [],
@@ -1407,6 +1430,27 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           ].slice(-MAX_PAPER_RESULTS),
         })),
 
+      noteAnswers: (results) =>
+        set((state) => {
+          const at = new Date().toISOString();
+          let next = state.mistakes;
+          for (const { ref, right } of results) {
+            const had = next.find((m) => m.ref === ref);
+            if (right) {
+              if (had) next = next.filter((m) => m.ref !== ref);
+            } else {
+              // Moved to the end, so the cap drops what has waited longest.
+              next = [
+                ...next.filter((m) => m.ref !== ref),
+                { ref, times: (had?.times ?? 0) + 1, lastWrongAt: at },
+              ];
+            }
+          }
+          // A right answer to a question not on the list changes nothing, so an
+          // ordinary quiz publishes no store update and arms no sync.
+          return next === state.mistakes ? state : { mistakes: next.slice(-MAX_MISTAKES) };
+        }),
+
       startSimulation: (sittings, test) =>
         set((state) => {
           if (state.simulations.some((a) => a.finishedAt === null)) return state;
@@ -1732,6 +1776,7 @@ export const useBrachNhaStore = create<BrachNhaState>()(
           paperResults: [],
           quizResults: [],
           simulations: [],
+          mistakes: [],
           competitions: [],
           competitionAttempts: [],
           completedSessions: [],

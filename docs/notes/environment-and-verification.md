@@ -226,6 +226,11 @@ transaction, because the function returns one more column. `db:check` cannot see
 publishable-key `GET /rest/v1/profiles?select=streak_protections&limit=0` answers `200` once it exists
 and `400` before.
 
+**`20261103000004_question_mistakes.sql`** (the "practice what I got wrong" list) can ship
+before or after the code. Without it each push fails quietly and the list stays on the phone; once
+it lands, the next push uploads it. Afterwards `db:check` lists `question_mistakes`, answering
+`200 []` to the publishable key.
+
 **`20261103000002_simulation_attempts.sql`** (the Simulation's saved attempts) can ship
 before or after the code. Without it each push of an attempt fails quietly and the attempt
 stays on the phone; once it lands, the next push uploads it. Afterwards `db:check` lists

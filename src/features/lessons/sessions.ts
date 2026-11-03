@@ -124,7 +124,8 @@ export function lessonHeading(number: number, title: string): string {
  * feature — a place a student's wrong answers accumulate — that does not exist
  * yet. This reserves its position in the path and nothing more.
  */
-const LESSON_TAIL = ["កំហុស", "សេចក្តីសង្ខេប", "តេស្ត"] as const;
+export const MISTAKES_NODE_TITLE = "កំហុស";
+const LESSON_TAIL = [MISTAKES_NODE_TITLE, "សេចក្តីសង្ខេប", "តេស្ត"] as const;
 
 /** Placeholder names for a lesson whose real section titles haven't arrived. */
 /**

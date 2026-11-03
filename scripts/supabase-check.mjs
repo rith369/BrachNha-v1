@@ -88,6 +88,8 @@ const TABLES = [
   "paper_results",
   // The Simulation's attempts (20261103000002). Read-own, same answer.
   "simulation_attempts",
+  // The "practice what I got wrong" list (20261103000004). Read-own, same answer.
+  "question_mistakes",
 ];
 
 /**

@@ -202,6 +202,9 @@ export function QuizRunner({
     // way). The content log's documented grain is the lesson; logging the
     // section would put two grains in one record for one real lesson.
     recordQuestions(lessonKeyOf(contentKey), 1, right ? 1 : 0);
+    useBrachNhaStore
+      .getState()
+      .noteAnswers([{ ref: quizRef(contentKey, question, numbers?.[index] ?? index), right }]);
     // Freeze this question's clock at the tap. It keeps ticking on screen only
     // while the question is unanswered, so the time reported is thinking time
     // rather than however long the student then spent reading the explanation

@@ -89,10 +89,11 @@ export function SimulationSit({
     // Once only: the clock and the submit button can both land here.
     if (!live || live.result) return;
     const parsed = parsePaperKey(current.paperKey);
-    if (parsed) {
+    if (parsed && content) {
       recordPaperAttempt(
         { key: current.paperKey, subjectId: parsed.subject.id, version: current.version },
-        paperAttempt
+        paperAttempt,
+        content
       );
     }
     store.finishSimulationSitting(attempt.id, current.sessionId, {

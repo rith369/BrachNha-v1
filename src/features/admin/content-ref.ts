@@ -1,4 +1,4 @@
-import type { PaperBody, QuizQuestionBody, SectionBody } from "@/types";
+import type { PaperBody, QuizQuestionBody, SectionBody, SkillHelp } from "@/types";
 import { scorePaper } from "@/features/exam/paper-scoring";
 import { paperTitle, parsePaperKey, toPastPaperContent } from "@/features/exam/papers";
 import { findSubject } from "@/features/lessons/subjects";
@@ -16,7 +16,8 @@ import { parseContentRef, type ContentRefKind } from "@/utils/content-ref";
  * question gets an Edit link to /admin/content, opened at that question.
  * "Fixed" on the mistakes page then means fixed there.
  *
- * Reached ONLY from the lazy /admin/mistakes chunk.
+ * Reached only from lazy chunks: /admin/mistakes, and /practice/mistakes/run, which
+ * passes the one body it has fetched and reads the same fields to ask the question.
  *
  * EVERY LOOKUP IS GUARDED with Object.hasOwn, never `in` or a truthiness test:
  * these are plain objects, so "constructor" is `in` them and "toString"
@@ -43,6 +44,8 @@ export interface ResolvedQuestion {
   options: string[];
   correct: string;
   explanation: string;
+  /** The rule and similar exercises, when the question has them. */
+  help?: SkillHelp;
   /** Where the question lives in the app, for "Open it in the app". */
   link: string;
   /** The question in the content editor. */
@@ -94,6 +97,7 @@ export function resolveContentRef(ref: string, sets: ContentSets): ResolvedQuest
       options: q.options,
       correct: q.correct,
       explanation: q.explanation,
+      help: q.help,
       link: `/sections/${key}`,
       edit: `/admin/content/section/${key}?q=${encodeURIComponent(q.id)}`,
     };
@@ -119,6 +123,7 @@ export function resolveContentRef(ref: string, sets: ContentSets): ResolvedQuest
       options: q.options,
       correct: q.correct,
       explanation: q.explanation,
+      help: q.help,
       link: `/practice/quiz/${subjectId}/${numbers.join("-")}`,
       edit: `/admin/content/quiz/${key}?q=${encodeURIComponent(q.id)}`,
     };
@@ -148,6 +153,10 @@ export function resolveContentRef(ref: string, sets: ContentSets): ResolvedQuest
       options,
       correct: reviewItem.correct,
       explanation: reviewItem.explanation,
+      help:
+        reviewItem.skill && content.skills && Object.hasOwn(content.skills, reviewItem.skill)
+          ? content.skills[reviewItem.skill]
+          : undefined,
       link: `/exam/subjects/${key}`,
       edit: `/admin/content/paper/${key}?q=${encodeURIComponent(item)}`,
     };

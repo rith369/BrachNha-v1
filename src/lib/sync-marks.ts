@@ -43,6 +43,8 @@ export interface SyncMarks {
   papers: string[];
   /** Simulation attempt id → its `updatedAt` when last uploaded. */
   simulations: Record<string, string>;
+  /** Question ref → its `lastWrongAt` when last uploaded. */
+  mistakes: Record<string, string>;
 }
 
 export function emptyMarks(userId: string): SyncMarks {
@@ -56,6 +58,7 @@ export function emptyMarks(userId: string): SyncMarks {
     quizzes: [],
     papers: [],
     simulations: {},
+    mistakes: {},
   };
 }
 
@@ -75,6 +78,7 @@ export function readMarks(userId: string): SyncMarks {
       quizzes: isStrings(m.quizzes) ? m.quizzes : [],
       papers: isStrings(m.papers) ? m.papers : [],
       simulations: isRecord(m.simulations) ? m.simulations : {},
+      mistakes: isRecord(m.mistakes) ? m.mistakes : {},
     };
   } catch {
     return emptyMarks(userId);

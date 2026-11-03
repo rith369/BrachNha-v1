@@ -18,6 +18,7 @@ export function isFocusRoute(pathname: string): boolean {
   return (
     pathname.startsWith("/sections/") ||
     pathname === "/practice/review" ||
+    pathname === "/practice/mistakes/run" ||
     isPracticeRunRoute(pathname) ||
     // The game review is a focus screen but NOT an assessment, so it has to be
     // named here rather than arriving through isAssessmentRoute below.
@@ -159,6 +160,7 @@ export function isStudyRoute(pathname: string): boolean {
   return (
     pathname.startsWith("/sections/") ||
     pathname === "/practice/review" ||
+    pathname === "/practice/mistakes/run" ||
     isPracticeRunRoute(pathname)
   );
 }

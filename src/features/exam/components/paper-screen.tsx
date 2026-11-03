@@ -67,10 +67,14 @@ export function PaperScreen({ paper }: { paper: PastPaper }) {
   const [mode, setMode] = useState<Mode>({ kind: "detail" });
 
   function handleSubmit(attempt: PaperAttempt) {
-    recordPaperAttempt(
-      { key: paper.key, subjectId: paper.subject.id, version: paper.version ?? 1 },
-      attempt
-    );
+    // The route guarantees the content, and a run cannot start without it.
+    if (paper.content) {
+      recordPaperAttempt(
+        { key: paper.key, subjectId: paper.subject.id, version: paper.version ?? 1 },
+        attempt,
+        paper.content
+      );
+    }
     setMode({
       kind: "result",
       answers: attempt.answers,

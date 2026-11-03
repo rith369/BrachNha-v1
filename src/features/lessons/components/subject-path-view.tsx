@@ -9,6 +9,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
+import { lessonKeyOf } from "@/features/progress/content-keys";
 import { retryContent, useContentManifest } from "@/lib/content";
 import { ContentNotice } from "@/features/practice/components/content-waiting";
 import { cn } from "@/utils/cn";
@@ -21,6 +22,7 @@ import {
   allSessions,
   chaptersFor,
   lessonHeading,
+  MISTAKES_NODE_TITLE,
   pathProgress,
   sessionStatus,
 } from "../sessions";
@@ -532,7 +534,17 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
                       with the banner it is meant to sit under. */}
                   <div className="pt-10">
                   {lesson.sessions.map((session, i) => {
-                    const status = sessionStatus(session, completedSessions);
+                    // The lesson's "កំហុស" node opens its mistakes. Linked HERE, not in
+                    // the data: a real `href` would make it a section to finish, which
+                    // would stop the path's progress reaching the end and hold the
+                    // START bubble on it for ever.
+                    const isMistakes = session.title === MISTAKES_NODE_TITLE;
+                    const status = isMistakes
+                      ? "current"
+                      : sessionStatus(session, completedSessions);
+                    const node = isMistakes
+                      ? { ...session, href: `/practice/mistakes?lesson=${lessonKeyOf(session.id)}` }
+                      : session;
                     return (
                       <div key={session.id}>
                         {i > 0 && (
@@ -549,7 +561,7 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
                         >
                           <div className="-translate-x-1/2">
                             <SessionNode
-                              session={session}
+                              session={node}
                               status={status}
                               subjectId={subject.id}
                               isNext={session.id === nextId}

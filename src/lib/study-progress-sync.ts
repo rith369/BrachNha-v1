@@ -1,11 +1,13 @@
 import { getSupabase } from "@/lib/supabase";
 import {
+  MAX_MISTAKES,
   MAX_PAPER_RESULTS,
   MAX_QUIZ_RESULTS,
   MAX_REVIEW_HISTORY,
   MAX_SIMULATIONS,
 } from "@/lib/store";
 import type {
+  QuestionMistake,
   PaperResult,
   QuizResult,
   SimulationAttempt,
@@ -21,6 +23,7 @@ import {
 } from "@/lib/sync-marks";
 import type { PracticeCard } from "@/types";
 import type { InsertOf, Json } from "@/types/database";
+import { isContentRef } from "@/utils/content-ref";
 import type { ReviewResult, ReviewState } from "@/utils/spaced-repetition";
 
 /**
@@ -63,6 +66,7 @@ export interface StudyProgress {
   quizResults: QuizResult[];
   paperResults: PaperResult[];
   simulations: SimulationAttempt[];
+  mistakes: QuestionMistake[];
 }
 
 /** Rows per request. A first upload can be a thousand log entries; split so no
@@ -284,6 +288,9 @@ export async function pushStudyProgress(userId: string, s: StoreState) {
     await ok("simulation_attempts: replace", () =>
       db.from("simulation_attempts").delete().eq("user_id", userId)
     );
+    await ok("question_mistakes: replace", () =>
+      db.from("question_mistakes").delete().eq("user_id", userId)
+    );
     marks = emptyMarks(userId);
     writeMarks(marks);
   }
@@ -295,6 +302,7 @@ export async function pushStudyProgress(userId: string, s: StoreState) {
   await pushQuizzes(db, userId, s, marks);
   await pushPapers(db, userId, s, marks);
   await pushSimulations(db, userId, s, marks);
+  await pushMistakes(db, userId, s, marks);
 
   writeMarks(marks);
 }
@@ -580,6 +588,48 @@ async function pushSimulations(db: Db, userId: string, s: StoreState, marks: Syn
   }
 }
 
+async function pushMistakes(db: Db, userId: string, s: StoreState, marks: SyncMarks) {
+  const fresh = s.mistakes.filter(
+    (m) =>
+      marks.mistakes[m.ref] !== m.lastWrongAt &&
+      isContentRef(m.ref) &&
+      count(m.times) &&
+      m.times >= 1 &&
+      instant(m.lastWrongAt)
+  );
+  if (fresh.length) {
+    const rows: InsertOf<"question_mistakes">[] = fresh.map((m) => ({
+      user_id: userId,
+      ref: m.ref,
+      times: m.times,
+      last_wrong_at: m.lastWrongAt,
+    }));
+    if (
+      await allOk("question_mistakes", rows, CHUNK, (part) =>
+        db.from("question_mistakes").upsert(part, { onConflict: "user_id,ref" })
+      )
+    ) {
+      const sent = { ...marks.mistakes };
+      for (const m of fresh) sent[m.ref] = m.lastWrongAt;
+      marks.mistakes = sent;
+    }
+  }
+
+  // A mistake gone from the device was answered right here, or fell off the cap.
+  const local = new Set(s.mistakes.map((m) => m.ref));
+  const gone = Object.keys(marks.mistakes).filter((ref) => !local.has(ref));
+  if (
+    gone.length &&
+    (await allOk("question_mistakes: delete", gone, ID_CHUNK, (part) =>
+      db.from("question_mistakes").delete().eq("user_id", userId).in("ref", part)
+    ))
+  ) {
+    const next = { ...marks.mistakes };
+    for (const ref of gone) delete next[ref];
+    marks.mistakes = next;
+  }
+}
+
 // ── pull ────────────────────────────────────────────────────────────────────
 
 /** Postgres answers `…+00:00`; the device writes `…Z`. One spelling, so the
@@ -619,6 +669,7 @@ export async function pullStudyProgress(userId: string): Promise<StudyProgress> 
     quizResults: [],
     paperResults: [],
     simulations: [],
+    mistakes: [],
   };
   const db = await getSupabase();
   if (!db) return empty;
@@ -657,12 +708,18 @@ export async function pullStudyProgress(userId: string): Promise<StudyProgress> 
       .eq("user_id", userId)
       .order("started_at", { ascending: false })
       .limit(MAX_SIMULATIONS),
+    db
+      .from("question_mistakes")
+      .select("*")
+      .eq("user_id", userId)
+      .order("last_wrong_at", { ascending: false })
+      .limit(MAX_MISTAKES),
     ]);
   } catch (err) {
     console.warn("[sync] pull study progress:", err);
     return empty;
   }
-  const [reviews, cards, starred, log, quizzes, papers, simulations] = results;
+  const [reviews, cards, starred, log, quizzes, papers, simulations, mistakes] = results;
 
   for (const [label, res] of [
     ["card_reviews", reviews],
@@ -672,6 +729,7 @@ export async function pullStudyProgress(userId: string): Promise<StudyProgress> 
     ["quiz_results", quizzes],
     ["paper_results", papers],
     ["simulation_attempts", simulations],
+    ["question_mistakes", mistakes],
   ] as const) {
     if (res.error) console.warn(`[sync] pull ${label}: ${res.error.message}`);
   }
@@ -761,6 +819,12 @@ export async function pullStudyProgress(userId: string): Promise<StudyProgress> 
     }))
     .reverse();
 
+  // Oldest first, like the store.
+  out.mistakes = (mistakes.data ?? [])
+    .filter((r) => isContentRef(r.ref))
+    .map((r) => ({ ref: r.ref, times: r.times, lastWrongAt: iso(r.last_wrong_at) }))
+    .reverse();
+
   return out;
 }
 
@@ -786,5 +850,6 @@ export function markStudyProgressPulled(userId: string, p: StudyProgress) {
     quizzes: p.quizResults.map(quizMark),
     papers: p.paperResults.map(paperMark),
     simulations: Object.fromEntries(p.simulations.map((a) => [a.id, a.updatedAt])),
+    mistakes: Object.fromEntries(p.mistakes.map((m) => [m.ref, m.lastWrongAt])),
   });
 }

@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { Link } from "react-router";
+import { ChevronRight, RotateCcw } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import { UnderlineTabs } from "@/components/ui/underline-tabs";
 import { PracticeSubjectCard } from "./practice-subject-card";
 import { ContentNotice } from "./content-waiting";
 import { retryContent, useContentManifest } from "@/lib/content";
+import { liveMistakes } from "../mistakes";
 import { PRACTICE_TABS, subjectsFor, type PracticeMode } from "../practice";
 
 /**
@@ -34,12 +37,34 @@ export function PracticeView() {
   const manifest = useContentManifest();
 
   const subjects = subjectsFor(mode, userLanguage);
+  const mistakes = useBrachNhaStore((s) => s.mistakes);
+  const mistakeCount =
+    manifest.status === "ready" ? liveMistakes(mistakes, manifest).length : 0;
 
   return (
     <div>
       <div className="font-heading mb-4 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
         ការអនុវត្ត
       </div>
+
+      {/* Absent, not empty, until there is something on the list. */}
+      {mistakeCount > 0 && (
+        <Link
+          to="/practice/mistakes"
+          className="mb-4 flex items-center gap-3 rounded-2xl border border-border bg-surface p-3 shadow-panel-sm transition-[transform,box-shadow] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+        >
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-neo-pink text-ink">
+            <RotateCcw className="size-5" strokeWidth={2.5} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="font-heading text-sm font-extrabold text-text">កំហុសរបស់ខ្ញុំ</div>
+            <div className="text-xs font-bold text-muted">
+              {mistakeCount} សំណួរត្រូវធ្វើម្តងទៀត
+            </div>
+          </div>
+          <ChevronRight className="size-4 shrink-0 text-muted" strokeWidth={2.5} />
+        </Link>
+      )}
 
       <UnderlineTabs tabs={PRACTICE_TABS} value={mode} onChange={setMode} />
 
