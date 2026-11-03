@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Nov 2026: Security Headers
 
-Commit: `HASH_HERE`. No database step.
+Commit: `465511e`. No database step.
 
 The site now tells browsers what it is allowed to do. If a bug ever let someone sneak code onto a page,
 the browser would refuse to run it or send data elsewhere. Other websites also can no longer embed
