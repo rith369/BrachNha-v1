@@ -401,3 +401,28 @@ adds no days. `daily_content_activity` feeds only a student's own Progress page.
 `leaderboard()`: 39 checks, including a real student's numbers staying exact, the app's own 14-day
 batch, a guest's history on a new account, and the Phnom Penh day boundary. **Not verified: against the
 real database.**
+
+## Limits on rows per student (3 Nov 2026, `20261103000009`)
+
+`keep_newest_rows()` runs after an insert, once per statement, on 16 tables. Over the table's limit, the
+student's oldest rows over it are deleted. **Nothing is ever refused**, for the same reason as the text
+limits. The table of limits, and what the app really keeps, is at the top of the migration.
+
+- **Once per statement** because the app's chunks run to 500 rows. 500 rows onto a full 20000-row table
+  took about 20 ms on PGlite.
+- **A per-student advisory lock** makes inserts sent at once take turns, or each would count only its own.
+  **Not tested:** PGlite has one connection.
+- **`card_review_log`, `quiz_results` and `paper_results` grow on the server** past what a device keeps, so
+  a real student can reach these limits in time. Only rows the app never reads again go.
+- **`daily_activity` is not on the list:** it is one row a day inside the window from `20261103000007`.
+- **A new table a student can insert into needs a line in this list.** It takes a `user_id` column.
+
+**THE WORST CASE IS STILL LARGE.** One account at every limit, with the longest text allowed and 4 bytes a
+character, is about 300 MB: chat 120, a student's cards 64, the rest about 115. Two could fill a 500 MB
+project. It takes a deliberate script and a real Google account, and removing the account deletes it all.
+Watching the database size is the check.
+
+**Verified:** the real tables on PGlite 0.2.17 as the `authenticated` role: 51 checks, including all 12
+history and list tables at their limits, the largest real chat of 800 messages pushed the app's way, upserts,
+trimming a table with no delete for students, and `log_event` at its limit. **Not verified: against the
+real database.**

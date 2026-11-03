@@ -16,6 +16,23 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 3 Nov 2026: Limit on Rows per Student
+
+Commit: `HASH_HERE`. **Database step:** run `20261103000009_row_limits_per_student.sql` in the Supabase
+SQL editor. Nothing in the app changed, so it works before or after.
+
+A script could keep adding rows to its own account until the database ran out of space. Now each student
+has a limit in each table, set well above what the app ever saves. Over it, that student's oldest rows are
+removed. Nothing is refused, so a student's saving cannot break because of this.
+
+**Students should not notice any difference.**
+
+**Still worth knowing:** one account made to fill everything could use about 300 MB at the very worst, so
+it is worth glancing at the database size now and then. Removing that account deletes all of it.
+
+**To re-test, please:** use KruAI and finish a quiz, then sign in on another phone and check your chats and
+progress come back.
+
 ## 3 Nov 2026: Three Small Security Fixes
 
 Commit: `9eebd55`. **Database step:** run `20261103000008_close_small_gaps.sql` in the Supabase SQL
