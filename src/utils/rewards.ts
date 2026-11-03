@@ -70,7 +70,7 @@ export const GIFT_PROTECTION_CHANCE = 0.2;
 
 /** How many a student can hold, and what buying one costs. */
 export const MAX_STREAK_PROTECTIONS = 2;
-export const STREAK_PROTECTION_COINS = 50;
+export const STREAK_PROTECTION_COINS = 200;
 
 /** `random` is an argument so the odds can be tested. At the limit a gift holds
  *  no protection, and still pays. */

@@ -16,6 +16,16 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 3 Nov 2026 — A streak protection now costs 200 coins
+
+Commit: `PENDING`.
+
+**What changed.** Buying a streak protection on the Streak page now costs 200 coins instead of 50,
+so it takes several days of study to save up for one.
+
+**What to re-test.** With fewer than 200 coins the Streak page should say how many more are needed,
+with no button. With 200 or more, buying one should take exactly 200.
+
 ## 3 Nov 2026 — Streak protection, and a surprise gift
 
 Commit: `71d2be6`. **Database step: run `20261103000003_streak_protection.sql` in the SQL editor

@@ -682,8 +682,10 @@ used by itself on a missed day and the app says so next time; the streak stays t
 rather than going up; it can be bought with coins; the gift's amount is a surprise and only sometimes
 holds a protection; and a protection saves a shared streak with a friend too.
 
-What I picked, all named constants in `utils/rewards.ts` and easy to change: 50 coins to buy one (a
-full day earns very roughly that), a gift of 30 to 100 XP in steps of 10 with coins following at the
+The price is the user's too: 200 coins, changed from the 50 first shipped the same day, so one takes
+several days of study to save up for.
+
+What I picked, all named constants in `utils/rewards.ts` and easy to change: a gift of 30 to 100 XP in steps of 10 with coins following at the
 usual rate, and a 1 in 5 chance of a protection inside. Buying is the first thing coins have ever
 been spent on, so before this `coins` only went up.
 
