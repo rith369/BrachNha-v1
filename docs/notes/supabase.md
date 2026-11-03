@@ -426,3 +426,5 @@ Watching the database size is the check.
 history and list tables at their limits, the largest real chat of 800 messages pushed the app's way, upserts,
 trimming a table with no delete for students, and `log_event` at its limit. **Not verified: against the
 real database.**
+
+**Applied to the live project on 3 Nov 2026:** 20261103000007, 20261103000008 and 20261103000009, by the user. Read as a guest afterwards: 39 published items, all 44 readable versions belong to a published item, 5 older versions still readable, a real body downloads, content_current works, and db:check passes. Limits, uploads refused and row trimming were not exercised with a real account.
