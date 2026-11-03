@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 3 Nov 2026: Three Small Security Fixes
 
-Commit: `HASH_HERE`. **Database step:** run `20261103000008_close_small_gaps.sql` in the Supabase SQL
+Commit: `9eebd55`. **Database step:** run `20261103000008_close_small_gaps.sql` in the Supabase SQL
 editor. The app works before or after.
 
 - **Photo uploads closed.** The Battle photo feature was already off in the app, but the database still
