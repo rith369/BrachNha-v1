@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 4 Nov 2026: Easier-to-Read Colours
 
-Commit: `HASH_HERE`. No database step.
+Commit: `dacf8c6`. No database step.
 
 Some text was too pale to read on a phone in sunlight: green, yellow and pink words on white, white words on
 the bright lesson banners, grey "coming soon" labels and faint calendar dates. A scan of 22 screens found 153
