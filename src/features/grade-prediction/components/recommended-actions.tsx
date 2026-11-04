@@ -52,7 +52,7 @@ export function RecommendedActions({
             to={a.href}
             className="flex items-center gap-3 rounded-xl border border-border bg-purple/4 px-3 py-2.5 transition-transform active:scale-[0.98]"
           >
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-purple/10 text-xs font-extrabold text-purple">
+            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-purple/10 text-xs font-extrabold text-purple-strong">
               {i + 1}
             </div>
             <div className="min-w-0 flex-1">
@@ -63,7 +63,7 @@ export function RecommendedActions({
                 </div>
               )}
             </div>
-            <div className="shrink-0 text-[11px] font-extrabold text-purple">
+            <div className="shrink-0 text-[11px] font-extrabold text-purple-strong">
               {KIND_LABEL[a.kind][lang]}
             </div>
           </Link>
@@ -75,7 +75,7 @@ export function RecommendedActions({
           <div className="mb-0.5 text-[10px] font-extrabold tracking-wide text-muted uppercase">
             {t.mainLimitingFactor}
           </div>
-          <div className="mb-2 text-sm font-extrabold text-pink">
+          <div className="mb-2 text-sm font-extrabold text-pink-strong">
             {limitingFactorName}
           </div>
           <Link

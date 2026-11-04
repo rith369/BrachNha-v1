@@ -11,20 +11,20 @@ import type { IntroSlide, IntroTone } from "./copy";
 
 /** Icons and labels: the per-theme --color-* scale, lifted in dark. */
 export const TONE_TEXT: Record<IntroTone, string> = {
-  purple: "text-purple",
-  pink: "text-pink",
-  blue: "text-blue",
-  mint: "text-mint",
-  yellow: "text-yellow",
+  purple: "text-purple-strong",
+  pink: "text-pink-strong",
+  blue: "text-blue-strong",
+  mint: "text-mint-strong",
+  yellow: "text-yellow-strong",
 };
 
 /** A tinted tile behind an icon. The /10 tints are correct in both themes. */
 export const TONE_TILE: Record<IntroTone, string> = {
-  purple: "bg-purple/10 text-purple",
-  pink: "bg-pink/10 text-pink",
-  blue: "bg-blue/10 text-blue",
-  mint: "bg-mint/10 text-mint",
-  yellow: "bg-yellow/10 text-yellow",
+  purple: "bg-purple/10 text-purple-strong",
+  pink: "bg-pink/10 text-pink-strong",
+  blue: "bg-blue/10 text-blue-strong",
+  mint: "bg-mint/10 text-mint-strong",
+  yellow: "bg-yellow/10 text-yellow-strong",
 };
 
 interface Accent {
@@ -44,14 +44,14 @@ export const ACCENT: Record<IntroSlide["accent"], Accent> = {
     lip: "color-mix(in srgb, var(--brand-purple) 55%, black)",
     glowA: "var(--color-purple)",
     glowB: "var(--color-pink)",
-    kicker: "bg-purple/10 text-purple",
+    kicker: "bg-purple/10 text-purple-strong",
   },
   ocean: {
     fill: "linear-gradient(135deg, var(--brand-blue), var(--brand-purple))",
     lip: "color-mix(in srgb, var(--brand-purple) 55%, black)",
     glowA: "var(--color-blue)",
     glowB: "var(--color-mint)",
-    kicker: "bg-blue/10 text-blue",
+    kicker: "bg-blue/10 text-blue-strong",
   },
   flame: {
     fill: "linear-gradient(135deg, var(--brand-flame-from), var(--brand-flame-to))",
@@ -60,7 +60,7 @@ export const ACCENT: Record<IntroSlide["accent"], Accent> = {
     // olive-brown. Yellow stays as the smaller second glow.
     glowA: "var(--color-pink)",
     glowB: "var(--color-yellow)",
-    kicker: "bg-pink/10 text-pink",
+    kicker: "bg-pink/10 text-pink-strong",
   },
 };
 

@@ -137,7 +137,7 @@ export function OpenCompetitions() {
         {state === "failed" && (
           <button
             onClick={retry}
-            className="text-xs font-extrabold text-purple"
+            className="text-xs font-extrabold text-purple-strong"
           >
             {t.retry}
           </button>

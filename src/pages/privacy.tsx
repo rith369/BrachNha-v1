@@ -329,7 +329,7 @@ export default function PrivacyPage() {
             Questions, or a deletion request:{" "}
             <a
               href="mailto:brachnha.skillwork@gmail.com"
-              className="font-extrabold text-purple underline underline-offset-2"
+              className="font-extrabold text-purple-strong underline underline-offset-2"
             >
               brachnha.skillwork@gmail.com
             </a>
@@ -339,7 +339,7 @@ export default function PrivacyPage() {
         <div className="mt-10 border-t border-border pt-5">
           <Link
             to="/"
-            className="text-sm font-extrabold text-purple underline underline-offset-2"
+            className="text-sm font-extrabold text-purple-strong underline underline-offset-2"
           >
             ← Back to BrachNha · ត្រឡប់ទៅ BrachNha
           </Link>

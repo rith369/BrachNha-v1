@@ -191,7 +191,7 @@ export function RoadmapView() {
           <span className="text-xl">🎯</span>
           <div>
             <div className={label}>{c.targetGrade}</div>
-            <div className="font-heading text-xl font-extrabold text-yellow">
+            <div className="font-heading text-xl font-extrabold text-yellow-strong">
               {userData.grade || "—"}
             </div>
           </div>
@@ -199,7 +199,7 @@ export function RoadmapView() {
             <div className={label}>{t.examDate}</div>
             {/* The count carries the emphasis and the words ride small beside
                 it — at 320px "350 Days Left" all at text-xl wraps mid-phrase. */}
-            <div className="font-heading text-xl font-extrabold text-pink">
+            <div className="font-heading text-xl font-extrabold text-pink-strong">
               {daysLeft} <span className="text-xs">{t.daysLeft}</span>
             </div>
             <div className="text-[11px] font-bold text-muted">
@@ -276,7 +276,7 @@ export function RoadmapView() {
                           <div className="mt-0.5 text-[10px] font-bold text-muted">{progress}</div>
                         )}
                         {isCurrent && (
-                          <div className="mt-1 inline-block rounded-full bg-pink/10 px-2 py-0.5 text-[10px] font-extrabold text-pink">
+                          <div className="mt-1 inline-block rounded-full bg-pink/10 px-2 py-0.5 text-[10px] font-extrabold text-pink-strong">
                             {m.done === 0 ? c.startNow : c.thisMonth}
                           </div>
                         )}

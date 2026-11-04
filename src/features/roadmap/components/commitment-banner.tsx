@@ -34,7 +34,7 @@ export function CommitmentBanner({
         <div className="font-heading text-sm font-extrabold">✍️ {c.title}</div>
         <button
           onClick={onResign}
-          className="flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-extrabold text-purple active:scale-[0.98]"
+          className="flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-extrabold text-purple-strong active:scale-[0.98]"
         >
           <PenLine className="size-3.5" strokeWidth={2.75} />
           {c.resign}

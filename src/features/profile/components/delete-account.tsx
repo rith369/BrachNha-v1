@@ -86,7 +86,7 @@ export function DeleteAccount({ lang }: { lang: Lang }) {
 
   return (
     <div className="mt-4 rounded-2xl border border-border bg-pink/30 p-4">
-      <div className="mb-1.5 text-sm font-extrabold text-pink">{c.title}</div>
+      <div className="mb-1.5 text-sm font-extrabold text-pink-strong">{c.title}</div>
       <p className="mb-3 text-xs leading-relaxed font-semibold text-text">{c.body}</p>
       <label className="mb-3 flex cursor-pointer items-start gap-2 text-xs font-bold">
         <input
@@ -99,7 +99,7 @@ export function DeleteAccount({ lang }: { lang: Lang }) {
         <span>{c.understand}</span>
       </label>
       {error && (
-        <div role="alert" className="mb-3 text-xs font-bold text-pink">
+        <div role="alert" className="mb-3 text-xs font-bold text-pink-strong">
           {c.failed}
         </div>
       )}
@@ -112,7 +112,7 @@ export function DeleteAccount({ lang }: { lang: Lang }) {
             setAgreed(false);
             setError(false);
           }}
-          className="flex-1 rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-extrabold text-purple disabled:opacity-50"
+          className="flex-1 rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-extrabold text-purple-strong disabled:opacity-50"
         >
           {c.cancel}
         </button>

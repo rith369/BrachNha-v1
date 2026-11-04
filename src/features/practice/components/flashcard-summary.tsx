@@ -61,8 +61,8 @@ export function FlashcardSummary({
   const cheer = encouragementFor(knew, results.length);
 
   const stats: { label: string; value: number; tone: string }[] = [
-    { label: "មិនទាន់ចងចាំ", value: counts.again + counts.hard, tone: "text-pink" },
-    { label: "ចងចាំ", value: counts.good + counts.easy, tone: "text-mint" },
+    { label: "មិនទាន់ចងចាំ", value: counts.again + counts.hard, tone: "text-pink-strong" },
+    { label: "ចងចាំ", value: counts.good + counts.easy, tone: "text-mint-strong" },
   ];
 
   return (

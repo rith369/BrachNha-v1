@@ -218,7 +218,7 @@ export default function GameReviewPage() {
             of "add your own working to see theirs" is a wall of the same
             sentence; one, above the answers, is a rule. */}
         {gateShut && (
-          <p className="rounded-2xl border border-border bg-purple/8 px-3 py-2.5 text-center text-xs font-bold text-purple">
+          <p className="rounded-2xl border border-border bg-purple/8 px-3 py-2.5 text-center text-xs font-bold text-purple-strong">
             {t.photoLocked}
           </p>
         )}
@@ -359,7 +359,7 @@ function JoinerPicker({
                     equally be read as "they won" — the one ambiguity a chip
                     cannot recover from. The comparison belongs in the answer
                     list this row selects, where both sides are labelled. */}
-                <span className="shrink-0 rounded-full bg-purple/10 px-2 py-0.5 text-[9px] font-extrabold text-purple">
+                <span className="shrink-0 rounded-full bg-purple/10 px-2 py-0.5 text-[9px] font-extrabold text-purple-strong">
                   {j.score}/{total}
                 </span>
               </button>

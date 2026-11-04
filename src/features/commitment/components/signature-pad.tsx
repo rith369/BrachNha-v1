@@ -162,7 +162,7 @@ export function SignaturePad({
 
   const tabClasses = (active: boolean) =>
     `flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-extrabold transition ${
-      active ? "bg-purple/15 text-purple" : "text-muted"
+      active ? "bg-purple/15 text-purple-strong" : "text-muted"
     }`;
 
   return (
@@ -217,7 +217,7 @@ export function SignaturePad({
             <button
               type="button"
               onClick={clearDrawing}
-              className="flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-extrabold text-pink active:scale-[0.98]"
+              className="flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-extrabold text-pink-strong active:scale-[0.98]"
             >
               <Eraser className="size-3.5" strokeWidth={2.75} />
               {c.clear}

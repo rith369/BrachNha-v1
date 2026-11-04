@@ -167,7 +167,7 @@ export function QuizFeedback({
         {/* The rule note, if available */}
         {help && (
           <div className="mt-3 rounded-lg border border-border bg-blue/5 p-2.5">
-            <div className="mb-1 text-[11px] font-extrabold text-blue md:text-xs">
+            <div className="mb-1 text-[11px] font-extrabold text-blue-strong md:text-xs">
               ចំណាំ · {help.label}
             </div>
             <ul className="list-outside list-disc space-y-0.5 pl-4 text-xs font-semibold text-text md:text-sm">
@@ -183,7 +183,7 @@ export function QuizFeedback({
         {/* The common mistake, if available */}
         {help?.mistake && (
           <div className="mt-2 rounded-lg border border-border border-l-4 border-l-pink bg-surface p-2.5">
-            <div className="mb-1 text-[11px] font-extrabold text-pink md:text-xs">
+            <div className="mb-1 text-[11px] font-extrabold text-pink-strong md:text-xs">
               កំហុសញឹកញាប់
             </div>
             <div className="text-xs font-semibold text-text md:text-sm">

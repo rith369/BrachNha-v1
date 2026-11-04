@@ -31,7 +31,7 @@ export function LanguageSwitcher() {
               className={cn(
                 "flex items-center justify-center gap-2 rounded-2xl border px-3 py-2.5 text-sm font-extrabold transition",
                 active
-                  ? "border-border bg-secondary text-purple shadow-panel-sm"
+                  ? "border-border bg-secondary text-purple-strong shadow-panel-sm"
                   : "border-border bg-surface text-text hover:bg-purple/8"
               )}
             >

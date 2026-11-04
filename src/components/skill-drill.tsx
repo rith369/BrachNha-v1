@@ -159,7 +159,7 @@ export function SkillDrill({
   return (
     <div className="mt-3">
       <div className="rounded-xl border border-border bg-blue/5 p-3">
-        <div className="mb-1 text-[11px] font-extrabold text-blue md:text-xs">
+        <div className="mb-1 text-[11px] font-extrabold text-blue-strong md:text-xs">
           ចំណាំ · {help.label}
         </div>
         <ul className="list-outside list-disc space-y-1 pl-4 text-xs font-semibold text-text md:text-sm">
@@ -177,7 +177,7 @@ export function SkillDrill({
           fill — one coloured element per card, the Callout rule. */}
       {help.mistake && (
         <div className="mt-2 rounded-xl border border-border border-l-4 border-l-pink bg-surface p-3">
-          <div className="mb-1 text-[11px] font-extrabold text-pink md:text-xs">
+          <div className="mb-1 text-[11px] font-extrabold text-pink-strong md:text-xs">
             កំហុសញឹកញាប់
           </div>
           <div className="text-xs font-semibold text-text md:text-sm">
@@ -189,7 +189,7 @@ export function SkillDrill({
       {!open ? (
         <button
           onClick={expand}
-          className="mt-2 w-full rounded-xl border border-border bg-purple/8 px-4 py-2 text-xs font-extrabold text-purple transition hover:bg-purple/12 md:text-sm"
+          className="mt-2 w-full rounded-xl border border-border bg-purple/8 px-4 py-2 text-xs font-extrabold text-purple-strong transition hover:bg-purple/12 md:text-sm"
         >
           ហាត់បន្ថែម · លំហាត់ {total}
         </button>

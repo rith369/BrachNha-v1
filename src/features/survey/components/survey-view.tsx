@@ -97,7 +97,7 @@ export function SurveyView() {
         />
         <button
           onClick={() => setLang(lang === "en" ? "km" : "en")}
-          className="flex items-center gap-1.5 rounded-full border border-border bg-purple/8 px-3 py-1.5 text-xs font-extrabold text-purple"
+          className="flex items-center gap-1.5 rounded-full border border-border bg-purple/8 px-3 py-1.5 text-xs font-extrabold text-purple-strong"
         >
           <Flag code={lang === "en" ? "kh" : "gb"} className="size-3.5" />
           {lang === "en" ? "ខ្មែរ" : "EN"}
@@ -157,7 +157,7 @@ export function SurveyView() {
             <div className="flex gap-2.5">
               <button
                 onClick={() => setStep(1)}
-                className="flex-1 rounded-2xl border border-border bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
+                className="flex-1 rounded-2xl border border-border bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple-strong"
               >
                 ← {lang === "en" ? "Back" : "ថយ"}
               </button>
@@ -192,7 +192,7 @@ export function SurveyView() {
             <div className="flex gap-2.5">
               <button
                 onClick={() => setStep(2)}
-                className="flex-1 rounded-2xl border border-border bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
+                className="flex-1 rounded-2xl border border-border bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple-strong"
               >
                 ← {lang === "en" ? "Back" : "ថយ"}
               </button>
@@ -231,7 +231,7 @@ export function SurveyView() {
             <div className="flex gap-2.5">
               <button
                 onClick={() => setStep(3)}
-                className="flex-1 rounded-2xl border border-border bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
+                className="flex-1 rounded-2xl border border-border bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple-strong"
               >
                 ← {lang === "en" ? "Back" : "ថយ"}
               </button>

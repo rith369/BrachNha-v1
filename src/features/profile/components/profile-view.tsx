@@ -125,7 +125,7 @@ export function ProfileView() {
           <GoogleButton variant="outline" />
           <Link
             to="/privacy"
-            className="block text-center text-xs font-bold text-muted underline underline-offset-2 hover:text-purple"
+            className="block text-center text-xs font-bold text-muted underline underline-offset-2 hover:text-purple-strong"
           >
             {t.privacyPolicy}
           </Link>
@@ -135,7 +135,7 @@ export function ProfileView() {
       {!confirming ? (
         <button
           onClick={() => setConfirming(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-pink/30 px-6 py-3.5 text-sm font-extrabold text-pink"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-pink/30 px-6 py-3.5 text-sm font-extrabold text-pink-strong"
         >
           <LogOut className="size-4" strokeWidth={2.5} />
           {isGuest
@@ -166,14 +166,14 @@ export function ProfileView() {
               the guest card directly above, so this points at it rather than
               rendering a second one inside a box already holding two. */}
           {isGuest && (
-            <div className="mb-3 text-xs font-bold text-purple">
+            <div className="mb-3 text-xs font-bold text-purple-strong">
               {t.exitGuestKeepHint}
             </div>
           )}
           <div className="flex gap-2.5">
             <button
               onClick={() => setConfirming(false)}
-              className="flex-1 rounded-2xl border border-border bg-surface px-6 py-3 text-sm font-extrabold text-purple"
+              className="flex-1 rounded-2xl border border-border bg-surface px-6 py-3 text-sm font-extrabold text-purple-strong"
             >
               {lang === "en" ? "Cancel" : "បោះបង់"}
             </button>
@@ -217,7 +217,7 @@ export function ProfileView() {
           href="https://www.freepik.com"
           target="_blank"
           rel="noreferrer"
-          className="underline decoration-purple/40 underline-offset-2 hover:text-purple"
+          className="underline decoration-purple/40 underline-offset-2 hover:text-purple-strong"
         >
           Designed by Freepik
         </a>

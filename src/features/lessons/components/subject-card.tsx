@@ -97,7 +97,7 @@ export function SubjectCard({
         {count > 0 ? (
           <Meta count={count} id={subject.id} />
         ) : (
-          <span className="inline-block rounded-full bg-surface/70 px-2 py-0.5 text-[10px] font-extrabold text-muted">
+          <span className="inline-block rounded-full bg-surface/70 px-2 py-0.5 text-[10px] font-extrabold text-text">
             ឆាប់ៗនេះ
           </span>
         )}

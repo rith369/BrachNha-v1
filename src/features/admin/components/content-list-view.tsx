@@ -217,13 +217,13 @@ function ImportPanel({ lang, onDone }: { lang: Lang; onDone: () => void }) {
         {c.importChoose}
         <input type="file" accept=".json,application/json" className="sr-only" onChange={(e) => void choose(e)} />
       </label>
-      {badFile && <p role="alert" className="mt-2 text-xs font-bold text-pink">{c.importBadFile}</p>}
+      {badFile && <p role="alert" className="mt-2 text-xs font-bold text-pink-strong">{c.importBadFile}</p>}
 
       {items && (
         <div className="mt-3">
           <p className="text-xs font-bold">{c.importChecked(items.length, errors.length, warnings)}</p>
           {errors.length > 0 && (
-            <ul className="mt-1.5 max-h-48 overflow-y-auto text-[11px] font-semibold text-pink">
+            <ul className="mt-1.5 max-h-48 overflow-y-auto text-[11px] font-semibold text-pink-strong">
               {errors.slice(0, 30).map((e, i) => (
                 <li key={i} className="[overflow-wrap:anywhere]">
                   {e.kind} {e.key}: {e.item >= 0 ? `${e.item + 1} ` : ""}
@@ -234,7 +234,7 @@ function ImportPanel({ lang, onDone }: { lang: Lang; onDone: () => void }) {
             </ul>
           )}
           {errors.length > 0 ? (
-            <p className="mt-2 text-xs font-bold text-pink">{c.importFixFirst}</p>
+            <p className="mt-2 text-xs font-bold text-pink-strong">{c.importFixFirst}</p>
           ) : (
             <>
               {/* The ⓘ is the label's SIBLING: a button inside a label would be
@@ -271,7 +271,7 @@ function ImportPanel({ lang, onDone }: { lang: Lang; onDone: () => void }) {
         </p>
       )}
       {error && (
-        <p role="alert" className="mt-2 text-xs font-bold text-pink [overflow-wrap:anywhere]">
+        <p role="alert" className="mt-2 text-xs font-bold text-pink-strong [overflow-wrap:anywhere]">
           {c.errors[error.reason]}
           {error.detail ? `: ${error.detail}` : ""}
         </p>
@@ -372,7 +372,7 @@ export function ContentListView() {
 
       {load.state === "loading" && <p className="text-sm font-bold text-muted">{c.working}</p>}
       {load.state === "failed" && (
-        <p className="text-sm font-bold text-pink">{c.errors.failed}</p>
+        <p className="text-sm font-bold text-pink-strong">{c.errors.failed}</p>
       )}
 
       {load.state === "ready" && (

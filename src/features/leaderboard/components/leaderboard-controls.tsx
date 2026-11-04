@@ -86,7 +86,7 @@ export function LeaderboardControls({
               className={cn(
                 "flex-1 rounded-full px-2 py-1.5 text-[11px] font-extrabold transition md:text-xs",
                 active
-                  ? "bg-purple/12 text-purple"
+                  ? "bg-purple/12 text-purple-strong"
                   : "text-muted hover:text-text"
               )}
             >

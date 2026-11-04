@@ -26,9 +26,9 @@ function Side({
         className={cn(
           "text-2xl font-extrabold md:text-3xl",
           highlight === "win"
-            ? "text-mint"
+            ? "text-mint-strong"
             : highlight === "loss"
-              ? "text-pink"
+              ? "text-pink-strong"
               : "text-text"
         )}
       >

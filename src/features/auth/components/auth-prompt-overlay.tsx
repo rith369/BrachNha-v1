@@ -99,7 +99,7 @@ export function AuthPromptOverlay() {
         <Link
           to="/privacy"
           onClick={closeAuthPrompt}
-          className="mt-1 block text-center text-xs font-bold text-muted underline underline-offset-2 hover:text-purple"
+          className="mt-1 block text-center text-xs font-bold text-muted underline underline-offset-2 hover:text-purple-strong"
         >
           {t.privacyPolicy}
         </Link>

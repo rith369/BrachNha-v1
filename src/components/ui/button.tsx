@@ -13,12 +13,12 @@ const buttonVariants = cva(
         default:
           "bg-brand text-white shadow-cta hover:brightness-105",
         secondary:
-          "bg-purple/10 text-purple hover:bg-purple/15 border border-border",
+          "bg-purple/10 text-purple-strong hover:bg-purple/15 border border-border",
         outline:
           "border border-border bg-transparent text-text hover:bg-purple/5",
         ghost: "hover:bg-purple/8 text-text",
         destructive: "bg-destructive text-white hover:brightness-105",
-        link: "text-purple underline-offset-4 hover:underline",
+        link: "text-purple-strong underline-offset-4 hover:underline",
       },
       size: {
         default: "h-11 px-5 py-2",

@@ -123,7 +123,7 @@ export function DailyGoalCard({
           <div
             className={cn(
               "mt-1.5 flex items-center gap-1.5 text-xs font-extrabold",
-              streakKept ? "text-mint" : "text-muted"
+              streakKept ? "text-mint-strong" : "text-muted"
             )}
           >
             {streakKept && (
@@ -202,7 +202,7 @@ export function DailyGoalCard({
           {continueTaskLabel(dailyTaskLabel(next.id, lang), lang)}
         </Link>
       ) : (
-        <div className="w-full rounded-2xl border border-border bg-mint/30 px-4 py-3 text-center text-sm font-extrabold text-mint">
+        <div className="w-full rounded-2xl border border-border bg-mint/30 px-4 py-3 text-center text-sm font-extrabold text-mint-strong">
           {c.goalComplete}
         </div>
       )}

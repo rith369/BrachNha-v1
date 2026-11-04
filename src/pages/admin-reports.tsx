@@ -139,7 +139,7 @@ function ReportCard({
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="rounded-full bg-pink/10 px-2 py-0.5 text-[10px] font-extrabold text-pink">
+          <span className="rounded-full bg-pink/10 px-2 py-0.5 text-[10px] font-extrabold text-pink-strong">
             {c.reports(item.reports)}
           </span>
           {item.reasons.map((r) => (
@@ -165,7 +165,7 @@ function ReportCard({
             type="button"
             disabled={busy}
             onClick={() => void act("keep")}
-            className="flex items-center gap-1 rounded-xl border border-border bg-mint/30 px-3 py-1.5 text-xs font-extrabold text-mint disabled:opacity-50"
+            className="flex items-center gap-1 rounded-xl border border-border bg-mint/30 px-3 py-1.5 text-xs font-extrabold text-mint-strong disabled:opacity-50"
           >
             <Check className="size-3.5" strokeWidth={3} />
             {c.keep}
@@ -186,7 +186,7 @@ function ReportCard({
           </button>
         </div>
         {failed && (
-          <p role="alert" className="text-[10px] font-bold text-pink">
+          <p role="alert" className="text-[10px] font-bold text-pink-strong">
             {c.actionFailed}
           </p>
         )}
@@ -228,7 +228,7 @@ function ReportsBody() {
         <p className="text-sm font-bold text-muted">{c.loading}</p>
       )}
       {load === "failed" && (
-        <p className="text-sm font-bold text-pink">{c.failed}</p>
+        <p className="text-sm font-bold text-pink-strong">{c.failed}</p>
       )}
       {load === "ready" && items.length === 0 && (
         <div className="rounded-2xl border border-border bg-surface p-5 text-center text-sm font-bold text-muted shadow-panel">

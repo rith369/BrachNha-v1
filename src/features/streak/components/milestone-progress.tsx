@@ -43,7 +43,7 @@ export function MilestoneProgress({ progress }: { progress: Progress }) {
             {progress.target.label[lang]}
           </div>
         </div>
-        <div className="font-heading shrink-0 text-sm font-extrabold text-purple">
+        <div className="font-heading shrink-0 text-sm font-extrabold text-purple-strong">
           {milestoneCountLabel(progress.current, progress.target.days, lang)}
         </div>
       </div>

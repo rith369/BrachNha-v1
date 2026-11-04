@@ -52,7 +52,7 @@ export function WeeklyStreak({
               <div
                 className={cn(
                   "text-[9px] font-extrabold tracking-wide uppercase md:text-[10px]",
-                  isToday ? "text-purple" : "text-muted"
+                  isToday ? "text-purple-strong" : "text-muted"
                 )}
               >
                 {weekdayLabel(day.id, lang)}
@@ -64,7 +64,7 @@ export function WeeklyStreak({
                   day.done
                     ? "bg-flame text-white"
                     : day.saved
-                      ? "border-2 border-purple text-purple"
+                      ? "border-2 border-purple text-purple-strong"
                       : "border-2 border-dashed border-border text-muted",
                   // ring-offset carries the page colour so the gap reads as a
                   // gap rather than a second, paler ring.
@@ -91,7 +91,7 @@ export function WeeklyStreak({
                   their baselines. h-4 rather than h-3: Khmer stacks vowel signs
                   above and coeng below, so ថ្ងៃនេះ needs more room than a Latin
                   cap-height line of the same size. */}
-              <div className="h-4 text-[8px] font-extrabold text-purple md:text-[9px]">
+              <div className="h-4 text-[8px] font-extrabold text-purple-strong md:text-[9px]">
                 {isToday ? c.today : ""}
               </div>
             </div>
@@ -100,7 +100,7 @@ export function WeeklyStreak({
       </div>
 
       {week.some((d) => d.saved && !d.done) && (
-        <div className="flex items-center gap-1.5 text-[11px] font-bold text-purple">
+        <div className="flex items-center gap-1.5 text-[11px] font-bold text-purple-strong">
           <Shield className="size-3.5 shrink-0" strokeWidth={2.5} aria-hidden />
           {c.protectedDay}
         </div>

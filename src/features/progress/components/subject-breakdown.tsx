@@ -159,7 +159,7 @@ function SubjectRow({ subject: s, c }: { subject: ProgressSubject; c: ProgressCo
                 {s.trendPct !== null && (
                   <span
                     className={`text-[10px] font-extrabold ${
-                      flat ? "text-muted" : up ? "text-mint" : "text-pink"
+                      flat ? "text-muted" : up ? "text-mint-strong" : "text-pink-strong"
                     }`}
                   >
                     {c.trend(s.trendPct)}

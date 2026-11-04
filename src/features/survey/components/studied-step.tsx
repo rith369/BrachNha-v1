@@ -27,7 +27,7 @@ export function StudiedStep({
       <div className="mb-4 flex flex-col gap-2">
         <button
           onClick={() => onAnswer(false)}
-          className="w-full rounded-xl border border-border bg-mint/30 px-3 py-3 text-sm font-bold text-mint transition hover:bg-mint/15"
+          className="w-full rounded-xl border border-border bg-mint/30 px-3 py-3 text-sm font-bold text-mint-strong transition hover:bg-mint/15"
         >
           {t.notStudiedYet}
         </button>

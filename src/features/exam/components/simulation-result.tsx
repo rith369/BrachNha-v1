@@ -126,7 +126,7 @@ export function SimulationResult({ attempt }: { attempt: SimulationAttempt }) {
                                 : `${row.pct}%`}
                             </div>
                             {row.endedEarly && (
-                              <div className="mt-0.5 flex items-center gap-1 text-xs font-bold text-pink">
+                              <div className="mt-0.5 flex items-center gap-1 text-xs font-bold text-pink-strong">
                                 <ShieldAlert className="size-3 shrink-0" strokeWidth={2.5} />
                                 បញ្ចប់មុនម៉ោង ដោយសារការចាកចេញ
                               </div>

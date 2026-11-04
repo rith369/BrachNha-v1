@@ -38,9 +38,9 @@ import { FlashcardForm } from "./flashcard-form";
  *  a solid fill under white: these take the per-theme `--color-*` scale, so
  *  they are correct in dark with no `dark:` override. */
 const PILE_TONE = {
-  mint: "border-border bg-mint/8 text-mint",
-  pink: "border-border bg-pink/8 text-pink",
-  yellow: "border-border bg-yellow/8 text-yellow",
+  mint: "border-border bg-mint/8 text-mint-strong",
+  pink: "border-border bg-pink/8 text-pink-strong",
+  yellow: "border-border bg-yellow/8 text-yellow-strong",
 } as const;
 
 const PILE_HOVER = {
@@ -204,7 +204,7 @@ function PileList({
                 : "សម្គាល់ថាសំខាន់"
             }
             aria-pressed={starredCards.includes(qc.card.id)}
-            className="flex size-7 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-yellow/15 hover:text-yellow"
+            className="flex size-7 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-yellow/15 hover:text-yellow-strong"
           >
             <Star
               className={cn(
@@ -475,7 +475,7 @@ export function FlashcardRunner({
           {editing === null && (
             <button
               onClick={() => setEditing("new")}
-              className="flex items-center gap-1 rounded-full border border-border bg-purple/8 px-2.5 py-1 text-[11px] font-extrabold text-purple"
+              className="flex items-center gap-1 rounded-full border border-border bg-purple/8 px-2.5 py-1 text-[11px] font-extrabold text-purple-strong"
             >
               <Plus className="size-3.5" strokeWidth={2.5} />
               បន្ថែម
@@ -495,11 +495,11 @@ export function FlashcardRunner({
               key={qc.card.id}
               className="mb-2 flex items-center justify-between gap-2 rounded-xl border border-border bg-pink/8 p-3"
             >
-              <div className="text-xs font-bold text-pink">លុបកាតនេះ?</div>
+              <div className="text-xs font-bold text-pink-strong">លុបកាតនេះ?</div>
               <div className="flex shrink-0 gap-2">
                 <button
                   onClick={() => setConfirmDeleteId(null)}
-                  className="rounded-lg border border-border px-2.5 py-1 text-[11px] font-extrabold text-purple"
+                  className="rounded-lg border border-border px-2.5 py-1 text-[11px] font-extrabold text-purple-strong"
                 >
                   ទេ
                 </button>
@@ -525,14 +525,14 @@ export function FlashcardRunner({
               <button
                 onClick={() => setEditing(qc.card)}
                 aria-label="កែសម្រួល"
-                className="flex size-7 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-purple/8 hover:text-purple"
+                className="flex size-7 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-purple/8 hover:text-purple-strong"
               >
                 <Pencil className="size-3.5" strokeWidth={2.5} />
               </button>
               <button
                 onClick={() => setConfirmDeleteId(qc.card.id)}
                 aria-label="លុប"
-                className="flex size-7 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-pink/8 hover:text-pink"
+                className="flex size-7 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-pink/8 hover:text-pink-strong"
               >
                 <Trash2 className="size-3.5" strokeWidth={2.5} />
               </button>

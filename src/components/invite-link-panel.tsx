@@ -137,7 +137,7 @@ export function InviteLinkPanel({
             "flex flex-1 items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-[11px] font-extrabold transition",
             copied
               ? "border-border bg-mint/30 text-text"
-              : "border-border bg-purple/8 text-purple hover:bg-purple/15"
+              : "border-border bg-purple/8 text-purple-strong hover:bg-purple/15"
           )}
         >
           {copied ? (

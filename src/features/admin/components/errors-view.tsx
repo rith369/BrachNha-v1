@@ -209,7 +209,7 @@ function ErrorCard({
           {c.errorSeen(whenLabel(group.firstSeen, lang), whenLabel(group.lastSeen, lang))}
         </span>
         {group.fixedAt && (
-          <span className={backAgain ? "text-pink" : undefined}>
+          <span className={backAgain ? "text-pink-strong" : undefined}>
             {c.errorFixedOn(whenLabel(group.fixedAt, lang), group.sinceFix ?? 0)}
           </span>
         )}
@@ -219,7 +219,7 @@ function ErrorCard({
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="mt-2 flex items-center gap-1 text-xs font-extrabold text-purple"
+        className="mt-2 flex items-center gap-1 text-xs font-extrabold text-purple-strong"
       >
         <ChevronDown
           className={cn("size-3.5 transition-transform", open && "rotate-180")}
@@ -289,7 +289,7 @@ function ErrorCard({
             {busy ? c.working : c.markFixed}
           </button>
           {error && (
-            <p role="alert" className="mt-2 text-xs font-bold text-pink">
+            <p role="alert" className="mt-2 text-xs font-bold text-pink-strong">
               {c.errors[error]}
             </p>
           )}
@@ -351,7 +351,7 @@ export function ErrorsView() {
     <>
       <p className="mb-4 text-xs font-semibold text-muted">{c.errorsBlurb}</p>
       {load.state === "loading" && <p className="text-sm font-bold text-muted">{c.loading}</p>}
-      {load.state === "failed" && <p className="text-sm font-bold text-pink">{c.failed}</p>}
+      {load.state === "failed" && <p className="text-sm font-bold text-pink-strong">{c.failed}</p>}
       {data && (
         <>
           <DailyBars data={data.daily} lang={lang} />

@@ -73,7 +73,7 @@ export function PersonalSummary({
             </span>
           </div>
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-            <span className="rounded-full bg-purple/10 px-2 py-0.5 text-[10px] font-extrabold text-purple">
+            <span className="rounded-full bg-purple/10 px-2 py-0.5 text-[10px] font-extrabold text-purple-strong">
               {t[TITLE_LABEL_KEY[row.title]]}
             </span>
             <span className="truncate text-[11px] font-extrabold text-muted">
@@ -101,7 +101,7 @@ export function PersonalSummary({
               both ways in neutral grey, but your own card stays forward
               looking, and the gap line below always gives you a next step. */}
           {row.change > 0 && (
-            <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-mint/12 px-2 py-0.5 text-[10px] font-extrabold text-mint">
+            <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-mint/12 px-2 py-0.5 text-[10px] font-extrabold text-mint-strong">
               <TrendingUp className="size-3" strokeWidth={2.5} />↑ {row.change}
             </div>
           )}
@@ -138,7 +138,7 @@ export function PersonalSummary({
             stats: row.stats,
           })}
         </div>
-        <div className="mt-0.5 text-[11px] font-bold text-purple">
+        <div className="mt-0.5 text-[11px] font-bold text-purple-strong">
           {gapLine(metric, lang, gap, row.rank - 1)}
         </div>
         {/* Streak is the one board where the next step is always the same and
@@ -150,7 +150,7 @@ export function PersonalSummary({
           </div>
         )}
         {row.change > 0 && (
-          <div className="mt-0.5 text-[11px] font-bold text-mint">
+          <div className="mt-0.5 text-[11px] font-bold text-mint-strong">
             {climbLine(row.change, period, lang)}
           </div>
         )}

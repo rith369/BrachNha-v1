@@ -52,7 +52,7 @@ function Stat({ label, value }: { label: string; value: string | number }) {
 
 function ErrorLine({ reason, lang }: { reason: AdminFail; lang: Lang }) {
   return (
-    <p role="alert" className="mt-2 text-xs font-bold text-pink">
+    <p role="alert" className="mt-2 text-xs font-bold text-pink-strong">
       {ADMIN_COPY[lang].errors[reason]}
     </p>
   );
@@ -583,7 +583,7 @@ export function StudentsView() {
 
       {result === null && <p className="text-sm font-bold text-muted">{c.loading}</p>}
       {result?.state === "failed" && !stale && (
-        <p className="text-sm font-bold text-pink">{c.failed}</p>
+        <p className="text-sm font-bold text-pink-strong">{c.failed}</p>
       )}
       {result?.state === "ready" && (
         <div className={cn("transition-opacity", stale && "opacity-50")}>

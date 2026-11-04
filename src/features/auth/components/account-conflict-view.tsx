@@ -43,7 +43,7 @@ function Side({
   tone: "purple" | "blue";
 }) {
   const ring = tone === "purple" ? "border-border" : "border-border";
-  const text = tone === "purple" ? "text-purple" : "text-blue";
+  const text = tone === "purple" ? "text-purple-strong" : "text-blue-strong";
 
   return (
     <div className={`rounded-2xl border bg-surface p-4 ${ring}`}>
@@ -158,7 +158,7 @@ export function AccountConflictView() {
           <button
             onClick={keepDevice}
             disabled={busy}
-            className="w-full rounded-2xl border border-border bg-purple/8 px-6 py-3.5 text-sm font-extrabold text-purple transition active:scale-[0.98] disabled:opacity-50"
+            className="w-full rounded-2xl border border-border bg-purple/8 px-6 py-3.5 text-sm font-extrabold text-purple-strong transition active:scale-[0.98] disabled:opacity-50"
           >
             {t.useThisDevice}
           </button>

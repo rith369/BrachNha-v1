@@ -80,7 +80,7 @@ export function AdminGate({
             {c.backToAdmin}
           </Link>
         )}
-        {kicker && <p className="text-xs font-extrabold text-purple">{kicker}</p>}
+        {kicker && <p className="text-xs font-extrabold text-purple-strong">{kicker}</p>}
         <div className="mb-1 flex items-center gap-2">
           <Icon className="size-5 text-purple" strokeWidth={2.5} />
           <h1 className="font-heading text-xl font-extrabold">{title}</h1>

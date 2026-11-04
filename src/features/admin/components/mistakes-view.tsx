@@ -148,7 +148,7 @@ function MistakeCard({
           <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-1">
             <Link
               to={q.link}
-              className="inline-flex items-center gap-1 text-xs font-extrabold text-purple"
+              className="inline-flex items-center gap-1 text-xs font-extrabold text-purple-strong"
             >
               <ExternalLink className="size-3.5" strokeWidth={2.5} />
               {c.openIt}
@@ -156,7 +156,7 @@ function MistakeCard({
             {q.edit && (
               <Link
                 to={q.edit}
-                className="inline-flex items-center gap-1 text-xs font-extrabold text-purple"
+                className="inline-flex items-center gap-1 text-xs font-extrabold text-purple-strong"
               >
                 <Pencil className="size-3.5" strokeWidth={2.5} />
                 {c.editIt}
@@ -213,7 +213,7 @@ function MistakeCard({
         </button>
       </div>
       {error && (
-        <p role="alert" className="mt-2 text-xs font-bold text-pink">
+        <p role="alert" className="mt-2 text-xs font-bold text-pink-strong">
           {c.errors[error]}
         </p>
       )}
@@ -270,7 +270,7 @@ export function MistakesView() {
     <>
       <p className="mb-4 text-xs font-semibold text-muted">{c.mistakesBlurb}</p>
       {load.state === "loading" && <p className="text-sm font-bold text-muted">{c.loading}</p>}
-      {load.state === "failed" && <p className="text-sm font-bold text-pink">{c.failed}</p>}
+      {load.state === "failed" && <p className="text-sm font-bold text-pink-strong">{c.failed}</p>}
       {load.state === "ready" && items.length === 0 && (
         <div className="rounded-2xl border border-border bg-surface p-5 text-center text-sm font-bold text-muted shadow-panel">
           {c.mistakesEmpty}

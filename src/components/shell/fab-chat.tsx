@@ -162,7 +162,7 @@ export function FabChat() {
         <button
           type="button"
           onClick={openMentor}
-          className="relative rounded-2xl border border-border bg-elevated py-2 pr-7 pl-3 text-left text-sm leading-snug font-semibold text-purple shadow-panel [overflow-wrap:anywhere]"
+          className="relative rounded-2xl border border-border bg-elevated py-2 pr-7 pl-3 text-left text-sm leading-snug font-semibold text-purple-strong shadow-panel [overflow-wrap:anywhere]"
         >
           {/* Two lines, the greeting and then the question, so a narrow
               phone never breaks the Khmer question mid-phrase. */}

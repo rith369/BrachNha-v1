@@ -97,7 +97,7 @@ export function ExamPaperCard({
               "flex shrink-0 items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-extrabold",
               ready
                 ? "text-white shadow-panel-sm"
-                : "border border-border bg-purple/8 text-purple"
+                : "border border-border bg-purple/8 text-purple-strong"
             )}
             style={ready ? { backgroundColor: style.fill } : undefined}
           >
@@ -107,7 +107,7 @@ export function ExamPaperCard({
         </div>
 
         {!ready && (
-          <span className="mt-2 inline-block rounded-full bg-purple/8 px-2 py-0.5 text-[10px] font-extrabold text-muted">
+          <span className="mt-2 inline-block rounded-full bg-purple/8 px-2 py-0.5 text-[10px] font-extrabold text-text">
             ឆាប់ៗនេះ
           </span>
         )}

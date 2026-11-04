@@ -423,7 +423,7 @@ export function ContentEditorView({
         <InfoTip triggerClassName="font-mono" trigger={<span>{contentKey}</span>}>
           {c.tips.key}
         </InfoTip>
-        <Link to={slot.link} className="inline-flex items-center gap-1 text-purple">
+        <Link to={slot.link} className="inline-flex items-center gap-1 text-purple-strong">
           <ExternalLink className="size-3" strokeWidth={2.5} />
           {c.openInApp}
         </Link>
@@ -443,7 +443,7 @@ export function ContentEditorView({
     return (
       <>
         {header}
-        <p className="text-sm font-bold text-pink">{c.errors[load.reason]}</p>
+        <p className="text-sm font-bold text-pink-strong">{c.errors[load.reason]}</p>
       </>
     );
   }
@@ -466,7 +466,7 @@ export function ContentEditorView({
         </p>
         {draft && <p className="mt-1">{c.draftSaved(draft.updatedBy, whenLabel(draft.updatedAt, lang))}</p>}
         {draft && published && draft.baseVersion !== null && draft.baseVersion !== published.version && (
-          <p className="mt-1 font-bold text-pink">{c.draftBase(draft.baseVersion, published.version)}</p>
+          <p className="mt-1 font-bold text-pink-strong">{c.draftBase(draft.baseVersion, published.version)}</p>
         )}
       </div>
 
@@ -496,7 +496,7 @@ export function ContentEditorView({
                   onClick={() => (isList ? jumpTo(issue.item) : jumpToField(issue.field))}
                   className={cn(
                     "text-left text-[11px] font-bold [overflow-wrap:anywhere] enabled:hover:underline",
-                    issue.level === "error" ? "text-pink" : "text-muted"
+                    issue.level === "error" ? "text-pink-strong" : "text-muted"
                   )}
                 >
                   {issue.level === "error" ? "✕ " : "! "}
@@ -660,7 +660,7 @@ export function ContentEditorView({
             role={notice.tone === "error" ? "alert" : "status"}
             className={cn(
               "mb-2 text-xs font-bold [overflow-wrap:anywhere]",
-              notice.tone === "error" ? "text-pink" : "text-text"
+              notice.tone === "error" ? "text-pink-strong" : "text-text"
             )}
           >
             {notice.text}
@@ -711,7 +711,7 @@ export function ContentEditorView({
           <InfoTip label={c.whatIsThis}>{c.tips.buttons}</InfoTip>
         </div>
         {isOwner && errorCount > 0 && (
-          <p className="mt-2 text-[11px] font-bold text-pink">{c.fixBeforePublish(errorCount)}</p>
+          <p className="mt-2 text-[11px] font-bold text-pink-strong">{c.fixBeforePublish(errorCount)}</p>
         )}
         {!isOwner && <p className="mt-2 text-[11px] font-bold text-muted">{c.ownerOnlyPublish}</p>}
       </div>

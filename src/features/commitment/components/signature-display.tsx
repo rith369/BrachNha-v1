@@ -32,7 +32,7 @@ export function SignatureDisplay({
     return (
       <div
         className={cn(
-          "flex items-center overflow-hidden text-3xl leading-tight text-purple",
+          "flex items-center overflow-hidden text-3xl leading-tight text-purple-strong",
           className
         )}
         style={{ fontFamily: "var(--font-signature), cursive" }}

@@ -39,6 +39,9 @@ export interface SubjectStyle {
   art: string;
   /** Solid fill for a white glyph to sit on. Inline style — see below. */
   fill: string;
+  /** The same hue deeper, for a fill under white TEXT (5:1 or more). A glyph
+   *  needs only 3:1, which `fill` gives; text needs 4.5:1, which it does not. */
+  deep: string;
 }
 
 export const SUBJECT_STYLE: Record<SubjectId, SubjectStyle> = {
@@ -47,47 +50,55 @@ export const SUBJECT_STYLE: Record<SubjectId, SubjectStyle> = {
     text: "text-subj-math",
     art: "from-subj-math/25 to-subj-math/5",
     fill: "var(--subject-math)",
+    deep: "var(--subject-math-deep)",
   },
   physics: {
     card: "border-subj-physics/20 bg-subj-physics/8",
     text: "text-subj-physics",
     art: "from-subj-physics/25 to-subj-physics/5",
     fill: "var(--subject-physics)",
+    deep: "var(--subject-physics-deep)",
   },
   chemistry: {
     card: "border-subj-chemistry/20 bg-subj-chemistry/8",
     text: "text-subj-chemistry",
     art: "from-subj-chemistry/25 to-subj-chemistry/5",
     fill: "var(--subject-chemistry)",
+    deep: "var(--subject-chemistry-deep)",
   },
   biology: {
     card: "border-subj-biology/20 bg-subj-biology/8",
     text: "text-subj-biology",
     art: "from-subj-biology/25 to-subj-biology/5",
     fill: "var(--subject-biology)",
+    deep: "var(--subject-biology-deep)",
   },
   history: {
     card: "border-subj-history/20 bg-subj-history/8",
     text: "text-subj-history",
     art: "from-subj-history/25 to-subj-history/5",
     fill: "var(--subject-history)",
+    deep: "var(--subject-history-deep)",
   },
   khmer: {
     card: "border-subj-khmer/20 bg-subj-khmer/8",
     text: "text-subj-khmer",
     art: "from-subj-khmer/25 to-subj-khmer/5",
     fill: "var(--subject-khmer)",
+    deep: "var(--subject-khmer-deep)",
   },
   english: {
     card: "border-subj-english/20 bg-subj-english/8",
     text: "text-subj-english",
     art: "from-subj-english/25 to-subj-english/5",
     fill: "var(--subject-english)",
+    deep: "var(--subject-english-deep)",
   },
   french: {
     card: "border-subj-french/20 bg-subj-french/8",
     text: "text-subj-french",
     art: "from-subj-french/25 to-subj-french/5",
     fill: "var(--subject-french)",
+    deep: "var(--subject-french-deep)",
   },
 };

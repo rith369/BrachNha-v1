@@ -48,7 +48,7 @@ export function UnderlineTabs<T extends string>({
               // rather than 1px above it, which reads as a misaligned seam.
               "-mb-px flex-1 border-b-2 px-2 pb-2.5 text-sm font-extrabold transition md:text-base",
               active
-                ? "border-purple text-purple"
+                ? "border-purple text-purple-strong"
                 : "border-transparent text-muted hover:text-text"
             )}
           >

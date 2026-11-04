@@ -58,7 +58,7 @@ export function StickyUserCard({ lang, row, metric, gap, name }: Props) {
           {t.yourRanking}
         </div>
         <div className="flex items-center gap-2.5">
-          <span className="w-7 shrink-0 text-center font-heading text-xs font-extrabold text-purple md:w-9 md:text-sm">
+          <span className="w-7 shrink-0 text-center font-heading text-xs font-extrabold text-purple-strong md:w-9 md:text-sm">
             #{row.rank}
           </span>
           <Avatar
@@ -88,7 +88,7 @@ export function StickyUserCard({ lang, row, metric, gap, name }: Props) {
             {formatMetricValue(row.value, metric)}
           </div>
         </div>
-        <div className="mt-1.5 text-[10px] font-extrabold text-purple md:text-[11px]">
+        <div className="mt-1.5 text-[10px] font-extrabold text-purple-strong md:text-[11px]">
           {gapLine(metric, lang, gap, row.rank - 1)}
         </div>
       </div>

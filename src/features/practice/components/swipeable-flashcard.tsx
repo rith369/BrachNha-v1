@@ -307,7 +307,7 @@ export function SwipeableFlashcard({
               style={{ transform: "rotateY(180deg)" }}
             >
               <div className="flex min-h-full flex-col items-center justify-center text-center">
-                {/* Plain `text-text`, NOT `text-mint`. The answer is the
+                {/* Plain `text-text`, NOT `text-mint-strong`. The answer is the
                     longest body of reading on the screen and mint-on-mint is
                     genuinely hard to read at length — the tint is carried by
                     the card's own background and border, which is enough to
@@ -341,7 +341,7 @@ export function SwipeableFlashcard({
           onPointerDown={(e) => e.stopPropagation()}
           aria-label={starred ? "លុបចេញពីសំខាន់" : "សម្គាល់ថាសំខាន់"}
           aria-pressed={starred}
-          className="absolute top-3 right-3 z-20 flex size-8 items-center justify-center rounded-full text-muted transition hover:bg-purple/8 hover:text-yellow"
+          className="absolute top-3 right-3 z-20 flex size-8 items-center justify-center rounded-full text-muted transition hover:bg-purple/8 hover:text-yellow-strong"
         >
           <Star
             className={cn("size-4.5", starred && "fill-current text-yellow")}

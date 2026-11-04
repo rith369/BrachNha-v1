@@ -43,7 +43,7 @@ export function PredictionHero({
           🎯 {t.brachNhaEstimate}
         </div>
         {daysRemaining > 0 && (
-          <div className="text-[11px] font-extrabold text-purple">
+          <div className="text-[11px] font-extrabold text-purple-strong">
             {daysRemaining} {t.daysRemaining}
           </div>
         )}
@@ -58,12 +58,12 @@ export function PredictionHero({
             {mostLikelyGrade}
             <span className="ml-1.5 text-lg text-muted">{mostLikelyPct}%</span>
           </div>
-          <div className="mt-1 text-xs font-extrabold text-purple">
+          <div className="mt-1 text-xs font-extrabold text-purple-strong">
             {comparisonText}
           </div>
           <div className="mt-2.5 flex items-center gap-1.5 text-[11px] font-bold text-muted">
             <span>{lang === "en" ? "Target Grade" : "ពិន្ទុគោលដៅ"}:</span>
-            <span className="font-heading text-sm font-extrabold text-yellow">
+            <span className="font-heading text-sm font-extrabold text-yellow-strong">
               {targetGrade || "—"}
             </span>
           </div>

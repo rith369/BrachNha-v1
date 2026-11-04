@@ -103,7 +103,7 @@ export function FriendsView() {
               <button
                 type="button"
                 onClick={reload}
-                className="rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-extrabold text-purple"
+                className="rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-extrabold text-purple-strong"
               >
                 {c.retry}
               </button>
@@ -195,7 +195,7 @@ function FriendLink({
           <div
             className={cn(
               "mt-0.5 flex items-center gap-1 text-[10px] font-extrabold",
-              doneToday ? "text-mint" : "text-muted"
+              doneToday ? "text-mint-strong" : "text-muted"
             )}
           >
             {doneToday ? (
@@ -391,7 +391,7 @@ function AddFriend({
       </label>
 
       {notice && (
-        <p role="status" className="text-[11px] font-bold text-mint">
+        <p role="status" className="text-[11px] font-bold text-mint-strong">
           {notice}
         </p>
       )}
@@ -442,7 +442,7 @@ function InviteFriend() {
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center justify-center gap-1.5 rounded-xl border border-border bg-purple/8 px-3 py-2.5 text-xs font-extrabold text-purple transition hover:bg-purple/15"
+        className="flex items-center justify-center gap-1.5 rounded-xl border border-border bg-purple/8 px-3 py-2.5 text-xs font-extrabold text-purple-strong transition hover:bg-purple/15"
       >
         <QrCode className="size-4 shrink-0" strokeWidth={2.5} aria-hidden />
         {c.inviteButton}
@@ -516,7 +516,7 @@ function SearchRow({
             {hit.relation === "received" ? c.accept : c.add}
           </button>
         ) : (
-          <span className="ml-auto flex shrink-0 items-center gap-1 rounded-full bg-mint/15 px-2 py-1 text-[10px] font-extrabold text-mint">
+          <span className="ml-auto flex shrink-0 items-center gap-1 rounded-full bg-mint/15 px-2 py-1 text-[10px] font-extrabold text-mint-strong">
             {hit.relation === "friends" ? (
               <Check className="size-3 shrink-0" strokeWidth={3.5} aria-hidden />
             ) : (

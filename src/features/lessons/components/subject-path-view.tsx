@@ -87,7 +87,7 @@ const centreAt = (i: number) => CENTRES[i % CENTRES.length];
 function Connector({ from, to }: { from: number; to: number }) {
   return (
     <svg
-      className="h-16 w-full text-purple/35 md:h-20"
+      className="h-16 w-full text-purple-strong/35 md:h-20"
       viewBox="0 0 100 40"
       preserveAspectRatio="none"
       aria-hidden="true"
@@ -406,7 +406,7 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
         <Link
           to="/lessons"
           aria-label="ត្រឡប់"
-          className="mb-3 flex size-9 shrink-0 items-center justify-center rounded-xl border border-border bg-purple/8 text-purple transition hover:bg-purple/15"
+          className="mb-3 flex size-9 shrink-0 items-center justify-center rounded-xl border border-border bg-purple/8 text-purple-strong transition hover:bg-purple/15"
         >
           <ArrowLeft className="size-4.5" strokeWidth={2.5} />
         </Link>
@@ -509,13 +509,13 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
                   <div
                     className="mt-8 flex items-center justify-between gap-3 rounded-2xl px-4 py-3 text-white first:mt-0"
                     style={{
-                      backgroundColor: c.fill,
-                      boxShadow: `0 4px 0 color-mix(in srgb, ${c.fill} 62%, black)`,
+                      backgroundColor: c.deep,
+                      boxShadow: `0 4px 0 color-mix(in srgb, ${c.deep} 62%, black)`,
                     }}
                   >
                     <div className="min-w-0">
                       {!chapter.flat && (
-                        <div className="truncate text-[10px] font-bold opacity-80">
+                        <div className="truncate text-[10px] font-bold">
                           ជំពូក {chapter.number}
                           {chapter.title && ` · ${chapter.title}`}
                         </div>
@@ -524,7 +524,7 @@ export function SubjectPathView({ subject }: { subject: SubjectMeta }) {
                         {lessonHeading(lesson.number, lesson.title)}
                       </div>
                     </div>
-                    <span className="shrink-0 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-extrabold">
+                    <span className="shrink-0 rounded-full bg-black/20 px-2 py-0.5 text-[10px] font-extrabold">
                       {done}/{lesson.sessions.length}
                     </span>
                   </div>

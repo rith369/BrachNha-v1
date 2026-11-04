@@ -190,7 +190,7 @@ export function AttachmentChip({
       <div
         className={cn(
           "min-w-0 flex-1 text-xs font-bold",
-          status === "error" ? "text-pink" : "text-muted"
+          status === "error" ? "text-pink-strong" : "text-muted"
         )}
       >
         {status === "processing" ? c.processing : status === "error" ? c.error : c.ready}
@@ -199,7 +199,7 @@ export function AttachmentChip({
         type="button"
         onClick={onRemove}
         aria-label={c.remove}
-        className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted transition hover:bg-pink/10 hover:text-pink"
+        className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted transition hover:bg-pink/10 hover:text-pink-strong"
       >
         <X className="size-4" strokeWidth={2.5} />
       </button>

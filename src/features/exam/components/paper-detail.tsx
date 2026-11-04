@@ -166,13 +166,13 @@ export function PaperDetail({
               {content.sections.map((section) => (
                 <span
                   key={section.id}
-                  className="rounded-full border border-border bg-purple/8 px-3 py-1 text-xs font-extrabold text-purple md:text-sm"
+                  className="rounded-full border border-border bg-purple/8 px-3 py-1 text-xs font-extrabold text-purple-strong md:text-sm"
                 >
                   {section.title}
                 </span>
               ))}
               {content.writing && (
-                <span className="rounded-full border border-border bg-purple/8 px-3 py-1 text-xs font-extrabold text-purple md:text-sm">
+                <span className="rounded-full border border-border bg-purple/8 px-3 py-1 text-xs font-extrabold text-purple-strong md:text-sm">
                   {content.writing.title}
                 </span>
               )}
@@ -195,7 +195,7 @@ export function PaperDetail({
               <li>លទ្ធផល ចម្លើយត្រឹមត្រូវ និងការពន្យល់ បង្ហាញក្រោយដាក់ស្នើ។</li>
               {/* The one rule that can END the paper, so it is said here and
                   again on the exam's first screen. */}
-              <li className="text-pink">
+              <li className="text-pink-strong">
                 ហាមចាកចេញពីកម្មវិធី ឬ បិទអេក្រង់។ ការចាកចេញលើសពី{" "}
                 {MAX_EXAM_LEAVES} ដង នឹងធ្វើឱ្យការប្រឡងត្រូវបញ្ចប់ភ្លាមៗ។
               </li>
@@ -254,7 +254,7 @@ function Stat({
 }) {
   return (
     <div className="flex items-center gap-2.5">
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-purple/8 text-purple">
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-purple/8 text-purple-strong">
         {icon}
       </span>
       <div className="min-w-0">
@@ -322,7 +322,7 @@ function HistoryList({
                   nothing, and one that merely used a warning is not the
                   student's business to be reminded of forever. */}
               {result.leaves !== undefined && result.leaves > MAX_EXAM_LEAVES && (
-                <span className="text-pink">បញ្ចប់មុនកំណត់</span>
+                <span className="text-pink-strong">បញ្ចប់មុនកំណត់</span>
               )}
             </span>
           </span>

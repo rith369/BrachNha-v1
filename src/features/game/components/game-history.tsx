@@ -6,9 +6,9 @@ import { OUTCOME_STYLE, rowOutcome, type MatchOutcome, type MatchRow } from "../
 import { OUTCOME_LABEL, gameCopy, relativeDay } from "../copy";
 
 const SCORE_TONE: Record<MatchOutcome, string> = {
-  win: "text-mint",
-  loss: "text-pink",
-  draw: "text-yellow",
+  win: "text-mint-strong",
+  loss: "text-pink-strong",
+  draw: "text-yellow-strong",
 };
 
 

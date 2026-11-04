@@ -132,7 +132,7 @@ export function MyCompetitions({ joiners }: { joiners: JoinerAttempt[] }) {
                         {c.sharedAt ? t.openForJoiners : t.notShared}
                       </span>
                       {played > 0 && (
-                        <span className="flex items-center gap-1 text-purple">
+                        <span className="flex items-center gap-1 text-purple-strong">
                           <Users className="size-3 shrink-0" strokeWidth={2.5} />
                           {t.playedBy(played)}
                         </span>
@@ -140,7 +140,7 @@ export function MyCompetitions({ joiners }: { joiners: JoinerAttempt[] }) {
                     </div>
                   </div>
 
-                  <div className="font-heading shrink-0 text-sm font-extrabold text-purple">
+                  <div className="font-heading shrink-0 text-sm font-extrabold text-purple-strong">
                     {c.creatorScore}/{c.total}
                   </div>
                 </Link>
@@ -159,7 +159,7 @@ export function MyCompetitions({ joiners }: { joiners: JoinerAttempt[] }) {
                       "flex shrink-0 items-center gap-1 rounded-xl border px-2 py-1.5 text-[10px] font-extrabold transition",
                       open
                         ? "border-border bg-purple/30 text-text"
-                        : "border-border bg-purple/8 text-purple hover:bg-purple/15"
+                        : "border-border bg-purple/8 text-purple-strong hover:bg-purple/15"
                     )}
                   >
                     <Share2 className="size-3.5 shrink-0" strokeWidth={2.5} />

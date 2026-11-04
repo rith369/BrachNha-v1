@@ -135,7 +135,8 @@ export function CreateForm({
                 </div>
                 <div className="mt-0.5 text-[10px] font-bold text-muted">
                   {empty ? (
-                    t.comingSoon
+                    // The tile is dimmed; the words saying why are not.
+                    <span className="text-text">{t.comingSoon}</span>
                   ) : (
                     <span className="flex items-center gap-1">
                       <Swords
@@ -213,7 +214,7 @@ export function CreateForm({
             <button
               type="button"
               onClick={() => retryBody("game", subjectId, version)}
-              className="text-sm font-extrabold text-purple"
+              className="text-sm font-extrabold text-purple-strong"
             >
               {t.retry}
             </button>
@@ -232,7 +233,7 @@ export function CreateForm({
               <button
                 type="button"
                 onClick={retryContent}
-                className="mt-2 text-sm font-extrabold text-purple"
+                className="mt-2 text-sm font-extrabold text-purple-strong"
               >
                 {t.retry}
               </button>

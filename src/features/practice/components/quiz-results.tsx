@@ -217,12 +217,12 @@ function ReviewRow({
       {open && (
         <div className="px-3.5 pb-3.5">
           <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-extrabold md:text-sm">
-            <span className={ok ? "text-mint" : "text-pink"}>
+            <span className={ok ? "text-mint-strong" : "text-pink-strong"}>
               ចម្លើយរបស់អ្នក:{" "}
               {answer === null ? "មិនបានឆ្លើយ" : <MathText text={answer} />}
             </span>
             {!ok && (
-              <span className="text-mint">
+              <span className="text-mint-strong">
                 ចម្លើយត្រឹមត្រូវ: <MathText text={q.correct} />
               </span>
             )}

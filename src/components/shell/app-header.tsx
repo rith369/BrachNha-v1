@@ -81,7 +81,7 @@ export function AppHeader() {
               />
             )}
           </svg>
-          <span className="absolute inset-0 flex items-center justify-center font-heading text-base font-extrabold text-blue">
+          <span className="absolute inset-0 flex items-center justify-center font-heading text-base font-extrabold text-blue-strong">
             {level}
           </span>
         </div>

@@ -44,7 +44,7 @@ export function FocusAreas({ summary }: { summary: ProgressSummary }) {
                 className={
                   "mb-1 text-[10px] font-extrabold " +
                   (lang === "en" ? "tracking-wide uppercase " : "") +
-                  (a.kind === "weak" ? "text-pink" : "text-mint")
+                  (a.kind === "weak" ? "text-pink-strong" : "text-mint-strong")
                 }
               >
                 {c.focusLabel[a.label]}

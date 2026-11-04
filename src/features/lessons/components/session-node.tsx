@@ -96,13 +96,13 @@ export function SessionNode({
         <span className="pointer-events-none absolute -top-8 left-1/2 z-10 -translate-x-1/2">
           <span
             className="animate-start-bob relative block rounded-lg px-2.5 py-1 text-[10px] font-extrabold whitespace-nowrap text-white shadow-panel-sm"
-            style={{ backgroundColor: c.fill }}
+            style={{ backgroundColor: c.deep }}
           >
             ចាប់ផ្តើម
             {/* the tail */}
             <span
               className="absolute -bottom-1 left-1/2 size-2 -translate-x-1/2 rotate-45"
-              style={{ backgroundColor: c.fill }}
+              style={{ backgroundColor: c.deep }}
             />
           </span>
         </span>
@@ -142,7 +142,7 @@ export function SessionNode({
           // the video player's placeholder. Below the title, never beside it:
           // CENTRES bounds the node on its WIDTH, and extra height only pushes
           // the next connector down.
-          <span className="mt-1 rounded-full bg-purple/10 px-2 py-0.5 text-[9px] font-extrabold text-muted">
+          <span className="mt-1 rounded-full bg-purple/10 px-2 py-0.5 text-[9px] font-extrabold text-text">
             ឆាប់ៗនេះ
           </span>
         )}

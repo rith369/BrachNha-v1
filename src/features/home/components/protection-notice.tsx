@@ -16,7 +16,7 @@ export function ProtectionNotice({ className }: { className?: string }) {
   return (
     <p
       role="status"
-      className={cn("flex items-center gap-1.5 text-xs font-bold text-purple", className)}
+      className={cn("flex items-center gap-1.5 text-xs font-bold text-purple-strong", className)}
     >
       <Shield className="size-4 shrink-0" strokeWidth={2.5} aria-hidden />
       {protectionSavedLabel(notice.days, lang)}

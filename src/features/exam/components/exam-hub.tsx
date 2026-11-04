@@ -112,7 +112,7 @@ export function ExamHub() {
                 ប្រឡងបាក់ឌុប · {examDate}
               </span>
               <div className="mt-2 flex items-baseline gap-2">
-                <span className="font-heading text-5xl leading-tight font-extrabold text-purple md:text-6xl">
+                <span className="font-heading text-5xl leading-tight font-extrabold text-purple-strong md:text-6xl">
                   {days}
                 </span>
                 <span className="text-sm font-extrabold text-text md:text-base">
@@ -260,7 +260,7 @@ function StatTile({
 }) {
   return (
     <div className="rounded-2xl border border-border bg-bg px-3 py-2.5 shadow-panel-sm">
-      <div className="flex items-center gap-1.5 text-purple">
+      <div className="flex items-center gap-1.5 text-purple-strong">
         {icon}
         <span className="truncate text-[10px] font-extrabold text-muted md:text-xs">
           {label}

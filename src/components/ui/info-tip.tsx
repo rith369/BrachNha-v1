@@ -245,7 +245,7 @@ export function InfoTip({
           trigger
             ? "cursor-help rounded-md"
             : // -m-1 p-1 widens the tap target without moving the title's layout.
-              "-m-1 cursor-pointer rounded-full p-1 text-muted transition-colors hover:text-text aria-expanded:text-purple",
+              "-m-1 cursor-pointer rounded-full p-1 text-muted transition-colors hover:text-text aria-expanded:text-purple-strong",
           triggerClassName
         )}
       >

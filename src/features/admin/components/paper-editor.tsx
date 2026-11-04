@@ -555,7 +555,7 @@ function SkillsPanel({
           {t.addSkill}
         </button>
       </div>
-      {newId && taken && <p className="mt-1 text-[11px] font-bold text-pink">{t.skillIdBad}</p>}
+      {newId && taken && <p className="mt-1 text-[11px] font-bold text-pink-strong">{t.skillIdBad}</p>}
     </section>
   );
 }

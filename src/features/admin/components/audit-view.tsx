@@ -181,7 +181,7 @@ function EntryRow({ entry, lang }: { entry: AuditEntry; lang: Lang }) {
           {content && (
             <Link
               to={`/admin/content/${content.kind}/${content.key}`}
-              className="font-extrabold text-purple"
+              className="font-extrabold text-purple-strong"
             >
               {c.openContent}
             </Link>
@@ -278,7 +278,7 @@ export function AuditView() {
       {!isOwner && <p className="mb-1 text-xs font-semibold text-muted">{c.ownerOnlyNote}</p>}
 
       {load.state === "loading" && <p className="mt-4 text-sm font-bold text-muted">{admin.loading}</p>}
-      {load.state === "failed" && <p className="mt-4 text-sm font-bold text-pink">{admin.failed}</p>}
+      {load.state === "failed" && <p className="mt-4 text-sm font-bold text-pink-strong">{admin.failed}</p>}
 
       {load.state === "ready" && (
         <>
@@ -355,7 +355,7 @@ export function AuditView() {
                 <p className="text-xs font-bold text-muted">{c.end}</p>
               )}
               {moreFailed && (
-                <p role="alert" className="mt-2 text-xs font-bold text-pink">
+                <p role="alert" className="mt-2 text-xs font-bold text-pink-strong">
                   {admin.failed}
                 </p>
               )}

@@ -42,7 +42,7 @@ export function MissionGift({
       <p
         role="status"
         className={cn(
-          "flex items-center justify-center gap-1.5 text-xs font-extrabold text-mint",
+          "flex items-center justify-center gap-1.5 text-xs font-extrabold text-mint-strong",
           justOpened && "animate-streak-pop",
           className
         )}

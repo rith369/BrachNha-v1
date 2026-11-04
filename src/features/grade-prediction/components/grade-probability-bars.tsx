@@ -34,7 +34,7 @@ export function GradeProbabilityBars({
             <div key={grade} className="flex items-center gap-3">
               <div
                 className={`w-4 shrink-0 font-heading text-sm font-extrabold ${
-                  isMostLikely ? "text-purple" : "text-muted"
+                  isMostLikely ? "text-purple-strong" : "text-muted"
                 }`}
               >
                 {grade}
@@ -47,7 +47,7 @@ export function GradeProbabilityBars({
               </div>
               <div
                 className={`w-10 shrink-0 text-right text-xs font-extrabold transition-all duration-500 ${
-                  isMostLikely ? "text-purple" : "text-muted"
+                  isMostLikely ? "text-purple-strong" : "text-muted"
                 }`}
               >
                 {pct}%

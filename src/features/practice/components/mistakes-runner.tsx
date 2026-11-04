@@ -192,7 +192,7 @@ function QuestionStep({
       }
     >
       <div className={focusCard}>
-        <div className="mb-2.5 text-xs font-extrabold text-purple md:text-sm">{question.title}</div>
+        <div className="mb-2.5 text-xs font-extrabold text-purple-strong md:text-sm">{question.title}</div>
 
         {/* A past paper's sub-question means nothing without its exercise. */}
         {question.statement && (

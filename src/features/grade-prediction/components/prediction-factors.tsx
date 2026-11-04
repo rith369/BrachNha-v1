@@ -63,7 +63,7 @@ export function PredictionFactors({
           narrower than the 288px a 320px phone already gives them. */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-1 2xl:grid-cols-2">
         <div>
-          <div className="mb-1.5 text-[11px] font-extrabold tracking-wide text-mint uppercase">
+          <div className="mb-1.5 text-[11px] font-extrabold tracking-wide text-mint-strong uppercase">
             {t.positiveFactors}
           </div>
           <ul className="flex flex-col gap-1">
@@ -72,14 +72,14 @@ export function PredictionFactors({
             )}
             {positives.map((line) => (
               <li key={line} className="flex items-start gap-1.5 text-xs font-bold">
-                <span className="text-mint">✓</span>
+                <span className="text-mint-strong">✓</span>
                 <span>{line}</span>
               </li>
             ))}
           </ul>
         </div>
         <div>
-          <div className="mb-1.5 text-[11px] font-extrabold tracking-wide text-pink uppercase">
+          <div className="mb-1.5 text-[11px] font-extrabold tracking-wide text-pink-strong uppercase">
             {t.areasToImprove}
           </div>
           <ul className="flex flex-col gap-1">
@@ -88,7 +88,7 @@ export function PredictionFactors({
             )}
             {improvements.map((line) => (
               <li key={line} className="flex items-start gap-1.5 text-xs font-bold">
-                <span className="text-pink">⚠</span>
+                <span className="text-pink-strong">⚠</span>
                 <span>{line}</span>
               </li>
             ))}

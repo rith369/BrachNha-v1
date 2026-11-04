@@ -246,7 +246,7 @@ export function StudyCalendar() {
         {!onThisMonth && (
           <button
             onClick={() => setShown(thisMonth)}
-            className="ml-auto rounded-full border border-border bg-purple/8 px-2.5 py-0.5 [font-family:var(--font-body),sans-serif] text-[11px] font-extrabold text-purple transition active:scale-95"
+            className="ml-auto rounded-full border border-border bg-purple/8 px-2.5 py-0.5 [font-family:var(--font-body),sans-serif] text-[11px] font-extrabold text-purple-strong transition active:scale-95"
           >
             {t.calendarToday}
           </button>
@@ -256,13 +256,13 @@ export function StudyCalendar() {
       <div className="mb-4 grid grid-cols-2 gap-2">
         <Stat
           icon={Flame}
-          tone="text-yellow"
+          tone="text-yellow-strong"
           value={daysLabel(streak, lang)}
           label={t.calendarCurrentStreak}
         />
         <Stat
           icon={Trophy}
-          tone="text-purple"
+          tone="text-purple-strong"
           value={daysLabel(best, lang)}
           label={t.calendarBestStreak}
         />
@@ -273,7 +273,7 @@ export function StudyCalendar() {
           onClick={() => setShown(addMonths(shown, -1))}
           disabled={!canPrev}
           aria-label={t.previousMonth}
-          className="rounded-lg p-1.5 text-purple transition hover:bg-purple/8 disabled:opacity-30 disabled:hover:bg-transparent"
+          className="rounded-lg p-1.5 text-purple-strong transition hover:bg-purple/8 disabled:opacity-30 disabled:hover:bg-transparent"
         >
           <ChevronLeft className="size-4" strokeWidth={2.75} />
         </button>
@@ -282,7 +282,7 @@ export function StudyCalendar() {
           <div
             className={cn(
               "text-[11px] font-bold",
-              examShown && futureMonth ? "text-pink" : "text-muted"
+              examShown && futureMonth ? "text-pink-strong" : "text-muted"
             )}
           >
             {examShown && futureMonth
@@ -296,7 +296,7 @@ export function StudyCalendar() {
           onClick={() => setShown(addMonths(shown, 1))}
           disabled={!canNext}
           aria-label={t.nextMonth}
-          className="rounded-lg p-1.5 text-purple transition hover:bg-purple/8 disabled:opacity-30 disabled:hover:bg-transparent"
+          className="rounded-lg p-1.5 text-purple-strong transition hover:bg-purple/8 disabled:opacity-30 disabled:hover:bg-transparent"
         >
           <ChevronRight className="size-4" strokeWidth={2.75} />
         </button>
@@ -356,13 +356,13 @@ export function StudyCalendar() {
                   goal
                     ? "text-white"
                     : studied || saved
-                      ? "text-purple"
+                      ? "text-purple-strong"
                       : isExam
-                        ? "text-pink"
+                        ? "text-pink-strong"
                         : isToday
                           ? "text-text"
                           : isFuture
-                            ? "text-muted/40"
+                            ? "text-muted/80"
                             : "text-muted"
                 )}
               >
@@ -432,7 +432,7 @@ export function StudyCalendar() {
           </span>
         )}
         {examShown && (
-          <span className="flex items-center gap-1.5 text-pink">
+          <span className="flex items-center gap-1.5 text-pink-strong">
             <GraduationCap className="size-3.5" strokeWidth={2.5} aria-hidden />
             {t.examDate}
           </span>

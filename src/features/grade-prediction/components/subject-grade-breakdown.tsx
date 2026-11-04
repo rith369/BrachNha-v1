@@ -15,9 +15,9 @@ const SUBJECT_ICONS: Record<string, string> = {
 };
 
 function gradeColor(grade: string) {
-  if (grade === "A" || grade === "B") return "text-mint";
-  if (grade === "C") return "text-yellow";
-  return "text-pink";
+  if (grade === "A" || grade === "B") return "text-mint-strong";
+  if (grade === "C") return "text-yellow-strong";
+  return "text-pink-strong";
 }
 
 function gradeBarColor(grade: string) {
@@ -36,9 +36,9 @@ function statusKey(pct: number): TranslationKey {
 }
 
 function statusColor(pct: number) {
-  if (pct >= 80) return "text-mint";
-  if (pct >= 65) return "text-yellow";
-  return "text-pink";
+  if (pct >= 80) return "text-mint-strong";
+  if (pct >= 65) return "text-yellow-strong";
+  return "text-pink-strong";
 }
 
 export function SubjectGradeBreakdown({
@@ -66,10 +66,10 @@ export function SubjectGradeBreakdown({
         <div className="mb-3 flex items-center gap-2.5 rounded-2xl border border-border bg-pink/8 p-3">
           <span className="text-xl">⚠️</span>
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-extrabold text-pink">
+            <div className="text-sm font-extrabold text-pink-strong">
               {t[weakest.subject as TranslationKey] ?? weakest.subject}
             </div>
-            <div className="text-[11px] font-bold text-pink/80">
+            <div className="text-[11px] font-bold text-pink-strong/80">
               {weakest.pct}% · {t[statusKey(weakest.pct)]}
             </div>
           </div>
@@ -93,7 +93,7 @@ export function SubjectGradeBreakdown({
                   <div className={`text-[10px] font-extrabold ${statusColor(s.pct)}`}>
                     {t[statusKey(s.pct)]}
                     {delta !== 0 && (
-                      <span className={delta > 0 ? "text-mint" : "text-pink"}>
+                      <span className={delta > 0 ? "text-mint-strong" : "text-pink-strong"}>
                         {" "}
                         {delta > 0 ? "▲" : "▼"} {Math.abs(delta)}%
                       </span>

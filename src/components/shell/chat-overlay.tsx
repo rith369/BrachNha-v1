@@ -209,7 +209,7 @@ const QUICK_QS = {
 const NO_MSGS: ChatMsg[] = [];
 
 const iconBtn =
-  "flex size-8 shrink-0 items-center justify-center rounded-full bg-purple/10 text-purple transition hover:bg-purple/20 disabled:opacity-40";
+  "flex size-8 shrink-0 items-center justify-center rounded-full bg-purple/10 text-purple-strong transition hover:bg-purple/20 disabled:opacity-40";
 
 export function ChatOverlay() {
   const lang = useBrachNhaStore((s) => s.lang);
@@ -679,7 +679,7 @@ export function ChatOverlay() {
                   <button
                     key={q}
                     onClick={() => send(q)}
-                    className="rounded-full border border-border bg-surface px-3 py-1.5 text-left text-xs font-bold text-purple transition hover:bg-purple/10"
+                    className="rounded-full border border-border bg-surface px-3 py-1.5 text-left text-xs font-bold text-purple-strong transition hover:bg-purple/10"
                   >
                     {/* The exercise chip is LaTeX, so it typesets here exactly as
                         it will in the student's bubble once sent. Plain chips
@@ -745,7 +745,7 @@ export function ChatOverlay() {
             <div className="flex justify-start">
               <button
                 onClick={() => send(SHOW_SOLUTION[lang])}
-                className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-extrabold text-purple transition hover:bg-purple/10"
+                className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-extrabold text-purple-strong transition hover:bg-purple/10"
               >
                 <Lightbulb className="size-3.5" strokeWidth={2.5} />
                 {lang === "en" ? "Show full solution" : "បង្ហាញដំណោះស្រាយពេញ"}
@@ -760,7 +760,7 @@ export function ChatOverlay() {
           <div className="flex justify-start">
             <button
               onClick={() => void retry()}
-              className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-extrabold text-purple transition hover:bg-purple/10"
+              className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-extrabold text-purple-strong transition hover:bg-purple/10"
             >
               <RotateCcw className="size-3.5" strokeWidth={2.5} />
               {lang === "en" ? "Try again" : "ព្យាយាមម្តងទៀត"}
@@ -801,7 +801,7 @@ export function ChatOverlay() {
           <div
             className={cn(
               "mb-2 px-1 text-xs font-bold",
-              left === 0 ? "text-pink" : "text-muted"
+              left === 0 ? "text-pink-strong" : "text-muted"
             )}
           >
             {leftLine(left, attachment?.status === "ready", lang)}
@@ -1045,7 +1045,7 @@ function HistoryPanel({
       <div className="mx-auto flex w-full max-w-2xl shrink-0 items-center justify-between gap-2 border-b border-border px-4 pt-4 pb-3">
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 rounded-full bg-purple/10 px-3 py-1.5 text-xs font-extrabold text-purple transition hover:bg-purple/20"
+          className="flex items-center gap-1.5 rounded-full bg-purple/10 px-3 py-1.5 text-xs font-extrabold text-purple-strong transition hover:bg-purple/20"
         >
           <ArrowLeft className="size-3.5" strokeWidth={2.75} />
           {t.back}
@@ -1104,7 +1104,7 @@ function HistoryPanel({
                     <div className="flex shrink-0 items-center gap-1.5">
                       <button
                         onClick={() => setConfirmingId(null)}
-                        className="rounded-full border border-border bg-surface px-2.5 py-1 text-[11px] font-extrabold text-purple"
+                        className="rounded-full border border-border bg-surface px-2.5 py-1 text-[11px] font-extrabold text-purple-strong"
                       >
                         {t.cancelDelete}
                       </button>
@@ -1122,7 +1122,7 @@ function HistoryPanel({
                     <button
                       onClick={() => setConfirmingId(c.id)}
                       aria-label={t.deleteChat}
-                      className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted transition hover:bg-pink/10 hover:text-pink"
+                      className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted transition hover:bg-pink/10 hover:text-pink-strong"
                     >
                       <Trash2 className="size-4" strokeWidth={2.25} />
                     </button>

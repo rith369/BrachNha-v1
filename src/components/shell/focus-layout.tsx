@@ -89,7 +89,7 @@ export function FocusLayout({
           </button>
           <button
             onClick={onExit}
-            className="rounded-2xl border border-border bg-pink/30 px-6 py-3 text-sm font-extrabold text-pink"
+            className="rounded-2xl border border-border bg-pink/30 px-6 py-3 text-sm font-extrabold text-pink-strong"
           >
             {lang === "en" ? "Leave" : "ចាកចេញ"}
           </button>
@@ -163,7 +163,7 @@ export function FocusLayout({
               <button
                 onClick={onBack}
                 aria-label={lang === "en" ? "Back" : "ថយក្រោយ"}
-                className="flex shrink-0 items-center justify-center rounded-2xl border border-border bg-purple/8 px-4 text-purple transition hover:bg-purple/15 md:px-5"
+                className="flex shrink-0 items-center justify-center rounded-2xl border border-border bg-purple/8 px-4 text-purple-strong transition hover:bg-purple/15 md:px-5"
               >
                 <ChevronLeft className="size-5 md:size-6" strokeWidth={2.5} />
               </button>
@@ -199,7 +199,7 @@ export function FocusButton({
         "w-full rounded-2xl px-6 py-3.5 text-sm font-extrabold transition disabled:opacity-40 md:py-4 md:text-base lg:text-lg " +
         (variant === "primary"
           ? "bg-brand text-white shadow-cta"
-          : "border border-border bg-purple/8 text-purple")
+          : "border border-border bg-purple/8 text-purple-strong")
       }
     >
       {children}

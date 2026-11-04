@@ -89,7 +89,7 @@ export function StatBar({
                 ? "ប្តូរទៅភ្លឺ"
                 : "ប្តូរទៅងងឹត"
           }
-          className="flex size-7 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-muted shadow-panel-sm transition hover:text-purple"
+          className="flex size-7 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-muted shadow-panel-sm transition hover:text-purple-strong"
         >
           {dark ? (
             <Sun className="size-3.5" strokeWidth={2.5} />

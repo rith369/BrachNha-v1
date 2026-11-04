@@ -136,7 +136,7 @@ export function IntroView({ onDone }: { onDone: () => void }) {
           <button
             onClick={onDone}
             className={cn(
-              "rounded-full px-3 py-1.5 text-sm font-bold text-muted transition hover:text-purple",
+              "rounded-full px-3 py-1.5 text-sm font-bold text-muted transition hover:text-purple-strong",
               last && "invisible",
             )}
             tabIndex={last ? -1 : 0}
@@ -223,7 +223,7 @@ export function IntroView({ onDone }: { onDone: () => void }) {
                   <button
                     onClick={() => go(index - 1)}
                     aria-label="ថយក្រោយ"
-                    className="grid w-14 shrink-0 place-items-center rounded-2xl border border-border bg-surface text-muted shadow-panel-sm transition hover:text-purple active:scale-95"
+                    className="grid w-14 shrink-0 place-items-center rounded-2xl border border-border bg-surface text-muted shadow-panel-sm transition hover:text-purple-strong active:scale-95"
                   >
                     <ArrowLeft className="size-5" />
                   </button>

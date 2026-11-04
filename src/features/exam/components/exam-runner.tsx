@@ -119,7 +119,7 @@ export function ExamRunner({
       }
     >
       <div className={focusCard}>
-        <div className={`mb-2.5 text-purple ${focusKicker}`}>{label}</div>
+        <div className={`mb-2.5 text-purple-strong ${focusKicker}`}>{label}</div>
         <div className={`mb-4 md:mb-6 ${focusPrompt}`}>{q.q[lang]}</div>
         <div className="flex flex-col gap-2 md:gap-3">
           {q.options.map((opt) => (

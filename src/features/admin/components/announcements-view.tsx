@@ -198,7 +198,7 @@ function ComposeCard({ lang, onPublished }: { lang: Lang; onPublished: () => voi
           onChange={(e) => setLink(e.target.value)}
           className={cn(field, !linkOk && "border-pink")}
         />
-        <span className={cn("text-[10px] font-semibold", linkOk ? "text-muted" : "text-pink")}>
+        <span className={cn("text-[10px] font-semibold", linkOk ? "text-muted" : "text-pink-strong")}>
           {linkOk ? c.fieldLinkHint : c.errors.link}
         </span>
       </label>
@@ -246,12 +246,12 @@ function ComposeCard({ lang, onPublished }: { lang: Lang; onPublished: () => voi
         {busy ? c.working : c.publish}
       </button>
       {done && (
-        <p role="status" className="mt-2 text-xs font-bold text-mint">
+        <p role="status" className="mt-2 text-xs font-bold text-mint-strong">
           {c.published}
         </p>
       )}
       {error && (
-        <p role="alert" className="mt-2 text-xs font-bold text-pink">
+        <p role="alert" className="mt-2 text-xs font-bold text-pink-strong">
           {error === "dash" ? c.annDash : c.errors[error]}
         </p>
       )}
@@ -307,7 +307,7 @@ function AnnouncementRow({
       {item.bodyEn && (
         <p className="text-xs font-semibold text-muted [overflow-wrap:anywhere]">{item.bodyEn}</p>
       )}
-      {item.link && <p className="mt-0.5 font-mono text-[11px] text-purple">{item.link}</p>}
+      {item.link && <p className="mt-0.5 font-mono text-[11px] text-purple-strong">{item.link}</p>}
       <p className="mt-1 text-[10px] font-bold text-muted">
         {c.publishedBy(item.createdByName, whenLabel(item.createdAt, lang))}
         {" · "}
@@ -328,7 +328,7 @@ function AnnouncementRow({
         </button>
       )}
       {error && (
-        <p role="alert" className="mt-1.5 text-xs font-bold text-pink">
+        <p role="alert" className="mt-1.5 text-xs font-bold text-pink-strong">
           {c.errors[error]}
         </p>
       )}
@@ -374,7 +374,7 @@ export function AnnouncementsView() {
         <div className={CARD}>
           <h2 className="mb-3 font-heading text-sm font-extrabold">{c.listTitle}</h2>
           {load.state === "loading" && <p className="text-sm font-bold text-muted">{c.loading}</p>}
-          {load.state === "failed" && <p className="text-sm font-bold text-pink">{c.failed}</p>}
+          {load.state === "failed" && <p className="text-sm font-bold text-pink-strong">{c.failed}</p>}
           {load.state === "ready" && items.length === 0 && (
             <p className="text-xs font-bold text-muted">{c.listEmpty}</p>
           )}

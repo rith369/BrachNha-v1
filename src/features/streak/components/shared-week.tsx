@@ -61,7 +61,7 @@ export function SharedWeek({
               <div
                 className={cn(
                   "text-[9px] font-extrabold tracking-wide uppercase md:text-[10px]",
-                  isToday ? "text-purple" : "text-muted"
+                  isToday ? "text-purple-strong" : "text-muted"
                 )}
               >
                 {label}
@@ -92,7 +92,7 @@ export function SharedWeek({
                 <Dot done={day.friend} />
               </div>
 
-              <div className="h-4 text-[8px] font-extrabold text-purple md:text-[9px]">
+              <div className="h-4 text-[8px] font-extrabold text-purple-strong md:text-[9px]">
                 {isToday ? c.today : ""}
               </div>
             </div>
@@ -122,8 +122,8 @@ export function SharedWeek({
  */
 const STATUS_STYLE: Record<SharedDayStatus, string> = {
   kept: "bg-flame text-white",
-  protected: "border-2 border-purple text-purple",
-  atRisk: "border-2 border-yellow/70 text-yellow",
+  protected: "border-2 border-purple text-purple-strong",
+  atRisk: "border-2 border-yellow/70 text-yellow-strong",
   broken: "border-2 border-dashed border-border text-muted",
   before: "bg-control text-muted",
 };

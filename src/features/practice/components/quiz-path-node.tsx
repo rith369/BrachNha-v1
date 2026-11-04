@@ -112,13 +112,13 @@ export function QuizPathNode({
         <span className="pointer-events-none absolute -top-8 left-1/2 z-10 -translate-x-1/2">
           <span
             className="animate-start-bob relative block rounded-lg px-2.5 py-1 text-[10px] font-extrabold whitespace-nowrap text-white shadow-panel-sm"
-            style={{ backgroundColor: c.fill }}
+            style={{ backgroundColor: c.deep }}
           >
             ចាប់ផ្តើម
             {/* the tail */}
             <span
               className="absolute -bottom-1 left-1/2 size-2 -translate-x-1/2 rotate-45"
-              style={{ backgroundColor: c.fill }}
+              style={{ backgroundColor: c.deep }}
             />
           </span>
         </span>

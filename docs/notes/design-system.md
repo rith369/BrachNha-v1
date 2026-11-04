@@ -148,3 +148,33 @@ built to darken away from white has no useful bottom end when it's brightening
 instead. `SignaturePad` redraws its canvas in a `requestAnimationFrame` on theme
 change: it reads `--color-purple` off the element, and React runs child effects
 before `AppShell`'s, so a synchronous redraw would read the outgoing theme.
+
+## Text contrast, measured (4 Nov 2026)
+
+An accessibility scan of 22 screens in both themes, as a cheap phone at 360px in Khmer, found **153 spots under
+4.5:1** (92 light, 61 dark). After this change there are **10**, every one the title or description on a
+subject card dimmed because it is not available yet. That is an inactive control, which the standard exempts.
+Its "ឆាប់ៗនេះ" chip, the part that says why, now passes.
+
+- **A third accent scale, `--color-<accent>-strong`, for TEXT.** `--color-*` stays the bright value for icons,
+  borders, tints and charts. As text on white the light theme's mint was 2.5:1 and yellow 2.1:1. Every
+  `text-pink|purple|blue|mint|yellow` in the app became `text-*-strong`. **New accent text uses `-strong`.**
+- **Icons kept the bright value**, because a shape needs only 3:1. A self-closing component tag was put back,
+  and so were the colour maps that only feed icons (`stat-bar`, `callout`, `feedback-accordion`). Where ONE
+  class colours both an icon and its number (Profile's stat tiles, the calendar's two tiles), both are strong.
+- **Yellow cannot be yellow and readable on white.** As text it is amber (`#9a4705`). The bright yellow stays
+  on icons and fills.
+- **`--subject-*-deep`, for a subject fill under white TEXT:** the lesson banners, the bobbing "Start" bubble
+  and Practice's lesson rows. White on the supplied 500s was 2.3 to 4.5:1. Play buttons and path nodes keep
+  `--subject-*`, since a white glyph needs only 3:1. `SubjectStyle.deep` carries it.
+- **Five `--color-subj-*` one step deeper in light** (math, history, biology, english, khmer). On their own 8%
+  card tint over the cream page they were 4.0 to 4.4:1.
+- **Dimmed cards stay dimmed** (`opacity-60` is the project's rule for "not available"), and the chip inside
+  takes `text-text` rather than `text-muted`, which is 4.7:1 even at 60%.
+- **Calendar days not yet reached:** `text-muted/80`, from `/40`. Still fainter than past days.
+- **Two small text-on-fill lines lost their fade:** the banner's chapter line (`opacity-80`) and Practice's
+  row subtitle (`opacity-90`). The banner count chip is `bg-black/20`, which white text passes on.
+
+**How it was checked:** axe-core 4.10 `color-contrast` on the production build before and after, both themes,
+22 routes, with a seeded student so the calendar, streak and leaderboard draw their real colours. Screenshots
+compared by eye. **Not checked:** a real phone in sunlight, and screens that need states the seed does not make.

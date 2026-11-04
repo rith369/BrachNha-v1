@@ -63,7 +63,7 @@ export function ExamResults({
       </button>
       <button
         onClick={onBack}
-        className="block w-full rounded-2xl border border-border bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple"
+        className="block w-full rounded-2xl border border-border bg-purple/8 px-6 py-3 text-sm font-extrabold text-purple-strong"
       >
         ← ត្រឡប់
       </button>

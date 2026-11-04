@@ -18,11 +18,11 @@ import { focusCard, focusKicker, focusLabel, focusPrompt } from "@/utils/focus-s
 export function PaperWritingStep({ writing }: { writing: PaperWriting }) {
   return (
     <div className={focusCard}>
-      <div className={`mb-2.5 text-purple ${focusKicker}`}>{writing.title}</div>
+      <div className={`mb-2.5 text-purple-strong ${focusKicker}`}>{writing.title}</div>
       <div className={`mb-4 ${focusPrompt}`}>{writing.prompt}</div>
 
       <div className="rounded-xl border border-border bg-purple/5 p-3 md:p-4">
-        <div className={`mb-1.5 flex items-center gap-1.5 text-purple ${focusLabel}`}>
+        <div className={`mb-1.5 flex items-center gap-1.5 text-purple-strong ${focusLabel}`}>
           <PenLine className="size-4 shrink-0" strokeWidth={2.5} />
           សរសេរនៅលើក្រដាស
         </div>

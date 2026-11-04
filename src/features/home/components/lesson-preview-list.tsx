@@ -66,10 +66,10 @@ const COPY = {
 /** Chip colour per reason. Per-theme `--color-*` tints — text on a tint, not
  *  white on a fill — so no dark: override is needed. */
 const REASON_CHIP: Record<StudyReason, string> = {
-  continue: "bg-purple/15 text-purple",
-  review: "bg-yellow/15 text-yellow",
-  next: "bg-blue/15 text-blue",
-  recommended: "bg-pink/15 text-pink",
+  continue: "bg-purple/15 text-purple-strong",
+  review: "bg-yellow/15 text-yellow-strong",
+  next: "bg-blue/15 text-blue-strong",
+  recommended: "bg-pink/15 text-pink-strong",
 };
 
 export function LessonPreviewList() {
@@ -93,7 +93,7 @@ export function LessonPreviewList() {
             {recommending ? c.recommendTitle : c.continueTitle}
           </span>
         </div>
-        <Link to="/lessons" className="shrink-0 text-xs font-extrabold text-purple">
+        <Link to="/lessons" className="shrink-0 text-xs font-extrabold text-purple-strong">
           {c.seeAll}
         </Link>
       </div>

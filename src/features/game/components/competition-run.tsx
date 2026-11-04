@@ -159,7 +159,7 @@ export function CompetitionRun({
           <span
             className={cn(
               "shrink-0 text-xs font-extrabold tabular-nums md:text-sm",
-              low ? "text-pink" : "text-muted"
+              low ? "text-pink-strong" : "text-muted"
             )}
           >
             <span className="font-bold">{t.timeLeft} </span>

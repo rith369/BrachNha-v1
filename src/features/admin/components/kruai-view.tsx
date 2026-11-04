@@ -55,7 +55,7 @@ function CardTitle({ children }: { children: ReactNode }) {
 
 function ErrorLine({ reason, lang }: { reason: AdminFail; lang: Lang }) {
   return (
-    <p role="alert" className="mt-2 text-xs font-bold text-pink">
+    <p role="alert" className="mt-2 text-xs font-bold text-pink-strong">
       {ADMIN_COPY[lang].errors[reason]}
     </p>
   );
@@ -314,12 +314,12 @@ function LimitsCard({
         {busy ? c.working : c.saveLimits}
       </button>
       {saved && (
-        <p role="status" className="mt-2 text-xs font-bold text-mint">
+        <p role="status" className="mt-2 text-xs font-bold text-mint-strong">
           {c.limitsSaved}
         </p>
       )}
       {error === "invalid" && (
-        <p role="alert" className="mt-2 text-xs font-bold text-pink">
+        <p role="alert" className="mt-2 text-xs font-bold text-pink-strong">
           {c.limitInvalid}
         </p>
       )}
@@ -446,7 +446,7 @@ export function KruaiView() {
     <>
       <p className="mb-4 text-xs font-semibold text-muted">{c.kruaiBlurb}</p>
       {load.state === "loading" && <p className="text-sm font-bold text-muted">{c.loading}</p>}
-      {load.state === "failed" && <p className="text-sm font-bold text-pink">{c.failed}</p>}
+      {load.state === "failed" && <p className="text-sm font-bold text-pink-strong">{c.failed}</p>}
       {load.state === "ready" && (
         <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
           <TodayCard data={load.data} lang={lang} />

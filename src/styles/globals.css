@@ -77,6 +77,22 @@
   --color-mint: #10b981;
   --color-yellow: #f59e0b;
 
+  /* ── Accent TEXT (4 Nov 2026) — a third scale, for text in an accent colour ──
+     The --color-* row above is right for icons, borders, tints and charts, but as
+     TEXT on white mint is 2.5:1 and yellow 2.1:1, and a cheap phone in sunlight
+     shows exactly that. Every `text-<accent>` in the app is `text-<accent>-strong`,
+     so only text moves and the bright look of everything else stays. Each passes
+     4.5:1 on white, the cream page, and its own 15% tint on either:
+       pink 5.7 · purple 5.2 · blue 5.6 · mint 5.7 · yellow 4.8 (worst case)
+     Yellow cannot be yellow and readable on white: as text it is amber. Icons drawn
+     in an accent need only 3:1, so they keep the bright --color-* value.
+     Use `text-<accent>-strong` for any new accent text. */
+  --color-pink-strong: #9d174d;
+  --color-purple-strong: #6d28d9;
+  --color-blue-strong: #075985;
+  --color-mint-strong: #065f46;
+  --color-yellow-strong: #9a4705;
+
   /* ── Per-subject identity colours (Study page) ──────────────────────────
      TWO SCALES, for the same reason --brand-* and --color-* are two scales.
      Do not merge them; no single value clears AA in both roles.
@@ -104,14 +120,31 @@
   --subject-french: #ec4899;
   --subject-khmer: #f97316;
 
-  --color-subj-math: #2563eb;
+  /* The same hues two or three steps deeper, IDENTICAL in both themes, for a fill
+     under white TEXT: the lesson banners and Practice's lesson rows. White on the
+     supplied 500s is 2.3:1 to 4.5:1. On these it is 5.0:1 (history, biology) to
+     7.9:1 (physics). A white glyph needs only 3:1, so play buttons and path nodes
+     keep the brighter --subject-* above. */
+  --subject-math-deep: #1d4ed8;
+  --subject-physics-deep: #4338ca;
+  --subject-chemistry-deep: #0f766e;
+  --subject-history-deep: #b45309;
+  --subject-biology-deep: #15803d;
+  --subject-english-deep: #b91c1c;
+  --subject-french-deep: #be185d;
+  --subject-khmer-deep: #c2410c;
+
+  /* 4 Nov 2026: math, history, biology, english and khmer one step deeper. On
+     their own 8% card tint over the cream page they measured 4.0 to 4.4:1. The
+     worst case of each, on white, cream or either tint, is now 4.6:1 or more. */
+  --color-subj-math: #1d4ed8;
   --color-subj-physics: #4f46e5;
   --color-subj-chemistry: #0f766e;
-  --color-subj-history: #b45309;
-  --color-subj-biology: #15803d;
-  --color-subj-english: #dc2626;
+  --color-subj-history: #a14a0a;
+  --color-subj-biology: #166534;
+  --color-subj-english: #c81e1e;
   --color-subj-french: #be185d;
-  --color-subj-khmer: #c2410c;
+  --color-subj-khmer: #b03a0b;
 
   /* ── Surfaces: three intentional steps, page → card → elevated ── */
   /* NEOBRUTALISM: a warm cream page under white cards, near-black ink for text,
@@ -205,6 +238,16 @@
   --color-mint: #34d399;
   --color-yellow: #fbbf24;
 
+  /* Accent text on dark: the lifted accents already pass, except purple on its
+     own tint (4.4:1), which is one step lighter here. Worst case on the surface,
+     the page and each 15% tint: pink 4.6 · purple 5.5 · blue 5.7 · mint 6.3 ·
+     yellow 7.0. */
+  --color-pink-strong: #ff5fb0;
+  --color-purple-strong: #c49cf8;
+  --color-blue-strong: #38bdf8;
+  --color-mint-strong: #34d399;
+  --color-yellow-strong: #fbbf24;
+
   /* Lifted subject accents. --subject-* is deliberately NOT redefined here:
      it is a fill under white text, and lifting it would drop that pairing
      below AA — the same reason --brand-* is theme-independent.
@@ -269,6 +312,11 @@
   --color-blue: var(--color-blue);
   --color-mint: var(--color-mint);
   --color-yellow: var(--color-yellow);
+  --color-pink-strong: var(--color-pink-strong);
+  --color-purple-strong: var(--color-purple-strong);
+  --color-blue-strong: var(--color-blue-strong);
+  --color-mint-strong: var(--color-mint-strong);
+  --color-yellow-strong: var(--color-yellow-strong);
 
   /* Generates bg-subj-math / text-subj-math / border-subj-math, alpha included.
      Only the contrast-corrected scale is mapped — --subject-* is referenced

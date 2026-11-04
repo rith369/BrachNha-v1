@@ -114,7 +114,7 @@ function GoogleSignInButton({
       </button>
 
       {failed && (
-        <p className="mt-2 text-center text-xs font-bold text-pink">
+        <p className="mt-2 text-center text-xs font-bold text-pink-strong">
           {t.signInFailed}
         </p>
       )}

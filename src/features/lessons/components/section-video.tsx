@@ -137,7 +137,7 @@ const YOUTUBE_ID = /^[\w-]{11}$/;
  * class is not. Same reason callout.tsx's TONE spells all five variants out.
  */
 const PLAY_DISC =
-  "flex size-14 items-center justify-center rounded-full bg-white/90 text-purple shadow-panel md:size-16";
+  "flex size-14 items-center justify-center rounded-full bg-white/90 text-purple-strong shadow-panel md:size-16";
 
 /**
  * The player parameters, and the ones deliberately left out.

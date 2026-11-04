@@ -80,7 +80,7 @@ export function PaperGapFillStep({
 
   return (
     <div className={focusCard}>
-      <div className={`mb-2.5 text-purple ${focusKicker}`}>
+      <div className={`mb-2.5 text-purple-strong ${focusKicker}`}>
         {gapFill.title}
       </div>
 
@@ -139,7 +139,7 @@ export function PaperGapFillStep({
           <span className="text-xs font-extrabold text-muted md:text-sm">
             ជ្រើសពាក្យដាក់ក្នុងចន្លោះ
           </span>
-          <span className="text-xs font-extrabold text-purple md:text-sm">
+          <span className="text-xs font-extrabold text-purple-strong md:text-sm">
             {filled}/{answerable.length}
           </span>
         </div>

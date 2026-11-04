@@ -63,7 +63,7 @@ const LIP = 4;
  * not a coincidence: this is that same "lip" 3D button technique brought into
  * a row instead of a disc, so the two screens read as one material.
  *
- * A ROW WITH CONTENT is a solid-fill lip button: `style.fill` under white
+ * A ROW WITH CONTENT is a solid-fill lip button: `style.deep` under white
  * text, a hard `0 Npx 0 color-mix(...black)` shadow (no blur, so it reads as
  * an edge), and `active:translate-y` + `active:shadow-[0_0_0_...]` so it
  * presses flush into its own shadow on tap. The lip colour is mixed TOWARD
@@ -102,7 +102,7 @@ function LessonRow({
             {lessonHeading(lesson.lessonNumber, lesson.title)}
           </div>
           <div className="mt-1">
-            <span className="inline-block rounded-full bg-purple/8 px-2 py-0.5 text-[10px] font-extrabold text-muted">
+            <span className="inline-block rounded-full bg-purple/8 px-2 py-0.5 text-[10px] font-extrabold text-text">
               ឆាប់ៗនេះ
             </span>
           </div>
@@ -111,7 +111,7 @@ function LessonRow({
     );
   }
 
-  const lip = `color-mix(in srgb, ${style.fill} 62%, black)`;
+  const lip = `color-mix(in srgb, ${style.deep} 62%, black)`;
 
   return (
     <Link
@@ -119,7 +119,7 @@ function LessonRow({
       className="mb-4 flex items-center gap-3 rounded-2xl p-3.5 text-white transition-[transform,box-shadow] duration-75 active:translate-y-[4px] active:shadow-[0_0_0_var(--lip)]"
       style={
         {
-          backgroundColor: style.fill,
+          backgroundColor: style.deep,
           boxShadow: `0 ${LIP}px 0 ${lip}`,
           "--lip": lip,
         } as React.CSSProperties
@@ -131,7 +131,7 @@ function LessonRow({
         <div className="font-heading truncate text-sm font-extrabold md:text-base">
           {lessonHeading(lesson.lessonNumber, lesson.title)}
         </div>
-        <div className="mt-1 flex items-center gap-1 text-[11px] font-bold opacity-90 md:text-xs">
+        <div className="mt-1 flex items-center gap-1 text-[11px] font-bold md:text-xs">
           <Icon className="size-3 shrink-0" strokeWidth={2.5} />
           {lesson.count} {unit}
         </div>

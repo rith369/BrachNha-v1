@@ -142,7 +142,7 @@ export function CommitmentOverlay() {
             <button
               onClick={close}
               aria-label={c.close}
-              className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-purple active:scale-95"
+              className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-purple-strong active:scale-95"
             >
               <X className="size-4" strokeWidth={2.5} />
             </button>
@@ -161,7 +161,7 @@ export function CommitmentOverlay() {
                   flashcards: mission.flashcards,
                 })).map((seg, i) =>
                   seg.strong ? (
-                    <strong key={i} className="font-extrabold text-purple">
+                    <strong key={i} className="font-extrabold text-purple-strong">
                       {seg.text}
                     </strong>
                   ) : (
@@ -177,7 +177,7 @@ export function CommitmentOverlay() {
                   key={pill.label}
                   className="rounded-2xl border border-border bg-surface p-3 text-center shadow-panel-sm"
                 >
-                  <div className="font-heading text-lg font-extrabold text-purple">
+                  <div className="font-heading text-lg font-extrabold text-purple-strong">
                     {pill.value}
                   </div>
                   <div className="text-[10px] font-extrabold text-muted">

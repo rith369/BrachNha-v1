@@ -287,7 +287,7 @@ export function WeeklyActivityChart({ summary }: { summary: ProgressSummary }) {
           <span
             className={cn(
               "flex items-center gap-0.5 font-extrabold",
-              flat ? "text-muted" : up ? "text-mint" : "text-pink"
+              flat ? "text-muted" : up ? "text-mint-strong" : "text-pink-strong"
             )}
           >
             {flat ? c.noChangeWeek : c.changeWeek(weekChangePct)}

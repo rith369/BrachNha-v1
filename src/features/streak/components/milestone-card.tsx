@@ -74,8 +74,8 @@ export function MilestoneCard({ milestone }: { milestone: RankedMilestone }) {
       <div
         className={cn(
           "mt-0.5 rounded-full px-2 py-0.5 text-[9px] font-extrabold",
-          reached && "bg-mint/15 text-mint",
-          next && "bg-purple/15 text-purple",
+          reached && "bg-mint/15 text-mint-strong",
+          next && "bg-purple/15 text-purple-strong",
           !reached && !next && "bg-control text-muted"
         )}
       >

@@ -40,7 +40,7 @@ export function PredictionTrendChart({
         </div>
         <div
           className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-extrabold ${
-            trendUp ? "bg-mint/10 text-mint" : "bg-pink/10 text-pink"
+            trendUp ? "bg-mint/10 text-mint-strong" : "bg-pink/10 text-pink-strong"
           }`}
         >
           {trendUp ? "↑" : "↓"} {Math.abs(delta)}

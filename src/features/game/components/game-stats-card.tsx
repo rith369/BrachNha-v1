@@ -26,25 +26,25 @@ export function GameStatsCard({ rows }: { rows: MatchRow[] }) {
       <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
         <div className="grid grid-cols-4 gap-2 text-center">
           <div>
-            <div className="font-heading text-lg font-extrabold text-mint">
+            <div className="font-heading text-lg font-extrabold text-mint-strong">
               {stats.wins}
             </div>
             <div className="text-[10px] font-bold text-muted">{t.wins}</div>
           </div>
           <div>
-            <div className="font-heading text-lg font-extrabold text-pink">
+            <div className="font-heading text-lg font-extrabold text-pink-strong">
               {stats.losses}
             </div>
             <div className="text-[10px] font-bold text-muted">{t.losses}</div>
           </div>
           <div>
-            <div className="font-heading text-lg font-extrabold text-yellow">
+            <div className="font-heading text-lg font-extrabold text-yellow-strong">
               {stats.draws}
             </div>
             <div className="text-[10px] font-bold text-muted">{t.draws}</div>
           </div>
           <div>
-            <div className="font-heading text-lg font-extrabold text-purple">
+            <div className="font-heading text-lg font-extrabold text-purple-strong">
               {stats.winRate}%
             </div>
             <div className="text-[10px] font-bold text-muted">{t.winRate}</div>
@@ -53,13 +53,13 @@ export function GameStatsCard({ rows }: { rows: MatchRow[] }) {
 
         <div className="mt-4">
           <div className="mb-1.5 flex justify-between text-[10px] font-extrabold">
-            <span className="text-mint">
+            <span className="text-mint-strong">
               {t.winsShort} {stats.winPct}%
             </span>
-            <span className="text-yellow">
+            <span className="text-yellow-strong">
               {t.drawShort} {stats.drawPct}%
             </span>
-            <span className="text-pink">
+            <span className="text-pink-strong">
               {t.lossesShort} {stats.lossPct}%
             </span>
           </div>

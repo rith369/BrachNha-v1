@@ -122,7 +122,7 @@ export function NewMatchCard({ rows }: { rows: MatchRow[] }) {
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex w-fit items-center gap-1.5 rounded-full bg-surface/70 px-2.5 py-1">
           <span className="size-1.5 rounded-full bg-pink" />
-          <span className="text-[10px] font-extrabold text-pink">
+          <span className="text-[10px] font-extrabold text-pink-strong">
             {battle ? t.latestBattle : t.liveGame}
           </span>
         </div>
@@ -161,13 +161,13 @@ export function NewMatchCard({ rows }: { rows: MatchRow[] }) {
           )}
           <div className="truncate text-xs font-extrabold">{mine.name}</div>
           {battle && mine.score !== null && (
-            <div className="mt-1 font-heading text-sm font-extrabold text-pink">
+            <div className="mt-1 font-heading text-sm font-extrabold text-pink-strong">
               {mine.score}/{battle.total}
             </div>
           )}
         </div>
 
-        <div className="font-heading shrink-0 text-lg font-extrabold text-purple">
+        <div className="font-heading shrink-0 text-lg font-extrabold text-purple-strong">
           VS
         </div>
 
@@ -182,13 +182,13 @@ export function NewMatchCard({ rows }: { rows: MatchRow[] }) {
               <div className="truncate text-xs font-extrabold">
                 {battle.them.name}
               </div>
-              <div className="mt-1 font-heading text-sm font-extrabold text-blue">
+              <div className="mt-1 font-heading text-sm font-extrabold text-blue-strong">
                 {battle.them.score}/{battle.total}
               </div>
             </>
           ) : (
             <>
-              <div className="mx-auto mb-1.5 flex size-14 items-center justify-center rounded-full border-2 border-dashed border-border font-heading text-xl font-extrabold text-blue/60">
+              <div className="mx-auto mb-1.5 flex size-14 items-center justify-center rounded-full border-2 border-dashed border-border font-heading text-xl font-extrabold text-blue-strong/60">
                 ?
               </div>
               <div className="text-[11px] font-bold text-muted">
@@ -228,7 +228,7 @@ export function NewMatchCard({ rows }: { rows: MatchRow[] }) {
 
           <Link
             to={reviewTo}
-            className="mt-3 block text-center text-xs font-extrabold text-purple"
+            className="mt-3 block text-center text-xs font-extrabold text-purple-strong"
           >
             {t.seeAnswers} →
           </Link>

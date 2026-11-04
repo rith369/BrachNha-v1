@@ -303,7 +303,7 @@ function StartCard({
   const [agreed, setAgreed] = useState(false);
   return (
     <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
-      <div className="text-xs font-extrabold text-purple">វិញ្ញាសាបន្ទាប់</div>
+      <div className="text-xs font-extrabold text-purple-strong">វិញ្ញាសាបន្ទាប់</div>
       <div className="font-heading mt-1 text-lg font-extrabold text-text">{title}</div>
       <div className="mt-0.5 text-xs font-bold text-muted">
         {session.minutes} នាទី · {session.points} ពិន្ទុ
@@ -398,7 +398,7 @@ function RunningCard({
 
   return (
     <div className="rounded-2xl border border-border bg-surface p-4 shadow-panel">
-      <div className="flex items-center gap-1.5 text-xs font-extrabold text-pink">
+      <div className="flex items-center gap-1.5 text-xs font-extrabold text-pink-strong">
         <Hourglass className="size-3.5 shrink-0" strokeWidth={2.5} />
         កំពុងប្រឡង
       </div>

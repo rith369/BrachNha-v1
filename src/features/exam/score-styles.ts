@@ -12,9 +12,9 @@
  * is a style property a class cannot reach.
  */
 export function scoreColor(pct: number) {
-  if (pct >= 80) return "text-mint";
-  if (pct >= 60) return "text-yellow";
-  return "text-pink";
+  if (pct >= 80) return "text-mint-strong";
+  if (pct >= 60) return "text-yellow-strong";
+  return "text-pink-strong";
 }
 
 export function scoreColorHex(pct: number) {

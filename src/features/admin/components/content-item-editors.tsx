@@ -48,7 +48,7 @@ export function IssueLines({ issues, lang }: { issues: ContentIssue[]; lang: Lan
           key={i}
           className={cn(
             "text-[11px] font-bold [overflow-wrap:anywhere]",
-            issue.level === "error" ? "text-pink" : "text-muted"
+            issue.level === "error" ? "text-pink-strong" : "text-muted"
           )}
         >
           <InfoTip

@@ -272,7 +272,7 @@ export function ExamSimulationView() {
           <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-12 lg:gap-8">
             {/* Hero Left Content */}
             <div className="flex min-w-0 flex-col lg:col-span-7">
-              <div className="inline-flex items-center gap-1.5 text-xs font-extrabold text-purple">
+              <div className="inline-flex items-center gap-1.5 text-xs font-extrabold text-purple-strong">
                 <GraduationCap className="size-4 shrink-0" strokeWidth={2.5} />
                 <span>MoEYS Standard · Science Track (ថ្នាក់វិទ្យាសាស្ត្រ)</span>
               </div>
@@ -741,7 +741,7 @@ function SectionKicker({
   children: string;
 }) {
   return (
-    <div className="flex items-center gap-1.5 text-[11px] font-extrabold tracking-wider text-purple uppercase">
+    <div className="flex items-center gap-1.5 text-[11px] font-extrabold tracking-wider text-purple-strong uppercase">
       <Icon className="size-3.5" />
       <span>{children}</span>
     </div>

@@ -64,7 +64,7 @@ export function ProfileIdentity() {
           className="size-12 shrink-0 rounded-full object-cover shadow-panel-sm"
         />
       ) : isGuest ? (
-        <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-purple/10 text-purple">
+        <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-purple/10 text-purple-strong">
           <User className="size-6" strokeWidth={2.25} />
         </div>
       ) : (
@@ -119,7 +119,7 @@ export function ProfileIdentity() {
                   setEditing(true);
                 }}
                 aria-label={t.editName}
-                className="shrink-0 rounded-md p-1 text-muted transition hover:bg-purple/8 hover:text-purple"
+                className="shrink-0 rounded-md p-1 text-muted transition hover:bg-purple/8 hover:text-purple-strong"
               >
                 <Pencil className="size-3.5" strokeWidth={2.5} />
               </button>

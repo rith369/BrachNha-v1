@@ -130,13 +130,13 @@ export function WeaknessStep({
                   <div className="grid grid-cols-2 gap-1.5">
                     <button
                       onClick={() => answer(subject, "weak")}
-                      className="rounded-lg border border-border bg-pink/30 px-2 py-2 text-[11px] font-bold text-pink"
+                      className="rounded-lg border border-border bg-pink/30 px-2 py-2 text-[11px] font-bold text-pink-strong"
                     >
                       {t.weak}
                     </button>
                     <button
                       onClick={() => answer(subject, "notWeak")}
-                      className="rounded-lg border border-border bg-mint/30 px-2 py-2 text-[11px] font-bold text-mint"
+                      className="rounded-lg border border-border bg-mint/30 px-2 py-2 text-[11px] font-bold text-mint-strong"
                     >
                       {t.notWeak}
                     </button>

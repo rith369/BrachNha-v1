@@ -63,7 +63,7 @@ export function ScoreHero({ summary }: { summary: ProgressSummary }) {
           {changePct !== null && (
             <div
               className={`mt-1 text-xs font-extrabold ${
-                flat ? "text-muted" : up ? "text-mint" : "text-pink"
+                flat ? "text-muted" : up ? "text-mint-strong" : "text-pink-strong"
               }`}
             >
               {/* POINTS, not percent: this is the difference between two
@@ -119,7 +119,7 @@ export function ScoreHero({ summary }: { summary: ProgressSummary }) {
         <Metric
           value={String(summary.questionsThisMonth)}
           label={c.tileQuestions}
-          color="text-pink"
+          color="text-pink-strong"
           hint={c.hintQuestions}
         />
         {/* ACTIVE study minutes — see hooks/use-study-timer.ts for what counts —
@@ -131,13 +131,13 @@ export function ScoreHero({ summary }: { summary: ProgressSummary }) {
           value={formatStudyTime(summary.minutesThisMonth)}
           unit={c.hoursUnit}
           label={c.tileStudyTime}
-          color="text-blue"
+          color="text-blue-strong"
           hint={c.hintStudyTime}
         />
         <Metric
           value={`${streak}🔥`}
           label={c.tileStreak}
-          color="text-mint"
+          color="text-mint-strong"
           hint={c.hintStreak}
         />
         {/* THIS MONTH's XP, not the lifetime total. Lifetime would restate the
@@ -147,7 +147,7 @@ export function ScoreHero({ summary }: { summary: ProgressSummary }) {
         <Metric
           value={summary.xpThisMonth.toLocaleString("en-GB")}
           label={c.tileXp}
-          color="text-yellow"
+          color="text-yellow-strong"
           hint={c.hintXp}
         />
       </div>

@@ -164,7 +164,7 @@ export function AnswerReview({
  *  correctness would say it twice. */
 function PickChip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="max-w-20 truncate rounded-full bg-purple/15 px-1.5 py-0.5 text-[9px] font-extrabold text-purple">
+    <span className="max-w-20 truncate rounded-full bg-purple/15 px-1.5 py-0.5 text-[9px] font-extrabold text-purple-strong">
       {children}
     </span>
   );

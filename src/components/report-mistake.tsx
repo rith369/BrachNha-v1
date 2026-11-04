@@ -125,7 +125,7 @@ export function ReportMistake({
         className="w-full resize-none rounded-xl border border-border bg-surface px-3 py-2 text-xs font-semibold outline-none placeholder:text-muted focus:border-purple"
       />
       {error && (
-        <p role="alert" className="mt-1.5 text-xs font-bold text-pink">
+        <p role="alert" className="mt-1.5 text-xs font-bold text-pink-strong">
           {error === "too_many"
             ? "ថ្ងៃនេះអ្នកបានរាយការណ៍ច្រើនហើយ។ សូមព្យាយាមម្តងទៀតនៅថ្ងៃស្អែក។"
             : "មិនអាចផ្ញើបានទេ។ សូមពិនិត្យអ៊ីនធឺណិត រួចព្យាយាមម្តងទៀត។"}

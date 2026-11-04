@@ -77,7 +77,7 @@ export function FriendInviteView({ userId }: { userId: string | undefined }) {
             setLookup(null);
             setAttempt((n) => n + 1);
           }}
-          className="rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-extrabold text-purple"
+          className="rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-extrabold text-purple-strong"
         >
           {c.retry}
         </button>

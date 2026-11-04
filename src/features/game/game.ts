@@ -375,7 +375,7 @@ export function attemptFor(
  * assembled at runtime — Tailwind cannot see a class built from a variable.
  */
 export const OUTCOME_STYLE: Record<MatchOutcome, string> = {
-  win: "bg-mint/15 text-mint",
-  loss: "bg-pink/15 text-pink",
-  draw: "bg-yellow/15 text-yellow",
+  win: "bg-mint/15 text-mint-strong",
+  loss: "bg-pink/15 text-pink-strong",
+  draw: "bg-yellow/15 text-yellow-strong",
 };

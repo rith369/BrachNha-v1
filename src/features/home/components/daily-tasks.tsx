@@ -118,7 +118,7 @@ export function DailyTasks() {
                       {dayCounts[key]}/{target}
                     </span>
                   )}
-                  <span className="rounded-full bg-purple/15 px-2 py-1 text-[10px] font-extrabold text-purple">
+                  <span className="rounded-full bg-purple/15 px-2 py-1 text-[10px] font-extrabold text-purple-strong">
                     +20 XP
                   </span>
                   <ChevronRight className="size-4 shrink-0 text-muted" />
@@ -129,7 +129,7 @@ export function DailyTasks() {
         ) : (
           <div className="py-5 text-center">
             <PartyPopper className="mx-auto mb-2 size-10 text-mint" strokeWidth={2} />
-            <div className="font-heading text-sm font-extrabold text-mint">
+            <div className="font-heading text-sm font-extrabold text-mint-strong">
               {t.completedMsg}
             </div>
           </div>
@@ -138,7 +138,7 @@ export function DailyTasks() {
           <p
             className={cn(
               "flex items-center gap-1.5 text-xs font-bold",
-              streakKept ? "text-mint" : "text-muted"
+              streakKept ? "text-mint-strong" : "text-muted"
             )}
           >
             <Flame

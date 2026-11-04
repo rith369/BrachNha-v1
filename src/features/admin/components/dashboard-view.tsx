@@ -417,7 +417,7 @@ function Dashboard({ data, lang }: { data: AdminDashboard; lang: Lang }) {
         )}
         <Link
           to="/admin/errors"
-          className="mt-3 inline-flex items-center gap-1 text-xs font-extrabold text-purple"
+          className="mt-3 inline-flex items-center gap-1 text-xs font-extrabold text-purple-strong"
         >
           {c.crashesAll}
           <ChevronRight className="size-3.5" strokeWidth={2.5} />
@@ -456,7 +456,7 @@ export function DashboardView() {
       <p className="mb-4 text-xs font-semibold text-muted">{c.hubBlurb}</p>
       <Tools lang={lang} />
       {load.state === "loading" && <p className="text-sm font-bold text-muted">{c.loading}</p>}
-      {load.state === "failed" && <p className="text-sm font-bold text-pink">{c.failed}</p>}
+      {load.state === "failed" && <p className="text-sm font-bold text-pink-strong">{c.failed}</p>}
       {load.state === "ready" && <Dashboard data={load.data} lang={lang} />}
     </>
   );

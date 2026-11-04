@@ -16,6 +16,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 4 Nov 2026: Easier-to-Read Colours
+
+Commit: `HASH_HERE`. No database step.
+
+Some text was too pale to read on a phone in sunlight: green, yellow and pink words on white, white words on
+the bright lesson banners, grey "coming soon" labels and faint calendar dates. A scan of 22 screens found 153
+such spots across light and dark mode. Now 10 are left, all on subject cards that are greyed out on purpose
+because they are not available yet.
+
+**What students will notice:** coloured text is a little deeper (green, pink, blue), yellow text is now amber,
+and the lesson banners on the Lessons and Quiz paths are a deeper shade of the subject's colour. Icons, buttons,
+progress bars and backgrounds keep their bright colours. The browser tab now reads "BrachNha: Bac II AI Mentor".
+
+**To re-test, please:** open Home, Lessons, a subject path, Practice, Profile and Streak in light and dark mode,
+and check the colours still feel like BrachNha. If any looks wrong, tell the developer which screen.
+
 ## 3 Nov 2026: Limit on Rows per Student
 
 Commit: `c7c2db7`. **Database step:** run `20261103000009_row_limits_per_student.sql` in the Supabase

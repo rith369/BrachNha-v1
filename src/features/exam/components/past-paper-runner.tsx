@@ -217,7 +217,7 @@ export function PastPaperRunner({
           className={cn(
             "inline-flex items-center gap-1",
             // Under a minute the clock is the only thing that matters.
-            deadline - now <= 60_000 && "text-pink",
+            deadline - now <= 60_000 && "text-pink-strong",
           )}
         >
           <Timer className="size-3.5 shrink-0" strokeWidth={2.5} />
@@ -262,7 +262,7 @@ export function PastPaperRunner({
 
         {step.kind === "question" && (
           <div className={focusCard}>
-            <div className={`mb-2.5 text-purple ${focusKicker}`}>
+            <div className={`mb-2.5 text-purple-strong ${focusKicker}`}>
               {kicker} · {step.section.title}
             </div>
             {/* MathText, not plain text: a maths paper's prompt is LaTeX inside
@@ -333,7 +333,7 @@ function LeaveWarning({ leaves }: { leaves: number }) {
   const last = leaves >= MAX_EXAM_LEAVES;
   return (
     <div className={`${focusCard} border-border bg-pink/8`}>
-      <div className={`mb-2.5 flex items-center gap-1.5 text-pink ${focusKicker}`}>
+      <div className={`mb-2.5 flex items-center gap-1.5 text-pink-strong ${focusKicker}`}>
         <ShieldAlert className="size-4 shrink-0" strokeWidth={2.5} />
         ការព្រមាន
       </div>
@@ -360,7 +360,7 @@ function SectionIntro({ section }: { section: PaperSection }) {
 
   return (
     <div className={focusCard}>
-      <div className={`mb-2.5 text-purple ${focusKicker}`}>
+      <div className={`mb-2.5 text-purple-strong ${focusKicker}`}>
         {count} សំណួរ
       </div>
       <div className={`mb-3 ${focusPrompt}`}>{section.title}</div>
@@ -389,7 +389,7 @@ function SectionIntro({ section }: { section: PaperSection }) {
 
       {section.example && (
         <div className="mt-4 rounded-xl border border-border bg-purple/5 p-3 md:p-4">
-          <div className={`mb-1 text-purple ${focusLabel}`}>ឧទាហរណ៍</div>
+          <div className={`mb-1 text-purple-strong ${focusLabel}`}>ឧទាហរណ៍</div>
           <p className="text-sm font-semibold text-text md:text-base">
             {section.example}
           </p>

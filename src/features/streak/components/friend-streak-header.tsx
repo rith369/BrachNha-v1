@@ -103,7 +103,7 @@ export function FriendStreakHeader({
         <span
           className={cn(
             "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1",
-            today.kept ? "bg-mint/12 text-mint" : "bg-yellow/12 text-yellow"
+            today.kept ? "bg-mint/12 text-mint-strong" : "bg-yellow/12 text-yellow-strong"
           )}
         >
           {today.kept ? (

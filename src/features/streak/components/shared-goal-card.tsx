@@ -74,7 +74,7 @@ export function SharedGoalCard({
           to do is your own goal, which the link below is for. */}
       {today.you && today.waitingOnFriend && (
         <div className="rounded-xl border border-border bg-yellow/30 p-3">
-          <div className="flex items-center gap-1.5 text-xs font-extrabold text-yellow">
+          <div className="flex items-center gap-1.5 text-xs font-extrabold text-yellow-strong">
             <Clock className="size-3.5 shrink-0" strokeWidth={2.5} aria-hidden />
             {waitingForLabel(friend.name, lang)}
           </div>
@@ -156,7 +156,7 @@ function GoalRow({
           // ml-auto so that on the wrapped row it still sits to the right,
           // reading as a status rather than a second label under the name.
           "ml-auto flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[10px] font-extrabold",
-          done ? "bg-mint/15 text-mint" : "bg-yellow/15 text-yellow"
+          done ? "bg-mint/15 text-mint-strong" : "bg-yellow/15 text-yellow-strong"
         )}
       >
         {done ? (

@@ -32,21 +32,21 @@ export const METRIC_META: Record<
     icon: Flame,
     labelKey: "metricStreak",
     descKey: "rankedByStreak",
-    color: "text-yellow",
+    color: "text-yellow-strong",
     tint: "bg-yellow/10",
   },
   xp: {
     icon: Star,
     labelKey: "metricXp",
     descKey: "rankedByXp",
-    color: "text-pink",
+    color: "text-pink-strong",
     tint: "bg-pink/10",
   },
   studyTime: {
     icon: Timer,
     labelKey: "metricStudyTime",
     descKey: "rankedByStudyTime",
-    color: "text-blue",
+    color: "text-blue-strong",
     tint: "bg-blue/10",
   },
 };
@@ -74,7 +74,7 @@ export const TITLE_LABEL_KEY: Record<StudentTitle, TranslationKey> = {
  * enough differentiation to see the three apart at a glance.
  */
 export const PODIUM_STYLE = [
-  { medal: "🥇", ring: "ring-yellow/70", badge: "bg-yellow/15 text-yellow" },
-  { medal: "🥈", ring: "ring-blue/60", badge: "bg-blue/15 text-blue" },
-  { medal: "🥉", ring: "ring-pink/60", badge: "bg-pink/15 text-pink" },
+  { medal: "🥇", ring: "ring-yellow/70", badge: "bg-yellow/15 text-yellow-strong" },
+  { medal: "🥈", ring: "ring-blue/60", badge: "bg-blue/15 text-blue-strong" },
+  { medal: "🥉", ring: "ring-pink/60", badge: "bg-pink/15 text-pink-strong" },
 ];

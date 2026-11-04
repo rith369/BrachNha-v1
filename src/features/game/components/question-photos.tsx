@@ -56,7 +56,7 @@ export function QuestionPhotos({
             />
           </div>
           {activity.failed && (
-            <p className="flex items-center gap-1.5 text-[10px] font-bold text-pink">
+            <p className="flex items-center gap-1.5 text-[10px] font-bold text-pink-strong">
               <TriangleAlert className="size-3.5 shrink-0" strokeWidth={2.5} />
               {activity.failed === "upload" ? t.photoFailed : t.deleteFailed}
             </p>

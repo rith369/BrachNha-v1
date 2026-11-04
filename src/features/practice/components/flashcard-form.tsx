@@ -50,7 +50,7 @@ export function FlashcardForm({
       <div className="flex gap-2">
         <button
           onClick={onCancel}
-          className="flex-1 rounded-xl border border-border bg-purple/8 px-4 py-2.5 text-xs font-extrabold text-purple"
+          className="flex-1 rounded-xl border border-border bg-purple/8 px-4 py-2.5 text-xs font-extrabold text-purple-strong"
         >
           បោះបង់
         </button>

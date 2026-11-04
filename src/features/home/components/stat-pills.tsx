@@ -73,7 +73,7 @@ export function StatPills() {
       note:
         (xpToday > 0 ? "▲ " : "") +
         (lang === "en" ? `+${xpToday} today` : `+${xpToday} ថ្ងៃនេះ`),
-      color: "text-pink",
+      color: "text-pink-strong",
     },
     {
       icon: Flame,
@@ -83,7 +83,7 @@ export function StatPills() {
       note: streakNote,
       // The trophy marks a record, so it only appears when this IS one.
       noteIcon: atBest ? Trophy : undefined,
-      color: "text-yellow",
+      color: "text-yellow-strong",
       href: "/streak",
     },
     {
@@ -94,14 +94,14 @@ export function StatPills() {
         lang === "en"
           ? `+${toNextLevel} to next`
           : `+${toNextLevel} ទៅកម្រិតបន្ទាប់`,
-      color: "text-purple",
+      color: "text-purple-strong",
     },
     {
       icon: BookOpen,
       value: questionsAnswered,
       label: lang === "en" ? "Questions" : "សំណួរ",
       note: lang === "en" ? "answered" : "បានឆ្លើយ",
-      color: "text-blue",
+      color: "text-blue-strong",
     },
   ];
 
@@ -117,7 +117,7 @@ export function StatPills() {
               {p.value}
             </div>
             <div className="text-[9px] font-bold text-muted">{p.label}</div>
-            <div className="flex items-center gap-0.5 text-[8px] font-extrabold text-mint">
+            <div className="flex items-center gap-0.5 text-[8px] font-extrabold text-mint-strong">
               {p.noteIcon && <p.noteIcon className="size-2.5" strokeWidth={2.5} />}
               {p.note}
             </div>

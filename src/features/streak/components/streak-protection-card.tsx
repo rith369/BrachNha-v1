@@ -28,7 +28,7 @@ export function StreakProtectionCard() {
   return (
     <Card className="gap-3">
       <div className="flex items-center gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-purple/15 text-purple">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-purple/15 text-purple-strong">
           <Shield className="size-5" strokeWidth={2.5} aria-hidden />
         </span>
         <div className="min-w-0 flex-1">
@@ -39,7 +39,7 @@ export function StreakProtectionCard() {
             {c.protectionHelp}
           </div>
         </div>
-        <div className="shrink-0 font-heading text-lg font-extrabold text-purple">
+        <div className="shrink-0 font-heading text-lg font-extrabold text-purple-strong">
           {held}/{MAX_STREAK_PROTECTIONS}
         </div>
       </div>
