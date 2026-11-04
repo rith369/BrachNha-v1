@@ -325,4 +325,30 @@ no account and no keys, and it cannot reach the live project.
 **Proved to fail:** 20 rules broken one at a time with a temporary last migration, including RLS off,
 profiles opened, the Battle cap removed, a limit dropped and hidden content opened. All 20 were caught.
 
-**Not covered yet:** the browser. Student journeys still have only one-off scripts.
+## The permanent browser tests (4 Nov 2026)
+
+`npm run test:e2e` builds the real app, then walks it in real Chrome, in about 5 minutes. It needs Chrome or Edge
+(or `CHROME_PATH`), and no account or keys. **It is not in `npm test`, on purpose:** that stays 10 seconds.
+
+- **`setup.mjs` serves the production build with the real headers from `vercel.json`**, so a page the security
+  policy would break fails here, and nowhere else before production. The build is under `node_modules/.cache`, so
+  it never touches `dist` and cannot be committed or deployed.
+- **The database is a small stand-in that remembers writes**, on a fixed port, which is why files run one at a
+  time. **It does not enforce anything:** what the database allows is `tests/db`. These check the screens, and what
+  the app sends. A signed-in session is seeded into the browser, so real Google sign-in is not tested.
+- **`screens`:** every main screen in light at 390px and dark at 320px: no crash, nothing the policy blocked, no
+  sideways scroll. It cannot say a screen is RIGHT.
+- **`lesson`:** from the path through both steps to the finish, the LAST lesson with no next one, a guest, the
+  account copy, a hidden lesson, and the 3D tile, including a failed download.
+- **`paper`:** the rules, every question, submit, the result, the history, English's different shape, the clock
+  running out, and the leave rule: a flicker forgiven, an absence warned, the third ending the paper.
+- **`battle`:** creating, the 21st, a failed share and its retry, a duplicate, joining, playing twice, a missing one.
+- **Answers are chosen from the real sample content**, so the expected score is known. Buttons are found by what
+  a student reads, so changing that wording means changing a test. That is the point of them, and the upkeep.
+
+**Proved to fail:** 16 things broken one at a time in the real source and rebuilt, including a finished lesson
+not saving, a crash on the last lesson, blanks counted as mistakes, a screen crashing, sideways scroll, and the
+policy blocking fonts. All 16 were caught by the test that should catch them.
+
+**Not covered yet:** flashcards, the practice quizzes, the Simulation's two days, KruAI, Google sign-in, admin
+pages, and anything that needs a real phone.

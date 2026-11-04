@@ -23,6 +23,8 @@ npx oxlint            # NOT eslint — there is no eslint config in this repo
 npm run check:digits  # no Khmer numerals in src/ or index.html
 npm run check:content # content files under content/
 npm test              # database rules on a real engine (tests/db/), about 10 seconds
+npm run test:e2e      # real Chrome through lessons, papers, Battles and every screen, about 5 minutes.
+                      # Run it when a change touches those or shared screen code.
 ```
 
 All four must report zero NEW issues. These warnings are known and are not
