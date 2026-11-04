@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 4 Nov 2026: Faster First Screen, and the 3D Lesson Saves Data
 
-Commit: `HASH_HERE`. No database step.
+Commit: `6ed52e2`. No database step.
 
 Measured on a simulated cheap phone, since no real one has been tested yet:
 
