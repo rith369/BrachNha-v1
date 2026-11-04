@@ -246,3 +246,31 @@ photo, a Google profile photo, the 3D viewer, the real YouTube player, Recharts,
 the theme guard. An injected inline script, an outside script, an event handler, `eval`, sending data
 to another site and framing were all blocked. The only blocks left were those attacks. **Not verified:
 real Google sign-in and a real phone**, which need the deployed site.
+
+## The cheap-phone audit, and what it changed (4 Nov 2026)
+
+Chrome slowed to a cheap phone (`Emulation.setCPUThrottlingRate` 6, which measured 8x on the audit machine), on
+"ordinary 4G" (1.6 Mbps, 150 ms) and "poor signal" (400 kbps, 400 ms), production build, brotli, real Google
+Fonts. An estimate: **no real phone has been measured.** Screens stayed fast once open, with a tab change at
+0.1 to 0.3 s and answering a quiz question at about 0.3 s.
+
+| | ordinary 4G | poor signal |
+| --- | --- | --- |
+| first visit, all downloads finished | 7.2 s, 847 KB | 22.1 s, 847 KB |
+| coming back later | 0.9 s, 17 KB | not measured |
+| something on screen, before | about 2.9 s | about 7.2 s |
+| **something on screen, now** | **about 1.1 s** | **about 3.2 s** |
+| real text on Home, old against new, 3 runs each | 3.8 s, 3.9 s | 8.1 s, 8.0 s |
+
+"Coming back" assumes Vercel lets browsers keep `/assets/` files, which the audit's own server did. Not confirmed
+on the live site.
+
+- **The logo sits in `#root` in `index.html`**, needing no JavaScript, and React replaces it on first render. It
+  costs nothing: real text arrives when it did, within run-to-run noise. It uses the same file the app does.
+- **`RouteWait` (`app.tsx`) is the Suspense fallback for routes**, which was `null`. A link straight to a lesson
+  stood empty for seconds. A 400ms CSS delay keeps it from flashing when the prefetch has already won.
+  **It does not shorten the wait:** real text in a formula lesson still arrives at about 5.7 s on ordinary 4G.
+- **The prefetch stays, and it is a known cost.** About 550 KB of a first visit's 847 KB is other screens,
+  bought so tabs open instantly. Paid once. Skipping it in data-saver mode was suggested, and not decided.
+- **Still open from the audit:** small Khmer text (314 pieces at 8 to 10px across 19 screens), 15 of 285 buttons
+  under 24px, no `<main>` on any screen, and no `<h1>` on 11 of them.

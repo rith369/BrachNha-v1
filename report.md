@@ -16,6 +16,24 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 4 Nov 2026: Faster First Screen, and the 3D Lesson Saves Data
+
+Commit: `HASH_HERE`. No database step.
+
+Measured on a simulated cheap phone, since no real one has been tested yet:
+
+- **The logo now shows straight away** instead of an empty screen, at about 1 second on ordinary 4G and about
+  3 on a poor signal. It was about 3 and 7. The real screen arrives at the same time as before, so the wait is
+  no shorter, it just no longer looks broken.
+- **The 3D brain lesson (Biology 3.1.1) now waits for a tap.** It used to download 4.7 MB as soon as it opened.
+  It now uses under 1 MB until the student taps the model, which adds about 1 MB, and the tile says so. The
+  model file went from 3.8 MB to 861 KB and looks the same.
+- **If the 3D download fails,** the student sees a short message with a button to try again, and keeps their lesson.
+
+**To re-test, please:** on a phone, open the app fresh and look for the logo. Open Biology 3.1.1, tap the 3D tile,
+and check the brain appears, turns when dragged, and names a part when tapped. Please also read the new Khmer on
+the tile and on the failure message, and change it if it sounds wrong.
+
 ## 4 Nov 2026: Easier-to-Read Colours
 
 Commit: `dacf8c6`. No database step.

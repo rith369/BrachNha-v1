@@ -670,3 +670,22 @@ A decorative one is a promise the product does not keep, and a real one needs
 refill-over-time rules and a paywall story nobody has designed.
 
 **Mock Exam** (`features/exam`) — a two-tab screen; see its own section below.
+
+## The 3D model waits for a tap (4 Nov 2026)
+
+`SectionModel` (`section-model.tsx`) holds the lazy boundary now, and shows a tile the viewer's size until tapped.
+Opening biology 3.1.1 used to download 4.7 MB by itself, before the student had scrolled to the model. It is now
+under 1 MB, and the tap adds about 1 MB, which the tile says. **The model went from 3.8 MB to 861 KB**, and the
+original is `design/brain.source.glb`; the commands and their traps are in `design/README.md`.
+
+- **`DOWNLOAD_SIZE` is what the tile tells a student.** Change it if the model changes much. A model not in it
+  shows no size rather than a guess.
+- **`ModelErrorBoundary` is in the viewer** because a dropped download used to reach the app's own boundary and
+  replace the whole screen. `useGLTF` caches a failed load, so Try again clears it first.
+- **The compressed file needs `'wasm-unsafe-eval'`**, already in the policy, and decoding is now real work the
+  policy must allow rather than an unused decoder starting up.
+
+**Verified:** the production build with the real headers from `vercel.json`, in Chrome, at 360 light and 320 dark:
+nothing 3D downloads on opening, a tap loads it, tapping a part still names it, a failed download keeps the lesson
+and Try again works. The original and compressed models compared by eye, whole and zoomed in. **Not verified:** a
+real phone's graphics chip. Software rendering says nothing about how 112,000 triangles feel on a cheap one.

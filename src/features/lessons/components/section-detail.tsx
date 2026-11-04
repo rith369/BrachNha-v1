@@ -1,7 +1,7 @@
 import { track } from "@/lib/telemetry";
 import { ReportMistake } from "@/components/report-mistake";
 import { sectionRef } from "@/utils/content-ref";
-import { lazy, Suspense, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import {
   CircleCheck,
@@ -29,18 +29,12 @@ import { QUIZ_COINS, QUIZ_XP } from "@/utils/rewards";
 import { MathText } from "@/components/shell/math-text";
 import { Callout } from "./callout";
 import { MisconceptionCard, SectionBlockBody } from "./section-blocks";
+import { SectionModel } from "./section-model";
 import { SectionVideoPlayer } from "./section-video";
 import type { SectionContent, SectionQuestion } from "@/types";
 import { markLessonFinished } from "@/lib/install-prompt";
 import { useFocusScrollTop } from "@/hooks/use-focus-scroll-top";
 import { SectionComplete, type SectionSummary } from "./section-complete";
-
-// three.js + react-three-fiber + drei is a large dependency needed only by the
-// sections that carry a model. Behind React.lazy so it downloads on opening one
-// of those, not on every section.
-const BrainModelViewer = lazy(() =>
-  import("./brain-model-viewer").then((m) => ({ default: m.BrainModelViewer }))
-);
 
 /**
  * One SECTION of the real curriculum — the runner behind a playable node on a
@@ -351,19 +345,7 @@ export function SectionDetail({
             </Callout>
 
             {section.model3d && (
-              <Suspense
-                fallback={
-                  <div
-                    className={`flex h-64 items-center justify-center md:h-80 lg:h-96 ${focusCard}`}
-                  >
-                    កំពុងផ្ទុកម៉ូឌែល 3D…
-                  </div>
-                }
-              >
-                <div className="h-64 w-full overflow-hidden rounded-2xl border border-border bg-surface md:h-80 lg:h-96">
-                  <BrainModelViewer model={section.model3d} lang={lang} />
-                </div>
-              </Suspense>
+              <SectionModel key={sectionId} model={section.model3d} lang={lang} />
             )}
 
             {quiz.length > 0 && (

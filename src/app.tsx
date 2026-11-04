@@ -101,6 +101,15 @@ const StreakPage = lazy(routeModules.streak);
 const StreakFriendsPage = lazy(routeModules.streakFriends);
 const StreakFriendPage = lazy(routeModules.streakFriend);
 
+/** The logo from index.html, appearing only if the wait passes 400ms. */
+function RouteWait() {
+  return (
+    <div className="animate-route-wait flex h-full min-h-dvh items-center justify-center">
+      <img src="/logo/brachnha.webp" alt="" width={72} height={72} className="rounded-[26%]" />
+    </div>
+  );
+}
+
 /**
  * Warms every split chunk once the browser is idle.
  *
@@ -189,10 +198,10 @@ function ShellLayout() {
 
   return (
     <AppShell hideChrome={hideChrome} hideMentor={hideMentor}>
-      {/* fallback={null} rather than a spinner, matching how AppShell mounts
-          ChatOverlay. The prefetch above means this almost never renders; a
-          spinner that flashes for a frame reads worse than a blank one. */}
-      <Suspense fallback={null}>
+      {/* The prefetch above means this almost never renders once the app is open.
+          It does on a link straight to a lesson, where the screen stood empty for
+          seconds on a slow phone. See RouteWait for why it cannot flash. */}
+      <Suspense fallback={<RouteWait />}>
         <Outlet />
       </Suspense>
     </AppShell>
@@ -227,7 +236,7 @@ export default function App() {
         <Route
           path="privacy"
           element={
-            <Suspense fallback={null}>
+            <Suspense fallback={<RouteWait />}>
               <PrivacyPage />
             </Suspense>
           }

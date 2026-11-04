@@ -42,3 +42,29 @@ see the script's header. Re-run it whenever the artwork changes.
 `public/favicon.ico` (the browser tab icon, 16/32/48px) is rendered from this
 file by the same script, cropped tighter so the drawing fills a 16px square.
 It was a different, older icon until 27 Oct 2026.
+
+## `brain.source.glb`
+
+The 3D brain as supplied: 3.8 MB, 112,000 triangles, nothing compressed. What ships is
+`public/models/brain.glb`, 861 KB, with the same triangles and the same part names, which
+`data/brain-labels.ts` looks up by name.
+
+| file | size |
+| --- | --- |
+| `design/brain.source.glb` (this, unshipped) | 3.8 MB |
+| `public/models/brain.glb` (shipped) | **861 KB** |
+
+### Regenerating it
+
+With `@gltf-transform/cli` 4, in this order, keeping the intermediate file out of the repo:
+
+```bash
+gltf-transform webp design/brain.source.glb a.glb --quality 80
+gltf-transform meshopt a.glb public/models/brain.glb --level high
+```
+
+**Never use its `optimize` command here:** it joins meshes, and the labels need each part
+to stay its own named mesh. **Never use `resize` either:** the words on the model are a 2048×4098
+image, and shrinking it broke them up, for a saving of about 75 KB. Compare zoomed in after any change. `useGLTF` decodes this by itself, using WebAssembly, which is why
+the Content-Security-Policy in `vercel.json` has `'wasm-unsafe-eval'`. If you change the size
+much, change `DOWNLOAD_SIZE` in `section-model.tsx`, which tells students what a tap costs.

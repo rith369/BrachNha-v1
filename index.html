@@ -86,7 +86,18 @@
     />
   </head>
   <body class="h-full">
-    <div id="root"></div>
+    <!--
+      What a student sees while the app downloads, in place of an empty page: about 3
+      seconds on a cheap phone, and about 7 on a poor signal. In the HTML, so it needs
+      no JavaScript at all, and React replaces it on its first render. Inline style,
+      since this has to work before anything else is decided. The same logo file the
+      app uses, so it costs nothing extra.
+    -->
+    <div id="root">
+      <div style="display: flex; min-height: 100dvh; align-items: center; justify-content: center">
+        <img src="/logo/brachnha.webp" alt="BrachNha" width="72" height="72" style="border-radius: 26%" />
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

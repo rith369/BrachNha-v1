@@ -549,6 +549,16 @@ h1, h2, h3, h4, .font-heading {
   animation: startBob 1.6s ease-in-out infinite;
 }
 
+/* The logo while a route's code downloads. The delay is the whole point: a route
+   that arrives quickly shows nothing, so nothing flashes. Opacity only. */
+@keyframes routeWait {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-route-wait {
+  animation: routeWait 200ms ease-out 400ms both;
+}
+
 /* ── Streak page ──
    All three are TRANSFORM AND OPACITY ONLY, for the reason spelled out in the
    fabPulse note above: nothing else can run on the compositor, and this page
