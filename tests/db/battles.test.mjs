@@ -168,7 +168,8 @@ test("20 new Battles a day: the 21st is refused, and only for that student", asy
 
 test("the 20 are counted by the day in Phnom Penh, not UTC", async () => {
   const e = await h.student("Eng");
-  const midnight = `((now() at time zone 'Asia/Phnom_Penh')::date at time zone 'Asia/Phnom_Penh')`;
+  // Written out independently of the function, since the same mistake on both sides once passed.
+  const midnight = `((now() at time zone 'Asia/Phnom_Penh')::date::text || ' 00:00:00+07')::timestamptz`;
   await h.db.exec(`
     insert into public.competitions (id, creator_id, creator_name, subject, difficulty, minutes, questions, creator_score, creator_ms, total, created_at)
     select 'yest-' || g, '${e}', 'x', 'math', 'mix', 10, '[]', 1, 1, 1, ${midnight} - interval '1 second' from generate_series(1, 20) g;

@@ -940,3 +940,7 @@ The feature was off only in the app, so the database still took uploads from any
 The upload policy is gone. Reading, reporting and deleting leftover photos still work, and so does account
 deletion. **Turning the feature back on needs `"competition work: upload own"` restored from
 `20260916000003` as well as `WORK_PHOTOS_ENABLED`.**
+
+## The Battle limit counted from the wrong hour (5 Nov 2026, `20261105000001`)
+
+`post_competition` worked out "the start of today" as 14:00 in Phnom Penh rather than midnight, so before 14:00 there was no limit at all. A date passed through `at time zone` is first read in the server's zone. **Write `::date::timestamp at time zone`, or compare dates with dates.** The test copied the same line and every earlier run was in the afternoon, so it passed. It now states midnight independently, and fails on the old function at any hour.
