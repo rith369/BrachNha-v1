@@ -140,6 +140,9 @@ composer's lazy panel, **Zustand + persist** as the single global store, and
 - **Task screens use `components/shell/focus-layout.tsx`** and `utils/focus-styles.ts`,
   and every one has a working exit. A multi-step one calls
   `hooks/use-focus-scroll-top.ts` with its step.
+- **Every screen has one `<main>` (the shell's) and one `<h1>`**, which `tests/e2e/structure.test.mjs` checks. A task
+  screen with no visible title passes `heading` to FocusLayout. `h1` takes the heading font, so a title in the
+  body font keeps it with `font-body!`.
 - **Performance:** animate only `transform` and `opacity`, with reduced-motion
   handled. No `backdrop-filter` over anything that scrolls. Charts on fixed data
   pass `isAnimationActive={false}`.

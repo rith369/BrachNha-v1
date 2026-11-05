@@ -208,6 +208,7 @@ export function PastPaperRunner({
 
   return (
     <FocusLayout
+      heading="វិញ្ញាសា"
       progressPct={((index + 1) / steps.length) * 100}
       onExit={onExit}
       confirmExit

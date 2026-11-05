@@ -343,6 +343,7 @@ profiles opened, the Battle cap removed, a limit dropped and hidden content open
 - **`paper`:** the rules, every question, submit, the result, the history, English's different shape, the clock
   running out, and the leave rule: a flicker forgiven, an absence warned, the third ending the paper.
 - **`battle`:** creating, the 21st, a failed share and its retry, a duplicate, joining, playing twice, a missing one.
+- **`structure`:** one main section and one main heading on every screen, including inside running tasks.
 - **Answers are chosen from the real sample content**, so the expected score is known. Buttons are found by what
   a student reads, so changing that wording means changing a test. That is the point of them, and the upkeep.
 

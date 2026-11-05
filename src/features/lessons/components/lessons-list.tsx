@@ -43,9 +43,9 @@ export function LessonsList() {
 
   return (
     <div>
-      <div className="font-heading mb-4 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
+      <h1 className="font-heading mb-4 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
         វគ្គសិក្សា
-      </div>
+      </h1>
 
       <UnderlineTabs tabs={SUBJECT_TABS} value={tab} onChange={setTab} />
 

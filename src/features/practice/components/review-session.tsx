@@ -37,9 +37,9 @@ function EmptyQueue({ onExit }: { onExit: () => void }) {
     >
       <div className="text-center">
         <div className="mb-2 text-4xl">📭</div>
-        <div className="font-heading mb-1 text-lg font-extrabold">
+        <h1 className="font-heading mb-1 text-lg font-extrabold">
           គ្មានកាតនៅឡើយទេ
-        </div>
+        </h1>
         <div className="text-sm font-bold text-muted">
           មិនទាន់មានកាតសរសេរនៅត្រង់នេះទេ។
         </div>
@@ -211,6 +211,7 @@ export function ReviewSession({
 
   return (
     <FocusLayout
+      heading="Flashcard"
       progressPct={(index / liveQueue.length) * 100}
       onExit={onExit}
       showStats

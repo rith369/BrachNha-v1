@@ -95,9 +95,9 @@ export function ExamHub() {
     <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-20 lg:pb-8">
       <div className="mx-auto w-full max-w-2xl">
         <div className="mb-4">
-          <div className="font-heading bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent md:text-2xl">
+          <h1 className="font-heading bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent md:text-2xl">
             វិញ្ញាសារត្រៀមប្រឡងបាក់ឌុប
-          </div>
+          </h1>
           <div className="mt-1 text-xs font-bold text-muted md:text-sm">
             ត្រៀមប្រឡងឱ្យបានឆ្លាតវៃ។ ដឹងពីកម្រិតរបស់ខ្លួន។
           </div>

@@ -168,9 +168,9 @@ function PileList({
           className={cn("mx-auto mb-2 size-9", PILE_TONE[tone].split(" ").at(-1))}
           strokeWidth={2}
         />
-        <div className="font-heading text-lg font-extrabold text-text">
+        <h1 className="font-heading text-lg font-extrabold text-text">
           {label}
-        </div>
+        </h1>
       </div>
 
       {/* Only reachable by grading a card out of the pile you are standing in —
@@ -416,9 +416,9 @@ export function FlashcardRunner({
         ) : (
           <Layers className="mx-auto mb-3 size-12 text-purple" strokeWidth={2} />
         )}
-        <div className="font-heading mb-4 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
+        <h1 className="font-heading mb-4 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
           {title}
-        </div>
+        </h1>
 
         {/* Three PILES, not the due/new/total readout that used to sit here —
             those were numbers with nothing to do about them. Each of these

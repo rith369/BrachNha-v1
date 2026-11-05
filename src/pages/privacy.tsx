@@ -71,7 +71,7 @@ function Section({
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-dvh bg-bg">
+    <main className="min-h-dvh bg-bg">
       <div className="mx-auto w-full max-w-2xl px-5 py-8">
         <Link to="/" className="mb-6 inline-block">
           <Wordmark
@@ -345,6 +345,6 @@ export default function PrivacyPage() {
           </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

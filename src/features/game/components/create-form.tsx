@@ -108,9 +108,9 @@ export function CreateForm({
       }
     >
       <div>
-        <div className="font-heading mb-1 text-lg font-extrabold md:text-xl">
+        <h1 className="font-heading mb-1 text-lg font-extrabold md:text-xl">
           {t.create}
-        </div>
+        </h1>
         <p className="mb-4 text-xs font-bold text-muted md:text-sm">
           {t.createBlurb}
         </p>

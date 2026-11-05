@@ -152,9 +152,9 @@ export default function GameCreatePage() {
             className="mx-auto mb-3 size-12 text-purple md:size-16"
             strokeWidth={2}
           />
-          <div className="font-heading mb-2 text-lg font-extrabold md:text-xl">
+          <h1 className="font-heading mb-2 text-lg font-extrabold md:text-xl">
             {t.loginRequired}
-          </div>
+          </h1>
           <p className="mx-auto max-w-xs text-sm font-bold text-muted">
             {t.loginRequiredGame}
           </p>

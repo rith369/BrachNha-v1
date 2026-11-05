@@ -551,3 +551,19 @@ screen). The calendar and identity row have their own section below.
 
 **KruAI chat** (`components/shell/chat-overlay.tsx` + `server/chat-handler.ts`)
 — real Gemini wiring, done. See the endpoint section above.
+
+## Screen reader structure (5 Nov 2026)
+
+Every screen has one `<main>` and one `<h1>`. The scan of the same 19 screens in light went from 680 structure warnings to 0.
+
+- **`<main>` is in `AppShell`** around the page, and around the intro, name form and survey, which render outside it.
+  `/privacy` has its own, having no shell. **`<header>` is the app bar.**
+- **`<h1>`: a screen's visible title where it has one**, the same classes on another tag.
+- **`FocusLayout`'s `heading` prop** is a hidden `sr-only` heading for a task with no title of its own: a running paper,
+  quiz, Battle, flashcard review or mistakes round. `/exam/subjects` and a lesson's second step have one too.
+- **`h1` takes the heading font from a global rule**, which beats a utility class. The four titles in the body font keep it
+  with `font-body!`: Home's greeting, a lesson's title, the name form and the survey.
+
+**Verified:** 19 screens in two themes compared before and after, 38 of 38 pixel-identical with the random quote held still.
+`tests/e2e/structure.test.mjs` covers 26 routes, a guest's screens, first-run and the running tasks. **Not verified:** a real
+screen reader, or how a phone reads Khmer aloud.

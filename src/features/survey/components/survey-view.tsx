@@ -106,7 +106,7 @@ export function SurveyView() {
 
       <div className="mb-5 text-center">
         <div className="mb-2 text-5xl">⚔️</div>
-        <div className="mb-1 text-lg font-extrabold">{t.welcome}</div>
+        <h1 className="mb-1 font-body! text-lg font-extrabold">{t.welcome}</h1>
         <div className="text-xs font-bold text-muted">{t.surveyIntro}</div>
       </div>
 

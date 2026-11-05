@@ -81,9 +81,9 @@ export function PostedView({
           className="mx-auto mb-3 size-14 text-purple md:mb-5 md:size-20"
           strokeWidth={2}
         />
-        <div className="font-heading mb-2 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent md:text-3xl">
+        <h1 className="font-heading mb-2 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent md:text-3xl">
           {t.posted}
-        </div>
+        </h1>
 
         <div className="mx-auto mb-4 w-fit rounded-2xl bg-brand px-6 py-3 text-center text-white">
           <div className="text-lg font-extrabold md:text-2xl">

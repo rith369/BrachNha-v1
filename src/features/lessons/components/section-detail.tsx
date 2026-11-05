@@ -331,9 +331,9 @@ export function SectionDetail({
       <div>
         {step === 0 && (
           <div className="flex flex-col gap-3">
-            <div className="text-xl font-extrabold md:text-3xl">
+            <h1 className="font-body! text-xl font-extrabold md:text-3xl">
               <MathText text={section.title} />
-            </div>
+            </h1>
             {section.video && (
               <SectionVideoPlayer video={section.video} title={section.title} />
             )}
@@ -368,6 +368,12 @@ export function SectionDetail({
           </div>
         )}
 
+        {/* Step 1 shows no title, so a screen reader still gets the section's name. */}
+        {step === 1 && (
+          <h1 className="sr-only">
+            <MathText text={section.title} />
+          </h1>
+        )}
         {step === 1 && (
           <div className="flex flex-col gap-3">
             <Callout tone="blue">

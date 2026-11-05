@@ -127,9 +127,9 @@ export function SectionComplete({
             <Trophy className="size-8 text-ink md:size-9" strokeWidth={2.25} aria-hidden />
           </div>
           <div className="min-w-0">
-            <div className="font-heading text-xl font-extrabold md:text-2xl">
+            <h1 className="font-heading text-xl font-extrabold md:text-2xl">
               បញ្ចប់ផ្នែកនេះ!
-            </div>
+            </h1>
             <div className="mt-0.5 text-sm font-bold [overflow-wrap:anywhere] md:text-base">
               {here && <span className="tabular-nums">{here.s.label} · </span>}
               <MathText text={title} />

@@ -1009,3 +1009,16 @@ chat screen at 390, 320 dark and 1280 (Try again, nothing sent back, no doubled 
 `splitMath` checks including every earlier guard and all 62 saved replies; the failed table drawn
 by the real chat at 390 and 320 dark. **The helpline question is open:** a self-harm reply points
 to a parent, teacher or trusted adult and names no helpline, because no number has been supplied.
+
+## Production uses only GEMINI_API_KEY, enforced in code (5 Nov 2026)
+
+`resolveApiKeys` (`server/gemini-keys.ts`) takes the first key in `GEMINI_API_KEY` on Vercel or under
+`NODE_ENV=production`, and ignores `GEMINI_API_KEYS` and `_1..5`. "Production uses ONE key" above used to be a rule
+someone had to keep by deleting keys. A leftover free key would have sent some students' questions to the free tier with
+nothing to show for it. **The code cannot tell the key is paid: `GEMINI_API_KEY` must hold the paid one.** With none set,
+KruAI answers 503 rather than touching a free key. Computers keep the whole pool, so testing never spends the credit.
+
+**Verified:** `tests/server/gemini-keys.test.mjs`, and the real `handleChat` against a fake model with six leftover keys
+set: 10 questions all used the paid key, and a paid key answering 429 never fell back to a free one. **Not verified:** the
+live site, since the key check sits behind sign-in. **Noticed, not changed:** one question with the only key out of quota
+made 19 calls to the fake model before giving up, because the SDK retries inside each of the 6 attempts.

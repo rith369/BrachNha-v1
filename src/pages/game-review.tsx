@@ -146,6 +146,7 @@ export default function GameReviewPage() {
   if (!created && !attempt) {
     return (
       <FocusLayout
+        heading="ចម្លើយ"
         progressPct={100}
         onExit={exit}
         footer={<FocusButton onClick={exit}>{t.back}</FocusButton>}
@@ -167,6 +168,7 @@ export default function GameReviewPage() {
   if (!revealed && mine.available) {
     return (
       <FocusLayout
+        heading="ចម្លើយ"
         progressPct={66}
         onExit={exit}
         // NOT held while a photo uploads. The upload state lives in this page's
@@ -188,6 +190,7 @@ export default function GameReviewPage() {
 
   return (
     <FocusLayout
+      heading="ចម្លើយ"
       progressPct={100}
       onExit={exit}
       footer={<FocusButton onClick={exit}>{t.done}</FocusButton>}

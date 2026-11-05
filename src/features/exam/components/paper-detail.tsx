@@ -97,9 +97,9 @@ export function PaperDetail({
           className="size-14 shrink-0 rounded-xl md:size-16"
         />
         <div className="min-w-0">
-          <div className="font-heading truncate bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
+          <h1 className="font-heading truncate bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
             {paper.title}
-          </div>
+          </h1>
           <div className="text-xs font-bold text-muted md:text-sm">
             សម័យប្រឡង {paper.year}
           </div>

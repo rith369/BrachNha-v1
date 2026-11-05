@@ -114,7 +114,7 @@ export function QuizResults({
             </div>
           </div>
 
-          <div className="font-heading mb-1 text-lg font-extrabold">{title}</div>
+          <h1 className="font-heading mb-1 text-lg font-extrabold">{title}</h1>
           <div className="mb-1 text-sm font-bold text-muted">
             {score}/{questions.length} ត្រឹមត្រូវ
           </div>

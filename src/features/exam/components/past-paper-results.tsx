@@ -88,7 +88,7 @@ export function PastPaperResults({
           </div>
         </div>
 
-        <div className="font-heading mb-1.5 text-xl font-extrabold">{title}</div>
+        <h1 className="font-heading mb-1.5 text-xl font-extrabold">{title}</h1>
         <div className="mb-1 text-sm font-bold text-muted">
           {marked.score}/{marked.total} ត្រឹមត្រូវ
         </div>

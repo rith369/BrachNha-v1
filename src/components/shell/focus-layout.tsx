@@ -24,6 +24,7 @@ export function FocusLayout({
   confirmExit = false,
   exitCopy,
   meta,
+  heading,
   footer,
   children,
 }: {
@@ -57,6 +58,9 @@ export function FocusLayout({
   exitCopy?: { title: string; body: string };
   /** Optional right-hand status, e.g. "3 answered" or "Q2 / 10". */
   meta?: React.ReactNode;
+  /** The screen's name for a screen reader, on a task that shows no title of its own.
+   *  A screen whose content already has an <h1> passes nothing. */
+  heading?: string;
   /** Pinned bottom action area. Render a disabled button rather than nothing
    *  when the student can't continue yet — an appearing/disappearing bar makes
    *  the content jump. */
@@ -148,6 +152,7 @@ export function FocusLayout({
           new prop on every task screen. */}
       <div data-focus-body className="min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto flex min-h-full w-full max-w-2xl flex-col justify-center px-4 py-6 md:max-w-3xl md:px-6 md:py-10">
+          {heading && <h1 className="sr-only">{heading}</h1>}
           {children}
         </div>
       </div>

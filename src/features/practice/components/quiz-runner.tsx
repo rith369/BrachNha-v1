@@ -239,6 +239,7 @@ export function QuizRunner({
 
   return (
     <FocusLayout
+      heading="Quiz"
       progressPct={(index / total) * 100}
       onExit={exit}
       // Absent on the first question — the X is the only way out there.

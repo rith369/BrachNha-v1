@@ -144,6 +144,7 @@ export function CompetitionRun({
 
   return (
     <FocusLayout
+      heading="ការប្រកួត"
       progressPct={(index / total) * 100}
       onExit={onExit}
       // Leaving discards the run, so it asks first — the mock exam's call. No

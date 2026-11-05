@@ -16,6 +16,23 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 5 Nov 2026: Battle Limit Fixed, Student Questions Kept on the Paid Key, Screen Reader Labels
+
+Commit: `HASH_HERE`, with the Battle limit in `affaa42`. **Database step:** run
+`20261105000001_battle_cap_day_fix.sql` in the Supabase SQL editor. The app works before or after.
+
+- **The 20 Battles a day limit had a bug.** It counted from 2 pm Phnom Penh time instead of midnight, so before 2 pm
+  each day there was no limit at all. It counts from midnight now.
+- **KruAI now uses only the one main key on the live site.** If an old free key were still saved on Vercel, some students'
+  questions could have gone through it. Now it would simply be ignored.
+- **Screen readers can find their way around.** Every screen now has a marked main section and a main heading, for
+  students who have the phone read the screen aloud.
+
+**Students should not notice any difference.** Old and new screens were compared pixel by pixel.
+
+**To re-test, please:** ask KruAI one question on the live site. If it says it is temporarily unavailable, the paid key on
+Vercel is saved under a different name, and it needs to be `GEMINI_API_KEY`.
+
 ## 4 Nov 2026: Faster First Screen, and the 3D Lesson Saves Data
 
 Commit: `6ed52e2`. No database step.

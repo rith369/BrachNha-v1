@@ -334,9 +334,9 @@ export function QuizPathView({
             className="size-16 shrink-0 rounded-xl"
           />
           <div className="min-w-0 flex-1">
-            <div className="font-heading truncate text-base font-extrabold text-text">
+            <h1 className="font-heading truncate text-base font-extrabold text-text">
               {subject.name}
-            </div>
+            </h1>
             <div className="mt-1.5 flex items-center gap-2">
               <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface">
                 <div

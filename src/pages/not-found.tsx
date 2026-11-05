@@ -9,9 +9,9 @@ export default function NotFoundPage() {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
       <div className="text-4xl">🧭</div>
-      <div className="font-heading text-lg font-extrabold">
+      <h1 className="font-heading text-lg font-extrabold">
         This page isn&apos;t here
-      </div>
+      </h1>
       <p className="text-sm text-muted">
         It may not be built yet. Let&apos;s get you back on track.
       </p>

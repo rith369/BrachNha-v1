@@ -76,9 +76,9 @@ export function FlashcardSummary({
           className="mx-auto mb-3 size-14 text-yellow md:mb-5 md:size-20"
           strokeWidth={2}
         />
-        <div className="font-heading mb-2.5 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent md:text-3xl">
+        <h1 className="font-heading mb-2.5 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent md:text-3xl">
           {cheer.title}
-        </div>
+        </h1>
         <div className="mx-auto mb-4 max-w-xs text-sm font-bold text-muted">
           {cheer.detail}
         </div>

@@ -127,9 +127,9 @@ export function ResultView({
           />
         )}
 
-        <div className="font-heading mb-4 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent md:text-3xl">
+        <h1 className="font-heading mb-4 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent md:text-3xl">
           {headline[outcome]}
-        </div>
+        </h1>
 
         <div className="mx-auto mb-3 flex w-fit items-center gap-4 rounded-2xl border border-border bg-surface px-4 py-3 shadow-panel md:gap-6 md:px-6">
           <Side

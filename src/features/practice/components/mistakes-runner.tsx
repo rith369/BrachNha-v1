@@ -78,7 +78,7 @@ function MistakeStep({
 
   if (body.status === "loading" || body.status === "offline") {
     return (
-      <FocusLayout progressPct={progressPct} onExit={exit} meta={`${number} / ${total}`}>
+      <FocusLayout heading="កំហុសរបស់ខ្ញុំ" progressPct={progressPct} onExit={exit} meta={`${number} / ${total}`}>
         <ContentNotice state={body.status} onRetry={() => retryBody(kind, key, mistake.version)} />
       </FocusLayout>
     );
@@ -123,6 +123,7 @@ function GoneStep({
   const navigate = useNavigate();
   return (
     <FocusLayout
+      heading="កំហុសរបស់ខ្ញុំ"
       progressPct={progressPct}
       onExit={() => navigate(EXIT_TO)}
       meta={`${number} / ${total}`}
@@ -181,6 +182,7 @@ function QuestionStep({
 
   return (
     <FocusLayout
+      heading="កំហុសរបស់ខ្ញុំ"
       progressPct={progressPct}
       onExit={() => navigate(EXIT_TO)}
       showStats
@@ -261,7 +263,7 @@ function RoundOver({ total, fixed }: { total: number; fixed: number }) {
   const navigate = useNavigate();
   const left = useBrachNhaStore((s) => s.mistakes.length);
   return (
-    <FocusLayout progressPct={100} onExit={() => navigate(EXIT_TO)}>
+    <FocusLayout heading="កំហុសរបស់ខ្ញុំ" progressPct={100} onExit={() => navigate(EXIT_TO)}>
       <div className={`${focusCard} text-center`}>
         <CheckCircle2 className="mx-auto size-12 text-mint" strokeWidth={2} />
         <div className={`mt-2 ${focusPrompt}`}>បានកែ {fixed}/{total} សំណួរ</div>

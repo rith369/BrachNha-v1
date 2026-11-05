@@ -197,12 +197,18 @@ export function AppShell({
              with no extra condition. */
       !introSeen && !userName && !isAuthenticated ? (
         <Suspense fallback={null}>
-          <IntroView onDone={finishIntro} />
+          <main className="contents">
+            <IntroView onDone={finishIntro} />
+          </main>
         </Suspense>
       ) : hasFullAccess && !userName ? (
-        <LoginView />
+        <main className="contents">
+          <LoginView />
+        </main>
       ) : hasFullAccess && !surveyed ? (
-        <SurveyView />
+        <main className="contents">
+          <SurveyView />
+        </main>
       ) : (
         <>
           {/* Hidden below lg by the component itself. hideChrome drops it too,
@@ -239,7 +245,7 @@ export function AppShell({
                   routes with no scroller of their own (not-found, and the two
                   focus routes that delegate to FocusLayout) are all either short
                   enough not to need one or bring their own. */}
-              <div className="min-h-0 flex-1 overflow-hidden">{children}</div>
+              <main className="min-h-0 flex-1 overflow-hidden">{children}</main>
               {!chatOpen && !pledgeOpen && !hideMentor && <FabChat />}
               {/* !hideMentor here too, not just on the FAB: the effect above
                   closes an open chat, but this makes the overlay unrenderable

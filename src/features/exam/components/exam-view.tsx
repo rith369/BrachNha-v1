@@ -112,6 +112,7 @@ export function ExamView() {
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-20 lg:pb-8">
+      <h1 className="sr-only">វិញ្ញាសារតាមមុខវិជ្ជា</h1>
       <div className="mx-auto w-full max-w-2xl">
         {finished ? (
           <ExamResults

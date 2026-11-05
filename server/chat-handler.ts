@@ -11,6 +11,7 @@ import {
   type ChatProfile,
 } from "../src/utils/chat-prompt.js";
 import type { ScreenRef } from "../src/utils/chat-screen.js";
+import { resolveApiKeys } from "./gemini-keys.js";
 import { checkRateLimit } from "./rate-limit.js";
 import { isVerificationConfigured, verifyRequestUser } from "./verify-user.js";
 import { searchBiologyTextbook, searchHistoryTextbook, searchMathTextbook } from "./textbook-search.js";
@@ -54,38 +55,6 @@ const GEMINI_MODELS = [
   "gemini-flash-latest",
   "gemini-3-flash-preview",
 ];
-
-/**
- * Resolves all available Gemini API keys from environment variables.
- * Supports GEMINI_API_KEYS (comma-delimited), GEMINI_API_KEY (single or comma-delimited),
- * and GEMINI_API_KEY_1..5 for rotation pools.
- */
-function getApiKeys(): string[] {
-  const keys: string[] = [];
-  const envVars = [
-    process.env.GEMINI_API_KEYS,
-    process.env.GEMINI_API_KEY,
-    process.env.GEMINI_API_KEY_1,
-    process.env.GEMINI_API_KEY_2,
-    process.env.GEMINI_API_KEY_3,
-    process.env.GEMINI_API_KEY_4,
-    process.env.GEMINI_API_KEY_5,
-  ];
-
-  for (const raw of envVars) {
-    if (!raw) continue;
-    const parts = raw
-      .split(",")
-      .map((k) => k.trim().replace(/^["']|["']$/g, ""))
-      .filter(Boolean);
-    for (const p of parts) {
-      if (!keys.includes(p)) {
-        keys.push(p);
-      }
-    }
-  }
-  return keys;
-}
 
 /** Round-robin pointer across available API keys in the pool. */
 let keyRotationIndex = 0;
@@ -940,7 +909,7 @@ export async function handleChat(req: Request): Promise<Response> {
 
   // ── API Key Pool & Rotation ──────────────────────────────────────────────
   // Collect all available Gemini API keys from environment variables.
-  const apiKeys = getApiKeys();
+  const apiKeys = resolveApiKeys(process.env);
   if (apiKeys.length === 0) {
     const devHint = process.env.NODE_ENV !== "production";
     return textResponse(

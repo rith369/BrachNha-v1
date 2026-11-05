@@ -43,9 +43,9 @@ export function PracticeView() {
 
   return (
     <div>
-      <div className="font-heading mb-4 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
+      <h1 className="font-heading mb-4 bg-brand-tri bg-clip-text text-xl font-extrabold text-transparent">
         ការអនុវត្ត
-      </div>
+      </h1>
 
       {/* Absent, not empty, until there is something on the list. */}
       {mistakeCount > 0 && (

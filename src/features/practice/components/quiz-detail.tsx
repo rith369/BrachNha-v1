@@ -61,9 +61,9 @@ export function QuizDetail({
       }
     >
       <div className="mx-auto w-full max-w-2xl">
-        <div className="font-heading mb-1 text-xl font-extrabold md:text-2xl">
+        <h1 className="font-heading mb-1 text-xl font-extrabold md:text-2xl">
           {title}
-        </div>
+        </h1>
         <div className="mb-4 text-xs font-bold text-muted md:text-sm">
           Quiz · ការអនុវត្ត
         </div>

@@ -52,7 +52,7 @@ export function AppHeader() {
       : `${t.level} ${level}, ${into} ក្នុងចំណោម ${needed} XP`;
 
   return (
-    <div className="flex shrink-0 items-center gap-2 px-4 pt-3 md:px-6 md:pt-4 lg:px-8">
+    <header className="flex shrink-0 items-center gap-2 px-4 pt-3 md:px-6 md:pt-4 lg:px-8">
       <div
         className="flex min-w-0 flex-1 items-center gap-2.5"
         role="img"
@@ -134,7 +134,7 @@ export function AppHeader() {
       >
         <Menu className="size-4.5 text-purple" strokeWidth={2.5} />
       </button>
-    </div>
+    </header>
   );
 }
 

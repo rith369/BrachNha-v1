@@ -31,10 +31,10 @@ export function MotivationHero() {
 
   return (
     <div className="relative overflow-hidden rounded-3xl border border-border bg-neo-yellow p-5 text-ink shadow-panel">
-      <div className="flex items-center gap-1 text-xs font-extrabold">
+      <h1 className="flex items-center gap-1 font-body! text-xs font-extrabold">
         <Sun className="size-3.5" strokeWidth={2.5} />
         {lang === "en" ? `Good Day, ${userName}!` : `ថ្ងៃល្អ, ${userName}!`}
-      </div>
+      </h1>
       <div className="font-heading mt-1 text-2xl font-extrabold">
         {daysLeft} {lang === "en" ? "Days Left" : "ថ្ងៃទៅ"}
       </div>

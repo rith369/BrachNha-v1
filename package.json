@@ -11,7 +11,7 @@
     "db:check": "node scripts/supabase-check.mjs",
     "check:digits": "node scripts/check-digits.mjs",
     "check:content": "node scripts/check-content.mjs",
-    "test": "node --test tests/db/*.test.mjs",
+    "test": "node --test tests/db/*.test.mjs tests/server/*.test.mjs",
     "test:e2e": "node tests/e2e/build.mjs && node --test --test-concurrency=1 tests/e2e/*.test.mjs",
     "eval:kruai": "node scripts/kruai-eval/run.mjs",
     "content:export": "node scripts/content-export.mjs"
