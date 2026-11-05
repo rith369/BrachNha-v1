@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 5 Nov 2026: Battle Limit Fixed, Student Questions Kept on the Paid Key, Screen Reader Labels
 
-Commit: `HASH_HERE`, with the Battle limit in `affaa42`. **Database step:** run
+Commit: `e2adc00`, with the Battle limit in `affaa42`. **Database step:** run
 `20261105000001_battle_cap_day_fix.sql` in the Supabase SQL editor. The app works before or after.
 
 - **The 20 Battles a day limit had a bug.** It counted from 2 pm Phnom Penh time instead of midnight, so before 2 pm
