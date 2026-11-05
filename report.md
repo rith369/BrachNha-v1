@@ -16,6 +16,19 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 5 Nov 2026: Flashcard Back Button Fixed
+
+Commit: `HASH_HERE`. No database step.
+
+On flashcards, tapping Back to re-read a card and then grading it again counted the card twice: the summary could say 7 cards for
+a 6-card deck, the XP was paid again, and the card's next review date moved further than it should. Doing it over and over gave
+free XP. Now grading a card that was already graded just moves on. To change a rating, grade the card the next time it comes round.
+
+The automatic checks now also cover flashcards, practice quizzes and the 2-day Simulation, which is how this was found.
+
+**To re-test, please:** in a flashcard deck, grade two cards, tap Back, grade again, and finish. The summary should count each
+card once.
+
 ## 5 Nov 2026: Battle Limit Fixed, Student Questions Kept on the Paid Key, Screen Reader Labels
 
 Commit: `e2adc00`, with the Battle limit in `affaa42`. **Database step:** run

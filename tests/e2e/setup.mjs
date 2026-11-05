@@ -63,11 +63,13 @@ function databaseServer() {
     competitions: [],
     attempts: [],
     hidden: new Set(),
+    /** Content on top of the sample, for a test that needs what the sample does not have. */
+    extra: [],
     /** Set to answer the next post_competition with this error, as the real function does. */
     postError: null,
     attemptError: null,
   };
-  const items = () => fixture.items.filter((i) => !db.hidden.has(i.key));
+  const items = () => [...fixture.items, ...db.extra].filter((i) => !db.hidden.has(i.key));
   const manifest = () =>
     items().map((i) => ({
       kind: i.kind,

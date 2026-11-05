@@ -1333,3 +1333,10 @@ its question, the summary after clearing the last, a removed and an unpublished 
 node's lesson filter with the path's progress unchanged, sync up and down and with the table
 missing, no sideways scroll, no page error). **Not verified: a real account against the real
 database.**
+
+## Stepping back cannot grade a card twice (5 Nov 2026)
+
+Back was always meant to be for re-reading (see the header of `review-session.tsx`), but the grade buttons stayed live. Grading
+a card stepped back to paid the XP again, wrote a second history row, ran the scheduler twice and counted the card twice in the
+summary, so Back then a grade, over and over, was free XP. `rate()` now only moves on when `index < results.length`. Found by
+`tests/e2e/flashcards.test.mjs` on its first run.

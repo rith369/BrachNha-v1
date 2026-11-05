@@ -168,6 +168,15 @@ export function ReviewSession({
   }
 
   function rate(grade: ReviewGrade) {
+    // A card stepped back to has its grade already. Grading it again only moves on:
+    // it used to pay the XP again, reschedule the card twice and count it twice in
+    // the summary, so Back then a grade, over and over, was free XP. The rule above
+    // stands: a student changes a rating the next time the card comes round.
+    if (index < results.length) {
+      setIndex(index + 1);
+      setFlipped(false);
+      return;
+    }
     // Scheduled from the card's LIVE state, read at the moment of the grade,
     // not from `current.state`: the queue is a snapshot taken when the session
     // opened. FSRS runs here rather than in the store so the library stays out

@@ -344,6 +344,9 @@ profiles opened, the Battle cap removed, a limit dropped and hidden content open
   running out, and the leave rule: a flicker forgiven, an absence warned, the third ending the paper.
 - **`battle`:** creating, the 21st, a failed share and its retry, a duplicate, joining, playing twice, a missing one.
 - **`structure`:** one main section and one main heading on every screen, including inside running tasks.
+- **`flashcards`:** a whole deck to the last card, what a grade schedules, stepping back, swipes, stars, the account copy, a guest and the daily review.
+- **`quiz`:** every question to Finish, the result, the history, retrying the wrong ones, the account copy, and the mistakes round.
+- **`simulation`:** all 7 papers across both days to the real grade, the 48 hours from both sides, a paper timing out while away, a reload, and giving up. The sample has two real papers, so `db.extra` adds five small ones.
 - **Answers are chosen from the real sample content**, so the expected score is known. Buttons are found by what
   a student reads, so changing that wording means changing a test. That is the point of them, and the upkeep.
 
@@ -351,5 +354,10 @@ profiles opened, the Battle cap removed, a limit dropped and hidden content open
 not saving, a crash on the last lesson, blanks counted as mistakes, a screen crashing, sideways scroll, and the
 policy blocking fonts. All 16 were caught by the test that should catch them.
 
-**Not covered yet:** flashcards, the practice quizzes, the Simulation's two days, KruAI, Google sign-in, admin
-pages, and anything that needs a real phone.
+**More proved to fail (5 Nov 2026):** 10 more broken the same way across flashcards, quizzes and the Simulation, all caught.
+
+**NEVER PUT A TIME LIMIT AROUND A SCRIPT THAT BREAKS THE SOURCE ON PURPOSE.** `timeout` kills it before its `finally`, and the break stays in the code. It happened once, on 5 Nov 2026, and `git status` caught it before any commit. Run it in the background, and check `git status` after.
+
+**A date bug can pass all afternoon.** The Battle limit's test shared the bug and passed until first run in a Phnom Penh morning. A test about time should state the expected moment independently, and not copy the code's expression.
+
+**Not covered yet:** KruAI, Google sign-in, admin pages, and anything that needs a real phone.

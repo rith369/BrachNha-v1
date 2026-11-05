@@ -285,7 +285,7 @@ npm run build         # whenever the change ships
 ```
 
 After changing KruAI's prompt or model, run `npm run eval:kruai` (`docs/notes/kruai.md`). After changing a
-lesson, paper, Battle or shared screen code, run `npm run test:e2e`: real Chrome, about 5 minutes (`tests/e2e/`).
+student task or shared screen code, run `npm run test:e2e`: real Chrome, about 10 minutes (`tests/e2e/`).
 
 Then exercise the change. KruAI needs a request against a running dev server,
 Supabase work needs `npm run db:check`, and auth and UI need a real browser, where you
