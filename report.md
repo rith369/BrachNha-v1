@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 5 Nov 2026: Flashcard Back Button Fixed
 
-Commit: `HASH_HERE`. No database step.
+Commit: `a96099f`. No database step.
 
 On flashcards, tapping Back to re-read a card and then grading it again counted the card twice: the summary could say 7 cards for
 a 6-card deck, the XP was paid again, and the card's next review date moved further than it should. Doing it over and over gave
