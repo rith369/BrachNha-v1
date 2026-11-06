@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 6 Nov 2026: Teacher Papers on the Mock Exam Page
 
-Commit: `pending`. **Database step:** run `20261106000001` in the SQL editor before importing the
+Commit: `0790d3f`. **Database step:** run `20261106000001` in the SQL editor before importing the
 first teacher paper (see `supabase/README.md`).
 
 The Mock Exam page's second tab, **វិញ្ញាសារបង្កើតថ្មី**, now holds teacher papers: whole papers
