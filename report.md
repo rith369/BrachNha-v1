@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 6 Nov 2026: Feedback Explains Before Opening Telegram
 
-Commit: `pending`. No database step.
+Commit: `ba2e64d`. No database step.
 
 Tapping the Feedback button in the corner used to jump straight to Telegram. Now it first shows a
 short box explaining what to send: what went wrong, which page, and a screenshot if possible. It also
