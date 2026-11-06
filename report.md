@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 6 Nov 2026: Tap Anywhere on the Install Card
 
-Commit: `pending`. No database step.
+Commit: `97f32d5`. No database step.
 
 On Profile, the Install BrachNha card used to work only when the small purple Install button was
 tapped. Now a tap anywhere on the card works: the icon, the title or the words.
