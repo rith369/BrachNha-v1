@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 6 Nov 2026: Security Fixes Before Launch
 
-Commit: `pending`. No database step. The one dashboard step is done.
+Commit: `0a65475`. No database step. The one dashboard step is done.
 
 A security review before launch found these. Fixed in the app:
 
