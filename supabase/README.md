@@ -527,6 +527,22 @@ twice. Afterwards each game pool is at version 2:
 select key, version, item_count from public.content_items where kind = 'game' order by key;
 ```
 
+## `20261106000001`: teacher papers
+
+The Mock Exam page's second tab holds teacher papers: whole papers in the Bac II
+format, many per subject, stored as kind `paper` under the key
+`new-{subject}-{n}` (`new-math-1` … `new-math-999`). It only teaches
+`content_key_ok()` that second key shape; nothing else changes.
+
+Run it in the SQL editor, in one go, BEFORE importing the first teacher paper
+(an import refuses `new-…` keys until then). The app may ship before or after
+it: with no teacher papers published, the tab shows ឆាប់ៗនេះ either way. Safe to
+run twice. Check it in the SQL editor:
+
+```sql
+select public.content_key_ok('paper', 'new-math-1');  -- true once applied
+```
+
 ## `20261013000002`: the errors page
 
 Adds `client_error_fixes` (when the team marked an error message fixed) and

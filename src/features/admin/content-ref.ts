@@ -1,6 +1,6 @@
 import type { PaperBody, QuizQuestionBody, SectionBody, SkillHelp } from "@/types";
 import { scorePaper } from "@/features/exam/paper-scoring";
-import { paperTitle, parsePaperKey, toPastPaperContent } from "@/features/exam/papers";
+import { paperFullName, parsePaperKey, toPastPaperContent } from "@/features/exam/papers";
 import { findSubject } from "@/features/lessons/subjects";
 import { parseContentRef, type ContentRefKind } from "@/utils/content-ref";
 
@@ -146,7 +146,7 @@ export function resolveContentRef(ref: string, sets: ContentSets): ResolvedQuest
       [];
     return {
       kind,
-      title: meta ? `${paperTitle(meta.subject)} ${meta.year}` : key,
+      title: meta ? paperFullName(meta) : key,
       number: at + 1,
       statement: section.statement,
       prompt: reviewItem.prompt,

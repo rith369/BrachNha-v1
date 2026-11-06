@@ -1,4 +1,5 @@
 import { PAST_PAPER_YEARS } from "@/data/past-papers";
+import { paperFullName, parsePaperKey } from "@/features/exam/papers";
 import { chaptersShape, lessonHeading } from "@/features/lessons/sessions";
 import { SUBJECTS, findSubject, type SubjectId } from "@/features/lessons/subjects";
 import { FLASHCARD_SUBJECTS, lessonRef, practiceKey } from "@/features/practice/practice";
@@ -171,13 +172,14 @@ export function slotFor(kind: ContentKind, key: string): ContentSlot {
     };
   }
   if (kind === "paper") {
-    const [year, subjectId = ""] = key.split("-");
-    const subject = findSubject(subjectId);
+    // A teacher paper ("new-math-3") has no slot of its own: there can be
+    // hundreds, and they arrive by Import like every paper.
+    const parts = parsePaperKey(key);
     return {
       kind,
       key,
-      subject: (subject?.id ?? "math") as SubjectId,
-      title: `វិញ្ញាសារ${subject?.name ?? subjectId} ${year}`,
+      subject: parts?.subject.id ?? "math",
+      title: parts ? paperFullName(parts) : key,
       link: `/exam/subjects/${key}`,
     };
   }

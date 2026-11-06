@@ -656,3 +656,43 @@ the same day, arriving late (grade counting the zeros, no XP, only sat papers op
 running paper not cut off and ending the attempt when handed in, both timers out while away
 (saved answers counted once), and the chooser and briefing noticing. **Not verified on a real
 phone.**
+
+### Tab B is teacher papers, many per subject (6 Nov 2026, `20261106000001`)
+
+**This replaces every passage above about Tab B's "generated" papers**: one code-authored
+question list per subject in `data/generated-exams.ts`, run in place by `ExamRunner` and
+recorded into `examResults`. It was never filled. The user's words: one subject has many mock
+exams, "like 100", each "a new paper made from teachers", predicted from the old exams, in the
+same format as the past papers, and called **វិញ្ញាសារទី 1** in the list ("when they touch on
+that subject they know what kind of exam it is").
+
+- **A teacher paper IS a past paper but for the key.** Kind `paper`, the same body, editor,
+  checks, import, screen, timer, leave guard, history, review and mistakes. Key
+  `new-{subject}-{n}`, n 1 to 999; the migration only widens `content_key_ok()`, mirrored in
+  `CONTENT_KEY` (`utils/content-manifest.ts`) and the editor route's `KEY`.
+- **Two levels in Tab B** (`teacher-papers-panel.tsx`): subject cards (Tab A's card, count =
+  that subject's papers, ឆាប់ៗនេះ at 0), then the subject's papers by NUMBER (1, 2, 10, not
+  text order), each row showing its question count and the student's best %, linking to
+  `/exam/subjects/new-math-3`.
+- **The open tab and subject are in the URL** (`?tab=generated&subject=math`), since the paper
+  is another route and coming back must not land on Tab A. Tabs replace history; opening a
+  subject pushes. `PastPaper` gained `number`, `subtitle` and `backTo`, so the detail screen
+  says `គណិតវិទ្យា · វិញ្ញាសារបង្កើតថ្មី` and goes back to the subject's list; a missing teacher
+  paper redirects there too.
+- **Names:** `វិញ្ញាសារទី N` where the subject is on screen (the list, the paper, the runner);
+  `paperFullName()` gives `វិញ្ញាសារគណិតវិទ្យា ទី N` on the admin pages and mistake reports.
+- **Results go to `paperResults`** like any paper (XP, content log, daily challenge, prediction).
+  The `/exam` countdown card counts Tab B only: old `examResults` plus `new-…` paper results.
+  KruAI's average still reads `examResults` alone (KruAI is off).
+- **Kept out of Home's study feed and the Roadmap** (`study-feed.ts`): up to 999 per subject
+  would fill the feed and pile into the Roadmap's exam month. My call, not the user's; easy to
+  reverse there.
+- **Deleted:** `data/generated-exams.ts`, `exam-runner.tsx`, `exam-results.tsx`,
+  `generated-papers-panel.tsx`. `examResults` and `addExamResult` stay in the store: old
+  results are still read by the prediction.
+- **`check:content` checks keys now** (shape and subject), for every kind.
+
+**Verified:** `tests/db/content-keys.test.mjs` (the key rule on the real engine) and
+`tests/e2e/teacher-papers.test.mjs` (subject cards, the empty notice, number order, back
+button, the LAST paper sat to the end at 320px, its score on the list and on `/exam`, the
+missing-paper redirect, not on Home). Screens looked at in light and dark at 320px.

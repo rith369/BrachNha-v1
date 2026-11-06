@@ -24,8 +24,8 @@ import { activeSimulation, planSimulation } from "../simulation";
  *
  *  1. A COUNTDOWN card — the "know where you stand" half of the page. Every
  *     number on it is real: days from `daysUntilExam()`, and the attempt count
- *     and average from `examResults`, which holds generated mock exams only
- *     (the same array Home's "from mock exams" pill reads, so the two agree).
+ *     and average over Tab B's mock exams only: old runs in `examResults` plus
+ *     teacher papers ("new-…") in `paperResults`. Past papers stay out.
  *  2. វិញ្ញាសារតាមមុខវិជ្ជា (Subject Mock Exams) — a `<Link>` to
  *     `/exam/subjects`, the two-tab screen that is the whole of what `/exam`
  *     used to be.
@@ -62,6 +62,7 @@ const PRESS =
 export function ExamHub() {
   const userLanguage = useBrachNhaStore((s) => s.userLanguage);
   const examResults = useBrachNhaStore((s) => s.examResults);
+  const paperResults = useBrachNhaStore((s) => s.paperResults);
   const simulations = useBrachNhaStore((s) => s.simulations);
   const manifest = useContentManifest();
 
@@ -84,11 +85,16 @@ export function ExamHub() {
   const examDate = `${BAC2_EXAM_DATE.getDate()} ${
     KM_MONTHS[BAC2_EXAM_DATE.getMonth()]
   } ${BAC2_EXAM_DATE.getFullYear()}`;
+  // Mock exams: Tab B's papers. Old runs of the code-authored list sit in
+  // examResults; teacher papers ("new-…") record into paperResults like any
+  // paper. Past papers stay out, as they always have.
+  const mockPcts = [
+    ...examResults.map((r) => r.pct),
+    ...paperResults.filter((r) => r.paperKey.startsWith("new-")).map((r) => r.pct),
+  ];
   const average =
-    examResults.length > 0
-      ? Math.round(
-          examResults.reduce((sum, r) => sum + r.pct, 0) / examResults.length
-        )
+    mockPcts.length > 0
+      ? Math.round(mockPcts.reduce((sum, pct) => sum + pct, 0) / mockPcts.length)
       : null;
 
   return (
@@ -125,7 +131,7 @@ export function ExamHub() {
               <StatTile
                 icon={<ClipboardCheck className="size-4" strokeWidth={2.5} />}
                 label="វិញ្ញាសារបានធ្វើ"
-                value={String(examResults.length)}
+                value={String(mockPcts.length)}
               />
               <StatTile
                 icon={<Target className="size-4" strokeWidth={2.5} />}

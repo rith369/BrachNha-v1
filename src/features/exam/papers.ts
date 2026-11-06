@@ -1,4 +1,3 @@
-import { GENERATED_EXAM_QUESTIONS } from "@/data/generated-exams";
 import type { ExamQuestion, PaperBody, PastPaperContent } from "@/types";
 import { contentEntry, type ContentManifest } from "@/utils/content-manifest";
 import type { UnderlineTab } from "@/components/ui/underline-tabs";
@@ -49,9 +48,9 @@ export const EXAM_TABS: UnderlineTab<ExamTab>[] = [
 
 /**
  * The fields ExamPaperCard actually renders — the shape shared by a real
- * past-year paper AND a newly-generated one. `PastPaper` below extends it with
- * `year`, which the card has never read; a generated paper simply has no such
- * field rather than carrying a fake one.
+ * past-year paper AND a Tab B subject card. `PastPaper` below extends it with
+ * what only a paper has (`year`, the detail screen's lines); a subject card
+ * simply has no such fields rather than carrying fake ones.
  */
 export interface ExamPaper {
   /** React key and notice key. */
@@ -60,19 +59,28 @@ export interface ExamPaper {
   /** "វិញ្ញាសារ" + the subject's name. */
   title: string;
   blurb: string;
-  /** Scored questions. 0 means nothing is there yet, and the card says so. A
-   *  past paper's comes from the manifest, so the card list downloads no
-   *  paper; a generated paper's is its question count. */
+  /** 0 means nothing is there yet, and the card says so. A paper's scored
+   *  questions, from the manifest, so the card list downloads no paper; on a
+   *  Tab B subject card, how many teacher papers the subject has. */
   count: number;
 }
 
-/** A Tab B paper: its questions are in code (data/generated-exams.ts). */
-export interface GeneratedPaper extends ExamPaper {
-  questions: ExamQuestion[];
-}
-
+/**
+ * One paper a student can open at /exam/subjects/:paperKey: a real past paper
+ * ("2025-math") or a TEACHER PAPER ("new-math-3"), a whole paper a teacher
+ * wrote in the Bac II format, modelled on the past exams. Both are the same
+ * stored body (kind "paper") on the same screen; only the key, the title and
+ * where "back" goes differ. Teacher papers are Tab B (20261106000001).
+ */
 export interface PastPaper extends ExamPaper {
-  year: number;
+  /** A past paper's exam session; null for a teacher paper. */
+  year: number | null;
+  /** A teacher paper's number within its subject (វិញ្ញាសារទី 3); null for a past paper. */
+  number: number | null;
+  /** The detail screen's line under the title. */
+  subtitle: string;
+  /** Where the detail screen's back link goes: the list this card sits in. */
+  backTo: string;
   /** The published version (lib/content.ts), or null when there is none. An
    *  attempt records it, so reopening one marks against what was sat. */
   version: number | null;
@@ -117,14 +125,25 @@ export function paperKey(year: number, id: SubjectId): string {
   return `${year}-${id}`;
 }
 
-export function generatedPaperKey(id: SubjectId): string {
-  return `generated-${id}`;
+/** A teacher paper's key: "new-math-3". The database allows 1 to 999. */
+export function teacherPaperKey(id: SubjectId, n: number): string {
+  return `new-${id}-${n}`;
+}
+
+/** The Mock Exam page's own place for one subject's teacher papers. */
+export function teacherListHref(id: SubjectId): string {
+  return `/exam/subjects?tab=generated&subject=${id}`;
+}
+
+/** A teacher paper's name in its subject's list, the user's wording (6 Nov 2026). */
+export function teacherPaperTitle(n: number): string {
+  return `វិញ្ញាសារទី ${n}`;
 }
 
 // Concatenated, not authored per subject: Khmer has no inter-word space, so
 // "វិញ្ញាសារ" + "គណិតវិទ្យា" reads correctly as one term, and a derived title
 // cannot drift from the catalog. Shared by both papersForYear() and
-// generatedPapers() so the two tabs render identical wording — "same style" was
+// teacherSubjects() so the two tabs render identical wording — "same style" was
 // asked for explicitly. If a subject ever needs a bespoke title, add an
 // optional `paperTitle` to SubjectMeta — don't special-case it here.
 export function paperTitle(subject: SubjectMeta): string {
@@ -154,11 +173,57 @@ export function toPastPaperContent(body: PaperBody): PastPaperContent {
   };
 }
 
-/** "2025-math" back into its year and subject, or null for anything else. */
-export function parsePaperKey(key: string): { year: number; subject: SubjectMeta } | null {
-  const m = /^(20\d{2})-([a-z]+)$/.exec(key);
-  const subject = m ? findSubject(m[2]) : undefined;
-  return m && subject ? { year: Number(m[1]), subject } : null;
+export interface PaperKeyParts {
+  subject: SubjectMeta;
+  /** Set for a past paper. */
+  year: number | null;
+  /** Set for a teacher paper. */
+  number: number | null;
+}
+
+/** "2025-math" or "new-math-3" back into its parts, or null for anything else. */
+export function parsePaperKey(key: string): PaperKeyParts | null {
+  const past = /^(20\d{2})-([a-z]+)$/.exec(key);
+  if (past) {
+    const subject = findSubject(past[2]);
+    return subject ? { subject, year: Number(past[1]), number: null } : null;
+  }
+  const teacher = /^new-([a-z]+)-([1-9]\d{0,2})$/.exec(key);
+  if (teacher) {
+    const subject = findSubject(teacher[1]);
+    return subject ? { subject, year: null, number: Number(teacher[2]) } : null;
+  }
+  return null;
+}
+
+/** A paper's name where its subject is not on screen: the admin pages, a
+ *  mistake report. "វិញ្ញាសារគណិតវិទ្យា 2025", "វិញ្ញាសារគណិតវិទ្យា ទី 3". */
+export function paperFullName(parts: PaperKeyParts): string {
+  return parts.year !== null
+    ? `${paperTitle(parts.subject)} ${parts.year}`
+    : `${paperTitle(parts.subject)} ទី ${parts.number}`;
+}
+
+/** The card fields both kinds of paper derive from their key. */
+function paperFields(parts: PaperKeyParts) {
+  const { subject } = parts;
+  if (parts.year !== null) {
+    return {
+      year: parts.year,
+      number: null,
+      title: paperTitle(subject),
+      subtitle: `សម័យប្រឡង ${parts.year}`,
+      backTo: "/exam/subjects",
+    };
+  }
+  const n = parts.number ?? 0;
+  return {
+    year: null,
+    number: n,
+    title: teacherPaperTitle(n),
+    subtitle: `${subject.name} · ${EXAM_TABS[1].label}`,
+    backTo: teacherListHref(subject.id),
+  };
 }
 
 /**
@@ -175,9 +240,8 @@ export function pastPaperCard(key: string, manifest: ContentManifest): PastPaper
   if (!parsed || !entry) return null;
   return {
     key,
-    year: parsed.year,
     subject: parsed.subject,
-    title: paperTitle(parsed.subject),
+    ...paperFields(parsed),
     blurb: paperBlurb(parsed.subject),
     count: entry.count,
     version: entry.version,
@@ -212,9 +276,8 @@ export function papersForYear(
     const entry = contentEntry(manifest, "paper", key);
     return {
       key,
-      year,
       subject,
-      title: paperTitle(subject),
+      ...paperFields({ subject, year, number: null }),
       blurb: paperBlurb(subject),
       count: entry?.count ?? 0,
       version: entry?.version ?? null,
@@ -223,28 +286,38 @@ export function papersForYear(
 }
 
 /**
- * The newly-generated papers, one per subject — Tab B's replacement for the old
- * single fixed 10-question test. SAME SHAPE as papersForYear(), just
- * with no year to choose: there is one paper per subject rather than one per
- * subject per session, so the tab renders straight into the card list with no
- * "ជ្រើសរើសសម័យប្រឡង" chip row above it — the user asked for the identical card
- * style minus that section specifically.
+ * Tab B, level one: one card per subject, in Tab A's card style with no year
+ * chips (the user asked for that style minus the year row). `count` is how many
+ * teacher papers the subject has, so a subject with none shows ឆាប់ៗនេះ, and
+ * the list downloads no paper. Derived from the subject catalog for the same
+ * reason papersForYear() is.
  *
- * `GENERATED_EXAM_QUESTIONS` is EMPTY today, so every subject shows ឆាប់ៗនេះ
- * until real per-subject content lands in that file. The old 10-question test
- * (MOCK_QS) and its intro/history panel were deleted on 7 Oct 2026.
+ * Tab B was one code-authored question list per subject until 6 Nov 2026, never
+ * filled; the user then asked for many whole papers per subject, written by
+ * teachers in the Bac II format (docs/notes/exams.md).
  */
-export function generatedPapers(userLanguage: string | undefined): GeneratedPaper[] {
-  return allSubjects(userLanguage).map((subject) => {
-    const key = generatedPaperKey(subject.id);
-    const questions = GENERATED_EXAM_QUESTIONS[subject.id] ?? [];
-    return {
-      key,
-      subject,
-      title: paperTitle(subject),
-      blurb: paperBlurb(subject),
-      questions,
-      count: questions.length,
-    };
-  });
+export function teacherSubjects(
+  userLanguage: string | undefined,
+  manifest: ContentManifest
+): ExamPaper[] {
+  return allSubjects(userLanguage).map((subject) => ({
+    key: `new-${subject.id}`,
+    subject,
+    title: paperTitle(subject),
+    blurb: paperBlurb(subject),
+    count: teacherPapersFor(subject.id, manifest).length,
+  }));
+}
+
+/**
+ * Tab B, level two: one subject's published teacher papers, by number. A gap in
+ * the numbers (paper 4 hidden, or never written) is simply not listed: a paper
+ * keeps its number for good, because a student's history is filed under its key.
+ */
+export function teacherPapersFor(subjectId: SubjectId, manifest: ContentManifest): PastPaper[] {
+  return Object.keys(manifest.paper)
+    .filter((key) => key.startsWith(`new-${subjectId}-`))
+    .map((key) => pastPaperCard(key, manifest))
+    .filter((p): p is PastPaper => p !== null && p.subject.id === subjectId)
+    .sort((a, b) => (a.number ?? 0) - (b.number ?? 0));
 }

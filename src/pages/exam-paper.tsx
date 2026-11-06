@@ -1,15 +1,20 @@
 import { Navigate, useParams } from "react-router";
 import { PaperScreen } from "@/features/exam/components/paper-screen";
-import { pastPaperCard, withContent } from "@/features/exam/papers";
+import {
+  parsePaperKey,
+  pastPaperCard,
+  teacherListHref,
+  withContent,
+} from "@/features/exam/papers";
 import { ContentNotice } from "@/features/practice/components/content-waiting";
 import { BottomNav } from "@/components/shell/bottom-nav";
 import { retryBody, retryContent, useContentBody, useContentManifest } from "@/lib/content";
 
 /**
- * `/exam/subjects/:paperKey` — one past paper's detail, run and review.
+ * `/exam/subjects/:paperKey` — one paper's detail, run and review.
  *
- * `paperKey` is `"{year}-{subjectId}"`, the key the database stores the paper
- * under. pastPaperCard() builds the same object the card list does, so the
+ * `paperKey` is the key the database stores the paper under: a past paper's
+ * `"{year}-{subjectId}"`, or a teacher paper's `"new-{subjectId}-{n}"` (Tab B). pastPaperCard() builds the same object the card list does, so the
  * paper's own screen cannot be titled differently from the card that opened it.
  *
  * THE PAPER COMES FROM THE DATABASE (lib/content.ts) since step B of
@@ -37,7 +42,10 @@ export default function ExamPaperPage() {
   const body = useContentBody("paper", paperKey, version);
 
   if (manifest.status === "ready" && (!card || version === null || body.status === "missing")) {
-    return <Navigate to="/exam/subjects" replace />;
+    // Back to the list the link came from: a teacher paper's is its subject's.
+    const parts = parsePaperKey(paperKey);
+    const list = parts?.number != null ? teacherListHref(parts.subject.id) : "/exam/subjects";
+    return <Navigate to={list} replace />;
   }
 
   if (manifest.status !== "ready" || !card || version === null || body.status !== "ready") {

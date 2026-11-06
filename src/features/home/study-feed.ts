@@ -156,7 +156,11 @@ function catalogFor(subject: SubjectId, input: StudyFeedInput): StudyItem[] {
 
   for (const key of Object.keys(input.manifest.paper).sort().reverse()) {
     const paper = pastPaperCard(key, input.manifest);
-    if (!paper || paper.subject.id !== subject) continue;
+    // Past papers only. A subject may have up to 999 teacher papers (Tab B),
+    // extra practice rather than a plan's to-do: in here they would fill Home's
+    // feed and pile hundreds of papers into the Roadmap's exam month
+    // (study-plan.ts). They live on the Mock Exam page.
+    if (!paper || paper.subject.id !== subject || paper.year === null) continue;
     items.push({
       id: `paper:${key}`,
       kind: "paper",

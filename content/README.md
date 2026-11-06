@@ -32,8 +32,12 @@ A deck's, a quiz's or a game pool's body is a list; a section's or a paper's is 
   `"{subject}-{chapter}-{lesson}"` for a deck (`biology-1-1`),
   `"{subject}-{chapter}-{lesson}-{section}"` for a quiz on a quiz path
   (`math-1-1-1`) and for a lesson section (`biology-3-1-1`, the node on the
-  Study path), `"{year}-{subject}"` for a past paper (`2025-math`), and the
-  subject alone for a game question pool (`math`). New
+  Study path), `"{year}-{subject}"` for a past paper (`2025-math`),
+  `"new-{subject}-{n}"` for a teacher paper (`new-math-1` up to `new-math-999`,
+  kind `paper`, see "Writing a teacher paper"), and the
+  subject alone for a game question pool (`math`). The subject is one of
+  `math physics chemistry biology history khmer english french`, and
+  `check:content` refuses a key of the wrong shape. New
   on Admin → Content only offers keys a student can reach.
 - **A card id is kept for ever** (`biology-1-1-3`). Each student's review
   history is filed under it, so an id is never changed and never given to
@@ -111,6 +115,31 @@ A deck's, a quiz's or a game pool's body is a list; a section's or a paper's is 
 - **`writing`** is the essay task: `{ "title", "prompt", "minWords", "modelEssay": [paragraphs], "checklist": [lines] }`.
   The model essay is written for BrachNha, not the paper's printed sample.
 - **`minutes` comes off the paper's own header**; students get that long.
+
+## Writing a teacher paper
+
+The Mock Exam page's second tab, **វិញ្ញាសារបង្កើតថ្មី**, holds teacher papers:
+whole papers a teacher writes in the Bac II format, predicted from and modelled
+on the past exams. A subject can have many (up to 999). A student taps the
+subject, sees its list (`វិញ្ញាសារទី 1`, `វិញ្ញាសារទី 2`…) and sits one on the
+same screen as a past paper: the rules, the timer, the history and the review.
+
+- **It is a past paper in every way but the key.** `"kind": "paper"`, the key
+  `new-{subject}-{n}`, and the body exactly as "Writing a past paper" above:
+  `minutes`, `points`, `sections` with `title`, `instruction`, `statement` and
+  `questions`, plus `note`, `gapFill`, `writing` and `skills` where they fit.
+  Copy the real paper's SHAPE for that subject: its parts, its points, its time.
+- **The words are the teacher's own**, so the "copied, never paraphrased" rule
+  above does not apply. Every other rule does: options, the ក ខ គ ឃ spread
+  across the whole paper, explanations that show the working, LaTeX, digits.
+- **`n` is the paper's number for good.** Number them in order from 1 and never
+  give a number to a second paper, even after the first is deleted: each
+  student's history and mistakes are filed under the key. To fix a paper, edit
+  it (a new version); do not renumber.
+- **One paper per item, many items per file** is fine
+  (`{ "format": 1, "items": [ {paper new-math-1}, {paper new-math-2}, … ] }`).
+- **Question ids** follow the past-paper rule: a letter per part and a number
+  (`l1`, `p3`), unique across the whole paper.
 
 ### Distractors (the wrong options) are rules, not taste
 

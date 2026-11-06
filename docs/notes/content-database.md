@@ -773,3 +773,12 @@ name. `content_versions` is now readable only while the item is published
 **Verified:** the real policy on PGlite 0.2.17 as `anon` and `authenticated`, including the read working
 before and refused after, listing everything, `content_current`, republishing, and a definer function
 still reading. **Not verified: against the real database.**
+
+## Teacher papers are papers with a second key shape (6 Nov 2026, `20261106000001`)
+
+The Mock Exam page's second tab became teacher papers: kind `paper`, key `new-{subject}-{n}`
+beside `{year}-{subject}`. Only `content_key_ok()` changed, so every paper function (count,
+ids, publish checks, versions, hiding) already covers them. A teacher paper has no slot and no
+New button (there can be hundreds): it arrives by Import, like every paper. The admin tab is
+now called "Papers" / វិញ្ញាសារ. `check:content` now refuses a key of the wrong shape or
+subject, for every kind, rather than leaving that to the import. See `docs/notes/exams.md`.

@@ -120,9 +120,9 @@ const ROUTES = [
       'button:has-text("បន្ត")',
     ],
   },
-  // Tab B's math card. GENERATED_EXAM_QUESTIONS is empty, so every generated
-  // paper is "coming soon" and this photographs the notice a tap shows; once a
-  // generated paper has questions, the same two clicks reach the runner.
+  // Tab B's math card. The fixture has no teacher papers ("new-math-1"…), so
+  // this photographs the coming-soon notice a tap shows; once math has one, the
+  // same two clicks open math's list of papers.
   {
     name: "focus-exam",
     path: "/exam/subjects",

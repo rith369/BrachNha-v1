@@ -16,6 +16,26 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 6 Nov 2026: Teacher Papers on the Mock Exam Page
+
+Commit: `pending`. **Database step:** run `20261106000001` in the SQL editor before importing the
+first teacher paper (see `supabase/README.md`).
+
+The Mock Exam page's second tab, **វិញ្ញាសារបង្កើតថ្មី**, now holds teacher papers: whole papers
+written by teachers in the Bac II format, based on the past exams. Each subject can have many. A
+student taps a subject, sees its list (**វិញ្ញាសារទី 1**, **វិញ្ញាសារទី 2**…), and sits one exactly
+like a past paper: the rules, the timer, the history and the answer review. Each paper in the list
+shows the student's best score. Until a subject has papers, its card says ឆាប់ៗនេះ.
+
+Teacher papers are written as files (`content/README.md`, "Writing a teacher paper") and imported on
+Admin → Content like every paper. That admin tab is now called **Papers** (វិញ្ញាសារ). They count in
+the Mock Exam page's "papers done" and average. They are not added to Home's study list or the
+Roadmap, since there can be hundreds.
+
+**To re-test, please:** after the first teacher paper is published, open Mock Exam → វិញ្ញាសារតាមមុខវិជ្ជា
+→ វិញ្ញាសារបង្កើតថ្មី, tap that subject, open a paper, finish it, then go back and check the list shows
+your score and the back button returns to the list. A subject with no papers should say ឆាប់ៗនេះ.
+
 ## 6 Nov 2026: Feedback Explains Before Opening Telegram
 
 Commit: `ba2e64d`. No database step.

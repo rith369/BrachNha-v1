@@ -117,6 +117,11 @@ let errors = 0;
 try {
   const { checkContent, describeIssue } = await server.ssrLoadModule("/src/utils/content-check.ts");
   const { SECTION_POSTERS, SECTION_MODELS } = await server.ssrLoadModule("/src/features/admin/section-media.ts");
+  const { CONTENT_KEY } = await server.ssrLoadModule("/src/utils/content-manifest.ts");
+  const { SUBJECTS } = await server.ssrLoadModule("/src/features/lessons/subjects.ts");
+  const subjectIds = new Set(SUBJECTS.map((s) => s.id));
+  // "math-1-1" and "math" lead with the subject; "2025-math" and "new-math-3" carry it second.
+  const keySubject = (kind, key) => (kind === "game" ? key : key.split("-")[kind === "paper" ? 1 : 0]);
 
   // The editor's pick lists must be exactly what the app ships.
   const posters = shipped("sections", ".webp");
@@ -159,9 +164,15 @@ try {
         ? Array.isArray(item.body)
         : OBJECT_KINDS.has(item.kind) && item.body && typeof item.body === "object" && !Array.isArray(item.body);
       if (!fits) {
-        console.log(`  ${rel} · ${label}: error: needs a kind (deck, quiz, section or paper) and a body of its shape`);
+        console.log(`  ${rel} · ${label}: error: needs a kind (deck, quiz, section, paper or game) and a body of its shape`);
         fileErrors += 1;
         continue;
+      }
+      // The key's shape and subject, so a wrong key fails here rather than at
+      // Import. The database's content_key_ok() is the final word.
+      if (typeof item.key !== "string" || !CONTENT_KEY[item.kind].test(item.key) || !subjectIds.has(keySubject(item.kind, item.key))) {
+        console.log(`  ${rel} · ${label}: error: not a ${item.kind} key (content/README.md, "Keys and ids")`);
+        fileErrors += 1;
       }
       if (item.kind === "section") {
         const poster = item.body.video?.poster;

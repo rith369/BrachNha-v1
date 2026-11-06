@@ -84,7 +84,7 @@ export function PaperDetail({
   return (
     <div className="mx-auto w-full max-w-2xl">
       <Link
-        to="/exam/subjects"
+        to={paper.backTo}
         className="mb-3 inline-flex items-center gap-1 text-xs font-extrabold text-muted transition hover:text-text md:text-sm"
       >
         <ChevronLeft className="size-4 shrink-0" strokeWidth={2.5} />
@@ -101,7 +101,7 @@ export function PaperDetail({
             {paper.title}
           </h1>
           <div className="text-xs font-bold text-muted md:text-sm">
-            សម័យប្រឡង {paper.year}
+            {paper.subtitle}
           </div>
         </div>
       </div>

@@ -66,12 +66,13 @@ export const EMPTY_MANIFEST: ContentManifest = {
 
 /** A key as the database stores it, per kind (content_key_ok() in SQL, with
  *  the subject checked separately where it matters): "biology-1-1",
- *  "math-1-1-1", "biology-3-1-1", "2025-math", "math". */
+ *  "math-1-1-1", "biology-3-1-1", "2025-math" or a teacher paper's
+ *  "new-math-3" (20261106000001), "math". */
 export const CONTENT_KEY: Record<ContentKind, RegExp> = {
   deck: /^[a-z]+-\d{1,3}-\d{1,3}$/,
   quiz: /^[a-z]+-\d{1,3}-\d{1,3}(-\d{1,3})?$/,
   section: /^[a-z]+-\d{1,3}-\d{1,3}-\d{1,3}$/,
-  paper: /^20\d{2}-[a-z]+$/,
+  paper: /^(20\d{2}-[a-z]+|new-[a-z]+-[1-9]\d{0,2})$/,
   game: /^[a-z]+$/,
 };
 
