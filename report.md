@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 6 Nov 2026: Install BrachNha From the Profile Page
 
-Commit: `pending`. No database step.
+Commit: `a6cdd00`. No database step.
 
 Profile now has an **Install BrachNha** card, so a student can put the app on their home screen
 whenever they want, not only when the install pop-up happens to appear.
