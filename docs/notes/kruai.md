@@ -1082,3 +1082,5 @@ which page, a screenshot helps, `Telegram: @Captain_Alexandros`) with **Open Tel
 time, and Not now / a tap outside / Escape to close. Same absolute-inset shape as the install pop-up. On Home
 the button usually rests over a lesson row at first paint, so it fades click-through until the student
 scrolls (`useFabPlacement`), which is why its test opens on the Leaderboard, whose gutter leaves it clear.
+**Kept on purpose (the user, 6 Nov 2026):** keeping it always solid, with room left at the foot of each page,
+was offered and declined. Do not propose it again.
