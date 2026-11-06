@@ -246,9 +246,10 @@ export default function PrivacyPage() {
               <strong>Google Gemini</strong>: the AI behind KruAI. When you ask
               a question we send that question, the recent conversation, a short
               summary of your profile (name, target grade, subjects you find
-              weak, level and streak), and <strong>which lesson page you had
+              weak, level and streak), <strong>which lesson page you had
               open</strong>, so KruAI can answer from the lesson you are
-              actually reading. We ask Google <strong>not to keep</strong> these
+              actually reading, and <strong>any photo you attach</strong> to
+              the question. We ask Google <strong>not to keep</strong> these
               conversations.
             </li>
           </ul>
@@ -269,6 +270,9 @@ export default function PrivacyPage() {
           <p>
             សេវាកម្មបីៈ Google សម្រាប់ការចូលគណនី, Supabase
             សម្រាប់រក្សាទុកទិន្នន័យ, និង Google Gemini សម្រាប់ KruAI។
+            ពេលអ្នកសួរ KruAI យើងផ្ញើទៅ Google Gemini នូវសំណួរ ការសន្ទនាថ្មីៗ
+            សេចក្ដីសង្ខេបខ្លីនៃប្រវត្តិរូបរបស់អ្នក មេរៀនដែលអ្នកកំពុងបើក
+            និងរូបថតដែលអ្នកភ្ជាប់ជាមួយសំណួរ។
             បើអ្នកមិនប្រើ KruAI ទេ គ្មានអ្វីផ្ញើទៅ AI ឡើយ។
           </p>
           <p>

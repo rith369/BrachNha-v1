@@ -1038,3 +1038,14 @@ KruAI answers 503 rather than touching a free key. Computers keep the whole pool
 set: 10 questions all used the paid key, and a paid key answering 429 never fell back to a free one. **Not verified:** the
 live site, since the key check sits behind sign-in. **Noticed, not changed:** one question with the only key out of quota
 made 19 calls to the fake model before giving up, because the SDK retries inside each of the 6 attempts.
+
+### The body is counted as it arrives (6 Nov 2026)
+
+`handleChat` used to `await req.text()` and measure the string afterwards, so a chunked request with no
+`content-length` was read whole into memory, up to Vercel's own 100 MB, before any sign-in check. It now
+reads the stream itself (`readBodyCapped`), counts BYTES and cancels the rest at `MAX_BODY_BYTES`. The cap
+was in UTF-16 characters before; in bytes, Khmer text costs 3 per letter, which still leaves several times
+the 40 longest messages the composer can send. `tests/server/chat-body.test.mjs`, in `npm test`, runs the
+real handler: the old code never returned on an endless body. **The production key is on a paid Google
+project** (the user confirmed, 6 Nov 2026), which is what the privacy page's wording relies on. The page now
+also says that a photo attached to a question is sent, in both languages; it had left photos out.

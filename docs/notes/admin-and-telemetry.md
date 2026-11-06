@@ -563,3 +563,9 @@ while it is being written to.
 - **`app_events` has no cleanup yet.** It is limited to 500 a day per signed-in student.
 
 **Verified:** PGlite 0.2.17, as `anon` and `authenticated`: 41 checks across the three fixes in this migration.
+
+**Guests keep reporting errors (6 Nov 2026, the user's call).** A security audit noted that anyone with no
+account can still add up to 300 rows a day, which could put misleading messages on Admin → Errors. Requiring
+sign-in was offered and declined: guests are a supported and common state, and every crash only guests hit
+would become invisible. The protection stays the caps above, plus Admin → Errors counting guest reports
+separately on each group, so a flood shows up as guests only.

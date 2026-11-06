@@ -955,3 +955,16 @@ your Battle is the design, and the feature is off, so no new photos arrive. Empt
 ## The Battle limit counted from the wrong hour (5 Nov 2026, `20261105000001`)
 
 `post_competition` worked out "the start of today" as 14:00 in Phnom Penh rather than midnight, so before 14:00 there was no limit at all. A date passed through `at time zone` is first read in the server's zone. **Write `::date::timestamp at time zone`, or compare dates with dates.** The test copied the same line and every earlier run was in the afternoon, so it passed. It now states midnight independently, and fails on the old function at any hour.
+
+## A Battle result can still be faked through the database (6 Nov 2026, accepted)
+
+A security audit found that someone calling the database directly can post a perfect score at almost no time.
+The answers cannot be hidden on the Battle row, because every game question is published content
+(`content_current('game')`, readable with no sign-in, answers included): the creator's phone needs the pool to
+build a Battle. Timing attempts on the server was considered and dropped, because questions can be read before
+starting, so a cheater would call start and submit half a second apart and get an honest, server-measured fast time.
+
+**The user accepted it.** Only a technical person can do it, in-app play always reports the real answers and time,
+nobody's data is exposed, and XP and the leaderboard can already be changed on a student's own phone (the store is
+the live copy), so a faked Battle gains nothing new. **The only real fix** is server-side Battles: the game pool
+leaves public content and the server picks and grades every question, which ends creating a Battle offline.

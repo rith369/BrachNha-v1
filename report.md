@@ -16,6 +16,25 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 6 Nov 2026: More Security Fixes, and the Privacy Page Mentions KruAI Photos
+
+Commit: `pending`. No database step.
+
+- **The privacy page now says photos are sent to the AI.** When a student attaches a photo to a KruAI
+  question, the photo goes to Google Gemini with the question. The page listed everything else that is
+  sent but not the photo. It now says so in English and in Khmer.
+- **KruAI can no longer be made to hold a huge message in memory.** A request with no stated size was read
+  in full before the size limit was checked. It is now stopped as soon as it passes the limit.
+- **A developer tool was updated** to fix two known problems that affect only developers' computers,
+  not the site.
+
+Decided, nothing changed: a technical person could still fake a Battle result, which gains them nothing the app counts. Crash reports from guests are still collected, because without them crashes
+that only guests hit would go unseen. The production KruAI key is on Google's paid service, which is
+what the privacy page promises.
+
+**To re-test, please:** ask KruAI a normal question and one with a photo; both should answer as before.
+Read the Privacy page in Khmer and check the new sentence about KruAI.
+
 ## 6 Nov 2026: Security Fixes Before Launch
 
 Commit: `0a65475`. No database step. The one dashboard step is done.

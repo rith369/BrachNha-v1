@@ -698,6 +698,35 @@ async function readUntilText(it: UpstreamIterator): Promise<FirstRead> {
   }
 }
 
+/**
+ * The body as UTF-8 text, or null once it passes `max` BYTES. Stops reading
+ * there and cancels the rest, so memory never holds more than `max` plus one
+ * chunk. Throws if the stream itself fails, which the caller answers with 400.
+ */
+async function readBodyCapped(req: Request, max: number): Promise<string | null> {
+  if (!req.body) return "";
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > max) {
+      reader.cancel().catch(() => {});
+      return null;
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder().decode(bytes);
+}
+
 export async function handleChat(req: Request): Promise<Response> {
   // Declared size first, before a byte is read. Cheap, and it turns the obvious
   // way to make this endpoint expensive into a 413 that costs one header read.
@@ -707,14 +736,18 @@ export async function handleChat(req: Request): Promise<Response> {
   }
 
   // Then the actual bytes, because content-length is the caller's claim about
-  // the caller's own body and a chunked request carries none at all.
-  let raw: string;
+  // the caller's own body and a chunked request carries none at all. Counted
+  // AS THEY ARRIVE (security audit, 6 Nov 2026): `req.text()` read the whole
+  // body into memory first and measured it after, so a chunked request with no
+  // length could make a function hold up to the platform's own limit (100MB on
+  // Vercel) before this line refused it, and before any sign-in check.
+  let raw: string | null;
   try {
-    raw = await req.text();
+    raw = await readBodyCapped(req, MAX_BODY_BYTES);
   } catch {
     return textResponse("Invalid request body.", 400);
   }
-  if (raw.length > MAX_BODY_BYTES) {
+  if (raw === null) {
     return textResponse("Request too large.", 413);
   }
 
