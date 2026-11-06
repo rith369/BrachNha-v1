@@ -112,6 +112,10 @@ installing from either ends both.
   browser that has not fired the event): a button that does nothing must not look
   tappable.
 
+**The whole card is the button** (the user, 6 Nov 2026: a tap on the icon or the words should work, not
+only on the pill). The pill is a styled `span` inside it, since a button cannot hold a button, and the
+iPhone steps sit below the button so they stay valid markup.
+
 `tests/e2e/install-card.test.mjs` covers all five cases and the 320px floor; the
 e2e `open()` takes a `userAgent` for it. **Not verified: a real phone**, for the same
 https reason as above.

@@ -65,55 +65,54 @@ export function InstallCard() {
   };
 
   const help = isIOS() ? t.inAppHelpIOS : isAndroid() ? t.inAppHelpAndroid : t.inAppHelpGeneric;
-  const button =
-    "shrink-0 rounded-full bg-brand px-4 py-2 text-xs font-extrabold text-white shadow-cta active:scale-[0.98]";
+  // The pill LOOKS like a button but is a span: the whole top of the card is
+  // the one button (asked for 6 Nov 2026: a tap anywhere on the card works, not
+  // only on the pill), and a button inside a button is invalid.
+  const pill =
+    "shrink-0 rounded-full bg-brand px-4 py-2 text-xs font-extrabold text-white shadow-cta";
+  const onTap = inApp
+    ? openBrowser
+    : mode === "prompt"
+      ? () => void promptInstall()
+      : () => setStepsOpen((open) => !open);
 
   return (
     <Card className="mb-4 gap-3" data-testid="install-card">
-      <div className="flex items-center gap-3">
-        {/* The real home-screen icon, white in both themes like the logo. */}
-        <img
-          src="/icons/icon-192.png"
-          alt=""
-          width={44}
-          height={44}
-          className="size-11 shrink-0 rounded-[22%] border border-border bg-white"
-        />
-        <div className="min-w-0 flex-1">
-          <div className="text-sm font-extrabold">{c.cardTitle}</div>
-          <div className="text-xs font-bold text-muted">
-            {inApp ? c.cardInAppBody : c.cardBody}
-          </div>
-        </div>
-        {mode === "prompt" && (
-          <button type="button" onClick={() => void promptInstall()} className={button}>
-            {c.install}
-          </button>
+      <button
+        type="button"
+        onClick={onTap}
+        aria-expanded={mode === "ios" && !inApp ? stepsOpen : undefined}
+        className="flex w-full flex-col gap-3 rounded-xl text-left transition-transform active:scale-[0.99]"
+      >
+        <span className="flex w-full items-center gap-3">
+          {/* The real home-screen icon, white in both themes like the logo. */}
+          <img
+            src="/icons/icon-192.png"
+            alt=""
+            width={44}
+            height={44}
+            className="size-11 shrink-0 rounded-[22%] border border-border bg-white"
+          />
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-extrabold">{c.cardTitle}</span>
+            <span className="block text-xs font-bold text-muted">
+              {inApp ? c.cardInAppBody : c.cardBody}
+            </span>
+          </span>
+          {!inApp && <span className={pill}>{c.install}</span>}
+        </span>
+        {inApp && (
+          <span className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand px-5 py-3 text-sm font-extrabold text-white shadow-cta">
+            <ExternalLink className="size-4" strokeWidth={2.5} />
+            {t.openInBrowser}
+          </span>
         )}
-        {mode === "ios" && (
-          <button
-            type="button"
-            aria-expanded={stepsOpen}
-            onClick={() => setStepsOpen((open) => !open)}
-            className={button}
-          >
-            {c.install}
-          </button>
-        )}
-      </div>
+      </button>
 
-      {mode === "ios" && stepsOpen && <IosSteps />}
+      {mode === "ios" && !inApp && stepsOpen && <IosSteps />}
 
       {inApp && (
         <>
-          <button
-            type="button"
-            onClick={openBrowser}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand px-5 py-3 text-sm font-extrabold text-white shadow-cta active:scale-[0.98]"
-          >
-            <ExternalLink className="size-4" strokeWidth={2.5} />
-            {t.openInBrowser}
-          </button>
           {refused && (
             <div className="border-t border-border pt-3">
               <p className="text-xs font-extrabold text-text">{t.inAppStillHere}</p>

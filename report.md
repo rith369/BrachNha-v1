@@ -16,6 +16,16 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 6 Nov 2026: Tap Anywhere on the Install Card
+
+Commit: `pending`. No database step.
+
+On Profile, the Install BrachNha card used to work only when the small purple Install button was
+tapped. Now a tap anywhere on the card works: the icon, the title or the words.
+
+**To re-test, please:** on Profile, tap the words on the Install card instead of the button. It should
+do the same as the button.
+
 ## 6 Nov 2026: KruAI Is Off for Now, and the Corner Button Sends Feedback
 
 Commit: `8e8bcf6`. No database step.

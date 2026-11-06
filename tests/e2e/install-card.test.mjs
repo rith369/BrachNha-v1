@@ -57,7 +57,8 @@ test("Android: Install opens the browser's own dialog, and the card goes once in
   await offerInstall(page);
   await card.waitFor();
   assert.ok((await card.innerText()).includes("ដំឡើង BrachNha"));
-  await card.getByRole("button", { name: "ដំឡើង" }).click();
+  // A tap on the WORDS, not the pill: the whole card is the button.
+  await card.getByText("ដាក់ BrachNha នៅលើអេក្រង់ដើម").click();
   await page.waitForTimeout(200);
   assert.equal(await page.evaluate(() => window.__prompted), 1);
   assert.equal(await card.count(), 0, "the card should go once the app is installed");
@@ -69,9 +70,13 @@ test("iPhone: Install shows the two steps in the card", async () => {
   const { ctx, page, problems, card } = await profile({ userAgent: IPHONE });
   await card.waitFor();
   assert.ok(!(await card.innerText()).includes("Add to Home Screen"));
-  await card.getByRole("button", { name: "ដំឡើង" }).click();
+  // A tap on the ICON opens the steps; a second tap closes them again.
+  await card.locator("img").click();
   const body = await card.innerText();
   assert.ok(body.includes("Share") && body.includes("Add to Home Screen"), body);
+  assert.equal(await card.getByRole("button").first().getAttribute("aria-expanded"), "true");
+  await card.locator("img").click();
+  assert.ok(!(await card.innerText()).includes("Add to Home Screen"));
   assert.deepEqual(await problemsOn(page, problems), []);
   await ctx.close();
 });
@@ -85,7 +90,8 @@ test("Telegram: asks for the real browser, then shows the manual way and the lin
   });
   await card.waitFor();
   assert.ok((await card.innerText()).includes("Chrome ឬ Safari"));
-  await card.getByRole("button", { name: /Browser/ }).click();
+  // The title, not the Open in Browser bar under it.
+  await card.getByText("ដំឡើង BrachNha", { exact: true }).click();
   await page.waitForTimeout(1900);
   const body = await card.innerText();
   assert.ok(body.includes("សូមបើកដោយដៃ"), body);
