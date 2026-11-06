@@ -20,7 +20,29 @@
  * set, animateTransform, iframe, and every attribute starting with "on" or
  * naming an href. `url(...)` is allowed only as a same-document reference
  * (`url(#arrow)`), which is how markers attach; anything else could fetch.
+ *
+ * NODES THAT ARE NOT ELEMENTS ARE THE OTHER HALF (security audit, 6 Nov 2026).
+ * The string is parsed as XML but rendered by the HTML parser, and the two read
+ * some nodes differently. `<?x ><img src=x onerror=…>?>` is one processing
+ * instruction to XML; HTML ends it at the first `>`, and the `<img>` after it
+ * breaks out of the SVG as a live HTML element. `<!--><img …>-->` is one comment
+ * to XML; HTML closes `<!-->` at once, with the same result. Both were measured
+ * in Chrome passing through the old version, which only walked `children`.
+ * So: a processing instruction is dropped, CDATA becomes plain text, and a
+ * comment is kept only with no `<` or `>` in it (authored diagrams carry notes
+ * like `<!-- Shaded Area S -->`, which the editor's check must still see
+ * unchanged). Then the result is parsed the HTML way, inertly, and refused
+ * outright if any element came out anywhere but the SVG namespace, so a trick
+ * not listed here fails closed instead of rendering.
  */
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+// Node.nodeType values, as numbers so this file needs no DOM globals to load.
+const ELEMENT_NODE = 1;
+const TEXT_NODE = 3;
+const CDATA_SECTION_NODE = 4;
+const COMMENT_NODE = 8;
 
 const ALLOWED_TAGS = new Set([
   "svg",
@@ -113,10 +135,44 @@ function clean(el: Element): void {
       safeValue(attr.name, attr.value);
     if (!allowed) el.removeAttribute(attr.name);
   }
-  for (const child of Array.from(el.children)) {
-    if (ALLOWED_TAGS.has(child.localName)) clean(child);
-    else child.remove();
+  // childNodes, not children: `children` skips every node that is not an
+  // element, and those are exactly the ones the HTML parser reads differently.
+  for (const node of Array.from(el.childNodes)) {
+    if (node.nodeType === ELEMENT_NODE) {
+      const child = node as Element;
+      // No namespace is how an authored diagram without xmlns parses; any
+      // other namespace (an XHTML `title`, say) is not part of a drawing.
+      const svgNs = child.namespaceURI === SVG_NS || child.namespaceURI === null;
+      if (svgNs && ALLOWED_TAGS.has(child.localName)) clean(child);
+      else child.remove();
+    } else if (node.nodeType === TEXT_NODE) {
+      // Serialised escaped, so it can only ever be text.
+    } else if (node.nodeType === CDATA_SECTION_NODE) {
+      node.parentNode?.replaceChild(
+        el.ownerDocument.createTextNode(node.nodeValue ?? ""),
+        node
+      );
+    } else if (node.nodeType === COMMENT_NODE && !/[<>]/.test(node.nodeValue ?? "")) {
+      // An author's note. Without `<` or `>` it cannot open or close anything.
+    } else {
+      // Processing instructions, and any comment that could break out.
+      node.parentNode?.removeChild(node);
+    }
   }
+}
+
+/**
+ * True when `markup`, parsed the way `dangerouslySetInnerHTML` will parse it,
+ * gives only SVG elements. A template's content is inert: nothing in it loads
+ * or runs while it is checked.
+ */
+function onlySvgElements(markup: string): boolean {
+  if (typeof document === "undefined") return false;
+  const probe = document.createElement("template");
+  probe.innerHTML = markup;
+  return Array.from(probe.content.querySelectorAll("*")).every(
+    (el) => el.namespaceURI === SVG_NS
+  );
 }
 
 /** Returns a sanitised copy of `raw`, or "" if it is not a well-formed SVG. */
@@ -131,6 +187,9 @@ export function sanitizeSvg(raw: string): string {
   if (root.localName !== "svg" || doc.getElementsByTagName("parsererror").length) {
     return "";
   }
+  // The root goes through the same namespace test as its children.
+  if (root.namespaceURI !== SVG_NS && root.namespaceURI !== null) return "";
   clean(root);
-  return new XMLSerializer().serializeToString(root);
+  const out = new XMLSerializer().serializeToString(root);
+  return onlySvgElements(out) ? out : "";
 }

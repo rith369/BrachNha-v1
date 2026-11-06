@@ -119,6 +119,11 @@ const en = {
   todayTitle: "Today",
   usedOfLimit: (used: number, limit: number) =>
     `${used} of ${limit} units for the whole app`,
+  capWarning: {
+    half: "Half of today's whole-app limit is used. When it runs out, KruAI stops for every student until midnight. Check Most units today below, and raise the whole-app limit if this is real use.",
+    near: "Today's whole-app limit is almost used up. When it runs out, KruAI stops for every student until midnight. Check Most units today below, and raise the whole-app limit if this is real use.",
+    out: "Today's whole-app limit is used up. KruAI is stopped for every student until midnight.",
+  },
   studentsToday: (n: number) =>
     `${n} ${n === 1 ? "student" : "students"} asked today`,
   unitsNote:
@@ -414,6 +419,11 @@ const km: AdminCopy = {
   todayTitle: "ថ្ងៃនេះ",
   usedOfLimit: (used: number, limit: number) =>
     `${used} ក្នុងចំណោម ${limit} ឯកតា សម្រាប់កម្មវិធីទាំងមូល`,
+  capWarning: {
+    half: "កម្រិតកម្មវិធីទាំងមូលថ្ងៃនេះ ត្រូវបានប្រើអស់ពាក់កណ្ដាលហើយ។ ពេលអស់ KruAI នឹងឈប់សម្រាប់សិស្សទាំងអស់ រហូតដល់ពាក់កណ្ដាលអធ្រាត្រ។ សូមពិនិត្យ ប្រើច្រើនជាងគេថ្ងៃនេះ ខាងក្រោម ហើយបង្កើនកម្រិតកម្មវិធីទាំងមូល ប្រសិនបើនេះជាការប្រើប្រាស់ពិតប្រាកដ។",
+    near: "កម្រិតកម្មវិធីទាំងមូលថ្ងៃនេះ ជិតអស់ហើយ។ ពេលអស់ KruAI នឹងឈប់សម្រាប់សិស្សទាំងអស់ រហូតដល់ពាក់កណ្ដាលអធ្រាត្រ។ សូមពិនិត្យ ប្រើច្រើនជាងគេថ្ងៃនេះ ខាងក្រោម ហើយបង្កើនកម្រិតកម្មវិធីទាំងមូល ប្រសិនបើនេះជាការប្រើប្រាស់ពិតប្រាកដ។",
+    out: "កម្រិតកម្មវិធីទាំងមូលថ្ងៃនេះ អស់ហើយ។ KruAI បានឈប់សម្រាប់សិស្សទាំងអស់ រហូតដល់ពាក់កណ្ដាលអធ្រាត្រ។",
+  },
   studentsToday: (n: number) => `សិស្ស ${n} នាក់បានសួរថ្ងៃនេះ`,
   unitsNote:
     "សំណួរមួយស្មើ 1 ឯកតា ហើយរូបថតថ្មីមួយស្មើ 3។ នេះជាឯកតា មិនមែនជាប្រាក់ដុល្លារទេ៖ តម្លៃជាដុល្លារមានតែក្នុងកំណត់ត្រារបស់ម៉ាស៊ីនមេប៉ុណ្ណោះ។",

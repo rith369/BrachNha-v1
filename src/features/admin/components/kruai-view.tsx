@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Play, Save } from "lucide-react";
+import { Play, Save, TriangleAlert } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -61,9 +61,27 @@ function ErrorLine({ reason, lang }: { reason: AdminFail; lang: Lang }) {
   );
 }
 
+/**
+ * How close today is to the whole-app limit, as a warning level, or null.
+ *
+ * WHY IT EXISTS (security audit, 6 Nov 2026): the whole-app limit is shared, so
+ * about ten accounts using their own limit in full can stop KruAI for every
+ * student until midnight. Nothing sends an email or a message yet (that waits
+ * for a real notification system), so the warning is here, on the page an admin
+ * opens, early enough to look at the top students and raise the limit.
+ */
+function capLevel(used: number, limit: number): "half" | "near" | "out" | null {
+  if (limit <= 0) return null;
+  if (used >= limit) return "out";
+  if (used >= limit * 0.8) return "near";
+  if (used >= limit * 0.5) return "half";
+  return null;
+}
+
 function TodayCard({ data, lang }: { data: KruaiOverview; lang: Lang }) {
   const c = ADMIN_COPY[lang];
   const pct = data.appDaily > 0 ? Math.min(100, (data.todayUnits / data.appDaily) * 100) : 0;
+  const level = capLevel(data.todayUnits, data.appDaily);
   return (
     <div className={`md:col-span-2 ${CARD}`}>
       <CardTitle>{c.todayTitle}</CardTitle>
@@ -80,6 +98,18 @@ function TodayCard({ data, lang }: { data: KruaiOverview; lang: Lang }) {
           style={{ width: `${pct}%` }}
         />
       </div>
+      {level && (
+        <p
+          role="alert"
+          className={cn(
+            "mt-3 flex items-start gap-2 rounded-xl border border-border px-3 py-2 text-xs leading-relaxed font-bold text-ink",
+            level === "half" ? "bg-neo-yellow" : "bg-neo-pink"
+          )}
+        >
+          <TriangleAlert className="mt-0.5 size-4 shrink-0" strokeWidth={2.5} aria-hidden />
+          <span>{c.capWarning[level]}</span>
+        </p>
+      )}
       <div className="mt-2 text-xs font-bold">{c.studentsToday(data.todayStudents)}</div>
       <p className="mt-3 text-[11px] leading-relaxed font-semibold text-muted">{c.unitsNote}</p>
     </div>

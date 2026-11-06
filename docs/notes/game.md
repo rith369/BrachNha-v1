@@ -337,7 +337,12 @@ could have acted as every student who played it. Two layers now (28 Sep 2026):
 `utils/sanitize-svg.ts` ALLOWLISTS what a diagram needs (tags, attributes,
 `url(#local)` only) and drops everything else, for every `MathText` caller; and
 `toQuestions()` in `lib/competitions.ts` checks each question's shape and
-refuses any containing SVG — the app's own pool has none. `game-play.tsx`
+refuses any containing SVG — the app's own pool has none. (**6 Nov 2026:** the sanitiser
+still had a hole in nodes that are not elements: a processing instruction, or a comment
+written `<!-->`, is one node to the XML parser it uses and is cut short by the HTML
+parser that renders it, letting an `<img>` out as live HTML. Measured in Chrome, fixed,
+and now a permanent test, `tests/e2e/sanitize-svg.test.mjs`, which needs no build:
+`node --test tests/e2e/sanitize-svg.test.mjs`.) `game-play.tsx`
 refuses a competition that lost a question in that check rather than playing it
 short. Verified in real Chrome: both `math-2025.ts` graphs come out
 element-for-element and attribute-for-attribute identical, and 14 payloads
@@ -940,6 +945,12 @@ The feature was off only in the app, so the database still took uploads from any
 The upload policy is gone. Reading, reporting and deleting leftover photos still work, and so does account
 deletion. **Turning the feature back on needs `"competition work: upload own"` restored from
 `20260916000003` as well as `WORK_PHOTOS_ENABLED`.**
+
+**Photos already uploaded stay readable by the Battle's players (6 Nov 2026, the user's call).** A
+security audit pointed out that the browse list shows every open Battle, so any signed-in student can
+play one and then open the creator's leftover photos. The user chose to keep that: strangers playing
+your Battle is the design, and the feature is off, so no new photos arrive. Emptying the
+`competition-work` bucket, or limiting its read policy to admins, would close it if that changes.
 
 ## The Battle limit counted from the wrong hour (5 Nov 2026, `20261105000001`)
 

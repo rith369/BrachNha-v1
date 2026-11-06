@@ -231,9 +231,16 @@ for you:
 2. Supabase → Authentication → Providers → **Google → enable**, paste the client
    id and secret.
 3. Supabase → Authentication → URL Configuration → Site URL and Redirect URLs.
-   **A Vercel preview gets a fresh hostname every deploy**, so that list needs a
-   wildcard or OAuth fails on every preview — the kind of thing diagnosed as
-   "OAuth is broken" a week later.
+   **Exact addresses only (security audit, 6 Nov 2026).** The list is
+   `https://brach-nha-v1.vercel.app/**` and `http://localhost:5173/**`, nothing
+   else. It used to carry a wildcard so previews could sign in, and a broad one
+   (`*.vercel.app`) lets ANY Vercel site receive a student's sign-in code: an
+   attacker starts the PKCE flow with their own verifier, sends the link, and
+   swaps the code for the student's session. Even the team-scoped
+   `brach-nha-v1-*-<team>.vercel.app` was removed, because a stranger's project
+   named to fit it might get a matching address, and nothing deploys to previews
+   (every deployment is Production). So sign-in fails on a preview build, on
+   purpose. Add that pattern back only for the day it is needed.
 4. Vercel → `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` on Production AND
    Preview, then **redeploy**. Without them the endpoint returns 503 by design.
 

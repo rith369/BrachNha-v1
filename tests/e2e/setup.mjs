@@ -158,7 +158,7 @@ function databaseServer() {
   return { server, db };
 }
 
-function findChrome() {
+export function findChrome() {
   const paths = [
     process.env.CHROME_PATH,
     "C:/Program Files/Google/Chrome/Application/chrome.exe",

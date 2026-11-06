@@ -608,6 +608,22 @@ comparison matrices render as responsive, scrollable HTML tables rather than raw
 papers — add entries to `BAC2_EXAMPLES` and flip `verified: true` once a teacher
 checks them; no code change needed.
 
+### The whole-app limit can be used up by a few accounts (6 Nov 2026)
+
+A security audit pointed out that the whole-app limit is one shared pool: with the defaults (30 per
+student, 300 for the app) about ten accounts using their own limit in full stop KruAI for every
+student until midnight in Phnom Penh. Google accounts are free, so this is a cheap way to switch
+KruAI off once sign-in is open to everyone.
+
+**What was built, the user's choice:** a warning on `/admin/kruai`, in the Today card, at 50% of the
+whole-app limit (yellow), 80% and used up (pink). It reads only what `admin_kruai_overview()`
+already returns, so no migration. Nothing sends an email or a message (see the deferred alerts
+decision); an admin sees it when they open the page.
+
+**Not built, offered:** a smaller limit for accounts younger than a day, and counting units only
+from the server. The real protection is still the owner setting the whole-app limit to match the
+Gemini budget.
+
 ### The corpus goes in TWICE, at two levels of detail
 
 This is the shape of `chat-prompt.ts` and the thing not to collapse back into

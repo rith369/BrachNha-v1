@@ -16,6 +16,32 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 6 Nov 2026: Security Fixes Before Launch
+
+Commit: `pending`. No database step. The one dashboard step is done.
+
+A security review before launch found these. Fixed in the app:
+
+- **Diagrams could carry hidden page code.** The guard that cleans the drawings in lessons and papers
+  missed two tricks that let other page parts out of a drawing. The site's security settings already
+  stopped any code from running, so nobody could have been signed in as someone else, but a fake box
+  or link could have been shown. It is closed now and checked automatically. Diagrams look the same.
+- **KruAI's daily total can run out early.** All students share one daily total, so about ten
+  accounts using their own limit fully could switch KruAI off for everyone until midnight. The
+  Admin KruAI page now shows a yellow warning at half of the total and a pink one at 80% and when
+  it is used up, so the owner can look at who is using it and raise the total.
+
+Decided, nothing changed: photos of working that students added to Battles before photos were turned
+off can still be seen by people who play that Battle. That is how Battles were designed.
+
+**Fixed in the dashboard:** the sign-in settings in Supabase allowed any Vercel website to receive a
+student's sign-in. They now allow only the real site and a developer's own computer. Sign-in on a
+test (preview) version of the site no longer works, on purpose.
+
+**To re-test, please:** sign in with Google on the live site, and once from a friend's invite link.
+Open a lesson or past paper with a graph and check it draws as before. On Admin, KruAI, the Today
+card shows no warning while less than half the total is used.
+
 ## 5 Nov 2026: Flashcard Back Button Fixed
 
 Commit: `a96099f`. No database step.
