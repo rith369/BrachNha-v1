@@ -1,6 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { motion } from "framer-motion";
-import { Share, SquarePlus } from "lucide-react";
 import { useBrachNhaStore } from "@/lib/store";
 import {
   dismissInstall,
@@ -11,6 +10,7 @@ import {
   type InstallReason,
 } from "@/lib/install-prompt";
 import { INSTALL_COPY } from "../copy";
+import { IosSteps } from "./ios-steps";
 
 /** Lets the first screen paint and settle before anything covers it. */
 const OPEN_DELAY_MS = 1500;
@@ -107,25 +107,7 @@ function InstallDialog({
 
         {mode === "ios" ? (
           <>
-            <ol className="mb-5 space-y-2 text-left">
-              <li className="flex items-center gap-3 rounded-2xl bg-control p-3">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-blue/10">
-                  <Share className="size-5 text-blue" strokeWidth={2.5} />
-                </span>
-                <span className="text-sm font-bold text-text">
-                  {c.iosStep1}
-                  <span className="block text-xs font-semibold text-muted">
-                    {c.iosStep1Hint}
-                  </span>
-                </span>
-              </li>
-              <li className="flex items-center gap-3 rounded-2xl bg-control p-3">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-purple/10">
-                  <SquarePlus className="size-5 text-purple" strokeWidth={2.5} />
-                </span>
-                <span className="text-sm font-bold text-text">{c.iosStep2}</span>
-              </li>
-            </ol>
+            <IosSteps className="mb-5" />
             <button
               onClick={close}
               className="w-full rounded-2xl bg-brand px-5 py-3 font-bold text-white shadow-cta active:scale-[0.98]"

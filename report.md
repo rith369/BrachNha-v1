@@ -16,6 +16,26 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 6 Nov 2026: Install BrachNha From the Profile Page
+
+Commit: `pending`. No database step.
+
+Profile now has an **Install BrachNha** card, so a student can put the app on their home screen
+whenever they want, not only when the install pop-up happens to appear.
+
+- **On Android**, tapping Install opens the phone's own install box.
+- **On an iPhone**, which has no install button for websites, it shows the two steps: tap Share, then
+  Add to Home Screen.
+- **Inside Telegram or Messenger**, which cannot install apps, it offers to open BrachNha in Chrome or
+  Safari, and shows how to do it by hand if Telegram does not let it.
+- **The card does not show** once the app is installed, or in a browser that cannot install it.
+
+The automatic pop-up works as before.
+
+**To re-test, please:** on an Android phone in Chrome, open Profile and tap Install. On an iPhone in
+Safari, tap Install and check the two steps. Open a BrachNha link inside Telegram, go to Profile and
+tap Open in Browser. After installing, the card should be gone.
+
 ## 6 Nov 2026: More Security Fixes, and the Privacy Page Mentions KruAI Photos
 
 Commit: `7787ada`. No database step.

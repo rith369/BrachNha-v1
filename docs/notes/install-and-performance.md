@@ -92,6 +92,30 @@ inside `/sections/...` and appears once, after leaving. **Not verified: a real
 install on a real phone.** That needs the deployed site, because the install
 event only fires over https.
 
+### An Install card on Profile (6 Nov 2026)
+
+The user asked for a way to install whenever a student wants, not only when the
+pop-up turns up: `features/install/components/install-card.tsx`, under the Target
+Grade card. It reads the same module as the pop-up, so they always agree, and
+installing from either ends both.
+
+- **Android/desktop Chromium:** Install calls `promptInstall()`, the browser's own
+  dialog. The event is single-use, so after a "no" the card goes until the browser
+  fires a fresh one.
+- **iPhone:** Install opens the two steps inside the card. They are now one
+  component, `ios-steps.tsx`, shared with the pop-up.
+- **Telegram, Messenger and other in-app browsers, unlike the pop-up, get a card**
+  (the user's choice): "Open in Browser" through `openInExternalBrowser()`, the same
+  request sign-in makes, then the manual way and the link after 1.5s if the host app
+  ignores it. The link keeps `/profile`, so the real browser opens on the card.
+- **No card** when installed, or where nothing can install (Firefox, a desktop
+  browser that has not fired the event): a button that does nothing must not look
+  tappable.
+
+`tests/e2e/install-card.test.mjs` covers all five cases and the 320px floor; the
+e2e `open()` takes a `userAgent` for it. **Not verified: a real phone**, for the same
+https reason as above.
+
 ## Performance — the four rules, and why each one exists
 
 The app was slow, and the reported symptom was **navigation**, not first load.

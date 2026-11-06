@@ -191,8 +191,8 @@ export async function startApp() {
    * A phone with a student on it. Real students read Khmer at a narrow width, so that is
    * the default. `guest` has no account.
    */
-  async function open({ guest = false, fresh = false, theme = "light", viewport = { width: 390, height: 844 }, state = {} } = {}) {
-    const ctx = await browser.newContext({ viewport, hasTouch: true, serviceWorkers: "block" });
+  async function open({ guest = false, fresh = false, theme = "light", viewport = { width: 390, height: 844 }, state = {}, userAgent } = {}) {
+    const ctx = await browser.newContext({ viewport, hasTouch: true, serviceWorkers: "block", ...(userAgent ? { userAgent } : {}) });
     const page = await ctx.newPage();
     const problems = [];
     page.on("pageerror", (e) => problems.push(`page error: ${e.message}`));

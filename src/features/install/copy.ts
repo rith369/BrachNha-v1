@@ -18,6 +18,10 @@ const en = {
   iosStep1Hint: "in your browser's toolbar",
   iosStep2: "Choose “Add to Home Screen”",
   dialogLabel: "Install BrachNha",
+  // The card on Profile (install-card.tsx), for installing whenever a student wants.
+  cardTitle: "Install BrachNha",
+  cardBody: "Add BrachNha to your home screen so it opens in one tap.",
+  cardInAppBody: "This app cannot install BrachNha. Open it in Chrome or Safari and install it there.",
 };
 
 const km: typeof en = {
@@ -32,6 +36,9 @@ const km: typeof en = {
   iosStep1Hint: "នៅលើរបារឧបករណ៍របស់កម្មវិធីរុករក",
   iosStep2: "ជ្រើសរើស «Add to Home Screen»",
   dialogLabel: "ដំឡើង BrachNha",
+  cardTitle: "ដំឡើង BrachNha",
+  cardBody: "ដាក់ BrachNha នៅលើអេក្រង់ដើម ដើម្បីចុចតែម្តងក៏បើកបាន។",
+  cardInAppBody: "កម្មវិធីនេះមិនអាចដំឡើង BrachNha បានទេ។ សូមបើកក្នុង Chrome ឬ Safari រួចដំឡើងនៅទីនោះ។",
 };
 
 export const INSTALL_COPY = { en, km };

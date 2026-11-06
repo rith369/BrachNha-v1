@@ -8,6 +8,7 @@ import { GoogleButton } from "@/features/auth/components/google-button";
 import { ProfileIdentity } from "./profile-identity";
 import { StudyCalendar } from "./study-calendar";
 import { DeleteAccount } from "./delete-account";
+import { InstallCard } from "@/features/install/components/install-card";
 import { useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { useAuth } from "@/hooks/use-auth";
@@ -108,6 +109,10 @@ export function ProfileView() {
           </div>
         </div>
       </Card>
+
+      {/* Install whenever the student wants, not only when the pop-up appears.
+          Renders nothing where installing is impossible or already done. */}
+      <InstallCard />
 
       {/* The upgrade path. The login prompt only appears when a guest reaches a
           locked feature, so without this there is no way to sign in from inside
