@@ -62,6 +62,21 @@ test("an ordinary body is still read and parsed", async () => {
   assert.equal(await res.text(), "No message.");
 });
 
+test("while KruAI is switched off, a real question is refused before anything is called", async (t) => {
+  const { KRUAI_ENABLED } = await server.ssrLoadModule("/src/data/kruai-switch.ts");
+  if (KRUAI_ENABLED) return t.skip("KruAI is switched on");
+  // No keys and no database here: a refusal from anywhere later would be a
+  // different status or message, and a call to Google would hang or throw.
+  const res = await handleChat(
+    new Request("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({ messages: [{ role: "user", text: "សួស្តី" }], lang: "km" }),
+    })
+  );
+  assert.equal(res.status, 503);
+  assert.equal(await res.text(), "🔒 KruAI ត្រូវបានបិទសិនសម្រាប់ពេលនេះ។");
+});
+
 test("a body split in the middle of a Khmer letter still parses", async () => {
   // Each Khmer letter is 3 bytes; 1-byte chunks split every one of them. The bytes
   // are joined before decoding, so nothing is turned into a replacement character.

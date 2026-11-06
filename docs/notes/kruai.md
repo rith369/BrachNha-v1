@@ -1049,3 +1049,30 @@ the 40 longest messages the composer can send. `tests/server/chat-body.test.mjs`
 real handler: the old code never returned on an endless body. **The production key is on a paid Google
 project** (the user confirmed, 6 Nov 2026), which is what the privacy page's wording relies on. The page now
 also says that a photo attached to a question is sent, in both languages; it had left photos out.
+
+## KruAI is switched off, and the corner button is Feedback (6 Nov 2026)
+
+**The user's decision:** they do not want to pay for the model yet. One constant, `KRUAI_ENABLED` in
+`src/data/kruai-switch.ts`, is read in three places:
+
+- **`server/chat-handler.ts`** answers 503 ("KruAI is turned off for now") right after the cheap shape
+  checks, before the rate limit, the sign-in check, the quota and any call to Google. So nothing is spent
+  even by a request that skips the app. `tests/server/chat-body.test.mjs` checks it while the switch is off.
+- **`components/shell/app-shell.tsx`** renders `FeedbackFab` instead of `FabChat`, and will not mount
+  `ChatOverlay` at all. The KruAI button was the only way into the chat, and its greeting bubble
+  (`lib/kruai-hint.ts`) lived on it, so both are gone with it.
+- **`features/login/components/login-view.tsx`** uses `createAccountSubtitleNoKruai`, since the sign-up
+  subtitle promised an AI coach. The other KruAI sign-in lines (`loginRequiredChat`) are only reachable
+  from the KruAI button.
+
+**Feedback** (`components/shell/feedback-fab.tsx`) is a plain link to `https://t.me/Captain_Alexandros`, the
+user's own choice over a form in the app, for guests and signed-in students alike. Same place, size and
+colour as the KruAI button: `hooks/use-fab-placement.ts` now holds the resting offset and the fade over
+another control for both. The app collects nothing; a student writes to the team in Telegram. A username,
+never the phone number the user also gave. Hidden where the KruAI button was hidden (assessments).
+`tests/e2e/feedback.test.mjs` checks it for a guest and a student, and expects to fail once KruAI is back.
+
+**Switching back on** is `true` in that file. Conversations, limits, Admin → KruAI and the prompt are all
+untouched. Then delete `tests/e2e/feedback.test.mjs` (or keep Feedback elsewhere) and re-run
+`npm run eval:kruai`. While off, the privacy page stays true: it describes what is sent when a student
+asks KruAI, and nobody can.

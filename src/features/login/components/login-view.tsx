@@ -6,6 +6,7 @@ import { MAX_NAME_LENGTH, useBrachNhaStore } from "@/lib/store";
 import { useShallow } from "zustand/react/shallow";
 import { useT } from "@/data/translations";
 import type { TranslationKey } from "@/data/translations";
+import { KRUAI_ENABLED } from "@/data/kruai-switch";
 
 const PROVINCES = [
   { en: "Phnom Penh", km: "ភ្នំពេញ" },
@@ -123,7 +124,7 @@ export function LoginView() {
         <div className="mb-2 text-5xl">⚔️</div>
         <h1 className="mb-1 font-body! text-lg font-extrabold">{t.createAccount}</h1>
         <div className="text-xs font-bold text-muted">
-          {t.createAccountSubtitle}
+          {KRUAI_ENABLED ? t.createAccountSubtitle : t.createAccountSubtitleNoKruai}
         </div>
         {/* Signed in already — this screen is now about the details Google does
             not know, chiefly the study language, which decides whether English

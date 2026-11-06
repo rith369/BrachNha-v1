@@ -16,6 +16,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 6 Nov 2026: KruAI Is Off for Now, and the Corner Button Sends Feedback
+
+Commit: `pending`. No database step.
+
+- **KruAI is switched off**, because we do not want to pay for the AI yet. The chat cannot be opened
+  anywhere, and the server refuses every question, so nothing is spent. Nothing was deleted: students'
+  old KruAI conversations, the limits and the Admin KruAI page all come back when it is switched on.
+- **The round button in the corner is now Feedback.** It opens a Telegram chat with the team, so any
+  student, signed in or not, can tell us what is wrong. It sits where the KruAI button was, and is
+  hidden during exams and Battles, as before.
+- **The sign-up form no longer mentions the AI coach** while KruAI is off.
+
+**To re-test, please:** on Home, tap the round button in the corner. Telegram should open on our chat.
+Check there is no way to open KruAI anywhere. Start a Battle and check the button is not shown while
+playing.
+
 ## 6 Nov 2026: Install BrachNha From the Profile Page
 
 Commit: `a6cdd00`. No database step.

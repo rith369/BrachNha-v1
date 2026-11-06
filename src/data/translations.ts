@@ -11,6 +11,8 @@ export const T = {
     createAccount: "Create your account",
     createAccountSubtitle:
       "A few details so your AI coach and study plan fit you.",
+    // While KruAI is switched off (data/kruai-switch.ts): the same, without it.
+    createAccountSubtitleNoKruai: "A few details so your study plan fits you.",
     enterName: "Full name",
     namePlaceholder: "Type your name...",
     // UNUSED since Google sign-in landed, and kept only so the km pair stays
@@ -256,6 +258,7 @@ export const T = {
     createAccount: "បង្កើតគណនីរបស់អ្នក",
     createAccountSubtitle:
       "ព័ត៌មានបន្តិចដើម្បីឲ្យ KruAI និងផែនការសិក្សាសាកសមនឹងអ្នក។",
+    createAccountSubtitleNoKruai: "ព័ត៌មានបន្តិចដើម្បីឲ្យផែនការសិក្សាសាកសមនឹងអ្នក។",
     enterName: "ឈ្មោះពេញ",
     namePlaceholder: "វាយបញ្ចូលឈ្មោះរបស់អ្នក...",
     emailOptional: "អ៊ីមែល (មិនចាំបាច់)",

@@ -3,6 +3,8 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { Drawer } from "./drawer";
 import { Sidebar } from "./sidebar-nav";
 import { FabChat } from "./fab-chat";
+import { FeedbackFab } from "./feedback-fab";
+import { KRUAI_ENABLED } from "@/data/kruai-switch";
 import { AppHeader } from "./app-header";
 import { AnnouncementBanner } from "./announcement-banner";
 import { LoginView } from "@/features/login/components/login-view";
@@ -246,11 +248,13 @@ export function AppShell({
                   focus routes that delegate to FocusLayout) are all either short
                   enough not to need one or bring their own. */}
               <main className="min-h-0 flex-1 overflow-hidden">{children}</main>
-              {!chatOpen && !pledgeOpen && !hideMentor && <FabChat />}
+              {/* While KruAI is switched off (data/kruai-switch.ts) the corner
+                  button is Feedback, in the same places the KruAI one shows. */}
+              {!chatOpen && !pledgeOpen && !hideMentor && (KRUAI_ENABLED ? <FabChat /> : <FeedbackFab />)}
               {/* !hideMentor here too, not just on the FAB: the effect above
                   closes an open chat, but this makes the overlay unrenderable
                   during an assessment rather than relying on that to have run. */}
-              {chatOpen && !hideMentor && hasFullAccess && (
+              {KRUAI_ENABLED && chatOpen && !hideMentor && hasFullAccess && (
                 <Suspense fallback={null}>
                   <ChatOverlay />
                 </Suspense>

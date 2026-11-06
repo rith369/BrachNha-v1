@@ -19,6 +19,7 @@ import { getCachedAnswer, createCachedStreamResponse } from "./chat-cache.js";
 import { takeQuota } from "./kruai-quota.js";
 import { publishedContent } from "./content-source.js";
 import { guidedAnchorIndex } from "../src/utils/chat-anchor.js";
+import { KRUAI_ENABLED } from "../src/data/kruai-switch.js";
 import {
   CUT_OFF_NOTE,
   KRUAI_LEFT_HEADER,
@@ -770,6 +771,19 @@ export async function handleChat(req: Request): Promise<Response> {
   // never sends more than 40.
   if (messages.length > MAX_MESSAGES) {
     return textResponse("Too many messages.", 400);
+  }
+
+  // Switched off (src/data/kruai-switch.ts): refused here, before the rate
+  // limit, the sign-in check and anything that could reach Google, so no
+  // question costs money even from a request that skipped the app. After the
+  // cheap shape checks only so a malformed request still gets its 400.
+  if (!KRUAI_ENABLED) {
+    return textResponse(
+      lang === "km"
+        ? "🔒 KruAI ត្រូវបានបិទសិនសម្រាប់ពេលនេះ។"
+        : "🔒 KruAI is turned off for now.",
+      503
+    );
   }
 
   // Anti-flood, before the signature check and before any upstream call, so

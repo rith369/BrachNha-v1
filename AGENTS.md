@@ -254,6 +254,12 @@ A `/*` catch-all renders `src/pages/not-found.tsx`, which Next used to provide.
 target is reached". A streak protection covers a missed day, holding the run together without
 adding to it, for a shared streak too. See `docs/notes/streak-leaderboard-profile.md`.
 
+**KruAI is switched OFF** (6 Nov 2026, the user does not want to pay for the model yet):
+`KRUAI_ENABLED` in `src/data/kruai-switch.ts`, read by the app and by `server/chat-handler.ts`,
+which refuses every question. The corner button is Feedback, a link to the team's Telegram
+(`components/shell/feedback-fab.tsx`). Nothing KruAI-related was deleted; do not remove it,
+and do not switch it back on unless the user asks. See `docs/notes/kruai.md`.
+
 There is no entry screen, guests land on Home. Donate is removed. KruAI is a global
 overlay rather than a route, available in lessons and blocked in assessments. It is a
 kind big sibling with no romantic persona. The exam countdown is derived from
