@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 6 Nov 2026: KruAI Is Off for Now, and the Corner Button Sends Feedback
 
-Commit: `pending`. No database step.
+Commit: `8e8bcf6`. No database step.
 
 - **KruAI is switched off**, because we do not want to pay for the AI yet. The chat cannot be opened
   anywhere, and the server refuses every question, so nothing is spent. Nothing was deleted: students'
