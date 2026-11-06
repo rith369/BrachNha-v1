@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 6 Nov 2026: More Security Fixes, and the Privacy Page Mentions KruAI Photos
 
-Commit: `pending`. No database step.
+Commit: `7787ada`. No database step.
 
 - **The privacy page now says photos are sent to the AI.** When a student attaches a photo to a KruAI
   question, the photo goes to Google Gemini with the question. The page listed everything else that is
