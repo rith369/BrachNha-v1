@@ -1076,3 +1076,9 @@ never the phone number the user also gave. Hidden where the KruAI button was hid
 untouched. Then delete `tests/e2e/feedback.test.mjs` (or keep Feedback elsewhere) and re-run
 `npm run eval:kruai`. While off, the privacy page stays true: it describes what is sent when a student
 asks KruAI, and nobody can.
+
+**Feedback explains first (6 Nov 2026, the user's request).** A tap opens a short pop-up (what to send,
+which page, a screenshot helps, `Telegram: @Captain_Alexandros`) with **Open Telegram** inside it, every
+time, and Not now / a tap outside / Escape to close. Same absolute-inset shape as the install pop-up. On Home
+the button usually rests over a lesson row at first paint, so it fades click-through until the student
+scrolls (`useFabPlacement`), which is why its test opens on the Leaderboard, whose gutter leaves it clear.

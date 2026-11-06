@@ -25,8 +25,6 @@ for (const guest of [false, true]) {
       await go(page, route);
       const fab = page.getByTestId("feedback-fab");
       assert.equal(await fab.count(), 1, `no Feedback button on ${route}`);
-      assert.equal(await fab.getAttribute("href"), TELEGRAM);
-      assert.equal(await fab.getAttribute("target"), "_blank");
       assert.equal(await page.getByRole("button", { name: "KruAI", exact: true }).count(), 0, `KruAI button on ${route}`);
     }
     // The KruAI greeting bubble lived on the KruAI button, so it must be gone too.
@@ -35,6 +33,40 @@ for (const guest of [false, true]) {
     await ctx.close();
   });
 }
+
+test("Feedback explains first, and the Open Telegram button inside goes to the team", async () => {
+  const { ctx, page, problems } = await app.open();
+  // The Leaderboard leaves a gutter for the corner button. On Home it rests over
+  // a lesson row at first and fades click-through, so a tap there reaches the row.
+  await go(page, "/leaderboard");
+  const dialog = page.getByTestId("feedback-dialog");
+  assert.equal(await dialog.count(), 0, "the explanation is open before any tap");
+
+  await page.getByTestId("feedback-fab").click();
+  await dialog.waitFor();
+  const body = await dialog.innerText();
+  assert.ok(body.includes("ប្រាប់យើងពីបញ្ហា"), body);
+  assert.ok(body.includes("រូបថតអេក្រង់ជួយបានច្រើន"), body);
+  assert.ok(body.includes("Telegram: @Captain_Alexandros"), body);
+  // Not clicked: it would leave for Telegram. Its address is what matters.
+  const go_ = dialog.getByRole("link", { name: "បើក Telegram" });
+  assert.equal(await go_.getAttribute("href"), TELEGRAM);
+  assert.equal(await go_.getAttribute("target"), "_blank");
+  assert.equal(await page.evaluate(() => document.activeElement?.textContent?.trim()), "បើក Telegram");
+
+  // Three ways to close it: Not now, a tap outside, Escape. Every tap explains again.
+  await dialog.getByRole("button", { name: "ពេលក្រោយ" }).click();
+  assert.equal(await dialog.count(), 0, "Not now did not close it");
+  await page.getByTestId("feedback-fab").click();
+  await dialog.click({ position: { x: 5, y: 5 } });
+  assert.equal(await dialog.count(), 0, "a tap outside did not close it");
+  await page.getByTestId("feedback-fab").click();
+  await page.keyboard.press("Escape");
+  assert.equal(await dialog.count(), 0, "Escape did not close it");
+
+  assert.deepEqual(await problemsOn(page, problems), []);
+  await ctx.close();
+});
 
 test("the sign-up form no longer promises KruAI", async () => {
   // Signed in with Google but no profile yet: the gate shows the sign-up form.
@@ -49,9 +81,12 @@ test("the sign-up form no longer promises KruAI", async () => {
 
 test("the Feedback button fits the 320px floor in dark mode", async () => {
   const { ctx, page, problems } = await app.open({ theme: "dark", viewport: { width: 320, height: 568 } });
-  await go(page, "/");
+  await go(page, "/leaderboard");
   await page.getByTestId("feedback-fab").waitFor();
   assert.equal(await scrollsSideways(page), false);
+  await page.getByTestId("feedback-fab").click();
+  await page.getByTestId("feedback-dialog").waitFor();
+  assert.equal(await scrollsSideways(page), false, "the open explanation scrolls sideways");
   assert.deepEqual(await problemsOn(page, problems), []);
   await ctx.close();
 });

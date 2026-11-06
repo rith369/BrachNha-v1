@@ -16,6 +16,18 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 6 Nov 2026: Feedback Explains Before Opening Telegram
+
+Commit: `pending`. No database step.
+
+Tapping the Feedback button in the corner used to jump straight to Telegram. Now it first shows a
+short box explaining what to send: what went wrong, which page, and a screenshot if possible. It also
+shows the Telegram name the message goes to. **Open Telegram** in the box goes to our chat, and **Not
+now** closes it.
+
+**To re-test, please:** tap the Feedback button, read the box, tap Open Telegram, and check Telegram
+opens on our chat. Tap the button again and close the box with Not now.
+
 ## 6 Nov 2026: Tap Anywhere on the Install Card
 
 Commit: `97f32d5`. No database step.
