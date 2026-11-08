@@ -16,6 +16,21 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 8 Nov 2026: Grade 12 Biology Chapter 6 (Evolution of Living Things) OCR, RAG & Flashcards
+
+Commit: `c222b09`. **No database step needed.**
+
+Transcribed and processed Chapter 6 ("ការវិវត្តនៃភវៈរស់" / Evolution of Living Things) from the official MoEYS Grade 12 Biology Summary textbook (pp. 51-56), completing the entire 56-page summary book.
+- **Textbook OCR**: Authored structured markdown transcriptions in `sources/ocr/biology-summary/chapter6/`:
+  - `lesson1-darwin-theory.md` (pp. 51-52: Darwin's Beagle voyage, Galapagos observations, finch beaks, adaptations, natural and artificial selection).
+  - `lesson2-evidence-of-evolution.md` (pp. 53-54: comparative embryology, homologous organs, biochemical/DNA and protein evidence, speciation, geographic and biological isolation).
+  - `lesson3-fossil-records.md` (pp. 54-56: sedimentary rock formation, petrification, mold and cast, whole body preservation, relative dating, C14 dating 5,700-year half-life, Radium/Lead dating, importance of fossils).
+- **RAG Grounding**: Added `BIOLOGY_CH6_SECTIONS` into `server/textbook-search.ts` and registered them in `ALL_BIOLOGY_SECTIONS` and `searchBiologyTextbook`.
+- **Curriculum Sessions**: Wired authentic section titles for Chapter 6 into `src/features/lessons/sessions.ts` under `biology`.
+- **Practice Flashcards**: Authored 30 high-yield flashcards across 3 decks (`biology-6-1`, `biology-6-2`, `biology-6-3`) in `content/new/biology-ch6.json` and merged into `content/fixture.json`.
+- **Verification**: Verified with `npm run check:content` (0 errors), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), and `npm test` (all 109 tests passed).
+
+
 ## 6 Nov 2026: Teacher Papers on the Mock Exam Page
 
 Commit: `0790d3f`. **Database step:** run `20261106000001` in the SQL editor before importing the

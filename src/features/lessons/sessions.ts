@@ -417,17 +417,29 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
         {
           number: 1,
           title: "ទ្រឹស្ដីរបស់លោកដាវិន",
-          sessions: sectionsFor("biology", 6, 1),
+          sessions: sectionsFor("biology", 6, 1, [
+            "ការសង្កេតរបស់ដាវិន និងកោះកាឡាប៉ាហ្កូស",
+            "បន្ស៊ាំ និងចំពុះបក្សីចាបដាវិន",
+            "ជម្រើសដោយមនុស្ស និងជម្រើសដោយធម្មជាតិ",
+          ]),
         },
         {
           number: 2,
           title: "ភស្តុតាងនៃការវិវត្ត",
-          sessions: sectionsFor("biology", 6, 2),
+          sessions: sectionsFor("biology", 6, 2, [
+            "ភស្តុតាងអំប្រ៊ីយ៉ុង និងកាយវិភាគវិទ្យា",
+            "សរីរាង្គអូម៉ូឡូក និងភស្តុតាងជីវគីមី",
+            "ដើមកំណើតប្រភេទ និងរបាំងខណ្ឌចែក",
+          ]),
         },
         {
           number: 3,
           title: "កំណត់ត្រាផូស៊ីល",
-          sessions: sectionsFor("biology", 6, 3),
+          sessions: sectionsFor("biology", 6, 3, [
+            "និយមន័យ និងដំណើរការកកើតផូស៊ីល",
+            "វិធីកំណត់អាយុផូស៊ីលតាមសិលា និងវិទ្យុសកម្ម",
+            "សារៈសំខាន់នៃផូស៊ីល និងប្រវត្តិផែនដី",
+          ]),
         },
       ],
     },
