@@ -16,9 +16,21 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Physics Summary Batch 5: Chapter 3 Lesson 1 (Magnetic Field & Force) OCR, Study Path & KruAI Grounding
+
+Commit: `0361378`. **No database step needed.**
+
+Digitized Batch 5 of the official MoEYS Grade 12 Physics Summary & Worked Examples textbook (`sources/textbooks/Physics summary.pdf`, PDF pages 28 to 36, book pages 24 to 32):
+- **Textbook Rendering & OCR**: Rendered high-resolution PNG scans (`p28.png` to `p36.png` in `sources/pages/Physics summary/`) and transcribed word-for-word into `sources/ocr/Physics summary/chapter3-lesson1-magnetic-field-and-force.md`:
+  - Chapter 3 (`ជំពូក 3 អគ្គិសនី និងម៉ាញេទិច`), Lesson 1 (`មេរៀនទី 1៖ ដែននិងកម្លាំងម៉ាញេទិច`), covering natural and artificial magnets, magnetic field of a straight wire ($B = \mu_o\frac{I}{2\pi d}$ and $B = \mu_o\mu_r\frac{I}{2\pi d}$), circular loop ($B = \mu_o\frac{I}{2R}$ and $B = \mu_o\frac{NI}{2R}$), solenoid ($B = \mu_o nI = \mu_o\frac{N}{\ell}I$, turn count $N = \frac{\ell}{d}$, $N = \frac{\ell}{d + 2e}$, $N = \frac{\ell \cdot x}{d + 2e}$, wire length $\ell' = 2\pi RN$), electromagnetic force on a current-carrying wire ($\vec{F} = I\vec{\ell} \times \vec{B}$, $F = I\ell B\sin\theta$, right-hand rule), force between two parallel straight wires ($F_{12} = F_{21} = \frac{\mu_o I_1 I_2 \ell}{2\pi a}$), Lorentz magnetic force on a moving charge ($\vec{F}_m = q(\vec{v} \times \vec{B})$, $F_m = |q|vB\sin\alpha$), uniform circular motion in a magnetic field ($R = \frac{mv}{|q|B}$, period $T = \frac{2\pi m}{|q|B}$, frequency $N = \frac{|q|B}{2\pi m}$), magnetic deflection ($\alpha = \frac{\ell |q|B}{mv_o}$, $Z = D\tan\alpha = \frac{D\ell |q|B}{mv_o}$), mass spectrograph ($\frac{|q|}{m} = \frac{2V}{B^2 R^2}$), and all 11 worked examples (`ឧទាហរណ៍ 1` to `ឧទាហរណ៍ 11`) with complete step-by-step solutions.
+- **KruAI RAG Grounding**: Added `PHYSICS_CH3_SECTIONS` (`tb:phys:ch3:l1-magnetic-field`, `tb:phys:ch3:l1-electromagnetic-force-and-parallel-wires`, `tb:phys:ch3:l1-lorentz-force-and-charged-particle-motion`, `tb:phys:ch3:l1-examples-1-to-5`, `tb:phys:ch3:l1-examples-6-to-11`) and spread into `ALL_PHYSICS_SECTIONS` in `server/textbook-search.ts`.
+- **Study Path Structure**: Added Chapter 3 (`អគ្គិសនី និងម៉ាញេទិច`) and Lesson 1 (`ដែននិងកម្លាំងម៉ាញេទិច`) with 5 authentic Khmer section titles under `SUBJECT_SESSIONS.physics` in `src/features/lessons/sessions.ts`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Physics summary"` (6 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals), `npx oxlint` (0 errors, 1 known warning), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Physics Summary Batch 4: Chapter 1 Lesson 3 (Part 2) & Chapter 2 Lesson 1 (Superposition of Waves & Standing Waves) OCR, Study Path & KruAI Grounding
 
-Commit: `6804ce0`. **No database step needed.**
+Commit: `8bf8996`. **No database step needed.**
 
 Digitized Batch 4 of the official MoEYS Grade 12 Physics Summary & Worked Examples textbook (`sources/textbooks/Physics summary.pdf`, PDF pages 23 to 27, book pages 19 to 23):
 - **Textbook Rendering & OCR**: Rendered high-resolution PNG scans (`p23.png` to `p27.png` in `sources/pages/Physics summary/`) and transcribed word-for-word into `sources/ocr/Physics summary/`:
