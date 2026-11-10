@@ -16,6 +16,21 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Math Summary Blind Audit Batch 1A: Chapter 1 Limits (Part 1, Pages 3 to 10)
+
+Commit: `ebec195`. **No database step needed.**
+
+Conducted strict blind audit pass on Chapter 1 (Limits, Part 1: PDF pages `p06.png` to `p13.png`, Book pages 3 to 10) in `sources/ocr/Math summary/chapter1-limits.md`:
+- **Line-by-Line Visual Audit & Fixes**:
+  - Inserted page boundary markers `<!-- Page p06.png -->` through `<!-- Page p13.png -->`.
+  - Restored missing bottom advisory note from page 4 (`p07.png`).
+  - Restored composite function mapping diagram in standard KaTeX.
+  - Corrected operation table row 4 signs from $\mp\infty$ to $\pm\infty$ on page 3 (`p06.png`).
+  - Corrected parameter factorization in Exercise 7.គ on page 9 (`p12.png`).
+  - Documented textbook print error in Exercise 8.គ on page 10 (`p13.png`).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Physics Summary Batch 6: Chapter 3 Lesson 2 (Electromagnetic Induction) OCR, Study Path & KruAI Grounding
 
 Commit: `d51431c`. **No database step needed.**
