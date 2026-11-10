@@ -16,7 +16,21 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
-## 8 Nov 2026: Grade 12 Biology Chapter 6 (Evolution of Living Things) OCR, RAG & Flashcards
+## 10 Nov 2026: Grade 12 Math Chapter 3 (Definite Integrals) OCR & KruAI RAG Grounding
+
+Commit: `f7d6b95`. **No database step needed.**
+
+Digitized Chapter 3 ("អាំងតេក្រាលកំណត់" / Definite Integrals) from the official MoEYS Grade 12 Mathematics Summary textbook (Book pp. 31–38, PDF pp. 34–41).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans with zero external API costs using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/math-summary/chapter3-definite-integrals.md`. Contains all fundamental definitions, Chasles' relation, linearity properties, integration by parts formula, power-reduction trigonometric integrals, rational fraction decomposition, parametric limit integrals, and 10 authentic MoEYS worked exercises.
+- **RAG Grounding**: Added keyworded chunks (`MATH_CH3_SECTIONS` / `MATH_DEFINITE_INTEGRALS_SECTIONS`) into `server/textbook-search.ts` covering:
+  - `tb:math:integrals:ch3:rules-and-properties`: Fundamental definition, identical limits, sign flipping, Chasles' relation, and linearity.
+  - `tb:math:integrals:ch3:rational-and-substitution`: Composite substitution $u'/u$ and partial fraction decomposition.
+  - `tb:math:integrals:ch3:integration-by-parts`: Integration by parts formula ($\int u\,dv = [uv] - \int v\,du$) applied to $\ln x$ and $x\sin^3 x$.
+  - `tb:math:integrals:ch3:trigonometric-integrals`: Even-power reduction for $\sin^4 x$, $u^n u'$ product form for $\sin^4 x \cos x$, and symmetric system calculation for $I + J$ and $I - J$.
+  - `tb:math:integrals:ch3:log-exp-and-limits`: Logarithmic integrals ($\frac{\ln x}{x}$ and $\frac{1}{x\ln x}$) and parametric integral limits ($\lim_{\alpha \to 1^-} g(\alpha) = 1$).
+  Included in `ALL_MATH_SECTIONS` and verified with `searchMathTextbook`.
+- **Curriculum Sessions**: Registered authentic section titles for Chapter 3 ("អាំងតេក្រាលកំណត់") in `src/features/practice/quiz-path.ts` under `MATH_LESSONS`.
+- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/math-summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), `npm test` (all 109 tests passed), and `npm run build` (production build and CSP checks passed).
 
 Commit: `c222b09`. **No database step needed.**
 

@@ -2105,13 +2105,179 @@ export const MATH_DERIVATIVES_PRIMITIVES_SECTIONS: TextbookSection[] = [
   },
 ];
 
+export const MATH_CH3_SECTIONS: TextbookSection[] = [
+  {
+    id: "tb:math:integrals:ch3:rules-and-properties",
+    title: "និយមន័យ និងលក្ខណៈនៃអាំងតេក្រាលកំណត់ (Definite Integral Rules & Chasles' Relation)",
+    keywords: [
+      "អាំងតេក្រាល",
+      "អាំងតេក្រាលកំណត់",
+      "integral",
+      "definite integral",
+      "រូបមន្តអាំងតេក្រាល",
+      "ព្រីមីទីវ",
+      "F(b) - F(a)",
+      "ទំនាក់ទំនងឆាល",
+      "chasles",
+      "លីនេអ៊ែរ",
+      "លក្ខណៈអាំងតេក្រាល",
+    ],
+    text: `រូបមន្តគ្រឹះ និងលក្ខណៈនៃអាំងតេក្រាលកំណត់ (MoEYS)៖
+1. និយមន័យគ្រឹះ៖
+   - បើអនុគមន៍ $f$ មានព្រីមីទីវ $F$ លើចន្លោះ $I$ និង $a, b \\in I$ នោះ៖
+     $\\int_a^b f(x)\\,dx = [F(x)]_a^b = F(b) - F(a)$
+   - ករណីគោលស្មើគ្នា៖ $\\int_a^a f(x)\\,dx = 0$
+   - ត្រឡប់គោល៖ $\\int_a^b f(x)\\,dx = -\\int_b^a f(x)\\,dx$
+2. លក្ខណៈនៃអាំងតេក្រាលកំណត់៖
+   - ទំនាក់ទំនង ឆាល (Chasles' relation)៖ ចំពោះគ្រប់ $a, b, c \\in I$៖
+     $\\int_a^b f(x)\\,dx + \\int_b^c f(x)\\,dx = \\int_a^c f(x)\\,dx$
+   - លីនេអ៊ែរ៖
+     $\\int_a^b [f(x) \\pm g(x)]\\,dx = \\int_a^b f(x)\\,dx \\pm \\int_a^b g(x)\\,dx$
+     $\\int_a^b \\lambda f(x)\\,dx = \\lambda \\int_a^b f(x)\\,dx$ (គ្រប់ $\\lambda \\in \\mathbb{R}$)
+3. ឧទាហរណ៍គំរូ MoEYS៖
+   - $\\int_0^1 (x^3 + 1)\\,dx = \\left[\\frac{x^4}{4} + x\\right]_0^1 = \\frac{1}{4} + 1 = \\frac{5}{4}$
+   - $\\int_{-2}^{-1} \\frac{1}{x^4}\\,dx = \\left[-\\frac{1}{3x^3}\\right]_{-2}^{-1} = \\frac{1}{3} - \\frac{1}{24} = \\frac{7}{24}$
+   - $\\int_1^2 \\frac{1}{t^2}\\,dt = \\left[-\\frac{1}{t}\\right]_1^2 = -\\frac{1}{2} + 1 = \\frac{1}{2}$
+   - $\\int_2^4 \\frac{1}{\\sqrt{u}}\\,du = [2\\sqrt{u}]_2^4 = 4 - 2\\sqrt{2}$
+   - $\\int_1^e \\frac{1}{t}\\,dt = [\\ln t]_1^e = 1$
+   - $\\int_0^1 2e^x\\,dx = [2e^x]_0^1 = 2(e - 1)$`,
+  },
+  {
+    id: "tb:math:integrals:ch3:rational-and-substitution",
+    title: "អាំងតេក្រាលតាមអថេរបណ្តាក់ និងប្រភាគសនិទាន (Substitution & Rational Integrals)",
+    keywords: [
+      "អាំងតេក្រាល",
+      "ប្តូរអថេរ",
+      "ប្រភាគសនិទាន",
+      "rational integral",
+      "substitution",
+      "u'/u",
+      "បំបែកប្រភាគ",
+      "អាំងតេក្រាលប្រភាគ",
+      "ln|u|",
+    ],
+    text: `អាំងតេក្រាលតាមអថេរបណ្តាក់ និងប្រភាគសនិទាន (MoEYS)៖
+1. ទម្រង់អថេរបណ្តាក់ $\\int_a^b \\frac{u'(x)}{u(x)}\\,dx = [\\ln |u(x)|]_a^b$៖
+   - គណនា $I = \\int_1^3 \\frac{2x + 1}{x^2 + x + 1}\\,dx$៖
+     តាង $u(x) = x^2 + x + 1 \\Rightarrow u'(x) = 2x + 1$
+     $I = \\int_1^3 \\frac{u'(x)}{u(x)}\\,dx = [\\ln(x^2 + x + 1)]_1^3 = \\ln 13 - \\ln 3 = \\ln \\frac{13}{3}$ (ព្រោះ $x^2 + x + 1 > 0$ ចំពោះគ្រប់ $x \\in \\mathbb{R}$)
+   - គណនា $I = \\int_{-3}^3 x e^{x^2}\\,dx$៖
+     ព្រីមីទីវគឺ $F(x) = \\frac{1}{2}e^{x^2} \\Rightarrow I = \\left[\\frac{1}{2}e^{x^2}\\right]_{-3}^3 = \\frac{1}{2}e^9 - \\frac{1}{2}e^9 = 0$
+2. វិធីបំបែកជាផលបូកប្រភាគងាយ (Partial Fractions)៖
+   - រក $a, b$ ដើម្បីឲ្យ $f(x) = \\frac{x + 1}{x + 2} = a + \\frac{b}{x + 2}$៖
+     $\\frac{ax + 2a + b}{x + 2} = \\frac{x + 1}{x + 2} \\Rightarrow a = 1, b = -1 \\Rightarrow f(x) = 1 - \\frac{1}{x + 2}$
+     $\\int_1^2 f(x)\\,dx = [x - \\ln|x + 2|]_1^2 = 1 - 2\\ln 2 + \\ln 3$
+   - រក $a, b$ ដើម្បីឲ្យ $f(x) = \\frac{x - 2}{(x - 1)^2} = \\frac{a}{x - 1} + \\frac{b}{(x - 1)^2}$៖
+     $\\frac{ax - (a - b)}{(x - 1)^2} = \\frac{x - 2}{(x - 1)^2} \\Rightarrow a = 1, b = -1 \\Rightarrow f(x) = \\frac{1}{x - 1} - \\frac{1}{(x - 1)^2}$
+     $\\int_{-1}^0 f(x)\\,dx = \\left[\\ln|x - 1| + \\frac{1}{x - 1}\\right]_{-1}^0 = -\\frac{1}{2} - \\ln 2$`,
+  },
+  {
+    id: "tb:math:integrals:ch3:integration-by-parts",
+    title: "អាំងតេក្រាលដោយផ្នែក (Integration by Parts Formula & Techniques)",
+    keywords: [
+      "អាំងតេក្រាលដោយផ្នែក",
+      "integration by parts",
+      "by parts",
+      "uv - vdu",
+      "f g'",
+      "អាំងតេក្រាល ln",
+      "integral ln x",
+      "integral x sin^3 x",
+      "តាង u និង v'",
+    ],
+    text: `រូបមន្តអាំងតេក្រាលដោយផ្នែក និងវិធីដោះស្រាយ (MoEYS)៖
+1. រូបមន្តគ្រឹះ៖
+   - បើ $f$ និង $g$ ជាអនុគមន៍ជាប់ និងមានដេរីវេលើ $I$ និង $a, b \\in I$ នោះ៖
+     $\\int_a^b f(x)g'(x)\\,dx = [f(x)g(x)]_a^b - \\int_a^b f'(x)g(x)\\,dx$
+     ឬសរសេរតាមទម្រង់ differential៖ $\\int_a^b u\\,dv = [uv]_a^b - \\int_a^b v\\,du$
+2. ឧទាហរណ៍គំរូ MoEYS៖
+   - គណនា $I = \\int_1^e \\ln x\\,dx$៖
+     តាង $u(x) = \\ln x \\Rightarrow u'(x) = \\frac{1}{x}$ និង $v'(x) = 1 \\Rightarrow v(x) = x$
+     $I = [x \\ln x]_1^e - \\int_1^e x \\cdot \\frac{1}{x}\\,dx = e - [x]_1^e = e - (e - 1) = 1$
+   - គណនា $J = \\int_0^{\\frac{\\pi}{2}} x \\sin^3 x\\,dx$៖
+     + ជំហាន 1 (បញ្ចុះដឺក្រេ $\\sin^3 x$)៖
+       $\\sin^3 x = \\sin x \\cdot \\frac{1 - \\cos 2x}{2} = \\frac{3}{4}\\sin x - \\frac{1}{4}\\sin 3x$
+     + ជំហាន 2 (អាំងតេក្រាលដោយផ្នែក)៖
+       តាង $u(x) = x \\Rightarrow u'(x) = 1$
+       $v'(x) = \\sin^3 x = \\frac{3}{4}\\sin x - \\frac{1}{4}\\sin 3x \\Rightarrow v(x) = -\\frac{3}{4}\\cos x + \\frac{1}{12}\\cos 3x$
+       $J = [x v(x)]_0^{\\frac{\\pi}{2}} - \\int_0^{\\frac{\\pi}{2}} v(x)\\,dx$
+       $= 0 - \\int_0^{\\frac{\\pi}{2}} \\left(-\\frac{3}{4}\\cos x + \\frac{1}{12}\\cos 3x\\right)\\,dx$
+       $= \\left[\\frac{3}{4}\\sin x - \\frac{1}{36}\\sin 3x\\right]_0^{\\frac{\\pi}{2}} = \\frac{3}{4} + \\frac{1}{36} = \\frac{28}{36} = \\frac{7}{9}$`,
+  },
+  {
+    id: "tb:math:integrals:ch3:trigonometric-integrals",
+    title: "អាំងតេក្រាលនៃអនុគមន៍ត្រីកោណមាត្រ (Trigonometric Power & System Integrals)",
+    keywords: [
+      "អាំងតេក្រាលត្រីកោណមាត្រ",
+      "trigonometric integral",
+      "sin^4 x",
+      "cos^4 x",
+      "sin^2 x cos^4 x",
+      "sin^4 x cos x",
+      "បញ្ចុះដឺក្រេ",
+      "ប្រព័ន្ធអាំងតេក្រាល",
+      "I + J",
+      "I - J",
+    ],
+    text: `អាំងតេក្រាលនៃអនុគមន៍ត្រីកោណមាត្រ និងបច្ចេកទេសគណនា (MoEYS)៖
+1. បច្ចេកទេសបញ្ចុះដឺក្រេស្វ័យគុណគូ៖
+   - $\\sin^2 x = \\frac{1 - \\cos 2x}{2}$ និង $\\cos^2 2x = \\frac{1 + \\cos 4x}{2}$
+   - $\\sin^4 x = \\frac{1}{4}(1 - \\cos 2x)^2 = \\frac{3}{8} - \\frac{1}{2}\\cos 2x + \\frac{1}{8}\\cos 4x$
+   - គណនា $I = \\int_0^{\\frac{\\pi}{4}} \\sin^4 x\\,dx = \\left[\\frac{3}{8}x - \\frac{\\sin 2x}{4} + \\frac{\\sin 4x}{32}\\right]_0^{\\frac{\\pi}{4}} = \\frac{3\\pi}{32} - \\frac{1}{4}$
+2. ទម្រង់ $u^n u'$៖
+   - គណនា $J = \\int_0^{\\frac{\\pi}{4}} \\sin^4 x \\cos x\\,dx$៖
+     ដោយ $(\\sin^5 x)' = 5\\sin^4 x \\cos x$ នាំឲ្យព្រីមីទីវគឺ $\\frac{1}{5}\\sin^5 x$
+     $J = \\left[\\frac{1}{5}\\sin^5 x\\right]_0^{\\frac{\\pi}{4}} = \\frac{1}{5}\\left(\\frac{\\sqrt{2}}{2}\\right)^5 = \\frac{\\sqrt{2}}{40}$
+3. បច្ចេកទេសគណនាប្រព័ន្ធអាំងតេក្រាលតាម $I + J$ និង $I - J$៖
+   - ឲ្យ $I = \\int_0^{\\frac{\\pi}{4}} \\sin^2 x \\cos^4 x\\,dx$ និង $J = \\int_0^{\\frac{\\pi}{4}} \\cos^2 x \\sin^4 x\\,dx$
+   - ផលបូក៖ $I + J = \\int_0^{\\frac{\\pi}{4}} \\sin^2 x \\cos^2 x(\\cos^2 x + \\sin^2 x)\\,dx = \\frac{1}{4}\\int_0^{\\frac{\\pi}{4}} \\sin^2 2x\\,dx = \\frac{1}{8}\\left[x - \\frac{\\sin 4x}{4}\\right]_0^{\\frac{\\pi}{4}} = \\frac{\\pi}{32}$
+   - ផលដក៖ $I - J = \\int_0^{\\frac{\\pi}{4}} \\sin^2 x \\cos^2 x(\\cos^2 x - \\sin^2 x)\\,dx = \\frac{1}{4}\\int_0^{\\frac{\\pi}{4}} \\sin^2 2x \\cos 2x\\,dx = \\frac{1}{24}[\\sin^3 2x]_0^{\\frac{\\pi}{4}} = \\frac{1}{24}$
+   - ដោះស្រាយប្រព័ន្ធសមីការ៖ $I = \\frac{\\pi}{64} + \\frac{1}{48}$ និង $J = \\frac{\\pi}{64} - \\frac{1}{48}$`,
+  },
+  {
+    id: "tb:math:integrals:ch3:log-exp-and-limits",
+    title: "អាំងតេក្រាលទាក់ទងលោការីត និងលីមីតនៃអាំងតេក្រាល (Logarithmic, Exponential & Limit Integrals)",
+    keywords: [
+      "អាំងតេក្រាល",
+      "លោការីត",
+      "អិចស្ប៉ូណង់ស្យែល",
+      "ln x / x",
+      "1 / (x ln x)",
+      "លីមីតអាំងតេក្រាល",
+      "integral limit",
+      "g(alpha)",
+      "parametric integral",
+    ],
+    text: `អាំងតេក្រាលទាក់ទងលោការីត អិចស្ប៉ូណង់ស្យែល និងលីមីត (MoEYS)៖
+1. រូបមន្តព្រីមីទីវគ្រឹះ៖
+   - $\\int_1^e \\frac{\\ln x}{x}\\,dx$៖
+     ដោយ $\\frac{\\ln x}{x} = (\\ln x)' \\ln x \\Rightarrow F(x) = \\frac{1}{2}(\\ln x)^2 \\Rightarrow J = \\left[\\frac{1}{2}(\\ln x)^2\\right]_1^e = \\frac{1}{2}$
+   - $\\int_e^{2e} \\frac{dx}{x \\ln x}$៖
+     ដោយ $\\frac{1}{x \\ln x} = \\frac{(\\ln x)'}{\\ln x} = \\frac{u'}{u} \\Rightarrow F(x) = \\ln|\\ln x| = \\ln(\\ln x)$ (ចំពោះ $x > 1$)
+     $k = [\\ln(\\ln x)]_e^{2e} = \\ln(\\ln 2e) - \\ln(\\ln e) = \\ln(1 + \\ln 2)$ (ព្រោះ $\\ln(\\ln e) = \\ln 1 = 0$)
+2. អាំងតេក្រាលអាស្រ័យប៉ារ៉ាម៉ែត្រ និងការរកលីមីត៖
+   - អនុគមន៍ $f(x) = \\frac{2}{(x - 1)^2} e^{\\frac{x + 1}{x - 1}}$ លើ $(-\\infty, 1)$៖
+     ដេរីវេនៃ $v(x) = e^{\\frac{x + 1}{x - 1}}$ គឺ $v'(x) = -\\frac{2}{(x - 1)^2} e^{\\frac{x + 1}{x - 1}} = -f(x)$
+     នាំឲ្យព្រីមីទីវនៃ $f(x)$ គឺ $-v(x) = -e^{\\frac{x + 1}{x - 1}}$
+   - គណនា $g(\\alpha) = \\int_{-\\alpha}^\\alpha f(x)\\,dx$ ចំពោះ $\\alpha \\in (0, 1)$៖
+     $g(\\alpha) = [-v(x)]_{-\\alpha}^\\alpha = v(-\\alpha) - v(\\alpha) = e^{\\frac{\\alpha - 1}{\\alpha + 1}} - e^{\\frac{\\alpha + 1}{\\alpha - 1}}$
+   - រកលីមីត $\\lim_{\\alpha \\to 1^-} g(\\alpha)$៖
+     + $\\lim_{\\alpha \\to 1^-} \\frac{\\alpha - 1}{\\alpha + 1} = 0 \\Rightarrow \\lim_{\\alpha \\to 1^-} e^{\\frac{\\alpha - 1}{\\alpha + 1}} = e^0 = 1$
+     + $\\lim_{\\alpha \\to 1^-} \\frac{\\alpha + 1}{\\alpha - 1} = -\\infty \\Rightarrow \\lim_{\\alpha \\to 1^-} e^{\\frac{\\alpha + 1}{\\alpha - 1}} = 0$
+     + ដូច្នេះ $\\lim_{\\alpha \\to 1^-} g(\\alpha) = 1 - 0 = 1$`,
+  },
+];
+
+export const MATH_DEFINITE_INTEGRALS_SECTIONS = MATH_CH3_SECTIONS;
+
 export const ALL_MATH_SECTIONS: TextbookSection[] = [
   ...MATH_LIMITS_SECTIONS,
   ...MATH_DERIVATIVES_PRIMITIVES_SECTIONS,
+  ...MATH_CH3_SECTIONS,
 ];
 
 /**
- * Searches Mathematics textbook chunks (Chapters 1 & 2: Limits, Derivatives, Primitives) for matches against a student query.
+ * Searches Mathematics textbook chunks (Chapters 1, 2 & 3: Limits, Derivatives, Primitives, Definite Integrals) for matches against a student query.
  * Returns up to maxResults retrieved chunks formatted for KruAI's system prompt.
  */
 export function searchMathTextbook(
