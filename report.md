@@ -16,6 +16,16 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Regional & World History (ASEAN, Cold War, Globalization) OCR & KruAI RAG Grounding
+
+Commit: `adde982`. **No database step needed.**
+
+Transcribed and grounded Section 8 ("ប្រវត្តិសាស្ត្រតំបន់ និងពិភពលោក" / Regional & World History) from the official Grade 12 History Q&A compilation by Eng Lay / compiled by Soung Sedy (Hun Sen 10 Makara High School / MoEYS Bac II 2014-2022) (Book pp. 47-55, PDF pp. 50-58).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ប្រវត្តិវិទ្យា_អេង_ឡាយ/` and transcribed clean Markdown into `sources/ocr/ប្រវត្តិវិទ្យា_អេង_ឡាយ/regional-and-world-history.md` containing all 16 authentic Bac II questions (2014, 2016, 2017, 2018, 2021, 2022) and their official scoring keys (អត្រាកំណែ). Covers major global issues (environmental degradation, climate change, population explosion, human trafficking, food security and famine, transnational crime, terrorism); causes and multi-faceted impacts of globalization (economic growth, market competition, high-tech automation vs. loss of small-state sovereignty, big-power interventions, inter-state conflicts); ASEAN's founding mission, role in Southeast Asia (peace, conflict resolution, economic integration, tourism, cultural exchange), all 10 member nations, and comprehensive benefits to Cambodia across politics, economy, social progress, and regional infrastructure; the European Union (EU) structure and principles (27 nations); Cold War impact on Indochina in 1950-1960 (independence and UN accession vs. ideological division of Vietnam and Laos, and devastating proxy conflicts); and global Cold War consequences (arms race, NATO vs. Warsaw Pact military blocs, UN paralysis, divided nations).
+- **RAG Grounding**: Added keyworded chunk `tb:hist:world:regional-and-world-history-bacii-qna` into `HISTORY_OVERVIEW_SECTIONS` in `server/textbook-search.ts` and included in `ALL_HISTORY_SECTIONS`, searchable via `searchHistoryTextbook`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs sources/ocr/ប្រវត្តិវិទ្យា_អេង_ឡាយ` (8 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Cambodia History Summary OCR & KruAI RAG Grounding
 
 Commit: `cc182713`. **No database step needed.**
