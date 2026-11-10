@@ -16,6 +16,19 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Physics Summary Batch 1: Front Matter & Chapter 1 Lesson 1 (Kinetic Theory of Gases) OCR, Study Path & KruAI Grounding
+
+Commit: `ad23135`. **No database step needed.**
+
+Digitized Batch 1 of the official MoEYS Grade 12 Physics Summary & Worked Examples textbook (`sources/textbooks/Physics summary.pdf`, PDF pages 1 to 8, book pages i to iii and 1 to 4):
+- **Textbook Rendering & OCR**: Verified rendered PNG scans (`p01.png` to `p08.png` in `sources/pages/Physics summary/`) and transcribed word-for-word into two Markdown files in `sources/ocr/Physics summary/`:
+  1. `front-matter.md` (PDF pages 1 to 4, book pages i to iii): Cover page (2014-2015), Preface (អារម្ភកថា) with authors and editors, Table of Contents (មាតិកា), and Lesson Difficulty Table (កម្រិតពិបាកនៃមេរៀន).
+  2. `chapter1-lesson1-kinetic-theory-of-gases.md` (PDF pages 5 to 8, book pages 1 to 4): Chapter 1 (ទែម៉ូឌីណាមិច), Lesson 1 (ទ្រឹស្ដីស៊ីនេទិចនៃឧស្ម័ន / Kinetic Theory of Gases), covering absolute temperature conversion ($T = t + 273.15$), kinetic theory postulates, gas pressure ($P = \frac{2}{3}(\frac{N}{V})K_{\text{av}}$), the ideal gas equation of state ($PV = Nk_B T = nRT$), Avogadro's number ($N_A = 6.022 \times 10^{23}\text{ ម៉ូលេគុល/mol}$), Boltzmann constant ($k_B = 1.38 \times 10^{-23}\text{ J/K}$), average and total kinetic energy ($K_{\text{av}} = \frac{3}{2}k_B T$, $K = \frac{3}{2}nRT$), root-mean-square speed ($v_{\text{rms}} = \sqrt{\frac{3k_B T}{m}} = \sqrt{\frac{3RT}{M}}$), and all 7 worked examples (ឧទាហរណ៍ 1 to 7) with step-by-step solutions (ចម្លើយ 1 to 7).
+- **KruAI RAG Grounding**: Added `PHYSICS_CH1_SECTIONS`, `ALL_PHYSICS_SECTIONS`, and `searchPhysicsTextbook` in `server/textbook-search.ts`, and wired Physics textbook retrieval into `server/chat-handler.ts`.
+- **Study Path Structure**: Registered `physics` in `SUBJECT_SESSIONS` and `PATH_TAB` in `src/features/lessons/sessions.ts` with Chapter 1 (`ទែម៉ូឌីណាមិច`), Lesson 1 (`ទ្រឹស្ដីស៊ីនេទិចនៃឧស្ម័ន`), and 5 authentic Khmer section titles.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Physics summary"` (2 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 5 Lesson 2 (Gene Expression) OCR & KruAI Grounding
 
 Commit: `2d56ba6`. **No database step needed.**
