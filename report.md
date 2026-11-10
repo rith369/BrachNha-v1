@@ -16,6 +16,18 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Physics Summary Batch 6: Chapter 3 Lesson 2 (Electromagnetic Induction) OCR, Study Path & KruAI Grounding
+
+Commit: `d51431c`. **No database step needed.**
+
+Digitized Batch 6 of the official MoEYS Grade 12 Physics Summary & Worked Examples textbook (`sources/textbooks/Physics summary.pdf`, PDF pages 37 to 42, book pages 33 to 38):
+- **Textbook Rendering & OCR**: Rendered high-resolution PNG scans (`p37.png` to `p42.png` in `sources/pages/Physics summary/`) and transcribed word-for-word into `sources/ocr/Physics summary/chapter3-lesson2-electromagnetic-induction.md`:
+  - Chapter 3 (`ជំពូក 3 អគ្គិសនី និងម៉ាញេទិច`), Lesson 2 (`មេរៀនទី 2៖ អាំងឌុចស្យុងអេឡិចត្រូម៉ាញេទិច`), covering induced current (`ចរន្តអាំងឌ្វី`), magnetic flux ($\Phi = BA\cos\theta$, measured in Weber $\text{Wb}$), Faraday's law of electromagnetic induction ($E = -N\frac{\Delta\Phi}{\Delta t} = -N\frac{\Phi_f - \Phi_i}{t_f - t_i}$ and $|E| = N\frac{|\Delta\Phi|}{\Delta t}$), Lenz's law (`ច្បាប់ឡិន`), motional EMF in a moving conductor ($|E| = vB\ell\sin\alpha$, perpendicular case $|E| = vB\ell$, induced current $I = \frac{|E|}{R} = \frac{vB\ell}{R}$), AC electric generator (`ជនិតាអគ្គិសនី`, $e(t) = NBA\omega\sin\omega t = E_m\sin\omega t$, peak EMF $E_m = NBA\omega$), electric motor (`ម៉ូទ័រ`), and all 9 worked examples (`ឧទាហរណ៍ 1` to `ឧទាហរណ៍ 9`) with complete step-by-step solutions.
+- **KruAI RAG Grounding**: Added 4 chunks (`tb:phys:ch3:l2-magnetic-flux-faraday-lenz`, `tb:phys:ch3:l2-motional-emf-and-ac-generator`, `tb:phys:ch3:l2-examples-1-to-5`, `tb:phys:ch3:l2-examples-6-to-9`) to `PHYSICS_CH3_SECTIONS` in `server/textbook-search.ts`.
+- **Study Path Structure**: Added Lesson 2 (`អាំងឌុចស្យុងអេឡិចត្រូម៉ាញេទិច`) with 5 authentic Khmer section titles under `SUBJECT_SESSIONS.physics[2]` (Chapter 3: `អគ្គិសនី និងម៉ាញេទិច`) in `src/features/lessons/sessions.ts`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Physics summary"` (7 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals), `npx oxlint` (0 errors, 1 known warning), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Physics Summary Batch 5: Chapter 3 Lesson 1 (Magnetic Field & Force) OCR, Study Path & KruAI Grounding
 
 Commit: `0361378`. **No database step needed.**
