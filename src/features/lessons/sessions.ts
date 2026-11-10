@@ -278,7 +278,15 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
       number: 1,
       title: "ស៊ីមណូស្ពែម និងអង់ស្យូស្ពែម",
       lessons: [
-        { number: 1, title: "ស៊ីមណូស្ពែម", sessions: sectionsFor("biology", 1, 1) },
+        {
+          number: 1,
+          title: "ស៊ីមណូស្ពែម",
+          sessions: sectionsFor("biology", 1, 1, [
+            "និយមន័យ និងប្រភេទទាំង 4 នៃស៊ីមណូស្ពែម",
+            "សរីរាង្គលូតលាស់ និងការបន្តពូជ",
+            "វដ្តជីវិត និងការប្រៀបធៀបកោន",
+          ]),
+        },
         {
           number: 2,
           title: "អង់ស្យូស្ពែម",

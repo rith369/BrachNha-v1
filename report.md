@@ -16,6 +16,18 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 1 Lesson 1 (Gymnosperms) OCR, KruAI Grounding & Section Titles
+
+Commit: `3fc80da`. **No database step needed.**
+
+Transcribed and grounded Chapter 1 Lesson 1 ("ស៊ីមណូស្ពែម" / Gymnosperms) from the official Grade 12 Biology Q&A textbook by Tho Phon (RUPP) (Book pp. 1-5, PDF pp. 2-6), bringing Chapter 1 of the book to 100% completion alongside Lesson 2 (Angiosperms).
+- **Textbook OCR**: Transcribed clean Markdown into `sources/ocr/biology-qna/chapter1-lesson1-gymnosperms.md` covering etymology, evolutionary origin (Silurian and Devonian of Mid-Paleozoic), the 4 surviving groups (Cycads, Conifers, Ginkgoes, Gnetophytes), vegetative organs (stem and leaf morphs), male and female cones, and all 7 authentic exam Q&As (including the high-yield male vs. female cone comparison).
+- **RAG Grounding**: Added `tb:bio:ch1:gymnosperm-high-yield-qna` into `BIOLOGY_CH1_SECTIONS` in `server/textbook-search.ts` with bilingual search keywords (Khmer and Latin) covering male vs. female cone anatomy, gametophytes, pollen grain cells, and life cycle phases.
+- **Curriculum Sessions**: Wired authentic section titles for Chapter 1 Lesson 1 into `src/features/lessons/sessions.ts` ("និយមន័យ និងប្រភេទទាំង 4 នៃស៊ីមណូស្ពែម", "សរីរាង្គលូតលាស់ និងការបន្តពូជ", "វដ្តជីវិត និងការប្រៀបធៀបកោន").
+- **Verification**: Verified with `node scripts/ocr-check.mjs sources/ocr/biology-qna` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), `npm test` (all 109 tests passed), and `npm run build` (production build and CSP check passed).
+
+
+
 ## 10 Nov 2026: Grade 12 Math Chapter 3 (Definite Integrals) OCR & KruAI RAG Grounding
 
 Commit: `f7d6b95`. **No database step needed.**
