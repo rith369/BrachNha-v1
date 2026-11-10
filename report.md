@@ -16,6 +16,19 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Physics Summary Batch 3: Chapter 1 Lesson 2 (Part 2) & Lesson 3 (Heat Engines, Part 1) OCR, Study Path & KruAI Grounding
+
+Commit: `b7761b1`. **No database step needed.**
+
+Digitized Batch 3 of the official MoEYS Grade 12 Physics Summary & Worked Examples textbook (`sources/textbooks/Physics summary.pdf`, PDF pages 16 to 22, book pages 12 to 18):
+- **Textbook Rendering & OCR**: Rendered high-resolution PNG scans (`p16.png` to `p22.png` in `sources/pages/Physics summary/`) and transcribed word-for-word into `sources/ocr/Physics summary/`:
+  1. Completed `chapter1-lesson2-first-law-of-thermodynamics.md` (book page 12): Full step-by-step solution for Example 8 (adiabatic expansion work $W = 5.0\text{ J} \Rightarrow \Delta U = -5.0\text{ J}$ and adiabatic compression work $W = -80\text{ J} \Rightarrow \Delta U = 80\text{ J}$).
+  2. Created `chapter1-lesson3-heat-engines.md` (book pages 13 to 18): Chapter 1, Lesson 3 (`មេរៀនទី 3៖ ម៉ាស៊ីន`), covering heat engines (`ម៉ាស៊ីនកម្ដៅ`), energy balance ($Q_h = Q_c + W$), thermal efficiency ($e = \frac{W}{Q_h} = 1 - \frac{Q_c}{Q_h}$), Carnot cycle (`ស៊ីចកាកណូ`) and Carnot's theorem ($e = 1 - \frac{T_c}{T_h}$, $\frac{Q_c}{Q_h} = \frac{T_c}{T_h}$), gasoline and diesel four-stroke engines (`ម៉ាស៊ីនសាំង និងម៉ាស៊ូត`, `ម៉ូទ័របន្ទុះបួនវគ្គ`), combustion chamber and transmission efficiencies ($e_c = \frac{W_M}{Q_h}$, $e_M = \frac{W_U}{W_M}$, $e = e_M \times e_c$), and worked Examples 1 to 8 (complete solutions for Examples 1 to 7 and the first part of Example 8).
+- **KruAI RAG Grounding**: Updated `tb:phys:ch1:l2-examples-4-to-8` and added 4 new chunks (`tb:phys:ch1:l3-carnot-and-heat-engines`, `tb:phys:ch1:l3-gasoline-and-diesel-engines`, `tb:phys:ch1:l3-examples-1-to-4`, `tb:phys:ch1:l3-examples-5-to-8`) to `PHYSICS_CH1_SECTIONS` in `server/textbook-search.ts`.
+- **Study Path Structure**: Registered Lesson 3 (`ម៉ាស៊ីន`) under Physics Chapter 1 (`ទែម៉ូឌីណាមិច`) in `src/features/lessons/sessions.ts` with 5 authentic Khmer section titles.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Physics summary"` (4 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals), `npx oxlint` (0 errors, 1 known warning), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Physics Summary Batch 2: Chapter 1 Lesson 2 (First Law of Thermodynamics, Part 1) OCR, Study Path & KruAI Grounding
 
 Commit: `3bb6ba1`. **No database step needed.**
