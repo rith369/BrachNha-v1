@@ -16,6 +16,26 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Practice Exams 1 to 5 OCR & KruAI RAG Grounding
+
+Commit: `ffea718`. **No database step needed.**
+
+Transcribed and grounded Section 9 ("វិញ្ញាសាទី 1 ដល់ ទី 5" / Practice Exams 1 to 5) from the official Grade 12 History Q&A compilation by Eng Lay / compiled by Soung Sedy (Hun Sen 10 Makara High School / MoEYS Bac II 2014-2022) (Book pp. 56-74, PDF pp. 59-77).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ប្រវត្តិវិទ្យា_អេង_ឡាយ/` and transcribed clean Markdown into `sources/ocr/ប្រវត្តិវិទ្យា_អេង_ឡាយ/practice-exams-1-to-5.md` containing all 5 comprehensive Bac II exam papers and official scoring criteria (អត្រាកំណែ). Covers: Exam 1 on Cambodia's 1955 UN membership, Sangkum Reastr Niyum's internal factions, and Khmer Rouge regime atrocities; Exam 2 on the 2 December 1978 United Front, national education restoration post-1979, and the K-5 national border defense plan; Exam 3 on ASEAN admission motives, community spirit and consensus, and Cambodia's ASEAN chairmanships (2002, 2012, 2022); Exam 4 on Southeast Asian anti-colonial resistance movements, Vietnam's 1986 Doi Moi economic reforms, and Middle East conflict drivers (1947 Palestine-Israel partition); and Exam 5 on UN permanent members, the 1947 Marshall Plan, Gorbachev's Perestroika reforms and the 1991 Soviet collapse, and emerging global crises (climate change, population surge, food security, terrorism).
+- **RAG Grounding**: Added keyworded chunk `tb:hist:practice:exams-1-to-5-bacii-qna` into `HISTORY_OVERVIEW_SECTIONS` in `server/textbook-search.ts` and included in `ALL_HISTORY_SECTIONS`, searchable via `searchHistoryTextbook`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs sources/ocr/ប្រវត្តិវិទ្យា_អេង_ឡាយ` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
+## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 3 Lesson 2 (Sense Organs) OCR & KruAI Grounding
+
+Commit: `PENDING`. **No database step needed.**
+
+Transcribed and grounded Chapter 3, Lesson 2 ("សរីរាង្គវិញ្ញាណ" / Sense Organs: Eye, Ear, Tongue, Nose, Skin) from the official ជីវវិទ្យា ថូ ភន (Tho Phon Biology Q&A) textbook (Book pp. 34–50, PDF pp. 35–51).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ជីវវិទ្យា - ធូ ភន biology qna/` and transcribed clean Markdown into `sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna/chapter3-lesson2-sense-organs.md` containing the complete theory summary and all 42 authentic Bac II questions and answers. Covers eye anatomy (sclera, cornea light refraction, choroid, ciliary body, iris pupil regulation, retina cones and rods, rhodopsin chemistry and vitamin A / night blindness, 3 chambers with aqueous and vitreous humors, accessory structures with lacrimal glands and 6 muscles for 3D vision, and visual defects: myopia with concave lens, hypermetropia with convex lens, astigmatism with cylindrical lens); ear anatomy and mechanisms (outer ear pinna and canal, middle ear tympanic membrane and 3 ossicles malleus/incus/stapes, Eustachian tube pressure regulation and infection pathway, inner ear cochlea hearing and semicircular canals balance coordination with cerebellum, motion sickness); tongue anatomy (papillae, taste buds structure, 4 primary taste zones: sweet, salty, sour, bitter); nose anatomy (olfactory epithelium, supporting cells, basal cells, olfactory receptor cells with cilia, mucous dissolution and common cold taste-smell relationship); and skin anatomy (epidermis keratin and melanocytes with melanin/albinism, dermis with 5 cutaneous receptors for pain, pressure, touch, heat, cold, sebaceous glands, sweat glands 500-600 ml/day, hair arrector pili muscle, nails lunula).
+- **RAG Grounding**: Added keyworded chunk `tb:bio:ch3:sense-organs-high-yield-bacii-qna` into `BIOLOGY_CH3_SECTIONS` in `server/textbook-search.ts` with comprehensive bilingual keywords for retrieval by KruAI.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna"` (5 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), `npm test` (all 109 tests passed), and `npm run build` (production build and CSP check passed).
+
+
 ## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Regional & World History (ASEAN, Cold War, Globalization) OCR & KruAI RAG Grounding
 
 Commit: `adde982`. **No database step needed.**
