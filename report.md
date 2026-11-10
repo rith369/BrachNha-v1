@@ -16,6 +16,30 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Cambodia History Summary OCR & KruAI RAG Grounding
+
+Commit: `cc182713`. **No database step needed.**
+
+Transcribed and grounded Section 7 ("ប្រវត្តិសាស្ត្រប្រទេសកម្ពុជា" / Cambodia History Summary) from the official Grade 12 History Q&A compilation by Eng Lay (Hun Sen 10 Makara High School / MoEYS Bac II 2014-2022) (Book pp. 43-46, PDF pp. 46-49).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ប្រវត្តិវិទ្យា_អេង_ឡាយ/` and transcribed clean Markdown into `sources/ocr/ប្រវត្តិវិទ្យា_អេង_ឡាយ/cambodia-history-summary.md` containing all 7 authentic Bac II questions (2014, 2015, 2016) and their official scoring keys (អត្រាកំណែ). Covers the construction of Angkor Wat by King Suryavarman II; achievements of King Jayavarman VII (liberation from Champa 1177-1181, Angkor Thom, Bayon, 102 hospitals / arogyasala, 121 dharmasala / rest houses, Mahayana Buddhism, father of the nation); major historical milestones of 20th-century Cambodia (French Protectorate border treaties 1904/1907/1908 Dangrek map, 1947 first constitution, loss of Kampuchea Krom 4 June 1949, 1953 royal independence crusade, 1954 Geneva; Sangkum Reastr Niyum UN membership 1955, 1962 Preah Vihear ICJ ruling; Khmer Republic 1970 coup, B-52 bombings 1969-1973, civil war; Democratic Kampuchea 17 April 1975, KUFNS 2 Dec 1978, 7 Jan 1979 victory; PRK & SOC, 23 Oct 1991 Paris Peace Agreements, UNESCO Angkor 1992, Win-Win policy 1998, ASEAN 1999); economic and social values of peace; the role of the "Culture of Dialogue" (វប្បធម៌សន្ទនា) in a democratic society; the role of Buddhism in Khmer society; and Samdech Preah Sangharaja Chuon Nath as creator of the Khmer Dictionary.
+- **RAG Grounding**: Added keyworded chunk `tb:hist:overview:cambodia-20th-century-and-monarchs` into `HISTORY_OVERVIEW_SECTIONS` in `server/textbook-search.ts` and included in `ALL_HISTORY_SECTIONS`, searchable via `searchHistoryTextbook`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs sources/ocr/ប្រវត្តិវិទ្យា_អេង_ឡាយ` (7 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
+## 10 Nov 2026: Grade 12 Math Chapter 9 (Vectors in Space & Applications) OCR & KruAI RAG Grounding (100% Textbook Complete!)
+
+Commit: `7c44438`. **No database step needed.**
+
+Digitized Chapter 9 ("ផលគុណនៃពីរវ៉ិចទ័រក្នុងលំហ និង អនុវត្តន៍" / Vectors in Space & Applications) from the official MoEYS Grade 12 Mathematics Summary textbook (Book pp. 89–93, PDF pp. 92–96), bringing the entire MoEYS Grade 12 Mathematics Summary Textbook to 100% completion across all 9 chapters.
+- **Textbook Rendering & OCR**: Rendered high-resolution scans using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/math-summary/chapter9-vectors-in-space.md`. Covers cross product definition and determinant formula $\vec{u} \times \vec{v}$, algebraic and geometric properties ($\vec{u} \times \vec{v} \perp \vec{u}, \vec{v}$, $|\vec{u} \times \vec{v}| = |\vec{u}||\vec{v}|\sin\theta$, collinear condition $\vec{u} \times \vec{v} = \vec{0}$), geometric applications (area of parallelogram $S = |\vec{u} \times \vec{v}|$, area of triangle $S = \frac{1}{2}|\vec{u} \times \vec{v}|$), triple scalar product $\vec{u} \cdot (\vec{v} \times \vec{w})$, volume of parallelepiped $V = |\vec{u} \cdot (\vec{v} \times \vec{w})|$, volume of tetrahedron $W = \frac{V}{6}$, lines in space (parametric and symmetric equations), planes in space (standard $a(x - x_0) + b(y - y_0) + c(z - z_0) = 0$ and general $ax + by + cz + d = 0$, normal vector from three points $\vec{n} = \vec{AB} \times \vec{AC}$, angle between planes), distance formulas (point-to-point, point-to-plane, point-to-line), sphere equations, and all 7 authentic MoEYS worked exercises.
+- **RAG Grounding**: Added keyworded chunks (`MATH_CH9_SECTIONS` / `MATH_VECTORS_IN_SPACE_SECTIONS`) into `server/textbook-search.ts` covering:
+  - `tb:math:vectors:ch9:cross-product-properties`: Cross product, properties, unit orthogonal vectors, parallelogram/triangle areas, and triple scalar product volume formulas.
+  - `tb:math:vectors:ch9:lines-planes-spheres`: Parametric/symmetric line equations, plane equations from three points, sphere equations, and distance formulas in space.
+  Included in `ALL_MATH_SECTIONS` and updated `searchMathTextbook` across all 9 chapters.
+- **Curriculum Sessions**: Registered authentic section titles for Chapter 9 ("ផលគុណនៃពីរវ៉ិចទ័រក្នុងលំហ និង អនុវត្តន៍") in `src/features/practice/quiz-path.ts` under `MATH_LESSONS`: "ផលគុណនៃពីរវ៉ិចទ័រ និងផលគុណចម្រុះ", "បន្ទាត់ ប្លង់ ស្វ៊ែរ និងចម្ងាយក្នុងលំហ".
+- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/math-summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Lesson 6 (Kingdom of Cambodia Second) OCR & KruAI RAG Grounding
 
 Commit: `f4740f9`. **No database step needed.**
