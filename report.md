@@ -16,6 +16,16 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Lesson 5 (People's Republic & State of Cambodia) OCR & KruAI RAG Grounding
+
+Commit: `5bf063b`. **No database step needed.**
+
+Transcribed and grounded Lesson 5 ("សាធារណរដ្ឋប្រជាមានិតកម្ពុជា និងរដ្ឋកម្ពុជា (1979-1993)" / People's Republic of Kampuchea and State of Cambodia) from the official Grade 12 History Q&A compilation by Eng Lay (Hun Sen 10 Makara High School / MoEYS Bac II 2014-2022) (Book pp. 23-29, PDF pp. 26-32).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ប្រវត្តិវិទ្យា_អេង_ឡាយ/` and transcribed clean Markdown into `sources/ocr/ប្រវត្តិវិទ្យា_អេង_ឡាយ/lesson5-peoples-republic-and-state-of-cambodia.md` containing all 7 authentic Bac II questions (2014, 2016, 2017, 2019, 2021, 2022) and their official scoring keys (អត្រាកំណែ). Covers the peace negotiation and national reconciliation process (1984-1991, Sihanouk-Hun Sen summits, JIM 1 & 2, Vietnamese troop withdrawal Sept 1989, SNC formation, Paris Peace Agreements 23 Oct 1991, UNTAC 1993, Win-Win policy 1998), post-1979 national reconstruction across politics, economy (solidarity groups / ក្រុមសាមគ្គីបង្កបង្កើនផល, 1980 riel re-circulation, shift to private property 1983-1986), education/culture ("អ្នកចេះច្រើនបង្រៀនអ្នកចេះតិច", literacy campaign, fine arts, pagodas), and health; resistance movements against Pol Pot (1975-1979, Hou Nim 1976, Chamkar Luong, Hun Sen journey to Vietnam 20 June 1977, KUFNS 2 Dec 1978); PRK governing state apparatus (KPRP, Council of State, Council of Ministers, National Assembly, K-5 defense plan); and the historical significance of the 7 January 1979 liberation day.
+- **RAG Grounding**: Added keyworded chunk `tb:hist:prk:ch5:high-yield-bacii-qna` into `HISTORY_CH5_SECTIONS` in `server/textbook-search.ts` with comprehensive bilingual keywords covering exam queries and scoring rubrics. Included in `ALL_HISTORY_SECTIONS` and searchable via `searchHistoryTextbook`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs sources/ocr/ប្រវត្តិវិទ្យា_អេង_ឡាយ` (5 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), and `npm test` (all 109 tests passed).
+
+
 ## 10 Nov 2026: Grade 12 Math Chapter 7 (Differential Equations) OCR & KruAI RAG Grounding
 
 Commit: `878c50c`. **No database step needed.**
