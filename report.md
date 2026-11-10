@@ -16,6 +16,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Grade 12 Math Chapter 4 (Function Variation & Curve Sketching) OCR & KruAI RAG Grounding
+
+Commit: `e97b49a`. **No database step needed.**
+
+Digitized Chapter 4 ("សិក្សាអថេរភាព និង សង់ខ្សែកោង" / Function Variation & Curve Sketching) from the official MoEYS Grade 12 Mathematics Summary textbook (Book pp. 39–55, PDF pp. 42–58).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans with zero external API costs using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/math-summary/chapter4-function-variation-curves.md`. Contains all theory and properties for rational functions, horizontal/vertical/oblique asymptotes, symmetry centers, exponential and logarithmic functions, and 7 authentic MoEYS worked exercises (including degree 2 rational curves, odd logarithmic functions, and the Bac II comprehensive exponential area problem).
+- **RAG Grounding**: Added keyworded chunks (`MATH_CH4_SECTIONS` / `MATH_FUNCTION_VARIATION_CURVES_SECTIONS`) into `server/textbook-search.ts` covering:
+  - `tb:math:curves:ch4:rational-asymptotes-variations`: Rational function asymptotes (vertical $x = -\frac{q}{p}$, oblique $y = mx + n$), center of symmetry, and table of signs.
+  - `tb:math:curves:ch4:degree2-rational-functions`: Degree 2 / Degree 2 rational functions, classification by $\Delta = q^2 - 4pr$, and relative extrema.
+  - `tb:math:curves:ch4:logarithmic-functions-and-graphs`: Logarithmic variations, odd symmetry $g(-x) = -g(x)$, tangent lines, and integration by parts.
+  - `tb:math:curves:ch4:exponential-comprehensive-problem`: Bac II exam problem on $f(x) = x - e^x$ and $g(x) = (1 - x)e^x$, intermediate value theorem for unique intersection $\alpha \in [1, 2]$ ($1.6 < \alpha < 1.7$), relative curve positions, and bounded area $S = \frac{2(\alpha^3 - 4\alpha^2 + 2\alpha - 12)}{2 - \alpha}\text{ cm}^2$.
+  Included in `ALL_MATH_SECTIONS` and verified with `searchMathTextbook`.
+- **Curriculum Sessions**: Registered authentic section titles for Chapter 4 ("សិក្សាអថេរភាព និង សង់ខ្សែកោង") in `src/features/practice/quiz-path.ts` under `MATH_LESSONS`.
+- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/math-summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), `npm test` (all 109 tests passed), and `npm run build` (production build and CSP check passed).
+
+
 ## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 3 Lesson 1 (Nervous Coordination) OCR & KruAI Grounding
 
 Commit: `f73e712`. **No database step needed.**
