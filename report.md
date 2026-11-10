@@ -16,6 +16,21 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Grade 12 Math Chapter 6 (Conics) OCR & KruAI RAG Grounding
+
+Commit: `d06f379`. **No database step needed.**
+
+Digitized Chapter 6 ("កោនិច" / Conics: Parabola, Ellipse, Hyperbola) from the official MoEYS Grade 12 Mathematics Summary textbook (Book pp. 69–77, PDF pp. 72–80).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/math-summary/chapter6-conics.md`. Contains all theory, reference tables, and standard equations for parabolas (vertex $(0, 0)$ and $(h, k)$, focus, directrix $x = -p$ / $y = -p$, open directions), ellipses (center $(0, 0)$ and $(h, k)$, horizontal and vertical major axes, foci $(\pm c, 0)$ / $(0, \pm c)$, vertices, $c^2 = a^2 - b^2$, axis lengths $2a$ and $2b$), hyperbolas (center $(0, 0)$ and $(h, k)$, transverse axes, foci, vertices, $c^2 = a^2 + b^2$, asymptotes $y = \pm \frac{b}{a} x$ / $y = \pm \frac{a}{b} x$), and all 9 authentic MoEYS worked exercises.
+- **RAG Grounding**: Added keyworded chunks (`MATH_CH6_SECTIONS` / `MATH_CONICS_SECTIONS`) into `server/textbook-search.ts` covering:
+  - `tb:math:conics:ch6:parabola`: Parabola standard forms $y^2 = 4px$, $x^2 = 4py$, $(y - k)^2 = 4p(x - h)$, $(x - h)^2 = 4p(y - k)$, vertex, focus, directrix, and axis of symmetry.
+  - `tb:math:conics:ch6:ellipse`: Ellipse standard forms $\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1$, $\frac{(x - h)^2}{a^2} + \frac{(y - k)^2}{b^2} = 1$, center, major/minor axes, vertices, foci, and $c^2 = a^2 - b^2$.
+  - `tb:math:conics:ch6:hyperbola`: Hyperbola standard forms $\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1$, $\frac{y^2}{a^2} - \frac{x^2}{b^2} = 1$, transverse/conjugate axes, vertices, foci, $c^2 = a^2 + b^2$, asymptotes, and rectangular box construction.
+  Included in `ALL_MATH_SECTIONS` and updated `searchMathTextbook`.
+- **Curriculum Sessions**: Registered authentic section titles for Chapter 6 ("កោនិច") in `src/features/practice/quiz-path.ts` under `MATH_LESSONS`: "ប៉ារ៉ាបូល", "អេលីប", "អ៊ីពែបូល".
+- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/math-summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), `npm test` (all 109 tests passed), and `npm run build` (production build and CSP check passed).
+
+
 ## 10 Nov 2026: Grade 12 Math Chapter 5 (Complex Numbers) OCR & KruAI RAG Grounding
 
 Commit: `10240dd`. **No database step needed.**
