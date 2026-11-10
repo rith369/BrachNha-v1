@@ -16,6 +16,18 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Physics Summary Batch 8 (Final Batch): Chapter 3 Lesson 4 (AC Circuits) OCR, Study Path & KruAI Grounding
+
+Commit: `pending`. **No database step needed.**
+
+Completed Batch 8 (the final batch, reaching 100% completion!) of the official MoEYS Grade 12 Physics Summary & Worked Examples textbook (`sources/textbooks/Physics summary.pdf`, PDF pages 50 to 58, book pages 46 to 54):
+- **Textbook Rendering & OCR**: Rendered high-resolution PNG scans (`p50.png` to `p58.png` in `sources/pages/Physics summary/`) and transcribed word-for-word into `sources/ocr/Physics summary/chapter3-lesson4-ac-circuits.md`:
+  - Chapter 3 (`ជំពូក 3 អគ្គិសនី និងម៉ាញេទិច`), Lesson 4 (`មេរៀនទី 4៖ សៀគ្វីចរន្តឆ្លាស់`), covering sinusoidal alternating current and voltage ($i(t) = I_m\sin(\omega t + \varphi)$, $V(t) = V_m\sin\omega t$), effective/RMS current and voltage ($I = \frac{I_m}{\sqrt{2}}$, $V = \frac{V_m}{\sqrt{2}}$), impedances and Fresnel phasor relationships for pure inductor ($Z_L = L\omega$, real coil $Z_L = \sqrt{R_L^2 + (L\omega)^2}$), pure resistor ($Z_R = R$), pure capacitor ($Z_C = \frac{1}{C\omega}$), series $(RC)$ circuit ($Z = \sqrt{R^2 + (\frac{1}{C\omega})^2}$, $\tan\varphi = \frac{1}{RC\omega}$), series $(RL)$ circuit ($Z = \sqrt{R^2 + (L\omega)^2}$, $\tan\varphi = \frac{L\omega}{R}$), series $(RLC)$ circuit ($Z = \sqrt{R^2 + (L\omega - \frac{1}{C\omega})^2}$, $\tan\varphi = \frac{L\omega - \frac{1}{C\omega}}{R}$, $\cos\varphi = \frac{R}{Z}$), electrical resonance ($Z_L = Z_C \Leftrightarrow LC\omega^2 = 1$, $Z = R$, $\varphi = 0$, $f_0 = \frac{1}{2\pi\sqrt{LC}}$), average power and power factor ($P = \frac{W}{t} = VI\cos\varphi$), transformers ($\frac{V_2}{V_1} = \frac{n_2}{n_1} = \frac{I_1}{I_2} = K$, step-up `សួកវ៉ុលទ័រ` $K > 1$, step-down `ស៊ូវ៉ុលទ័រ` $K < 1$, efficiency $Rd = \frac{Pe_2}{Pe_1}$, power balance $Pe_1 = Pe_2 + P_J$), and all 9 worked examples (`ឧទាហរណ៍ 1` to `ឧទាហរណ៍ 9`) with complete step-by-step solutions.
+- **KruAI RAG Grounding**: Added 4 chunks (`tb:phys:ch3:l4-ac-rms-and-rlc-branch-impedances`, `tb:phys:ch3:l4-rlc-series-resonance-power-and-transformer`, `tb:phys:ch3:l4-examples-1-to-5`, `tb:phys:ch3:l4-examples-6-to-9`) to `PHYSICS_CH3_SECTIONS` in `server/textbook-search.ts`, completing 100% coverage of the Grade 12 Physics Summary Textbook across Chapters 1 to 3.
+- **Study Path Structure**: Added Lesson 4 (`សៀគ្វីចរន្តឆ្លាស់`) with 5 authentic Khmer section titles under `SUBJECT_SESSIONS.physics[2]` (Chapter 3: `អគ្គិសនី និងម៉ាញេទិច`) in `src/features/lessons/sessions.ts`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Physics summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals), `npx oxlint` (0 errors, 1 known warning), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Physics Summary Batch 7: Chapter 3 Lesson 3 (Self-Induction) OCR, Study Path & KruAI Grounding
 
 Commit: `edac6d9`. **No database step needed.**
