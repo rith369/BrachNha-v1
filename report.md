@@ -16,6 +16,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Grade 12 Math Chapter 8 (Probability) OCR & KruAI RAG Grounding
+
+Commit: `983efbd`. **No database step needed.**
+
+Digitized Chapter 8 ("ប្រូបាប" / Probability) from the official MoEYS Grade 12 Mathematics Summary textbook (Book pp. 83–88, PDF pp. 86–91).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/math-summary/chapter8-probability.md`. Covers basic probability definitions and properties ($P(A) = \frac{n(A)}{n(S)}$, $0 \le P(A) \le 1$, $P(S) = 1$, $P(\emptyset) = 0$), union and intersection of events, mutually exclusive events ($A \cap B = \emptyset \implies P(A \cup B) = P(A) + P(B)$), complementary events ($P(\bar{A}) = 1 - P(A)$), conditional probability ($P(B|A) = \frac{P(A \cap B)}{P(A)}$), multiplication rule, independent events ($P(A \cap B) = P(A) \times P(B)$), law of total probability, Bayes' theorem, and all 4 authentic MoEYS worked exercises (marble draws with combinations $C(n, k)$, student boarding contingency tables, 32-card deck draws, and numbered ball draws forming arithmetic/geometric progressions).
+- **RAG Grounding**: Added keyworded chunks (`MATH_CH8_SECTIONS` / `MATH_PROBABILITY_SECTIONS`) into `server/textbook-search.ts` covering:
+  - `tb:math:prob:ch8:basic-probability-rules`: Definition, properties, addition rule, mutually exclusive events, complementary events, and combination counting.
+  - `tb:math:prob:ch8:conditional-and-independent`: Conditional probability, multiplication rule, independent vs. dependent events, total probability, and Bayes' theorem.
+  Included in `ALL_MATH_SECTIONS` and updated `searchMathTextbook`.
+- **Curriculum Sessions**: Registered authentic section titles for Chapter 8 ("ប្រូបាប") in `src/features/practice/quiz-path.ts` under `MATH_LESSONS`: "និយមន័យ និងលក្ខណៈគ្រឹះនៃប្រូបាប", "ប្រូបាបមានលក្ខខណ្ឌ និងព្រឹត្តិការណ៍មិនអាស្រ័យគ្នា".
+- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/math-summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Lesson 5 (People's Republic & State of Cambodia) OCR & KruAI RAG Grounding
 
 Commit: `5bf063b`. **No database step needed.**

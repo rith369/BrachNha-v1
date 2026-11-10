@@ -2834,6 +2834,74 @@ export const MATH_CH7_SECTIONS: TextbookSection[] = [
 
 export const MATH_DIFFERENTIAL_EQUATIONS_SECTIONS = MATH_CH7_SECTIONS;
 
+export const MATH_CH8_SECTIONS: TextbookSection[] = [
+  {
+    id: "tb:math:prob:ch8:basic-probability-rules",
+    title: "និយមន័យ និងរូបមន្តគ្រឹះនៃប្រូបាប (Probability: Basic Rules & Properties)",
+    keywords: [
+      "ប្រូបាប",
+      "លំហសំណាក",
+      "ព្រឹត្តិការណ៍ផលបូក",
+      "ព្រឹត្តិការណ៍ផលគុណ",
+      "ព្រឹត្តិការណ៍មិនចុះសម្រុង",
+      "ព្រឹត្តិការណ៍ផ្ទុយ",
+      "ករណីស្រប",
+      "ករណីអាច",
+      "probability",
+      "sample space",
+      "mutually exclusive",
+      "complementary events",
+      "addition rule",
+      "ចម្លាស់",
+      "បន្សំ",
+    ],
+    text: `និយមន័យ និងរូបមន្តគ្រឹះនៃប្រូបាប (MoEYS Grade 12)៖
+1. និយមន័យគ្រឹះ៖
+   - ប្រូបាបនៃព្រឹត្តិការណ៍ $A$៖ $P(A) = \\frac{n(A)}{n(S)} = \\frac{\\text{ចំនួនករណីស្រប}}{\\text{ចំនួនករណីអាច}}$
+   - លក្ខណៈ៖ $0 \\le P(A) \\le 1$, $P(S) = 1$, $P(\\emptyset) = 0$
+2. ព្រឹត្តិការណ៍ផលបូក និងផលគុណ៖
+   - ព្រឹត្តិការណ៍ផលបូក៖ $A \\cup B$ (កើតឡើងពេល $A$ ឬ $B$ កើតឡើង)
+   - ព្រឹត្តិការណ៍ផលគុណ៖ $A \\cap B$ (កើតឡើងពេល $A$ និង $B$ កើតឡើងព្រមគ្នា)
+   - រូបមន្តផលបូកទូទៅ៖ $P(A \\cup B) = P(A) + P(B) - P(A \\cap B)$
+   - ព្រឹត្តិការណ៍មិនចុះសម្រុង ($A \\cap B = \\emptyset$)៖ $P(A \\cup B) = P(A) + P(B)$
+3. ព្រឹត្តិការណ៍ផ្ទុយ (បំពេញគ្នា)៖
+   - $A \\cap \\bar{A} = \\emptyset$ និង $A \\cup \\bar{A} = S$
+   - $P(\\bar{A}) = 1 - P(A)$
+4. ការគណនាក្នុងការចាប់ដោយចៃដន្យ (ប្រើបន្សំ $C(n, k)$)៖
+   - ចាប់យក $k$ ក្នុងចំណោម $n$ ព្រមគ្នា៖ $n(S) = C(n, k) = \\frac{n!}{k!(n - k)!}$`,
+  },
+  {
+    id: "tb:math:prob:ch8:conditional-and-independent",
+    title: "ប្រូបាបមានលក្ខខណ្ឌ និងព្រឹត្តិការណ៍មិនអាស្រ័យគ្នា (Conditional Probability & Independence)",
+    keywords: [
+      "ប្រូបាបមានលក្ខខណ្ឌ",
+      "ព្រឹត្តិការណ៍មិនអាស្រ័យគ្នា",
+      "ព្រឹត្តិការណ៍ទាក់ទងគ្នា",
+      "រូបមន្តប្រូបាបសរុប",
+      "ទ្រឹស្តីបទបេយេស",
+      "conditional probability",
+      "independent events",
+      "dependent events",
+      "Bayes theorem",
+      "law of total probability",
+    ],
+    text: `ប្រូបាបមានលក្ខខណ្ឌ និងព្រឹត្តិការណ៍មិនអាស្រ័យគ្នា (MoEYS Grade 12)៖
+1. ប្រូបាបមានលក្ខខណ្ឌ (Conditional Probability)៖
+   - ប្រូបាបនៃ $B$ ដោយដឹងថា $A$ បានកើតឡើង៖ $P(B|A) = \\frac{P(A \\cap B)}{P(A)}$ ($P(A) \\neq 0$)
+   - ប្រូបាបនៃ $A$ ដោយដឹងថា $B$ បានកើតឡើង៖ $P(A|B) = \\frac{P(A \\cap B)}{P(B)}$ ($P(B) \\neq 0$)
+   - វិបាក (រូបមន្តផលគុណ)៖ $P(A \\cap B) = P(A) \\times P(B|A) = P(B) \\times P(A|B)$
+2. ព្រឹត្តិការណ៍មិនអាស្រ័យគ្នា (Independent Events)៖
+   - $A$ និង $B$ មិនអាស្រ័យគ្នា (ឯករាជ្យ) លុះត្រាតែ $P(A \\cap B) = P(A) \\times P(B)$
+   - សមមូលនឹង $P(B|A) = P(B)$ ឬ $P(A|B) = P(A)$
+   - បើ $P(A \\cap B) \\neq P(A) \\times P(B)$ នោះ $A$ និង $B$ អាស្រ័យគ្នា (ទាក់ទងគ្នា)
+3. រូបមន្តប្រូបាបសរុប និងទ្រឹស្តីបទបេយេស៖
+   - រូបមន្តប្រូបាបសរុប៖ $P(B) = \\sum_{i=1}^n [P(B|A_i) \\times P(A_i)]$
+   - ទ្រឹស្តីបទបេយេស៖ $P(A_k|B) = \\frac{P(B|A_k) \\times P(A_k)}{\\sum_{i=1}^n [P(B|A_i) \\times P(A_i)]}$`,
+  },
+];
+
+export const MATH_PROBABILITY_SECTIONS = MATH_CH8_SECTIONS;
+
 export const ALL_MATH_SECTIONS: TextbookSection[] = [
   ...MATH_LIMITS_SECTIONS,
   ...MATH_DERIVATIVES_PRIMITIVES_SECTIONS,
@@ -2842,10 +2910,11 @@ export const ALL_MATH_SECTIONS: TextbookSection[] = [
   ...MATH_CH5_SECTIONS,
   ...MATH_CH6_SECTIONS,
   ...MATH_CH7_SECTIONS,
+  ...MATH_CH8_SECTIONS,
 ];
 
 /**
- * Searches Mathematics textbook chunks (Chapters 1-7: Limits, Derivatives, Primitives, Integrals, Curves, Complex, Conics, Differential Equations) for matches against a student query.
+ * Searches Mathematics textbook chunks (Chapters 1-8: Limits, Derivatives, Primitives, Integrals, Curves, Complex, Conics, DiffEq, Probability) for matches against a student query.
  * Returns up to maxResults retrieved chunks formatted for KruAI's system prompt.
  */
 export function searchMathTextbook(
