@@ -16,9 +16,25 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Math Summary Blind Audit Batch 1B: Chapter 1 Limits (Part 2, Pages 11 to 18)
+
+Commit: `32dc3fe`. **No database step needed.**
+
+Conducted strict blind audit pass on Chapter 1 (Limits, Part 2: PDF pages `p14.png` to `p21.png`, Book pages 11 to 18) in `sources/ocr/Math summary/chapter1-limits.md`:
+- **Line-by-Line Visual Audit & Fixes**:
+  - Inserted page boundary markers `<!-- Page p14.png -->` through `<!-- Page p21.png -->`.
+  - Restored missing question statement for Exercise 9.ឃ on page 11 (`p14.png`).
+  - Corrected boundary between page 11 and page 12 in Exercise 10, fixing solution heading to authentic `**ចម្លើយ:**`.
+  - Corrected OCR misread in Exercise 12.ក and 12.ខ on page 13 (`p16.png`) from `ទាញរក` to authentic textbook `ទាញយក`.
+  - Replaced non-original `\iff` arrows with textbook line-by-line inequality reasoning and Khmer conjunction `ឬ` on page 13 (`p16.png`).
+  - Restored original textbook algebraic form and annotated scan print typo in Exercise 14.d on page 15 (`p18.png`).
+  - Removed synthetic arithmetic calculations and restored exact authentic MoEYS problem statements and steps across Exercises 15, 16, 17, 18, and 19.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Physics Summary Batch 8 (Final Batch): Chapter 3 Lesson 4 (AC Circuits) OCR, Study Path & KruAI Grounding
 
-Commit: `pending`. **No database step needed.**
+Commit: `d372012`. **No database step needed.**
 
 Completed Batch 8 (the final batch, reaching 100% completion!) of the official MoEYS Grade 12 Physics Summary & Worked Examples textbook (`sources/textbooks/Physics summary.pdf`, PDF pages 50 to 58, book pages 46 to 54):
 - **Textbook Rendering & OCR**: Rendered high-resolution PNG scans (`p50.png` to `p58.png` in `sources/pages/Physics summary/`) and transcribed word-for-word into `sources/ocr/Physics summary/chapter3-lesson4-ac-circuits.md`:
