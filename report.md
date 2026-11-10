@@ -16,6 +16,21 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 4 Lesson 3 (Enzymes) OCR & KruAI Grounding (Chapter 4 100% Complete)
+
+Commit: `a91f48c`. **No database step needed.**
+
+Digitized Chapter 4, Lesson 3 ("អង់ស៊ីម" / Enzymes) of the Grade 12 Biology Q&A textbook compilation by Tho Phon (Book pp. 77-81, PDF pp. 78-82). This concludes the 100% complete digitization of Chapter 4 (Role of Proteins in Organisms).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ជីវវិទ្យា - ធូ ភន biology qna/` (p078.png to p082.png) and transcribed clean Markdown into `sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna/chapter4-lesson3-enzymes.md` containing the complete lesson summary and all 11 authentic Bac II Q&A questions:
+  1. Enzyme definition and nature: all enzymes are proteins operating as biological catalysts to accelerate biochemical reactions without being consumed ($E + S \rightleftharpoons ES \rightleftharpoons E + P$).
+  2. Naming conventions: derived from reaction type catalyzed or substrate name with suffix "-ase" (e.g. amylase, lipase, protease, sucrase, catalase).
+  3. Six major enzyme classes: oxidoreductases (redox, e.g. dehydrogenases), transferases (transfer functional groups, e.g. transcarboxylases), hydrolases (hydrolytic cleavages, e.g. proteases, lipases, carbohydrases), lyases (non-hydrolytic bond cleavages releasing $H_2O, CO_2, NH_3$, e.g. decarboxylases), isomerases (intramolecular rearrangements, e.g. epimerases, mutases), and ligases (bond formation coupled with ATP hydrolysis, e.g. synthetases).
+  4. Enzyme specificity (យថាប្រភេទ): strict substrate specificity necessitating thousands of distinct enzymes in living cells.
+  5. Environmental factors influencing activity: temperature (doubling per 10 °C rise, optimal range at 40 °C to 45 °C, denaturation above 45 °C or below 0 °C), pH (optimum at pH 7, declining towards pH 4 or pH 9), substrate/enzyme concentrations, non-protein coenzymes (vitamin B complex, Coenzyme A), and reversible catalysis.
+- **RAG Grounding**: Grounded comprehensive chunk `tb:bio:ch4:enzymes-tho-phon-qna` in `BIOLOGY_CH4_SECTIONS` in `server/textbook-search.ts`, searchable by KruAI for student inquiries on enzyme mechanisms, kinetics, and 6 enzyme classes.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 4 Lesson 2 (Proteins) OCR & KruAI Grounding
 
 Commit: `acc23d5`. **No database step needed.**
