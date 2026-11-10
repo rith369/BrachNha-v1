@@ -16,6 +16,18 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Physics Summary Batch 7: Chapter 3 Lesson 3 (Self-Induction) OCR, Study Path & KruAI Grounding
+
+Commit: `edac6d9`. **No database step needed.**
+
+Digitized Batch 7 of the official MoEYS Grade 12 Physics Summary & Worked Examples textbook (`sources/textbooks/Physics summary.pdf`, PDF pages 43 to 49, book pages 39 to 45):
+- **Textbook Rendering & OCR**: Rendered high-resolution PNG scans (`p43.png` to `p49.png` in `sources/pages/Physics summary/`) and transcribed word-for-word into `sources/ocr/Physics summary/chapter3-lesson3-self-induction.md`:
+  - Chapter 3 (`ជំពូក 3 អគ្គិសនី និងម៉ាញេទិច`), Lesson 3 (`មេរៀនទី 3៖ អូតូអាំងឌុចស្យុង`), covering the phenomenon of self-induction (`បាតុភូតអូតូអាំងឌុចស្យុង`), self-induced current (`ចរន្តអូតូអាំងឌ្វី`), self-magnetic flux and inductance ($\Phi = Li$, measured in Henry $\text{H}$), self-induced EMF ($e = -L\frac{\Delta i}{\Delta t}$ and $e = -L\frac{di}{dt}$), inductance of an air-core solenoid ($L = \mu_0 \frac{N^2}{\ell} A = \mu_0 n^2 A\ell$, $A = \pi R^2 = \pi \frac{D^2}{4}$), terminal voltage of an inductor coil ($V_{AB} = ri + L\frac{di}{dt}$), $(R, L)$ circuit time constant ($\tau = \frac{L}{R}$) and current equations ($i(t) = I_p(1 - e^{-t/\tau})$ with $I_p = \frac{E}{R}$ on closing, $i(t) = I_p e^{-t/\tau}$ on opening), magnetic energy stored in an inductor ($E_L = \frac{1}{2}Li^2$), free undamped electrical oscillations in an ideal $(L, C)$ circuit ($\frac{d^2 V_c}{dt^2} + \frac{1}{LC} V_c = 0$, $V_c(t) = V_m\cos(\omega_0 t + \phi_0)$, $\omega_0 = \frac{2\pi}{T_0} = \frac{1}{\sqrt{LC}}$, $T_0 = 2\pi\sqrt{LC}$, $f_0 = \frac{1}{2\pi\sqrt{LC}}$, $q(t)$, $i(t)$, $i_m = q_m\frac{2\pi}{T_0} = CV_m\frac{2\pi}{T_0}$, total energy $E_{LC} = E_L + E_C = \frac{1}{2}Li^2 + \frac{1}{2}CV_c^2 = \frac{1}{2}CV_m^2 = \frac{1}{2}Li_m^2$), and all 8 worked examples (`ឧទាហរណ៍ 1` to `ឧទាហរណ៍ 8`) with complete step-by-step solutions.
+- **KruAI RAG Grounding**: Added 4 chunks (`tb:phys:ch3:l3-self-induction-inductance-and-bobine`, `tb:phys:ch3:l3-rl-circuit-magnetic-energy-and-lc-oscillations`, `tb:phys:ch3:l3-examples-1-to-4`, `tb:phys:ch3:l3-examples-5-to-8`) to `PHYSICS_CH3_SECTIONS` in `server/textbook-search.ts`.
+- **Study Path Structure**: Added Lesson 3 (`អូតូអាំងឌុចស្យុង`) with 5 authentic Khmer section titles under `SUBJECT_SESSIONS.physics[2]` (Chapter 3: `អគ្គិសនី និងម៉ាញេទិច`) in `src/features/lessons/sessions.ts`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Physics summary"` (8 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals), `npx oxlint` (0 errors, 1 known warning), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Math Summary Blind Audit Batch 1A: Chapter 1 Limits (Part 1, Pages 3 to 10)
 
 Commit: `ebec195`. **No database step needed.**
