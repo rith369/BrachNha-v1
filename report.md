@@ -16,6 +16,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Grade 12 History Eng Lay Q&A: 52 Selected Q&A OCR & KruAI RAG Grounding (100% Textbook Complete)
+
+Commit: `22625f7`. **No database step needed.**
+
+Digitized the final Section 10 ("សំណួរ និង ចម្លើយជ្រើសរើស" / 52 Selected Questions & Answers) of the Grade 12 History Q&A textbook compilation by Eng Lay / compiled by Soung Sedy (Hun Sen 10 Makara High School / MoEYS Bac II 2014-2022) (Book pp. 75-102, PDF pp. 78-105). This concludes the 100% complete digitization of the entire 105-page textbook.
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ប្រវត្តិវិទ្យា_អេង_ឡាយ/` and transcribed clean Markdown into `sources/ocr/ប្រវត្តិវិទ្យា_អេង_ឡាយ/selected-qna.md` containing all 52 high-yield questions and detailed answers categorized into 6 core historical eras and themes:
+  1. French Protectorate (1863-1953): King Ang Duong's diplomatic letters (1853, 1856), 1863 treaty, 1867 Siam treaty, 1884 convention and 1884-1887 rebellion, and the 1954 Geneva Accords.
+  2. Sangkum Reastr Niyum (1953-1970): Sihanouk abdication and popular mandate, National Congress (1955-1968), key achievements, and internal fractures.
+  3. Khmer Republic (1970-1975): US B-52 carpet bombings (Feb-Aug 1973), severe socio-economic impact, and roots of the 1970-1975 civil war.
+  4. Democratic Kampuchea (1975-1979): Pol Pot's 8 directives (17 April 1975), collectivization, 4-year plan (1977-1980), administrative divisions (6 zones, 32 sectors), Khmer Rouge central leadership, and ECCC tribunals (Cases 001 and 002).
+  5. PRK and Kingdom of Cambodia II (1979-present): Post-7 January 1979 humanitarian crisis, 1989 constitutional amendments, 4 warring factions, 1991 Paris Peace Agreements, UNTAC, and the 1998-2003 Triangular Strategy (Win-Win policy, regional integration, socio-economic reforms).
+  6. ASEAN and General Knowledge: Bangkok Declaration 1967, 10 member states, Cambodia's 1999 admission, motto, flag symbolism, ASEAN+1/2/3/10 and ASEAN-minus formulas, Cambodia's 3 chairmanships (2002, 2012, 2022), UNESCO World Heritage sites (tangible: Angkor, Preah Vihear, Toul Sleng, Sambor Prei Kuk; intangible: Royal Ballet, Sbek Thom, Tug-of-war, Chapei Dang Veng, Lakhon Khol, Bokator), and Mekong River hydrology across 6 nations.
+- **RAG Grounding**: Added comprehensive keyworded chunk `tb:hist:overview:selected-qna-high-yield` into `HISTORY_OVERVIEW_SECTIONS` in `server/textbook-search.ts` and included in `ALL_HISTORY_SECTIONS`, searchable via `searchHistoryTextbook`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs sources/ocr/ប្រវត្តិវិទ្យា_អេង_ឡាយ` (10 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Practice Exams 1 to 5 OCR & KruAI RAG Grounding
 
 Commit: `ffea718`. **No database step needed.**
