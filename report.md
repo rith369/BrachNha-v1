@@ -16,6 +16,19 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Physics Summary Batch 4: Chapter 1 Lesson 3 (Part 2) & Chapter 2 Lesson 1 (Superposition of Waves & Standing Waves) OCR, Study Path & KruAI Grounding
+
+Commit: `6804ce0`. **No database step needed.**
+
+Digitized Batch 4 of the official MoEYS Grade 12 Physics Summary & Worked Examples textbook (`sources/textbooks/Physics summary.pdf`, PDF pages 23 to 27, book pages 19 to 23):
+- **Textbook Rendering & OCR**: Rendered high-resolution PNG scans (`p23.png` to `p27.png` in `sources/pages/Physics summary/`) and transcribed word-for-word into `sources/ocr/Physics summary/`:
+  1. Completed `chapter1-lesson3-heat-engines.md` (book page 19): Appended the final heat rejection calculation for Example 8 ($Q_c = 12660(1 - 0.1125) = 11235\text{ J} = 11\text{ kJ}$, noting the textbook's unit typo for calories/kilocalories) and updated the lesson header page range to `ទំព័រ 13 – 19 (PDF ទំព័រ 17 – 23)`.
+  2. Created `chapter2-waves.md` (book pages 19 to 23): Chapter 2 (`ជំពូក 2 រលក`), Lesson 1 (`មេរៀនទី 1៖ គោលការណ៍តម្រួតនៃរលក និងរលកជញ្ជ្រុំ`), covering the wave superposition principle (`គោលការណ៍តម្រួតនៃរលក`), Fresnel vector construction (`សំណង់ប្រេណែល`, $y = a\sin(\omega t + \phi)$), special phase cases ($\Delta\phi = 0, \pi, \frac{\pi}{2}$), superposition of 2 and $n$ sinusoidal oscillations ($a = \sqrt{a_1^2 + a_2^2 + 2a_1a_2\cos(\phi_2 - \phi_1)}$, $a = \sqrt{a_x^2 + a_y^2}$, $\tan\phi_o = \frac{|a_y|}{|a_x|}$ with quadrant rules I to IV), standing waves (`រលកជញ្ជ្រុំ`, $y = (2A\sin kx)\cos\omega t$), antinode positions (`ទីតាំងពោះ`, $x = n\frac{\lambda}{4}$ for $n = 1, 3, 5, 7\dots$), node positions (`ទីតាំងថ្នាំង`, $x = n\frac{\lambda}{2}$ for $n = 0, 1, 2, 3, 4\dots$), and worked Examples 1 to 4 with complete solutions.
+- **KruAI RAG Grounding**: Updated `tb:phys:ch1:l3-examples-5-to-8` and added `PHYSICS_CH2_SECTIONS` (`tb:phys:ch2:l1-superposition-and-fresnel`, `tb:phys:ch2:l1-standing-waves`, `tb:phys:ch2:l1-examples-1-to-4`) into `ALL_PHYSICS_SECTIONS` in `server/textbook-search.ts`.
+- **Study Path Structure**: Added Chapter 2 (`រលក`) and Lesson 1 (`គោលការណ៍តម្រួតនៃរលក និងរលកជញ្ជ្រុំ`) with 5 authentic Khmer section titles under `SUBJECT_SESSIONS.physics` in `src/features/lessons/sessions.ts`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Physics summary"` (5 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals), `npx oxlint` (0 errors, 1 known warning), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Physics Summary Batch 3: Chapter 1 Lesson 2 (Part 2) & Lesson 3 (Heat Engines, Part 1) OCR, Study Path & KruAI Grounding
 
 Commit: `b7761b1`. **No database step needed.**
