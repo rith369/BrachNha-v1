@@ -16,6 +16,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 5 Lesson 3 (Biotechnology) OCR & KruAI Grounding (Chapter 5 100% Complete)
+
+Commit: `9b47b67`. **No database step needed.**
+
+Digitized Chapter 5, Lesson 3 ("បច្ចេកវិទ្យាជីវៈ" / Biotechnology) of the Grade 12 Biology Q&A textbook compilation by Tho Phon (Book pp. 163-170, PDF pp. 164-171), completing Chapter 5 in its entirety.
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ជីវវិទ្យា - ធូ ភន biology qna/` (p164.png to p171.png) and transcribed into `sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna/chapter5-lesson3-biotechnology.md` containing the complete lesson summary and all 8 authentic Bac II Q&A questions:
+  1. Selective breeding (ការបង្កាត់ជ្រើស): natural vs artificial selection; hybridization (អ៊ីប្រ៊ីតកម្ម) and hybrid vigor / heterosis (អេតេរ៉ូស៊ីស); inbreeding (ការបង្កាត់ជិត) to establish pure breeds vs outbreeding (ការបង្កាត់ឆ្ងាយ, e.g. horse and donkey producing mule).
+  2. Plant and animal cloning (ក្លូន): definition (cell lineage originating from a single progenitor cell with identical genetic constitution); plant micropropagation via tissue culture (មីក្រូកាល់); animal cloning through somatic cell nuclear transfer into enucleated oocytes.
+  3. Polyploidy (ប៉ូលីប្លូអ៊ីឌី): definition (chromosome sets multiplying as exact multiples of n: 3n, 4n, 5n), agricultural characteristics (hypertrophied vegetative organs, seedless triploid watermelons, increased stress resistance).
+  4. Genetic engineering (វិស្វកម្មសេនេទិច): 4 precise recombinant DNA steps (restriction enzyme cleavage at specific palindromic sequences, insertion and ligation into bacterial plasmids via DNA ligase, host transformation into bacterial cells for cloning, and phenotypic expression of target proteins like insulin).
+  5. Applications: healthcare and medicine (human insulin, somatotropin growth hormone, antiviral and anticancer interferon, lymphocyte-stimulating interleukin, vaccines, antibiotics), agriculture and food security (transgenic pest/drought resistant crops).
+  6. Bioethics and biosafety: environmental risks (genetic drift, biodiversity loss), human health concerns (antibiotic-resistant bacterial strains), socioeconomic disparities (corporate monopoly over GMO seeds, genetic divide).
+- **RAG Grounding**: Grounded comprehensive chunk `tb:bio:ch5:biotechnology-genetic-engineering-tho-phon-qna` in `BIOLOGY_CH5_SECTIONS` in `server/textbook-search.ts`, and updated query matching in `server/chat-handler.ts`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna"` (12 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Physics Summary Batch 1: Front Matter & Chapter 1 Lesson 1 (Kinetic Theory of Gases) OCR, Study Path & KruAI Grounding
 
 Commit: `ad23135`. **No database step needed.**

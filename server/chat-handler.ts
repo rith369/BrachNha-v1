@@ -1067,7 +1067,7 @@ export async function handleChat(req: Request): Promise<Response> {
     );
   const isBioQuery =
     screen.subjectId === "biology" ||
-    /ជីវ|កោសិកា|ប្រសាទ|អង់ស៊ីម|ប្រូតេអ៊ីន|adn|arn|ស៊ីណាប់|ណឺរ៉ូន|ស៊ីមណូ|អង់ស្យូ|មេយ៉ូស|មីតូស/i.test(
+    /ជីវ|កោសិកា|ប្រសាទ|អង់ស៊ីម|ប្រូតេអ៊ីន|adn|arn|ស៊ីណាប់|ណឺរ៉ូន|ស៊ីមណូ|អង់ស្យូ|មេយ៉ូស|មីតូស|បច្ចេកវិទ្យា|វិស្វកម្មសេនេទិច|ក្លូន|ប្លាស្មីត|អេតេរ៉ូស៊ីស/i.test(
       lastUserText
     );
   const isHistoryQuery =
