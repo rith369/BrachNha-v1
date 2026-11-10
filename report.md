@@ -16,6 +16,17 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Lesson 4 (Democratic Kampuchea) OCR & KruAI RAG Grounding
+
+Commit: `2eaced2`. **No database step needed.**
+
+Transcribed and grounded Lesson 4 ("កម្ពុជាប្រជាធិបតេយ្យ (1975-1979)" / Democratic Kampuchea) from the official Grade 12 History Q&A compilation by Eng Lay (Hun Sen 10 Makara High School / MoEYS Bac II 2014-2022) (Book pp. 18-22, PDF pp. 21-25).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ប្រវត្តិវិទ្យា_អេង_ឡាយ/` and transcribed clean Markdown into `sources/ocr/ប្រវត្តិវិទ្យា_អេង_ឡាយ/lesson4-democratic-kampuchea.md` containing all 9 authentic Bac II questions (2014, 2016, 2018, 2019, 2021) and their official scoring keys (អត្រាកំណែ). Covers ECCC tribunal charges (genocide, crimes against humanity, war crimes) and objectives, list of top leaders, causes of national destruction, 4 key causes for the regime's collapse (popular resistance, internal purges, Vietnam border war, KUFNS 2 Dec 1978 and 7 Jan 1979 liberation), and post-1979 reconstruction (Solidarity Groups / ក្រុមសាមគ្គីបង្កបង្កើនផល, riel re-circulation 1980).
+- **RAG Grounding**: Added keyworded chunk `tb:hist:dk:ch4:high-yield-bacii-qna` into `HISTORY_CH4_SECTIONS` in `server/textbook-search.ts` with comprehensive bilingual keywords covering exam queries and scoring rubrics. Included in `ALL_HISTORY_SECTIONS` and searchable via `searchHistoryTextbook`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs sources/ocr/ប្រវត្តិវិទ្យា_អេង_ឡាយ` (4 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), and `npm test` (all 109 tests passed).
+
+
+
 ## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Lesson 3 (Khmer Republic) OCR & KruAI RAG Grounding
 
 Commit: `fbc38b7`. **No database step needed.**
