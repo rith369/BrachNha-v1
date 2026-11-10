@@ -16,6 +16,21 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 4 Lesson 2 (Proteins) OCR & KruAI Grounding
+
+Commit: `acc23d5`. **No database step needed.**
+
+Digitized Chapter 4, Lesson 2 ("ប្រូតេអ៊ីន" / Proteins) of the Grade 12 Biology Q&A textbook compilation by Tho Phon (Book pp. 72-76, PDF pp. 73-77).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ជីវវិទ្យា - ធូ ភន biology qna/` (p073.png to p077.png) and transcribed clean Markdown into `sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna/chapter4-lesson2-proteins.md` containing the complete lesson summary and all 8 authentic Bac II Q&A questions:
+  1. Protein definition and structure: polymer of $>50$ amino acids (under 50 is a polypeptide).
+  2. Four levels of protein structure: primary (amino acid sequence and peptide bonds), secondary (hydrogen bonding, $\alpha$-helix vs $\beta$-pleated sheets), tertiary (multi-folded globular 3D conformation with active domains), and quaternary (assembly of 3 or 4 polypeptide subunits like hemoglobin).
+  3. Six fundamental protein functions: catalytic (rubisco, nitrogenase), structural (collagen, elastin), motility/cytoskeletal (actin, tubulin, endocytosis, exocytosis, cell division), defensive (keratin, thrombin, fibrinogen, antibodies), regulatory/hormonal (insulin, glucagon, GH), and transport (hemoglobin, lipoproteins, $Na^+/K^+$ ion pumps).
+  4. Classifications: by shape (fibrous vs globular) and by composition (simple vs conjugated/heteroproteins with prosthetic groups like lipids, carbohydrates, phosphate, metals, sulfur).
+  5. Protein denaturation causes: strong acids/bases (pH shifts), organic solvents, detergents/soaps, urea, high salinity, heavy metals ($Hg, Pb$), thermal extremes, and mechanical shear.
+- **RAG Grounding**: Grounded comprehensive chunk `tb:bio:ch4:proteins-tho-phon-qna` in `BIOLOGY_CH4_SECTIONS` in `server/textbook-search.ts`, searchable by KruAI for student inquiries on protein structures, 6 biological functions, and denaturation.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna"` (8 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 4 Lesson 1 (Amino Acids) OCR & KruAI Grounding
 
 Commit: `adb077f`. **No database step needed.**
