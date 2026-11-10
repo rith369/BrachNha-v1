@@ -16,6 +16,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 4 Lesson 1 (Amino Acids) OCR & KruAI Grounding
+
+Commit: `adb077f`. **No database step needed.**
+
+Digitized Chapter 4, Lesson 1 ("អាស៊ីតអាមីណេ" / Amino Acids) of the Grade 12 Biology Q&A textbook compilation by Tho Phon (Book pp. 67-71, PDF pp. 68-72).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ជីវវិទ្យា - ធូ ភន biology qna/` (p068.png to p072.png) and transcribed clean Markdown into `sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna/chapter4-lesson1-amino-acids.md` containing the complete lesson summary and all 9 authentic Bac II Q&A questions:
+  1. Amino acid chemical structure: central carbon ($C_\alpha$), $-H$, carboxyl group ($-COOH$), amine group ($-NH_2$), and variable radical ($-R$).
+  2. Amphoteric nature and ionic states: at neutral $\text{pH}=7$ forms zwitterion with $-COO^-$ and $-NH_3^+$; at acidic $\text{pH}<7$ forms $-COOH$ and $-NH_3^+$; at basic $\text{pH}>7$ forms $-COO^-$ and $-NH_2$.
+  3. Hydrophilic properties and cellular transport: highly water-soluble, crosses plasma membranes smoothly into cells.
+  4. Cellular functions: messenger molecules (glycine, glutamate, serotonin from tryptophan), metabolic regulation and cellular transport (thyroxine, arginine, citrulline, ornithine).
+  5. 20 standard amino acids (coded by genetic code) vs non-standard amino acids (metabolic intermediates, not incorporated into proteins).
+  6. Peptides and peptide bond formation: covalent condensation between $-COOH$ of one amino acid and $-NH_2$ of another with loss of $H_2O$ ($-CO-NH-$); dipeptide chemical formulas (serine-alanine dipeptide).
+- **RAG Grounding**: Grounded comprehensive chunk `tb:bio:ch4:amino-acids-tho-phon-qna` in `BIOLOGY_CH4_SECTIONS` in `server/textbook-search.ts`, searchable by KruAI for student inquiries on amino acid structure, peptide bonds, and properties.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna"` (7 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 3 Lesson 3 (Endocrine System) OCR & KruAI Grounding
 
 Commit: `99f6297`. **No database step needed.**
