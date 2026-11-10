@@ -16,6 +16,16 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Lesson 6 (Kingdom of Cambodia Second) OCR & KruAI RAG Grounding
+
+Commit: `f4740f9`. **No database step needed.**
+
+Transcribed and grounded Lesson 6 ("ព្រះរាជាណាចក្រកម្ពុជាទី 2 (1993 - បច្ចុប្បន្ន)" / Kingdom of Cambodia Second) from the official Grade 12 History Q&A compilation by Eng Lay (Hun Sen 10 Makara High School / MoEYS Bac II 2014-2022) (Book pp. 30-42, PDF pp. 33-45).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ប្រវត្តិវិទ្យា_អេង_ឡាយ/` and transcribed clean Markdown into `sources/ocr/ប្រវត្តិវិទ្យា_អេង_ឡាយ/lesson6-kingdom-of-cambodia-second.md` containing all 14 authentic Bac II questions (2014, 2015, 2017, 2018, 2019, 2021, 2022) and their official scoring keys (អត្រាកំណែ). Covers the roles of King Norodom Sihanouk and Samdech Hun Sen as fathers of peace; significance of listing Preah Vihear Temple as UNESCO World Heritage; Win-Win Policy (និយមន័យ និងសមិទ្ធផល, 29 Dec 1998, Khmer Rouge integration, security and development along the border); founding of the Second Kingdom of Cambodia on 24 Sept 1993 and constitutional monarchy; national reconstruction across politics, economy, social affairs, education, culture, and rule of law; national achievements under the Royal Government (Triangular & Rectangular Strategies, ASEAN accession 1999, WTO accession 2004, ASEAN Chairmanship 2002/2012/2022); and the pivotal role of peace in sustainable national development.
+- **RAG Grounding**: Added keyworded chunk `tb:hist:koc:ch6:high-yield-bacii-qna` into `HISTORY_CH6_SECTIONS` in `server/textbook-search.ts` with comprehensive bilingual keywords covering exam queries and scoring rubrics. Included in `ALL_HISTORY_SECTIONS` and searchable via `searchHistoryTextbook`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs sources/ocr/ប្រវត្តិវិទ្យា_អេង_ឡាយ` (6 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Grade 12 Math Chapter 8 (Probability) OCR & KruAI RAG Grounding
 
 Commit: `983efbd`. **No database step needed.**
