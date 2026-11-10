@@ -16,6 +16,19 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Physics Summary Batch 2: Chapter 1 Lesson 2 (First Law of Thermodynamics, Part 1) OCR, Study Path & KruAI Grounding
+
+Commit: `3bb6ba1`. **No database step needed.**
+
+Digitized Batch 2 of the official MoEYS Grade 12 Physics Summary & Worked Examples textbook (`sources/textbooks/Physics summary.pdf`, PDF pages 9 to 15, book pages 5 to 11):
+- **Textbook Rendering & OCR**: Rendered high-resolution PNG scans (`p09.png` to `p15.png` in `sources/pages/Physics summary/`) and transcribed word-for-word into `sources/ocr/Physics summary/chapter1-lesson2-first-law-of-thermodynamics.md`:
+  1. Lesson summary (book pages 5 to 8): Thermodynamic systems, open and closed processes (បំលែងចំហ និងបំលែងបិទ), isochoric (អ៊ីសូករ), isobaric (អ៊ីសូបារ), isothermal (អ៊ីសូទែម), adiabatic (អាដ្យាបាទិច), and linearly varying pressure processes; thermodynamic work ($W = 0$, $W = P(V_f - V_i)$, $W = \frac{1}{2}(P_f + P_i)(V_f - V_i)$, $W = nRT \ln\frac{V_f}{V_i}$) and $P\text{-}V$ diagrams; the First Law of Thermodynamics ($Q = \Delta U + W$), sign conventions for $Q$, $W$, and $\Delta U$, special cases for the 3 processes, and internal energy of a monatomic ideal gas ($U = \frac{3}{2}nRT$, $\Delta U = \frac{3}{2}nR\Delta T$).
+  2. Worked examples (book pages 8 to 11): Complete step-by-step solutions for Examples 1 to 7 and the problem statement of Example 8 (isobaric work from $P\text{-}V$ area, cyclic work $W_{ABCA}$ and $W_{ABCD}$, heat and work conversions with calories and joules, isothermal expansion and compression of $\text{O}_2$, and internal energy changes).
+- **KruAI RAG Grounding**: Added 4 comprehensive chunks (`tb:phys:ch1:l2-processes-and-work`, `tb:phys:ch1:l2-first-law-and-internal-energy`, `tb:phys:ch1:l2-examples-1-to-3`, `tb:phys:ch1:l2-examples-4-to-8`) to `PHYSICS_CH1_SECTIONS` in `server/textbook-search.ts`.
+- **Study Path Structure**: Registered Lesson 2 (`ច្បាប់ទីមួយទែម៉ូឌីណាមិច`) under Physics Chapter 1 (`ទែម៉ូឌីណាមិច`) in `src/features/lessons/sessions.ts` with 6 authentic Khmer section titles.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Physics summary"` (3 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals), `npx oxlint` (0 errors, 1 known warning), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 5 Lesson 3 (Biotechnology) OCR & KruAI Grounding (Chapter 5 100% Complete)
 
 Commit: `9b47b67`. **No database step needed.**
