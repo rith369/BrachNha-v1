@@ -551,6 +551,28 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
       ],
     },
   ],
+
+  // ── Physics: Grade 12 MoEYS summary textbook ─────────────────────────────
+  physics: [
+    {
+      number: 1,
+      title: "ទែម៉ូឌីណាមិច",
+      lessons: [
+        {
+          number: 1,
+          title: "ទ្រឹស្ដីស៊ីនេទិចនៃឧស្ម័ន",
+          openHere: true,
+          sessions: sectionsFor("physics", 1, 1, [
+            "សីតុណ្ហភាពដាច់ខាត និងគោលការណ៍ទ្រឹស្ដីស៊ីនេទិចនៃឧស្ម័ន",
+            "សម្ពាធឧស្ម័ន និងសមីការភាពនៃឧស្ម័នបរិសុទ្ធ",
+            "ថាមពលស៊ីនេទិចមធ្យម ថាមពលសរុប និងល្បឿនប្រសិទ្ធ",
+            "លំហាត់គំរូ៖ ម៉ាសម៉ូលេគុល មាឌឧស្ម័ន និងល្បឿនប្រសិទ្ធ",
+            "លំហាត់គំរូ៖ ថាមពលស៊ីនេទិចមធ្យម និងច្បាប់រក្សាថាមពល",
+          ]),
+        },
+      ],
+    },
+  ],
 };
 
 /**
@@ -575,6 +597,7 @@ export const PATH_TAB: Partial<Record<SubjectId, SubjectTab>> = {
   math: "foundation",
   biology: "all",
   history: "all",
+  physics: "all",
 };
 
 /** How many locked placeholders to show after the real content runs out, so the

@@ -14,7 +14,12 @@ import type { ScreenRef } from "../src/utils/chat-screen.js";
 import { resolveApiKeys } from "./gemini-keys.js";
 import { checkRateLimit } from "./rate-limit.js";
 import { isVerificationConfigured, verifyRequestUser } from "./verify-user.js";
-import { searchBiologyTextbook, searchHistoryTextbook, searchMathTextbook } from "./textbook-search.js";
+import {
+  searchBiologyTextbook,
+  searchHistoryTextbook,
+  searchMathTextbook,
+  searchPhysicsTextbook,
+} from "./textbook-search.js";
 import { getCachedAnswer, createCachedStreamResponse } from "./chat-cache.js";
 import { takeQuota } from "./kruai-quota.js";
 import { publishedContent } from "./content-source.js";
@@ -1054,7 +1059,7 @@ export async function handleChat(req: Request): Promise<Response> {
   const { decks, sections } = await contentPromise;
   const pinned = pinnedContextFor(screen, decks, sections);
 
-  // Ground KruAI in official MoEYS textbook text (Biology, Math, and History)
+  // Ground KruAI in official MoEYS textbook text (Biology, Math, History, and Physics)
   const isMathQuery =
     screen.subjectId === "math" ||
     /គណិត|លីមីត|limit|ដេរីវេ|អាំងតេក្រាល|កុំផ្លិច|កោនិក|សមីការ|ប្រូបាប|វ៉ិចទ័រ|matrix|integral|derivative|\b0\/0\b|\b\+?\\infty\b/i.test(
@@ -1070,12 +1075,18 @@ export async function handleChat(req: Request): Promise<Response> {
     /ប្រវត្តិ|អាណាព្យាបាល|បារាំង|សន្ធិសញ្ញា|អង្គឌួង|នរោត្តម|ស៊ីសុវត្ថិ|មុនីវង្ស|សីហនុ|សៀម|កូសាំងស៊ីន|កម្ពុជាក្រោម|កោះត្រល់|ហ្សឺណែវ|ឯករាជ្យ|បាដេស|ក្រាំងលាវ|ឥស្សរៈ|ចលនាតស៊ូ|សង្គ្រាមលោក/i.test(
       lastUserText
     );
+  const isPhysicsQuery =
+    screen.subjectId === "physics" ||
+    /រូបវិទ្យា|ទែម៉ូឌីណាមិច|ឧស្ម័ន|ស៊ីនេទិច|ម៉ូលេគុល|សម្ពាធ|បុលស្មាន់|ប៉ូលស្មាន់|អាវូកាដ្រូ|អាវ៉ូកាដ្រូ|រលក|ម៉ាញេទិច|អាំងឌុចស្យុង|ចរន្តឆ្លាស់|thermodynamics|kinetic|magnetic|induction/i.test(
+      lastUserText
+    );
 
-  const isSpecificSubject = isMathQuery || isBioQuery || isHistoryQuery;
+  const isSpecificSubject = isMathQuery || isBioQuery || isHistoryQuery || isPhysicsQuery;
   const bioChunks = isBioQuery || !isSpecificSubject ? searchBiologyTextbook(lastUserText) : [];
   const mathChunks = isMathQuery || !isSpecificSubject ? searchMathTextbook(lastUserText) : [];
   const historyChunks = isHistoryQuery || !isSpecificSubject ? searchHistoryTextbook(lastUserText) : [];
-  const textbook = [...bioChunks, ...mathChunks, ...historyChunks].slice(0, 3);
+  const physicsChunks = isPhysicsQuery || !isSpecificSubject ? searchPhysicsTextbook(lastUserText) : [];
+  const textbook = [...bioChunks, ...mathChunks, ...historyChunks, ...physicsChunks].slice(0, 3);
   const context = [...pinned, ...textbook];
 
   const system_instruction = buildSystemPrompt({

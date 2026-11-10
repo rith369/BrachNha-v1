@@ -16,6 +16,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 5 Lesson 2 (Gene Expression) OCR & KruAI Grounding
+
+Commit: `2d56ba6`. **No database step needed.**
+
+Digitized Chapter 5, Lesson 2 ("ការសំដែងចេញនៃសែន" / Gene Expression) of the Grade 12 Biology Q&A textbook compilation by Tho Phon (Book pp. 125-132, PDF pp. 126-133).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ជីវវិទ្យា - ធូ ភន biology qna/` (p126.png to p133.png) and transcribed clean Markdown into `sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna/chapter5-lesson2-gene-expression.md` containing the complete lesson summary and all 7 authentic Bac II Q&A questions:
+  1. Gene definition and historical grounding: Beadle and Tatum's *Neurospora crassa* X-ray mutagenesis experiments ("one gene - one enzyme" hypothesis); comparative analysis between DNA and proteins.
+  2. Transcription (ការចម្លងក្រម): nuclear localization during interphase, RNA polymerase enzyme functions (promoter recognition, DNA unwinding, phosphodiester polymerization following $A_{\text{DNA}}-U_{\text{RNA}}, T_{\text{DNA}}-A_{\text{RNA}}, C_{\text{DNA}}-G_{\text{RNA}}, G_{\text{DNA}}-C_{\text{RNA}}$ complementarity, transcript release, DNA rewinding).
+  3. The 3 RNA classes and structural traits: $\text{ARN}_m$ (single-strand messenger carrying genetic transcripts to cytoplasm), $\text{ARN}_t$ (cloverleaf transfer RNA, anticodon loop, 3' aminoacyl attachment site, charging via aminoacyl-tRNA synthetase), and $\text{ARN}_r$ (ribosomal structural RNA).
+  4. Genetic code (ក្រមសេនេទិច): mathematical proof of triplet code ($4^3 = 64$ codons), start codon AUG (methionine), 3 stop codons (UAA, UAG, UGA), universal and degenerate nature; ribosome morphology (small/large subunits, P and A peptidyl sites, polysomes).
+  5. Translation mechanism (ការបកប្រែក្រម): 3 distinct phases (Initiation, Elongation, Termination with release factor and cleavage of leader methionine).
+  6. Gene regulation hierarchy: structural genes, operator genes, and regulatory/repressor genes responsive to cytoplasmic cues.
+- **RAG Grounding**: Grounded comprehensive chunk `tb:bio:ch5:gene-expression-transcription-translation-tho-phon-qna` in `BIOLOGY_CH5_SECTIONS` in `server/textbook-search.ts`, searchable by KruAI for student inquiries on transcription, translation, codons, and gene regulation.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna"` (11 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Math Summary Folder Consolidation & Verification
 
 Commit: `3ee7a5a`. **No database step needed.**
