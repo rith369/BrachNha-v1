@@ -16,6 +16,21 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 5 Lesson 1 (DNA as Genetic Material) OCR & KruAI Grounding
+
+Commit: `954c36a`. **No database step needed.**
+
+Digitized Chapter 5, Lesson 1 ("ADN ជាទ្រនំព័ត៌មានសេនេទិច" / DNA as Genetic Material) of the Grade 12 Biology Q&A textbook compilation by Tho Phon (Book pp. 82-87, PDF pp. 83-88).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ជីវវិទ្យា - ធូ ភន biology qna/` (p083.png to p088.png) and transcribed clean Markdown into `sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna/chapter5-lesson1-dna-genetic-material.md` containing the complete lesson summary and all 5 authentic Bac II Q&A questions:
+  1. Key historical experiments establishing DNA as genetic material: Griffith's bacterial transformation (pneumococcus S and R strains), Avery-MacLeod-McCarty's identification of DNA as transforming principle, Hershey-Chase's bacteriophage $^{35}\text{S}/^{32}\text{P}$ isotopic tracing.
+  2. Chemical composition and nucleotide architecture: phosphoric acid ($\text{H}_3\text{PO}_4$), deoxyribose ($\text{C}_5\text{H}_{10}\text{O}_4$), and 4 nitrogenous bases (purines: A, G; pyrimidines: T, C); phosphodiester covalent bonds on single strands.
+  3. Chargaff's rules: base equivalence ($\%A = \%T, \%C = \%G, A+G=50\%, T+C=50\%$) and constancy of $(A+C)/(T+G) = 1$.
+  4. Watson-Crick double helix model: 2 nm diameter, 10 base pairs per helical turn ($3.4\text{ nm}$ pitch, $0.34\text{ nm}$ inter-nucleotide rise), complementary base pairing via hydrogen bonds ($A=T$ 2 H-bonds, $C\equiv G$ 3 H-bonds).
+  5. DNA replication (ស្វ័យដំឡើងទ្វេ): S-phase of interphase in the nucleus, DNA polymerase catalysis, semi-conservative replication mechanism (one conserved parental template strand, one newly synthesized daughter strand), prokaryotic single-origin ($10^6\text{ bp/s}$) vs eukaryotic multi-origin ($500-5000\text{ bp/s}$) replication bubbles, biological roles (chromosome duplication, genetic continuity).
+- **RAG Grounding**: Grounded comprehensive chunk `tb:bio:ch5:dna-as-genetic-material-tho-phon-qna` in `BIOLOGY_CH5_SECTIONS` in `server/textbook-search.ts`, searchable by KruAI for student inquiries on DNA structure, historical discovery experiments, and replication mechanisms.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna"` (10 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 4 Lesson 3 (Enzymes) OCR & KruAI Grounding (Chapter 4 100% Complete)
 
 Commit: `a91f48c`. **No database step needed.**
@@ -139,13 +154,13 @@ Transcribed and grounded Section 7 ("ប្រវត្តិសាស្ត្�
 Commit: `7c44438`. **No database step needed.**
 
 Digitized Chapter 9 ("ផលគុណនៃពីរវ៉ិចទ័រក្នុងលំហ និង អនុវត្តន៍" / Vectors in Space & Applications) from the official MoEYS Grade 12 Mathematics Summary textbook (Book pp. 89–93, PDF pp. 92–96), bringing the entire MoEYS Grade 12 Mathematics Summary Textbook to 100% completion across all 9 chapters.
-- **Textbook Rendering & OCR**: Rendered high-resolution scans using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/math-summary/chapter9-vectors-in-space.md`. Covers cross product definition and determinant formula $\vec{u} \times \vec{v}$, algebraic and geometric properties ($\vec{u} \times \vec{v} \perp \vec{u}, \vec{v}$, $|\vec{u} \times \vec{v}| = |\vec{u}||\vec{v}|\sin\theta$, collinear condition $\vec{u} \times \vec{v} = \vec{0}$), geometric applications (area of parallelogram $S = |\vec{u} \times \vec{v}|$, area of triangle $S = \frac{1}{2}|\vec{u} \times \vec{v}|$), triple scalar product $\vec{u} \cdot (\vec{v} \times \vec{w})$, volume of parallelepiped $V = |\vec{u} \cdot (\vec{v} \times \vec{w})|$, volume of tetrahedron $W = \frac{V}{6}$, lines in space (parametric and symmetric equations), planes in space (standard $a(x - x_0) + b(y - y_0) + c(z - z_0) = 0$ and general $ax + by + cz + d = 0$, normal vector from three points $\vec{n} = \vec{AB} \times \vec{AC}$, angle between planes), distance formulas (point-to-point, point-to-plane, point-to-line), sphere equations, and all 7 authentic MoEYS worked exercises.
+- **Textbook Rendering & OCR**: Rendered high-resolution scans using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/Math summary/chapter9-vectors-in-space.md`. Covers cross product definition and determinant formula $\vec{u} \times \vec{v}$, algebraic and geometric properties ($\vec{u} \times \vec{v} \perp \vec{u}, \vec{v}$, $|\vec{u} \times \vec{v}| = |\vec{u}||\vec{v}|\sin\theta$, collinear condition $\vec{u} \times \vec{v} = \vec{0}$), geometric applications (area of parallelogram $S = |\vec{u} \times \vec{v}|$, area of triangle $S = \frac{1}{2}|\vec{u} \times \vec{v}|$), triple scalar product $\vec{u} \cdot (\vec{v} \times \vec{w})$, volume of parallelepiped $V = |\vec{u} \cdot (\vec{v} \times \vec{w})|$, volume of tetrahedron $W = \frac{V}{6}$, lines in space (parametric and symmetric equations), planes in space (standard $a(x - x_0) + b(y - y_0) + c(z - z_0) = 0$ and general $ax + by + cz + d = 0$, normal vector from three points $\vec{n} = \vec{AB} \times \vec{AC}$, angle between planes), distance formulas (point-to-point, point-to-plane, point-to-line), sphere equations, and all 7 authentic MoEYS worked exercises.
 - **RAG Grounding**: Added keyworded chunks (`MATH_CH9_SECTIONS` / `MATH_VECTORS_IN_SPACE_SECTIONS`) into `server/textbook-search.ts` covering:
   - `tb:math:vectors:ch9:cross-product-properties`: Cross product, properties, unit orthogonal vectors, parallelogram/triangle areas, and triple scalar product volume formulas.
   - `tb:math:vectors:ch9:lines-planes-spheres`: Parametric/symmetric line equations, plane equations from three points, sphere equations, and distance formulas in space.
   Included in `ALL_MATH_SECTIONS` and updated `searchMathTextbook` across all 9 chapters.
 - **Curriculum Sessions**: Registered authentic section titles for Chapter 9 ("ផលគុណនៃពីរវ៉ិចទ័រក្នុងលំហ និង អនុវត្តន៍") in `src/features/practice/quiz-path.ts` under `MATH_LESSONS`: "ផលគុណនៃពីរវ៉ិចទ័រ និងផលគុណចម្រុះ", "បន្ទាត់ ប្លង់ ស្វ៊ែរ និងចម្ងាយក្នុងលំហ".
-- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/math-summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/Math summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
 
 
 ## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Lesson 6 (Kingdom of Cambodia Second) OCR & KruAI RAG Grounding
@@ -163,13 +178,13 @@ Transcribed and grounded Lesson 6 ("ព្រះរាជាណាចក្រ�
 Commit: `983efbd`. **No database step needed.**
 
 Digitized Chapter 8 ("ប្រូបាប" / Probability) from the official MoEYS Grade 12 Mathematics Summary textbook (Book pp. 83–88, PDF pp. 86–91).
-- **Textbook Rendering & OCR**: Rendered high-resolution scans using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/math-summary/chapter8-probability.md`. Covers basic probability definitions and properties ($P(A) = \frac{n(A)}{n(S)}$, $0 \le P(A) \le 1$, $P(S) = 1$, $P(\emptyset) = 0$), union and intersection of events, mutually exclusive events ($A \cap B = \emptyset \implies P(A \cup B) = P(A) + P(B)$), complementary events ($P(\bar{A}) = 1 - P(A)$), conditional probability ($P(B|A) = \frac{P(A \cap B)}{P(A)}$), multiplication rule, independent events ($P(A \cap B) = P(A) \times P(B)$), law of total probability, Bayes' theorem, and all 4 authentic MoEYS worked exercises (marble draws with combinations $C(n, k)$, student boarding contingency tables, 32-card deck draws, and numbered ball draws forming arithmetic/geometric progressions).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/Math summary/chapter8-probability.md`. Covers basic probability definitions and properties ($P(A) = \frac{n(A)}{n(S)}$, $0 \le P(A) \le 1$, $P(S) = 1$, $P(\emptyset) = 0$), union and intersection of events, mutually exclusive events ($A \cap B = \emptyset \implies P(A \cup B) = P(A) + P(B)$), complementary events ($P(\bar{A}) = 1 - P(A)$), conditional probability ($P(B|A) = \frac{P(A \cap B)}{P(A)}$), multiplication rule, independent events ($P(A \cap B) = P(A) \times P(B)$), law of total probability, Bayes' theorem, and all 4 authentic MoEYS worked exercises (marble draws with combinations $C(n, k)$, student boarding contingency tables, 32-card deck draws, and numbered ball draws forming arithmetic/geometric progressions).
 - **RAG Grounding**: Added keyworded chunks (`MATH_CH8_SECTIONS` / `MATH_PROBABILITY_SECTIONS`) into `server/textbook-search.ts` covering:
   - `tb:math:prob:ch8:basic-probability-rules`: Definition, properties, addition rule, mutually exclusive events, complementary events, and combination counting.
   - `tb:math:prob:ch8:conditional-and-independent`: Conditional probability, multiplication rule, independent vs. dependent events, total probability, and Bayes' theorem.
   Included in `ALL_MATH_SECTIONS` and updated `searchMathTextbook`.
 - **Curriculum Sessions**: Registered authentic section titles for Chapter 8 ("ប្រូបាប") in `src/features/practice/quiz-path.ts` under `MATH_LESSONS`: "និយមន័យ និងលក្ខណៈគ្រឹះនៃប្រូបាប", "ប្រូបាបមានលក្ខខណ្ឌ និងព្រឹត្តិការណ៍មិនអាស្រ័យគ្នា".
-- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/math-summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/Math summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
 
 
 ## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Lesson 5 (People's Republic & State of Cambodia) OCR & KruAI RAG Grounding
@@ -187,13 +202,13 @@ Transcribed and grounded Lesson 5 ("សាធារណរដ្ឋប្រជ�
 Commit: `878c50c`. **No database step needed.**
 
 Digitized Chapter 7 ("សមីការឌីផេរ៉ង់ស្យែល" / Differential Equations) from the official MoEYS Grade 12 Mathematics Summary textbook (Book pp. 78–82, PDF pp. 81–85).
-- **Textbook Rendering & OCR**: Rendered high-resolution scans using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/math-summary/chapter7-differential-equations.md`. Covers first-order linear differential equations (homogeneous $y' + ay = 0$, general solution $y = A e^{-ax}$, non-homogeneous $y' + ay = p(x)$, variation of constants method $y = A(x) e^{-ax}$, undetermined coefficients method), second-order linear differential equations ($a y'' + b y' + c y = 0$, characteristic equation $a \lambda^2 + b \lambda + c = 0$, real distinct roots, repeated root, complex conjugate roots $y = e^{\alpha x}(C \cos\beta x + D \sin\beta x)$, non-homogeneous $y = y_c + y_p$), and all 4 authentic MoEYS worked exercises with initial conditions and tangent line slope conditions.
+- **Textbook Rendering & OCR**: Rendered high-resolution scans using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/Math summary/chapter7-differential-equations.md`. Covers first-order linear differential equations (homogeneous $y' + ay = 0$, general solution $y = A e^{-ax}$, non-homogeneous $y' + ay = p(x)$, variation of constants method $y = A(x) e^{-ax}$, undetermined coefficients method), second-order linear differential equations ($a y'' + b y' + c y = 0$, characteristic equation $a \lambda^2 + b \lambda + c = 0$, real distinct roots, repeated root, complex conjugate roots $y = e^{\alpha x}(C \cos\beta x + D \sin\beta x)$, non-homogeneous $y = y_c + y_p$), and all 4 authentic MoEYS worked exercises with initial conditions and tangent line slope conditions.
 - **RAG Grounding**: Added keyworded chunks (`MATH_CH7_SECTIONS` / `MATH_DIFFERENTIAL_EQUATIONS_SECTIONS`) into `server/textbook-search.ts` covering:
   - `tb:math:diffeq:ch7:first-order`: First-order homogeneous & non-homogeneous equations, general/particular solutions, variation of parameters, and initial value problems.
   - `tb:math:diffeq:ch7:second-order`: Second-order characteristic equations, three discriminant cases, general solutions, and particular solutions with boundary conditions.
   Included in `ALL_MATH_SECTIONS` and updated `searchMathTextbook`.
 - **Curriculum Sessions**: Registered authentic section titles for Chapter 7 ("សមីការឌីផេរ៉ង់ស្យែល") in `src/features/practice/quiz-path.ts` under `MATH_LESSONS`: "សមីការឌីផេរ៉ង់ស្យែលលំដាប់ទី 1", "សមីការឌីផេរ៉ង់ស្យែលលំដាប់ទី 2".
-- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/math-summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/Math summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
 
 
 ## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Lesson 4 (Democratic Kampuchea) OCR & KruAI RAG Grounding
@@ -255,14 +270,14 @@ Transcribed and grounded Lesson 1 ("ប្រទេសកម្ពុជាក�
 Commit: `d06f379`. **No database step needed.**
 
 Digitized Chapter 6 ("កោនិច" / Conics: Parabola, Ellipse, Hyperbola) from the official MoEYS Grade 12 Mathematics Summary textbook (Book pp. 69–77, PDF pp. 72–80).
-- **Textbook Rendering & OCR**: Rendered high-resolution scans using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/math-summary/chapter6-conics.md`. Contains all theory, reference tables, and standard equations for parabolas (vertex $(0, 0)$ and $(h, k)$, focus, directrix $x = -p$ / $y = -p$, open directions), ellipses (center $(0, 0)$ and $(h, k)$, horizontal and vertical major axes, foci $(\pm c, 0)$ / $(0, \pm c)$, vertices, $c^2 = a^2 - b^2$, axis lengths $2a$ and $2b$), hyperbolas (center $(0, 0)$ and $(h, k)$, transverse axes, foci, vertices, $c^2 = a^2 + b^2$, asymptotes $y = \pm \frac{b}{a} x$ / $y = \pm \frac{a}{b} x$), and all 9 authentic MoEYS worked exercises.
+- **Textbook Rendering & OCR**: Rendered high-resolution scans using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/Math summary/chapter6-conics.md`. Contains all theory, reference tables, and standard equations for parabolas (vertex $(0, 0)$ and $(h, k)$, focus, directrix $x = -p$ / $y = -p$, open directions), ellipses (center $(0, 0)$ and $(h, k)$, horizontal and vertical major axes, foci $(\pm c, 0)$ / $(0, \pm c)$, vertices, $c^2 = a^2 - b^2$, axis lengths $2a$ and $2b$), hyperbolas (center $(0, 0)$ and $(h, k)$, transverse axes, foci, vertices, $c^2 = a^2 + b^2$, asymptotes $y = \pm \frac{b}{a} x$ / $y = \pm \frac{a}{b} x$), and all 9 authentic MoEYS worked exercises.
 - **RAG Grounding**: Added keyworded chunks (`MATH_CH6_SECTIONS` / `MATH_CONICS_SECTIONS`) into `server/textbook-search.ts` covering:
   - `tb:math:conics:ch6:parabola`: Parabola standard forms $y^2 = 4px$, $x^2 = 4py$, $(y - k)^2 = 4p(x - h)$, $(x - h)^2 = 4p(y - k)$, vertex, focus, directrix, and axis of symmetry.
   - `tb:math:conics:ch6:ellipse`: Ellipse standard forms $\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1$, $\frac{(x - h)^2}{a^2} + \frac{(y - k)^2}{b^2} = 1$, center, major/minor axes, vertices, foci, and $c^2 = a^2 - b^2$.
   - `tb:math:conics:ch6:hyperbola`: Hyperbola standard forms $\frac{x^2}{a^2} - \frac{y^2}{b^2} = 1$, $\frac{y^2}{a^2} - \frac{x^2}{b^2} = 1$, transverse/conjugate axes, vertices, foci, $c^2 = a^2 + b^2$, asymptotes, and rectangular box construction.
   Included in `ALL_MATH_SECTIONS` and updated `searchMathTextbook`.
 - **Curriculum Sessions**: Registered authentic section titles for Chapter 6 ("កោនិច") in `src/features/practice/quiz-path.ts` under `MATH_LESSONS`: "ប៉ារ៉ាបូល", "អេលីប", "អ៊ីពែបូល".
-- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/math-summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), `npm test` (all 109 tests passed), and `npm run build` (production build and CSP check passed).
+- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/Math summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), `npm test` (all 109 tests passed), and `npm run build` (production build and CSP check passed).
 
 
 ## 10 Nov 2026: Grade 12 Math Chapter 5 (Complex Numbers) OCR & KruAI RAG Grounding
@@ -270,7 +285,7 @@ Digitized Chapter 6 ("កោនិច" / Conics: Parabola, Ellipse, Hyperbola) f
 Commit: `10240dd`. **No database step needed.**
 
 Digitized Chapter 5 ("ចំនួនកុំផ្លិច" / Complex Numbers) from the official MoEYS Grade 12 Mathematics Summary textbook (Book pp. 56–68, PDF pp. 59–71).
-- **Textbook Rendering & OCR**: Rendered high-resolution scans using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/math-summary/chapter5-complex-numbers.md`. Contains all theory and properties for algebraic form $z = a + bi$, real and imaginary parts, complex operations, conjugate $\bar{z} = a - bi$, opposite $-z$, Argand plane representation, modulus $r = \sqrt{a^2 + b^2}$, argument $\varphi$, trigonometric form $z = r(\cos\varphi + i\sin\varphi)$, De Moivre's theorem, $n$-th roots of complex numbers $w_k$, rotation by angle $\alpha$, geometric applications (distances, vectors, midpoints, triangles), and all 14 authentic MoEYS worked exercises (including powers of $i$, cyclicity, complex quadratics, polynomial factorization $z^3 + 8 = 0$, and parametric equations with $\cos\alpha$).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/Math summary/chapter5-complex-numbers.md`. Contains all theory and properties for algebraic form $z = a + bi$, real and imaginary parts, complex operations, conjugate $\bar{z} = a - bi$, opposite $-z$, Argand plane representation, modulus $r = \sqrt{a^2 + b^2}$, argument $\varphi$, trigonometric form $z = r(\cos\varphi + i\sin\varphi)$, De Moivre's theorem, $n$-th roots of complex numbers $w_k$, rotation by angle $\alpha$, geometric applications (distances, vectors, midpoints, triangles), and all 14 authentic MoEYS worked exercises (including powers of $i$, cyclicity, complex quadratics, polynomial factorization $z^3 + 8 = 0$, and parametric equations with $\cos\alpha$).
 - **RAG Grounding**: Added keyworded chunks (`MATH_CH5_SECTIONS` / `MATH_COMPLEX_NUMBERS_SECTIONS`) into `server/textbook-search.ts` covering:
   - `tb:math:complex:ch5:algebraic-form-operations`: Algebraic form, operations, conjugates, opposites, complex plane affixes, and powers of $i$.
   - `tb:math:complex:ch5:trigonometric-demoivre`: Modulus, argument, trigonometric form, De Moivre's theorem, angle expansions, and center $O$ rotation.
@@ -278,7 +293,7 @@ Digitized Chapter 5 ("ចំនួនកុំផ្លិច" / Complex Numbers
   - `tb:math:complex:ch5:geometry-applications`: Segment distances, vector affixes, midpoints, division by ratio, triangle side/angle ratios, and conditions for real vs. purely imaginary values.
   Included in `ALL_MATH_SECTIONS` and verified with `searchMathTextbook`.
 - **Curriculum Sessions**: Registered authentic section titles for Chapter 5 ("ចំនួនកុំផ្លិច") in `src/features/practice/quiz-path.ts` under `MATH_LESSONS`.
-- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/math-summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), `npm test` (all 109 tests passed), and `npm run build` (production build and CSP check passed).
+- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/Math summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), `npm test` (all 109 tests passed), and `npm run build` (production build and CSP check passed).
 
 
 ## 10 Nov 2026: Grade 12 Math Chapter 4 (Function Variation & Curve Sketching) OCR & KruAI RAG Grounding
@@ -286,7 +301,7 @@ Digitized Chapter 5 ("ចំនួនកុំផ្លិច" / Complex Numbers
 Commit: `e97b49a`. **No database step needed.**
 
 Digitized Chapter 4 ("សិក្សាអថេរភាព និង សង់ខ្សែកោង" / Function Variation & Curve Sketching) from the official MoEYS Grade 12 Mathematics Summary textbook (Book pp. 39–55, PDF pp. 42–58).
-- **Textbook Rendering & OCR**: Rendered high-resolution scans with zero external API costs using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/math-summary/chapter4-function-variation-curves.md`. Contains all theory and properties for rational functions, horizontal/vertical/oblique asymptotes, symmetry centers, exponential and logarithmic functions, and 7 authentic MoEYS worked exercises (including degree 2 rational curves, odd logarithmic functions, and the Bac II comprehensive exponential area problem).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans with zero external API costs using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/Math summary/chapter4-function-variation-curves.md`. Contains all theory and properties for rational functions, horizontal/vertical/oblique asymptotes, symmetry centers, exponential and logarithmic functions, and 7 authentic MoEYS worked exercises (including degree 2 rational curves, odd logarithmic functions, and the Bac II comprehensive exponential area problem).
 - **RAG Grounding**: Added keyworded chunks (`MATH_CH4_SECTIONS` / `MATH_FUNCTION_VARIATION_CURVES_SECTIONS`) into `server/textbook-search.ts` covering:
   - `tb:math:curves:ch4:rational-asymptotes-variations`: Rational function asymptotes (vertical $x = -\frac{q}{p}$, oblique $y = mx + n$), center of symmetry, and table of signs.
   - `tb:math:curves:ch4:degree2-rational-functions`: Degree 2 / Degree 2 rational functions, classification by $\Delta = q^2 - 4pr$, and relative extrema.
@@ -294,7 +309,7 @@ Digitized Chapter 4 ("សិក្សាអថេរភាព និង សង�
   - `tb:math:curves:ch4:exponential-comprehensive-problem`: Bac II exam problem on $f(x) = x - e^x$ and $g(x) = (1 - x)e^x$, intermediate value theorem for unique intersection $\alpha \in [1, 2]$ ($1.6 < \alpha < 1.7$), relative curve positions, and bounded area $S = \frac{2(\alpha^3 - 4\alpha^2 + 2\alpha - 12)}{2 - \alpha}\text{ cm}^2$.
   Included in `ALL_MATH_SECTIONS` and verified with `searchMathTextbook`.
 - **Curriculum Sessions**: Registered authentic section titles for Chapter 4 ("សិក្សាអថេរភាព និង សង់ខ្សែកោង") in `src/features/practice/quiz-path.ts` under `MATH_LESSONS`.
-- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/math-summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), `npm test` (all 109 tests passed), and `npm run build` (production build and CSP check passed).
+- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/Math summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), `npm test` (all 109 tests passed), and `npm run build` (production build and CSP check passed).
 
 
 ## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 3 Lesson 1 (Nervous Coordination) OCR & KruAI Grounding
@@ -323,7 +338,7 @@ Transcribed and grounded Chapter 1 Lesson 1 ("ស៊ីមណូស្ពែម"
 Commit: `f7d6b95`. **No database step needed.**
 
 Digitized Chapter 3 ("អាំងតេក្រាលកំណត់" / Definite Integrals) from the official MoEYS Grade 12 Mathematics Summary textbook (Book pp. 31–38, PDF pp. 34–41).
-- **Textbook Rendering & OCR**: Rendered high-resolution scans with zero external API costs using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/math-summary/chapter3-definite-integrals.md`. Contains all fundamental definitions, Chasles' relation, linearity properties, integration by parts formula, power-reduction trigonometric integrals, rational fraction decomposition, parametric limit integrals, and 10 authentic MoEYS worked exercises.
+- **Textbook Rendering & OCR**: Rendered high-resolution scans with zero external API costs using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/Math summary/chapter3-definite-integrals.md`. Contains all fundamental definitions, Chasles' relation, linearity properties, integration by parts formula, power-reduction trigonometric integrals, rational fraction decomposition, parametric limit integrals, and 10 authentic MoEYS worked exercises.
 - **RAG Grounding**: Added keyworded chunks (`MATH_CH3_SECTIONS` / `MATH_DEFINITE_INTEGRALS_SECTIONS`) into `server/textbook-search.ts` covering:
   - `tb:math:integrals:ch3:rules-and-properties`: Fundamental definition, identical limits, sign flipping, Chasles' relation, and linearity.
   - `tb:math:integrals:ch3:rational-and-substitution`: Composite substitution $u'/u$ and partial fraction decomposition.
@@ -332,7 +347,7 @@ Digitized Chapter 3 ("អាំងតេក្រាលកំណត់" / Defini
   - `tb:math:integrals:ch3:log-exp-and-limits`: Logarithmic integrals ($\frac{\ln x}{x}$ and $\frac{1}{x\ln x}$) and parametric integral limits ($\lim_{\alpha \to 1^-} g(\alpha) = 1$).
   Included in `ALL_MATH_SECTIONS` and verified with `searchMathTextbook`.
 - **Curriculum Sessions**: Registered authentic section titles for Chapter 3 ("អាំងតេក្រាលកំណត់") in `src/features/practice/quiz-path.ts` under `MATH_LESSONS`.
-- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/math-summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), `npm test` (all 109 tests passed), and `npm run build` (production build and CSP checks passed).
+- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/Math summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), `npm test` (all 109 tests passed), and `npm run build` (production build and CSP checks passed).
 
 Commit: `c222b09`. **No database step needed.**
 
@@ -2463,7 +2478,7 @@ Landed in commit `da2c88a`. **No database step needed.**
 - **Audited and Fixed Khmer Terminology Errors in Flashcards.** Corrected multiple OCR-introduced transcription errors in `src/data/practice.ts` (`biology-1-1`):
   - Fixed misread words: "កោនញញោល" → "កោនឈ្មោល" (male cone), "ផលិតលង" / "គ្រាប់លងផ្កា" → "ផលិតគ្រាប់លម្អង" / "គ្រាប់លម្អង" (pollen grains), "ជាស្រុក" → "ជាស្រកា" (scale-like leaves), "សត្វកកេវ" → "សត្វកកេរ" (rodents), "ក្សេត្រូពិច" → "ក្បែរត្រូពិច" (subtropics), "ដើមឆ្កាត" → "ដើមត្នោត" (palm-like tree), "ស្លឹកទុំ" → "ស្លឹកដុំ" (terminal cluster of leaves), and "ប្រង់" / "ស៊ីណេគូតី" → "ប្រដឺ ឬស៊ីកាដ" / "ស៊ីណេតូភីត".
   - Cleaned up arrow symbols in `biology-1-2` double fertilization reactions from ASCII `->` to `→`.
-- **Rendered and Transcribed Chapter 2 (Derivatives & Primitives).** Rendered PDF pages 22 to 33 (Book pages 19 to 30) of `Math summary.pdf` to high-resolution PNGs and transcribed the entire chapter into `sources/ocr/math-summary/chapter2-derivatives-primitives.md`. Contains all derivative and primitive rules plus 13 authentic worked exercises with full steps.
+- **Rendered and Transcribed Chapter 2 (Derivatives & Primitives).** Rendered PDF pages 22 to 33 (Book pages 19 to 30) of `Math summary.pdf` to high-resolution PNGs and transcribed the entire chapter into `sources/ocr/Math summary/chapter2-derivatives-primitives.md`. Contains all derivative and primitive rules plus 13 authentic worked exercises with full steps.
 - **KruAI Math RAG Knowledge Expanded.** In `server/textbook-search.ts`, integrated 6 new structured knowledge modules into `ALL_MATH_SECTIONS`:
   - `tb:math:derivatives:ch2:basic-rules`: Basic rules, product, quotient, composite, roots, and powers.
   - `tb:math:derivatives:ch2:trig-derivatives`: Trigonometric derivatives, higher-order derivatives, and $n$-th derivative formulas.
@@ -2954,7 +2969,7 @@ Commit `pending`. **No database step needed.**
 **Why.** Grade 12 Mathematics carries the highest weight in the Bac II National Examination. To equip KruAI with authoritative textbook explanations and worked problem solutions for **Chapter 1: Limits of Functions**, we transcribed the official MoEYS Grade 12 Mathematics summary textbook (`Math summary.pdf`, Book pp. 3–18) and connected it to KruAI's real-time retrieval grounding (RAG).
 
 **What changed.**
-- **High-Fidelity MoEYS Mathematics Transcription (`sources/ocr/math-summary/chapter1-limits.md`):**
+- **High-Fidelity MoEYS Mathematics Transcription (`sources/ocr/Math summary/chapter1-limits.md`):**
   - Rendered high-resolution pages locally (PDF pp. 6–21) without consuming AI API quota.
   - Transcribed all foundational definitions, operation limit rules, indeterminate form removal techniques, composite function limits, squeeze theorem, trigonometric limits, exponential limits, and natural logarithm limits.
   - Transcribed all 19 model Bac II exercise solutions with step-by-step LaTeX formulas, conjugate multiplier expansions, and factorization methods.
