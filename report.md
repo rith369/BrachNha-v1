@@ -16,6 +16,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Grade 12 Math Chapter 5 (Complex Numbers) OCR & KruAI RAG Grounding
+
+Commit: `10240dd`. **No database step needed.**
+
+Digitized Chapter 5 ("ចំនួនកុំផ្លិច" / Complex Numbers) from the official MoEYS Grade 12 Mathematics Summary textbook (Book pp. 56–68, PDF pp. 59–71).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/math-summary/chapter5-complex-numbers.md`. Contains all theory and properties for algebraic form $z = a + bi$, real and imaginary parts, complex operations, conjugate $\bar{z} = a - bi$, opposite $-z$, Argand plane representation, modulus $r = \sqrt{a^2 + b^2}$, argument $\varphi$, trigonometric form $z = r(\cos\varphi + i\sin\varphi)$, De Moivre's theorem, $n$-th roots of complex numbers $w_k$, rotation by angle $\alpha$, geometric applications (distances, vectors, midpoints, triangles), and all 14 authentic MoEYS worked exercises (including powers of $i$, cyclicity, complex quadratics, polynomial factorization $z^3 + 8 = 0$, and parametric equations with $\cos\alpha$).
+- **RAG Grounding**: Added keyworded chunks (`MATH_CH5_SECTIONS` / `MATH_COMPLEX_NUMBERS_SECTIONS`) into `server/textbook-search.ts` covering:
+  - `tb:math:complex:ch5:algebraic-form-operations`: Algebraic form, operations, conjugates, opposites, complex plane affixes, and powers of $i$.
+  - `tb:math:complex:ch5:trigonometric-demoivre`: Modulus, argument, trigonometric form, De Moivre's theorem, angle expansions, and center $O$ rotation.
+  - `tb:math:complex:ch5:nth-roots-equations`: $n$-th roots of complex numbers, solving $z^n = w$, quadratic equations in $\mathbb{C}$, and trigonometric parameter $\cos\alpha$.
+  - `tb:math:complex:ch5:geometry-applications`: Segment distances, vector affixes, midpoints, division by ratio, triangle side/angle ratios, and conditions for real vs. purely imaginary values.
+  Included in `ALL_MATH_SECTIONS` and verified with `searchMathTextbook`.
+- **Curriculum Sessions**: Registered authentic section titles for Chapter 5 ("ចំនួនកុំផ្លិច") in `src/features/practice/quiz-path.ts` under `MATH_LESSONS`.
+- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/math-summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), `npm test` (all 109 tests passed), and `npm run build` (production build and CSP check passed).
+
+
 ## 10 Nov 2026: Grade 12 Math Chapter 4 (Function Variation & Curve Sketching) OCR & KruAI RAG Grounding
 
 Commit: `e97b49a`. **No database step needed.**

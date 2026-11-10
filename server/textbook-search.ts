@@ -2468,15 +2468,160 @@ export const MATH_CH4_SECTIONS: TextbookSection[] = [
 
 export const MATH_FUNCTION_VARIATION_CURVES_SECTIONS = MATH_CH4_SECTIONS;
 
+export const MATH_CH5_SECTIONS: TextbookSection[] = [
+  {
+    id: "tb:math:complex:ch5:algebraic-form-operations",
+    title: "ទម្រង់ពិជគណិត និងប្រមាណវិធីនៃចំនួនកុំផ្លិច (Complex Numbers: Algebraic Form & Operations)",
+    keywords: [
+      "ចំនួនកុំផ្លិច",
+      "ទម្រង់ពិជគណិត",
+      "ផ្នែកពិត",
+      "ផ្នែកនិម្មិត",
+      "កុំផ្លិចឆ្លាស់",
+      "កុំផ្លិចផ្ទុយ",
+      "ស្វ័យគុណនៃ i",
+      "complex number",
+      "algebraic form",
+      "real part",
+      "imaginary part",
+      "complex conjugate",
+      "powers of i",
+      "complex plane",
+      "ប្លង់កុំផ្លិច",
+      "អាហ្វីច",
+    ],
+    text: `ទម្រង់ពិជគណិត និងប្រមាណវិធីនៃចំនួនកុំផ្លិច (MoEYS Grade 12)៖
+1. ទម្រង់ពិជគណិត៖ $z = a + bi$ ($a, b \\in \\mathbb{R}$, $i^2 = -1$)
+   - ផ្នែកពិត (Real part)៖ $\\text{Re}(z) = a$
+   - ផ្នែកនិម្មិត (Imaginary part)៖ $\\text{Im}(z) = b$
+   - សមភាព៖ $z_1 = z_2 \\iff a_1 = a_2$ និង $b_1 = b_2$
+2. ប្រមាណវិធីលើចំនួនកុំផ្លិច៖
+   - ផលបូក៖ $z_1 + z_2 = (a_1 + a_2) + i(b_1 + b_2)$
+   - ផលដក៖ $z_1 - z_2 = (a_1 - a_2) + i(b_1 - b_2)$
+   - ផលគុណ៖ $z_1 z_2 = (a_1 a_2 - b_1 b_2) + i(a_1 b_2 + b_1 a_2)$
+   - ផលចែក៖ $\\frac{z_1}{z_2} = \\frac{(a_1 + ib_1)(a_2 - ib_2)}{a_2^2 + b_2^2} = \\frac{a_1 a_2 + b_1 b_2}{a_2^2 + b_2^2} + i\\frac{a_2 b_1 - a_1 b_2}{a_2^2 + b_2^2}$
+3. ចំនួនកុំផ្លិចឆ្លាស់ និងផ្ទុយ៖
+   - កុំផ្លិចឆ្លាស់៖ $\\bar{z} = a - bi$ (ផលគុណ $z\\bar{z} = a^2 + b^2$)
+   - កុំផ្លិចផ្ទុយ៖ $-z = -a - bi$
+4. ប្លង់កុំផ្លិច (Argand Plane)៖
+   - ចំណុច $M(a, b)$ ជាចំណុចរូបភាព (Affix) នៃ $z = a + bi$
+   - វ៉ិចទ័រ $\\vec{OM}(a, b)$ ជាវ៉ិចទ័ររូបភាពនៃ $z$
+   - អ័ក្ស $(x'Ox)$ ជាអ័ក្សផ្នែកពិត, អ័ក្ស $(y'Oy)$ ជាអ័ក្សផ្នែកនិម្មិត
+5. ស្វ័យគុណនៃ $i$ (Powers of $i$)៖
+   - $i^1 = i$, $i^2 = -1$, $i^3 = -i$, $i^4 = 1$ (ខួប 4)
+   - $i^{4k} = 1$, $i^{4k+1} = i$, $i^{4k+2} = -1$, $i^{4k+3} = -i$
+   - $\\frac{1}{i} = -i$, $\\frac{1}{i^n} = (-1)^n i^n$`,
+  },
+  {
+    id: "tb:math:complex:ch5:trigonometric-demoivre",
+    title: "ទម្រង់ត្រីកោណមាត្រ និងទ្រឹស្តីបទដឺម័រ (Trigonometric Form & De Moivre's Theorem)",
+    keywords: [
+      "ទម្រង់ត្រីកោណមាត្រ",
+      "ម៉ូឌុល",
+      "អាគុយម៉ង់",
+      "ដឺម័រ",
+      "ទ្រឹស្តីបទដឺម័រ",
+      "trigonometric form",
+      "modulus",
+      "argument",
+      "De Moivre",
+      "Moivre formula",
+      "polar form",
+      "បម្លែងវិល",
+      "rotation in complex plane",
+    ],
+    text: `ទម្រង់ត្រីកោណមាត្រ និងទ្រឹស្តីបទដឺម័រ (MoEYS Grade 12)៖
+1. ម៉ូឌុល និងអាគុយម៉ង់៖
+   - ម៉ូឌុល៖ $r = |z| = \\sqrt{a^2 + b^2}$
+   - លក្ខណៈម៉ូឌុល៖ $|z| = |\\bar{z}| = |-z|$, $|z_1 z_2| = |z_1||z_2|$, $\\left|\\frac{z_1}{z_2}\\right| = \\frac{|z_1|}{|z_2|}$, $|z_1 + z_2| \\le |z_1| + |z_2|$
+   - អាគុយម៉ង់ $\\varphi = \\arg(z)$ កំណត់ដោយ៖ $\\cos\\varphi = \\frac{a}{r}$ និង $\\sin\\varphi = \\frac{b}{r}$
+2. ទម្រង់ត្រីកោណមាត្រ៖
+   - $z = r(\\cos\\varphi + i\\sin\\varphi)$
+   - ផលគុណ៖ $z_1 z_2 = r_1 r_2[\\cos(\\varphi_1 + \\varphi_2) + i\\sin(\\varphi_1 + \\varphi_2)]$
+   - ផលចែក៖ $\\frac{z_1}{z_2} = \\frac{r_1}{r_2}[\\cos(\\varphi_1 - \\varphi_2) + i\\sin(\\varphi_1 - \\varphi_2)]$
+3. ទ្រឹស្តីបទដឺម័រ (De Moivre's Theorem)៖
+   - $(\\cos\\varphi + i\\sin\\varphi)^n = \\cos(n\\varphi) + i\\sin(n\\varphi)$
+   - $z^n = [r(\\cos\\varphi + i\\sin\\varphi)]^n = r^n[\\cos(n\\varphi) + i\\sin(n\\varphi)]$ ($n \\in \\mathbb{Z}$)
+   - ការពន្លាតកូស៊ីនុស និងស៊ីនុស៖ $\\cos 3\\theta = 4\\cos^3\\theta - 3\\cos\\theta$, $\\sin 3\\theta = 3\\sin\\theta - 4\\sin^3\\theta$
+4. បម្លែងវិលជុំវិញគល់តម្រុយ៖
+   - $M'(z')$ ជារូបភាពនៃ $M(z)$ តាមបម្លែងវិលផ្ចិត $O$ មុំ $\\alpha$៖ $z' = (\\cos\\alpha + i\\sin\\alpha)z$`,
+  },
+  {
+    id: "tb:math:complex:ch5:nth-roots-equations",
+    title: "ឫសទី n និងសមីការដឺក្រេទី 2 ក្នុង C (nth Roots & Complex Quadratic Equations)",
+    keywords: [
+      "ឫសទី n",
+      "ឫសនៃចំនួនកុំផ្លិច",
+      "សមីការក្នុង C",
+      "សមីការដឺក្រេទីពីរ",
+      "ឌីសគ្រីមីណង់",
+      "nth root",
+      "complex roots",
+      "equations in complex",
+      "quadratic equation",
+      "discriminant",
+    ],
+    text: `ឫសទី n និងសមីការក្នុងសំណុំ C (MoEYS Grade 12)៖
+1. ឫសទី $n$ នៃចំនួនកុំផ្លិច៖
+   - បើ $z = r(\\cos\\varphi + i\\sin\\varphi) \\neq 0$ នោះ $z$ មាន $n$ ឫសទី $n$៖
+     $w_k = \\sqrt[n]{r}\\left[\\cos\\left(\\frac{\\varphi + 2k\\pi}{n}\\right) + i\\sin\\left(\\frac{\\varphi + 2k\\pi}{n}\\right)\\right]$ ($k = 0, 1, 2, \\dots, n - 1$)
+   - ឧទាហរណ៍៖ ដោះស្រាយ $z^3 + 8 = 0 \\iff z^3 = -8 = 8(\\cos\\pi + i\\sin\\pi)$
+     $w_0 = 1 + i\\sqrt{3}$, $w_1 = -2$, $w_2 = 1 - i\\sqrt{3}$
+2. សមីការដឺក្រេទីពីរក្នុង $\\mathbb{C}$៖ $az^2 + bz + c = 0$ ($a \\neq 0$, $a, b, c \\in \\mathbb{R}$)
+   - ឌីសគ្រីមីណង់ $\\Delta = b^2 - 4ac$
+   - បើ $\\Delta > 0$៖ ឫសពិតពីរផ្សេងគ្នា $z = \\frac{-b \\pm \\sqrt{\\Delta}}{2a}$
+   - បើ $\\Delta = 0$៖ ឫសឌុប $z_1 = z_2 = -\\frac{b}{2a}$
+   - បើ $\\Delta < 0$៖ ឫសកុំផ្លិចឆ្លាស់ពីរ $z = \\frac{-b \\pm i\\sqrt{|\\Delta|}}{2a}$
+3. សមីការប៉ារ៉ាម៉ែត្រត្រីកោណមាត្រ៖
+   - $z^2 + (4\\cos\\alpha)z + 4\\cos 2\\alpha + 2 = 0$
+   - $\\Delta = 16(\\frac{1}{2} - \\cos^2\\alpha)$
+   - សមីការមានចម្លើយជាចំនួនពិត $\\iff \\Delta \\ge 0 \\iff -\\frac{\\sqrt{2}}{2} \\le \\cos\\alpha \\le \\frac{\\sqrt{2}}{2}$`,
+  },
+  {
+    id: "tb:math:complex:ch5:geometry-applications",
+    title: "អនុវត្តន៍ចំនួនកុំផ្លិចក្នុងធរណីមាត្រ (Geometric Applications of Complex Numbers)",
+    keywords: [
+      "អនុវត្តន៍ធរណីមាត្រ",
+      "ចម្ងាយ",
+      "ចំណុចកណ្តាល",
+      "វ៉ិចទ័ររូបភាព",
+      "ផលធៀបប្រវែង",
+      "មុំនៃត្រីកោណ",
+      "complex geometry",
+      "distance formula",
+      "midpoint",
+      "vector affix",
+      "triangle ratio",
+      "argument of angle",
+    ],
+    text: `អនុវត្តន៍ចំនួនកុំផ្លិចក្នុងធរណីមាត្រ (MoEYS Grade 12)៖
+1. ចម្ងាយ និងវ៉ិចទ័រ៖
+   - ចម្ងាយរវាងពីរចំណុច $A(z_1)$ និង $B(z_2)$៖ $AB = |z_2 - z_1| = |z_1 - z_2|$
+   - អាហ្វីចនៃវ៉ិចទ័រ $\\vec{AB}$៖ $z(\\vec{AB}) = z_B - z_A = z_2 - z_1$
+   - ចំណុចកណ្តាល $I$ នៃអង្កត់ $[AB]$៖ $z(I) = \\frac{z_1 + z_2}{2}$
+   - ចំណុច $P(z)$ ចែកអង្កត់ $AB$ តាមផលធៀប $m:n$ (តាង $\\lambda = \\frac{m}{n}$)៖ $z = \\frac{z_1 + \\lambda z_2}{1 + \\lambda}$
+2. រូបរាងត្រីកោណ និងមុំ៖
+   - បើ $A(z)$, $B(z_1)$ និង $C(z_2)$ បង្កើតបានត្រីកោណ $ABC$៖
+     $\\frac{AC}{AB} = \\left|\\frac{z_2 - z}{z_1 - z}\\right|$ និង $\\angle BAC = \\arg\\left(\\frac{z_2 - z}{z_1 - z}\\right)$
+3. លក្ខខណ្ឌកុំផ្លិចជាចំនួនពិត ឬនិម្មិតសុទ្ធ៖
+   - ចំពោះ $Z = \\frac{z + 2 - i}{z + i}$ ($z = a + bi$)៖
+   - $Z$ ជាចំនួនពិត $\\iff \\text{Im}(Z) = 0 \\iff a + b + 1 = 0$ ($(a, b) \\neq (0, -1)$)
+   - $Z$ ជាចំនួននិម្មិតសុទ្ធ $\\iff \\text{Re}(Z) = 0 \\iff a^2 + b^2 + 2a - 1 = 0$ ($(a, b) \\neq (0, -1)$)`,
+  },
+];
+
+export const MATH_COMPLEX_NUMBERS_SECTIONS = MATH_CH5_SECTIONS;
+
 export const ALL_MATH_SECTIONS: TextbookSection[] = [
   ...MATH_LIMITS_SECTIONS,
   ...MATH_DERIVATIVES_PRIMITIVES_SECTIONS,
   ...MATH_CH3_SECTIONS,
   ...MATH_CH4_SECTIONS,
+  ...MATH_CH5_SECTIONS,
 ];
 
 /**
- * Searches Mathematics textbook chunks (Chapters 1, 2, 3 & 4: Limits, Derivatives, Primitives, Definite Integrals, Curves) for matches against a student query.
+ * Searches Mathematics textbook chunks (Chapters 1, 2, 3, 4 & 5: Limits, Derivatives, Primitives, Definite Integrals, Curves, Complex Numbers) for matches against a student query.
  * Returns up to maxResults retrieved chunks formatted for KruAI's system prompt.
  */
 export function searchMathTextbook(
