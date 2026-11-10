@@ -674,6 +674,43 @@ export const BIOLOGY_CH3_SECTIONS: TextbookSection[] = [
    - បង្រួមប្លោកនោម។`,
   },
   {
+    id: "tb:bio:ch3:nervous-coordination-high-yield-qna",
+    title: "សំណួរ-ចម្លើយគន្លឹះប្រឡងបាក់ឌុប តម្រូវប្រសាទ (Bac II High-Yield Nervous System Q&A)",
+    keywords: [
+      "សំណួរប្រព័ន្ធប្រសាទ",
+      "ប្រូទីស",
+      "អ៊ីដ្រា",
+      "ជន្លេន",
+      "កណ្ដូប",
+      "សត្វឥតឆ្អឹងកង",
+      "សត្វឆ្អឹងកង",
+      "ខួរតូចស្រវឹង",
+      "អឌ្ឍគោលខួរឆ្វេងស្តាំ",
+      "ទូរស័ព្ទរោទ៍",
+      "ឈឺចាប់មុតស្រួច",
+      "អាល់កុល",
+      "កាហ្វេអ៊ីន",
+      "នីកូទីន",
+      "nervous system qna",
+    ],
+    text: `សំណួរ-ចម្លើយគន្លឹះប្រឡងបាក់ឌុប តម្រូវប្រសាទ (តាមសៀវភៅ ថូ ភន)៖
+1. ប្រព័ន្ធប្រសាទសត្វឥតឆ្អឹងកង និងការប្រៀបធៀប៖
+   - ប្រូទីស៖ គ្មានប្រព័ន្ធប្រសាទពិតប្រាកដទេ តែមានលទ្ធភាពឆ្លើយតបនឹងរំញោចសមស្រប។
+   - អ៊ីដ្រា៖ ប្រព័ន្ធប្រសាទជាបណ្ដាញសរសៃប្រសាទ គ្មានមជ្ឈមណ្ឌលប្រសាទ អាំងភ្លុចសាយភាយពេញខ្លួន។
+   - ជន្លេន និងកណ្ដូប៖ មានទាំងមជ្ឈមណ្ឌលប្រសាទ និងបរិមណ្ឌលប្រសាទ។ ជន្លេនមានស្បែកជាវិញ្ញាណ ឯកណ្ដូបមានភ្នែក ពុកមាត់ និងវិញ្ញាណប៉ះ។
+   - ប្រៀបធៀបសត្វឆ្អឹងកង និងឥតឆ្អឹងកង៖ សត្វឥតឆ្អឹងកងមានសរីរាង្គវិញ្ញាណតិច ខួរក្បាលតូចសាមញ្ញ គ្មានអឌ្ឍគោលខួរនិងខួរតូចទេ។ សត្វឆ្អឹងកងមានសរីរាង្គវិញ្ញាណច្រើន ខួរក្បាលធំស្មុគស្មាញ និងមានអឌ្ឍគោលខួរនិងខួរតូចច្បាស់លាស់។
+2. យន្តការឆ្លើយតប និងលំនាំណឺរ៉ូន (ឧទាហរណ៍ទូរស័ព្ទរោទ៍ និងការឈឺចាប់)៖
+   - ពេលទូរស័ព្ទរោទ៍៖ (1) ណឺរ៉ូនវិញ្ញាណនាំទទួលរំញោចសំឡេងពីត្រចៀកបញ្ជូនទៅខួរក្បាល $\\to$ (2) អន្តរណឺរ៉ូនក្នុងខួរក្បាលបកស្រាយ និងសម្រេចចិត្ត $\\to$ (3) ណឺរ៉ូនចលករដឹកនាំបញ្ជាទៅសាច់ដុំដៃឲ្យលើកទូរស័ព្ទ។
+   - ហេតុអ្វីមុតវត្ថុស្រួចមានការឈឺចាប់? ព្រោះទួលវិញ្ញាណក្រោមស្បែកបង្កើតអាំងភ្លុចប្រសាទ បញ្ជូនតាមសរសៃវិញ្ញាណនាំទៅខួរឆ្អឹងខ្នង រួចបន្តតាមអន្តរណឺរ៉ូនទៅខួរក្បាលបកស្រាយធ្វើឲ្យដឹងការឈឺចាប់។
+3. អឌ្ឍគោលខួរ និងខួរតូច៖
+   - ហេតុអ្វីរបួសអឌ្ឍគោលខួរឆ្វេងប៉ះពាល់សារពាង្គកាយស្តាំ? ព្រោះបាច់សរសៃប្រសាទបញ្ជាឆ្លងកាត់បញ្ច្រាសគ្នា អឌ្ឍគោលឆ្វេងត្រួតពិនិត្យចលនារាងកាយចំហៀងស្តាំ ហើយអឌ្ឍគោលស្តាំត្រួតពិនិត្យចំហៀងឆ្វេង។
+   - ហេតុអ្វីមនុស្សស្រវឹងដើរទ្រេកទ្រោត? ព្រោះជាតិអាល់កុលធ្វើឲ្យខួរតូចបាត់បង់សមត្ថភាពសម្របសម្រួលចលនាសាច់ដុំឆន្ទៈ និងតុល្យភាពលំនឹង។
+4. ឥទ្ធិពលថ្នាំលើប្រព័ន្ធប្រសាទ៖
+   - អាល់កុល៖ ពន្យឺតមជ្ឈមណ្ឌលប្រសាទ បន្ថយការពិចារណា សតិ និងការប្រមូលអារម្មណ៍។
+   - កាហ្វេអ៊ីន៖ បង្កើនល្បឿនមជ្ឈមណ្ឌលប្រសាទ ផឹកច្រើនធ្វើឲ្យញ័រ គេងមិនលក់។
+   - នីកូទីន៖ បង្កើនអ័រម៉ូនអាដ្រេណាលីន បង្កើនចង្វាក់បេះដូង សម្ពាធឈាម និងអាស៊ីតក្រពះ។`,
+  },
+  {
     id: "tb:bio:ch3:eye-anatomy-retina",
     title: "ទម្រង់គ្រាប់ភ្នែក ស្រទាប់ទាំង 3 និងកោសិកាស្រូបពន្លឺ (Eye Anatomy & Retina)",
     keywords: [
@@ -2305,14 +2342,141 @@ export const MATH_CH3_SECTIONS: TextbookSection[] = [
 
 export const MATH_DEFINITE_INTEGRALS_SECTIONS = MATH_CH3_SECTIONS;
 
+export const MATH_CH4_SECTIONS: TextbookSection[] = [
+  {
+    id: "tb:math:curves:ch4:rational-asymptotes-variations",
+    title: "សិក្សាអថេរភាព និងសង់ក្រាបអនុគមន៍សនិទាន (Rational Functions: Asymptotes & Curve Sketching)",
+    keywords: [
+      "អនុគមន៍សនិទាន",
+      "សង់ក្រាប",
+      "អាស៊ុយមតូត",
+      "rational function",
+      "asymptote",
+      "curve sketching",
+      "អាស៊ុយមតូតឈរ",
+      "អាស៊ុយមតូតដេក",
+      "អាស៊ុយមតូតទ្រេត",
+      "ផ្ចិតឆ្លុះ",
+      "slant asymptote",
+      "vertical asymptote",
+      "horizontal asymptote",
+    ],
+    text: `សិក្សាអថេរភាព និងសង់ក្រាបអនុគមន៍សនិទាន (MoEYS)៖
+1. ទម្រង់ $y = \\frac{ax^2 + bx + c}{px + q}$ ($p \\neq 0, a \\neq 0$)៖
+   - ដែនកំណត់៖ $D = \\mathbb{R} \\setminus \\left\\{-\\frac{q}{p}\\right\\}$
+   - អាស៊ុយមតូតឈរ៖ បន្ទាត់ $x = -\\frac{q}{p}$
+   - អាស៊ុយមតូតទ្រេត៖ ចែកពហុធាបាន $y = mx + n + \\frac{k}{px + q}$ នោះបន្ទាត់ $y = mx + n$ ជាអាស៊ុយមតូតទ្រេត
+   - ផ្ចិតឆ្លុះ៖ ចំណុចប្រសព្វរវាងអាស៊ុយមតូតឈរ និងអាស៊ុយមតូតទ្រេត
+   - បរមា៖ ដេរីវេ $y' = 0$ មានឫសពីរផ្សេងគ្នា $\\Rightarrow$ មានអតិបរមាធៀបមួយ និងអប្បបរមាធៀបមួយ
+2. ឧទាហរណ៍គំរូ MoEYS៖
+   - $f(x) = \\frac{x + 4}{2x - 3}$៖ ដែនកំណត់ $D = \\mathbb{R} \\setminus \\left\\{\\frac{3}{2}\\right\\}$, អាស៊ុយមតូតឈរ $x = \\frac{3}{2}$, អាស៊ុយមតូតដេក $y = \\frac{1}{2}$, ដេរីវេ $f'(x) = \\frac{-11}{(2x - 3)^2} < 0 \\Rightarrow$ ចុះដាច់ខាតលើចន្លោះនីមួយៗនៃ $D$
+   - $f(x) = \\frac{2x^2 + x - 2}{x + 1} = 2x - 1 - \\frac{1}{x + 1}$៖
+     + អាស៊ុយមតូតឈរ $x = -1$, អាស៊ុយមតូតទ្រេត $y = 2x - 1$
+     + ទីតាំងធៀប៖ $f(x) - (2x - 1) = \\frac{-1}{x + 1}$; បើ $x < -1$ ក្រាប $(C)$ នៅលើ $(\\Delta)$, បើ $x > -1$ ក្រាប $(C)$ នៅក្រោម $(\\Delta)$
+     + ដេរីវេ៖ $f'(x) = \\frac{2x^2 + 4x + 3}{(x + 1)^2} > 0 \\Rightarrow$ កើនដាច់ខាត`,
+  },
+  {
+    id: "tb:math:curves:ch4:degree2-rational-functions",
+    title: "អនុគមន៍សនិទានដឺក្រេទី 2 លើដឺក្រេទី 2 (Degree 2 Rational Functions & Bounded Variations)",
+    keywords: [
+      "អនុគមន៍សនិទានដឺក្រេទី 2",
+      "degree 2 rational",
+      "បរមាធៀប",
+      "អតិបរមា",
+      "អប្បបរមា",
+      "relative extrema",
+      "delta < 0",
+      "delta > 0",
+      "បន្ទាត់កាត់អាស៊ុយមតូត",
+    ],
+    text: `អនុគមន៍សនិទានដឺក្រេទី 2 លើដឺក្រេទី 2 $y = \\frac{ax^2 + bx + c}{px^2 + qx + r}$ (MoEYS)៖
+1. លក្ខណៈទូទៅ៖
+   - អាស៊ុយមតូតដេកជានិច្ចគឺ $y = \\frac{a}{p}$
+   - ចំនួនអាស៊ុយមតូតឈរអាស្រ័យលើ $\\Delta = q^2 - 4pr$៖
+     + $\\Delta < 0$៖ គ្មានអាស៊ុយមតូតឈរ, ក្រាបមានមែកតែមួយ
+     + $\\Delta = 0$៖ អាស៊ុយមតូតឈរមួយ $x = -\\frac{q}{2p}$, ក្រាបមានមែកពីរ
+     + $\\Delta > 0$៖ អាស៊ុយមតូតឈរពីរ $x = \\frac{-q \\pm \\sqrt{\\Delta}}{2p}$, ក្រាបមានមែកបី
+2. ឧទាហរណ៍គំរូ MoEYS៖
+   - $f(x) = \\frac{2x^2 - 7x + 5}{x^2 - 5x + 7}$ លើ $D = \\mathbb{R}$ (ព្រោះ $\\Delta = -3 < 0$)៖
+     + អាស៊ុយមតូតដេក $y = 2$
+     + ដេរីវេ $f'(x) = \\frac{-3(x^2 - 6x + 8)}{(x^2 - 5x + 7)^2}$; $f'(x) = 0 \\Leftrightarrow x = 2$ ឬ $x = 4$
+     + អប្បបរមា $f(2) = -1$, អតិបរមា $f(4) = 3$
+     + ក្រាបកាត់អាស៊ុយមតូតដេកត្រង់ $(3, 2)$ ព្រោះ $f(x) - 2 = \\frac{3x - 9}{x^2 - 5x + 7}$
+   - $f(x) = \\frac{x^2 + 1}{x^2 - 3x + 2}$ លើ $D = \\mathbb{R} \\setminus \\{1, 2\\}$៖
+     + អាស៊ុយមតូតឈរពីរ $x = 1, x = 2$; អាស៊ុយមតូតដេក $y = 1$
+     + ដេរីវេ $f'(x) = \\frac{-3x^2 + 2x + 3}{(x^2 - 3x + 2)^2}$; ឫស $x = \\frac{1 \\pm \\sqrt{10}}{3}$`,
+  },
+  {
+    id: "tb:math:curves:ch4:logarithmic-functions-and-graphs",
+    title: "សិក្សាអថេរភាព និងសង់ក្រាបអនុគមន៍លោការីត (Logarithmic Function Variations & Symmetry)",
+    keywords: [
+      "អនុគមន៍លោការីត",
+      "logarithmic curve",
+      "ln u",
+      "ភាពគូសេស",
+      "odd function",
+      "អាស៊ុយមតូតលោការីត",
+      "បន្ទាត់ប៉ះ",
+      "អាំងតេក្រាលលោការីត",
+      "integral ln",
+    ],
+    text: `សិក្សាអថេរភាព និងសង់ក្រាបអនុគមន៍លោការីត (MoEYS)៖
+1. អនុគមន៍ $f(x) = \\ln\\left(\\frac{3x + 1}{x - 1}\\right)$៖
+   - ដែនកំណត់៖ $\\frac{3x + 1}{x - 1} > 0 \\Rightarrow D = \\left(-\\infty, -\\frac{1}{3}\\right) \\cup (1, +\\infty)$
+   - ដេរីវេ៖ $f'(x) = \\frac{-4}{(3x + 1)(x - 1)} < 0 \\Rightarrow f$ ចុះដាច់ខាតលើ $D$
+   - អាស៊ុយមតូតដេក $y = \\ln 3$ ត្រង់ $\\pm\\infty$; អាស៊ុយមតូតឈរ $x = -\\frac{1}{3}$ និង $x = 1$
+2. អនុគមន៍ $g(x) = \\ln\\left(\\frac{3 + x}{3 - x}\\right)$ លើ $(-3, 3)$៖
+   - ភាពសេស៖ $g(-x) = \\ln\\left(\\frac{3 - x}{3 + x}\\right) = -g(x) \\Rightarrow g$ ជាអនុគមន៍សេស (ក្រាបឆ្លុះធៀបនឹងគល់ $O$)
+   - ដេរីវេ៖ $g'(x) = \\frac{6}{9 - x^2} > 0 \\Rightarrow g$ កើនដាច់ខាតលើ $(-3, 3)$
+   - អាស៊ុយមតូតឈរ $x = -3$ និង $x = 3$; បន្ទាត់ប៉ះត្រង់ $O(0, 0)$ គឺ $y = \\frac{2}{3}x$
+   - គណនាអាំងតេក្រាល៖ $\\int_0^1 g(x)\\,dx = \\ln 2 + 3\\ln\\left(\\frac{8}{9}\\right)$ តាមដេរីវេនៃ $h(x) = x g(x)$`,
+  },
+  {
+    id: "tb:math:curves:ch4:exponential-comprehensive-problem",
+    title: "ប្រធានវិញ្ញាសាបាក់ឌុប អនុគមន៍អិចស្ប៉ូណង់ស្យែល ប្រសព្វក្រាប និងផ្ទៃក្រឡា (Bac II Problem: Exp Variations, Intersection & Area)",
+    keywords: [
+      "បាក់ឌុប",
+      "វិញ្ញាសាបាក់ឌុប",
+      "អនុគមន៍អិចស្ប៉ូណង់ស្យែល",
+      "exponential variation",
+      "ប្រសព្វក្រាប",
+      "ទ្រឹស្តីបទតម្លៃកណ្តាល",
+      "រក alpha",
+      "ផ្ទៃក្រឡាខណ្ឌ",
+      "area between curves",
+      "f(x) - g(x)",
+    ],
+    text: `ប្រធានវិញ្ញាសាគំរូបាក់ឌុប អនុគមន៍អិចស្ប៉ូណង់ស្យែល និងផ្ទៃក្រឡា (MoEYS)៖
+1. ប្រធាន៖ $f(x) = x - e^x$ និង $g(x) = (1 - x)e^x$ លើ $\\mathbb{R}$
+2. លីមីត និងអាស៊ុយមតូត៖
+   - $\\lim_{x \\to -\\infty} f(x) = -\\infty$, $\\lim_{x \\to -\\infty} [f(x) - x] = 0 \\Rightarrow y = x$ ជាអាស៊ុយមតូតទ្រេតនៃ $(C)$ ត្រង់ $-\\infty$
+   - $\\lim_{x \\to -\\infty} g(x) = 0 \\Rightarrow y = 0$ (អ័ក្សអាប់ស៊ីស) ជាអាស៊ុយមតូតដេកនៃ $(C')$ ត្រង់ $-\\infty$
+   - $\\lim_{x \\to +\\infty} f(x) = -\\infty$, $\\lim_{x \\to +\\infty} g(x) = -\\infty$
+3. អថេរភាព៖
+   - $f'(x) = 1 - e^x$ មានអតិបរមា $f(0) = -1$
+   - $g'(x) = -x e^x$ មានអតិបរមា $g(0) = 1$
+4. អនុគមន៍ផលដក $h(x) = f(x) - g(x) = x - (2 - x)e^x$៖
+   - $h'(x) = 1 - g(x) \\ge 0 \\Rightarrow h$ កើនដាច់ខាតលើ $\\mathbb{R}$
+   - $h(1) = 1 - e < 0$ និង $h(2) = 2 > 0 \\Rightarrow h(x) = 0$ មានឫសពិតតែមួយគត់ $\\alpha \\in [1, 2]$ ($1.6 < \\alpha < 1.7$)
+   - ទីតាំងធៀប៖ បើ $x < \\alpha$ នោះ $(C)$ នៅក្រោម $(C')$; បើ $x > \\alpha$ នោះ $(C)$ នៅលើ $(C')$
+5. ផ្ទៃក្រឡាខណ្ឌដោយ $(C)$, $(C')$, អ័ក្សអរដោនេ និង $x = \\alpha$ (ឯកតាប្រវែង $2\\text{ cm} \\Rightarrow$ ឯកតាផ្ទៃ $4\\text{ cm}^2$)៖
+   - $\\theta(x) = \\int_0^x h(t)\\,dt = \\frac{x^2}{2} + x e^x + 3(1 - e^x)$
+   - $S = 4[-\\theta(\\alpha)]\\text{ cm}^2 = 4\\left[-\\frac{\\alpha^2}{2} + (3 - \\alpha)e^\\alpha - 3\\right]\\text{ cm}^2$
+   - ដោយ $e^\\alpha = \\frac{\\alpha}{2 - \\alpha}$ នាំឲ្យ $S = \\frac{2(\\alpha^3 - 4\\alpha^2 + 2\\alpha - 12)}{2 - \\alpha}\\text{ cm}^2$`,
+  },
+];
+
+export const MATH_FUNCTION_VARIATION_CURVES_SECTIONS = MATH_CH4_SECTIONS;
+
 export const ALL_MATH_SECTIONS: TextbookSection[] = [
   ...MATH_LIMITS_SECTIONS,
   ...MATH_DERIVATIVES_PRIMITIVES_SECTIONS,
   ...MATH_CH3_SECTIONS,
+  ...MATH_CH4_SECTIONS,
 ];
 
 /**
- * Searches Mathematics textbook chunks (Chapters 1, 2 & 3: Limits, Derivatives, Primitives, Definite Integrals) for matches against a student query.
+ * Searches Mathematics textbook chunks (Chapters 1, 2, 3 & 4: Limits, Derivatives, Primitives, Definite Integrals, Curves) for matches against a student query.
  * Returns up to maxResults retrieved chunks formatted for KruAI's system prompt.
  */
 export function searchMathTextbook(

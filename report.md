@@ -16,9 +16,18 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 3 Lesson 1 (Nervous Coordination) OCR & KruAI Grounding
+
+Commit: `f73e712`. **No database step needed.**
+
+Transcribed and grounded Chapter 3 Lesson 1 ("តម្រូវប្រសាទ" / Nervous Coordination) from the official Grade 12 Biology Q&A textbook by Tho Phon (RUPP) (Book pp. 18-33, PDF pp. 19-34).
+- **Textbook OCR**: Extracted and transcribed 16 pages of rich content into `sources/ocr/biology-qna/chapter3-lesson1-nervous-system.md` covering invertebrate nervous coordination (Protists, Hydra, Earthworm, Grasshopper), vertebrate nervous systems, neuron morphology and classification (by cytoplasmic process and function), nerve impulse transmission (120m/s) and synapse mechanisms, brain anatomy (Cerebrum, 4 lobes, Thalamus, Hypothalamus, Cerebellum, Brainstem), spinal cord structure and reflex arcs, peripheral nervous system (12 pairs cranial nerves, 31 pairs spinal nerves, sympathetic and parasympathetic systems), effects of drugs (alcohol, caffeine, nicotine), and all 34 authentic Bac II exam Q&As.
+- **RAG Grounding**: Added `tb:bio:ch3:nervous-coordination-high-yield-qna` into `BIOLOGY_CH3_SECTIONS` in `server/textbook-search.ts` with comprehensive bilingual keywords covering invertebrate comparisons, telephone ringing 3-neuron workflow, why sharp wounds cause pain, cerebellum damage in alcohol intoxication, and cross-hemispheric control.
+- **Verification**: Verified with `node scripts/ocr-check.mjs sources/ocr/biology-qna` (0 warnings across 3 files), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), `npm test` (all 109 tests passed), and `npm run build` (production build and CSP check passed).
+
 ## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 1 Lesson 1 (Gymnosperms) OCR, KruAI Grounding & Section Titles
 
-Commit: `3fc80da`. **No database step needed.**
+Commit: `667dc8f`. **No database step needed.**
 
 Transcribed and grounded Chapter 1 Lesson 1 ("ស៊ីមណូស្ពែម" / Gymnosperms) from the official Grade 12 Biology Q&A textbook by Tho Phon (RUPP) (Book pp. 1-5, PDF pp. 2-6), bringing Chapter 1 of the book to 100% completion alongside Lesson 2 (Angiosperms).
 - **Textbook OCR**: Transcribed clean Markdown into `sources/ocr/biology-qna/chapter1-lesson1-gymnosperms.md` covering etymology, evolutionary origin (Silurian and Devonian of Mid-Paleozoic), the 4 surviving groups (Cycads, Conifers, Ginkgoes, Gnetophytes), vegetative organs (stem and leaf morphs), male and female cones, and all 7 authentic exam Q&As (including the high-yield male vs. female cone comparison).
