@@ -16,6 +16,24 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Math Summary Folder Consolidation & Verification
+
+Commit: `3ee7a5a`. **No database step needed.**
+
+Consolidated the two separate Math Summary folders (`Math summary` and `math-summary`) into the canonical single directory `sources/ocr/Math summary/` and `sources/pages/Math summary/` per the exact PDF filename convention (`Math summary.pdf`).
+- **Directory Consolidation**:
+  - Moved Chapters 7, 8, and 9 (`chapter7-differential-equations.md`, `chapter8-probability.md`, and `chapter9-vectors-in-space.md`) into `sources/ocr/Math summary/`. All 9 chapters (Chapters 1 to 9) now reside together in a single folder.
+  - Moved scanned pages `p86.png` to `p96.png` into `sources/pages/Math summary/`. All 96 rendered page scans now reside together in `sources/pages/Math summary/`.
+  - Removed the duplicate kebab-case `math-summary` directories from both `sources/ocr/` and `sources/pages/`.
+- **Textbook Formatting Fixes**:
+  - Replaced Myanmar character `ည` (U+100A) with authentic Khmer `ញ` (U+1789) in `chapter1-limits.md`.
+  - Moved inline Khmer annotations out of LaTeX math delimiters `$…$` in `chapter1-limits.md`.
+- **Verification**:
+  - Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (all 9 chapters checked).
+  - Verified with `npm run check:digits` (0 Khmer numerals across all 363 files).
+  - Verified with `npx oxlint` (0 errors) and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 5 Lesson 1 (DNA as Genetic Material) OCR & KruAI Grounding
 
 Commit: `954c36a`. **No database step needed.**
