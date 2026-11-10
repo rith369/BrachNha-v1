@@ -16,6 +16,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Grade 12 Math Chapter 7 (Differential Equations) OCR & KruAI RAG Grounding
+
+Commit: `878c50c`. **No database step needed.**
+
+Digitized Chapter 7 ("សមីការឌីផេរ៉ង់ស្យែល" / Differential Equations) from the official MoEYS Grade 12 Mathematics Summary textbook (Book pp. 78–82, PDF pp. 81–85).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans using `scripts/pdf-to-png.mjs` and transcribed clean Markdown with standard KaTeX formulas into `sources/ocr/math-summary/chapter7-differential-equations.md`. Covers first-order linear differential equations (homogeneous $y' + ay = 0$, general solution $y = A e^{-ax}$, non-homogeneous $y' + ay = p(x)$, variation of constants method $y = A(x) e^{-ax}$, undetermined coefficients method), second-order linear differential equations ($a y'' + b y' + c y = 0$, characteristic equation $a \lambda^2 + b \lambda + c = 0$, real distinct roots, repeated root, complex conjugate roots $y = e^{\alpha x}(C \cos\beta x + D \sin\beta x)$, non-homogeneous $y = y_c + y_p$), and all 4 authentic MoEYS worked exercises with initial conditions and tangent line slope conditions.
+- **RAG Grounding**: Added keyworded chunks (`MATH_CH7_SECTIONS` / `MATH_DIFFERENTIAL_EQUATIONS_SECTIONS`) into `server/textbook-search.ts` covering:
+  - `tb:math:diffeq:ch7:first-order`: First-order homogeneous & non-homogeneous equations, general/particular solutions, variation of parameters, and initial value problems.
+  - `tb:math:diffeq:ch7:second-order`: Second-order characteristic equations, three discriminant cases, general solutions, and particular solutions with boundary conditions.
+  Included in `ALL_MATH_SECTIONS` and updated `searchMathTextbook`.
+- **Curriculum Sessions**: Registered authentic section titles for Chapter 7 ("សមីការឌីផេរ៉ង់ស្យែល") in `src/features/practice/quiz-path.ts` under `MATH_LESSONS`: "សមីការឌីផេរ៉ង់ស្យែលលំដាប់ទី 1", "សមីការឌីផេរ៉ង់ស្យែលលំដាប់ទី 2".
+- **Verification**: Passed `node scripts/ocr-check.mjs sources/ocr/math-summary` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Lesson 4 (Democratic Kampuchea) OCR & KruAI RAG Grounding
 
 Commit: `2eaced2`. **No database step needed.**
