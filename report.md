@@ -16,6 +16,27 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 5 DNA & Genetics Calculations OCR & KruAI Grounding
+
+Commit: `PENDING`. **No database step needed.**
+
+Transcribed and grounded the official DNA & Genetics calculation guide and authentic Bac II problem sets from the ជីវវិទ្យា ថូ ភន (Tho Phon Biology Q&A) textbook (Book pp. 88–101, PDF pp. 89–102).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/biology-qna/` and transcribed clean Markdown into `sources/ocr/biology-qna/chapter5-genetics-dna-exercises.md` (290 lines). Contains the complete 11-formula summary: DNA length $l = \frac{M}{2} \times 0.34\text{ nm}$, steps/spirals $\frac{M}{20}$, Chargaff rules $M = 2A + 2C$, hydrogen bonds $L = 2A + 3C = M + C$, phosphodiester bonds $M - 2$, molecular mass $M \times 300\text{ u}$, replication free nucleotides $M' = M(2^n - 1)$, nucleotide percentages $\%A + \%C = 50\%$, single-strand relations ($A_1 = T_2, C_1 = G_2$), and unit conversions, plus 9 complete Bac II worked calculation problems with full step-by-step mathematical reasoning.
+- **RAG Grounding**: Added keyworded chunk `tb:bio:ch5:dna-genetics-calculations-worked-problems` into `BIOLOGY_CH5_SECTIONS` in `server/textbook-search.ts` with comprehensive bilingual keywords for retrieval by KruAI.
+- **Verification**: Verified with `node scripts/ocr-check.mjs sources/ocr/biology-qna` (4 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), `npm test` (all 109 tests passed), and `npm run build` (production build and CSP check passed).
+
+
+## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Lesson 1 (French Protectorate) OCR & KruAI RAG Grounding
+
+Commit: `PENDING`. **No database step needed.**
+
+Transcribed and grounded Lesson 1 ("ប្រទេសកម្ពុជាក្រោមអាណាព្យាបាលបារាំង (1863-1953)" / French Protectorate) from the official Grade 12 History Q&A compilation by Eng Lay (Hun Sen 10 Makara High School / MoEYS Bac II 2014-2022) (Book pp. 1-4, PDF pp. 4-7).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/history-qna` and transcribed clean Markdown into `sources/ocr/history-qna/lesson1-french-protectorate.md` containing all 10 authentic Bac II questions (2015, 2016, 2017, 2018, 2021, 2022) and their official scoring keys (អត្រាកំណែ). Covers 9 Nov 1953 independence significance, political/economic/social reasons for seeking French protection under King Ang Duong and Mgr. Miche, positive points (territorial survival, administration/education, infrastructure, EFEO temple conservation, 1904/1907 recovered territories, 1908 Dangrek Map securing 1962 ICJ Preah Vihear victory), and negative points (heavy tax exploitation, social divide, WWI/WWII conscription, antiquities loss, and unilateral loss of Trat 1907, Koh Tral 1939, and Kampuchea Krom 1949).
+- **RAG Grounding**: Added keyworded chunk `tb:hist:protectorate:ch1:high-yield-bacii-qna` into `HISTORY_CH1_SECTIONS` in `server/textbook-search.ts` with comprehensive bilingual keywords covering exam queries, scoring rubrics, and historical events. Included in `ALL_HISTORY_SECTIONS` and searchable via `searchHistoryTextbook`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs sources/ocr/history-qna` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), and `npm test` (all 109 tests passed).
+
+
+
 ## 10 Nov 2026: Grade 12 Math Chapter 6 (Conics) OCR & KruAI RAG Grounding
 
 Commit: `d06f379`. **No database step needed.**
