@@ -16,6 +16,17 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Grade 12 History Eng Lay Q&A: Lesson 2 (Sangkum Reastr Niyum) OCR & KruAI RAG Grounding
+
+Commit: `0720246`. **No database step needed.**
+
+Transcribed and grounded Lesson 2 ("របបសង្គមរាស្ត្រនិយម (1953-1970)" / Sangkum Reastr Niyum) from the official Grade 12 History Q&A compilation by Eng Lay (Hun Sen 10 Makara High School / MoEYS Bac II 2014-2022) (Book pp. 5-10, PDF pp. 8-13).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ប្រវត្តិវិទ្យា_អេង_ឡាយ/` and transcribed clean Markdown into `sources/ocr/ប្រវត្តិវិទ្យា_អេង_ឡាយ/lesson2-sangkum-reastr-niyum.md` containing all 5 authentic Bac II questions (2016, 2017, 2018, 2019) and their official scoring keys (អត្រាកំណែ). Covers Sangkum achievements across 4 sectors (politics, economy, education/culture, society), national congress (សមាជជាតិ), neutrality policy (Bandung 1955, UN 1955, Belgrade NAM 1961, Cold War pressure), and violent vs non-violent independence struggle paths (Khmer Issarak vs King Sihanouk's Royal Crusade).
+- **RAG Grounding**: Added keyworded chunk `tb:hist:sangkum:ch2:high-yield-bacii-qna` into `HISTORY_CH2_SECTIONS` in `server/textbook-search.ts` with comprehensive bilingual keywords covering exam queries and scoring rubrics. Included in `ALL_HISTORY_SECTIONS` and searchable via `searchHistoryTextbook`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs sources/ocr/ប្រវត្តិវិទ្យា_អេង_ឡាយ` (2 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), `npx tsc -b` (0 errors), and `npm test` (all 109 tests passed).
+
+
+
 ## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 5 DNA & Genetics Calculations OCR & KruAI Grounding
 
 Commit: `c26d912`. **No database step needed.**
