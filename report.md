@@ -16,6 +16,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 10 Nov 2026: Biology Tho Phon Q&A: Chapter 3 Lesson 3 (Endocrine System) OCR & KruAI Grounding
+
+Commit: `99f6297`. **No database step needed.**
+
+Digitized Chapter 3, Lesson 3 ("ប្រព័ន្ធអង់ដូគ្រីន" / Endocrine System) of the Grade 12 Biology Q&A textbook compilation by Tho Phon (Book pp. 51-66, PDF pp. 52-67).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ជីវវិទ្យា - ធូ ភន biology qna/` (p052.png to p067.png) and transcribed clean Markdown into `sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna/chapter3-lesson3-endocrine-system.md` containing the complete lesson summary and all 26 authentic Bac II Q&A questions:
+  1. Exocrine glands (with ducts, external/lumen secretion) vs endocrine glands (ductless, direct secretion into blood) and mixed glands (pancreas, stomach, small intestine, gonads).
+  2. Peptide hormones (insulin, glucagon, thyroxine, water-soluble, bind surface receptors, cAMP second messenger) vs steroid hormones (estrogen, testosterone, cortisol, lipid-soluble, cross membrane, cytoplasmic receptors, direct gene activation).
+  3. Hypothalamus and pituitary axes: posterior pituitary stores ADH and oxytocin; anterior pituitary synthesizes GH (dwarfism, gigantism), Prolactin, TSH, ACTH, MSH, FSH, and LH.
+  4. Thyroid & parathyroid glands: thyroxine ($T_4$ synthesis from tyrosine and iodine, basal metabolic rate regulation, goiter, myxedema, Basedow's disease) and PTH (calcium homeostasis, tetany, osteoporosis).
+  5. Pancreas & diabetes: beta (β) cells secrete insulin (hypoglycemic), alpha (α) cells secrete glucagon (hyperglycemic); causes, mechanisms, and cardinal symptoms of diabetes mellitus.
+  6. Digestive hormones (gastrin, secretin) and negative feedback homeostatic loops.
+- **RAG Grounding**: Grounded comprehensive chunk `tb:bio:ch3:endocrine-system-high-yield-bacii-qna` in `BIOLOGY_CH3_SECTIONS` in `server/textbook-search.ts`, searchable by KruAI for student inquiries on endocrine glands, hormones, and hormonal disorders.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna"` (6 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Grade 12 History Eng Lay Q&A: 52 Selected Q&A OCR & KruAI RAG Grounding (100% Textbook Complete)
 
 Commit: `22625f7`. **No database step needed.**
