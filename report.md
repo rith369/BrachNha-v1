@@ -16,6 +16,21 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 11 Nov 2026: Math Summary Blind Audit Batch 3: Chapter 3 Definite Integrals (Pages 31 to 38)
+
+Commit: `26bd271`. **No database step needed.**
+
+Conducted strict blind audit pass on Chapter 3 (Definite Integrals: PDF pages `p34.png` to `p41.png`, Book pages 31 to 38) in `sources/ocr/Math summary/chapter3-definite-integrals.md`:
+- **Line-by-Line Visual Audit & Fixes**:
+  - Inserted page boundary markers `<!-- Page p34.png -->` through `<!-- Page p41.png -->`.
+  - Removed artificial English labels and non-textbook headings in theory section.
+  - Restored dropped sentence in property 3 and exact Khmer phrasing across properties.
+  - Aligned page boundaries across Exercises 1 through 10.
+  - Restored dropped intermediate steps in Exercise 9 and full parameter conditions in Exercise 6.
+  - Purged inline Khmer text from LaTeX delimiters and replaced stacked LaTeX with standard one-sided limits.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 11 Nov 2026: Biology Tho Phon Q&A: Chapter 6 Lesson 2 (Evidence of Evolution) OCR & KruAI Grounding
 
 Commit: `5e05f42`. **No database step needed.**
