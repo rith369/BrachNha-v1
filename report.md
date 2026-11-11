@@ -16,6 +16,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 11 Nov 2026: Math Summary Blind Audit Batch 5B: Chapter 5 Complex Numbers (Part 2, Pages 63 to 68)
+
+Commit: `71078a6`. **No database step needed.**
+
+Conducted strict blind audit pass on Chapter 5 (Complex Numbers, Part 2: PDF pages `p66.png` to `p71.png`, Book pages 63 to 68) in `sources/ocr/Math summary/chapter5-complex-numbers.md`:
+- **Line-by-Line Visual Audit & Fixes**:
+  - Inserted page boundary markers `<!-- Page p66.png -->` through `<!-- Page p71.png -->`.
+  - Corrected inverted root signs in Question 8 ($z_3 = -i\sqrt{2}, z_4 = i\sqrt{2}$).
+  - Removed fabricated subtitles and method numbers, restoring canonical MoEYS identities.
+  - Restored full induction proofs, interval conditions, and discriminant calculations across Questions 7, 9, 10, 11, 13, and 14.
+  - Aligned page transitions across all 6 pages with 100% boundary fidelity.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 11 Nov 2026: Chemistry Workbook Batch 2: Chapter 1 Lesson 2 (Factors Affecting Reaction Rates) OCR, Study Path & KruAI Grounding
 
 Commit: `621993e`. **No database step needed.**
