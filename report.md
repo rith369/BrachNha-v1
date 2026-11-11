@@ -72,6 +72,16 @@ Conducted strict blind audit pass on Chapter 3 (Definite Integrals: PDF pages `p
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
 
 
+## 11 Nov 2026: Biology Tho Phon Q&A: Chapter 7 Lesson 1 (Populations) OCR, Study Path & KruAI Grounding
+
+Commit: `PENDING_COMMIT`. **No database step needed.**
+
+Digitized and strictly audited Chapter 7, Lesson 1 ("ពពួក" / Populations) of the Grade 12 Biology Q&A textbook compilation by Tho Phon (Book pp. 182-184, PDF pp. 183-185).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ជីវវិទ្យា - ធូ ភន biology qna/` (p183.png to p185.png) and transcribed into `sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna/chapter7-lesson1-populations.md`.
+- **Strict Blind Audit**: Audited line-by-line with Subagent 2 ("Strict Blind Auditor") against original scans. Corrected 5 key transcription nuances: crab orthography (ក្ដាម), nest spelling (សំបុក), turtle orthography (អណ្ដើក), mark/recapture wording (ដែលបានទុក), and a major semantic OCR error in jar experiment (កែវពីរទំហំប៉ុនគ្នា កែវមួយដាក់ត្រី 10 ក្បាល ឯកែវមួយទៀតដាក់ 100 ក្បាល). Verified calculation steps and zero line cutoffs.
+- **RAG Grounding & Study Path**: Created `BIOLOGY_CH7_SECTIONS` and included in `ALL_BIOLOGY_SECTIONS` in `server/textbook-search.ts` with chunk `tb:bio:ch7:populations-sampling-density-tho-phon-qna`. Registered authentic curriculum section titles in `src/features/lessons/sessions.ts`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs` (16 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
 ## 11 Nov 2026: Biology Tho Phon Q&A: Chapter 6 Lesson 3 (Fossil Record & Q&A) OCR & KruAI Grounding (Chapter 6 100% Complete)
 
 Commit: `3bb71fe`. **No database step needed.**

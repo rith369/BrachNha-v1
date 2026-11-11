@@ -455,7 +455,15 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
       number: 7,
       title: "ពពួក និងសហគមន៍",
       lessons: [
-        { number: 1, title: "ពពួក", sessions: sectionsFor("biology", 7, 1) },
+        {
+          number: 1,
+          title: "ពពួក",
+          sessions: sectionsFor("biology", 7, 1, [
+            "ការកំណត់ទំហំពពួក និងវិធីរាប់",
+            "ការផ្លាស់ប្តូរទំហំពពួក និងដង់ស៊ីតេ",
+            "កត្តាកំណត់ការលូតលាស់នៃពពួក",
+          ]),
+        },
         {
           number: 2,
           title: "អន្តរអំពើក្នុងចំណោមការរស់",
