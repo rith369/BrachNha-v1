@@ -16,6 +16,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 11 Nov 2026: Math Summary Blind Audit Batch 4A: Chapter 4 Function Variation & Curves (Part 1, Pages 39 to 46)
+
+Commit: `1ebee8c`. **No database step needed.**
+
+Conducted strict blind audit pass on Chapter 4 (Function Variation & Curves, Part 1: PDF pages `p42.png` to `p49.png`, Book pages 39 to 46) in `sources/ocr/Math summary/chapter4-function-variation-curves.md`:
+- **Line-by-Line Visual Audit & Fixes**:
+  - Inserted page boundary markers `<!-- Page p42.png -->` through `<!-- Page p49.png -->`.
+  - Corrected widespread term misspelling from `អាស៊ុយមតូត` to official textbook `អាស៊ីមតូត`.
+  - Removed hallucinated formula `($y = \frac{a}{p}$)` on page 39 (`p42.png`).
+  - Restored missing limit simplification steps, sign analysis, and curve-sketching data (tangent slopes, axis intercepts, relative positions).
+  - Aligned page transitions across Problems 1, 2, 3, 4, and 5 statement on page 46 (`p49.png`).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 11 Nov 2026: Chemistry Workbook Batch 1: Chapter 1 Lesson 1 (Reaction Rates) OCR, Study Path & KruAI Grounding
 
 Commit: `50667ad`. **No database step needed.**
