@@ -16,6 +16,19 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 11 Nov 2026: Chemistry Workbook Batch 3: Chapter 2 Lesson 1 (Compounds in Aqueous Solution) OCR, Study Path & KruAI Grounding
+
+Commit: `PENDING`. **No database step needed.**
+
+Digitized and audited Batch 3 of Grade 12 Chemistry Workbook (`sources/textbooks/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ.pdf`, Book pages 48 to 66, PDF pages `p056.png` to `p074.png`):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans (`p056.png` to `p074.png`) and transcribed word-for-word into `sources/ocr/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ/chapter2-lesson1-compounds-in-aqueous-solution.md`:
+  - Chapter 2 (`ជំពូកទី 2 សមាសធាតុក្នុងសូលុយស្យុងទឹក និងកម្លាំងអន្តរម៉ូលេគុល`), Lesson 1 (`មេរៀនទី 1 សមាសធាតុក្នុងសូលុយស្យុងទឹក`), covering ionic dissociation, solubility rules, spectator ions, net ionic equations, ionization of molecular compounds, hydronium ion ($\mathrm{H_3O^+}$) coordinate bonding, strong/weak/non-electrolytes, and all 20 applied exercises and problems with printed answer keys, followed by 10 student answer sheets.
+- **Strict Blind Visual Audit**: Completed page-by-page visual audit across all 19 pages, correcting spelling `អាស៊ីតក្លរីឌ្រីច` on pages 49 and 53, fixing `អាលុយមីញ៉ូមក្លរួ` on page 53, verifying all 19 page boundaries, and checking chemical formulas, exponents, and precipitation reaction equations.
+- **KruAI RAG Grounding**: Added 2 keyworded chunks (`tb:chem:ch2:l1-dissociation-ionization-hydronium`, `tb:chem:ch2:l1-electrolytes-and-stoichiometry-exercises`) to `CHEMISTRY_CH2_SECTIONS` and included in `ALL_CHEMISTRY_SECTIONS` in `server/textbook-search.ts`.
+- **Study Path Structure**: Added Chapter 2 (`សមាសធាតុក្នុងសូលុយស្យុងទឹក និងកម្លាំងអន្តរម៉ូលេគុល`), Lesson 1 (`សមាសធាតុក្នុងសូលុយស្យុងទឹក`) with 6 authentic Khmer section titles under `SUBJECT_SESSIONS.chemistry[1]` in `src/features/lessons/sessions.ts`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ"` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 11 Nov 2026: Math Summary Blind Audit Batch 7: Chapter 7 Differential Equations (Pages 78 to 82)
 
 Commit: `1ffed39`. **No database step needed.**
@@ -126,6 +139,16 @@ Conducted strict blind audit pass on Chapter 3 (Definite Integrals: PDF pages `p
   - Purged inline Khmer text from LaTeX delimiters and replaced stacked LaTeX with standard one-sided limits.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
 
+
+## 11 Nov 2026: Biology Tho Phon Q&A: Chapter 8 Lesson 1 (Energy Flow in Ecosystems) OCR, Study Path & KruAI Grounding
+
+Commit: `PENDING_COMMIT`. **No database step needed.**
+
+Digitized and strictly audited Chapter 8, Lesson 1 ("រំហូរថាមពលក្នុងស្ថានប្រព័ន្ធ" / Energy Flow in Ecosystems) of the Grade 12 Biology Q&A textbook compilation by Tho Phon (Book pp. 187-188, PDF pp. 188-189).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ជីវវិទ្យា - ធូ ភន biology qna/` (p188.png to p189.png) and transcribed into `sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna/chapter8-lesson1-energy-flow.md`.
+- **Strict Blind Audit**: Audited line-by-line with Subagent 2 ("Strict Blind Auditor") against original scans. Corrected 6 key transcription nuances: restored missing food chain & food web diagrams (ខ្សែអាហារ និងបណ្ដាញអាហារ), autotroph orthography (សារពាង្គកាយស្វ័យជីព), hydrogen sulfide chemical formula (អ៊ីដ្រូសែនស៊ុលភ្វីត), rat subscript (កណ្ដុរ), food web subscript (បណ្ដាញអាហារ), and storage subscript (ត្រូវស្ដុកទុក). Verified 90% utilization and 10% storage law.
+- **RAG Grounding & Study Path**: Created `BIOLOGY_CH8_SECTIONS` and included in `ALL_BIOLOGY_SECTIONS` in `server/textbook-search.ts` with chunk `tb:bio:ch8:energy-flow-food-chains-pyramid-tho-phon-qna`. Registered authentic curriculum section titles in `src/features/lessons/sessions.ts`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs` (18 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
 
 ## 11 Nov 2026: Biology Tho Phon Q&A: Chapter 7 Lesson 2 (Interactions Among Living Things) OCR, Study Path & KruAI Grounding (Chapter 7 100% Complete)
 
