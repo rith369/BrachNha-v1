@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 11 Nov 2026: Chemistry Workbook Batch 3: Chapter 2 Lesson 1 (Compounds in Aqueous Solution) OCR, Study Path & KruAI Grounding
 
-Commit: `PENDING`. **No database step needed.**
+Commit: `e13811a`. **No database step needed.**
 
 Digitized and audited Batch 3 of Grade 12 Chemistry Workbook (`sources/textbooks/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ.pdf`, Book pages 48 to 66, PDF pages `p056.png` to `p074.png`):
 - **Textbook Rendering & OCR**: Rendered high-resolution scans (`p056.png` to `p074.png`) and transcribed word-for-word into `sources/ocr/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ/chapter2-lesson1-compounds-in-aqueous-solution.md`:
