@@ -99,6 +99,16 @@ Conducted strict blind audit pass on Chapter 3 (Definite Integrals: PDF pages `p
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
 
 
+## 11 Nov 2026: Biology Tho Phon Q&A: Chapter 7 Lesson 2 (Interactions Among Living Things) OCR, Study Path & KruAI Grounding (Chapter 7 100% Complete)
+
+Commit: `c007da0`. **No database step needed.**
+
+Digitized and strictly audited Chapter 7, Lesson 2 ("អន្តរអំពើក្នុងចំណោមភាវៈរស់" / Interactions Among Living Things) of the Grade 12 Biology Q&A textbook compilation by Tho Phon (Book pp. 185-186, PDF pp. 186-187), completing Chapter 7 in its entirety.
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ជីវវិទ្យា - ធូ ភន biology qna/` (p186.png to p187.png) and transcribed into `sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna/chapter7-lesson2-interactions.md`.
+- **Strict Blind Audit**: Audited line-by-line with Subagent 2 ("Strict Blind Auditor") against original scans. Corrected 6 key transcription nuances: grasshopper subscript (កណ្ដូប), avoiding spelling (ជៀសផុត), competition subscript (ដណ្ដើម), Paramecium aurelia and P. caudatum transliterations (ប៉ារ៉ាមេស៊ីអូរ៉េឡ្យា, ប៉ារ៉ាមេស៊ីកូដាទុម), competing for prey (ដណ្ដើមរំពា), and symbiosis terminology (ភាពប្រជួយ mutualism, ភាពបន្សំ commensalism, ដើមបញ្ញើក្អែក mistletoe parasitism). Verified zero line cutoffs.
+- **RAG Grounding & Study Path**: Grounded chunk `tb:bio:ch7:interactions-competition-predation-symbiosis-tho-phon-qna` in `BIOLOGY_CH7_SECTIONS` in `server/textbook-search.ts`. Registered authentic curriculum section titles in `src/features/lessons/sessions.ts`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs` (17 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
 ## 11 Nov 2026: Biology Tho Phon Q&A: Chapter 7 Lesson 1 (Populations) OCR, Study Path & KruAI Grounding
 
 Commit: `6f76503`. **No database step needed.**
