@@ -16,6 +16,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 11 Nov 2026: Math Summary Blind Audit Batch 4B: Chapter 4 Function Variation & Curves (Part 2, Pages 47 to 55)
+
+Commit: `f0cecfe`. **No database step needed.**
+
+Conducted strict blind audit pass on Chapter 4 (Function Variation & Curves, Part 2: PDF pages `p50.png` to `p58.png`, Book pages 47 to 55) in `sources/ocr/Math summary/chapter4-function-variation-curves.md`:
+- **Line-by-Line Visual Audit & Fixes**:
+  - Inserted page boundary markers `<!-- Page p50.png -->` through `<!-- Page p58.png -->`.
+  - Restored full sign table and root evaluation in Exercise 5.
+  - Corrected widespread term misspelling from `អាស៊ុយមតូត` to official textbook `អាស៊ីមតូត`.
+  - Restored complete step-by-step limits, variation reasoning, and primitive derivations in Exercise 6.
+  - Restored rigorous induction/bijection proofs, integration by parts derivations, and area calculations in Exercise 7.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 11 Nov 2026: Math Summary Blind Audit Batch 4A: Chapter 4 Function Variation & Curves (Part 1, Pages 39 to 46)
 
 Commit: `1ebee8c`. **No database step needed.**
