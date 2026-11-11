@@ -16,6 +16,21 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 11 Nov 2026: Math Summary Blind Audit Batch 2A: Chapter 2 Derivatives & Primitives (Part 1, Pages 19 to 24)
+
+Commit: `9fa85e9`. **No database step needed.**
+
+Conducted strict blind audit pass on Chapter 2 (Derivatives & Primitives, Part 1: PDF pages `p22.png` to `p27.png`, Book pages 19 to 24) in `sources/ocr/Math summary/chapter2-derivatives-primitives.md`:
+- **Line-by-Line Visual Audit & Fixes**:
+  - Inserted page boundary markers `<!-- Page p22.png -->` through `<!-- Page p27.png -->`.
+  - Corrected domain intervals for $\sqrt{x}$ and $\ln x$, matching authentic textbook typography.
+  - Corrected composite derivative product notation from `\cdot` to `\times`.
+  - Restored missing student advisory note from page 22 (`p25.png`).
+  - Restored missing intermediate substitutions and steps across Exercises 1, 2, 3, 4, and 5.
+  - Aligned page splits between pages 22/23, 23/24, and sealed boundary before Exercise 6 on page 25 (`p28.png`).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 10 Nov 2026: Math Summary Blind Audit Batch 1B: Chapter 1 Limits (Part 2, Pages 11 to 18)
 
 Commit: `32dc3fe`. **No database step needed.**
