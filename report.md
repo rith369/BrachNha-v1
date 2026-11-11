@@ -16,6 +16,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 11 Nov 2026: Math Summary Blind Audit Batch 7: Chapter 7 Differential Equations (Pages 78 to 82)
+
+Commit: `1ffed39`. **No database step needed.**
+
+Conducted strict blind audit pass on Chapter 7 (Differential Equations: PDF pages `p81.png` to `p85.png`, Book pages 78 to 82) in `sources/ocr/Math summary/chapter7-differential-equations.md`:
+- **Line-by-Line Visual Audit & Fixes**:
+  - Inserted page boundary markers `<!-- Page p81.png -->` through `<!-- Page p85.png -->`.
+  - Fixed recurring OCR error "ខ្សែរោង" to the authentic mathematical term "ខ្សែកោង" (curve) in Exercise 4 on pages 81 and 82.
+  - Restored missing intermediate derivation on page 78 for first-order non-homogeneous equations: `- ពី $y = A(x)e^{-ax}$ ទាញរក $y'$ រួចយក $y$ និង $y'$ ជំនួសក្នុងសមីការ...`.
+  - Removed artificial discriminant headings not in the textbook; restored canonical algebraic formulation $(y' - \alpha y)' - \beta(y' - \alpha y) = 0$ and monic characteristic equation $\lambda^2 + b\lambda + c = 0$.
+  - Restored student note on page 80 (`កំណត់សម្គាល់ : អ្នកសិក្សាត្រូវខំប្រឹងដោះស្រាយលំហាត់ដោយខ្លួនឯង...`) and integration constant $(A = \pm e^c)$ on page 81.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 11 Nov 2026: Math Summary Blind Audit Batch 6: Chapter 6 Conics (Pages 69 to 77)
 
 Commit: `17cae0b`. **No database step needed.**
