@@ -16,6 +16,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 11 Nov 2026: Math Summary Blind Audit Batch 6: Chapter 6 Conics (Pages 69 to 77)
+
+Commit: `17cae0b`. **No database step needed.**
+
+Conducted strict blind audit pass on Chapter 6 (Conics: PDF pages `p72.png` to `p80.png`, Book pages 69 to 77) in `sources/ocr/Math summary/chapter6-conics.md`:
+- **Line-by-Line Visual Audit & Fixes**:
+  - Inserted page boundary markers `<!-- Page p72.png -->` through `<!-- Page p80.png -->`.
+  - Corrected concavity terminology from `ភាពប៉ោង` to authentic textbook `ភាពផត` across all 8 parabola cases.
+  - Removed fabricated summary lines and hallucinated graphing sentences not present in original print.
+  - Restored missing student guidance note on page 71 (`p74.png`).
+  - Aligned page transitions across Exercises 1 through 9 with 100% boundary fidelity.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 11 Nov 2026: Math Summary Blind Audit Batch 5B: Chapter 5 Complex Numbers (Part 2, Pages 63 to 68)
 
 Commit: `71078a6`. **No database step needed.**
