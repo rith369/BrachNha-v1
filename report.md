@@ -16,19 +16,17 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
-## 11 Nov 2026: Math Summary Blind Audit Batch 5A: Chapter 5 Complex Numbers (Part 1, Pages 56 to 62)
+## 11 Nov 2026: Chemistry Workbook Batch 2: Chapter 1 Lesson 2 (Factors Affecting Reaction Rates) OCR, Study Path & KruAI Grounding
 
-Commit: `d8fe6e9`. **No database step needed.**
+Commit: `PENDING`. **No database step needed.**
 
-Conducted strict blind audit pass on Chapter 5 (Complex Numbers, Part 1: PDF pages `p59.png` to `p65.png`, Book pages 56 to 62) in `sources/ocr/Math summary/chapter5-complex-numbers.md`:
-- **Line-by-Line Visual Audit & Fixes**:
-  - Inserted page boundary markers `<!-- Page p59.png -->` through `<!-- Page p65.png -->`.
-  - Fixed conjugate and opposite notation to $a - ib$ and $-a - ib$, matching textbook layout.
-  - Restored missing student advisory note on page 58 (`p61.png`).
-  - Corrected definition wording from directed angle to principal/smallest angle on page 57 (`p60.png`).
-  - Removed artificial intermediate algebraic steps across Exercises 1, 2, 4, 5, and 6.
-  - Extracted inline Khmer conjunctions and explanatory text from KaTeX delimiters.
-- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+Digitized and audited Batch 2 of Grade 12 Chemistry Workbook (`sources/textbooks/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ.pdf`, Book pages 23 to 47, PDF pages `p031.png` to `p055.png`):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans (`p031.png` to `p055.png`) and transcribed word-for-word into `sources/ocr/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ/chapter1-lesson2-factors-affecting-reaction-rate.md`:
+  - Chapter 1 (`ជំពូកទី 1 ស៊ីនេទិចគីមី`), Lesson 2 (`មេរៀនទី 2 កត្តាជះឥទ្ធិពលលើល្បឿនប្រតិកម្ម`), covering all 5 kinetic factors: particle size / surface area, concentration, pressure for gases, temperature and effective collisions (ទង្គិចប្រសិទ្ធ), and catalysts (homogeneous, heterogeneous, enzymatic, and autocatalysis), plus all 15 applied exercises and problems with printed answer keys, followed by 15 student answer sheets.
+- **Strict Blind Visual Audit**: Completed page-by-page visual audit across all 25 pages, correcting author name to `ហែម ការ៉ែ`, fixing critical ion charge $\mathrm{S_2O_8^{2-}}$ (corrected from $\mathrm{S_2O_8^{2+}}$), fixing redox couple $\mathrm{Fe^{3+}/Fe^{2+}}$ (corrected from $\mathrm{Fe^{3+}/Fe^{3+}}$), fixing OCR corruptions `ខ្សែកោង`, `កាតាលីករ`, `អេឡិចត្រូនិក`, `កំហាប់`, `ភាពស្ថេរភាព`, removing hallucinated subquestions, and verifying all equations and page boundaries.
+- **KruAI RAG Grounding**: Added 2 keyworded chunks (`tb:chem:ch1:l2-kinetic-factors-theory`, `tb:chem:ch1:l2-catalysis-redox-mechanism-and-exercises`) to `CHEMISTRY_CH1_SECTIONS` and `ALL_CHEMISTRY_SECTIONS` in `server/textbook-search.ts`.
+- **Study Path Structure**: Added Chapter 1 Lesson 2 with 5 authentic Khmer section titles under `SUBJECT_SESSIONS.chemistry[0]` in `src/features/lessons/sessions.ts`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ"` (0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
 
 
 ## 11 Nov 2026: Math Summary Blind Audit Batch 4B: Chapter 4 Function Variation & Curves (Part 2, Pages 47 to 55)
@@ -6570,162 +6568,5 @@ is coming.
 - **Each subject is a card** with its name, a picture, a short description, and how many
   lessons it holds with a rough total time. Cards stagger into two columns on a phone and
   spread to three or four on a bigger screen.
-- **The page is in Khmer, always** — even if the app is switched to English. That was asked
-  for deliberately. The menu and tab bar around it still follow the language toggle, so in
-  English mode you will see English navigation around a Khmer page. That is expected.
-- **The streak counter** now appears at the top of the page, next to the title. It is your
-  real streak, not a placeholder.
-- **Every subject now has its own colour** — Math blue, Physics indigo, Chemistry teal,
-  History amber, Biology green, English red, French pink, Khmer orange. The card's tint,
-  border, icons and play button all follow it, so a student can recognise a subject by
-  colour before reading its name.
-
-**One adjustment to the colours you supplied, and why.** The eight hex values are perfect
-as *fills* — they are used exactly as given on the play button, a solid circle with a white
-arrow. But used as small text or small icons they were too pale to read: measured against
-the page background, all eight fell below the accessibility standard, some as low as
-2.1 against a required 4.5. So the small icons and text use a slightly deeper shade of the
-same colour, and dark mode uses a slightly lighter one. Same colour identity, readable in
-both themes. Every value was measured rather than eyeballed.
-
-**To change a picture later**, drop a replacement into `public/subjects/` named after the
-subject — `math.webp`, `physics.webp` and so on. It appears automatically with no further
-work. A subject with no file simply shows a coloured tile with its icon instead, so a
-missing picture never looks broken. `design/subjects.md` explains the naming and sizes.
-
-**Name the files in lowercase**, exactly matching the list in that document. The name is
-the only link between a file and its card, and a mismatch fails quietly — the card simply
-keeps its coloured tile rather than showing anything broken. So if a picture doesn't turn
-up, check the capitalisation first.
-
-**The images are WebP, and there is now a converter for them.** WebP is a modern picture
-format that is typically 25–35% smaller than PNG or JPG at the same quality, which matters
-on mobile data. Your stock art will arrive as PNG or JPG, so the project now has a script
-that converts it:
-
-```
-node scripts/webp.mjs art/*.png
-```
-
-That reads a folder of pictures, crops them to the right shape, resizes them, converts them
-to WebP and puts them straight into `public/subjects/`. It prints the size of every file
-before and after, and warns you if one comes out too big. Only one file per subject is
-needed — eight in total, not sixteen.
-
-**Please keep those images small — around 40 KB each.** This is the one thing that can
-quietly undo recent work: the app logo arrived at 431 KB and shrinking it was a large part
-of cutting the first load from 487 KB to 183 KB. Eight full-size stock illustrations would
-put that straight back. The converter warns you when a file goes over.
-
-**Most subjects say "ឆាប់ៗនេះ" (coming soon)** because they genuinely have no lessons yet —
-only math and biology do. Those cards are deliberately not tappable, so they cannot look
-broken by responding to a tap with nothing. As you supply lessons, the counts, the times
-and the play buttons appear on their own.
-
-**All eight subject pictures are now in**, totalling 199 KB for the whole set — less than
-the app sends before showing its first screen, and they only download when someone opens
-Study.
-
-**There is now one small credit line at the bottom of the Profile page**, reading
-*"រូបភាព៖ Designed by Freepik"*. It is there because the illustrations came from Freepik's
-free tier, and that free licence only permits using them if Freepik is credited somewhere
-visible. Without the line the app would be using the pictures with no permission behind
-them, which is the kind of thing that surfaces during funding or partnership checks.
-
-It is deliberately out of the way — not on the cards, not on the Study page — and no
-student is likely to notice it. **Please don't remove it while these pictures are in use.**
-If you would rather it were gone entirely, one month of Freepik Premium (around €12,
-cancellable straight after) permanently licenses whatever you download during it with no
-credit required, and the line can then come out.
-
-**Two notes on the French picture.** Its original file has "designed by freepik.com"
-printed across the bottom; the way the picture is cropped for the card removes it, so it
-is not visible in the app. It is also a greeting-card design rather than a study
-illustration — it has placeholder nonsense text on it and is about Paris rather than
-learning French. Too small to read on the card, but worth swapping if French ever becomes
-a real option for students.
-
-**No lesson content was written or deleted** — that is yours to provide. The existing
-biology foundation lesson was left in place.
-
-**What to re-test.** Open Study, switch between both tabs, and tap a subject that has
-lessons (គណិតវិទ្យា or ជីវវិទ្យា) to check it opens. Check both light and dark, and check a
-narrow phone. Then switch the app to English and confirm the Study page stays in Khmer.
-
----
-
-## 26 Aug 2026 — Score Trend replaced with a Weekly Learning Activity chart
-
-*Landed in commit `6b62c4e`.*
-
-**Why.** Asked to rebuild the Score Trend chart on the Progress page to match a specific
-reference design exactly — not just borrow its style. The reference was a whole different
-card: a "Weekly Learning Activity" chart with an icon badge, a toggle between XP Points
-and Study Hours, and a Mon–Sun week instead of a 4-week trend.
-
-**What changed.** The card is a new one, replacing Score Trend rather than restyling it:
-
-- **A small gradient icon badge** now sits next to the title, matching the reference.
-- **The toggle switches between XP Points and Study Hours** — two real things students
-  earn each day — instead of the old Score vs Target comparison. Each has its own scale
-  (XP runs 20–120, Study Hours runs in fractions of an hour), and the chart's numbered
-  gridlines adjust to whichever is showing.
-- **The chart now covers one week, Monday to Sunday**, instead of 4 calendar weeks.
-- **The gradient fill under the line and the bigger ring-style dots** carry over from the
-  first pass at this.
-- **The footer line reads "Highest productivity on Sat (120 XP)"** with a green dot, plus
-  a "+28% vs last week" badge in the corner — both update when you switch the toggle.
-- Fixed a pre-existing bug found while rebuilding this: **the numbers along the left side
-  of the chart (20, 45, 70…) were not showing at all**, on this chart and its Grade
-  Prediction sibling, cut off past the left edge of the card. That's now fixed everywhere
-  it applied.
-
-**What to re-test.** Open Progress, scroll to Weekly Learning Activity, and tap between
-XP Points and Study Hours — check the chart, the left-side numbers, and the footer line
-all update together. Check it in dark mode and on a phone-width screen.
-
----
-
-## 26 Aug 2026 — The Study Activity calendar on Progress now actually does something
-
-*Landed in commit `6c82931`.*
-
-**Why.** The calendar-style grid on the Progress page (Study Activity) was decoration —
-30-odd coloured squares with no real meaning behind the colour, and tapping one did
-nothing. It looked like it should work like GitHub's contribution graph, but wasn't
-wired up to.
-
-**What changed.**
-
-- **Every square is now a real day, and tapping one shows what happened that day.** Tap
-  a square and a small label pops up above it — "Today · 13 questions", or "Sun 2 Aug ·
-  No activity" for a quiet day. Tap it again, tap anywhere else, or press Escape to close
-  it.
-- **The grid now lines up with real dates**, ending on today, rather than being 28
-  arbitrary squares with no calendar behind them. Today's square gets a small ring around
-  it so it's easy to find at a glance.
-- **Days that haven't happened yet are shown differently on purpose** — an empty dashed
-  outline instead of a coloured square — so "no activity yet because it's the future" no
-  longer looks the same as "studied nothing that day."
-- The colour of each square is now driven by a real number of questions answered, the
-  same number the tap popup shows — before, the colour was just a made-up 0–4 value with
-  nothing backing it.
-
-**What to re-test.** Open Progress, scroll to Study Activity, and tap a few different
-squares — including ones near the left and right edges of the grid, to make sure the
-popup stays on-screen rather than running off the card. Check it in both light and dark,
-and on a phone-width screen.
-
----
-
-## 25 Aug 2026 — The app is much faster, especially moving between pages
-
-*Landed in commit `6c82931`.*
-
-**Why.** The app felt slow, most of all when tapping from one page to another. The logo
-was the suspect. It turned out to be a real problem but not the main one — it is only
-paid once, on the first load, and then cached. Four other things were being paid **every
-single time you changed page**.
-
-**Wha
+- **The page is 
 ... [truncated for diff preview]
