@@ -489,7 +489,15 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
             "ពីរ៉ាមីតថាមពល និងច្បាប់ 10%",
           ]),
         },
-        { number: 2, title: "វដ្តរូបធាតុ", sessions: sectionsFor("biology", 8, 2) },
+        {
+          number: 2,
+          title: "វដ្តរូបធាតុ",
+          sessions: sectionsFor("biology", 8, 2, [
+            "វដ្តកាបូន និងការផ្លាស់ប្តូរឧស្ម័ន",
+            "វដ្តអាសូត និងបាក់តេរីកំពកឫស",
+            "ការប្រៀបធៀបវដ្តកាបូន និងវដ្តអាសូត",
+          ]),
+        },
       ],
     },
   ],

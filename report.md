@@ -16,6 +16,21 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 11 Nov 2026: Biology Tho Phon Completion: Chapter 8 Lesson 2 Biogeochemical Cycles OCR & KruAI RAG
+
+Commit: `PENDING`. **No database step needed.**
+
+Completed and audited the final textbook lesson of Grade 12 Biology (Tho Phon) covering Chapter 8, Lesson 2 (Biogeochemical Cycles / វដ្តរូបធាតុ, PDF pages 190 to 191, Book pages 189 to 190):
+- **Transcribed & Blind-Audited OCR**:
+  - Transcribed `sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna/chapter8-lesson2-biogeochemical-cycles.md`.
+  - Dispatched Strict Blind Auditor subagent comparing character-by-character against scans `p190.png` and `p191.png`.
+  - Fixed OCR hallucination in Section 2 (`ផ្លេកបន្ទោរ` instead of hallucinated `ផ្គររន្ទះ`), corrected Khmer orthography (`ឬស` and `សណ្ដែក`), rectified diagram labels (`ហៀរចេញ`, `កម្ទេចកំណ`, `($\mathrm{HCO_3}$)`), and preserved the comparative table between Carbon and Nitrogen cycles.
+- **KruAI RAG Grounding & Curriculum Sessions**:
+  - Added dedicated RAG section `tb:bio:ch8:biogeochemical-carbon-nitrogen-cycles-tho-phon-qna` to `server/textbook-search.ts` under `BIOLOGY_CH8_SECTIONS`.
+  - Registered authentic Khmer section titles in `src/features/lessons/sessions.ts` for Chapter 8 Lesson 2: "វដ្តកាបូន និងការផ្លាស់ប្តូរឧស្ម័ន", "វដ្តអាសូត និងបាក់តេរីកំពកឫស", and "ការប្រៀបធៀបវដ្តកាបូន និងវដ្តអាសូត".
+- **Verification**: Verified with `ocr-check.mjs` (19 pages, 0 issues), `npm run check:digits` (0 Khmer digits), `npx oxlint` (0 errors), and `npx tsc -b` (clean).
+
+
 ## 11 Nov 2026: Math Summary Blind Audit Batch 8: Chapter 8 Probability (Pages 83 to 88)
 
 Commit: `e6e0dab`. **No database step needed.**
