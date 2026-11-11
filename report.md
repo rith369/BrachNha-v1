@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 11 Nov 2026: Chemistry Workbook Batch 2: Chapter 1 Lesson 2 (Factors Affecting Reaction Rates) OCR, Study Path & KruAI Grounding
 
-Commit: `PENDING`. **No database step needed.**
+Commit: `621993e`. **No database step needed.**
 
 Digitized and audited Batch 2 of Grade 12 Chemistry Workbook (`sources/textbooks/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ.pdf`, Book pages 23 to 47, PDF pages `p031.png` to `p055.png`):
 - **Textbook Rendering & OCR**: Rendered high-resolution scans (`p031.png` to `p055.png`) and transcribed word-for-word into `sources/ocr/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ/chapter1-lesson2-factors-affecting-reaction-rate.md`:
