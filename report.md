@@ -16,6 +16,21 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 11 Nov 2026: Math Summary Blind Audit Batch 5A: Chapter 5 Complex Numbers (Part 1, Pages 56 to 62)
+
+Commit: `d8fe6e9`. **No database step needed.**
+
+Conducted strict blind audit pass on Chapter 5 (Complex Numbers, Part 1: PDF pages `p59.png` to `p65.png`, Book pages 56 to 62) in `sources/ocr/Math summary/chapter5-complex-numbers.md`:
+- **Line-by-Line Visual Audit & Fixes**:
+  - Inserted page boundary markers `<!-- Page p59.png -->` through `<!-- Page p65.png -->`.
+  - Fixed conjugate and opposite notation to $a - ib$ and $-a - ib$, matching textbook layout.
+  - Restored missing student advisory note on page 58 (`p61.png`).
+  - Corrected definition wording from directed angle to principal/smallest angle on page 57 (`p60.png`).
+  - Removed artificial intermediate algebraic steps across Exercises 1, 2, 4, 5, and 6.
+  - Extracted inline Khmer conjunctions and explanatory text from KaTeX delimiters.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 11 Nov 2026: Math Summary Blind Audit Batch 4B: Chapter 4 Function Variation & Curves (Part 2, Pages 47 to 55)
 
 Commit: `f0cecfe`. **No database step needed.**
@@ -74,7 +89,7 @@ Conducted strict blind audit pass on Chapter 3 (Definite Integrals: PDF pages `p
 
 ## 11 Nov 2026: Biology Tho Phon Q&A: Chapter 7 Lesson 1 (Populations) OCR, Study Path & KruAI Grounding
 
-Commit: `PENDING_COMMIT`. **No database step needed.**
+Commit: `6f76503`. **No database step needed.**
 
 Digitized and strictly audited Chapter 7, Lesson 1 ("ពពួក" / Populations) of the Grade 12 Biology Q&A textbook compilation by Tho Phon (Book pp. 182-184, PDF pp. 183-185).
 - **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ជីវវិទ្យា - ធូ ភន biology qna/` (p183.png to p185.png) and transcribed into `sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna/chapter7-lesson1-populations.md`.
