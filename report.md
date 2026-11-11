@@ -16,6 +16,219 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 11 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batch 5: Chapter 1 Solutions Part 2 Line-by-Line Blind Audit
+
+Commit: Pending. **No database step needed.**
+
+Strict visual audit and verification for Batch 5 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p030.png` to `p038.png`, Book pages 24 to 32: `sources/ocr/វីញ្ញាសារូបវិទ្យា/chapter1-solutions-part2.md`):
+- **Lesson Scope**: Chapter 1 Thermodynamics Solutions Part 2 (`ជំពូក 1 ទែម៉ូឌីណាមិច · ផ្នែកដំណោះស្រាយ ភាគ 2`) & Chapter 2 Cover:
+  - First Law of Thermodynamics (`ច្បាប់ទីមួយនៃទែម៉ូឌីណាមិច`), Solutions to Exercises 5 (cont.), 6, 7, and 8.
+  - Heat Engines (`ដំណោះស្រាយ (ម៉ាស៊ីន)`), Solutions to Exercises 1 through 8.
+  - Chapter 2 Cover (`ជំពូក 2 រលក` · `គោលការណ៍តម្រួតនៃរលក និងរលកជញ្ជ្រុំ`).
+- **Line-by-Line Blind Visual Audit**:
+  - Corrected Khmer law title on pages 24, 25 (`p030.png`, `p031.png`), restoring `តាមច្បាប់ទី 1 នៃទែម៉ូឌីណាមិច ៖` from truncated OCR `នៃម៉ូឌីណាមិច`.
+  - Replaced illegal Khmer numeral `១` in editorial note with standard Latin numeral `1`.
+  - Verified and documented textbook typos (e.g. $800\text{ J}$ vs $80\text{ J}$ on page 25, $T_h = \frac{T_c}{1 - e_c}$ notation slip on page 28, omitted $\times 10^6$ in subtraction step on page 29, $e_c = 0.82$ instead of $e_M = 0.82$ on page 30, and $1\text{ hp} = 746\text{ W}$ calculation discrepancy on page 31).
+  - Confirmed 0 lines clipped or dropped at page breaks (`p030.png` through `p038.png`) with 100% boundary continuity.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new chunks added to `server/textbook-search.ts`.
+- **Status Update**: Updated `sources/ocr/វីញ្ញាសារូបវិទ្យា/STATUS.md` Batch 5 to `OCR Audited: YES`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/វីញ្ញាសារូបវិទ្យា"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 11 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 4: Lesson 1 Rational Functions Exercises Part 3 (Exercises 4 cont., 5)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 4 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p032.png` to `p039.png`, Book pages 27 to 34):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson1-rational-functions-exercises-part3.md`, covering:
+  - Exercise 4 (conclusion): derivative sign table, local extrema ($f(-4) = -5, f(0) = 3$), limits at infinity, complete variation table, tangent line $(L) : y = \frac{5}{9}x + \frac{25}{9}$ at $x_0 = 1$, intersection point $A(4, 5)$ with oblique asymptote $(D) : y = x + 1$, full-page geometric figure with shaded region, and bounded area calculation $S = \int_1^2 \left(\frac{5}{9}x + \frac{25}{9} - \frac{x^2+3x+6}{x+2}\right)dx \approx 3.7\text{ units}^2$.
+  - Exercise 5 ($f(x) = \frac{x^2 - 4x + 8}{x - 2}$): questions 1 to 4, domain $D = \mathbb{R} - \{2\}$, limits at infinity and vertical asymptote $x = 2$, oblique asymptote $y = x - 2$, derivative $f'(x) = \frac{x(x-4)}{(x-2)^2}$, sign table, monotonic intervals, local extrema ($f(0) = -4, f(4) = 4$), variation table, and curve construction figure.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 8 pages (`p032.png` to `p039.png`):
+  - Fixed Khmer subscript orthography on page 27: updated to `ប្តូរ` matching the printed book.
+  - Corrected LaTeX array column specifiers in sign and variation tables to preserve 10 and 11 column alignment.
+  - Documented printed book notation slips (e.g. $x = 2$ instead of $x \neq 2$ in domain step, and slant asymptote label slip).
+  - Maintained boundary markers `<!-- Page p032.png -->` through `<!-- Page p039.png -->` with 100% boundary integrity.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (6 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 11 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batch 4: Chapter 1 Solutions Part 1 Line-by-Line Blind Audit
+
+Commit: Pending. **No database step needed.**
+
+Strict visual audit and verification for Batch 4 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p021.png` to `p029.png`, Book pages 15 to 23: `sources/ocr/វីញ្ញាសារូបវិទ្យា/chapter1-solutions-part1.md`):
+- **Lesson Scope**: Chapter 1 Thermodynamics Solutions Part 1 (`ជំពូក 1 ទែម៉ូឌីណាមិច · ផ្នែកដំណោះស្រាយ ភាគ 1`):
+  - Section 1: Kinetic Theory of Gases (`ទ្រឹស្តីស៊ីនេទិចនៃឧស្ម័ន`), Solutions to Exercises 1–7 complete.
+  - Section 2: First Law of Thermodynamics (`ច្បាប់ទីមួយនៃទែម៉ូឌីណាមិច`), Solutions to Exercises 1–4, and Exercise 5 part ក start.
+- **Line-by-Line Blind Visual Audit**:
+  - Corrected Khmer spelling in Exercise 1 from `បណ្ដោយ` to authentic `បណ្តោយ`.
+  - Removed extraneous word `ក្រាប` in question title on page 20 (`p026.png`).
+  - Added clarifying editorial notes on missing unit $\text{J}$ in boxed answer $W_{\text{ABCA}} = 1.5 \times 10^5$ on page 21 (`p027.png`).
+  - Fixed dropped Khmer syllable in law title on pages 22 and 23 (`p028.png`, `p029.png`), restoring `តាមច្បាប់ទី 1 នៃទែម៉ូឌីណាមិច` from incomplete `នៃម៉ូឌីណាមិច`.
+  - Added physics notes on printed textbook typos on page 23 (multiplied by $10^3$ twice and work value discrepancy).
+  - Confirmed 0 lines clipped or dropped at page breaks (`p021.png` through `p029.png`) with 100% boundary continuity.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new chunks added to `server/textbook-search.ts`.
+- **Status Update**: Updated `sources/ocr/វីញ្ញាសារូបវិទ្យា/STATUS.md` for Batch 4 to `OCR Audited: YES`.
+
+
+## 11 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 3: Lesson 1 Rational Functions Exercises Part 2 (Exercises 2 cont., 3, 4 start)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 3 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p024.png` to `p031.png`, Book pages 19 to 26):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson1-rational-functions-exercises-part2.md`, covering:
+  - Exercise 2 (conclusion): graph construction $C$ and graphical discussion of parameter $m$ ($x^2 - (m+1)x - 2(m+1) = 0$).
+  - Exercise 3 ($f(x) = \frac{x^2 - 4x}{x^2 - 4x + 3}$): domain, limits at infinity and vertical/horizontal asymptotes ($x=1, x=3, y=1$), derivative $f'(x) = \frac{6(x-2)}{(x^2 - 4x + 3)^2}$, derivative sign table, local minimum $f(2) = 4$, variation table, proof of symmetry axis $x = 2$, curve construction, and tangents $(T_1) : y = -\frac{4}{3}x$ at $O(0, 0)$ and $(T_2) : y = \frac{4}{3}x - \frac{16}{3}$ at $A(4, 0)$ intersecting on the symmetry axis.
+  - Exercise 4 ($f(x) = \frac{x^2 + 3x + 6}{x + 2}$, Bac II 2010): questions a, b, c, derivative $f'(x) = \frac{x(x+4)}{(x+2)^2}$, and extrema setup.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 8 pages (`p024.png` to `p031.png`):
+  - Documented book typo for limit sign inversion at $x \to 1$ ($+\infty$ for $x \to 1^-$ and $-\infty$ for $x \to 1^+$ in print).
+  - Removed hallucinated conclusion line on page 23 not present on the printed page.
+  - Added missing colon in extremum calculation heading matching the original scan.
+  - Maintained boundary markers `<!-- Page p024.png -->` through `<!-- Page p031.png -->` with 100% boundary integrity.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (5 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 11 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batch 3: Chapter 1 Exercises Line-by-Line Blind Audit
+
+Commit: Pending. **No database step needed.**
+
+Strict visual audit and verification for Batch 3 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p015.png` to `p020.png`, Book pages 9 to 14: `sources/ocr/វីញ្ញាសារូបវិទ្យា/chapter1-exercises.md`):
+- **Lesson Scope**: Chapter 1 Thermodynamics Exercises (`ជំពូក 1 ទែម៉ូឌីណាមិច · ផ្នែកលំហាត់`):
+  - Section 1: Kinetic Theory of Gases (`ទ្រឹស្តីស៊ីនេទិចនៃឧស្ម័ន`), Exercises 1–7.
+  - Section 2: First Law of Thermodynamics (`ច្បាប់ទីមួយនៃម៉ូឌីណាមិច`), Exercises 1–8 (including $P-V$ diagram work calculations, closed cycle $\text{ABCA}$ triangle and $\text{ABCD}$ rectangle work, and heat).
+  - Section 3: Heat Engines (`ម៉ាស៊ីន`), Exercises 1–8 (including Carnot engines, actual engines, diesel engines, and steam engines).
+- **Line-by-Line Blind Visual Audit**:
+  - Restored missing Khmer full stop `។` at line-end of page 11 (PDF `p017.png`), Exercise 5 (`(សន្មតថាជាឧស្ម័នបរិសុទ្ធ)។`).
+  - Corrected typographical omission in Exercise 8 (PDF `p018.png`), noting `ខណៈប្រព័ន្ធរួមដ្យាបាទិច [រួមអាដ្យាបាទិច]` for adiabatic compression.
+  - Added editorial clarifying annotations to Exercise 3 and 4 (PDF `p019.png`) regarding textbook phrasing `ធុងក្តៅពីរ [ប្រភពកម្តៅពីរ គឺធុងក្តៅ និងធុងត្រជាក់]` and `បំភាយកម្តៅ [ស្រូបកម្តៅ] $500\text{ kJ}$ ពីធុងក្តៅ`.
+  - Added physics standard note for Exercise 8 (PDF `p020.png`) regarding printed horsepower conversion $1.0\text{ hp} = 786\text{ W}$ ($1\text{ hp} \approx 746\text{ W}$).
+  - Confirmed 0 lines clipped or dropped at page breaks (`p015.png` through `p020.png`) and exact word boundaries verified.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new chunks added to `server/textbook-search.ts`.
+- **Status Update**: Updated `sources/ocr/វីញ្ញាសារូបវិទ្យា/STATUS.md` for Batch 3 to `OCR Audited: YES`.
+
+## 11 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 2: Lesson 1 Rational Functions Exercises Part 1 (Exercises 1 to 4)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 2 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p016.png` to `p023.png`, Book pages 11 to 18):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson1-rational-functions-exercises-part1.md`, covering:
+  - Exercise 1 ($f(x) = \frac{x^2 - 4x + 8}{2x - 4}$): canonical form decomposition, limits at infinity and vertical asymptote $x = 2$, oblique asymptote $y = \frac{1}{2}x - 1$, derivative $f'(x)$, variation sign table, relative extrema, curve construction $C$, and graphical inequality solving.
+  - Exercise 2 ($f(x) = \frac{x^2 - x - 6}{x + 2}$): domain, limits, vertical asymptote $x = -2$, polynomial long division, oblique asymptote $y = x - 3$, derivative $f'(x)$, variation sign table, relative extrema, and proof of symmetry center $I(-2, -5)$.
+  - Exercise 3 and Exercise 4: full problem formulations, synthetic divisions, derivative tables, and curve plotting setups.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 8 pages (`p016.png` to `p023.png`):
+  - Corrected Khmer spelling typo in subquestion គ from `បរិមារធៀប` to `បរិមាធៀប` (relative extremum).
+  - Restored comma in `$b = -1,$` in solution text matching printed textbook formula notation.
+  - Corrected subscript orthography from `ប្តូរសញ្ញា` to authentic `ប្ដូរសញ្ញា`.
+  - Re-aligned KaTeX array table columns in derivative sign and variation tables where `-\infty ||` was merged.
+  - Maintained boundary markers `<!-- Page p016.png -->` through `<!-- Page p023.png -->` with 100% boundary integrity.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (4 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 11 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batch 2: Chapter 1 Lessons 1–3 Theory & Formulas Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Batch 2 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p009.png` to `p014.png`, Book pages 3 to 8):
+- **Textbook Rendering & OCR**: Verified high-resolution scans and complete transcription in `sources/ocr/វីញ្ញាសារូបវិទ្យា/chapter1-theory-and-formulas.md`, covering Chapter 1 Thermodynamics (`ជំពូក 1 ទែម៉ូឌីណាមិច`):
+  - Lesson 1: Kinetic Theory of Gases (`ទ្រឹស្តីស៊ីនេទិចនៃឧស្ម័ន`): molar mass, molecular mass, total mass, moles, molecules, Avogadro's number, ideal gas equation of state, constants ($R, N_A, k_B$), temperature conversion, average kinetic energy, total kinetic energy, and RMS speed.
+  - Lesson 2: First Law of Thermodynamics (`ច្បាប់ទី 1 ទែម៉ូឌីណាមិច`): first law statement ($Q = \Delta U + W$), sign conventions for heat, internal energy, and work, isobaric process with $P-V$ diagram, linear pressure variation process with $P-V$ diagram ($A_1 + A_2$), isothermal process with $P-V$ diagram, and internal energy formulas for monoatomic gas.
+  - Lesson 3: Heat Engines (`ម៉ាស៊ីន`): Carnot engine energy balance, energy balance diagram, thermal efficiency ($e = 1 - Q_c/Q_h = 1 - T_c/T_h$), parameter descriptions, four-stroke engine cycle, mechanical work, thermal efficiency, transmission/mechanical efficiency, and overall/useful engine efficiency.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 6 pages (`p009.png` to `p014.png`):
+  - Split display equation and unit conversion on page 4 ($1\text{ eV} = 1.6 \times 10^{-19}\text{ J}$) onto separate lines to prevent mobile viewport clipping.
+  - Formatted page 7 parameter reference table into structured 2-column layout (`| និមិត្តសញ្ញា | ពន្យល់ |`) to match page 8 and avoid empty cells.
+  - Added clean block separation before equation derivation lines.
+  - Verified 100% boundary integrity, zero Khmer numerals, zero em dashes, and zero Khmer text inside math delimiters.
+  - Updated `sources/ocr/វីញ្ញាសារូបវិទ្យា/STATUS.md` for Batch 2 to `OCR Audited: YES`.
+- **KruAI RAG Status**: KruAI RAG: YES (already grounded in `server/textbook-search.ts`). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/វីញ្ញាសារូបវិទ្យា"` (3 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 11 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 1: Front Matter & Lesson 1 Rational Functions Theory
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 1 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p001.png` to `p015.png`, Book pages i to iv and 1 to 10):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/`:
+  - `front-matter.md`: Cover, Foreword (`អារម្ភកថា`), Review Committee, Acknowledgments, and Table of Contents (`មាតិកា`).
+  - `lesson1-rational-functions-theory.md`: Lesson 1 Rational Functions (`មេរៀនទី 1 អនុគមន៍សនិទាន`) covering definitions 1.1 and 1.2, variation study rules, domain calculations, vertical/horizontal/oblique asymptotes, derivative formulas, relative extrema, inflection points, symmetry axis/center, continuity on intervals, and root theorems (Intermediate Value Theorem and Rolle's Theorem).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 15 pages (`p001.png` to `p015.png`):
+  - Formatted display math equations to separate lines to ensure proper KaTeX rendering and zero Khmer characters inside math blocks.
+  - Corrected textbook misprint in limit numerator on page 6 ($\lim_{x \to 2} (x^2 + 2x - 3) = 5$).
+  - Corrected misread interval terminology on page 10 (`ចន្លោះបិទ [a, b]`).
+  - Restored missing function parameter in limit equation on page 10 ($\lim_{x \to b^-} f(x) = f(b)$).
+  - Maintained boundary markers `<!-- Page p001.png -->` through `<!-- Page p015.png -->` with 100% boundary integrity.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (3 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
+## 11 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batch 1: Front Matter & Chapter 1 Title
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Batch 1 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p001.png` to `p008.png`, Book pages i to iv, 1 to 2):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/វីញ្ញាសារូបវិទ្យា/front-matter.md`, covering Cover, Foreword (`អារម្ភកថា`), Table of Contents (`មាតិកា`), Chapter 1 Title Page (`1- ទែម៉ូឌីណាមិច`), and Problem Solving Keys Banner (`គន្លឹះដោះស្រាយ`).
+- **Strict Blind Visual Audit**: Completed page-by-page visual audit across all 8 pages (`p001.png` to `p008.png`), removing hallucinated duplicate titles, adjusting header layout, converting Khmer numerals to Latin digits 0-9, verifying zero dropped lines at page bottoms, and recording audit results in `sources/ocr/វីញ្ញាសារូបវិទ្យា/STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (Front Matter, OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/វីញ្ញាសារូបវិទ្យា"` (2 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 11 Nov 2026: Chemistry Summary & Solutions: Chapter 2 Lesson 1 (Aqueous Solutions) OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Lesson 1 of Chapter 2 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p026.png` bottom half to `p032.png` top half):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter2-lesson1-aqueous-solutions.md`, covering Chapter 2 (`ជំពូកទី 2 សមាសធាតុក្នុងសូលុយស្យុងទឹក និងកម្លាំងអន្តរម៉ូលេគុល`), Lesson 1 (`មេរៀនទី 1 : សមាសធាតុក្នុងសូលុយស្យុងទឹក`), including dissociation, precipitation reactions, net ionic equations, strong and weak electrolytes, full 17-column solubility rules table, and all 10 questions and step-by-step solutions.
+- **Strict Blind Visual Audit**: Completed page-by-page visual audit across all 7 pages, verifying all 160 cells of the solubility matrix, correcting OCR misspelling `អតិបរិមា` to printed `អតិបរមា`, correcting duplicate `ក/` to `ខ/` in Answer 7, fixing subscript and superscript order in ionic KaTeX blocks, resolving polyatomic parentheses grouping, and documenting author molar mass typo with editorial note.
+- **KruAI RAG Status**: KruAI RAG: YES (already grounded under `tb:chem:ch2:l1-dissociation-ionization-hydronium` and `tb:chem:ch2:l1-electrolytes-and-stoichiometry-exercises`). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 11 Nov 2026: Chemistry Summary & Solutions: Chapter 1 Exercises Part 2 (p021 to p026) OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Part 2 of Chapter 1 End-of-Chapter Exercises and Solutions (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p021.png` to `p026.png` top half):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter1-exercises-part2.md`, completing Chapter 1 (`ជំពូកទី 1 ស៊ីនេទិចគីមី`) supplementary exercises, reaction equations, rate calculations, and redox catalysts.
+- **Strict Blind Visual Audit**: Completed page-by-page visual audit across all 6 pages, removing artifact `# ?`, restoring missing full stops, correcting `contacts` OCR hallucination to authentic Khmer `គឺជារេដុករផង និងអុកស៊ីតករផង`, restoring beaker term `កែវបេស៊ែ`, preserving printed book typos with editorial notes, and confirming the clean boundary before Chapter 2 on `p026.png`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 11 Nov 2026: Chemistry Summary & Solutions: Chapter 1 Exercises Part 1 (p014 to p020) OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Part 1 of Chapter 1 End-of-Chapter Exercises and Solutions (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p014.png` to `p020.png`):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter1-exercises-part1.md`, covering Chapter 1 (`ជំពូកទី 1 ស៊ីនេទិចគីមី`), End-of-Chapter Exercises (Questions 1 to 11, Solutions 1 to 12, and Supplementary Exercises Questions 1 to 6).
+- **Strict Blind Visual Audit**: Completed page-by-page visual audit across all 7 pages, correcting OCR misreadings (`ការប្រែប្រួល` to `កំណែប្រែដល់`, `អនុកមន៍` to `អនុគមន៍`), correcting critical chemical concept misreads (`ទំហំធៀប` to `ទំហំផ្ទុយនៃផលធៀប` and `ទំហំផ្ទុយនៃលីមីត` with proper negative signs in rate limit formulas, and `ឌីស្វូតកម្ម` to `ឌីស្មូតកម្ម`), and aligning page breaks with exact line continuity.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 11 Nov 2026: Chemistry Summary & Solutions: Chapter 1 Lesson 2 (Kinetic Factors) OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Lesson 2 of Grade 12 Chemistry Summary and Solutions textbook (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p006.png` bottom half to `p013.png` full):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter1-lesson2-kinetic-factors.md`, covering Chapter 1 (`ជំពូកទី 1 ស៊ីនេទិចគីមី`), Lesson 2 (`មេរៀនទី 2 កត្តាជះឥទ្ធិពលលើល្បឿនប្រតិកម្ម`), including surface area, reactant concentration, temperature, pressure, catalysts (homogeneous, heterogeneous, enzymatic), reaction mechanisms, intermediate complexes, potential energy diagrams, and all 21 questions and solutions.
+- **Strict Blind Visual Audit**: Completed page-by-page visual audit across all 8 pages, fixing OCR misread `ឬបំបាត់` to printed `ឬបាត់`, restoring missing word `ជា` (`គឺជាការបង្កើនល្បឿនប្រតិកម្ម`), correcting acid spelling `អាស៊ីតក្លរីឌ្រិច`, resolving critical KaTeX issue in Answer 16 where Khmer text was inside `$$...$$`, restoring dropped word `ការ`, and verifying that Lesson 2 concludes at `p013.png` before end-of-chapter exercises start on `p014.png`.
+- **KruAI RAG Status**: KruAI RAG: YES (already grounded under `tb:chem:ch1:l2-kinetic-factors-theory` and `tb:chem:ch1:l2-catalysis-redox-mechanism-and-exercises`). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 11 Nov 2026: Chemistry Summary & Solutions: Chapter 1 Lesson 1 (Reaction Rates) OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Lesson 1 of Grade 12 Chemistry Summary and Solutions textbook (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p003.png` to `p006.png` top half):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter1-lesson1-reaction-rate.md`, covering Chapter 1 (`ជំពូកទី 1 ស៊ីនេទិចគីមី`), Lesson 1 (`មេរៀនទី 1 ល្បឿនប្រតិកម្មគីមី`), including reaction rate definitions, instantaneous rates, tangent slopes, and 3 numbered questions and complete solutions.
+- **Strict Blind Visual Audit**: Completed page-by-page visual audit across all 4 pages, correcting OCR misread `ជាបម្រែបម្រួលកំហាប់` to printed `ជាបំណាស់ប្តូរកំហាប់`, restoring colon in definition headers, adding tangent line labels $T_1$ and $T_2$, correcting acid spelling `អាស៊ីតក្លរីឌ្រិច`, correcting formula subscripts to $t_1, t_2$, and verifying line boundary cut-offs.
+- **KruAI RAG Status**: KruAI RAG: YES (already grounded under `tb:chem:ch1:l1-reaction-rate-definition-and-types` and `tb:chem:ch1:l1-stoichiometry-dismutation-and-problems`). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
 ## 11 Nov 2026: Chemistry Workbook Batch 4: Chapter 2 Lesson 2 (Intermolecular Forces) OCR, Study Path & KruAI Grounding
 
 Commit: `60b37d7`. **No database step needed.**
