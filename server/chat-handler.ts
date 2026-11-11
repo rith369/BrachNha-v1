@@ -16,6 +16,7 @@ import { checkRateLimit } from "./rate-limit.js";
 import { isVerificationConfigured, verifyRequestUser } from "./verify-user.js";
 import {
   searchBiologyTextbook,
+  searchChemistryTextbook,
   searchHistoryTextbook,
   searchMathTextbook,
   searchPhysicsTextbook,
@@ -1080,13 +1081,19 @@ export async function handleChat(req: Request): Promise<Response> {
     /រូបវិទ្យា|ទែម៉ូឌីណាមិច|ឧស្ម័ន|ស៊ីនេទិច|ម៉ូលេគុល|សម្ពាធ|បុលស្មាន់|ប៉ូលស្មាន់|អាវូកាដ្រូ|អាវ៉ូកាដ្រូ|រលក|ម៉ាញេទិច|អាំងឌុចស្យុង|ចរន្តឆ្លាស់|thermodynamics|kinetic|magnetic|induction/i.test(
       lastUserText
     );
+  const isChemistryQuery =
+    screen.subjectId === "chemistry" ||
+    /គីមី|ល្បឿនប្រតិកម្ម|ស៊ីនេទិចគីមី|ឌីស្មូតកម្ម|កាតាលីករ|កាតាលីស|សូលុយស្យុង|អេឡិចត្រូលីត|កម្លាំងអន្តរម៉ូលេគុល|ឌីប៉ូល|អ៊ីយ៉ុង|អាស៊ីត|បាស|ph|សមីការគីមី|reaction rate|chemistry/i.test(
+      lastUserText
+    );
 
-  const isSpecificSubject = isMathQuery || isBioQuery || isHistoryQuery || isPhysicsQuery;
+  const isSpecificSubject = isMathQuery || isBioQuery || isHistoryQuery || isPhysicsQuery || isChemistryQuery;
   const bioChunks = isBioQuery || !isSpecificSubject ? searchBiologyTextbook(lastUserText) : [];
   const mathChunks = isMathQuery || !isSpecificSubject ? searchMathTextbook(lastUserText) : [];
   const historyChunks = isHistoryQuery || !isSpecificSubject ? searchHistoryTextbook(lastUserText) : [];
   const physicsChunks = isPhysicsQuery || !isSpecificSubject ? searchPhysicsTextbook(lastUserText) : [];
-  const textbook = [...bioChunks, ...mathChunks, ...historyChunks, ...physicsChunks].slice(0, 3);
+  const chemChunks = isChemistryQuery || !isSpecificSubject ? searchChemistryTextbook(lastUserText) : [];
+  const textbook = [...bioChunks, ...mathChunks, ...historyChunks, ...physicsChunks, ...chemChunks].slice(0, 3);
   const context = [...pinned, ...textbook];
 
   const system_instruction = buildSystemPrompt({

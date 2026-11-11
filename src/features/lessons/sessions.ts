@@ -663,6 +663,25 @@ export const SUBJECT_SESSIONS: Partial<Record<SubjectId, Chapter[]>> = {
       ],
     },
   ],
+  chemistry: [
+    {
+      number: 1,
+      title: "ស៊ីនេទិចគីមី",
+      lessons: [
+        {
+          number: 1,
+          title: "ល្បឿនប្រតិកម្មគីមី",
+          sessions: sectionsFor("chemistry", 1, 1, [
+            "កត្តាពេលក្នុងប្រតិកម្មគីមី និងចំណាត់ថ្នាក់ប្រតិកម្ម",
+            "និយមន័យល្បឿនមធ្យម និងល្បឿនខណៈ",
+            "ទំនាក់ទំនងល្បឿនតាមមេគុណស្ដូក្យូម៉ែត្រ",
+            "ការគណនាល្បឿនតាមខ្សែកោង និងបន្ទាត់ប៉ះ",
+            "ប្រតិកម្មឌីស្មូតកម្ម និងលំហាត់គំរូ",
+          ]),
+        },
+      ],
+    },
+  ],
 };
 
 /**
@@ -688,6 +707,7 @@ export const PATH_TAB: Partial<Record<SubjectId, SubjectTab>> = {
   biology: "all",
   history: "all",
   physics: "all",
+  chemistry: "all",
 };
 
 /** How many locked placeholders to show after the real content runs out, so the
