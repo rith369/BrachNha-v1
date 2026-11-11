@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 11 Nov 2026: Chemistry Workbook Batch 4: Chapter 2 Lesson 2 (Intermolecular Forces) OCR, Study Path & KruAI Grounding
 
-Commit: `PENDING`. **No database step needed.**
+Commit: `60b37d7`. **No database step needed.**
 
 Digitized and audited Batch 4 of Grade 12 Chemistry Workbook (`sources/textbooks/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ.pdf`, Book pages 67 to 73, PDF pages `p075.png` to `p081.png`):
 - **Textbook Rendering & OCR**: Rendered high-resolution scans (`p075.png` to `p081.png`) and transcribed word-for-word into `sources/ocr/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ/chapter2-lesson2-intermolecular-forces.md`:
