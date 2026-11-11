@@ -16,6 +16,31 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 11 Nov 2026: Biology Tho Phon Q&A: Chapter 6 Lesson 1 (Darwin's Theory) OCR & KruAI Grounding
+
+Commit: `735720a`. **No database step needed.**
+
+Digitized and strictly audited Chapter 6, Lesson 1 ("ទ្រឹស្តីរបស់លោកដាវិន" / Darwin's Theory of Evolution) of the Grade 12 Biology Q&A textbook compilation by Tho Phon (Book pp. 171-172, PDF pp. 172-173).
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ជីវវិទ្យា - ធូ ភន biology qna/` (p172.png to p173.png) and transcribed into `sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna/chapter6-lesson1-darwin-theory.md`.
+- **Strict Blind Audit**: Audited line-by-line with Subagent 2 ("Strict Blind Auditor") against original scans. Corrected 7 key transcription errors including beak functional morphology (ចំពុះវែងតូចឆ្មារជញ្ជក់អាហារ, ចំពុះកោងខុបស្រួចស៊ីរំពារ, ចំពុះសំប៉ែតកញ្ច្រោកយកអាហារក្នុងភក់), variation terminology (បម្រែបម្រួលជាកំណែប្រែ), and accumulation mechanics (គរផ្ដុំទុកពូជ). Verified zero lines cut off at page edges.
+- **RAG Grounding**: Grounded chunk `tb:bio:ch6:darwin-theory-tho-phon-qna` in `BIOLOGY_CH6_SECTIONS` in `server/textbook-search.ts` covering Darwin's Galapagos observations, marine iguana and tortoise adaptations, 4 beak morphs, artificial selection, and the 4 natural selection pillars.
+- **Verification**: Verified with `node scripts/ocr-check.mjs` (13 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
+## 11 Nov 2026: Math Summary Blind Audit Batch 2B: Chapter 2 Derivatives & Primitives (Part 2, Pages 25 to 30)
+
+Commit: `735720a`. **No database step needed.**
+
+Conducted strict blind audit pass on Chapter 2 (Derivatives & Primitives, Part 2: PDF pages `p28.png` to `p33.png`, Book pages 25 to 30) in `sources/ocr/Math summary/chapter2-derivatives-primitives.md`:
+- **Line-by-Line Visual Audit & Fixes**:
+  - Inserted page boundary markers `<!-- Page p28.png -->` through `<!-- Page p33.png -->`.
+  - Restored full induction proof of $g^{(n)}(x) = \cos(x + n\frac{\pi}{2})$ for Exercise 9(ខ) on page 28 (`p31.png`).
+  - Restored missing domain branches and sign analysis in Exercise 12(គ) on page 30 (`p33.png`).
+  - Restored dropped intermediate derivative expansion lines and auxiliary function derivations across Exercises 6, 7, 8, and 11.
+  - Aligned problem statements and solution blocks with authentic textbook layout.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 11 Nov 2026: Math Summary Blind Audit Batch 2A: Chapter 2 Derivatives & Primitives (Part 1, Pages 19 to 24)
 
 Commit: `9fa85e9`. **No database step needed.**
