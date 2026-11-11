@@ -58,6 +58,16 @@ Conducted strict blind audit pass on Chapter 3 (Definite Integrals: PDF pages `p
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
 
 
+## 11 Nov 2026: Biology Tho Phon Q&A: Chapter 6 Lesson 3 (Fossil Record & Q&A) OCR & KruAI Grounding (Chapter 6 100% Complete)
+
+Commit: `3bb71fe`. **No database step needed.**
+
+Digitized and strictly audited Chapter 6, Lesson 3 ("កំណត់ត្រាផូស៊ីល" / Fossil Record, Geological Time & Chapter 6 Q&A) of the Grade 12 Biology Q&A textbook compilation by Tho Phon (Book pp. 176-181, PDF pp. 177-182), completing Chapter 6 in its entirety.
+- **Textbook Rendering & OCR**: Rendered high-resolution scans into `sources/pages/ជីវវិទ្យា - ធូ ភន biology qna/` (p177.png to p182.png) and transcribed into `sources/ocr/ជីវវិទ្យា - ធូ ភន biology qna/chapter6-lesson3-fossil-record.md` containing the complete theory and all 19 authentic Bac II Q&A questions.
+- **Strict Blind Audit**: Audited line-by-line with Subagent 2 ("Strict Blind Auditor") against original scans. Corrected 8 key transcription nuances: petrification process (ដំណើរក្លាយជាថ្ម, ប្លែងទៅជាថ្ម), amber preservation spelling (ជ័រុក្ខជាតិ), relative layer dating age (មានអាយុតិចជាងគេ), Paleozoic/Mesozoic eras and Jurassic period (ស័កប៉ាឡេអូសូអ៊ិច, ស័កមេសូសូអ៊ិច, សម័យស៊ួរ៉ាសុិច, លូនទី 1), question prompts (ចូរពន្យល់ថា, ភស្តុតាងអ្វីខ្លះ), gene mutation spelling (មុយតាស៊ីយុងសែន), and pharyngeal slits (រង្វះស្រកី). Verified exact first 4 and last 4 words on every page with zero lines cut off.
+- **RAG Grounding**: Grounded chunk `tb:bio:ch6:fossil-records-geologic-dating-tho-phon-qna` in `BIOLOGY_CH6_SECTIONS` in `server/textbook-search.ts` covering petrification, external molds and internal casts, amber/ice preservation, relative layer dating, radioactive carbon-14 dating (half-life 5730 years), and geological eras.
+- **Verification**: Verified with `node scripts/ocr-check.mjs` (15 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
 ## 11 Nov 2026: Biology Tho Phon Q&A: Chapter 6 Lesson 2 (Evidence of Evolution) OCR & KruAI Grounding
 
 Commit: `5e05f42`. **No database step needed.**
