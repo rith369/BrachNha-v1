@@ -16,6 +16,19 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 11 Nov 2026: Chemistry Workbook Batch 4: Chapter 2 Lesson 2 (Intermolecular Forces) OCR, Study Path & KruAI Grounding
+
+Commit: `PENDING`. **No database step needed.**
+
+Digitized and audited Batch 4 of Grade 12 Chemistry Workbook (`sources/textbooks/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ.pdf`, Book pages 67 to 73, PDF pages `p075.png` to `p081.png`):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans (`p075.png` to `p081.png`) and transcribed word-for-word into `sources/ocr/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ/chapter2-lesson2-intermolecular-forces.md`:
+  - Chapter 2 (`ជំពូកទី 2 សមាសធាតុក្នុងសូលុយស្យុងទឹក និងកម្លាំងអន្តរម៉ូលេគុល`), Lesson 2 (`មេរៀនទី 2 កម្លាំងអន្តរម៉ូលេគុល`), covering comparison of ionic vs covalent forces, ionic lattice energy ($\mathrm{CaF_2 > NaCl > KCl > RbCl}$), dipole-dipole attractions, hydrogen bonding in $\mathrm{HF, H_2O, NH_3}$, London dispersion forces in non-polar molecules and noble gases ($\mathrm{Ar, Ne, CBr_4, CCl_4}$), boiling point anomalies ($\mathrm{H_2O}$ vs $\mathrm{H_2S}$, $\mathrm{HF}$ vs $\mathrm{HCl/HBr/HI}$, $\mathrm{NH_3}$ vs $\mathrm{PH_3}$), and squalene ($\mathrm{C_{30}H_{50}}$) large molecular mass effects, encompassing all 46 questions across 8 sections.
+- **Strict Blind Visual Audit**: Completed page-by-page visual audit across all 7 pages, fixing Section 8 heading hallucination to exact print `### 8. ទម្រង់ភាគល្អិត និងទ្រង់ទ្រាយក៏ដើរតួនាទីសំខាន់`, adding missing word `គ្នា` in Section 1 Question 1, correcting verb in Section 5 Question 2 to `ចូររកឧទាហរណ៍`, restoring top page boundary line on page 71 (`p079.png`), and verifying all chemical formulas and subscripts.
+- **KruAI RAG Grounding**: Added 2 keyworded chunks (`tb:chem:ch2:l2-intermolecular-forces-and-types`, `tb:chem:ch2:l2-boiling-points-and-molecular-geometry`) to `CHEMISTRY_CH2_SECTIONS` and included in `ALL_CHEMISTRY_SECTIONS` in `server/textbook-search.ts`.
+- **Study Path Structure**: Added Chapter 2 Lesson 2 with 5 authentic Khmer section titles under `SUBJECT_SESSIONS.chemistry[1]` in `src/features/lessons/sessions.ts`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ"` (4 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 11 Nov 2026: Math Summary Blind Audit Batch 9: Chapter 9 Vectors in Space (Pages 89 to 93)
 
 Commit: `fe3f891`. **No database step needed.**
