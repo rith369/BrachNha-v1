@@ -16,6 +16,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 11 Nov 2026: Math Summary Blind Audit Batch 8: Chapter 8 Probability (Pages 83 to 88)
+
+Commit: `e6e0dab`. **No database step needed.**
+
+Conducted strict blind audit pass on Chapter 8 (Probability: PDF pages `p86.png` to `p91.png`, Book pages 83 to 88) in `sources/ocr/Math summary/chapter8-probability.md`:
+- **Line-by-Line Visual Audit & Fixes**:
+  - Inserted page boundary markers `<!-- Page p86.png -->` through `<!-- Page p91.png -->`.
+  - Restored missing textbook advisory note on page 84: `កំណត់សម្គាល់ : អ្នកសិក្សាត្រូវខំប្រឹងដោះស្រាយលំហាត់ដោយខ្លួនឯង ចំណែកចម្លើយសម្រាប់តែផ្ទៀងផ្ទាត់ ។`.
+  - Corrected Khmer mathematical vocabulary: `ជារូបបេះដូង` (was misread as `បេះដូងក្រហម`), `កើតជាស្វ៊ីតនព្វន្ត` (was misread as `បង្កើតបានស្វ៊ីតនព្វន្ត`), `សមត្ថិកម្ម` with proper subscript consonant, and `គេសន្មិដ្ឋាន` (was misread as `គេសន្មត`).
+  - Removed hallucinated remarks (e.g. fabricated notes like $P(B)+P(C)=1$ and artificial card distribution breakdowns).
+  - Restored exact textbook factorial expansion steps and algebraic setups across Exercises 1 to 4 ($C(8, 3)$, $C(4, 2)$, $C(12, 3)$, permutations, and combinations).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 11 Nov 2026: Chemistry Workbook Batch 3: Chapter 2 Lesson 1 (Compounds in Aqueous Solution) OCR, Study Path & KruAI Grounding
 
 Commit: `e13811a`. **No database step needed.**
@@ -31,7 +45,7 @@ Digitized and audited Batch 3 of Grade 12 Chemistry Workbook (`sources/textbooks
 
 ## 11 Nov 2026: Math Summary Blind Audit Batch 7: Chapter 7 Differential Equations (Pages 78 to 82)
 
-Commit: `1ffed39`. **No database step needed.**
+Commit: `813d246`. **No database step needed.**
 
 Conducted strict blind audit pass on Chapter 7 (Differential Equations: PDF pages `p81.png` to `p85.png`, Book pages 78 to 82) in `sources/ocr/Math summary/chapter7-differential-equations.md`:
 - **Line-by-Line Visual Audit & Fixes**:
