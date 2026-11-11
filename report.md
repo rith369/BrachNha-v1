@@ -18,7 +18,7 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 
 ## 11 Nov 2026: Chemistry Workbook Batch 1: Chapter 1 Lesson 1 (Reaction Rates) OCR, Study Path & KruAI Grounding
 
-Commit: `PENDING`. **No database step needed.**
+Commit: `50667ad`. **No database step needed.**
 
 Digitized and audited Batch 1 of Grade 12 Chemistry Workbook (`sources/textbooks/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ.pdf`, Book pages 1 to 22, PDF pages `p009.png` to `p030.png`):
 - **Textbook Rendering & OCR**: Rendered high-resolution scans (`p009.png` to `p030.png`) and transcribed word-for-word into `sources/ocr/សៀវភៅលំហាត់គីមីវិទ្យា_ម៉ៃ_ម៉ាល័យ/chapter1-lesson1-reaction-rates.md`:
