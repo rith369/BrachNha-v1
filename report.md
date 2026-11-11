@@ -16,9 +16,24 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 11 Nov 2026: Math Summary Blind Audit Batch 9: Chapter 9 Vectors in Space (Pages 89 to 93)
+
+Commit: `fe3f891`. **No database step needed.**
+
+Conducted strict blind audit pass on the 9th and final chapter of the Grade 12 Math summary textbook, Chapter 9 (Vectors in Space: PDF pages `p92.png` to `p96.png`, Book pages 89 to 93) in `sources/ocr/Math summary/chapter9-vectors-in-space.md`:
+- **Line-by-Line Visual Audit & Fixes**:
+  - Inserted page boundary markers `<!-- Page p92.png -->` through `<!-- Page p96.png -->`.
+  - Corrected critical OCR corruption in Exercise 4: `ចតុgroup` to authentic `ចតុកោណ` (quadrilateral).
+  - Fixed Khmer spelling on page 90: `ពីរផ្លង់` to `ប្លង់ពីរ` (two planes).
+  - Restored omitted Ministry study guidance note on page 90: `កំណត់សម្គាល់ : អ្នកសិក្សាត្រូវខំប្រឹងដោះស្រាយលំហាត់ដោយខ្លួនឯង ចំណែកចម្លើយសម្រាប់តែផ្ទៀងផ្ទាត់ ។`.
+  - Restored omitted textbook derivation text in plane and line distance formulas, parallelepiped/tetrahedron volume explanations (`បានន័យថា យកមាឌរបស់ប្រលេពីប៉ែតចែកនឹង 6 ។`), and explicit substitution steps in parametric line equations.
+  - Removed unprinted additions, fabricated determinants, English interpolations, and unprinted equation simplifications at the end of page 93.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math summary"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files), `npx oxlint` (0 errors), and `npx tsc -b` (0 errors).
+
+
 ## 11 Nov 2026: Biology Tho Phon Completion: Chapter 8 Lesson 2 Biogeochemical Cycles OCR & KruAI RAG
 
-Commit: `PENDING`. **No database step needed.**
+Commit: `c4101c0`. **No database step needed.**
 
 Completed and audited the final textbook lesson of Grade 12 Biology (Tho Phon) covering Chapter 8, Lesson 2 (Biogeochemical Cycles / វដ្តរូបធាតុ, PDF pages 190 to 191, Book pages 189 to 190):
 - **Transcribed & Blind-Audited OCR**:
@@ -33,7 +48,7 @@ Completed and audited the final textbook lesson of Grade 12 Biology (Tho Phon) c
 
 ## 11 Nov 2026: Math Summary Blind Audit Batch 8: Chapter 8 Probability (Pages 83 to 88)
 
-Commit: `e6e0dab`. **No database step needed.**
+Commit: `f838d7e`. **No database step needed.**
 
 Conducted strict blind audit pass on Chapter 8 (Probability: PDF pages `p86.png` to `p91.png`, Book pages 83 to 88) in `sources/ocr/Math summary/chapter8-probability.md`:
 - **Line-by-Line Visual Audit & Fixes**:
