@@ -16,6 +16,45 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 12 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 7: Lesson 1 Rational Functions Exercises Part 6 (Exercises 8 cont., 9)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 7 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p056.png` to `p063.png`, Book pages 51 to 58):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson1-rational-functions-exercises-part6.md`, covering:
+  - Exercise 8 (conclusion): relative position between $(C_f)$ and oblique asymptote $(D)$, derivative $f'(x) = \frac{g(x)}{x^3}$, sign table of $f'(x)$, variation table of $f$, tangent line $(T) : y = -x + 5/2$ at $A(-1, 7/2)$, table of values, and coordinate plane graph of $(C_f)$, $(d)$, $(D)$, $(T)$.
+  - Exercise 9 ($f(x) = \frac{x^2}{x + 2}$): questions 1 to 3, domain $D = \mathbb{R} - \{-2\}$, derivative $f'(x) = \frac{x(x+4)}{(x+2)^2}$, sign table, relative extrema ($f(-4) = -8, f(0) = 0$), infinite limits and vertical asymptote $x = -2$, variation table, canonical form $f(x) = x - 2 + \frac{4}{x+2}$, oblique asymptote $(T) : y = x - 2$, graph plotting of $(C)$ and $(\Gamma) : g(x) = \frac{x^2}{|x| + 2}$, symmetry center proof $I(-2, -4)$, tangent $(D) : y = \frac{3}{4}x - \frac{1}{2}$ at $A(2, 1)$, and intersection $P(-2, -2)$.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 8 pages (`p056.png` to `p063.png`):
+  - Fixed variation table row positions so negative infinity and minimum values are consistently on the lower row matching the curve directions.
+  - Restored authentic Khmer character `ធ្វើឲ្យ` (U+17B1) in problem statement bullet.
+  - Added missing colons in question sub-headings and removed extraneous conclusion parentheses around `ពិត`.
+  - Maintained boundary markers `<!-- Page p056.png -->` through `<!-- Page p063.png -->` with 100% boundary integrity.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (9 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 12 Nov 2026: Chemistry Summary & Solutions: Chapter 3 Lesson 2 (Acid-Base Reactions) OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Chapter 3 Lesson 2 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p045.png` to `p050.png` top half):
+- **Textbook Rendering & OCR**: Transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter3-lesson2-acid-base-reactions.md`, covering Chapter 3 (`ជំពូកទី 3 អាស៊ីត-បាស`), Lesson 2 (`មេរៀនទី 2 ប្រតិកម្មអាស៊ីត-បាស`), including conjugate acid-base pairs, amphoteric substances, neutralization reactions, spectator ions, acid-base strength relationships, 12 lesson review questions, and step-by-step stoichiometric solutions for gas evolution and titration calculations.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit against scanned pages `p045.png` to `p050.png`, fixing OCR spelling errors (`អាស៊ីតក្លរួឌ្រិច` to `អាស៊ីតក្លរីឌ្រិច`, systematic correction of `សមាសធាតុអំពូទែ` to `សមាសធាតុអំផូទែ`), verifying chemical reaction equations, reversible equilibrium arrows, and KaTeX mathematical formatting with zero Khmer text inside math blocks.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 12 Nov 2026: Chemistry Summary & Solutions: Chapter 3 Lesson 1 (Acid-Base Theories) OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Chapter 3 Lesson 1 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p039.png` bottom half to `p044.png`):
+- **Textbook Rendering & OCR**: Transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter3-lesson1-acid-base-theories.md`, covering Chapter 3 (`ជំពូកទី 3 អាស៊ីត-បាស`), Lesson 1 (`មេរៀនទី 1 ទ្រឹស្តីអាស៊ីត-បាស`), including Arrhenius theory, Bronsted-Lowry theory, Lewis theory, polyprotic acids, 11 lesson review questions, and complete solutions.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit against scanned pages `p039.png` to `p044.png`, verifying formulas, subscripts, charges, and KaTeX compliance.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
 ## 12 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batch 6: Chapter 2 Theory & Formulas Line-by-Line Blind Audit
 
 Commit: Pending. **No database step needed.**
