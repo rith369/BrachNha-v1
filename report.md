@@ -16,6 +16,34 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 12 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 8: Lesson 1 Rational Functions Exercises Part 7 (Conclusion of Lesson 1)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 8 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p064.png` to `p071.png`, Book pages 59 to 66), concluding Lesson 1 (Rational Functions):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson1-rational-functions-exercises-part7.md`, covering:
+  - Exercise 9 (conclusion): intersection point $Q(6, 4)$ between oblique asymptote $(T)$ and tangent line $(D)$, midpoint proof $A(2, 1) = \text{midpoint}[P, Q]$, domain $D_g = \mathbb{R}$ of $g(x) = \frac{x^2}{|x| + 2}$, parity proof $g(-x) = g(x)$ (even function), and relationship between curve $(C)$ and graph $(\Gamma)$.
+  - Exercise 10 ($f(x) = \frac{-x^2 + 3x + 2}{x - 2}$): questions 1 to 6, canonical form $f(x) = -x + 1 + \frac{4}{x - 2}$, infinite and point limits, vertical asymptote $x = 2$, oblique asymptote $(d) : y = -x + 1$, relative position table between $(C)$ and $(d)$, derivative $f'(x) = -\frac{(x - 2)^2 + 4}{(x - 2)^2} < 0$, strictly decreasing variation table, tangent lines $(T_1) : y = -2x - 1$ at $M(0, -1)$ and $(T_2) : y = -2x + 7$ at $N(4, -1)$, integer coordinate points $A(-2, 2), B(1, -4), C(6, -4), D(3, 2)$ forming a parallelogram ($\vec{AB} = \vec{DC} = (3, -6)$), symmetry center $I(2, -1)$, curve plotting, and bounded region area $S = \int_{-2}^{1} [(-x + 1) - f(x)] dx = 8\ln 2 \approx 5.55\text{ units}^2$.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 8 pages (`p064.png` to `p071.png`):
+  - Fixed inline KaTeX equation to resolve parser collision on Khmer annotation.
+  - Pixel verification proved printed text is `ប៉ារ៉ាបូល` (parabola).
+  - Documented printed book typographical slips (`ខ្សែ​កោណ`, `ជាជា`) with footnotes.
+  - Maintained boundary markers `<!-- Page p064.png -->` through `<!-- Page p071.png -->` with 100% boundary integrity.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (10 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 12 Nov 2026: Chemistry Summary & Solutions: Chapter 3 Lesson 4 (Acid-Base Titrations) OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Chapter 3 Lesson 4 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p055.png` to `p058.png` top half):
+- **Textbook Rendering & OCR**: Transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter3-lesson4-acid-base-titrations.md`, covering Chapter 3 (`ជំពូកទី 3 អាស៊ីត-បាស`), Lesson 4 (`មេរៀនទី 4 អត្រាកម្មអាស៊ីត-បាស`), including titration principle and reaction $\text{H}_3\text{O}^+ + \text{OH}^- \rightarrow 2\text{H}_2\text{O}$, equivalence point condition $C_\text{A} \times V_\text{A} = C_\text{B} \times V_\text{B}$, colored indicator selection table (Hélianthine, bromothymol blue, phenolphthalein), 11 lesson review questions, and complete stoichiometric titration calculation solutions.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit against scans `p055.png` to `p058.png`, corrected critical indicator OCR error in table row 1 (`មេស្យង់ទីន` to authentic French nomenclature `អេល្យង់ទីន` for methyl orange), fixed Khmer subjoined consonant orthography (`ផ្ដុំគ្នា` to `ផ្តុំគ្នា`, `ការផ្លាស់ប្ដូរ` to `ការផ្លាស់ប្តូរ`), verified all mathematical expressions and boxed results ($0.18\,\text{M}$), and confirmed clean separation before Chapter 3 review exercises.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
 ## 12 Nov 2026: Chemistry Summary & Solutions: Chapter 3 Lesson 3 (Aqueous Solutions & pH) OCR & Audit
 
 Commit: Pending. **No database step needed.**
@@ -27,11 +55,11 @@ Digitized and audited Chapter 3 Lesson 3 (`sources/textbooks/មេរៀនស�
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
 
 
-## 12 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batches 7 to 9: OCR and Blind Audit
+## 12 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batches 7 to 10: OCR and Blind Audit
 
 Commit: Pending. **No database step needed.**
 
-Digitized and audited Batches 7, 8, and 9 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p046.png` to `p065.png`, Book pages 40 to 59):
+Digitized and audited Batches 7, 8, 9, and 10 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p046.png` to `p072.png`, Book pages 40 to 66):
 - **Batch 7 (PDF pages 46 to 54, Book pages 40 to 48)**:
   - Scope: Chapter 2 Waves Exercises and Solutions (`ជំពូក 2 រលក · ផ្នែកលំហាត់ និងដំណោះស្រាយ`), covering Exercises 1 to 4 and complete solutions for standing waves, node and antinode calculations, fundamental frequencies, harmonics, phase differences, and wave velocities.
   - Audit: Completed line-by-line visual audit against scans `p046.png` to `p054.png`, verified formulas and subscripts, preserved textbook layout and problem notes.
@@ -43,6 +71,10 @@ Digitized and audited Batches 7, 8, and 9 of Grade 12 Physics Exam Papers, Summa
 - **Batch 9 (PDF pages 61 to 65, Book pages 55 to 59)**:
   - Scope: Chapter 3 Lesson 1 Part 2 (`ជំពូក 3 មេរៀនទី 1 ភាគ 2`), covering interaction forces between parallel currents, Lorentz force on moving charged particles ($\vec{F}_m = q(\vec{v} \times \vec{B})$), deflection of charged particles in uniform magnetic field, circular trajectory radius $R = \frac{mv}{|q|B}$, angular deflection, magnetic deflection $Z = \frac{D\ell|q|B}{mv}$, and Bainbridge mass spectrometer specific charge $\frac{|q|}{m}$.
   - Audit: Completed line-by-line visual audit against scans `p061.png` to `p065.png`, verified variable definitions, formula groupings, mass spectrometer detector plates, and fixed KaTeX math boundaries.
+  - KruAI RAG Status: KruAI RAG: YES (already grounded in `server/textbook-search.ts`). No new RAG chunks added (per OCR-only scope).
+- **Batch 10 (PDF pages 66 to 72, Book pages 60 to 66)**:
+  - Scope: Chapter 3 Electricity and Magnetism Lesson 2 (Electromagnetic Induction) and Lesson 3 (Self-Induction) (`ជំពូក 3 មេរៀនទី 2 អាំងឌុចស្យុងអេឡិចត្រូម៉ាញេទិច និងមេរៀនទី 3 អូតូអាំងឌុចស្យុង`), covering magnetic flux $\phi = BA\cos\theta$, Faraday law and Lenz law $E = -N \frac{\Delta\Phi}{\Delta t}$, induced electromotive force in sliding conductor bar $|E| = B\ell v$, instantaneous induced emf in rotating coil $e = E_m \sin\omega t$, self-induction coefficient (inductance $L = \mu \frac{N^2 S}{\ell}$), self-induced emf $e = -L \frac{di}{dt}$, RL circuit dipole voltage, time constant $\tau = L/R$, circuit switch on/off exponential transient response curves, and LC circuit oscillations (period $T_o = 2\pi\sqrt{LC}$, frequency $f_o$, electrical energy, magnetic energy, and total energy conservation).
+  - Audit: Completed line-by-line visual audit against scans `p066.png` to `p072.png`, verified formula box boundaries, page split continuations, circuit switch states, response curve percentages ($63\%, 99\%, 37\%, 1\%$), and KaTeX formatting.
   - KruAI RAG Status: KruAI RAG: YES (already grounded in `server/textbook-search.ts`). No new RAG chunks added (per OCR-only scope).
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/វីញ្ញាសារូបវិទ្យា"`, `npm run check:digits` (0 Khmer numerals across all files).
 
