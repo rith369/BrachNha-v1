@@ -16,6 +16,67 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 12 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batch 6: Chapter 2 Theory & Formulas Line-by-Line Blind Audit
+
+Commit: Pending. **No database step needed.**
+
+Strict visual audit and verification for Batch 6 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p039.png` to `p045.png`, Book pages 33 to 39: `sources/ocr/វីញ្ញាសារូបវិទ្យា/chapter2-theory-and-formulas.md`):
+- **Lesson Scope**: Chapter 2 Waves Theory & Formulas (`ជំពូក 2 រលក · គន្លឹះដោះស្រាយ និងរូបមន្ត`):
+  - Section 1: Fundamental wave formulas table ($T, f, \omega, \lambda, k$) with standard SI and angular units.
+  - Section 2: Wave propagation equation forms (time/space coordinates and progressive phase shifts).
+  - Section 3: Superposition of two waves and multiple wave components, resultant amplitude $a$, and phase angle $\tan\phi_o$.
+  - Section 4: Special phase differences: in-phase ($\Delta\phi = 2n\pi$) and opposite-phase ($\Delta\phi = (2n+1)\pi$) with Fresnel vector diagram geometric derivations.
+  - Section 5: Quadrature phase difference ($\Delta\phi = (2n + 1/2)\pi$) with tip-to-tail triangle and parallelogram diagrams, phase lead/lag notes, and standing waves (`រលកជញ្ជ្រុំ`) reflection at fixed/free boundaries, node ($x = n\frac{\lambda}{2}$) and antinode ($x = n\frac{\lambda}{4}$) spatial distributions.
+- **Line-by-Line Blind Visual Audit**:
+  - Replaced hallucinated table headers with neutral and precise labels `| សមីការរលក (ទម្រង់ទី 1) | សមីការរលក (ទម្រង់ទី 2) |`.
+  - Added missing KaTeX boxes `\boxed{...}` around $a = \sqrt{a_x^2 + a_y^2}$ on page 35 (`p041.png`) to faithfully match printed boxes.
+  - Enhanced vector diagram descriptions on page 37 (`p043.png`) documenting both parallelogram and tip-to-tail right-triangle methods.
+  - Standardized Khmer colon typography `[កំណត់សម្គាល់ ៖` on page 38 (`p044.png`).
+  - Confirmed 0 lines clipped or dropped across all 7 pages (`p039.png` through `p045.png`) with 100% boundary continuity.
+- **KruAI RAG Status**: KruAI RAG: YES (already grounded in `server/textbook-search.ts` under `tb:phys:ch2:l1-superposition-and-fresnel` and `tb:phys:ch2:l1-standing-waves`). No new chunks added (per OCR-only scope).
+- **Status Update**: Updated `sources/ocr/វីញ្ញាសារូបវិទ្យា/STATUS.md` for Batch 6 to `OCR Audited: YES`.
+
+
+## 12 Nov 2026: Chemistry Summary & Solutions: Chapter 2 Exercises & Solutions (p038 to p039) OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Chapter 2 End-of-Chapter Exercises and Solutions (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p038.png` bottom half to `p039.png` top half):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter2-exercises-solutions.md`, covering Chapter 2 (`ជំពូកទី 2 សមាសធាតុក្នុងសូលុយស្យុងទឹក និងកម្លាំងអន្តរម៉ូលេគុល`), End-of-Chapter Exercises (Questions 1 to 5 and complete step-by-step Solutions 1 to 5) on solubility, intermolecular forces, hydrogen bonding, net ionic precipitation reactions, and gravimetric percentage calculation of chlorine in an unknown ionic compound.
+- **Strict Blind Visual Audit**: Completed page-by-page visual audit across both pages, removing OCR hallucination `ភាព`, correcting critical chemical terminology misreads (`នៅទីរំលាយ` to `នៅទឹករំលាយ`, `ឌីប៉ូល-ឌីប៉ូលអរណោទ` to `ឌីប៉ូល-ឌីប៉ូលអន្ទោង` for induced dipole), formatting equations and boxed answer `\boxed{47.51\%}` in standard KaTeX, and confirming zero line cut-offs before Chapter 3 start.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 12 Nov 2026: Chemistry Summary & Solutions: Chapter 2 Lesson 2 (Intermolecular Forces) OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Lesson 2 of Chapter 2 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p032.png` bottom half to `p038.png` top half):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter2-lesson2-intermolecular-forces.md`, covering Chapter 2 (`ជំពូកទី 2 សមាសធាតុក្នុងសូលុយស្យុងទឹក និងកម្លាំងអន្តរម៉ូលេគុល`), Lesson 2 (`មេរៀនទី 2 : កម្លាំងអន្តរម៉ូលេគុល`), including ionic bonds, covalent bonds, dipole-dipole forces, ionic forces, hydrogen bonds, London dispersion forces, boiling point comparisons, 11 lesson questions and solutions, and 12 end-of-chapter review questions and solutions.
+- **Strict Blind Visual Audit**: Completed page-by-page visual audit across all 7 pages (`p032.png` to `p038.png`), fixing Khmer spacing in `លើទឹករាវ ?`, formatting all chemical formulas and electron counts in KaTeX, verifying textbook errata corrections (correcting misprinted $\text{CO}_3^{2+}$ to $\text{CO}_3^{2-}$), adjusting phase change description `ពីរាវទៅឧស្ម័ន`, verifying both Markdown comparison tables, and establishing a strict cut-off before the end-of-chapter exercise block on `p038.png`.
+- **KruAI RAG Status**: KruAI RAG: YES (already grounded under `tb:chem:ch2:l2-intermolecular-forces-and-types` and `tb:chem:ch2:l2-boiling-points-and-molecular-geometry`). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 12 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 5: Lesson 1 Rational Functions Exercises Part 4 (Exercises 5 cont., 6, 7 start)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 5 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p040.png` to `p047.png`, Book pages 35 to 42):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson1-rational-functions-exercises-part4.md`, covering:
+  - Exercise 5 (conclusion): graphical discussion of parameter $m$ for quadratic equation $x^2 - (m+4)x + 2m + 8 = 0$ against curve $(C)$ and horizontal line $(\Delta) : y = m$ with 5 distinct root cases.
+  - Exercise 6 ($f(x) = \frac{x^2 - x + 1}{x - 1}$): domain $D = \mathbb{R} - \{1\}$, limits at infinity and vertical asymptote $x = 1$, oblique asymptote $y = x$, derivative $f'(x) = \frac{x(x-2)}{(x-1)^2}$, sign table, relative extrema ($f(0) = -1, f(2) = 3$), variation table, proof of symmetry center $I(1, 1)$, curve construction $C$, and graphical discussion of roots for $x^2 - (m+1)x + m + 1 = 0$.
+  - Exercise 7 ($y = \frac{x^2 - 1}{(x + 2)^2}$): questions 1 to 6, domain $D = \mathbb{R} - \{-2\}$, vertical asymptote $x = -2$, horizontal asymptote $y = 1$, and relative position study between $(C)$ and line $(L) : y = 1$ via $\alpha(x) = \frac{-4x - 5}{(x + 2)^2}$.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 8 pages (`p040.png` to `p047.png`):
+  - Restored missing function notation `$f$` in Exercise 6 question 1 clause matching the printed text.
+  - Corrected Khmer subscript from `ប្តូរសញ្ញា` to authentic `ប្ដូរសញ្ញា` (coeng da) in derivative sign transition statements.
+  - Verified and footnoted printed book errata (e.g. $-(m-4)x$ vs $-(m+4)x$).
+  - Maintained boundary markers `<!-- Page p040.png -->` through `<!-- Page p047.png -->` with 100% boundary integrity.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (7 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
 ## 11 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batch 5: Chapter 1 Solutions Part 2 Line-by-Line Blind Audit
 
 Commit: Pending. **No database step needed.**
