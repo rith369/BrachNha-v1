@@ -86,6 +86,17 @@ Digitized and audited Batch 8 of Grade 12 Math Function Graphs (`sources/textboo
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (10 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
 
 
+## 12 Nov 2026: Chemistry Summary & Solutions: Chapter 4 Lesson 1 (Nature of Chemical Equilibrium) OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Chapter 4 Lesson 1 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p071.png` to `p077.png`):
+- **Textbook Rendering & OCR**: Transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter4-lesson1-nature-of-chemical-equilibrium.md`, covering Chapter 4 (`ជំពូកទី 4 លំនឹងគីមី`), Lesson 1 (`មេរៀនទី 1 : ធម្មជាតិនៃលំនឹងគីមី`), including reversible reactions, dynamic chemical equilibrium definitions, equilibrium constant expression $K = \frac{[\text{C}]^c[\text{D}]^d}{[\text{A}]^a[\text{B}]^b}$, temperature dependence, partial pressure equilibrium constants ($K_\text{p}$), reaction quotients ($Q_\text{c}, Q_\text{p}$), 12 lesson review questions, and 8 additional problems with step-by-step solutions (including Hess's Law combination of equilibrium constants).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit against scans `p071.png` to `p077.png`, fixed OCR spelling error `ស្ទ័រស្យូមេទ្រី` to `ស្ទើស្យូមេទ្រី`, corrected critical OCR misread `ចោរ` to authentic `ថេរ` in questions 7 and 8 (`ចូរថេរតម្លៃលំនឹង K`), restored textbook phrasing `ពីលំនាំបង្កើតលំនឹង` in problem 14, verified gas phase requirement for $K_\text{p}$, and confirmed all equilibrium derivations and reversible arrows ($\rightleftarrows$).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
 ## 12 Nov 2026: Chemistry Summary & Solutions: Chapter 3 End-of-Chapter Exercises Part 2 (p065 to p070) OCR & Audit
 
 Commit: Pending. **No database step needed.**
@@ -130,11 +141,11 @@ Digitized and audited Chapter 3 Lesson 3 (`sources/textbooks/មេរៀនស�
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
 
 
-## 12 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batches 7 to 12: OCR and Blind Audit
+## 12 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batches 7 to 13: OCR and Blind Audit
 
 Commit: Pending. **No database step needed.**
 
-Digitized and audited Batches 7, 8, 9, 10, 11, and 12 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p046.png` to `p088.png`, Book pages 40 to 82):
+Digitized and audited Batches 7, 8, 9, 10, 11, 12, and 13 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p046.png` to `p096.png`, Book pages 40 to 90):
 - **Batch 7 (PDF pages 46 to 54, Book pages 40 to 48)**:
   - Scope: Chapter 2 Waves Exercises and Solutions (`ជំពូក 2 រលក · ផ្នែកលំហាត់ និងដំណោះស្រាយ`), covering Exercises 1 to 4 and complete solutions for standing waves, node and antinode calculations, fundamental frequencies, harmonics, phase differences, and wave velocities.
   - Audit: Completed line-by-line visual audit against scans `p046.png` to `p054.png`, verified formulas and subscripts, preserved textbook layout and problem notes.
@@ -158,6 +169,10 @@ Digitized and audited Batches 7, 8, 9, 10, 11, and 12 of Grade 12 Physics Exam P
 - **Batch 12 (PDF pages 79 to 88, Book pages 73 to 82)**:
   - Scope: Chapter 3 Electricity and Magnetism Exercises (`ជំពូក 3 អគ្គិសនី និងម៉ាញេទិច · ផ្នែកលំហាត់`), covering all 33 exercises across 4 lessons: Magnetic Field and Force (Exercises 1 to 11), Electromagnetic Induction (Exercises 1 to 9), Self-Induction (Exercises 1 to 8), and AC Circuits (Exercises 1 to 9), complete with circuit schematics, vector diagrams, and end ornament.
   - Audit: Completed line-by-line visual audit against scans `p079.png` to `p088.png`, verified multi-branch resistor network diagram, page split continuations, rotational frequency units, and KaTeX formatting.
+  - KruAI RAG Status: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Batch 13 (PDF pages 89 to 96, Book pages 83 to 90)**:
+  - Scope: Chapter 3 Electricity and Magnetism Solutions Part 1 (`ជំពូក 3 អគ្គិសនី និងម៉ាញេទិច · ផ្នែកដំណោះស្រាយ ភាគ 1`), covering Lesson 1 Magnetic Field and Force Solutions (Exercises 1 to 11): straight wire magnetic field, circular loop coil field, solenoid field, flat coil field with relative permeability, Laplace electromagnetic force at various angles ($30^\circ, 60^\circ, 90^\circ$), Lorentz force on proton, alpha particle circular trajectory, specific charge ratio, cathode ray tube electron deflection radius, parallel currents magnetic forces, and nickel isotope separation ($^{58}\text{Ni}$ and $^{60}\text{Ni}$).
+  - Audit: Completed line-by-line visual audit against scans `p089.png` to `p096.png`, corrected Khmer orthography (`សូលេណូអ៊ីត`, `ឡូរ៉ិន`), eliminated all Khmer inside math blocks, verified Latin digits throughout, and validated mathematical derivations.
   - KruAI RAG Status: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/វីញ្ញាសារូបវិទ្យា"`, `npm run check:digits` (0 Khmer numerals across all files).
 
