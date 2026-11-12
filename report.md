@@ -16,6 +16,23 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 12 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 9: Lesson 2 Logarithmic Functions Theory and Exercises Part 1
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 9 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p072.png` to `p080.png`, Book pages 67 to 75), covering Lesson 2 (Logarithmic Functions):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson2-logarithmic-functions-part1.md`, covering:
+  - Theory sections 2.1 to 2.5: definition of Napierian logarithm $y = \ln x$, domain $D = (0, +\infty)$, identities $\ln 1 = 0$, $\ln e = 1$, basic algebraic properties ($\ln(ab) = \ln a + \ln b$, $\ln(a/b) = \ln a - \ln b$, $\ln(a^\alpha) = \alpha\ln a$), key limits ($\lim_{x \to +\infty} \ln x = +\infty$, $\lim_{x \to 0^+} \ln x = -\infty$, $\lim_{x \to 0} \frac{\ln(x+1)}{x} = 1$, indeterminate growth comparisons $\lim_{x \to +\infty} \frac{\ln x}{x^n} = 0$, $\lim_{x \to 0^+} x^n\ln x = 0$), derivative formulas ($(\ln x)' = \frac{1}{x}$, $(\ln u)' = \frac{u'}{u}$), curve shape and variations of $y = \ln x$ and $y = -\ln x$.
+  - Exercise 1 ($f(x) = x + 1 + 2\ln\frac{x}{x-1}$): domain $D = (-\infty, 0) \cup (1, +\infty)$, limits at boundary endpoints, vertical asymptotes $x = 0$ and $x = 1$, first derivative $f'(x) = \frac{(x+1)(x-2)}{x(x-1)}$, extremum $f(2) = 3 + 2\ln 2 \approx 4.8$, variation table, oblique asymptote $(D) : y = x + 1$, relative position proof, and curve plotting.
+  - Exercise 2 ($f(x) = \frac{x + \ln x}{x}$): domain $D = (0, +\infty)$, Bac II 2005 exam exercise, infinite and zero limits, vertical asymptote $x = 0$, horizontal asymptote $y = 1$, derivative $f'(x) = \frac{1 - \ln x}{x^2}$, maximum value $f(e) = \frac{e+1}{e} \approx 1.7$, and variation table.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 9 pages (`p072.png` to `p080.png`):
+  - Removed hallucinated bullet points below graphs that did not exist in the printed book, integrating graph descriptions cleanly into standard markdown figure blocks.
+  - Documented printed book typos with explanatory notes ($b \in 0$ [sic: $b \in \mathbb{R}$], $x = 0$ [sic: $y = 1$] for horizontal asymptote, and omitted coefficient 2 in $f(2)$ substitution).
+  - Maintained boundary markers `<!-- Page p072.png -->` through `<!-- Page p080.png -->` with 100% boundary integrity.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (11 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
 ## 12 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 8: Lesson 1 Rational Functions Exercises Part 7 (Conclusion of Lesson 1)
 
 Commit: pending. **No database step needed.**
