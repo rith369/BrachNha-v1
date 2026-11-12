@@ -50,6 +50,17 @@ Digitized and audited Batch 8 of Grade 12 Math Function Graphs (`sources/textboo
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (10 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
 
 
+## 12 Nov 2026: Chemistry Summary & Solutions: Chapter 3 End-of-Chapter Exercises Part 1 (p058 to p064) OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Chapter 3 End-of-Chapter Exercises Part 1 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p058.png` bottom half to `p064.png`):
+- **Textbook Rendering & OCR**: Transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter3-exercises-part1.md`, covering Chapter 3 (`ជំពូកទី 3 អាស៊ីត-បាស`), Section I (Multiple choice questions 1 to 15), Section II (Fill-in-the-blanks statements 1 to 7), Section III (Critical thinking questions 1 to 17), and Section IV (Numerical problems 1 to 3), along with full step-by-step solutions for Sections I, II, III, and IV (problems 1 to 3).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit against scans `p058.png` to `p064.png`, corrected multiple-choice options (`កំហិត` vs `កំណិត`, restored `មិនស្មើគ្នានឹង`), restored dropped grammatical connector `ឯ` in Section II.1, fixed spelling of cresol red indicator (`ក្រេសូល`), resolved multiple-choice key in question 14 (`[x] ក`), and verified step-by-step stoichiometry and logarithmic pH/pOH derivations for problems 1, 2, and 3 with zero Khmer text inside KaTeX math blocks.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
 ## 12 Nov 2026: Chemistry Summary & Solutions: Chapter 3 Lesson 4 (Acid-Base Titrations) OCR & Audit
 
 Commit: Pending. **No database step needed.**
@@ -72,11 +83,11 @@ Digitized and audited Chapter 3 Lesson 3 (`sources/textbooks/មេរៀនស�
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
 
 
-## 12 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batches 7 to 10: OCR and Blind Audit
+## 12 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batches 7 to 11: OCR and Blind Audit
 
 Commit: Pending. **No database step needed.**
 
-Digitized and audited Batches 7, 8, 9, and 10 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p046.png` to `p072.png`, Book pages 40 to 66):
+Digitized and audited Batches 7, 8, 9, 10, and 11 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p046.png` to `p078.png`, Book pages 40 to 72):
 - **Batch 7 (PDF pages 46 to 54, Book pages 40 to 48)**:
   - Scope: Chapter 2 Waves Exercises and Solutions (`ជំពូក 2 រលក · ផ្នែកលំហាត់ និងដំណោះស្រាយ`), covering Exercises 1 to 4 and complete solutions for standing waves, node and antinode calculations, fundamental frequencies, harmonics, phase differences, and wave velocities.
   - Audit: Completed line-by-line visual audit against scans `p046.png` to `p054.png`, verified formulas and subscripts, preserved textbook layout and problem notes.
@@ -92,6 +103,10 @@ Digitized and audited Batches 7, 8, 9, and 10 of Grade 12 Physics Exam Papers, S
 - **Batch 10 (PDF pages 66 to 72, Book pages 60 to 66)**:
   - Scope: Chapter 3 Electricity and Magnetism Lesson 2 (Electromagnetic Induction) and Lesson 3 (Self-Induction) (`ជំពូក 3 មេរៀនទី 2 អាំងឌុចស្យុងអេឡិចត្រូម៉ាញេទិច និងមេរៀនទី 3 អូតូអាំងឌុចស្យុង`), covering magnetic flux $\phi = BA\cos\theta$, Faraday law and Lenz law $E = -N \frac{\Delta\Phi}{\Delta t}$, induced electromotive force in sliding conductor bar $|E| = B\ell v$, instantaneous induced emf in rotating coil $e = E_m \sin\omega t$, self-induction coefficient (inductance $L = \mu \frac{N^2 S}{\ell}$), self-induced emf $e = -L \frac{di}{dt}$, RL circuit dipole voltage, time constant $\tau = L/R$, circuit switch on/off exponential transient response curves, and LC circuit oscillations (period $T_o = 2\pi\sqrt{LC}$, frequency $f_o$, electrical energy, magnetic energy, and total energy conservation).
   - Audit: Completed line-by-line visual audit against scans `p066.png` to `p072.png`, verified formula box boundaries, page split continuations, circuit switch states, response curve percentages ($63\%, 99\%, 37\%, 1\%$), and KaTeX formatting.
+  - KruAI RAG Status: KruAI RAG: YES (already grounded in `server/textbook-search.ts`). No new RAG chunks added (per OCR-only scope).
+- **Batch 11 (PDF pages 73 to 78, Book pages 67 to 72)**:
+  - Scope: Chapter 3 Electricity and Magnetism Lesson 4 (AC Circuits) (`ជំពូក 3 មេរៀនទី 4 សៀគ្វីចរន្តឆ្លាស់`), covering sinusoidal alternating emf ($e = E_m \sin\omega t$), alternating current and voltage ($i = I_m \sin\omega t, v = V_m \sin(\omega t + \phi)$), effective values ($I = I_m/\sqrt{2}, V = V_m/\sqrt{2}$), single component branches (pure resistor $R$, pure inductor $L$, pure capacitor $C$) with Ohm's law and Fresnel vector diagrams, RLC series circuit (total impedance $Z = \sqrt{R^2 + (L\omega - 1/C\omega)^2}$, phase angle $\tan\phi$, power factor $\cos\phi$), electrical resonance ($\omega_o = 1/\sqrt{LC}, f_o = 1/(2\pi\sqrt{LC}), Z = R, \phi = 0, \cos\phi = 1$) with resonance curves, transformer transformation ratio $K = U_2/U_1 = N_2/N_1 = I_1/I_2$, step-up/step-down transformers, transformer efficiency $Rd = P_{c2}/P_{c1}$, and average electric power $P = VI\cos\phi$.
+  - Audit: Completed line-by-line visual audit against scans `p073.png` to `p078.png`, corrected Khmer orthography (`ពុលសាស្យុង`), verified all formulas, component diagrams, resonance conditions, and KaTeX formatting.
   - KruAI RAG Status: KruAI RAG: YES (already grounded in `server/textbook-search.ts`). No new RAG chunks added (per OCR-only scope).
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/វីញ្ញាសារូបវិទ្យា"`, `npm run check:digits` (0 Khmer numerals across all files).
 
