@@ -68,6 +68,17 @@ Digitized and audited Batch 8 of Grade 12 Math Function Graphs (`sources/textboo
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (10 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
 
 
+## 12 Nov 2026: Chemistry Summary & Solutions: Chapter 3 End-of-Chapter Exercises Part 2 (p065 to p070) OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Chapter 3 End-of-Chapter Exercises Part 2 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p065.png` to `p070.png`):
+- **Textbook Rendering & OCR**: Transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter3-exercises-part2.md`, completing Chapter 3 (`ជំពូកទី 3 អាស៊ីត-បាស`), Section IV (Problems 4, 5, 6), Additional Exercises (`? លំហាត់បន្ថែម` Problems 1 to 11), and comprehensive step-by-step solutions for all problems including weak acid and base dissociation constants ($K_\text{a}, K_\text{b}$), ionization percentages ($\alpha$), titration equivalence volumes, and secondary bisulfate ionization ($K_{\text{a}_2}$).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit against scans `p065.png` to `p070.png`, verified multi-step pH calculations for methanoic, perchloric, and ethanoic acids, converted standalone inline math to display math, confirmed the algebraic proof $K_\text{a} \times K_\text{b} = K_\text{w}$, and verified 100% boundary integrity ending at the concluding horizontal divider before Chapter 4.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
 ## 12 Nov 2026: Chemistry Summary & Solutions: Chapter 3 End-of-Chapter Exercises Part 1 (p058 to p064) OCR & Audit
 
 Commit: Pending. **No database step needed.**
@@ -101,11 +112,11 @@ Digitized and audited Chapter 3 Lesson 3 (`sources/textbooks/មេរៀនស�
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
 
 
-## 12 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batches 7 to 11: OCR and Blind Audit
+## 12 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batches 7 to 12: OCR and Blind Audit
 
 Commit: Pending. **No database step needed.**
 
-Digitized and audited Batches 7, 8, 9, 10, and 11 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p046.png` to `p078.png`, Book pages 40 to 72):
+Digitized and audited Batches 7, 8, 9, 10, 11, and 12 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p046.png` to `p088.png`, Book pages 40 to 82):
 - **Batch 7 (PDF pages 46 to 54, Book pages 40 to 48)**:
   - Scope: Chapter 2 Waves Exercises and Solutions (`ជំពូក 2 រលក · ផ្នែកលំហាត់ និងដំណោះស្រាយ`), covering Exercises 1 to 4 and complete solutions for standing waves, node and antinode calculations, fundamental frequencies, harmonics, phase differences, and wave velocities.
   - Audit: Completed line-by-line visual audit against scans `p046.png` to `p054.png`, verified formulas and subscripts, preserved textbook layout and problem notes.
@@ -126,6 +137,10 @@ Digitized and audited Batches 7, 8, 9, 10, and 11 of Grade 12 Physics Exam Paper
   - Scope: Chapter 3 Electricity and Magnetism Lesson 4 (AC Circuits) (`ជំពូក 3 មេរៀនទី 4 សៀគ្វីចរន្តឆ្លាស់`), covering sinusoidal alternating emf ($e = E_m \sin\omega t$), alternating current and voltage ($i = I_m \sin\omega t, v = V_m \sin(\omega t + \phi)$), effective values ($I = I_m/\sqrt{2}, V = V_m/\sqrt{2}$), single component branches (pure resistor $R$, pure inductor $L$, pure capacitor $C$) with Ohm's law and Fresnel vector diagrams, RLC series circuit (total impedance $Z = \sqrt{R^2 + (L\omega - 1/C\omega)^2}$, phase angle $\tan\phi$, power factor $\cos\phi$), electrical resonance ($\omega_o = 1/\sqrt{LC}, f_o = 1/(2\pi\sqrt{LC}), Z = R, \phi = 0, \cos\phi = 1$) with resonance curves, transformer transformation ratio $K = U_2/U_1 = N_2/N_1 = I_1/I_2$, step-up/step-down transformers, transformer efficiency $Rd = P_{c2}/P_{c1}$, and average electric power $P = VI\cos\phi$.
   - Audit: Completed line-by-line visual audit against scans `p073.png` to `p078.png`, corrected Khmer orthography (`ពុលសាស្យុង`), verified all formulas, component diagrams, resonance conditions, and KaTeX formatting.
   - KruAI RAG Status: KruAI RAG: YES (already grounded in `server/textbook-search.ts`). No new RAG chunks added (per OCR-only scope).
+- **Batch 12 (PDF pages 79 to 88, Book pages 73 to 82)**:
+  - Scope: Chapter 3 Electricity and Magnetism Exercises (`ជំពូក 3 អគ្គិសនី និងម៉ាញេទិច · ផ្នែកលំហាត់`), covering all 33 exercises across 4 lessons: Magnetic Field and Force (Exercises 1 to 11), Electromagnetic Induction (Exercises 1 to 9), Self-Induction (Exercises 1 to 8), and AC Circuits (Exercises 1 to 9), complete with circuit schematics, vector diagrams, and end ornament.
+  - Audit: Completed line-by-line visual audit against scans `p079.png` to `p088.png`, verified multi-branch resistor network diagram, page split continuations, rotational frequency units, and KaTeX formatting.
+  - KruAI RAG Status: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/វីញ្ញាសារូបវិទ្យា"`, `npm run check:digits` (0 Khmer numerals across all files).
 
 
