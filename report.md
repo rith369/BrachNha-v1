@@ -16,6 +16,37 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 12 Nov 2026: Chemistry Summary & Solutions: Chapter 3 Lesson 3 (Aqueous Solutions & pH) OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Chapter 3 Lesson 3 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p050.png` bottom half to `p054.png`):
+- **Textbook Rendering & OCR**: Transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter3-lesson3-aqueous-solutions-and-ph.md`, covering Chapter 3 (`ជំពូកទី 3 អាស៊ីត-បាស`), Lesson 3 (`មេរៀនទី 3 សូលុយស្យុងទឹកនិងpH`), including hydronium and hydroxide ions, autoionization of water, water autoionization constant $K_w = K_e$ at varying temperatures ($0^\circ\text{C}, 10^\circ\text{C}, 25^\circ\text{C}, 50^\circ\text{C}$), pH and pOH definitions and logarithmic relationship $\text{pH} + \text{pOH} = 14.0$, acidic/neutral/basic solution scale diagram, 13 review questions, and step-by-step mathematical solutions.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit against scans `p050.png` to `p054.png`, corrected Khmer full stop punctuation in Question 2 (`នៃទឹក។តាង`), fixed spelling error in Answer 6 (`លោការីត`), formatted display math onto dedicated lines, and confirmed 100% KaTeX compliance with zero Khmer inside math blocks.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 12 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batches 7 to 9: OCR and Blind Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Batches 7, 8, and 9 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p046.png` to `p065.png`, Book pages 40 to 59):
+- **Batch 7 (PDF pages 46 to 54, Book pages 40 to 48)**:
+  - Scope: Chapter 2 Waves Exercises and Solutions (`ជំពូក 2 រលក · ផ្នែកលំហាត់ និងដំណោះស្រាយ`), covering Exercises 1 to 4 and complete solutions for standing waves, node and antinode calculations, fundamental frequencies, harmonics, phase differences, and wave velocities.
+  - Audit: Completed line-by-line visual audit against scans `p046.png` to `p054.png`, verified formulas and subscripts, preserved textbook layout and problem notes.
+  - KruAI RAG Status: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Batch 8 (PDF pages 55 to 60, Book pages 49 to 54)**:
+  - Scope: Chapter 3 Electricity and Magnetism Intro, Problem Solving Keys, and Lesson 1 Part 1 (`ជំពូក 3 អគ្គិសនី និងម៉ាញេទិច · គន្លឹះដោះស្រាយ និងមេរៀនទី 1 ភាគ 1`), covering magnetic field of straight conductor, circular coil, solenoid, Laplace electromagnetic force, and parallel current-carrying conductors.
+  - Audit: Completed line-by-line visual audit against scans `p055.png` to `p060.png`, verified right-hand rule notations, vector definitions, units, and KaTeX math formatting with zero Khmer text inside math blocks.
+  - KruAI RAG Status: KruAI RAG: YES (already grounded in `server/textbook-search.ts`). No new RAG chunks added (per OCR-only scope).
+- **Batch 9 (PDF pages 61 to 65, Book pages 55 to 59)**:
+  - Scope: Chapter 3 Lesson 1 Part 2 (`ជំពូក 3 មេរៀនទី 1 ភាគ 2`), covering interaction forces between parallel currents, Lorentz force on moving charged particles ($\vec{F}_m = q(\vec{v} \times \vec{B})$), deflection of charged particles in uniform magnetic field, circular trajectory radius $R = \frac{mv}{|q|B}$, angular deflection, magnetic deflection $Z = \frac{D\ell|q|B}{mv}$, and Bainbridge mass spectrometer specific charge $\frac{|q|}{m}$.
+  - Audit: Completed line-by-line visual audit against scans `p061.png` to `p065.png`, verified variable definitions, formula groupings, mass spectrometer detector plates, and fixed KaTeX math boundaries.
+  - KruAI RAG Status: KruAI RAG: YES (already grounded in `server/textbook-search.ts`). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/វីញ្ញាសារូបវិទ្យា"`, `npm run check:digits` (0 Khmer numerals across all files).
+
+
 ## 12 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 7: Lesson 1 Rational Functions Exercises Part 6 (Exercises 8 cont., 9)
 
 Commit: pending. **No database step needed.**
