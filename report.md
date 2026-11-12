@@ -16,6 +16,24 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 12 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 10: Lesson 2 Logarithmic Functions Exercises Part 2
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 10 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p081.png` to `p088.png`, Book pages 76 to 83), covering Lesson 2 (Logarithmic Functions):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson2-logarithmic-functions-part2.md`, covering:
+  - Exercise 2 (conclusion): intersection point $A(1, 1)$ between curve $(C)$ and line $(D) : y = 1$, tangent line $(L) : y = 3x - 2$, auxiliary coordinate table, and full-page Cartesian coordinate curve construction with asymptotes $y = 1, x = 0$ and peak $(e, 1.7)$.
+  - Exercise 3 ($f(x) = 1 - \frac{2\ln x}{x}$): Bac II 2013 exam exercise, questions ក to ឃ, limits at $+\infty$ and $0^+$, horizontal asymptote $y = 1$, vertical asymptote $x = 0$, first derivative $f'(x) = \frac{2\ln x - 2}{x^2}$, sign study, variation table with minimum $f(e) = 1 - \frac{2}{e} \approx 0.3$, curve construction, and definite integral for bounded region area $S = \int_{1}^{e} [1 - f(x)] dx = 1\text{ unit}^2$.
+  - Exercise 4 ($f(x) = \frac{x + \ln x}{x^2}$): Bac II 2014 Round 2 exam exercise, auxiliary polynomial-logarithmic function $h(x) = -x + 1 - 2\ln x$, derivative $h'(x) = -\frac{x+2}{x} < 0$, strictly decreasing variation table for $h(x)$, sign analysis ($h(x) > 0$ for $x \in (0, 1)$ and $h(x) < 0$ for $x \in (1, +\infty)$), limits of $f(x)$ at $0^+$ and $+\infty$ via substitution $u = 1/x$, derivative connection $f'(x) = \frac{h(x)}{x^3}$, and variation deduction with peak $f(1) = 1$.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 8 pages (`p081.png` to `p088.png`):
+  - Fixed display math formatting so no trailing Khmer text shares a line with `$$...$$`.
+  - Audited and documented multiple printed textbook typos: author dropped $x$ in `\Rightarrow = e` (annotated `[sic: \Rightarrow x = e]`), author mislabeled minimum as maximum (annotated `[sic: តម្លៃអប្បបរមា]`), and author inverted inequality sign for $h(x)$ on interval $(1, +\infty)$ (annotated `[sic: h(x) < 0]`).
+  - Preserved printed erratum in tangent equation calculation with explanatory note explaining derivative calculation.
+  - Maintained boundary markers `<!-- Page p081.png -->` through `<!-- Page p088.png -->` with 100% boundary integrity.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (12 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
 ## 12 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 9: Lesson 2 Logarithmic Functions Theory and Exercises Part 1
 
 Commit: pending. **No database step needed.**
