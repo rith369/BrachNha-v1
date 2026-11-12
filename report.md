@@ -16,6 +16,24 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 12 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 11: Lesson 2 Logarithmic Functions Exercises Part 3
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 11 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p089.png` to `p096.png`, Book pages 84 to 91), covering Lesson 2 (Logarithmic Functions):
+- **Textbook Rendering & OCR**: Rendered high-resolution scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson2-logarithmic-functions-part3.md`, covering:
+  - Exercise 4 (conclusion): variation table for $f(x) = \frac{x + \ln x}{x^2}$, behavior and limits, relative extrema, and orthonormal coordinate curve construction.
+  - Exercise 5 (Bac II 2015): complete problem parts A and B. Part A: auxiliary function $g(x) = x^2 + \ln x$, derivative $g'(x) = \frac{2x^2+1}{x} > 0$, strictly increasing proof, $g(1) = 1$, root deduction via analytical comparison (Method 1) and variation table (Method 2), and sign determination of $x^2 + \ln x - 1$. Part B: $f(x) = x + 1 - \frac{\ln x}{x}$, limits at $0^+$ and $+\infty$, derivative $f'(x) = \frac{x^2 + \ln x - 1}{x^2}$, variation table, oblique asymptote $(\Delta) : y = x + 1$, relative position analysis, intersection point $I(1, 2)$, auxiliary coordinate values table, and curve plotting.
+  - Exercise 6 (Bac II 19 September 2019): problem statement for $f(x) = \frac{x^2 - 2}{x} - \ln x$ (questions 1 to 4) and start of solution for canonical form $f(x) = x - \ln x - \frac{2}{x}$ and limit calculations.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 8 pages (`p089.png` to `p096.png`):
+  - Refactored multiple consecutive display math equations into aligned KaTeX environments (`\begin{aligned} ... \end{aligned}`) to ensure aligned equal signs while keeping Khmer text strictly outside math blocks.
+  - Flattened split bullet math into continuous inline equations to preserve clean markdown list indentation.
+  - Preserved printed book typos and notation oddities with footnotes: $x \in 0 < x < 1$ (annotated `[sic: \forall x \in (0, 1)]`), vector arrow over origin $\vec{O}$ (annotated `[sic: (O, \vec{i}, \vec{j})]`), and printed limit sign slips.
+  - Maintained boundary markers `<!-- Page p089.png -->` through `<!-- Page p096.png -->` with 100% boundary integrity.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (13 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
 ## 12 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 10: Lesson 2 Logarithmic Functions Exercises Part 2
 
 Commit: pending. **No database step needed.**
