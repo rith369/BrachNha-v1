@@ -16,6 +16,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 19: Lesson 3 Exponential Functions Theory (3.1 to 3.8)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 19 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p157.png` to `p160.png`, Book pages 152 to 155), beginning Lesson 3 (Exponential Functions):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson3-exponential-functions-theory.md`, covering sections 3.1 to 3.8: definition $\exp(x) = e^x$, 9 fundamental properties, domain table, 7 standard limits and 5 corollaries, continuity and derivatives of $e^x$ and $e^{u(x)}$, curve $y = e^x$ symmetry with $y = \ln x$ across $y = x$, base-$a$ exponential function $a^x$, inequalities table, derivative $(a^x)' = a^x \ln a$, and base-$a$ limit table.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 4 pages (`p157.png` to `p160.png`):
+  - Reordered Section 3.2 bullets (`p157`) to match visual column/row order, restored missing Khmer colon `៖` (`p158`), indented nested equivalence under its parent bullet (`p160`), and added visible axis tick range `[-3, 4]` to the graph description (`p159`).
+  - Documented printed textbook typos with explanatory notes: stray log formula note (`p158`), spelling typo `អាចដកដេរីវេបាន` (`p159`), and $a^x = e^{x\log(x)}$ base typo (`p160`).
+  - Maintained `<!-- Page p157.png -->` through `<!-- Page p160.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (21 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 18: Lesson 2 Logarithmic Functions Exercises Part 10 (Lesson 2 Complete)
 
 Commit: pending. **No database step needed.**
