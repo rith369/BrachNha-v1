@@ -16,6 +16,23 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 13: Lesson 2 Logarithmic Functions Exercises Part 5
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 13 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p106.png` to `p114.png`, Book pages 101 to 109):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson2-logarithmic-functions-part5.md`, covering:
+  - Exercise 8 (conclusion): derivative sign and variation table of $f(x) = x - \frac{\ln(1 + x)}{1 + x}$, intersection point $A(0, 0)$ with line $(D) : y = x$, and coordinate graph description.
+  - Exercise 9 (complete): study of $f(x) = \ln(1 + e^{-x}) + \frac{1}{3}x$ (parts ក through ឆ), limits at $+\infty$ and $-\infty$, oblique asymptotes $(D) : y = \frac{1}{3}x$ and $(D') : y = -\frac{2}{3}x$, relative positions, derivative $f'(x) = \frac{e^x - 2}{3(e^x + 1)}$, variation table, minimum at $(\ln 2, 0.63)$, and combined graph plot description.
+  - Exercise 10 (start): problem statement (Parts A, B, C) plus Part A ($g(x) = x^2 - 2\ln x + 2$: derivative sign, variation table, proof $g(x) > 0$) and Part B 1.ក to ខ (limit at $0$ and vertical asymptote $(D) : x = 0$).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 9 pages (`p106.png` to `p114.png`):
+  - Corrected Khmer vowel OCR slip `មានឬស` to `មានឫស` (`p112`) and added explanatory note for printed vector notation $\vec{O}$ in `$(\vec{O}, \ \vec{i}, \ \vec{j})$`.
+  - Documented printed textbook typos with explanatory notes: `$x_D$` on RHS (`p106`), `$\ln 1 + 0 = 0$` (`p109`), omitted `$e^x$` numerator (`p110`), maximum vs minimum wording (`p111`), omitted factor `$2$` (`p113`), and boxed `$+\infty$` sign mismatch (`p114`).
+  - Maintained `<!-- Page p106.png -->` through `<!-- Page p114.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (15 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 12: Lesson 2 Logarithmic Functions Exercises Part 4 (Pages 1 to 100 Complete)
 
 Commit: pending. **No database step needed.**
