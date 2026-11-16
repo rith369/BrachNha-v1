@@ -16,6 +16,24 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 12: Lesson 2 Logarithmic Functions Exercises Part 4 (Pages 1 to 100 Complete)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 12 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p097.png` to `p105.png`, Book pages 92 to 100), completing the full target scope of Book pages 1 to 100 (Front Matter pp. i–iv + Book pp. 1–100 across 13 audited files):
+- **Textbook Rendering & OCR**: Transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson2-logarithmic-functions-part4.md`, covering:
+  - Exercise 6 (conclusion, Bac II 19 September 2019): canonical rewritings of $f(x) = \frac{x^2 - 2}{x} - \ln x$, limits at $0^+$ and $+\infty$, derivative $f'(x) = \frac{x^2 + 2 - x}{x^2} > 0$, strictly increasing variation table, asymptote $x = 0$, tangent lines $(D) : y = 2x - 3$ at $A(1, -1)$ and $(T)$ parallel to $y = x$ at $B(2, 0.3)$, and curve plotting.
+  - Exercise 7 (Bac II 8 October 2024): full study of $f(x) = \ln(x + 1) - \ln(x - 1) - x + 2$ on $(1, +\infty)$, limits at $1^+$ and $+\infty$, derivative $f'(x) = \frac{-(x^2 + 1)}{(x + 1)(x - 1)} < 0$, strictly decreasing variation table, oblique asymptote $(d) : y = -x + 2$, relative position proof, and curve plotting.
+  - Exercise 8 (start, parts 1, 2, and start of 3): study of $f(x) = x - \frac{\ln(1 + x)}{1 + x}$ on $(0, +\infty)$, derivative numerator expression $N(x) = (1 + x)^2 - 1 + \ln(x + 1)$, value $N(0) = 0$, variation table and positivity of $N(x)$ on $(0, +\infty)$, and boundary limits of $f(x)$ at $0$ and $+\infty$.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 9 pages (`p097.png` to `p105.png`):
+  - Corrected graph x-intercept approximation in Exercise 6 figure description ($x \approx 1.7$) and added intersection $(3, 3)$ of $y = x$ and $(D)$.
+  - Fixed variation table top/bottom infinity cell alignment (`+\infty <br>`) and normalized Khmer justification spacing and colons (`ព្រោះ៖`).
+  - Documented printed textbook typos with explanatory notes: omitted `0` in `ត្រង់` (`p097`), domain typo `(0, +\infty)` instead of `(1, +\infty)` (`p101`), sign row `+` despite decreasing curve (`p102`), negative sign typo in graph label (`p103`), and mislabeled table title `f` instead of `N` plus duplicated `"តាមតារាង"` (`p105`).
+  - Maintained boundary markers `<!-- Page p097.png -->` through `<!-- Page p105.png -->` with 100% boundary integrity and updated `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/STATUS.md` (13 of 13 OCR files written and audited).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (14 files checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across 363 files), `npm run check:content`, and `npx oxlint` (0 errors).
+
+
 ## 12 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 11: Lesson 2 Logarithmic Functions Exercises Part 3
 
 Commit: pending. **No database step needed.**
