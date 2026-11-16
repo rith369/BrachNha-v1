@@ -83,6 +83,17 @@ Digitized and audited Batch 13 of Grade 12 Math Function Graphs (`sources/textbo
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (15 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
 
 
+## 16 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 2 (Ch 2 Lesson 1 Part 2 French Protectorate Complete) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 2 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch2-lesson1-part2-french-protectorate.md`, PDF pages `p018.png` to `p024.png`, Book pp. 8-14), completing Chapter 2 Lesson 1:
+- Covered Section 2 continuation (questions 6-9 on the 1884-1886 rebellion and French-Khmer compromise), Section 3 (`ការតស៊ូដើម្បីឯករាជ្យជាតិ និងសន្ធិសញ្ញាក្រុងសឺណែវឆ្នាំ1954`: questions 1-7 covering armed vs peaceful independence struggles and Geneva 1954), and Section 4 (`ចំណុចវិជ្ជមាន និងអវិជ្ជមាននៃកំណែទម្រង់របស់បារាំង`: questions 1-2 including 1904/1907 border treaties). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit restored a missing subscript in `ឯករាជ្យជាតិ` on `p019.png` and confirmed zero omitted lines across all 7 pages.
+- **KruAI RAG: YES (already grounded)** under `HISTORY_CH1_SECTIONS` in `server/textbook-search.ts` (`tb:hist:protectorate:ch1:*`). No conflicting dates found during audit; no new RAG chunks added.
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`4 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
+
+
 ## 16 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 1 (Ch 2 Lesson 1 Part 1 French Protectorate) OCR & Audit
 
 Commit: pending. **No database step needed.**
@@ -257,11 +268,11 @@ Digitized and audited Chapter 3 Lesson 3 (`sources/textbooks/មេរៀនស�
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
 
 
-## 16 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batches 7 to 14: OCR and Blind Audit
+## 16 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batches 7 to 16: 100% Complete Book OCR & Audit
 
 Commit: Pending. **No database step needed.**
 
-Digitized and audited Batches 7, 8, 9, 10, 11, 12, 13, and 14 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p046.png` to `p104.png`, Book pages 40 to 98):
+Digitized and audited Batches 7 through 16 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p046.png` to `p117.png`, Book pages 40 to 111), bringing the entire textbook (all 117 pages) to 100% OCR Written and 100% OCR Audited:
 - **Batch 7 (PDF pages 46 to 54, Book pages 40 to 48)**:
   - Scope: Chapter 2 Waves Exercises and Solutions (`ជំពូក 2 រលក · ផ្នែកលំហាត់ និងដំណោះស្រាយ`), covering Exercises 1 to 4 and complete solutions for standing waves, node and antinode calculations, fundamental frequencies, harmonics, phase differences, and wave velocities.
   - Audit: Completed line-by-line visual audit against scans `p046.png` to `p054.png`, verified formulas and subscripts, preserved textbook layout and problem notes.
@@ -293,6 +304,14 @@ Digitized and audited Batches 7, 8, 9, 10, 11, 12, 13, and 14 of Grade 12 Physic
 - **Batch 14 (PDF pages 97 to 104, Book pages 91 to 98)**:
   - Scope: Chapter 3 Electricity and Magnetism Solutions Part 2 (`ជំពូក 3 អគ្គិសនី និងម៉ាញេទិច · ផ្នែកដំណោះស្រាយ ភាគ 2`), covering Lesson 2 Electromagnetic Induction Solutions (Exercises 1 to 9: induced emf in 50-turn circular coil $|E| = 18\text{ V}$ and $|E| = 0.75\text{ V}$, magnetic field between magnet poles $B = 0.21\text{ T}$ via charge and galvanometer, moving conductor bar induced current $I = 0.10\text{ A}$, rectangular loop induced emf $|E| = 12\text{ V}$ and current $I = 1.2\text{ A}$, rotating coil maximum induced emf $E_m = 0.018\text{ V}$, AC generator speed $N_2 = 1800\text{ ជុំ/mn}$, horizontal rail sliding bar induced emf $|E| = 1.94\text{ V}$ and speed $v = 5.7\text{ m/s}$, rotating coil $E_m = 1.8 \times 10^{-2}\text{ V}$) and Lesson 3 Self-Induction Solutions (Exercises 1 to 2, Exercise 3 part ក: solenoid self-inductance $L = 1.6 \times 10^{-5}\text{ H}$ and self-induced emf $e = -7.9 \times 10^{-5}\text{ V}$, solenoid inductance $L = 0.18 \times 10^{-3}\text{ H}$ and emf $e = 9.0 \times 10^{-3}\text{ V}$, capacitor electrostatic energy $E_C = \frac{1}{2}CV^2$).
   - Audit: Completed line-by-line visual audit against scans `p097.png` to `p104.png`, verified variable indices ($\Phi_i, \Phi_f$), cleaned LaTeX spacing in boxed results, verified that zero bottom lines were clipped, and confirmed zero Khmer text inside math blocks.
+  - KruAI RAG Status: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Batch 15 (PDF pages 105 to 111, Book pages 99 to 105)**:
+  - Scope: Chapter 3 Electricity and Magnetism Solutions Part 3 (`ជំពូក 3 អគ្គិសនី និងម៉ាញេទិច · ផ្នែកដំណោះស្រាយ ភាគ 3`), covering Lesson 3 Self-Induction Solutions conclusion (Exercise 3 part ខ: peak current $i_m = 6.3 \times 10^{-3}\text{ A}$, Exercise 4: inductance $L = 12 \times 10^{-3}\text{ H}$, Exercise 5: LC resonance inductance $L = 0.22\text{ H}$, Exercise 6: resistor network reduction $R_{\text{eq}} = 92\,\Omega$, time constant $\tau = 4.0 \times 10^{-4}\text{ s}$, transient currents at $t = 2\tau$ and $t = \infty$, Exercise 7: solenoid inductance $L = 43 \times 10^{-4}\text{ H}$ and area $A = 1.0 \times 10^{-2}\text{ m}^2$, Exercise 8: inductance $L = 3.5 \times 10^{-4}\text{ H}$ and self-induced emf $e = -1.6 \times 10^{-3}\text{ V}$) and Lesson 4 AC Circuits Solutions start (Exercise 1: pure resistor RMS current $I = 1.41\text{ A}$, Exercise 2: pure inductor impedance $Z_L = 9.42\,\Omega$ and RMS current $I = 15.9\text{ A}$, Exercise 3: pure capacitor impedance $Z_C = 332\,\Omega$ and RMS current $I = 0.452\text{ A}$, Exercise 4 part ក: series RLC circuit branch impedances $Z_L = 471\,\Omega, Z_C = 758\,\Omega$ and total impedance $Z = 513\,\Omega$).
+  - Audit: Completed line-by-line visual audit against scans `p105.png` to `p111.png`, standardized Khmer terminology (`អាំប៉េដង់`, `សូលេណូអ៊ុត`), preserved printed textbook typo notes ($431 \times 0^{-4}\text{ H}$), verified circuit branch diagrams, and confirmed zero Khmer text inside math blocks.
+  - KruAI RAG Status: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Batch 16 (PDF pages 112 to 117, Book pages 106 to 111 - Final Batch & Book Complete)**:
+  - Scope: Chapter 3 Electricity and Magnetism Solutions Part 4 (`ជំពូក 3 អគ្គិសនី និងម៉ាញេទិច · ផ្នែកដំណោះស្រាយ ភាគ 4`), covering Lesson 4 AC Circuits Solutions conclusion (Exercise 4 parts ខ, គ, ឃ: peak current $I_m = 0.292\text{ A}$, phase difference $\tan\varphi = -0.675 \Rightarrow \varphi = -34^\circ$, branch peak voltages and instantaneous expressions $v_R(t), v_L(t), v_C(t)$, Exercise 5: RLC impedance at $60\text{ Hz}$ and $10\text{ kHz}$ and effective currents $I = 0.228\text{ A}$ and $I = 0.627\text{ A}$, Exercise 6: resonance frequency $f_0 = 1300\text{ Hz}$ and current $I = 5.5\text{ A}$, Exercise 7: power factor $\cos\varphi = 0.106$, average power $P = 38.3\text{ W}$ and resonance power $P_0 = 360\text{ W}$, Exercise 8: phase angle $\tan\varphi = 2.5 \Rightarrow \varphi = 68^\circ$ with current lagging voltage, Exercise 9: peak voltages $V_{m,R} = 2.7\text{ V}, V_{m,L} = 8.1\text{ V}, V_{m,C} = 45\text{ V}$), ending with terminal ornament vignette.
+  - Audit: Completed line-by-line visual audit against scans `p112.png` to `p117.png`, corrected spelling (`អានុភាព`), formatted inline math comparisons cleanly outside math blocks, verified zero dropped lines to the final book page, and confirmed 100% textbook completion.
   - KruAI RAG Status: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/វីញ្ញាសារូបវិទ្យា"`, `npm run check:digits` (0 Khmer numerals across all files).
 
