@@ -146,6 +146,17 @@ Digitized and audited Batch 13 of Grade 12 Math Function Graphs (`sources/textbo
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (15 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
 
 
+## 16 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 6 (Ch 2 Lesson 4 Part 2 Democratic Kampuchea Complete) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 6 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch2-lesson4-part2-democratic-kampuchea.md`, PDF pages `p048.png` to `p053.png`, Book pp. 38-43), completing Chapter 2 Lesson 4:
+- Covered continuation of `III. សោកនាដកម្ម` (Q3-Q4), `IV. ការផ្តួលរលំរបបកម្ពុជាប្រជាធិបតេយ្យ` (Q1-Q4, including the 1976 purge policy), and `V. ការបង្កើតសាលាក្តីកាត់ទោសមេដឹកនាំខ្មែរក្រហម` (Q1-Q4 on the ECCC). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit inspected all 6 PNGs, removed a line-wrap space artifact (`បានបង្ក ផលវិបាក` -> `បានបង្កផលវិបាក`), and annotated printed workbook typos (`ស្វែងអ្នក`, `ចូលបង្ហាញ`, `...កាត់ទោសមេដឹកនាំខ្មែរក្រហមកាត់ទោស`).
+- **KruAI RAG: YES (already grounded)** under `HISTORY_CH4_SECTIONS` in `server/textbook-search.ts` (`tb:hist:dk:ch4:*`). No conflicting dates found; no new RAG chunks added.
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`8 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
+
+
 ## 16 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 5 (Ch 2 Lesson 4 Part 1 Democratic Kampuchea) OCR & Audit
 
 Commit: pending. **No database step needed.**
@@ -296,6 +307,17 @@ Digitized and audited Batch 8 of Grade 12 Math Function Graphs (`sources/textboo
   - Maintained boundary markers `<!-- Page p064.png -->` through `<!-- Page p071.png -->` with 100% boundary integrity.
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (10 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
+## 16 Nov 2026: Chemistry Summary & Solutions: Chapter 4 End-of-Chapter Exercises & Solutions OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Chapter 4 End-of-Chapter Exercises & Solutions (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p092.png` bottom half to `p099.png`), completing 100% of Chapter 4 (Chemical Equilibrium):
+- **Textbook Rendering & OCR**: Transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter4-exercises-solutions.md`, covering Chapter 4 (`ជំពូកទី 4 លំនឹងគីមី`), Section I (Multiple choice 1 to 3), Section II (Fill-in-the-blanks 1 to 2), Section III (Critical thinking questions 1 to 4 on Le Chatelier shifts and catalytic effects), Section IV (Numerical problems 1 to 10 on equilibrium constants $K$, initial/change/equilibrium calculations, acid/base dissociation $K_\text{a}, K_\text{b}$, pH, buffer systems, and common ion effects with $\text{NaF}$ and $\text{NaOH}$), and comprehensive step-by-step solutions for all items.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit against scans `p092.png` to `p099.png`, moved Khmer descriptive subscripts (`សល់`, `ក្រោយប្រតិកម្ម`) outside KaTeX math blocks to prevent empty rendering boxes, verified display math formatting on isolated lines, confirmed textbook typographical erratum preservation where $K_\text{a}(\text{HF}) = 6.7 \times 10^{-4}$ was used in calculation, and verified clean boundary termination before Chapter 5.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
 
 
 ## 16 Nov 2026: Chemistry Summary & Solutions: Chapter 4 Lesson 3 (Acid-Base & Salt Equilibrium) OCR & Audit
