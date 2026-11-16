@@ -16,6 +16,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 18: Lesson 2 Logarithmic Functions Exercises Part 10 (Lesson 2 Complete)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 18 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p149.png` to `p156.png`, Book pages 144 to 151), concluding Lesson 2 (Logarithmic Functions, Book pp. 67 to 151 across 10 parts):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson2-logarithmic-functions-part10.md`, covering:
+  - Exercise 16 (conclusion): derivative identity $f'(x) = \frac{g(x^2)}{x(1 + x^2)^2}$, variation table of $f$, extremum value $f(\sqrt{x_0}) = \frac{1}{2x_0}$, and curve plotting of $(C)$.
+  - Exercise 17 (complete): full problem and solution for $f(x) = \ln\left(\frac{1 + x}{1 - x}\right)$ (Parts 1 to 6), domain $(-1, 1)$, derivative $f'(x) = \frac{2}{1 - x^2}$, odd symmetry, variation table, tangent line $(T) : y = 2x$ at origin $O$, inequalities $f'(t) \ge 2$ and $f(x) \ge 2x$ via integration, curve plotting with vertical asymptotes $x = \pm 1$, bounded area $A(\lambda)$, and limit $\lim_{\lambda \to 1^-} A(\lambda) = 2\ln 2$.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 8 pages (`p149.png` to `p156.png`):
+  - Clarified tangency and crossing at origin $I(0, 0)$ in Exercise 17 figure description (`p155`).
+  - Documented printed textbook typos with explanatory notes: missing exponent `2` on `(1 + x^2)` (`p149`), interval wording `គ្រប់ចំនួនពិត t` (`p151`) and `\lambda \in (0, 1]` endpoint note (`p151`), sign slip `(1 - x) - (x + 1)` (`p152`), omitted differential `dx` after `f'(x)` (`p155`), and limit index `\lambda \to 0^+` plus omitted unit-area factor `4\text{cm}^2` (`p156`).
+  - Maintained `<!-- Page p149.png -->` through `<!-- Page p156.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (20 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 17: Lesson 2 Logarithmic Functions Exercises Part 9
 
 Commit: pending. **No database step needed.**
@@ -97,6 +113,17 @@ Digitized and audited Batch 13 of Grade 12 Math Function Graphs (`sources/textbo
   - Maintained `<!-- Page p106.png -->` through `<!-- Page p114.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (15 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
+## 16 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 4 (Ch 2 Lesson 3 Khmer Republic) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 4 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch2-lesson3-khmer-republic.md`, PDF pages `p033.png` to `p041.png`, Book pp. 23-31):
+- Covered Chapter 2 Lesson 3 (`សាធារណរដ្ឋខ្មែរ 1970-1975`) across all 5 sections: rise of the Khmer Republic and 18 March 1970 coup (`I`), socio-economic conditions during the war (`II`), 1970-1975 civil war (`III`), fall of the Khmer Republic (`IV`), and war damages and consequences (`V`). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit inspected all 9 PNGs line-by-line, verified source print quirks (repeated `3.` on `p034.png`, skipped `3.` on `p037.png`/`p038.png`), and annotated the `19070-1975` printing typo on `p038.png` (`*(កំហុសបោះពុម្ពនៃឆ្នាំ 1970-1975)*`).
+- **KruAI RAG: YES (already grounded)** under `HISTORY_CH3_SECTIONS` in `server/textbook-search.ts` (`tb:hist:republic:ch3:*`). No conflicting dates found; no new RAG chunks added.
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`6 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
 
 
 ## 16 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 3 (Ch 2 Lesson 2 Sangkum Reastr Niyum) OCR & Audit
