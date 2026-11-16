@@ -16,6 +16,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 21: Lesson 3 Exponential Functions Exercises Part 2
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 21 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p170.png` to `p178.png`, Book pages 165 to 173):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson3-exponential-functions-exercises-part2.md`, covering:
+  - Exercise 3 (conclusion): horizontal asymptote $(L) : y = -1$ and relative position, tangent line $(T) : y = ex + 1.7$, variation table of $f$, Part B ($g(x) = -\frac{1}{2}x^2$, sign table of $g'(x)$, variation table of $g$, relative position between $(C)$ and $(P)$, value tables, and curve plotting).
+  - Exercise 4 (start): full problem statement (Parts 1 to 3) for $f(x) = x - e^x$ and $g(x) = (1 - x)e^x$, Part 1 (oblique asymptote $(\Delta) : y = x$, relative position, variation tables of $f$ and $g$), and Part 2 ($h'(x) = 1 - g(x)$, unique root $\alpha \in [1, 2]$, start of relative position between $(C_1)$ and $(C_2)$).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 9 pages (`p170.png` to `p178.png`):
+  - Added explanatory erratum note on `p176` documenting textbook notation `$y_C$` written instead of `$y_{C_1}$`.
+  - Documented printed textbook typos with explanatory notes: `\forall x \in \mathbb{R}` vs `\forall x_0`, `=` used for rounded estimates, Khmer typo `ជាអនុគមន៍ លើចុះ` (`p171`), unprinted `ផ្នែក B` header (`p172`), strict inequality `g'(x) > 0` despite `g'(0) = 0` and omitted table endpoints (`p173`), and `(C)` vs `(C_1)` (`p175`).
+  - Maintained `<!-- Page p170.png -->` through `<!-- Page p178.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (23 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 20: Lesson 3 Exponential Functions Exercises Part 1
 
 Commit: pending. **No database step needed.**
