@@ -104,6 +104,17 @@ Digitized and audited Batch 8 of Grade 12 Math Function Graphs (`sources/textboo
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (10 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
 
 
+## 16 Nov 2026: Chemistry Summary & Solutions: Chapter 4 Lesson 2 (Equilibrium Shifts) OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Chapter 4 Lesson 2 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p078.png` to `p086.png` top half):
+- **Textbook Rendering & OCR**: Transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter4-lesson2-equilibrium-shifts.md`, covering Chapter 4 (`ជំពូកទី 4 លំនឹងគីមី`), Lesson 2 (`មេរៀនទី 2 : ការរំកិលលំនឹង`), including Le Chatelier's principle, factors shifting equilibrium (pressure, concentration, temperature), common ion effect in weak acid and sparingly soluble salt solutions, 9 lesson questions and answers, and 7 additional problems (10 to 16) with complete ICE tables and quadratic formula derivations.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit against scans `p078.png` to `p086.png`, corrected critical OCR misreads (`បន្ថែមកាតាលីករ` from `បន្ថែមភាវលីករ`, `សញ្ញាណអ៊ីយ៉ុងរួម` from `វត្តមានញាណអ៊ីយ៉ុងរួម`, `ឈានទៅរកសព្វ` from `មានទៅរកសព្វ`), fixed chemical nomenclature spelling (`នីត្រុស៊ីលក្លរួ`, `កាចុងនិងអាញ៉ុង`), verified ICE equilibrium tables and quadratic solutions, and ensured clean termination before Lesson 3 divider.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
 ## 12 Nov 2026: Chemistry Summary & Solutions: Chapter 4 Lesson 1 (Nature of Chemical Equilibrium) OCR & Audit
 
 Commit: Pending. **No database step needed.**
@@ -159,11 +170,11 @@ Digitized and audited Chapter 3 Lesson 3 (`sources/textbooks/មេរៀនស�
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
 
 
-## 12 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batches 7 to 13: OCR and Blind Audit
+## 16 Nov 2026: Physics Exam Papers (Student Volunteer 2019-2020) Batches 7 to 14: OCR and Blind Audit
 
 Commit: Pending. **No database step needed.**
 
-Digitized and audited Batches 7, 8, 9, 10, 11, 12, and 13 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p046.png` to `p096.png`, Book pages 40 to 90):
+Digitized and audited Batches 7, 8, 9, 10, 11, 12, 13, and 14 of Grade 12 Physics Exam Papers, Summary and Solutions (`sources/textbooks/វីញ្ញាសារូបវិទ្យា.pdf`, PDF pages `p046.png` to `p104.png`, Book pages 40 to 98):
 - **Batch 7 (PDF pages 46 to 54, Book pages 40 to 48)**:
   - Scope: Chapter 2 Waves Exercises and Solutions (`ជំពូក 2 រលក · ផ្នែកលំហាត់ និងដំណោះស្រាយ`), covering Exercises 1 to 4 and complete solutions for standing waves, node and antinode calculations, fundamental frequencies, harmonics, phase differences, and wave velocities.
   - Audit: Completed line-by-line visual audit against scans `p046.png` to `p054.png`, verified formulas and subscripts, preserved textbook layout and problem notes.
@@ -191,6 +202,10 @@ Digitized and audited Batches 7, 8, 9, 10, 11, 12, and 13 of Grade 12 Physics Ex
 - **Batch 13 (PDF pages 89 to 96, Book pages 83 to 90)**:
   - Scope: Chapter 3 Electricity and Magnetism Solutions Part 1 (`ជំពូក 3 អគ្គិសនី និងម៉ាញេទិច · ផ្នែកដំណោះស្រាយ ភាគ 1`), covering Lesson 1 Magnetic Field and Force Solutions (Exercises 1 to 11): straight wire magnetic field, circular loop coil field, solenoid field, flat coil field with relative permeability, Laplace electromagnetic force at various angles ($30^\circ, 60^\circ, 90^\circ$), Lorentz force on proton, alpha particle circular trajectory, specific charge ratio, cathode ray tube electron deflection radius, parallel currents magnetic forces, and nickel isotope separation ($^{58}\text{Ni}$ and $^{60}\text{Ni}$).
   - Audit: Completed line-by-line visual audit against scans `p089.png` to `p096.png`, corrected Khmer orthography (`សូលេណូអ៊ីត`, `ឡូរ៉ិន`), eliminated all Khmer inside math blocks, verified Latin digits throughout, and validated mathematical derivations.
+  - KruAI RAG Status: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Batch 14 (PDF pages 97 to 104, Book pages 91 to 98)**:
+  - Scope: Chapter 3 Electricity and Magnetism Solutions Part 2 (`ជំពូក 3 អគ្គិសនី និងម៉ាញេទិច · ផ្នែកដំណោះស្រាយ ភាគ 2`), covering Lesson 2 Electromagnetic Induction Solutions (Exercises 1 to 9: induced emf in 50-turn circular coil $|E| = 18\text{ V}$ and $|E| = 0.75\text{ V}$, magnetic field between magnet poles $B = 0.21\text{ T}$ via charge and galvanometer, moving conductor bar induced current $I = 0.10\text{ A}$, rectangular loop induced emf $|E| = 12\text{ V}$ and current $I = 1.2\text{ A}$, rotating coil maximum induced emf $E_m = 0.018\text{ V}$, AC generator speed $N_2 = 1800\text{ ជុំ/mn}$, horizontal rail sliding bar induced emf $|E| = 1.94\text{ V}$ and speed $v = 5.7\text{ m/s}$, rotating coil $E_m = 1.8 \times 10^{-2}\text{ V}$) and Lesson 3 Self-Induction Solutions (Exercises 1 to 2, Exercise 3 part ក: solenoid self-inductance $L = 1.6 \times 10^{-5}\text{ H}$ and self-induced emf $e = -7.9 \times 10^{-5}\text{ V}$, solenoid inductance $L = 0.18 \times 10^{-3}\text{ H}$ and emf $e = 9.0 \times 10^{-3}\text{ V}$, capacitor electrostatic energy $E_C = \frac{1}{2}CV^2$).
+  - Audit: Completed line-by-line visual audit against scans `p097.png` to `p104.png`, verified variable indices ($\Phi_i, \Phi_f$), cleaned LaTeX spacing in boxed results, verified that zero bottom lines were clipped, and confirmed zero Khmer text inside math blocks.
   - KruAI RAG Status: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/វីញ្ញាសារូបវិទ្យា"`, `npm run check:digits` (0 Khmer numerals across all files).
 
