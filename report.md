@@ -16,6 +16,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 14: Lesson 2 Logarithmic Functions Exercises Part 6
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 14 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p115.png` to `p123.png`, Book pages 110 to 118):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson2-logarithmic-functions-part6.md`, covering:
+  - Exercise 10 (conclusion): Part B (limits at $+\infty$, oblique asymptote $(\Delta) : y = \frac{1}{2}x - 1$, relative position, derivative $f'(x) = \frac{g(x)}{2x^2}$, variation table, intermediate value root $\alpha \in [1, 2]$, tangent line $(T) : y = \frac{3}{2}x - 2$, graph construction) and Part C ($h'(x) = \frac{\ln x}{x}$, integral $\int_2^e \frac{\ln x}{x}\,dx$, and bounded area $S = 0.25$).
+  - Exercise 11 (start): full problem statement (Parts A and B) plus Part A ($g(x) = 3 - 3\ln x + x^3$: derivative factorization, sign table, variation table, positivity proof) and Part B (limits at $0^+$ and $+\infty$, derivative $f'(x) = \frac{g(x)}{x^2}$, variation table, relative position with parabola $(P) : y = \frac{1}{2}x^2 + 1$, and shaded area curve construction).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 9 pages (`p115.png` to `p123.png`):
+  - Fixed missing Khmer colons `៖` after `នោះ` in relative position bullets (`p115`), removed extraneous `<br>` tags in variation table boundary cells (`p121`), and fixed variation table indentation (`p122`).
+  - Documented printed textbook typos with explanatory notes: boxed $-\infty$ sign mismatch (`p115`), $x = -2$ vs $2$ in value table (`p117`), missing derivative prime in $h'(x)$ (`p118`), rounding/truncation note for $0.25$ (`p118`), Khmer typo `អ័ក្យអាប់ស៊ីស` (`p119`), omitted factor $3$ in $g'(x)$ (`p120`), and omitted $\Rightarrow f'(x) =$ plus missing prime and sign erratum (`p122`).
+  - Maintained `<!-- Page p115.png -->` through `<!-- Page p123.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (16 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 13: Lesson 2 Logarithmic Functions Exercises Part 5
 
 Commit: pending. **No database step needed.**
