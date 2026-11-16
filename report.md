@@ -16,6 +16,23 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 15: Lesson 2 Logarithmic Functions Exercises Part 7
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 15 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p124.png` to `p131.png`, Book pages 119 to 126):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson2-logarithmic-functions-part7.md`, covering:
+  - Exercise 11 (conclusion): definite integral area calculation $S = \frac{3}{2}$ square units.
+  - Exercise 12 (complete): study of $f(x)$ on $(-\infty, 0) \cup (1, +\infty)$, limits, vertical asymptotes, derivative sign table, extrema $f(-1) = 1.2$ and $f(2) = -1.7$, variation table, oblique asymptote $(L) : y = -\frac{x}{2}$, curve construction, and graphical parameter discussion for $a$.
+  - Exercise 13 (start): full problem statement (Parts 1 to 3) plus solutions for 1.ក, 1.ខ ($u'(x) = 1 - e^{-x}$ sign and variation table, $u(x) > 0$), and 2.ក ($D_f = \mathbb{R}$).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 8 pages (`p124.png` to `p131.png`):
+  - Fixed misread Khmer cross-reference `1.2` to `1. ខ` (`p131`), restored printed spelling `គូអរដោនេ` (`p130`) and `នឹង` (`p129`) with explanatory notes, and converted bullet display-math lines (`p125`, `p126`) so every `$$...$$` block sits on its own line.
+  - Documented printed textbook typos with explanatory notes: `អាស៊ីមតូតទ្រេត` vs `អាស៊ីមតូតឈរ` and callout `\ln(ab)` (`p126`), `y = m` and closed interval `[1.2, +\infty]` (`p129`), and `ទារក` (`p130`).
+  - Maintained `<!-- Page p124.png -->` through `<!-- Page p131.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (17 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 14: Lesson 2 Logarithmic Functions Exercises Part 6
 
 Commit: pending. **No database step needed.**
@@ -47,6 +64,16 @@ Digitized and audited Batch 13 of Grade 12 Math Function Graphs (`sources/textbo
   - Maintained `<!-- Page p106.png -->` through `<!-- Page p114.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (15 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
+## 16 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Phase 0 Audit & Batch 0 Front Matter / TOC OCR (OCR Only)
+
+Commit: pending. **No database step needed.**
+
+Started **OCR-only** digitization and strict blind visual auditing of the Grade 12 History Student Workbook (`sources/textbooks/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន.pdf`, 157 pages, Preah Sisowath High School Next Generation School, 2022-2023):
+- **Phase 0 Audit & Master Status**: Mapped all 26 batches across Chapters 2, 3, and 1 into `sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/STATUS.md`, identifying which lessons already have KruAI RAG chunks in `server/textbook-search.ts` (`YES`: Cambodia History Ch 2 Lessons 1-6 and World History Ch 1 Lessons 11-12) vs OCR-only (`NO`: Regional History Ch 3 Lessons 1-5 and World History Ch 1 Lessons 1-10).
+- **Batch 0 OCR & Blind Audit**: Transcribed and line-by-line audited `sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/front-matter.md` (PDF pages `p001.png` to `p010.png`: covers, editorial committee, preface, and full Table of Contents). Blind audit fixed 3 Khmer spelling/syllable typos (`វឹកវរ`, `នឹង`, `ការចាប់បដិសន្ធិ`) and replaced decorative school seal `[?]` markers. **KruAI RAG: NO (OCR only)**.
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`2 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
 
 
 ## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 12: Lesson 2 Logarithmic Functions Exercises Part 4 (Pages 1 to 100 Complete)
