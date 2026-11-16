@@ -16,6 +16,38 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 16 Nov 2026: Grade 12 Chemistry OCR: Chapter 5 Lesson 1 (Gas Properties)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Grade 12 Chemistry Chapter 5 Lesson 1 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p100.png` to `p102.png` top half):
+- **Textbook OCR**: Transcribed into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter5-lesson1-gas-properties.md`, covering summary of gas characteristics (fluidity, low density, compressibility, diffusion), molecular collisions and pressure origin, pressure conversion table (Atm, Bar, mmHg, Pa, Psi, torr), questions 1–7, and detailed answers/calculations 1–7.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit against `p100.png`–`p102.png` scans:
+  - Corrected `បង្រួមបាន` to authentic textbook terminology `បំណែនបាន` (compressibility).
+  - Clarified question wording and noted printed typo in calculation for tire pressure ($42\text{ psi}$ vs textbook misprint of $32\text{ psi}$).
+  - Maintained `<!-- Page p100.png -->` to `<!-- Page p102.png -->` markers.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"` (19 pages checked, 0 warnings) and `npm run check:digits`.
+
+
+
+## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 22: Lesson 3 Exponential Functions Exercises Part 3
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 22 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p179.png` to `p187.png`, Book pages 174 to 182):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson3-exponential-functions-exercises-part3.md`, covering:
+  - Exercise 4 (conclusion): variation table of $h(x)$, relative position of $(C_1)$ and $(C_2)$, value tables, and graph plotting description.
+  - Exercise 5 (complete): Part A ($g(x) = e^x(1 - x) - 1$: derivative sign table, variation table, negativity proof) and Part B ($f(x) = (2 - x)e^x + 2 - x$: limits, variation table, oblique asymptote $(D) : y = 2 - x$, relative position, tangent $(\Delta) : y = -x + 2 + e$, inflection point $I(0, 4)$, and graph plotting).
+  - Exercise 6 (start): problem statement (Q1 to Q6) for $f(x) = (4 - 2x)e^x$ and $F(x) = 2e^x(3 - x)$, plus Q1 boundary limits at $-\infty$ and $+\infty$.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 9 pages (`p179.png` to `p187.png`):
+  - Clarified rendered scan intersection visually crossing below $y = -4$ in the Exercise 4 figure description (`p180`).
+  - Documented printed textbook typos with explanatory notes: `h(x) < 0` on $(\alpha, +\infty)$ (`p179`), `(C_2)` label printing `f(x)` instead of `g(x)` (`p180`), omitted `ផ្នែក A` solution header (`p181`), `- 2 + x` sign typos in $(D)$ limit (`p183`), and `ពីក្រោមលើ` plus `e + 1 = 3.7` (`p184`).
+  - Maintained `<!-- Page p179.png -->` through `<!-- Page p187.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (24 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 21: Lesson 3 Exponential Functions Exercises Part 2
 
 Commit: pending. **No database step needed.**
@@ -160,6 +192,27 @@ Digitized and audited Batch 13 of Grade 12 Math Function Graphs (`sources/textbo
   - Maintained `<!-- Page p106.png -->` through `<!-- Page p114.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (15 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
+## 16 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 8 (Ch 2 Lesson 6 Kingdom of Cambodia II — Ch 2 Complete) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 8 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch2-lesson6-kingdom-of-cambodia-second.md`, PDF pages `p063.png` to `p065.png`, Book pp. 53-55), completing **all of Chapter 2 (History of Cambodia)**:
+- Covered Chapter 2 Lesson 6 (`ព្រះរាជាណាចក្រកម្ពុជាទី 2 1993-បច្ចុប្បន្ន`): 5 questions covering the 1993 UNTAC elections, dual-PM coalition, 1993-1998 national reconstruction, Triangular Strategy, and Rectangular Strategy (annotating the printed `3.` typo for `4.` on `p064.png`). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- **KruAI RAG: YES (already grounded)** under `HISTORY_CH6_SECTIONS` in `server/textbook-search.ts` (`tb:hist:koc:ch6:*`). No conflicting dates found; no new RAG chunks added.
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`10 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
+
+
+## 16 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 7 (Ch 2 Lesson 5 PRK and State of Cambodia) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 7 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch2-lesson5-prk-and-soc.md`, PDF pages `p054.png` to `p062.png`, Book pp. 44-52):
+- Covered Chapter 2 Lesson 5 (`របបសាធារណរដ្ឋប្រជាមានិតកម្ពុជា និងរដ្ឋកម្ពុជា 1979-1993`): 2 Dec 1978 Front and 7 Jan 1979 liberation (`I`), post-1979 state-building and solidarity groups (`II`), and 1982 tripartite coalition, 1989 constitutional reforms, 1991 Paris Peace Accords, and 1993 UNTAC elections (`III`). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit inspected all 9 PNGs and annotated workbook print typos (`1979-1999` for `1979-1993` on `p054.png`, `ចរចារ`, `ស្តីសន្តិភាព`, and `បេសកម្ម` on `p060.png`).
+- **KruAI RAG: YES (already grounded)** under `HISTORY_CH5_SECTIONS` in `server/textbook-search.ts` (`tb:hist:prk:ch5:*`). No conflicting dates found; no new RAG chunks added.
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`9 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
 
 
 ## 16 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 6 (Ch 2 Lesson 4 Part 2 Democratic Kampuchea Complete) OCR & Audit
