@@ -202,6 +202,17 @@ Digitized and audited Batch 8 of Grade 12 Math Function Graphs (`sources/textboo
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (10 pages checked, 0 warnings), `npm run check:digits` (0 Khmer numerals across all 363 files).
 
 
+## 16 Nov 2026: Chemistry Summary & Solutions: Chapter 4 Lesson 3 (Acid-Base & Salt Equilibrium) OCR & Audit
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Chapter 4 Lesson 3 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p086.png` bottom half to `p092.png` top half):
+- **Textbook Rendering & OCR**: Transcribed word-for-word into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter4-lesson3-acid-base-salt-equilibrium.md`, covering Chapter 4 (`ជំពូកទី 4 លំនឹងគីមី`), Lesson 3 (`មេរៀនទី 3 : លំនឹងនៃអាស៊ីត-បាសនិងអំបិល`), including acid ionization constant ($K_\text{a}$), degree of ionization ($\alpha$), autoprotolysis of water, salt hydrolysis (cation and anion), buffer solutions (`សូលុយស្យុងតំប៉ុង`), 13 lesson review questions, and complete quantitative solutions (phenol ionization, weak acid $K_\text{a}$, methylamine dilution effects, and common ion suppression by strong acid $\text{HCl}$).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit against scans `p086.png` to `p092.png`, restored omitted textbook phrase `មួយដើរតួជា` in autoprotolysis definition, fixed OCR misread `បំរែបំរួល` from `បំប្លែង` in buffer definition, corrected printed book misprint `\text{CH}_3\text{COOH}` to basic salt `\text{CH}_3\text{COOLi}`, fixed table orthography `មុនប្រតិ.`, corrected volume concentration typo, and verified 100% boundary integrity before Chapter 4 review exercises.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added (per OCR-only scope).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"`, `npm run check:digits` (0 Khmer numerals across all 363 files).
+
+
 ## 16 Nov 2026: Chemistry Summary & Solutions: Chapter 4 Lesson 2 (Equilibrium Shifts) OCR & Audit
 
 Commit: Pending. **No database step needed.**
