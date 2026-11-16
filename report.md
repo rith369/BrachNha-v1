@@ -16,6 +16,23 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 20: Lesson 3 Exponential Functions Exercises Part 1
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 20 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p161.png` to `p169.png`, Book pages 156 to 164):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson3-exponential-functions-exercises-part1.md`, covering section `3.9 ផ្នែកលំហាត់`:
+  - Exercise 1 (complete): study of $f(x) = \frac{e^x - 2}{e^x + 1}$ (domain $\mathbb{R}$, limits, horizontal asymptotes $y = -2$ and $y = 1$, derivative, variation table, symmetry center $I(0, -1/2)$, tangent line $(T) : y = \frac{3}{4}x - \frac{1}{2}$, x-intercept $(\ln 2, 0)$, and curve plotting).
+  - Exercise 2 (complete): Part A $f(x) = xe^x$ (limits, derivative sign table, variation table with minimum $-1/e$) and Part B $g(x) = \frac{1}{2}x^2$, $h(x) = f(x) - g(x)$ (variation of $h$, relative position of $(C)$ and $(C')$, value tables, and curve plotting).
+  - Exercise 3 (start): problem statement (Parts A and B) for $f(x) = (x + 1)e^{-x} - 1$ and $g(x) = f(x) + \frac{x^2}{2}$, plus Part A Q1 boundary limits at $-\infty$ and $+\infty$.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 9 pages (`p161.png` to `p169.png`):
+  - Removed unprinted `-\infty` and `+\infty` endpoints from the $h(x)$ variation table (`p168`) to match the textbook table layout and added an explanatory note.
+  - Documented printed textbook typos with explanatory notes: callout limit sign (`p161`), extra minus sign `(-1)e^{-1} -` (`p166`), callout `h(x) =` vs `h'(x) =` (`p167`), `-0.36` vs `-0.37` rounding (`p168`), and prompt label slips `(C)` vs `(L)`, `(L)` vs `(T)`, stray `f` (`p169`).
+  - Maintained `<!-- Page p161.png -->` through `<!-- Page p169.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (22 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 19: Lesson 3 Exponential Functions Theory (3.1 to 3.8)
 
 Commit: pending. **No database step needed.**
@@ -127,6 +144,17 @@ Digitized and audited Batch 13 of Grade 12 Math Function Graphs (`sources/textbo
   - Maintained `<!-- Page p106.png -->` through `<!-- Page p114.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (15 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
+## 16 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 5 (Ch 2 Lesson 4 Part 1 Democratic Kampuchea) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 5 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch2-lesson4-part1-democratic-kampuchea.md`, PDF pages `p042.png` to `p047.png`, Book pp. 32-37):
+- Covered Chapter 2 Lesson 4 Part 1 (`កម្ពុជាប្រជាធិបតេយ្យ 1975-1979`): leadership & administrative zones (`I. រចនាសម្ព័ន្ធដឹកនាំ`), Super Great Leap Forward & cooperatives/marriages/education (`II. នយោបាយមហាលោតផ្លោះមហាអស្ចារ្យ`), and start of purges/security centers (`III. សោកនាដកម្ម`, Q1-Q2). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit restored missing word `កាប់` (`កាន់កាប់អំណាច` on `p045.png`) and annotated two source workbook print typos (`សមូហាភារូបនីយកម្ម`, `វិរិសុទ្ធកម្ម`).
+- **KruAI RAG: YES (already grounded)** under `HISTORY_CH4_SECTIONS` in `server/textbook-search.ts` (`tb:hist:dk:ch4:*`). No conflicting dates found; no new RAG chunks added.
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`7 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
 
 
 ## 16 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 4 (Ch 2 Lesson 3 Khmer Republic) OCR & Audit
