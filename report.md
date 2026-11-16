@@ -16,6 +16,23 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 16: Lesson 2 Logarithmic Functions Exercises Part 8
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 16 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p132.png` to `p140.png`, Book pages 127 to 135):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson2-logarithmic-functions-part8.md`, covering:
+  - Exercise 13 (conclusion): boundary limits, sign table, variation table with minimum $\ln 2$ at $x = 0$, oblique asymptote $(T) : y = -x$, relative position, infinite branch at $+\infty$, and curve plotting for $f(x) = \ln(x + 1 + e^{-x})$.
+  - Exercise 14 (complete): study of $f(x) = \ln(1 + e^{-x}) + \frac{1}{3}x$ (Parts 1 to 3), oblique asymptotes $(D) : y = \frac{1}{3}x$ and $(T) : y = -\frac{2}{3}x$, derivative $f'(x) = \frac{e^x - 2}{3(e^x + 1)}$, variation table with minimum $(\ln 2, 0.63)$, and curve construction.
+  - Exercise 15 (start): full problem statement (Parts A and B) on `p140.png`.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 9 pages (`p132.png` to `p140.png`):
+  - Fixed PDF-justification word breaks in Khmer prose on `p136` (`អរតូណរម៉ាល់`) and `p140` (`កំណត់យក $(d)$ ជាបន្ទាត់ដែលមានសមីការ`).
+  - Documented printed textbook typos with explanatory notes: reversed `f'(x)` inequalities (`p132`), sign/monotonicity errors against $(T) : y = -x$ (`p134`), `អ័ក្សអរដោនេ` vs `អ័ក្សអាប់ស៊ីស` (`p135`), omitted minus sign in $(D)$ asymptote limit (`p138`), and second value table label `$(D)$` (`p139`).
+  - Maintained `<!-- Page p132.png -->` through `<!-- Page p140.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (18 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 15: Lesson 2 Logarithmic Functions Exercises Part 7
 
 Commit: pending. **No database step needed.**
@@ -64,6 +81,16 @@ Digitized and audited Batch 13 of Grade 12 Math Function Graphs (`sources/textbo
   - Maintained `<!-- Page p106.png -->` through `<!-- Page p114.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (15 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
+## 16 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 1 (Ch 2 Lesson 1 Part 1 French Protectorate) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 1 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch2-lesson1-part1-french-protectorate.md`, PDF pages `p011.png` to `p017.png`, Book pp. 1-7):
+- Covered Chapter 2 title page (`ជំពូកទី 2៖ ប្រវត្តិសាស្ត្រប្រទេសកម្ពុជា`), Lesson 1 (`អាណាព្យាបាលបារាំង 1863-1953`), Section 1 (`វត្តមានបារាំងក្នុងប្រទេសកម្ពុជា`: 7 questions across 1863 treaty and King Ang Duong / King Norodom), and Section 2 (`នយោបាយកំណែទម្រង់សង្គមខ្មែរ`: questions 1-5 on the 1877 and 17 June 1884 convention reforms). Dotted student fill-in blanks replaced with `*(ចម្លើយសិស្ស)*`.
+- **KruAI RAG: YES (already grounded)** under `HISTORY_CH1_SECTIONS` in `server/textbook-search.ts` (`tb:hist:protectorate:ch1:*`). No conflicting dates found during audit; no new RAG chunks added.
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`3 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
 
 
 ## 16 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Phase 0 Audit & Batch 0 Front Matter / TOC OCR (OCR Only)
