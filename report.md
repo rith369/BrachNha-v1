@@ -16,6 +16,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 17: Lesson 2 Logarithmic Functions Exercises Part 9
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 17 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p141.png` to `p148.png`, Book pages 136 to 143):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson2-logarithmic-functions-part9.md`, covering:
+  - Exercise 15 (conclusion): Part A (monotonicity, limit at $+\infty$, variation table and sign of $g$), Part B (limits at $0^+$ and $+\infty$, right-hand differentiability and vertical half-tangent at $x = 0$, $f'(x) = g(x)$ proof, oblique asymptote $(d) : y = \frac{x}{4} + \frac{5}{2}$, value table and curve plotting of $(d)$ and $(C)$).
+  - Exercise 16 (start): full problem statement (Parts 1 and 2) plus solutions for 1.ក to គ ($g'$ sign table, variation table of $g$, unique root $x_0 \in (3.5, 3.6)$) and 2.ក (derivative $f'(x) = \frac{1 + x^2 - 2x^2\ln x}{x(1 + x^2)^2}$).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 8 pages (`p141.png` to `p148.png`):
+  - Restored printed Khmer typo `អរណរម៉ាល់` (`p146`) with an explanatory erratum note and corrected Khmer coeng subscript `កណ្តាល` to `កណ្ដាល` (`p147`).
+  - Documented printed textbook typos with explanatory notes: omitted `> 0` after `f'(x)` (`p143`) and omitted `+\frac{5}{2}` on LHS of oblique asymptote limit (`p144`).
+  - Maintained `<!-- Page p141.png -->` through `<!-- Page p148.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (19 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 16 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 16: Lesson 2 Logarithmic Functions Exercises Part 8
 
 Commit: pending. **No database step needed.**
@@ -81,6 +97,17 @@ Digitized and audited Batch 13 of Grade 12 Math Function Graphs (`sources/textbo
   - Maintained `<!-- Page p106.png -->` through `<!-- Page p114.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (15 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
+## 16 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 3 (Ch 2 Lesson 2 Sangkum Reastr Niyum) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 3 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch2-lesson2-sangkum-reastr-niyum.md`, PDF pages `p025.png` to `p032.png`, Book pp. 15-22):
+- Covered Chapter 2 Lesson 2 (`របបសង្គមរាស្ត្រនិយម 1955-1970`) across all 5 sections: rise of Sangkum Reastr Niyum (`1955`), National Congress (`II. សមាជជាតិ`), Neutrality policy (`III. នយោបាយអព្យាក្រឹត`), decline and 1963 aid break (`IV. ការធ្លាក់ចុះខ្សោយរបបសង្គមរាស្ត្រនិយម`), and legacy achievements (`V. សមិទ្ធផលសង្គមរាស្ត្រនិយម`). Dotted answer blanks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit checked all 8 pages codepoint-by-codepoint against the PNG scans (0 discrepancies found).
+- **KruAI RAG: YES (already grounded)** under `HISTORY_CH2_SECTIONS` in `server/textbook-search.ts` (`tb:hist:sangkum:ch2:*`). No conflicting dates found during audit; no new RAG chunks added.
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`5 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
 
 
 ## 16 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 2 (Ch 2 Lesson 1 Part 2 French Protectorate Complete) OCR & Audit
