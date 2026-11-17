@@ -16,6 +16,32 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 27: Lesson 3 Exponential Functions Exercises Part 8
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 27 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p224.png` to `p231.png`, Book pages 219 to 226):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson3-exponential-functions-exercises-part8.md`, covering Exercise 11 continuation:
+  - Remainder of French problem statement (Part B: 3.a to 4.b), full Khmer problem statement (Parts A and B), and complete solutions for Part A (1, 2.ក to គ) and Part B (1.ក to ខ, 2.ក to ខ, 3.ក to គ, 4.ក including `f(\alpha) = \alpha` and `f(\beta) = \beta`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 8 pages (`p224.png` to `p231.png`):
+  - Aligned `(x > 0)` onto the first branch of `\begin{cases}` (`p224`), normalized Khmer colons `ផ្នែក A៖` / `ផ្នែក B៖` (`p224`, `p225`, `p227`), removed unprinted `នៃ` in `តារាងអថេរភាពអនុគមន៍ g` (`p226`), and fixed variation table array column spec from 14 to 13 columns (`p231`).
+  - Documented printed textbook typos with explanatory notes (`រកដែនកំណត់ចុងដែន` and `\vec{O}` on `p224`, `អនុគមន៍ f` vs `g` on `p225`, swapped `g`/`g'` monotonicity wording on `p226`, `\ln x > 0`, `x = 1`, factored fraction, and missing `f(x)` on `p228`, and `x(x - 1/x)` denominator on `p229`).
+  - Maintained `<!-- Page p224.png -->` through `<!-- Page p231.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (29 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
+## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 17 (Ch 1 Lesson 4 West Germany 1945-1991) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 17 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch1-lesson4-west-germany.md`, PDF pages `p116.png` to `p121.png`, Book pp. 106-111):
+- Covered Chapter 1 Lesson 4 (`សហព័ន្ធអាល្លឺម៉ង់ខាងលិច 1945-1991`): Germany in WWII & 1945 Yalta occupation zones (`I`, Q1-Q4), Berlin Wall & Marshall Plan (`II`, Q1-Q4), and birth & economic rise of West/East Germany (`III`, Q1-Q4). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit inspected all 6 PNGs at glyph level, fixed two `ឱ្យ` -> `ឲ្យ` character matches (`p119.png`, `p120.png`), and kept annotated source print typo (`ការចាប់បសន្ធិ` on `p119.png`).
+- **KruAI RAG: NO (OCR only)** (no RAG chunks added).
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`19 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
+
+
 ## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 16 (Ch 1 Lesson 3 France) OCR & Audit
 
 Commit: pending. **No database step needed.**
