@@ -16,6 +16,33 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 28: Lesson 3 Exponential Functions Exercises Part 9
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 28 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p232.png` to `p239.png`, Book pages 227 to 234):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson3-exponential-functions-exercises-part9.md`, covering:
+  - Exercise 11 (conclusion): graph construction of $(C_f)$ for $f(x) = \frac{x\ln x + x}{x - 1}$ (`p232`).
+  - Exercise 12 (start): bilingual French/Khmer problem statement (`Partie A` and `Partie B`), plus solutions for `ផ្នែក A` (study of $h(x) = xe^x + 1$, domain of $f$, variation of $g(x) = x + 2 - e^x$, roots $\alpha, \beta$ with $1.14 < \alpha < 1.15$, sign table of $g$) and `ផ្នែក B` (boundary limits of $f$, asymptotes, and derivation of $f'(x)$).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 8 pages (`p232.png` to `p239.png`):
+  - Fixed inaccurate graph description on `p232` (clarifying that $\alpha$ marks the x-axis crossing rather than the local maximum), reduced accidental 7-space indentation to 3 spaces (`p234`), and added explanatory domain condition note (`p236`).
+  - Documented printed textbook typos with explanatory notes (`limites de f` vs `g` on `p233`, `e^{1.15} = 3.1` vs `3.16` on `p235`, `x = 0` vs `x = -1` on `p236`, swapped monotonicity/roots/`]1; +\infty[` on `p237`, and `អាស៊ីមតូតទ្រេត` for `y = 0` on `p239`).
+  - Maintained `<!-- Page p232.png -->` through `<!-- Page p239.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (30 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
+## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 18 (Ch 1 Lesson 5 Italy) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 18 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch1-lesson5-italy.md`, PDF pages `p122.png` to `p124.png`, Book pp. 112-114):
+- Covered Chapter 1 Lesson 5 (`ប្រទេសអ៊ីតាលី`): creation of the Italian Republic & institutional structure (`I`, Q1-Q5) and post-war socio-economic progress (`II`, Q1). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit verified all 3 PNGs (plus `p125.png` boundary) codepoint-by-codepoint against the transcript (0 discrepancies).
+- **KruAI RAG: NO (OCR only)** (no RAG chunks added).
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`20 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
+
+
 ## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 27: Lesson 3 Exponential Functions Exercises Part 8
 
 Commit: pending. **No database step needed.**
