@@ -16,6 +16,16 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 37: Section 3.13 Practice Logarithmic Functions Part 2 (Section 3.13 Complete)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 37 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p296.png` to `p303.png`, Book pages 291 to 298), completing Section 3.13:
+- **Textbook Rendering & OCR**: Transcribed word-for-word from rendered page scans into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/section3-13-practice-logarithmic-part2.md`, covering Section 3.13 (`លំហាត់អនុវត្តន៍អនុគមន៍លោការីតនេព`) Exercises 44 through 49.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 8 pages (`p296.png` to `p303.png`) with zero discrepancies and zero formatting violations; preserved printed textbook errata notes in Exercises 44 (`p296` to `p297`: extra `លើ`, `[-\infty; ...` brackets, `\ln x` for `\ln|x|`, `\ln(7) = 2.9`), 47 (`p300`: `g(x)` vs `1 - x` numerator), 48 (`p301`: `2\ln x` vs `2x\ln x` and `រិសមីការ`), and 49 (`p302`: omitted `f(0)` value).
+- **Verification**: Ran `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (`39 pages checked, 0 to look at by hand.`). `KruAI RAG in textbook-search.ts`: `NO (OCR only)`.
+
+
 ## 17 Nov 2026: Rename Grade 12 Chemistry Summary Textbook & OCR Folders
 
 Commit: pending. **No database step needed.**
