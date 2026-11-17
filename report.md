@@ -16,6 +16,31 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 30: Lesson 3 Exponential Functions Exercises Part 11 (Section 3.9 Complete)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 30 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p247.png` to `p252.png`, Book pages 242 to 247), concluding Section 3.9:
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson3-exponential-functions-exercises-part11.md`, covering the conclusion of Exercise 13: coefficients $a = 2, b = -2, c = 1$ in $f(x) = ax + b + \frac{c}{e^x - 1}$, boundary limits, derivative $f'(x)$, solving $2e^{2x} - 5e^x + 2 = 0$, sign and variation tables, oblique asymptotes $y = 2x - 1$ and $y = 2x - 2$, vertical asymptote $x = 0$, symmetry center $\Omega(0, -3/2)$, value tables, and coordinate graph plotting.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 6 pages (`p247.png` to `p252.png`):
+  - Expanded the coordinate graph description (`p252`) to include the diagonal dashed symmetry segment connecting $(-\ln 2, -4.4)$ and $(\ln 2, 1.4)$ through $\Omega(0, -3/2)$ and the vertical dashed projection lines to $-\ln 2$ and $\ln 2$ on the x-axis.
+  - Documented printed textbook typos with explanatory notes (`(-\ln 2, \ln 2)` excluding $0$ on `p249`, `y = 2x - 1` vs `2x - 2` and `អាស៊ីមឈរ` on `p250`, and `x = 0` for `a = 0` plus `y = 1` at `x = 2` on `p251`).
+  - Maintained `<!-- Page p247.png -->` through `<!-- Page p252.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (32 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
+## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 22 (Ch 1 Lesson 9 Poland) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 22 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch1-lesson9-poland.md`, PDF pages `p139.png` to `p142.png`, Book pp. 129-132):
+- Covered Chapter 1 Lesson 9 (`ប្រទេសប៉ូឡូញ`): Poland in WWII (`I`, Q1-Q6) and post-WWII Poland including Lech Walesa & 1990 transition (`II`, Q7-Q9). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit inspected all 4 PNGs codepoint-by-codepoint against the transcript (0 discrepancies), preserving annotated print typo on `p140.png`.
+- **KruAI RAG: NO (OCR only)** (no RAG chunks added).
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`24 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
+
+
 ## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 29: Lesson 3 Exponential Functions Exercises Part 10
 
 Commit: pending. **No database step needed.**
