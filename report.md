@@ -16,6 +16,34 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Physics 200 Q&A (In Sovannaroth): Batches 1 to 5 (100% Book Complete, OCR & Audit)
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited all 5 batches (24 PDF pages, Cover + Book pages 1 to 23) of Grade 12 Physics 200 Q&A (`sources/textbooks/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន.pdf`) in `sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន/`, achieving **100% OCR Written and 100% OCR Audited**:
+- **Batch 1 (PDF pages 1 to 6, Cover + Book pages 1 to 5)**:
+  - Scope: Cover page and Chapter 1 Thermodynamics (`ជំពូកទី 1 ទែម៉ូឌីណាមិច`, Lessons 1 to 3, Questions 1 to 40, plus motivational footers and Bac II year annotations 2014 to 2024) in `chapter1-thermodynamics.md`.
+  - Audit: Completed line-by-line visual audit against scans `p01.png` to `p06.png`, fixing Boltzmann constant subscript `$k_b$` in Question 3, verifying all Khmer diacritics, subscripts, and thermodynamic formulas (`$K_{\text{av}}$`, `$Q = \Delta U + W$`, `$T_h, T_c$`).
+  - KruAI RAG Status: KruAI RAG: NO (OCR only; Ch1 topics already grounded via Physics Summary `tb:phys:ch1:*`). No new RAG chunks added.
+- **Batch 2 (PDF pages 7 to 12, Book pages 6 to 11)**:
+  - Scope: Chapter 2 Waves (`ជំពូកទី 2 រលក`, Lesson 1 Superposition & Standing Waves, Lesson 2 Interference & Diffraction, Questions 41 to 103, plus motivational footers) in `chapter2-waves.md`.
+  - Audit: Completed line-by-line visual audit against scans `p07.png` to `p12.png`, fixing 5 Khmer subscript/spelling mistakes (`ដាលឆ្លងកាត់`, `រង្វិល`, `រលកសូរអាំងហ្វ្រា`, `ខ្ទរត្រួតគ្នា`, `សូរខ្ទរខ្ទាត់ៗ`), and verifying interference formulas (`$d_2 - d_1 = n\lambda$`, `$d_2 - d_1 = (n + \frac{1}{2})\lambda$`, `$d \approx \lambda$`).
+  - KruAI RAG Status: KruAI RAG: NO (OCR only; Ch2 topics already grounded via Physics Summary `tb:phys:ch2:*`). No new RAG chunks added.
+- **Batch 3 (PDF pages 13 to 16, Book pages 12 to 15)**:
+  - Scope: Chapter 3 Electricity and Magnetism (`ជំពូកទី 3 អគ្គិសនី និងម៉ាញេទិច`, Lesson 1 Magnetic Field and Force, Lesson 2 Electromagnetic Induction, Questions 104 to 130, preserving the triple printed `128` numbering quirk on book p. 14 and Q130 magnet-coil diagrams) in `chapter3-lesson1-lesson2.md`.
+  - Audit: Completed line-by-line visual audit against scans `p13.png` to `p16.png`, removing a spurious period after `$I$` in Q116, fixing Khmer diacritics/spellings (`ស្ប៊ិចក្រាប`, `ស្ប៊ិចម៉ាញេទិច`, `ចរន្តភូកូល`, `ប្រាំងអេឡិចត្រូម៉ាញេទិច`), and verifying all formulas (`$\vec{B}$`, `$\frac{l}{R} \ge 5$`, `$\Phi$`, `$A$`) and diagram notes.
+  - KruAI RAG Status: KruAI RAG: NO (OCR only; Ch3 L1-L2 topics already grounded via Physics Summary `tb:phys:ch3:l1*`, `l2*`). No new RAG chunks added.
+- **Batch 4 (PDF pages 17 to 19, Book pages 16 to 18)**:
+  - Scope: Chapter 3 Lesson 3 Self-Induction (`ជំពូកទី 3 · មេរៀនទី 3 អូតូអាំងឌុចស្យុង`, Questions 131 to 162, preserving duplicate `147` numbering for RL and LC circuits and closing note on book p. 17) in `chapter3-lesson3-self-induction.md`.
+  - Audit: Completed line-by-line visual audit against scans `p17.png` to `p19.png`, verifying coeng TA/DA orthography (`រេស៊ីស្តង់`), differential equations (`$\ddot{V}_c + \frac{1}{LC}V_c = 0$`, `$I_p = \tau\frac{di}{dt} + i$`, `$I = I_p(1 - e^{-\frac{t}{\tau}})$`), and energy conservation (`$E_{CL} = E_C + E_L$`).
+  - KruAI RAG Status: KruAI RAG: NO (OCR only; Ch3 L3 topics already grounded via Physics Summary `tb:phys:ch3:l3*`). No new RAG chunks added.
+- **Batch 5 (PDF pages 20 to 24, Book pages 19 to 23)**:
+  - Scope: Chapter 3 Lesson 4 AC Circuits (`ជំពូកទី 3 · មេរៀនទី 4 សៀគ្វីចរន្តឆ្លាស់`, Questions 163 to 200) and the Bac II Exam Questions Index (`សំណួរធ្លាប់ចេញប្រឡងបាក់ឌុប` 2014 to 2024, tracks, Roman numerals, score breakdowns, and closing quote) in `chapter3-lesson4-and-bac2-index.md`.
+  - Audit: Completed line-by-line visual audit with zoomed crops against scans `p20.png` to `p24.png`, fixing 26 Khmer spelling/vowel discrepancies (`ស៊ីនុយសូអ៊ីត` 13x, `អាំប៉ែដង់` 9x, `ប្រេណែល` 4x) and verifying exact source-printed terms (`ចរន្តភូកូល`, `ភាវបរិមាណកម្ដៅ`, `អាម៉ាតួ`, `របុំមធ្យម`, `ស្លឹករ៉ុលទ័រ`, `ស៊ីរ៉ុលទ័រ`, `ស្នូលដែលពីរ`).
+  - KruAI RAG Status: KruAI RAG: NO (OCR only; Ch3 L4 topics already grounded via Physics Summary `tb:phys:ch3:l4*`). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន"` (6 files checked, 0 warnings) and `npm run check:digits` (0 Khmer numerals).
+
+
 ## 17 Nov 2026: Chemistry Fundamentals (មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា) Batch 4: Part 3 Advanced Level (100% Book Complete)
 
 Commit: pending. **No database step needed.**
@@ -104,30 +132,6 @@ Added the `Chemistry_` prefix to the Grade 12 Chemistry summary & solutions text
 - **Pages**: `sources/pages/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/` -> `sources/pages/Chemistry_មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/`
 - **OCR**: `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/` -> `sources/ocr/Chemistry_មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/` (including updated paths in `STATUS.md`).
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Chemistry_មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"` (`27 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
-
-
-## 17 Nov 2026: Physics 200 Q&A (In Sovannaroth): Batches 1 to 4 (Cover, Ch 1, Ch 2 & Ch 3 L1-L3, OCR & Audit)
-
-Commit: Pending. **No database step needed.**
-
-Digitized and audited Batches 1, 2, 3, and 4 of Grade 12 Physics 200 Q&A (`sources/textbooks/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន.pdf`, PDF pages `p01.png` to `p19.png`, Cover + Book pages 1 to 18):
-- **Batch 1 (PDF pages 1 to 6, Cover + Book pages 1 to 5)**:
-  - Scope: Cover page and Chapter 1 Thermodynamics (`ជំពូកទី 1 ទែម៉ូឌីណាមិច`, Lessons 1 to 3, Questions 1 to 40, plus motivational footers and Bac II year annotations 2014 to 2024) in `sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន/chapter1-thermodynamics.md`.
-  - Audit: Completed line-by-line visual audit against scans `p01.png` to `p06.png`, fixing Boltzmann constant subscript `$k_b$` in Question 3, verifying all Khmer diacritics, subscripts, and thermodynamic formulas (`$K_{\text{av}}$`, `$Q = \Delta U + W$`, `$T_h, T_c$`).
-  - KruAI RAG Status: KruAI RAG: NO (OCR only; Ch1 topics already grounded via Physics Summary `tb:phys:ch1:*`). No new RAG chunks added.
-- **Batch 2 (PDF pages 7 to 12, Book pages 6 to 11)**:
-  - Scope: Chapter 2 Waves (`ជំពូកទី 2 រលក`, Lesson 1 Superposition & Standing Waves, Lesson 2 Interference & Diffraction, Questions 41 to 103, plus motivational footers) in `sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន/chapter2-waves.md`.
-  - Audit: Completed line-by-line visual audit against scans `p07.png` to `p12.png`, fixing 5 Khmer subscript/spelling mistakes (`ដាលឆ្លងកាត់`, `រង្វិល`, `រលកសូរអាំងហ្វ្រា`, `ខ្ទរត្រួតគ្នា`, `សូរខ្ទរខ្ទាត់ៗ`), and verifying interference formulas (`$d_2 - d_1 = n\lambda$`, `$d_2 - d_1 = (n + \frac{1}{2})\lambda$`, `$d \approx \lambda$`).
-  - KruAI RAG Status: KruAI RAG: NO (OCR only; Ch2 topics already grounded via Physics Summary `tb:phys:ch2:*`). No new RAG chunks added.
-- **Batch 3 (PDF pages 13 to 16, Book pages 12 to 15)**:
-  - Scope: Chapter 3 Electricity and Magnetism (`ជំពូកទី 3 អគ្គិសនី និងម៉ាញេទិច`, Lesson 1 Magnetic Field and Force, Lesson 2 Electromagnetic Induction, Questions 104 to 130, preserving the triple printed `128` numbering quirk on book p. 14 and Q130 magnet-coil diagrams) in `sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន/chapter3-lesson1-lesson2.md`.
-  - Audit: Completed line-by-line visual audit against scans `p13.png` to `p16.png`, fixing 11 Khmer spelling, subscript, and wording discrepancies (`សម្ដេចម៉ែ`, `ឱ្យ`, `ខ្សែដែន`, `ធំជាងឬស្មើ`, `ឬផ្លាស្ទិច`, `ខ្សែវង់`, `បម្រែបម្រួល`, `ទិសដៅចរន្ត`), and verifying all formulas (`$\vec{B}$`, `$\frac{l}{R} \ge 5$`, `$\Phi$`, `$A$`) and diagram notes.
-  - KruAI RAG Status: KruAI RAG: NO (OCR only; Ch3 L1-L2 topics already grounded via Physics Summary `tb:phys:ch3:l1*`, `l2*`). No new RAG chunks added.
-- **Batch 4 (PDF pages 17 to 19, Book pages 16 to 18)**:
-  - Scope: Chapter 3 Lesson 3 Self-Induction (`ជំពូកទី 3 · មេរៀនទី 3 អូតូអាំងឌុចស្យុង`, Questions 131 to 162, preserving duplicate `147` numbering for RL and LC circuits and closing note on book p. 17) in `sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន/chapter3-lesson3-self-induction.md`.
-  - Audit: Completed line-by-line visual audit against scans `p17.png` to `p19.png`, verifying coeng TA/DA orthography (`រេស៊ីស្តង់`), differential equations (`$\ddot{V}_c + \frac{1}{LC}V_c = 0$`, `$I_p = \tau\frac{di}{dt} + i$`, `$I = I_p(1 - e^{-\frac{t}{\tau}})$`), and energy conservation (`$E_{CL} = E_C + E_L$`).
-  - KruAI RAG Status: KruAI RAG: NO (OCR only; Ch3 L3 topics already grounded via Physics Summary `tb:phys:ch3:l3*`). No new RAG chunks added.
-- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន"` (5 files checked, 0 warnings) and `npm run check:digits` (0 Khmer numerals).
 
 
 ## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 36: Section 3.13 Practice Logarithmic Functions Part 1
