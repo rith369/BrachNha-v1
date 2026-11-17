@@ -16,6 +16,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 33: Section 3.11 Practice Rational Functions Part 1
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 33 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p267.png` to `p273.png`, Book pages 262 to 268):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/section3-11-practice-rational-part1.md`, covering Section 3.11 (`លំហាត់អនុវត្តន៍អនុគមន៍សនិទាន`): practice rational function exercises 1 through 18.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 7 pages (`p267.png` to `p273.png`):
+  - Added explanatory errata notes for printed digit `0` written instead of origin letter `O` on `p271` (Ex 11) and `p273` (Ex 18).
+  - Preserved earlier printed errata notes (`តម្រុយអរដោនេ` on `p267`, `g` vs `f(x)` on `p268`, `4a + l = 0` on `p270`, `សង់សមីការបន្ទាត់ប៉ះ` on `p272`, and word-order note on `p273`).
+  - Maintained `<!-- Page p267.png -->` through `<!-- Page p273.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (35 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 32: Section 3.10 Past Exam Exercises Part 2 (2014 to 2025, Section 3.10 Complete)
 
 Commit: pending. **No database step needed.**
