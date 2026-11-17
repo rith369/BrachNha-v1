@@ -16,6 +16,19 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 6 Lesson 4 (Carbohydrates and Lipids)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Grade 12 Chemistry Chapter 6 Lesson 4 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p131.png` bottom half to `p134.png`):
+- **Textbook OCR**: Transcribed into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter6-lesson4-carbohydrates-and-lipids.md`, covering carbohydrates classification table (monosaccharides, disaccharides, polysaccharides), lipids (simple vs. complex lipids), questions 1–6, and worked solutions/calculations 1–6 (Tollens' test redox reactions, starch hydrolysis mass balance, enzymatic fermentation, cellulose/linen degree of polymerization).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 4 pages (`p131.png`–`p134.png`):
+  - Fixed paraphrased wording in Answer 2 (`ខ/ គ្លុយកូស` bullet 2) back to verbatim `ឡែងជាអេតាណុល` (`p134.png`).
+  - Kept enzyme annotations and Khmer subscripts (`M`<sub>ម៉ូណូមែ</sub>) outside KaTeX delimiters with zero stacked-LaTeX commands and updated `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"` (26 files checked, 0 warnings) and `npm run check:digits`.
+
+
 ## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 25: Lesson 3 Exponential Functions Exercises Part 6
 
 Commit: pending. **No database step needed.**
