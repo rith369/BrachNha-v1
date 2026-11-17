@@ -16,6 +16,17 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Chemistry Fundamentals (មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា) Batch 4: Part 3 Advanced Level (100% Book Complete)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 4 of Chemistry Problem-Solving Fundamentals (`sources/textbooks/មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា.pdf`, PDF pages `p17.png` to `p20.png`), achieving **100% completion across all 20 pages** (`4` audited OCR files in `sources/ocr/មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា/`):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា/part3-advanced-level.md`, covering Part 3 (`ផ្នែកទី 3 ការគិតកម្រិតខ្ពស់`) Exercises 1–20 (solution dilution $C_iV_i = C_fV_f$, mass-percentage dilution, density/molarity conversions, titration neutralization, alloy displacement reactions, limiting reactants, hard water stoichiometry, organic combustion empirical/molecular formulas, and aldehyde Tollens' silver mirror analysis).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 4 pages (`p17.png`–`p20.png`), fixing misread `សមុតកម្ម` -> `សម្មតកម្ម` (`p17.png` & `p18.png`), noting printed duplicate `លំហាត់ទី18` (`p20.png`) and missing answer line in Exercise 13 (`p19.png`), maintaining `<!-- Page p17.png -->` through `<!-- Page p20.png -->` markers, and marking all rows in `STATUS.md` as `OCR Written: YES` and `OCR Audited: YES`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា"` (`5 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
+
+
 ## 17 Nov 2026: Chemistry Fundamentals (មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា) Batch 3: Part 2 Intermediate Level
 
 Commit: pending. **No database step needed.**
@@ -95,11 +106,11 @@ Added the `Chemistry_` prefix to the Grade 12 Chemistry summary & solutions text
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Chemistry_មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"` (`27 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
 
 
-## 17 Nov 2026: Physics 200 Q&A (In Sovannaroth): Batches 1 to 3 (Cover, Ch 1, Ch 2 & Ch 3 L1-L2, OCR & Audit)
+## 17 Nov 2026: Physics 200 Q&A (In Sovannaroth): Batches 1 to 4 (Cover, Ch 1, Ch 2 & Ch 3 L1-L3, OCR & Audit)
 
 Commit: Pending. **No database step needed.**
 
-Digitized and audited Batches 1, 2, and 3 of Grade 12 Physics 200 Q&A (`sources/textbooks/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន.pdf`, PDF pages `p01.png` to `p16.png`, Cover + Book pages 1 to 15):
+Digitized and audited Batches 1, 2, 3, and 4 of Grade 12 Physics 200 Q&A (`sources/textbooks/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន.pdf`, PDF pages `p01.png` to `p19.png`, Cover + Book pages 1 to 18):
 - **Batch 1 (PDF pages 1 to 6, Cover + Book pages 1 to 5)**:
   - Scope: Cover page and Chapter 1 Thermodynamics (`ជំពូកទី 1 ទែម៉ូឌីណាមិច`, Lessons 1 to 3, Questions 1 to 40, plus motivational footers and Bac II year annotations 2014 to 2024) in `sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន/chapter1-thermodynamics.md`.
   - Audit: Completed line-by-line visual audit against scans `p01.png` to `p06.png`, fixing Boltzmann constant subscript `$k_b$` in Question 3, verifying all Khmer diacritics, subscripts, and thermodynamic formulas (`$K_{\text{av}}$`, `$Q = \Delta U + W$`, `$T_h, T_c$`).
@@ -112,7 +123,11 @@ Digitized and audited Batches 1, 2, and 3 of Grade 12 Physics 200 Q&A (`sources/
   - Scope: Chapter 3 Electricity and Magnetism (`ជំពូកទី 3 អគ្គិសនី និងម៉ាញេទិច`, Lesson 1 Magnetic Field and Force, Lesson 2 Electromagnetic Induction, Questions 104 to 130, preserving the triple printed `128` numbering quirk on book p. 14 and Q130 magnet-coil diagrams) in `sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន/chapter3-lesson1-lesson2.md`.
   - Audit: Completed line-by-line visual audit against scans `p13.png` to `p16.png`, fixing 11 Khmer spelling, subscript, and wording discrepancies (`សម្ដេចម៉ែ`, `ឱ្យ`, `ខ្សែដែន`, `ធំជាងឬស្មើ`, `ឬផ្លាស្ទិច`, `ខ្សែវង់`, `បម្រែបម្រួល`, `ទិសដៅចរន្ត`), and verifying all formulas (`$\vec{B}$`, `$\frac{l}{R} \ge 5$`, `$\Phi$`, `$A$`) and diagram notes.
   - KruAI RAG Status: KruAI RAG: NO (OCR only; Ch3 L1-L2 topics already grounded via Physics Summary `tb:phys:ch3:l1*`, `l2*`). No new RAG chunks added.
-- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន"` (4 files checked, 0 warnings) and `npm run check:digits` (0 Khmer numerals).
+- **Batch 4 (PDF pages 17 to 19, Book pages 16 to 18)**:
+  - Scope: Chapter 3 Lesson 3 Self-Induction (`ជំពូកទី 3 · មេរៀនទី 3 អូតូអាំងឌុចស្យុង`, Questions 131 to 162, preserving duplicate `147` numbering for RL and LC circuits and closing note on book p. 17) in `sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន/chapter3-lesson3-self-induction.md`.
+  - Audit: Completed line-by-line visual audit against scans `p17.png` to `p19.png`, verifying coeng TA/DA orthography (`រេស៊ីស្តង់`), differential equations (`$\ddot{V}_c + \frac{1}{LC}V_c = 0$`, `$I_p = \tau\frac{di}{dt} + i$`, `$I = I_p(1 - e^{-\frac{t}{\tau}})$`), and energy conservation (`$E_{CL} = E_C + E_L$`).
+  - KruAI RAG Status: KruAI RAG: NO (OCR only; Ch3 L3 topics already grounded via Physics Summary `tb:phys:ch3:l3*`). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន"` (5 files checked, 0 warnings) and `npm run check:digits` (0 Khmer numerals).
 
 
 ## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 36: Section 3.13 Practice Logarithmic Functions Part 1
