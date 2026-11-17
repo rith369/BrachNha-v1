@@ -16,6 +16,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 32: Section 3.10 Past Exam Exercises Part 2 (2014 to 2025, Section 3.10 Complete)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 32 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p260.png` to `p266.png`, Book pages 255 to 261), concluding Section 3.10:
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/section3-10-past-exam-exercises-part2.md`, covering Bac II past exam function graph problems from `[04 សីហា 2014] លើកទី 1` (continuation), `[13 តុលា 2014] លើកទី 2`, `[24 សីហា 2015]`, `[22 សីហា 2016]`, `[21 សីហា 2017]`, `[20 សីហា 2018]`, `[19 សីហា 2019]`, `[27 ធ្នូ 2021]`, `[05 ធ្នូ 2022]`, `[06 វិច្ឆិកា 2023]`, `[09 តុលា 2024]`, and `[27 សីហា 2025]`.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 7 pages (`p260.png` to `p266.png`):
+  - Normalized `\text{2cm}` to `2\text{cm}` (`p262`), added explanatory notes for printed typo `ក្រាបជាក្រាបរបស់វាក្នុងតម្រុយអរដោនេ` (`p261`) and misplaced `តម្រុយអរតូណរម៉ាល់` (`p264`).
+  - Preserved earlier printed errata notes (`គណនា f(x)` for `f'(x)` and omitted abscissa `0` on `p260`, slope `5/3` vs `-5/3` and missing `0` after `ត្រង់` on `p263`, `f'(x)` denominator typo and duplicated `(40 ពិន្ទុ)` on `p264`, and missing `f(x)` in limits on `p265`).
+  - Maintained `<!-- Page p260.png -->` through `<!-- Page p266.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (34 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 17 Nov 2026: History Student Workbook (Sam Saboeun & Sin Kamsot) Batch 25: Chapter 1 Lesson 12 (Globalization) — 100% Complete
 
 Commit: pending. **No database step needed.**
