@@ -16,6 +16,22 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 25: Lesson 3 Exponential Functions Exercises Part 6
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 25 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p206.png` to `p214.png`, Book pages 201 to 209):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson3-exponential-functions-exercises-part6.md`, covering:
+  - Exercise 9 (complete, bilingual French/Khmer): study of $g(x) = x - \ln x$ and $f(x) = \frac{\ln x}{x - \ln x}$, sign and variation tables, boundary limits, extremum at $x = e$, and curve plot description.
+  - Exercise 10 (problem statement, bilingual French/Khmer): Parties A, B, and C for $g(x) = \frac{e^x}{1 + 2e^x} - \ln(1 + 2e^x)$, $f(x) = e^{-2x}\ln(1 + 2e^x)$, integral $I(\alpha)$, and differential equation $(E) : y' + 2y = 2\left(\frac{e^{-x}}{1 + 2e^x}\right)$.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 9 pages (`p206.png` to `p214.png`):
+  - Fixed erroneous 3-space leading indentation on item `3.` of Partie B (`p213`) and added an explanatory erratum note for printed typo `អ័ក្យ` (for `អ័ក្ស`) and omitted `(C_f)` (`p214`).
+  - Documented printed textbook typos with explanatory notes (`Ètudier`, `(\vec{o}, \vec{i}, \vec{j})`, missing prime, `x = 0` for `x = 1`, `តារាងថេរភាព`, `\ln x > 0`, sign errors in limit steps, blank conclusions on `p210`, `$(xx)$`, and Khmer bullet labels `ឆ`, `យ`).
+  - Maintained `<!-- Page p206.png -->` through `<!-- Page p214.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (27 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 6 Lesson 3 (Aromatic Compounds)
 
 Commit: pending. **No database step needed.**
@@ -96,6 +112,17 @@ Digitized and audited Batch 24 of Grade 12 Math Function Graphs (`sources/textbo
   - Maintained `<!-- Page p197.png -->` through `<!-- Page p205.png -->` markers and updated `STATUS.md` (all 25 OCR files written and audited).
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (26 files checked, 0 warnings), `npm run check:digits`, `npm run check:content`, `npx oxlint`, `npx tsc -b`, and `npm test`.
+
+
+## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 15 (Ch 1 Lesson 2 United Kingdom) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 15 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch1-lesson2-uk.md`, PDF pages `p104.png` to `p110.png`, Book pp. 94-100):
+- Covered Chapter 1 Lesson 2 (`ចក្រភពអង់គ្លេស`): Britain and WWII (`I`, Q1-Q7) and post-WWII British domestic & foreign policies from Churchill/Attlee to Wilson, Callaghan, and Thatcher (`II`, Q1-Q10). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit inspected all 7 PNGs line-by-line, corrected a Khmer subscript (`កាឡាហ្គាន` -> `កាឡាហ្កាន` on `p109.png`), and kept annotated source print typos (`វីលសុន ឆឺឈីល`, `ធ្វើតូបនីយកម្មព្រែកជីស៊ុយអេ`, `ចាច់ឆឺ`).
+- **KruAI RAG: NO (OCR only)** (no RAG chunks added).
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`17 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
 
 
 ## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 14 (Ch 1 Lesson 1 USA 1960-1990) OCR & Audit
