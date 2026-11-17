@@ -16,6 +16,40 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Rename Grade 12 Chemistry Summary Textbook & OCR Folders
+
+Commit: pending. **No database step needed.**
+
+Added the `Chemistry_` prefix to the Grade 12 Chemistry summary & solutions textbook and its matching rendered-page and OCR folders for clear subject identification:
+- **PDF**: `sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf` -> `sources/textbooks/Chemistry_មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`
+- **Pages**: `sources/pages/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/` -> `sources/pages/Chemistry_មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/`
+- **OCR**: `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/` -> `sources/ocr/Chemistry_មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/` (including updated paths in `STATUS.md`).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Chemistry_មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"` (`27 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
+
+
+## 17 Nov 2026: Physics 200 Q&A (In Sovannaroth): Batch 1 (Cover & Chapter 1 Thermodynamics, OCR & Audit)
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited Batch 1 of Grade 12 Physics 200 Q&A (`sources/textbooks/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន.pdf`, PDF pages `p01.png` to `p06.png`, Cover + Book pages 1 to 5):
+- **Textbook Rendering & OCR**: Rendered all 24 pages of the book and transcribed Batch 1 word-for-word into `sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន/chapter1-thermodynamics.md`, covering the cover page and Chapter 1 Thermodynamics (`ជំពូកទី 1 ទែម៉ូឌីណាមិច`, Lessons 1 to 3, Questions 1 to 40, plus motivational footers and Bac II year annotations 2014 to 2024).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit against scans `p01.png` to `p06.png`, fixing Boltzmann constant subscript `$k_b$` in Question 3, verifying all Khmer diacritics, subscripts, and thermodynamic formulas (`$K_{\text{av}}$`, `$Q = \Delta U + W$`, `$T_h, T_c$`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only; Ch1 topics already grounded via Physics Summary `tb:phys:ch1:*`). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន"` (2 pages checked, 0 warnings) and `npm run check:digits` (0 Khmer numerals).
+
+
+## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 36: Section 3.13 Practice Logarithmic Functions Part 1
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 36 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p287.png` to `p295.png`, Book pages 282 to 290):
+- **Textbook Rendering & OCR**: Transcribed word-for-word from rendered page scans into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/section3-13-practice-logarithmic-part1.md`, covering Section 3.13 (`លំហាត់អនុវត្តន៍អនុគមន៍លោការីតនេព`) Exercises 31 through 43.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 9 pages (`p287.png` to `p295.png`):
+  - Restored `:` after `បន្ទាត់ប៉ះ` in Exercise 41 គ (`p292`).
+  - Documented printed errata notes in Exercise 42 (`p293` to `p294`): closed vs open interval brackets in `42.A.3.ខ`, omitted `$(\Delta) : y = x - 1$` in `42.B.2.ខ`, and `ព្រីមីទីវលើនៃ`, missing `x` in `k : x \longmapsto f(x)/x`, and closed bracket at `1/e` in `42.C.2.ក`.
+- **Verification**: Ran `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (`38 pages checked, 0 to look at by hand.`). `KruAI RAG in textbook-search.ts`: `NO (OCR only)`.
+
+
 ## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 35: Section 3.12 Bac II Rational Functions (Section 3.12 Complete)
 
 Commit: pending. **No database step needed.**
