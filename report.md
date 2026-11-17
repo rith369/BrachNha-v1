@@ -16,6 +16,28 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: History Student Workbook (Sam Saboeun & Sin Kamsot) Batch 25: Chapter 1 Lesson 12 (Globalization) — 100% Complete
+
+Commit: pending. **No database step needed.**
+
+Digitized and blind-audited Batch 25 (Chapter 1 Lesson 12: សកលភាវូបនីយកម្ម / Globalization, PDF pages `p153.png`–`p157.png`, Book pages 143–147) of the Grade 12 History Student Workbook (`sources/textbooks/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន.pdf`), completing 100% of the 157-page book across all 26 batches (`STATUS.md`):
+- **OCR Markdown (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch1-lesson12-globalization.md`)**: Transcribed word-for-word with `<!-- Page p153.png -->` through `<!-- Page p157.png -->` markers and `*(ចម្លើយសិស្ស)*` placeholders for student dotted answer lines, covering Sections I–II (`I.សេចក្តីផ្តើម`, `II.ការវិវត្តន៍សកលភាវូបនីយកម្ម`) and all 9 numbered study questions (`1.`–`9.`).
+- **Strict Blind Audit**: Verified all 5 PNG page scans (`p153.png`–`p157.png`) line-by-line against `ch1-lesson12-globalization.md`, fixing an OCR misread of `ឬរារាំង` in Q8 (`p156.png`) and annotating printed typos `បណ្ដាឱ្យ` in Q2 (`p153.png`) and `មនុស្សធមិ` in Q8 (`p156.png`).
+- **KruAI RAG Status**: `YES (already grounded in tb:hist:world:regional-and-world-history-bacii-qna)` in `server/textbook-search.ts` (cross-checked with zero conflicts); updated `sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/STATUS.md` so all 26 rows are marked `OCR Written: YES` and `OCR Audited: YES`.
+- **Verification**: Passed `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` (`27 pages checked, 0 to look at by hand`), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
+## 17 Nov 2026: History Student Workbook (Sam Saboeun & Sin Kamsot) Batch 24: Chapter 1 Lesson 11 (Global Issues)
+
+Commit: pending. **No database step needed.**
+
+Digitized and blind-audited Batch 24 (Chapter 1 Lesson 11: បញ្ហារួមនៅលើពិភពលោក / Global Issues, PDF pages `p148.png`–`p152.png`, Book pages 138–142) of the Grade 12 History Student Workbook (`sources/textbooks/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន.pdf`):
+- **OCR Markdown (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch1-lesson11-global-issues.md`)**: Transcribed word-for-word with `<!-- Page p148.png -->` through `<!-- Page p152.png -->` markers and `*(ចម្លើយសិស្ស)*` placeholders for student dotted answer lines, covering Sections I–V (`I.បញ្ហាបរិស្ថាន`, `II.បញ្ហាកំណើនប្រជាជន និងបញ្ហាជនអន្តោប្រវេសន៍`, `III.បញ្ហាសន្តិសុខស្បៀង`, `IV.បញ្ហាសង្គ្រាម និងអស្ថិរភាពសន្តិសុខសង្គម`, `V.មូលហេតុចម្បងនៃការលេចឡើងនូវបញ្ហារួមលើពិភពលោក`) and all 9 numbered study questions (`1.`–`9.`).
+- **Strict Blind Audit**: Verified all 5 PNG page scans (`p148.png`–`p152.png`) line-by-line against `ch1-lesson11-global-issues.md`, normalizing `បណ្តាលឱ្យ` in Q2 (`p148.png`) and annotating printed typos `ហើយឫនៅ?` in Q7 (`p150.png`) and `អស្ថេរភាព` in Q8 (`p151.png`).
+- **KruAI RAG Status**: `YES (already grounded in tb:hist:world:regional-and-world-history-bacii-qna)` in `server/textbook-search.ts` (cross-checked with zero conflicts); updated `sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **Verification**: Passed `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` (`26 pages checked, 0 to look at by hand`) and `npm run check:digits`.
+
+
 ## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 31: Section 3.10 Past Exam Exercises Part 1 (2002 to 2014 Start)
 
 Commit: pending. **No database step needed.**
