@@ -16,6 +16,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 34: Section 3.11 Practice Rational Functions Part 2 (Section 3.11 Complete)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 34 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p274.png` to `p280.png`, Book pages 269 to 275), concluding Section 3.11:
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/section3-11-practice-rational-part2.md`, covering practice rational function exercises 19 through 30.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 7 pages (`p274.png` to `p280.png`):
+  - Removed 2 hallucinated Khmer colons `៖` after `កំណត់ចំពោះ` in Exercises 19 and 20 (`p274`).
+  - Documented printed textbook typos with explanatory notes (`x \neq 2, x \neq 2` on `p274`, digit `0` instead of `O` on `p274`–`p279`, `O(,)` and `kx^2 4x + 4k = 0` on `p275`, repeated `ធៀបធៀបនឹង` on `p276`, `ចំណុច នឹងមួយ`, omitted `(C)`, and `អាស៊ីមតូតដេក` for oblique asymptote on `p277`, `គ្រប់ពិត` and `x \neq 1` on `p278`–`p279`, and `អរតូណរមេ` plus `\vec{O}` on `p280`).
+  - Maintained `<!-- Page p274.png -->` through `<!-- Page p280.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (36 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 33: Section 3.11 Practice Rational Functions Part 1
 
 Commit: pending. **No database step needed.**
