@@ -16,6 +16,33 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 24: Lesson 3 Exponential Functions Exercises Part 5 (Pages 101 to 200 Complete)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 24 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p197.png` to `p205.png`, Book pages 192 to 200), completing the full target scope of Book pages 1 to 200 (PDF pages 1 to 205 across 25 audited OCR files):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson3-exponential-functions-exercises-part5.md`, covering:
+  - Exercise 7 (conclusion): Part B variation table of $f(x) = e^{-x} + e^x - x$ (`p197`), oblique asymptote $(D) : y = x + 1$ at $+\infty$, relative position, tangent $(\Delta) : y = x + 2.35$ at $M(-1/2, 1.85)$, value tables, and curve plotting of $(C)$, $(D)$, and $(\Delta)$.
+  - Exercise 8 (complete): study of $f(x) = -x - 2 + \frac{4e^x}{e^x + 1}$ (parts ក through ង), boundary limits at $\pm\infty$, oblique asymptotes $y = -x - 2$ and $y = -x + 2$, derivative $f'(x) \le 0$, variation table, inflection point and center of symmetry $O(0, 0)$, curve plotting, and graphical inequality $\frac{4e^x}{e^x + 1} \ge x + 2$ giving $x \in (-\infty, 0]$.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 9 pages (`p197.png` to `p205.png`):
+  - Added missing errata notes on `p203` documenting both the misprinted $f'(x)$ row label and reversed signs (`-`/`+` and `(-) ទៅ (+)`) in the $f''(x)$ sign table, plus omitted Khmer word `«ជា»` on `p204`.
+  - Documented printed textbook typos with explanatory notes: omitted `\lim_{x \to +\infty}` (`p197`), `+1` inside exponent (`p198`), semicolon `;` in `(\Delta)` and `(T)` label on line `(D)` (`p199`), omitted `«នោះ»` (`p203`), `= 4 - 4 = 0` arithmetic typo (`p204`), and `(\Delta) : y = m` prompt slip (`p205`).
+  - Maintained `<!-- Page p197.png -->` through `<!-- Page p205.png -->` markers and updated `STATUS.md` (all 25 OCR files written and audited).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (26 files checked, 0 warnings), `npm run check:digits`, `npm run check:content`, `npx oxlint`, `npx tsc -b`, and `npm test`.
+
+
+## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 10 (Ch 3 Lesson 2 Vietnam) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 10 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch3-lesson2-vietnam.md`, PDF pages `p072.png` to `p079.png`, Book pp. 62-69):
+- Covered Chapter 3 Lesson 2 (`ប្រទេសវៀតណាម`): anti-French independence struggle (`I`, Q1-Q7), war against the US (`II`, Q1-Q8), and socialist construction / Doi Moi reforms (`III`, Q1-Q4). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit restored missing `ពីបារាំង` in the Section I heading (`p072.png`) and corrected an OCR hallucination in Section II Q1 (`តើសន្ធិសីទក្រុងហ្សឺណែវឆ្នាំ1954` with print-typo annotation on `p074.png`), preserving printed skipped numbering (`6.` in Section I, `3.` in Section III) and `1969` verbatim.
+- **KruAI RAG: NO (OCR only)** (brief Doi Moi mention exists in `tb:hist:practice:exams-1-to-5-bacii-qna`; no new RAG chunks added).
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`12 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
+
+
 ## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 9 (Ch 3 Lesson 1 Southeast Asia Post-WWII) OCR & Audit
 
 Commit: pending. **No database step needed.**
@@ -41,6 +68,19 @@ Digitized and audited Batch 23 of Grade 12 Math Function Graphs (`sources/textbo
   - Maintained `<!-- Page p188.png -->` through `<!-- Page p196.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (25 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
+## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 5 Lesson 3 (Gas Molecular Composition & Chapter Review)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Grade 12 Chemistry Chapter 5 Lesson 3 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p107.png` bottom half to `p115.png` top half):
+- **Textbook OCR**: Transcribed into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter5-lesson3-gas-molecular-composition.md`, covering the Ideal Gas Law ($PV = nRT$), Graham's Law of diffusion/effusion, Dalton's Law of partial pressures, Lesson 3 questions & answers (1–10), and end-of-chapter 5 review exercises Parts I–IV (MCQs, fill-in-the-blank, conceptual questions with $\text{NH}_3$/$\text{HCl}$ diagram description, and numerical solutions).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 9 pages (`p107.png`–`p115.png`):
+  - Corrected Khmer OCR misreads (`ប៉ែង` -> `ប៉េង`, `ចំណុច` -> `ចំនុច`, removed spurious `ឋិត`), kept printed textbook quirks annotated/preserved faithfully, and moved Khmer subscripts like `សរុប` / `ខ្យល់` outside KaTeX delimiters.
+  - Maintained `<!-- Page p107.png -->` through `<!-- Page p115.png -->` markers and updated `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"` (21 files checked, 0 warnings) and `npm run check:digits`.
 
 
 ## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 5 Lesson 2 (Gas Laws)
