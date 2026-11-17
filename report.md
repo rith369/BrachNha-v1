@@ -16,6 +16,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 5 Lesson 2 (Gas Laws)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Grade 12 Chemistry Chapter 5 Lesson 2 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p102.png` bottom half to `p107.png` top half):
+- **Textbook OCR**: Transcribed into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter5-lesson2-gas-laws.md`, covering Boyle's Law ($P_1V_1 = P_2V_2$), Charles's Law ($V_1/T_1 = V_2/T_2$), Gay-Lussac's Law ($P_1/T_1 = P_2/T_2$), Avogadro's Law ($V = k \cdot n$), questions 1–16, and worked solutions/calculations 1–16. Also corrected `STATUS.md` Chapter 5 boundaries (split into 3 distinct lessons matching the printed book: Lesson 2 ends on `p107.png`, Lesson 3 begins on `p107.png`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 6 pages (`p102.png`–`p107.png`):
+  - Fixed Khmer spelling and OCR errors (`សម្រុះ` -> `សមុទ្រ`, `អង្កាសែលស្យុស` -> `អង្សាសែលស្យុស`, restored missing `រ` in `ថេរ`, restored missing `ត្រង់` and `៖`).
+  - Moved `នាំអោយ` outside KaTeX math blocks and kept all `$$...$$` display blocks on dedicated lines.
+  - Maintained `<!-- Page p102.png -->` through `<!-- Page p107.png -->` markers.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"` (20 files checked, 0 warnings) and `npm run check:digits`.
+
+
 ## 16 Nov 2026: Grade 12 Chemistry OCR: Chapter 5 Lesson 1 (Gas Properties)
 
 Commit: pending. **No database step needed.**
