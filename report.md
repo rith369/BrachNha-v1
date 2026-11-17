@@ -16,6 +16,19 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 5 Lesson 3 (Gas Molecular Composition & Chapter Review)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Grade 12 Chemistry Chapter 5 Lesson 3 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p107.png` bottom half to `p115.png` top half):
+- **Textbook OCR**: Transcribed into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter5-lesson3-gas-molecular-composition.md`, covering the Ideal Gas Law ($PV = nRT$), Graham's Law of diffusion/effusion, Dalton's Law of partial pressures, Lesson 3 questions & answers (1–10), and end-of-chapter 5 review exercises Parts I–IV (MCQs, fill-in-the-blank, conceptual questions with $\text{NH}_3$/$\text{HCl}$ diagram description, and numerical solutions).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 9 pages (`p107.png`–`p115.png`):
+  - Corrected Khmer OCR misreads (`ប៉ែង` -> `ប៉េង`, `ចំណុច` -> `ចំនុច`, removed spurious `ឋិត`), kept printed textbook quirks annotated/preserved faithfully, and moved Khmer subscripts like `សរុប` / `ខ្យល់` outside KaTeX delimiters.
+  - Maintained `<!-- Page p107.png -->` through `<!-- Page p115.png -->` markers and updated `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"` (21 files checked, 0 warnings) and `npm run check:digits`.
+
+
 ## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 24: Lesson 3 Exponential Functions Exercises Part 5 (Pages 101 to 200 Complete)
 
 Commit: pending. **No database step needed.**
@@ -68,19 +81,6 @@ Digitized and audited Batch 23 of Grade 12 Math Function Graphs (`sources/textbo
   - Maintained `<!-- Page p188.png -->` through `<!-- Page p196.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (25 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
-
-
-## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 5 Lesson 3 (Gas Molecular Composition & Chapter Review)
-
-Commit: pending. **No database step needed.**
-
-Digitized and audited Grade 12 Chemistry Chapter 5 Lesson 3 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p107.png` bottom half to `p115.png` top half):
-- **Textbook OCR**: Transcribed into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter5-lesson3-gas-molecular-composition.md`, covering the Ideal Gas Law ($PV = nRT$), Graham's Law of diffusion/effusion, Dalton's Law of partial pressures, Lesson 3 questions & answers (1–10), and end-of-chapter 5 review exercises Parts I–IV (MCQs, fill-in-the-blank, conceptual questions with $\text{NH}_3$/$\text{HCl}$ diagram description, and numerical solutions).
-- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 9 pages (`p107.png`–`p115.png`):
-  - Corrected Khmer OCR misreads (`ប៉ែង` -> `ប៉េង`, `ចំណុច` -> `ចំនុច`, removed spurious `ឋិត`), kept printed textbook quirks annotated/preserved faithfully, and moved Khmer subscripts like `សរុប` / `ខ្យល់` outside KaTeX delimiters.
-  - Maintained `<!-- Page p107.png -->` through `<!-- Page p115.png -->` markers and updated `STATUS.md`.
-- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
-- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"` (21 files checked, 0 warnings) and `npm run check:digits`.
 
 
 ## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 5 Lesson 2 (Gas Laws)
