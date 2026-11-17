@@ -16,6 +16,17 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Chemistry Fundamentals (មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា) Batch 2: Part 1 Topics 6–10
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 2 of Chemistry Problem-Solving Fundamentals (`sources/textbooks/មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា.pdf`, PDF pages `p08.png` to `p13.png`):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា/part1-basic-level-2.md`, completing Part 1 (`ផ្នែកទី 1 ការគិតកម្រិតទាប`) Topics 6–10: mole formulas ($n = m/M$, $n = V/V_m$, $n = CV$), pure mass formulas, volume formulas, constituent element mass and percentage ($m$ and $\%$ of elements in $\text{CaCO}_3$, $\text{HCHO}$, $\text{MgO}$), and solution mass formulas ($m_s = DV$, $m_s = 100m/C\%$, $m_s = m_1 + m_2 + \dots$).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 6 pages (`p08.png`–`p13.png`), reordering the two-column proportional solution method on `p11.png` (`ប្រើវិធីសមាមាត្រ`), fixing the density unit slash (`g/mL`) on `p12.png`, spacing `1` cleanly on `p09.png`, and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា"` (`3 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
+
+
 ## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 39: Section 3.14 Practice Exponential Functions Part 2 & References (100% Book Complete)
 
 Commit: pending. **No database step needed.**
