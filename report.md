@@ -16,6 +16,17 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Chemistry Fundamentals (មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា) Batch 3: Part 2 Intermediate Level
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 3 of Chemistry Problem-Solving Fundamentals (`sources/textbooks/មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា.pdf`, PDF pages `p14.png` to `p16.png`):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា/part2-intermediate-level.md`, covering Part 2 (`ផ្នែកទី 2 ការគិតកម្រិតមធ្យម`) Exercises 1–15 (molarity, empirical formulas, ionic concentrations, and percentage reaction yield $Rd$ with worked solutions).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 3 pages (`p14.png`–`p16.png`), verifying formulas, subscripts (`10^{-3}`, `[SO_4^{2-}]`), printed duplicate `លំហាត់ទី8` (`p15.png`), normalized Khmer typos (`អុកស៊ីសែន`, `អាស៊ីតក្លរីឌ្រិច`), `<!-- Page p14.png -->` through `<!-- Page p16.png -->` markers, and `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា"` (`4 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
+
+
 ## 17 Nov 2026: Chemistry Fundamentals (មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា) Batch 2: Part 1 Topics 6–10
 
 Commit: pending. **No database step needed.**
