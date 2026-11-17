@@ -16,6 +16,33 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 9 (Ch 3 Lesson 1 Southeast Asia Post-WWII) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 9 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch3-lesson1-southeast-asia-post-wwii.md`, PDF pages `p066.png` to `p071.png`, Book pp. 56-61):
+- Covered Chapter 3 title page (`ជំពូកទី 3៖ ប្រវត្តិសាស្ត្រតំបន់ក្នុងសង្គ្រាមត្រជាក់`) and Lesson 1 (`បម្រែបម្រួលសង្គមអាស៊ីអាគ្នេយ៍ក្រោយសង្គ្រាមលោកលើកទី 2`): anti-colonial independence struggles (`I. ចលនាតស៊ូទាមទារឯករាជ្យ`, Q1-Q3) and Cold War turmoil across Southeast Asia (`II. ភាពវឹកវរនៃបណ្តាលប្រទេសអាស៊ីអាគ្នេយ៍ក្នុងដំណាក់កាលសង្គ្រាមត្រជាក់`, Q4-Q10). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit verified all 6 PNGs line-by-line, restored printed duplicate numbering `5.` (with typo note `*(កំហុសបោះពុម្ពនៃលេខរៀង 6.)*` on `p069.png`), and kept annotated source print typos (`អាស៊ីគ្នេយ៍`, `បណ្តាល`).
+- **KruAI RAG: NO (OCR only)** (brief overview already exists in `tb:hist:practice:exams-1-to-5-bacii-qna`; no new RAG chunks added).
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`11 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
+
+
+## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 23: Lesson 3 Exponential Functions Exercises Part 4
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 23 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p188.png` to `p196.png`, Book pages 183 to 191):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson3-exponential-functions-exercises-part4.md`, covering:
+  - Exercise 6 (conclusion): derivative sign table and variation table of $f(x) = (4 - 2x)e^x$ (maximum $2e$ at $x = 1$), tangent line $(T) : y = 2x + 4$, auxiliary function $g(x) = f(x) - (2x + 4)$ sign and variation table, relative position, value table, curve plotting of $(C)$ and $(T)$, antiderivative $F(x) = 2e^x(3 - x)$ verification, and shaded region area $S = 2e^2 - 6$ square units.
+  - Exercise 7 (start): full problem statement (Parts A and B) for $h(x) = 1 - e^{-x} - e^x$ and $f(x) = e^{-x} + e^x - x$, plus solutions for Part A (variation table and sign of $h(x)$) and Part B (start of $f'(x) = e^{-2x}h(x)$ and boundary limits at $-\infty$ and $+\infty$).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 9 pages (`p188.png` to `p196.png`):
+  - Fixed Khmer subscript spelling `ប្តូរ` to `ប្ដូរ` (`p188`), split `$$= 2e^2(3 - 2) - 2e^0(3 - 0) = 2e^2 - 6$$` onto its own line before `ឯកតាផ្ទៃ` (`p193`), and updated figure descriptions on `p192` and `p193` to remove unprinted black dots and match only the origin marker $(0, 0)$ and shaded region boundary.
+  - Preserved printed textbook typos with explanatory notes (`g(x)` for `g'(x)` and `g'(0) = 2` on `p189`, missing `-\infty` table ends on `p190`, and `(\vec{o}, \vec{i}, \vec{j})` on `p194`).
+  - Maintained `<!-- Page p188.png -->` through `<!-- Page p196.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (25 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 5 Lesson 2 (Gas Laws)
 
 Commit: pending. **No database step needed.**
