@@ -16,6 +16,31 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 31: Section 3.10 Past Exam Exercises Part 1 (2002 to 2014 Start)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 31 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p253.png` to `p259.png`, Book pages 248 to 254):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/section3-10-past-exam-exercises-part1.md`, covering Section 3.10 (`លំហាត់អនុគមន៍ធ្លាប់ចេញពីឆ្នាំ 2002 - 2025`): Bac II past exam function graph problems from `[22 កក្កដា 2002]`, `[09 សីហា 2003]`, `[16 សីហា 2004]`, `[08 សីហា 2005]`, `[07 សីហា 2006]`, `[06 សីហា 2007]`, `[04 សីហា 2008]`, `[27 កក្កដា 2009]`, `[26 កក្កដា 2010]`, `[25 កក្កដា 2011]`, `[06 សីហា 2012]`, `[05 សីហា 2013]`, and the start of `[04 សីហា 2014] លើកទី 1`.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 7 pages (`p253.png` to `p259.png`):
+  - Added explanatory notes for printed textbook omissions and oddities: omitted symbol `$f$` before `ជាអនុគមន៍កំណត់ដោយ` (`p253`), repeated `នៃ` in `នៃអនុគមន៍នៃ f` (`p256`), omitted `$f(x) =$` before fraction and lowercase subscript `$o$` in `$x_o = 1$` (`p258`), and approximation $\frac{2}{e} = 0.79$ (`p259`).
+  - Preserved earlier printed errata notes (`\lim_{x \to 0^-} f(x)` on `p255` and duplicate `1. 1.` numbering on `p259`).
+  - Maintained `<!-- Page p253.png -->` through `<!-- Page p259.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (33 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
+## 17 Nov 2026: History Student Workbook (Sam Saboeun & Sin Kamsot) Batch 23: Chapter 1 Lesson 10 (Federal Republic of Yugoslavia)
+
+Commit: pending. **No database step needed.**
+
+Digitized and blind-audited Batch 23 (Chapter 1 Lesson 10: សហព័ន្ធយូហ្គោស្លាវី / Federal Republic of Yugoslavia, PDF pages `p143.png`–`p147.png`, Book pages 133–137) of the Grade 12 History Student Workbook (`sources/textbooks/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន.pdf`):
+- **OCR Markdown (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch1-lesson10-yugoslavia.md`)**: Transcribed word-for-word with `<!-- Page p143.png -->` through `<!-- Page p147.png -->` markers and `*(ចម្លើយសិស្ស)*` placeholders for student dotted answer lines, covering Sections I–IV (`I. ការវិវត្តន៍នៃយូហ្គោស្លាវី`, `II. នយោបាយ`, `III. សេនាប្រមុខទីតូ`, `IV. ប្រធានាធិបតីស្លូបូដានមេឡូសេវិច`) and all 10 numbered study questions (`1.`–`10.`).
+- **Strict Blind Audit**: Verified all 5 PNG page scans (`p143.png`–`p147.png`) line-by-line against `ch1-lesson10-yugoslavia.md` in an independent auditor subagent, confirming 100% match across all headings, numbered questions, and continuation answer blocks.
+- **KruAI RAG Status**: `NO (OCR only)` in `server/textbook-search.ts`; updated `sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **Verification**: Passed `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` (`25 pages checked, 0 to look at by hand`) and `npm run check:digits`.
+
+
 ## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 30: Lesson 3 Exponential Functions Exercises Part 11 (Section 3.9 Complete)
 
 Commit: pending. **No database step needed.**
