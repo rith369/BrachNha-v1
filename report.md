@@ -16,6 +16,43 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 29: Lesson 3 Exponential Functions Exercises Part 10
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 29 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p240.png` to `p246.png`, Book pages 235 to 241):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson3-exponential-functions-exercises-part10.md`, covering:
+  - Exercise 12 (conclusion, Part B): sign and variation tables of $f$, extremum $f(\alpha) = \frac{1}{\alpha + 1} \approx 0.47$, tangent $(T) : y = x$ at $x_0 = 0$, $f(x) - x = \frac{(x + 1)u(x)}{xe^x + 1}$, variation of $u(x)$ and $u(x) \le 0$, relative position of $(T)$ and $(C)$, value table, and coordinate curve plot description.
+  - Exercise 13 (start): full French and Khmer problem statements for $f(x) = \frac{(2x - 1)e^x - 2x + 2}{e^x - 1}$ and start of solution (domain $D_f = \mathbb{R} - \{0\}$ and setup for finding $a, b, c$).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 7 pages (`p240.png` to `p246.png`) verifying exact match of all formulas, tables, French accents, and curve plot coordinates.
+  - Preserved printed textbook typos with explanatory notes: `\cap` vs `\cup` and `g(x)` vs `f'(x)` (`p240`), swapped `<` and `>` bullets for `u'(x)` (`p242`), and misprinted `1` at `y = -1` tick label (`p244`).
+  - Maintained `<!-- Page p240.png -->` through `<!-- Page p246.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (31 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
+## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 20 (Ch 1 Lesson 7 East Germany) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 20 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch1-lesson7-east-germany.md`, PDF pages `p133.png` to `p135.png`, Book pp. 123-125):
+- Covered Chapter 1 Lesson 7 (`សាធារណរដ្ឋប្រជាធិបតេយ្យអាល្លឺម៉ង់ខាងកើត`): creation of East Germany & 1945 Yalta occupation (`I`, Q1-Q3), East German economy (`II`, Q4), and social sphere (`III`, Q5). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit inspected all 3 PNGs codepoint-by-codepoint against the transcript (0 discrepancies).
+- **KruAI RAG: NO (OCR only)** (no RAG chunks added).
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`22 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
+
+
+## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 19 (Ch 1 Lesson 6 Soviet Union 1945-1991) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 19 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch1-lesson6-soviet-union.md`, PDF pages `p125.png` to `p132.png`, Book pp. 115-122):
+- Covered Chapter 1 Lesson 6 (`សហភាពសូវៀត 1945-1991`): post-WWII USSR (`I`), Stalin era (`II`), Khrushchev `1953-1964` (`III`), Brezhnev era (`IV`), Perestroika reforms (`V`), and USSR dissolution (`VI`). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit verified all 8 PNGs at high zoom, fixed subscript `ប្រេស្ណេវ` -> `ប្រេស្នេវ` (`p128.png`) and vowel `ពេរ៉េស្ត្រយការ` -> `ពេរ៉ែស្ត្រយការ` with typo annotations (`p129.png`, `p130.png`), and kept annotated source print typos (`លើកលើកទី2`, `ប្រឈមមុខ និងវិបត្តិ`).
+- **KruAI RAG: NO (OCR only)** (brief Perestroika mention exists in `tb:hist:practice:exams-1-to-5-bacii-qna`; no new RAG chunks added).
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`21 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
+
+
 ## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 6 Exercises & Full Textbook OCR Complete
 
 Commit: pending. **No database step needed.**
