@@ -16,6 +16,19 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 6 Lesson 2 (Aliphatic Nitrogen Derivatives)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Grade 12 Chemistry Chapter 6 Lesson 2 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p122.png` bottom half to `p127.png` top half):
+- **Textbook OCR**: Transcribed into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter6-lesson2-aliphatic-nitrogen-derivatives.md`, covering amines (classes I–III, basicity, alkylation to quaternary ammonium salt, acyl chloride reaction, synthesis), amides (classes I–III, hydrolysis, synthesis from esters/acyl chlorides/anhydrides/carboxylic acids), amino acids ($\alpha$-amino acids, methods 1–2, peptide bonds), questions 1–10, and detailed answers/calculations 1–10.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 6 pages (`p122.png`–`p127.png`):
+  - Fixed Khmer spelling (`អាស៊ីតអាមីណូ` -> `អាស៊ីតអាមីណេ` in Q4/Q5 on `p124.png`), corrected lone-pair and substituent bond alignment in ASCII diagrams (`p122.png`–`p124.png`), and removed a duplicated balancing equation at the end of Answer 10 (`p127.png`).
+  - Maintained `<!-- Page p122.png -->` through `<!-- Page p127.png -->` markers and updated `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"` (24 files checked, 0 warnings) and `npm run check:digits`.
+
+
 ## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 6 Lesson 1 (Esters, Fats and Oils)
 
 Commit: pending. **No database step needed.**
@@ -69,6 +82,17 @@ Digitized and audited Batch 24 of Grade 12 Math Function Graphs (`sources/textbo
   - Maintained `<!-- Page p197.png -->` through `<!-- Page p205.png -->` markers and updated `STATUS.md` (all 25 OCR files written and audited).
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (26 files checked, 0 warnings), `npm run check:digits`, `npm run check:content`, `npx oxlint`, `npx tsc -b`, and `npm test`.
+
+
+## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 13 (Ch 3 Lesson 5 Israel — Ch 3 Complete) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 13 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch3-lesson5-israel.md`, PDF pages `p087.png` to `p094.png`, Book pp. 77-84), completing **all of Chapter 3 (Regional History in the Cold War)**:
+- Covered Chapter 3 Lesson 5 (`ប្រទេសអ៊ីស្រាអែល`): 19 questions across 4 sections covering Israel's establishment (`1948`), leadership structure, the Six-Day War (`1967`), and Arab-Israeli war outcomes. Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit verified all 8 PNGs line-by-line (0 discrepancies), preserving annotated printed typos (`បានឈ្មោះ` on `p087.png`, `បណ្តាឱ្យ` on `p090.png`/`p093.png`).
+- **KruAI RAG: NO (OCR only)** (brief Arab-Israeli conflict overview exists in `tb:hist:practice:exams-1-to-5-bacii-qna`; no new RAG chunks added).
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`15 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
 
 
 ## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 12 (Ch 3 Lesson 4 Middle East) OCR & Audit
