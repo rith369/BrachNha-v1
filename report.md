@@ -16,6 +16,19 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 6 Exercises & Full Textbook OCR Complete
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited the final section of Grade 12 Chemistry (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p135.png` to `p140.png`), achieving **100% completion across all 6 chapters and 140 pages** (`26` audited OCR markdown files in `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/`):
+- **Textbook OCR**: Transcribed into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter6-exercises-solutions.md`, covering Chapter 6 review Part I (MCQs 1–4), Part II (fill-in-the-blank 1–3), Part III (exercises 1–10), and detailed answers/calculations (tetrapeptide molar mass, urea mass percentage, esterification yield, triglyceride saponification titration, amino acid empirical formula via matrix method, acetamide molarity, aldose Fehling's test formula determination, glucose fermentation + limewater precipitation, and benzoic acid $\text{pH}/K_a$ mass calculation).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 6 pages (`p135.png`–`p140.png`):
+  - Fixed Khmer spelling (`ភូសែន` -> `ផូសែន`, `ឡើង` -> `ល្បើង` in Q8 prompt and solution), fixed formula subscript sign in Q7 oxidation (`\text{O}_{n-1}` -> `\text{O}_{n+1}`), and annotated source-book print quirks (`o06`, `286`, `6,0810^{-3}`, unprinted Q4 formula gap, and Q9 `ប្រធានខុស`).
+  - Maintained `<!-- Page p135.png -->` through `<!-- Page p140.png -->` markers and updated `STATUS.md` so every row (Chapters 1–6) is marked `OCR Written: YES` and `OCR Audited: YES`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only; Chapters 1 & 2 Lessons 1–2 already have existing RAG chunks in `server/textbook-search.ts`).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"` (27 files checked, 0 warnings) and `npm run check:digits` (0 Khmer numerals across 363 files).
+
+
 ## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 28: Lesson 3 Exponential Functions Exercises Part 9
 
 Commit: pending. **No database step needed.**
