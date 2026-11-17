@@ -16,6 +16,33 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 16 (Ch 1 Lesson 3 France) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 16 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch1-lesson3-france.md`, PDF pages `p111.png` to `p115.png`, Book pp. 101-105):
+- Covered Chapter 1 Lesson 3 (`សាធារណរដ្ឋបារាំង`): Provisional Government (`I`, Q1-Q6), Fourth French Republic (`II`, Q1-Q2), Fifth French Republic (`III`, Q1-Q3), and Fifth Republic policies (`IV`, Q1). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit inspected all 5 PNGs line-by-line (0 discrepancies), preserving annotated source print typos on `p114.png` (`លោកហ្សាដឺហ្គោល`, `បានលទ្ធដូចម្តេច`).
+- **KruAI RAG: NO (OCR only)** (no RAG chunks added).
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`18 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
+
+
+## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 26: Lesson 3 Exponential Functions Exercises Part 7
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 26 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p215.png` to `p223.png`, Book pages 210 to 218):
+- **Textbook Rendering & OCR**: Rendered scans and transcribed word-for-word into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/lesson3-exponential-functions-exercises-part7.md`, covering:
+  - Exercise 10 (complete solution): Part A ($g'(x)$, limits at $-\infty$ and $+\infty$, variation table, sign of $g$), Part B ($f'(x) = 2e^{-2x}g(x)$, limits, variation table, curve $(C_f)$ figure description, integral $I(\alpha)$, area $S$), and Part C (differential equation $(E)$ verification, equivalence with $(E')$, general solutions).
+  - Exercise 11 (start): French problem statement (`Partie A` and `Partie B`) on `p223`.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 9 pages (`p215.png` to `p223.png`):
+  - Fixed word-splitting line-wrap space (`ជា ចម្លើយមួយនៃ` to `ជាចម្លើយមួយនៃ`, `p221`), split combined conclusion boxes cleanly outside Khmer text, and verified all French accents and piecewise intervals.
+  - Documented printed textbook typos with explanatory notes (`\ln(1 - 0)` on `p216`, `\ln(1 + 2e^{2x})` and factor `2` in limits on `p217`–`p221`, `ឆ`/`យ` labeling and `(u - 2)^2` on `p218`–`p219`, y-intercept discrepancy on `p219`, and `S = I(\alpha)` on `p220`).
+  - Maintained `<!-- Page p215.png -->` through `<!-- Page p223.png -->` markers and updated `STATUS.md` (`OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (28 files checked, 0 warnings), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 6 Lesson 4 (Carbohydrates and Lipids)
 
 Commit: pending. **No database step needed.**
