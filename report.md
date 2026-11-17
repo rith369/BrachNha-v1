@@ -16,6 +16,19 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 6 Lesson 1 (Esters, Fats and Oils)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Grade 12 Chemistry Chapter 6 Lesson 1 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p118.png` bottom half to `p122.png` top half):
+- **Textbook OCR**: Transcribed into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter6-lesson1-esters-fats-oils.md`, covering ester structure ($\text{R}-\text{COO}-\text{R}'$), fats vs. oils, saponification, soap hydrophilic/hydrophobic parts, detergents in hard water ($\text{Ca}^{2+}$, $\text{Mg}^{2+}$), ester hydrolysis equilibrium, questions 1–7, and worked calculations/structural equations 1–7.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 5 pages (`p118.png`–`p122.png`):
+  - Fixed Khmer misread `អ៊ីដ្រូភីល` to verbatim printed `អ៊ីដ្រូលីស` (`p119.png`), verified bottom-of-page structural line overlapping footer on `p120.png` was fully preserved, and kept Khmer subscripts like `M`<sub>គ្លីសេរ៉ុល</sub> outside KaTeX delimiters with zero stacked-LaTeX commands.
+  - Maintained `<!-- Page p118.png -->` through `<!-- Page p122.png -->` markers and updated `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"` (23 files checked, 0 warnings) and `npm run check:digits`.
+
+
 ## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 5 Additional Exercises & Chapter 5 Complete
 
 Commit: pending. **No database step needed.**
@@ -56,6 +69,17 @@ Digitized and audited Batch 24 of Grade 12 Math Function Graphs (`sources/textbo
   - Maintained `<!-- Page p197.png -->` through `<!-- Page p205.png -->` markers and updated `STATUS.md` (all 25 OCR files written and audited).
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (26 files checked, 0 warnings), `npm run check:digits`, `npm run check:content`, `npx oxlint`, `npx tsc -b`, and `npm test`.
+
+
+## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 12 (Ch 3 Lesson 4 Middle East) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 12 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch3-lesson4-middle-east.md`, PDF pages `p083.png` to `p086.png`, Book pp. 73-76):
+- Covered Chapter 3 Lesson 4 (`បណ្តាប្រទេសនៅតំបន់មជ្ឈិមបូព៌ា`): ethnic and religious diversity (`I`, Q1-Q4), Middle East politics and great-power interests (`II`, Q1-Q4, Q6 with skipped Q5 annotated), and synthesis (`III`, Q1). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit inspected all 4 PNGs character-by-character against `.md` (0 discrepancies).
+- **KruAI RAG: NO (OCR only)** (brief Middle East conflict overview exists in `tb:hist:practice:exams-1-to-5-bacii-qna`; no new RAG chunks added).
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`14 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
 
 
 ## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 11 (Ch 3 Lesson 3 Thailand) OCR & Audit
