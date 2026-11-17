@@ -16,6 +16,29 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 38: Section 3.14 Practice Exponential Functions Part 1
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 38 of Grade 12 Math Function Graphs (`sources/textbooks/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី.pdf`, PDF pages `p304.png` to `p309.png`, Book pages 299 to 304):
+- **Textbook Rendering & OCR**: Transcribed word-for-word from rendered page scans into `sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី/section3-14-practice-exponential-part1.md`, covering Section 3.14 (`លំហាត់អនុគមន៍អិចស្បូណង់ស្យែល`) Exercises 50 through 57.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 6 pages (`p304.png` to `p309.png`):
+  - Restored verbatim `ដែលបប្រែប្រួលតាមតម្លៃនៃ $x$` (preserving printed typo `បប្រែប្រួល` with an erratum note) in Exercise 56.A (`p307`) and added the trailing period after `$n$` in Exercise 57.B (`p309`).
+  - Documented printed textbook errata notes across Exercises 50 to 57 (duplicate limits, `អតូណរម៉ាល់`, `រិសមីការ`, `ex \neq 0`, duplicated words, missing exponent/factors, and piecewise notation).
+- **Verification**: Ran `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (`40 pages checked, 0 to look at by hand.`). `KruAI RAG in textbook-search.ts`: `NO (OCR only)`.
+
+
+## 17 Nov 2026: Chemistry Fundamentals (មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា) Batch 1: Cover, Preface & Part 1 Topics 1–5
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 1 of Chemistry Problem-Solving Fundamentals (`sources/textbooks/មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា.pdf`, PDF pages `p01.png` to `p07.png`):
+- **Textbook Rendering & OCR**: Rendered all 20 pages of the textbook and transcribed Batch 1 into `sources/ocr/មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា/part1-basic-level-1.md`, covering the cover page, preface (`អារម្ភកថា`, 6 study tips), and Part 1 (`ផ្នែកទី 1 ការគិតកម្រិតទាប`) Topics 1–5: molecular mass ($M$), mole stoichiometry ($n$), mass stoichiometry ($m$), gas volume stoichiometry ($V$), and mass-volume relationships in chemical equations.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 7 pages (`p01.png`–`p07.png`), restoring Khmer spelling/diacritics (`ខ្លឹមសារមេរៀន`, `ល្គឹកណា`, `សម្មតិកម្ម`, `នៃលំហរបស់វត្ថុមួយ`, `ជ្រុង`, `រើស`), fixing `0.15 mol`, `m_D`, and stoichiometric coefficients (`2H2O`, `3H2O`), and maintaining `<!-- Page p01.png -->` through `<!-- Page p07.png -->` markers and `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មូលដ្ឋានគ្រឹះក្នុងការដោះស្រាយលំហាត់គីមីវិទ្យា"` (`2 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
+
+
 ## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 37: Section 3.13 Practice Logarithmic Functions Part 2 (Section 3.13 Complete)
 
 Commit: pending. **No database step needed.**
@@ -37,15 +60,20 @@ Added the `Chemistry_` prefix to the Grade 12 Chemistry summary & solutions text
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Chemistry_មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"` (`27 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
 
 
-## 17 Nov 2026: Physics 200 Q&A (In Sovannaroth): Batch 1 (Cover & Chapter 1 Thermodynamics, OCR & Audit)
+## 17 Nov 2026: Physics 200 Q&A (In Sovannaroth): Batches 1 to 2 (Cover, Ch 1 & Ch 2, OCR & Audit)
 
 Commit: Pending. **No database step needed.**
 
-Digitized and audited Batch 1 of Grade 12 Physics 200 Q&A (`sources/textbooks/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន.pdf`, PDF pages `p01.png` to `p06.png`, Cover + Book pages 1 to 5):
-- **Textbook Rendering & OCR**: Rendered all 24 pages of the book and transcribed Batch 1 word-for-word into `sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន/chapter1-thermodynamics.md`, covering the cover page and Chapter 1 Thermodynamics (`ជំពូកទី 1 ទែម៉ូឌីណាមិច`, Lessons 1 to 3, Questions 1 to 40, plus motivational footers and Bac II year annotations 2014 to 2024).
-- **Strict Blind Visual Audit**: Completed line-by-line visual audit against scans `p01.png` to `p06.png`, fixing Boltzmann constant subscript `$k_b$` in Question 3, verifying all Khmer diacritics, subscripts, and thermodynamic formulas (`$K_{\text{av}}$`, `$Q = \Delta U + W$`, `$T_h, T_c$`).
-- **KruAI RAG Status**: KruAI RAG: NO (OCR only; Ch1 topics already grounded via Physics Summary `tb:phys:ch1:*`). No new RAG chunks added.
-- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន"` (2 pages checked, 0 warnings) and `npm run check:digits` (0 Khmer numerals).
+Digitized and audited Batches 1 and 2 of Grade 12 Physics 200 Q&A (`sources/textbooks/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន.pdf`, PDF pages `p01.png` to `p12.png`, Cover + Book pages 1 to 11):
+- **Batch 1 (PDF pages 1 to 6, Cover + Book pages 1 to 5)**:
+  - Scope: Cover page and Chapter 1 Thermodynamics (`ជំពូកទី 1 ទែម៉ូឌីណាមិច`, Lessons 1 to 3, Questions 1 to 40, plus motivational footers and Bac II year annotations 2014 to 2024) in `sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន/chapter1-thermodynamics.md`.
+  - Audit: Completed line-by-line visual audit against scans `p01.png` to `p06.png`, fixing Boltzmann constant subscript `$k_b$` in Question 3, verifying all Khmer diacritics, subscripts, and thermodynamic formulas (`$K_{\text{av}}$`, `$Q = \Delta U + W$`, `$T_h, T_c$`).
+  - KruAI RAG Status: KruAI RAG: NO (OCR only; Ch1 topics already grounded via Physics Summary `tb:phys:ch1:*`). No new RAG chunks added.
+- **Batch 2 (PDF pages 7 to 12, Book pages 6 to 11)**:
+  - Scope: Chapter 2 Waves (`ជំពូកទី 2 រលក`, Lesson 1 Superposition & Standing Waves, Lesson 2 Interference & Diffraction, Questions 41 to 103, plus motivational footers) in `sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន/chapter2-waves.md`.
+  - Audit: Completed line-by-line visual audit against scans `p07.png` to `p12.png`, fixing 5 Khmer subscript/spelling mistakes (`ដាលឆ្លងកាត់`, `រង្វិល`, `រលកសូរអាំងហ្វ្រា`, `ខ្ទរត្រួតគ្នា`, `សូរខ្ទរខ្ទាត់ៗ`), and verifying interference formulas (`$d_2 - d_1 = n\lambda$`, `$d_2 - d_1 = (n + \frac{1}{2})\lambda$`, `$d \approx \lambda$`).
+  - KruAI RAG Status: KruAI RAG: NO (OCR only; Ch2 topics already grounded via Physics Summary `tb:phys:ch2:*`). No new RAG chunks added.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/រូបវិទ្យា_២០០_ចម្លើយ_អ៊ិន_សុវណ្ណរ័ត្ន"` (3 files checked, 0 warnings) and `npm run check:digits` (0 Khmer numerals).
 
 
 ## 17 Nov 2026: Math Function Graphs (Ron Raksmey) Batch 36: Section 3.13 Practice Logarithmic Functions Part 1
