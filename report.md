@@ -16,6 +16,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 6 Lesson 3 (Aromatic Compounds)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Grade 12 Chemistry Chapter 6 Lesson 3 (`sources/textbooks/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់.pdf`, PDF pages `p127.png` bottom half to `p131.png` top half):
+- **Textbook OCR**: Transcribed into `sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់/chapter6-lesson3-aromatic-compounds.md`, covering aromatic nitrogen compounds (nitrobenzene, trinitrotoluene, aniline), aromatic hydroxy compounds (phenols vs aromatic alcohols), aromatic aldehydes and carboxylic acids, questions 1–6, and worked solutions/benzene-ring reaction figures 1–6.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 5 pages (`p127.png`–`p131.png`):
+  - Fixed wrong `-Br` ring vertex positions on the 2,4,6-tribromophenol diagram (`p129.png`) and replaced a fabricated `1/100` numerator with the exact printed expression `(n_{C6H5-NH2} ប្រតិកម្ម) / 100 × 80` (`p131.png`).
+  - Kept Khmer subscripts like `$Rd$`<sub>ប្រតិកម្ម</sub> and `$n$`<sub>ពិសោធ</sub> outside KaTeX delimiters with zero stacked-LaTeX commands and documented source-book print typos (`-NH3`, `នីត្រូតូលុយអែន`).
+  - Maintained `<!-- Page p127.png -->` through `<!-- Page p131.png -->` markers and updated `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/មេរៀនសង្ខេប_ចម្លើយសំណួរនិងលំហាត់"` (25 files checked, 0 warnings) and `npm run check:digits`.
+
+
 ## 17 Nov 2026: Grade 12 Chemistry OCR: Chapter 6 Lesson 2 (Aliphatic Nitrogen Derivatives)
 
 Commit: pending. **No database step needed.**
@@ -82,6 +96,17 @@ Digitized and audited Batch 24 of Grade 12 Math Function Graphs (`sources/textbo
   - Maintained `<!-- Page p197.png -->` through `<!-- Page p205.png -->` markers and updated `STATUS.md` (all 25 OCR files written and audited).
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Math ក្រាបនៃអនុគមន៍_រុន_រស្មី"` (26 files checked, 0 warnings), `npm run check:digits`, `npm run check:content`, `npx oxlint`, `npx tsc -b`, and `npm test`.
+
+
+## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 14 (Ch 1 Lesson 1 USA 1960-1990) OCR & Audit
+
+Commit: pending. **No database step needed.**
+
+Completed OCR-only transcription and blind visual audit of Batch 14 (`sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន/ch1-lesson1-usa-1960-1990.md`, PDF pages `p095.png` to `p103.png`, Book pp. 85-93):
+- Covered Chapter 1 title page (`ជំពូកទី 1៖ ប្រវត្តិសាស្ត្រពិភពលោក`) and Lesson 1 (`សហរដ្ឋអាមេរិក 1960-1990`): US political institutions (`I`, Q1-Q7), reforms and 1929 Great Depression (`II`, Q1-Q9), and 1960s-1980s domestic/Cold War programs (`III`, Q1-Q4). Dotted student answer blocks replaced with `*(ចម្លើយសិស្ស)*`.
+- Blind visual audit inspected all 9 PNGs line-by-line, restored printed `ញូឌៀល` (with typo note `*(កំហុសបោះពុម្ពនៃ ញូវឌៀល)*` on `p100.png`), and kept annotated source print typos (`បណ្តាឱ្យ`, `វីដ្រូវីលសុន` on `p099.png`).
+- **KruAI RAG: NO (OCR only)** (no RAG chunks added).
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/សៀវភៅកិច្ចការផ្ទះប្រវត្តិវិទ្យា_សំ_សាបឿន"` passed (`16 pages checked, 0 to look at by hand`), and `npm run check:digits` passed (`0 Khmer numerals`).
 
 
 ## 17 Nov 2026: History Workbook (Sam Saboeun & Sin Kamsot): Batch 13 (Ch 3 Lesson 5 Israel — Ch 3 Complete) OCR & Audit
