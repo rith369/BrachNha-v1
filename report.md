@@ -38,6 +38,20 @@ Started OCR digitization of Grade 12 MoEYS `sources/textbooks/Chemistry summary.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Chemistry summary"` (`2 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
 
 
+## 18 Nov 2026: Limits of Functions (Khem Putthy) Batches 8 to 13: Lesson 3 Complete
+
+Commit: pending. **No database step needed.**
+
+Digitized and blind-audited Batches 8 to 13 of Grade 12 Math `លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី.pdf` (`p052.png` to `p101.png`, Book pp. 51 to 100), completing all of `មេរៀនទី 3 : លំហាត់ និង ដំណោះស្រាយ` (`លំហាត់គំរូទី 1` through `23`):
+- **Batch 8 (`p052.png` to `p059.png`, Book pp. 51 to 58)**: `lesson3-exercises-part1.md` (`លំហាត់គំរូទី 1` to `6 ឋ.` prompt); blind audit confirmed 0 discrepancies across all 8 pages.
+- **Batch 9 (`p060.png` to `p067.png`, Book pp. 59 to 66)**: `lesson3-exercises-part2.md` (`លំហាត់គំរូទី 6 ឋ.` to `10 ញ.` setup); blind audit restored verbatim `\sqrt[3]{x - 1}` typo on `p066.png` with an erratum note.
+- **Batch 10 (`p068.png` to `p075.png`, Book pp. 67 to 74)**: `lesson3-exercises-part3.md` (`លំហាត់គំរូទី 10 ញ.` tail to `15 ទ.` setup); blind audit removed unprinted `\lim_{x \to +\infty}` in `13. ឃ.` line 6 (`p070.png`) and updated its erratum note.
+- **Batch 11 (`p076.png` to `p084.png`, Book pp. 75 to 83)**: `lesson3-exercises-part4.md` (`លំហាត់គំរូទី 15 ឌ.` to `18 ដ.`); blind audit restored verbatim `\sqrt{\cos 2x}` typo in `18. ឆ.` line 1 (`p084.png`) and updated its erratum note.
+- **Batch 12 (`p085.png` to `p093.png`, Book pp. 84 to 92)**: `lesson3-exercises-part5.md` (`លំហាត់គំរូទី 18 ង.` end to `21` prompts); blind audit confirmed 0 discrepancies and verified the microscopic shrunk line on `p092.png` at native 1600px zoom.
+- **Batch 13 (`p094.png` to `p101.png`, Book pp. 93 to 100)**: `lesson3-exercises-part6.md` (`លំហាត់គំរូទី 21` solutions to `23 ឌ.`, completing Lesson 3); blind audit confirmed 0 discrepancies.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី"` (`17 pages checked, 0 to look at by hand.`), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`. `KruAI RAG in textbook-search.ts`: `NO (OCR only)`.
+
+
 ## 18 Nov 2026: Limits of Functions (Khem Putthy) Batches 4 to 7: Lesson 2 Complete
 
 Commit: pending. **No database step needed.**
