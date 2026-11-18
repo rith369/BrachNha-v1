@@ -27,6 +27,18 @@ Started OCR digitization of Grade 12 MoEYS `sources/textbooks/Chemistry summary.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Chemistry summary"` (`2 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
 
 
+## 18 Nov 2026: Limits of Functions (Khem Putthy) Batches 4 to 7: Lesson 2 Complete
+
+Commit: pending. **No database step needed.**
+
+Digitized and blind-audited Batches 4 to 7 of Grade 12 Math `លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី.pdf` (`p020.png` to `p051.png`, Book pp. 19 to 50), completing all of `មេរៀនទី 2 : វិធីសាស្រ្តក្នុងការគណនា` (Sections 1 to 12, `លំហាត់គំរូ 1` through `27`):
+- **Batch 4 (`p020.png` to `p027.png`, Book pp. 19 to 26)**: `lesson2-methods-part1.md` (Section 1 limit proofs by definition `1.1` to `1.9` + Section `2.1` start). Blind audit restored exact 4-glyph `☒☒☒☒` corrupted font artifacts (`p024.png`) and verbatim `$x > N$` in `លំហាត់គំរូ 8` `ខ.` (`p026.png`) with errata notes.
+- **Batch 5 (`p028.png` to `p035.png`, Book pp. 27 to 34)**: `lesson2-methods-part2.md` (Section `2.1` factoring formulas + irrational limit forms `3.1` to `3.6`, Examples `10` to `16`). Blind visual audit confirmed 0 discrepancies across all 8 pages.
+- **Batch 6 (`p036.png` to `p043.png`, Book pp. 35 to 42)**: `lesson2-methods-part3.md` (Sections `3.7`, `4.`/`4.1`, `5.`/`5.1`, `6.`/`6.1`/`6.2`, `7.`, `8.`, Examples `16 ឃ.` to `22`). Blind audit fixed `18.គ` denominator (`1 + \frac{1}{x}` on `p038.png`), added `19.ក` square-inside-radical note (`p039.png`), and documented misplaced `21.ឃ` conclusion (`p042.png`).
+- **Batch 7 (`p044.png` to `p051.png`, Book pp. 43 to 50)**: `lesson2-methods-part4.md` (Sections `9.` to `12.`, sequence sum formulas, 21-row derivative table, L'Hopital's rule, Examples `24` to `27`, completing Lesson 2). Blind audit corrected sign/denominator transcription in Examples `24 ក.`/`គ.` (`p044` to `p045`).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី"`, `npm run check:digits`, `npx oxlint`, and `npx tsc -b`. `KruAI RAG in textbook-search.ts`: `NO (OCR only)`.
+
+
 ## 18 Nov 2026: Limits of Functions (Khem Putthy) Batches 1 to 3: Front Matter & Lesson 1 Complete
 
 Commit: pending. **No database step needed.**
