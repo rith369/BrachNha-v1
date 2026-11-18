@@ -16,6 +16,17 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 18 Nov 2026: Chemistry Summary (Chemistry summary.pdf) Batch 2: Chapter 1 Lesson 2
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 2 of Grade 12 MoEYS `sources/textbooks/Chemistry summary.pdf` (PDF pages `p08.png` to `p12.png`):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/Chemistry summary/chapter1-lesson2-kinetic-factors.md`, covering Chapter 1 Lesson 2 (`កត្តាជះឥទ្ធិពលលើល្បឿនប្រតិកម្ម`: particle size, reactant concentration, gas pressure, temperature, catalysts, homogeneous/heterogeneous/enzymatic catalysis, specificity, autocatalysis, and industrial importance).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 5 pages (`p08.png`–`p12.png`), restoring dropped prefix `អង្គ` (`ល្បឿនបំបាត់អង្គធាតុប្រតិករ`) on `p09.png`, verifying all redox tables and experimental setups, and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Chemistry summary"` (`3 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
+
+
 ## 18 Nov 2026: Chemistry Summary (Chemistry summary.pdf) Batch 1: Front Matter & Chapter 1 Lesson 1
 
 Commit: pending. **No database step needed.**
