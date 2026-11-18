@@ -16,6 +16,17 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 18 Nov 2026: Chemistry Summary (Chemistry summary.pdf) Batch 4: Chapter 2 Lesson 2
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 4 of Grade 12 MoEYS `sources/textbooks/Chemistry summary.pdf` (PDF pages `p15.png` to `p17.png`):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/Chemistry summary/chapter2-lesson2-intermolecular-forces.md`, covering Chapter 2 Lesson 2 (`កម្លាំងអន្តរម៉ូលេគុល`: ionic vs. covalent compounds comparison table, electrostatic attraction, intermolecular forces, London dispersion forces, dipole-dipole forces, hydrogen bonding diagram, sample exercise, and answers).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p15.png`–`p17.png`, fixing missing trailing `ន` (`សម្ព័ន្ធអ៊ីដ្រូសែន`), London dispersion wording (`ធំ`), $\text{NH}_3\dots\text{NH}_3$ bond orientation & $\delta^+/\delta^-$ charges, and spurious `ក/` prefix, and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Chemistry summary"` (`5 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
+
+
 ## 18 Nov 2026: Chemistry Summary (Chemistry summary.pdf) Batch 3: Chapter 2 Lesson 1
 
 Commit: pending. **No database step needed.**
@@ -47,6 +58,20 @@ Started OCR digitization of Grade 12 MoEYS `sources/textbooks/Chemistry summary.
 - **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 7 pages (`p01.png`–`p07.png`), verifying all redox half-equation tables, $E^\circ$ diagrams, graph labels, LaTeX formatting, `<!-- Page p01.png -->` through `<!-- Page p07.png -->` markers, and `STATUS.md`.
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only).
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Chemistry summary"` (`2 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
+
+
+## 18 Nov 2026: Limits of Functions (Khem Putthy) Batches 14 to 19: Lesson 4 Complete
+
+Commit: pending. **No database step needed.**
+
+Digitized and blind-audited Batches 14 to 19 of Grade 12 Math `លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី.pdf` (`p102.png` to `p168.png`), completing all of `មេរៀនទី 4 : លំហាត់ប្រតិបត្តិសម្រាប់អនុវត្ត` (`លំហាត់អនុវត្តទី 1` through `39`, plus workbook lined solution sheets and blank separator `p168.png`):
+- **Batch 14 (`p102.png` to `p111.png`)**: `lesson4-practice-part1.md` (Exercises 1 to 5). Blind audit fixed `ឫសការេ` (`p102`) and verbatim `ឲ្យ` spelling (`p104`).
+- **Batch 15 (`p112.png` to `p121.png`)**: `lesson4-practice-part2.md` (Exercises 6 to 9). Blind audit confirmed 0 discrepancies across all 10 pages.
+- **Batch 16 (`p122.png` to `p131.png`)**: `lesson4-practice-part3.md` (Exercises 10 to 12). Blind audit confirmed 0 discrepancies across all 10 pages.
+- **Batch 17 (`p132.png` to `p141.png`)**: `lesson4-practice-part4.md` (Exercises 13 to 17). Blind audit confirmed 0 discrepancies across all 10 pages.
+- **Batch 18 (`p142.png` to `p151.png`)**: `lesson4-practice-part5.md` (Exercises 18 to 23 + `លំហាត់ប្រឡងថ្នាក់ជាតិ`). Blind audit fixed `m;` spacing in `cases` and restored verbatim corrupted print `អនុគមន៍ាប់` (`p151.png`) with detailed erratum note.
+- **Batch 19 (`p152.png` to `p168.png`)**: `lesson4-practice-part6.md` (Exercises 24 to 32) and `lesson4-practice-part7.md` (Exercises 33 to 39, including 2019/2025/2026 exam problems and `p168.png` separator). Blind audits confirmed 0 discrepancies across all 17 pages.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី"` (`23 pages checked, 0 to look at by hand.`), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`. `KruAI RAG in textbook-search.ts`: `NO (OCR only)`.
 
 
 ## 18 Nov 2026: Limits of Functions (Khem Putthy) Batches 8 to 13: Lesson 3 Complete
