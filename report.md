@@ -16,6 +16,17 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 18 Nov 2026: Limits of Functions (Khem Putthy) Batches 1 to 3: Front Matter & Lesson 1 Complete
+
+Commit: pending. **No database step needed.**
+
+Started full OCR digitization of Grade 12 Math textbook `លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី.pdf` (293 PDF pages rendered to 1600px PNGs in `sources/pages/លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី/`), completing and blind-auditing Batches 1 to 3 (`p001.png` to `p019.png`):
+- **Batch 1 (`p001.png` to `p007.png`, Front Matter)**: Transcribed and audited cover, book info, preface (`អារម្ភកថា`), acknowledgments (`សេចក្តីដឹងគុណ`), table of contents (`មាតិកា`), and blank separator into `sources/ocr/លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី/front-matter.md` (0 audit discrepancies; 15 KaTeX TOC expressions verified).
+- **Batch 2 (`p008.png` to `p013.png`, Book pp. 7 to 12, Lesson 1 Part 1)**: Transcribed and audited `មេរៀនទី 1 : មេរៀនសង្ខេប` sections `1.1` through `1.9` into `lesson1-summary-part1.md`; blind audit corrected the `1.4` erratum note on `p010.png` (`អនុគមន៍ f` space check).
+- **Batch 3 (`p014.png` to `p019.png`, Book pp. 13 to 18, Lesson 1 Part 2)**: Transcribed and audited sections `1.10` through `1.18` and `2.1` through `2.5` (`ភាពជាប់នៃអនុគមន៍`) into `lesson1-summary-part2.md`, completing Lesson 1; blind audit fixed bullet labels `ដ.` / `ឋ.` in `1.18` (`p017.png`) and restored `ឫសទី` on line 204 (`p018.png`).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី"` (`5 pages checked, 0 to look at by hand.`), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`. `KruAI RAG in textbook-search.ts`: `NO (OCR only)`.
+
+
 ## 17 Nov 2026: Physics 200 Q&A (In Sovannaroth): Batches 1 to 5 (100% Book Complete, OCR & Audit)
 
 Commit: Pending. **No database step needed.**
