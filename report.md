@@ -16,6 +16,17 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 18 Nov 2026: Chemistry Summary (Chemistry summary.pdf) Batch 1: Front Matter & Chapter 1 Lesson 1
+
+Commit: pending. **No database step needed.**
+
+Started OCR digitization of Grade 12 MoEYS `sources/textbooks/Chemistry summary.pdf` (56 pages rendered to PNGs in `sources/pages/Chemistry summary/`), completing Batch 1 (`p01.png` to `p07.png`):
+- **Textbook Rendering & OCR**: Mapped all 5 chapters / 14 lessons in `sources/ocr/Chemistry summary/STATUS.md` and transcribed Batch 1 into `sources/ocr/Chemistry summary/chapter1-lesson1-reaction-rate.md`, covering the cover page, preface (`អារម្ភកថា`), Table of Contents (`មាតិកា`), and Chapter 1 Lesson 1 (`ល្បឿនប្រតិកម្មគីមី`: fast/slow/very slow reactions, $E^\circ$ diagrams, average & instantaneous rates, half-life $t_{1/2}$, kinetic curves, and sample exercise).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 7 pages (`p01.png`–`p07.png`), verifying all redox half-equation tables, $E^\circ$ diagrams, graph labels, LaTeX formatting, `<!-- Page p01.png -->` through `<!-- Page p07.png -->` markers, and `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Chemistry summary"` (`2 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
+
+
 ## 18 Nov 2026: Limits of Functions (Khem Putthy) Batches 1 to 3: Front Matter & Lesson 1 Complete
 
 Commit: pending. **No database step needed.**
