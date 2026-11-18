@@ -16,6 +16,17 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 18 Nov 2026: Chemistry Summary (Chemistry summary.pdf) Batch 3: Chapter 2 Lesson 1
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 3 of Grade 12 MoEYS `sources/textbooks/Chemistry summary.pdf` (PDF pages `p13.png` to `p14.png`):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/Chemistry summary/chapter2-lesson1-aqueous-solutions.md`, covering Chapter 2 Lesson 1 (`សមាសធាតុក្នុងសូលុយស្យុងទឹក`: ionic dissociation, precipitation reactions, net ionic equations, ionization, hydronium ion $\text{H}_3\text{O}^+$, and strong vs. weak electrolytes).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p13.png` and `p14.png`, restoring missing diacritic `ំ` (`ហ៊ុំព័ទ្ធ`) and omitted Khmer text (`ពីអាស៊ីត`, `ទេ`), preserving the source-book `NaCl (aq)` quirk verbatim, and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/Chemistry summary"` (`4 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
+
+
 ## 18 Nov 2026: Chemistry Summary (Chemistry summary.pdf) Batch 2: Chapter 1 Lesson 2
 
 Commit: pending. **No database step needed.**
