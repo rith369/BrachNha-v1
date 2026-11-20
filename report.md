@@ -16,6 +16,94 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 20 Nov 2026: 2014 Bac II Past Exam Papers (2014-first.pdf) Batch 8: English (100% Book Complete)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 8 of MoEYS 2014 Bac II Session 1 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-first.pdf` (`p23.png`, book p. 22), completing **100% OCR Written and 100% OCR Audited** across all 23 PDF pages (`01-cover-and-khmer.md` through `08-english.md`):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2014-first/08-english.md`, covering the complete English exam (`ប្រធាន`: `I. Reading` 11-gap `elections` cloze with word box, `II. Grammar.` 5 MCQs, `III. Vocabulary.` 5 MCQs, `IV. Writing.` essay prompt) and official key (`កំណែភាសាអង់គ្លេស`), preserving literal print quirks with editorial notes.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit of `p23.png`, fixing the missing comma in `Choose the correct letter a, b, c, or d.` (`II. Grammar.`), verifying all 13 reading box words, 11 gaps, 48 MCQ options, answer keys, and print quirks (`Read the test`, `opinion pool`, `Reservation`, `d.. makes`, `d. golds`), and updating `STATUS.md` to 100% complete (`8/8` sections `OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only across all 8 sections; no existing `2014-first` chunks in `server/textbook-search.ts`).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-first"` (`9 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
+
+
+## 20 Nov 2026: 2014 Bac II Past Exam Papers (2014-first.pdf) Batch 7: French
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 7 of MoEYS 2014 Bac II Session 1 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-first.pdf` (`p22.png`, book p. 21):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2014-first/07-french.md`, covering the complete French exam (`ប្រធាន`: `I. Vocabulaire`, `II. Grammaire.`, `III. Expression écrite.`) and official key (`កំណែភាសាបារាំង` + 5-item essay rubric).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit of `p22.png`, verifying all 32 numbered items/answers, French accents/orthography, `<u>sans</u>` underline and `**vent**` bolding, and literal print quirks (`il` lowercase, `d’ étoiles`, `soeur`, `fatigue`, `A.Répondez`, `1-Ma`, `Laissez-les y.`), and updating `STATUS.md` (0 discrepancies).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-first"` and `npm run check:digits`.
+
+
+## 20 Nov 2026: 2014 Bac II Past Exam Papers (2014-first.pdf) Batch 6: History
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 6 of MoEYS 2014 Bac II Session 1 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-first.pdf` (`p21.png`, book p. 20):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2014-first/06-history.md`, covering all 3 History exam questions (`I.`–`III.`: major global challenges, destruction under Democratic Kampuchea & post-1979 Cambodian reconstruction, and the significance of listing Preah Vihear Temple as UNESCO World Heritage) and their complete official scoring key (`កំណែប្រវត្តិវិទ្យា`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit of `p21.png`, restoring the omitted word `លោក` (`បេតិកភណ្ឌពិភពលោកមានន័យថា` in `III.`), verifying all subscripts (`្ត` vs `្ដ`), dates (`04 សីហា 2014`, `23 តុលា 1991`), Latin digits, and trailing ellipsis dots, and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-first"` (`7 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
+
+
+## 20 Nov 2026: 2014 Bac II Past Exam Papers (2014-first.pdf) Batch 5: Biology
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 5 of MoEYS 2014 Bac II Session 1 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-first.pdf` (`p17.png` to `p20.png`, book pp. 16–19):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2014-first/05-biology.md`, covering all 6 Biology exam questions (`I.`–`VI.`: dicot identification, double fertilization, Biuret protein test, DNA nucleotides, neuron types in reflex/response, DNA replication calculations, and $\text{ARN}_m$ length & base-percentage ratios) and their full official solutions (`កំណែជីវវិទ្យា`), keeping all Khmer units/labels (`នុយក្លេអូទីត`, `សែន`) outside KaTeX math spans.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p17.png`–`p20.png`, removing a hallucinated `ៗ` (`ច្រើនខុសៗគ្នា` → `ច្រើនខុសគ្នា` in `III.2.`, `p18.png`), fixing a misread Khmer subscript (`110 ក្អេអូទីត` → `110 ក្លេអូទីត` and its print note in `VI.2.`, `p19.png`), verifying all boxed results, subscripts, and `(1) => 370 + G = 540` print-typo note, and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-first"` (`6 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
+
+
+## 20 Nov 2026: 2014 Bac II Past Exam Papers (2014-first.pdf) Batch 4: Chemistry
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 4 of MoEYS 2014 Bac II Session 1 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-first.pdf` (`p13.png` to `p16.png`, book pp. 12–15):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2014-first/04-chemistry.md`, covering all 6 Chemistry exam questions (`I.`–`VI.`: organic structural formulas, $\text{CaCO}_3 + \text{HCl}$ ionic/net ionic equations, $\text{H}_2\text{SO}_4$ molarity from density & mass percent, dilution molarity, $\text{Zn} + \text{HCl}$ redox proof, and 3 kinetic factors for $\text{H}_2$ production) and their complete multi-method official solutions (`កំណែគីមីវិទ្យា`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p13.png`–`p16.png`, re-aligning the ASCII redox oxidation-number bracket diagram over `2HCl`, `ZnCl2`, and `H2` (`V.`, `p15.png`), adding a print-error note for `អេឡិចត្រកុ` (`p15.png`), verifying all multi-method molarity/dilution calculations, uppercase `(S)` / `\ell` notations, and print-typo notes (`ស្វិត`, `C = 2.26 mol·L^-1`, `10^-4 mol`, `ទៅ O ពី +I ទៅ O`), and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-first"` and `npm run check:digits`.
+
+
+## 20 Nov 2026: 2014 Bac II Past Exam Papers (2014-first.pdf) Batch 3: Physics
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 3 of MoEYS 2014 Bac II Session 1 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-first.pdf` (`p11.png` to `p12.png`, book pp. 10–11):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2014-first/03-physics.md`, covering all 6 Physics exam questions (`I.`–`VI.`: transformer structure & voltage ratio, self-induction, right-hand rule for straight & circular currents, RLC series AC circuit impedance/resistance, solenoid turn count) and their full official solutions (`កំណែរូបវិទ្យា`) plus Khmer bracketed descriptions for the RLC circuit and transformer schematic diagrams.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p11.png`–`p12.png`, verifying all 17 inline physics values/units and 23 equation/result lines (`IV.`–`VI.2.`), both diagram descriptions (RLC circuit & transformer symbol), the printed-book `របុំមធ្យម` wording and `VI.1.` nested-radical typo note, and updating `STATUS.md` (0 discrepancies).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-first"` and `npm run check:digits`.
+
+
+## 20 Nov 2026: 2014 Bac II Past Exam Papers (2014-first.pdf) Batch 2: Mathematics
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 2 of MoEYS 2014 Bac II Session 1 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-first.pdf` (`p04.png` to `p10.png`, book pp. 3–9):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2014-first/02-mathematics.md`, covering all 5 exam parts (`I.`–`V.`, 18 sub-questions: limits, complex numbers, probability, logarithmic function variation & intersection, exponential function variation, tangent line & intermediate value theorem) and their complete official solutions (`កំណែគណិតវិទ្យា`, including 3 methods for complex roots and all 3 variation tables).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 7 pages (`p04.png`–`p10.png`), fixing a duplicated `3 \cdot \frac{-2\pi}{3}` expression in `II.3` (`របៀបទី1`, `p06.png`) to match the printed `2^3\left[\cos\left(-\frac{2\pi}{3}\right) + i\sin\left(-\frac{2\pi}{3}\right)\right]^3` line, verifying all variation tables and preserved print quirks, and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-first"` and `npm run check:digits`.
+
+
+## 20 Nov 2026: 2014 Bac II Past Exam Papers (2014-first.pdf) Batch 1: Cover & Khmer Literature
+
+Commit: pending. **No database step needed.**
+
+Started OCR digitization of MoEYS 2014 Bac II Session 1 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-first.pdf` (all 23 pages rendered to PNGs in `sources/pages/2014-first/`), completing Batch 1 (`p01.png` to `p03.png`):
+- **Textbook OCR**: Mapped all 8 subjects/sections (`p01.png` to `p23.png`) in `sources/ocr/2014-first/STATUS.md` and transcribed Batch 1 into `sources/ocr/2014-first/01-cover-and-khmer.md`, covering the cover page and the Khmer Literature exam prompt (`ប្រធាន`: `«អក្សរសិល្ប៍ គឺជាកញ្ចក់សម្រាប់ឆ្លុះសង្គម»`) and full official outline key (`គម្រោងអត្ថាធិប្បាយ`, sections `I.`–`IV.`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p01.png`–`p03.png`, fixing `អត្ថបទ` (`p02.png`), `ចាស់គំរីល`, `យសសក្តិរមែងតែង`, and `...កាប់ចាក់វាយដំពុំប្រណី”` (`p03.png`), preserving verbatim print quirks (`វិញ្ញាសាភាសាបារាំងប្រឡងលើកទី1`, `រាតទី`, `ជាស៊ីសជប៉ុន`, `មុខដារ`), and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-first"` and `npm run check:digits`.
+
+
 ## 18 Nov 2026: Chemistry Summary (Chemistry summary.pdf) Batch 4: Chapter 2 Lesson 2
 
 Commit: pending. **No database step needed.**
