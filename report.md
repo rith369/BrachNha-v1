@@ -16,6 +16,17 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 25 Nov 2026: 2016 Bac II Past Exam Papers (2016.pdf) Batch 1: Cover & Khmer Literature
+
+Commit: pending. **No database step needed.**
+
+Started OCR digitization of MoEYS 2016 Bac II Science Track exam compilation `sources/textbooks/Past Exam Papers/2016.pdf` (all 24 pages rendered to PNGs in `sources/pages/2016/`), completing Batch 1 (`p01.png` to `p03.png`):
+- **Textbook OCR**: Mapped all 8 subjects/sections (`p01.png` to `p24.png`, book pp. 64–86) in `sources/ocr/2016/STATUS.md` and transcribed Batch 1 into `sources/ocr/2016/01-cover-and-khmer.md`, covering the cover page and the Khmer Literature exam prompt (`ប្រធាន`: `«អត្ថបទអក្សរសិល្ប៍មានគោលដៅអប់រំមនុស្សឱ្យចេះដោះស្រាយបញ្ហា»`) and full official outline key (`គម្រោងអត្ថាធិប្បាយ`, sections `I.`–`IV.`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p01.png`–`p03.png`, fixing `អាថ៌កំបាំង` → `អាថិកំបាំង` (`p02.png`) and `តស៊ូព្យាយាមុ` → `តស៊ូព្យាមុ` (`p03.png`) with updated print notes, verifying all preserved print quirks (`ប្រលង`, `សិល្ប៍វិធី`/`សិស្សវិធី`, `គោរពធន្នុះរាស្ត្រ`, `កំសាន្ត`) and blank right column on `p03.png`, and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2016"` and `npm run check:digits`.
+
+
 ## 25 Nov 2026: Bac II Physics Solutions 2014-2024 (Chou Chamnan): Batches 1 to 5 (100% Book Complete, OCR & Audit)
 
 Commit: Pending. **No database step needed.**
@@ -116,6 +127,18 @@ Started OCR digitization of MoEYS 2015 Bac II Science Track exam compilation `so
 - **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p01.png`–`p03.png`, verifying all subscripts, literary examples (`កុលាបប៉ៃលិន`, `ព្រះអាទិត្យថ្មីរះនៅលើផែនដីចាស់`, `ទុំទាវ`, `គូលីកំណែន`, `មាយើង`), `→` arrows, and preserved literal print quirks (`ប្រលង`, `25 សីហា` running header vs `24 សីហា` title, `អចិន្ត្រៃ`, `ស្ថេរភាព`, `ទុំ-ពេជ្រ`), and updating `STATUS.md` (0 discrepancies).
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only).
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2015"` and `npm run check:digits`.
+
+
+## 25 Nov 2026: Complex Numbers (ចំនួនកុំផ្លិច · Prek Leap NGSPL 2026) Batches 1 to 4: Front Matter & Section 1 Complete
+
+Commit: pending. **No database step needed.**
+
+Rendered all 146 pages of Grade 12 Math textbook `sources/textbooks/math/ចំនួនកុំផ្លិច.pdf` to 1600px PNGs under `sources/pages/math/ចំនួនកុំផ្លិច/` and digitized + blind-audited Batches 1 to 4 (`p001.png` to `p030.png`), completing Front Matter and all of Section 1 (`1. ចំនួនកុំផ្លិចទម្រង់ពិជគណិត`):
+- **Batch 1 (`p001.png` to `p006.png`, Front Matter)**: `front-matter.md` (cover, preface `អារម្ភកថា`, credits `NGSPL Teams`, blank pages `p004`/`p006`, TOC `មាតិកា`). Blind audit added erratum note for `គណកម្មការត្រួតពិនិត្យ` (`p003.png`).
+- **Batch 2 (`p007.png` to `p014.png`, Book pp. 7 to 14)**: `section1-algebraic-form-part1.md` (Sections `1.1` to `1.5`, Argand/vector diagrams, `កម្រងលំហាត់បន្ថែម` #1 to #22 intro). Blind audit matched banner spelling `ពិជគណិត`, added `ដូចនេះ៖` colons (`p009`), fixed `#15g` bracket grouping (`p013`), and noted `#12f` missing `$x$` (`p013`).
+- **Batch 3 (`p015.png` to `p022.png`, Book pp. 15 to 22)**: `section1-algebraic-form-part2.md` (Practice Exercises #22 to #30 + worked solutions #1 to #18 b). Blind audit confirmed 0 discrepancies across all 8 pages.
+- **Batch 4 (`p023.png` to `p030.png`, Book pp. 23 to 30)**: `section1-algebraic-form-part3.md` (Worked solutions #18 c to #30 + blank separator `p030.png`). Blind audit restored verbatim `ឲ្យ` in #27 and #29 (`p028`, `p029`).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/math/ចំនួនកុំផ្លិច"`, `npm run check:digits`, `npx oxlint`, and `npx tsc -b`. `KruAI RAG in textbook-search.ts`: `NO (OCR only)`.
 
 
 ## 25 Nov 2026: Limits of Functions (Khem Putthy) Batches 25 to 32: Lesson 5 Parts 6 to 13 & References (100% Book Complete)
