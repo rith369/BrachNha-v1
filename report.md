@@ -16,6 +16,41 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 25 Nov 2026: 2014 Bac II Past Exam Papers Session 2 (2014-second.pdf) Batch 2: Mathematics
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 2 of MoEYS 2014 Bac II Session 2 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-second.pdf` (`p04.png` to `p08.png`, book pp. 25–29):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2014-second/02-mathematics.md`, covering all 6 exam parts (`I.`–`VI.`, 18 sub-questions: limits, complex numbers & $i^{2015} - i^{2014}$, probability, $f(x) = \frac{x+\ln x}{x^2}$ variation & graph, second-order differential equation $y'' + 4y = x^2 + 2x - 1$, and 3D geometry parallelogram area/line/plane) and their complete official solutions (`កំណែគណិតវិទ្យា`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 5 pages (`p04.png`–`p08.png`), applying 7 fixes: removed hallucinated `ជា` (`III.`, `p04.png`), fixed `ទាញរក` → `ទាញយក` (`IV.2.ឃ` on `p04.png` & `p07.png`), corrected the graph grid scale (`1 ឯកតាស្មើ 2 ក្រឡា` on `p07.png`), restored 3 missing `នោះ:` colons (`p08.png`), and verified all variation tables, determinants, and preserved print quirks (`I.2` missing minus sign, `I.4` missing `^2`, `B(4, -1, 0)` vs `B(4, -2, 0)`, `2k`), and updated `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-second"` and `npm run check:digits`.
+
+
+## 25 Nov 2026: Limits of Functions (Khem Putthy) Batches 20 to 24: Lesson 5 Parts 1 to 5
+
+Commit: pending. **No database step needed.**
+
+Continued full OCR digitization and blind auditing of Grade 12 Math `sources/textbooks/math/លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី.pdf` (reorganized under `sources/ocr/math/លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី/` and `sources/pages/math/លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី/`), completing Lesson 5 Parts 1 to 5 (`p169.png` to `p218.png`, Book pp. 23 to 72):
+- **Batch 20 (`p169.png` to `p178.png`, Book pp. 23 to 32)**: `lesson5-solutions-part1.md` (`ដំណោះស្រាយលំហាត់ទី 1` to `3 ឋ.`); blind audit confirmed 0 discrepancies across all 10 pages.
+- **Batch 21 (`p179.png` to `p188.png`, Book pp. 33 to 42)**: `lesson5-solutions-part2.md` (`ដំណោះស្រាយលំហាត់ទី 3 ឌ.` to `5 ខ.`); blind audit fixed printed cross-reference `18` -> `19` in `4 ធ.` (`p187.png`, removing false erratum note).
+- **Batch 22 (`p189.png` to `p198.png`, Book pp. 43 to 52)**: `lesson5-solutions-part3.md` (`ដំណោះស្រាយលំហាត់ទី 5 គ.` to `6 ន.`); blind audit refined overlap and right-edge clipping notes on `p195.png` and `p196.png`.
+- **Batch 23 (`p199.png` to `p208.png`, Book pp. 53 to 62)**: `lesson5-solutions-part4.md` (`ដំណោះស្រាយលំហាត់ទី 6 ប.` to `8 ឃ.`); blind audit restored verbatim `នាំឱ្យ` (`p205.png`, `p207.png`) and documented `7 ញ.` right-edge clipping (`p205.png`).
+- **Batch 24 (`p209.png` to `p218.png`, Book pp. 63 to 72)**: `lesson5-solutions-part5.md` (`ដំណោះស្រាយលំហាត់ទី 8 ង.` to `9 ឡ.`); blind audit restored verbatim `បញ្ជូនរ៉ាឌីកាល់` in `8 ធ.` (`p211.png`) with an erratum note.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/math/លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី"` (`27 pages checked, 0 to look at by hand.`), `npm run check:digits`, `npx oxlint`, and `npx tsc -b`. `KruAI RAG in textbook-search.ts`: `NO (OCR only)`.
+
+
+## 25 Nov 2026: 2014 Bac II Past Exam Papers Session 2 (2014-second.pdf) Batch 1: Cover & Khmer Literature
+
+Commit: pending. **No database step needed.**
+
+Started OCR digitization of MoEYS 2014 Bac II Session 2 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-second.pdf` (all 22 pages rendered to PNGs in `sources/pages/2014-second/`), completing Batch 1 (`p01.png` to `p03.png`):
+- **Textbook OCR**: Mapped all 8 subjects/sections (`p01.png` to `p22.png`, book pp. 23–43) in `sources/ocr/2014-second/STATUS.md` and transcribed Batch 1 into `sources/ocr/2014-second/01-cover-and-khmer.md`, covering the cover page and the Session 2 Khmer Literature exam prompt (`ប្រធាន`: `«អក្សរសាស្ត្ររលត់ ជាតិរលាយ អក្សរសាស្ត្រពណ្ណរាយជាតិថ្កើងថ្កាន»`) and full official outline key (`គម្រោងអត្ថាធិប្បាយ`, sections `I.`–`IV.`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p01.png`–`p03.png`, removing 2 stray spaces before `។` (`រុងរឿងរីកចម្រើន។`, `កូនចៅជាតិខ្មែរ។` on `p02.png`), preserving literal print quirks (`ប្រលង`, `ប្រះនគរ`, `នាំមូលដ្ឋានគ្រឹះ`, `ខ.កាលណា`), and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-second"` and `npm run check:digits`.
+
+
 ## 20 Nov 2026: 2014 Bac II Past Exam Papers (2014-first.pdf) Batch 8: English (100% Book Complete)
 
 Commit: pending. **No database step needed.**
