@@ -32,6 +32,39 @@ Completed 100% OCR digitization and strict blind visual auditing of Grade 12 Mat
 - **Verification**: Ran full verification suite: `node scripts/ocr-check.mjs "sources/ocr/math/លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី"` (`34 pages checked, 0 to look at by hand.`), `npm run check:digits`, `npm run check:content`, `npx oxlint`, `npx tsc -b`, and `npm test`. `KruAI RAG in textbook-search.ts`: `NO (OCR only)`.
 
 
+## 25 Nov 2026: 2014 Bac II Past Exam Papers Session 2 (2014-second.pdf) Batch 8: English (100% Book Complete)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 8 of MoEYS 2014 Bac II Session 2 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-second.pdf` (`p22.png`, book p. 43), completing **100% OCR Written and 100% OCR Audited** across all 22 PDF pages (`01-cover-and-khmer.md` through `08-english.md`):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2014-second/08-english.md`, covering the complete English exam (`ប្រធាន`: `I. Reading.` 11-gap `Learning How to learn` cloze with 12-word box, `II. Grammar.` 5 MCQs, `III. Vocabulary.` 5 MCQs, `IV. Writing.` essay prompt) and official key (`កំណែ ភាសាអង់គ្លេស`), preserving literal print quirks with editorial notes.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit of `p22.png`, verifying all 12 reading box words, 11 gaps, 48 MCQ options, answer keys, spacing/hyphenation quirks (`(1)subject`, `Timetables` vs `2. timetable`, `a,b, c,or d.`, `a-` options, `......on`, `1- d`), and updating `STATUS.md` to 100% complete (`8/8` sections `OCR Written: YES`, `OCR Audited: YES`) (0 discrepancies).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only across all 8 sections; no existing `2014-second` chunks in `server/textbook-search.ts`).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-second"` (`9 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
+
+
+## 25 Nov 2026: 2014 Bac II Past Exam Papers Session 2 (2014-second.pdf) Batch 7: French
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 7 of MoEYS 2014 Bac II Session 2 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-second.pdf` (`p21.png`, book p. 42):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2014-second/07-french.md`, covering the complete French exam (`ប្រធាន`: `I. Vocabulaire`, `II. Grammaire`, `III. Expression écrite.`) and official key (`កំណែភាសាបារាំង` + 5-item essay rubric).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit of `p21.png`, verifying all 32 numbered items/answers, French accents/diacritics, underlined target phrases (`<u>...</u>`), bolding (`**en**`), and preserved literal print quirks (`les double négations`, `crevé aussi`, `D’près`, `Ecrivez`, `B. .`, `Coéhérence`), and updating `STATUS.md` (0 discrepancies).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-second"` and `npm run check:digits`.
+
+
+## 25 Nov 2026: 2014 Bac II Past Exam Papers Session 2 (2014-second.pdf) Batch 6: History
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 6 of MoEYS 2014 Bac II Session 2 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-second.pdf` (`p18.png` to `p20.png`, book pp. 39–41):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2014-second/06-history.md`, covering all 3 History exam questions (`I.`–`III.`: Angkor Wat construction under Suryavarman II, national reconciliation & Paris Peace Agreements / Win-Win policy, and 20th-century Cambodian history milestones from French Protectorate through 1999) and their full official scoring key (`កំណែប្រវត្តិវិទ្យា`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit (including zoomed crops) across `p18.png`–`p20.png`, verifying all 58 bullet items, dates, empty right column on `p20.png`, and preserved literal print quirks (`គូរវិវាទ`, `វេទិការ`, `សាឌីសាវេតស៊ីឡា`, `ទន្លេរពៅ`, `(ស៊ីសូផុន)`, `រណសិរ្យ`), and updating `STATUS.md` (0 discrepancies).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-second"` and `npm run check:digits`.
+
+
 ## 25 Nov 2026: 2014 Bac II Past Exam Papers Session 2 (2014-second.pdf) Batch 5: Biology
 
 Commit: pending. **No database step needed.**
