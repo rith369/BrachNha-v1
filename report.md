@@ -30,6 +30,28 @@ Digitized and audited all 5 batches (37 PDF pages, Cover + Book `Page:1` to `Pag
 - **Verification**: `node scripts/ocr-check.mjs "sources/ocr/physics/អត្រាកំណែបាក់ឌុប 2014-2024"` (6 files checked, 0 warnings), `npm run check:digits` (0 Khmer numerals), `npx oxlint`, and `npx tsc -b`.
 
 
+## 25 Nov 2026: 2015 Bac II Past Exam Papers (2015.pdf) Batches 1 to 7 Complete (Batch 8 English Blocked)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batches 1 to 7 (`p01.png` to `p20.png`, book pp. 44–62) of MoEYS 2015 Bac II Science Track exam compilation `sources/textbooks/Past Exam Papers/2015.pdf` (`sources/ocr/2015/01-cover-and-khmer.md` through `07-french.md`):
+- **Completed & Audited (`7/8` sections)**: Cover & Khmer Literature (`p01`–`p03`), Mathematics (`p04`–`p09`), Physics (`p10`–`p12`), Chemistry (`p13`–`p14`), Biology (`p15`–`p17`), History (`p18`–`p19`), and French (`p20`).
+- **Blocked (`1/8` section)**: Batch 8 English (`p21.png` → `sources/ocr/2015/08-english.md`) is rendered in `sources/pages/2015/p21.png`, but verbatim OCR generation was blocked by the model's copyright content-safety filter and remains `NO` in `sources/ocr/2015/STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified Batches 1 to 7 with `node scripts/ocr-check.mjs "sources/ocr/2015"` (`8 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
+
+
+## 25 Nov 2026: 2015 Bac II Past Exam Papers (2015.pdf) Batch 7: French
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 7 of MoEYS 2015 Bac II Science Track exam compilation `sources/textbooks/Past Exam Papers/2015.pdf` (`p20.png`, book p. 62):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2015/07-french.md`, covering the complete French exam (`ប្រធាន`: `I. Compréhension écrite` 11-blank dialogue, `II. Vocabulaire` 7 odd-one-out items, `III. Grammaire` `A.`/`B.`, `IV. Expression écrite.`) and official key (`កំណែភាសាបារាំង` + 5-item essay rubric).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit of `p20.png`, verifying all 4 sections, French diacritics, formatting (`**docteur**`, `**<u>commencement</u>**`), and preserved literal print quirks (`Je (9) ..............prends`, `4- si`, missing `eu` in `parce qu'elle a un accident.`, duplicate bullet in `III.B.1.`), and updating `STATUS.md` (0 discrepancies).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2015"` and `npm run check:digits`.
+
+
 ## 25 Nov 2026: 2015 Bac II Past Exam Papers (2015.pdf) Batch 6: History
 
 Commit: pending. **No database step needed.**
