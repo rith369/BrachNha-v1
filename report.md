@@ -16,6 +16,75 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 25 Nov 2026: Bac II Physics Solutions 2014-2024 (Chou Chamnan): Batches 1 to 5 (100% Book Complete, OCR & Audit)
+
+Commit: Pending. **No database step needed.**
+
+Digitized and audited all 5 batches (37 PDF pages, Cover + Book `Page:1` to `Page:36`) of Bac II Physics Past Exam Solutions (`sources/textbooks/physics/អត្រាកំណែបាក់ឌុប 2014-2024.pdf`) in `sources/ocr/physics/អត្រាកំណែបាក់ឌុប 2014-2024/`, achieving **100% OCR Written and 100% OCR Audited**:
+- **Batch 1 (`p01.png` to `p09.png`)**: Cover page (`វិទ្យាល័យអង្គរ · រូបវិទ្យា ថ្នាក់ទី 12 · 2014-2024 · បង្រៀនដោយ៖ ជូ ចំណាន`), `08 តុលា 2024` exam & solutions (Sections I to VI), and `06 វិច្ឆិកា 2023` exam & solutions (Sections I to VI) in `2024-2023-exams.md`. Audit fixed Khmer subscript misreads (`ស្នៀរ` to `ស្ពៀរ` x2, `រេស៊ីស្ដង់` to `រេស៊ីស្តង់`), preserved verbatim printed slips with editorial notes, and verified all KaTeX derivations and boxed answers (`\boxed{...}`).
+- **Batch 2 (`p10.png` to `p18.png`)**: `05 ធ្នូ 2022` exam & solutions (I–VI), `27 ធ្នូ 2021` exam & solutions (I–VI), and `19 សីហា 2019` exam & solutions (1–6) in `2022-2021-2019-exams.md`. Audit removed a spurious `នៅ` in 2019 Q6.គ (`p16.png`) and verified all KaTeX equations, signs, and boxed results (`1246.5 \times 10^{-5}`, `3324 \times 10^{-5}`, `2493 \times 10^{-23}`, `\theta_1`..`\theta_5`, `\Delta U`).
+- **Batch 3 (`p19.png` to `p25.png`)**: `20 សីហា 2018` exam & solutions (1–6, including parallel-wire diagrams) and `21 សីហា 2017` exam & solutions (I–VII) in `2018-2017-exams.md`. Audit restored the missing word `តែ` on `p21.png` (`F' = F`) and verified all boxed calculations (`15814\text{ J}`, `24.93 \times 10^{-4}\text{ m}^3`, `K_{av} = 415 \times 10^{-22}\text{ J}`, `0.1664 \times 10^{-26}\text{ kg}`, `4\pi \times 10^{-2}\text{ H}`, `0.4\text{ m}^2`).
+- **Batch 4 (`p26.png` to `p31.png`)**: `22 សីហា 2016` exam & solutions (I–VII) and `24 សីហា 2015` exam & solutions (I–VI, including `P-V` triangle cycle `ABCA` diagrams and preserving the printed `W_{AB}` typo note) in `2016-2015-exams.md`. Audit confirmed 100% alignment across all 6 pages (`V = 664.8 \times 10^{-5}\text{ m}^3`, `12\pi \times 10^{-3}\text{ T}`, `249.3 \times 10^{-5}\text{ m}^3`, `0.5 \times 10^5\text{ J}`, `4\pi \times 10^{-3}\text{ T}`, `306\ \Omega`).
+- **Batch 5 (`p32.png` to `p37.png`)**: `13 តុលា 2014` exam & solutions (I–VI, parallel-wire force diagram) and `24 សីហា 2014` exam & solutions (I–VI, series RLC circuit and transformer diagrams) in `2014-exams.md`. Audit fixed 6 Khmer spelling/diacritic/subscript discrepancies (`ម៉ាស់ម៉ូល`, `ម៉ាស់របស់អេឡិចត្រុង`, `រេស៊ីស្តង់` x2, `ជារបុំបឋម`, `ជារបុំមធ្យម`) and verified all derivations and boxed results (`747.9 \times 10^{-5}\text{ m}^3`, `2 \times 10^{-5}\text{ N}`, `0.84 \times 10^{-3}\text{ T}`, `2.4 \times 10^7` ជុំ/s, `11000\text{ V}`, `480\ \Omega`, `16 \times 10^4` ស្ពៀ, `18 \times 10^4` ស្ពៀ).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added to `server/textbook-search.ts`.
+- **Verification**: `node scripts/ocr-check.mjs "sources/ocr/physics/អត្រាកំណែបាក់ឌុប 2014-2024"` (6 files checked, 0 warnings), `npm run check:digits` (0 Khmer numerals), `npx oxlint`, and `npx tsc -b`.
+
+
+## 25 Nov 2026: 2015 Bac II Past Exam Papers (2015.pdf) Batch 5: Biology
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 5 of MoEYS 2015 Bac II Science Track exam compilation `sources/textbooks/Past Exam Papers/2015.pdf` (`p15.png` to `p17.png`, book pp. 57–59):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2015/05-biology.md`, covering all 7 Biology exam questions (`I.`–`VII.`: vertebrate nervous system divisions, taste receptors & tongue map, amino acids & dipeptide structure, fossil formation modes, stomach/small intestine endocrine roles, DNA hydrogen-bond & base-count problem, and gene length / amino-acid count / ribosome speed) and their full official solutions (`កំណែជីវវិទ្យា`), keeping all Khmer units/labels outside KaTeX math mode.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p15.png`–`p17.png`, correcting the running-header date `25` → `24 សីហា ឆ្នាំ2015` on all 3 pages (removing the false header-date note on `p15.png`), fixing `រលាយបន្តិចម្តងៗ` → `ក្លាយបន្តិចម្តងៗ` (`IV.2.`, `p16.png`, with print note), restoring `2. គណនាចំនួនអា.អា` (`VII.2.`, `p17.png`), verifying all diagrams/boxes and print-typo notes (`M = 14400/6 - 2`, `ដោយម៉ូ.ARN_m`), and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2015"` and `npm run check:digits`.
+
+
+## 25 Nov 2026: 2015 Bac II Past Exam Papers (2015.pdf) Batch 4: Chemistry
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 4 of MoEYS 2015 Bac II Science Track exam compilation `sources/textbooks/Past Exam Papers/2015.pdf` (`p13.png` to `p14.png`, book pp. 55–56):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2015/04-chemistry.md`, covering all 6 Chemistry exam questions (`I.`–`VI.`: esterification of propanoic acid + ethanol, why aqueous $\text{NH}_3$ is basic, $(\text{NH}_4)_2\text{S} + \text{Cd(NO}_3)_2$ ionic/net ionic equations, $\text{Fe} + \text{HCl}$ reaction-rate measurement methods, $\text{pH}=10.70$ $[\text{H}_3\text{O}^+]$ & $[\text{OH}^-]$, and $\text{HCl} + \text{base}$ titration) and their full official solutions (`កំណែគីមីវិទ្យា`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p13.png`–`p14.png`, fixing 2 misread Khmer words (`ទេគាអេឡិចត្រុងសេរីមួយ` → `ទ្វេតាអេឡិចត្រុងសេរីមួយ` and `ងទឹក` → `ឯទឹក` in `II.`, `p13.png`, removing the corresponding false print notes), verifying all charges/exponents/methods and genuine print-typo notes (`4.` in `IV.`, `/[\text{OH}^-]`, `\text{n}(\text{H}_3\text{O}^-)`), and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2015"` and `npm run check:digits`.
+
+
+## 25 Nov 2026: 2015 Bac II Past Exam Papers (2015.pdf) Batch 3: Physics
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 3 of MoEYS 2015 Bac II Science Track exam compilation `sources/textbooks/Past Exam Papers/2015.pdf` (`p10.png` to `p12.png`, book pp. 52–54):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2015/03-physics.md`, covering all 6 Physics exam questions (`I.`–`VI.`: kinetic theory of gases, wave interference, nitrogen gas ideal-gas volume, cyclic $P$-$V$ thermodynamic work $ABCA$, heat engine mechanical work/heat/transmission efficiency, and solenoid magnetic field, wire length, & resistance) and their complete official solutions (`កំណែរូបវិទ្យា`), plus both $P$-$V$ cycle diagram descriptions.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit (including zoomed crops) across `p10.png`–`p12.png`, fixing the misread print typo `ឥតឈល់ឈរ` → `ឥតឈលប់ឈរ` and line-wrap spacing `ឬច្រើន ដាលកាត់គ្នា` (`p10.png`), verifying all 71 physics equations/expressions, `ស្ពៀ` units kept outside math mode, and preserved print-typo notes (`28 \times 10^3 kg/mol`, `VI.3` Latin numeral), and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2015"` and `npm run check:digits`.
+
+
+## 25 Nov 2026: 2015 Bac II Past Exam Papers (2015.pdf) Batch 2: Mathematics
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 2 of MoEYS 2015 Bac II Science Track exam compilation `sources/textbooks/Past Exam Papers/2015.pdf` (`p04.png` to `p09.png`, book pp. 46–51):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2015/02-mathematics.md`, covering all 7 exam parts (`I.`–`VII.`: complex numbers & trigonometric forms, limits, probability, definite integrals, vector cross products & ellipse equation/graph, first-order differential equation $y'+2y = 2\frac{e^{-x}}{1+2e^x}$, and $f(x)=x+1-\frac{\ln x}{x}$ variation/asymptote/graph) and their complete official solutions (`កំណែគណិតវិទ្យា`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 6 pages (`p04.png`–`p09.png`), fixing 2 Khmer subscript typos (`ស្ដង់ដា` → `ស្តង់ដា` on `p06.png`), verifying the variation table, sign/value tables, ellipse & curve graph descriptions, determinants, and preserved print-typo notes (`\ln(1+2e^x) \times`, `\varphi' - 2\varphi`, `x + \ln x \ge 1`, `(x+h)^2`), and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2015"` and `npm run check:digits`.
+
+
+## 25 Nov 2026: 2015 Bac II Past Exam Papers (2015.pdf) Batch 1: Cover & Khmer Literature
+
+Commit: pending. **No database step needed.**
+
+Started OCR digitization of MoEYS 2015 Bac II Science Track exam compilation `sources/textbooks/Past Exam Papers/2015.pdf` (all 21 pages rendered to PNGs in `sources/pages/2015/`), completing Batch 1 (`p01.png` to `p03.png`):
+- **Textbook OCR**: Mapped all 8 subjects/sections (`p01.png` to `p21.png`, book pp. 44–63) in `sources/ocr/2015/STATUS.md` and transcribed Batch 1 into `sources/ocr/2015/01-cover-and-khmer.md`, covering the cover page and the Khmer Literature exam prompt (`ប្រធាន`: `«ការងារជាមាសប្រាក់»`) and full official outline key (`គម្រោងអត្ថាធិប្បាយ`, sections `I.`–`IV.`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p01.png`–`p03.png`, verifying all subscripts, literary examples (`កុលាបប៉ៃលិន`, `ព្រះអាទិត្យថ្មីរះនៅលើផែនដីចាស់`, `ទុំទាវ`, `គូលីកំណែន`, `មាយើង`), `→` arrows, and preserved literal print quirks (`ប្រលង`, `25 សីហា` running header vs `24 សីហា` title, `អចិន្ត្រៃ`, `ស្ថេរភាព`, `ទុំ-ពេជ្រ`), and updating `STATUS.md` (0 discrepancies).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2015"` and `npm run check:digits`.
+
+
 ## 25 Nov 2026: Limits of Functions (Khem Putthy) Batches 25 to 32: Lesson 5 Parts 6 to 13 & References (100% Book Complete)
 
 Commit: pending. **No database step needed.**
@@ -4513,686 +4582,4 @@ Landed in commit `201a701`. **No database step needed.**
   - `tb:hist:republic:ch3:fall-of-phnom-penh-17-april-1975` (Lon Nol flight to US in early April 1975, Saloth Sar's unilateral offensive, entry of black-uniformed Khmer Rouge into Phnom Penh on April 17, 1975 at 9:30 AM).
   - `tb:hist:republic:ch3:war-damages-and-consequences` (>1 million dead, war orphans and widows, 55% of factories destroyed, 70–80% of roads/bridges wrecked, minefields and craters).
 - **Authored 16 High-Yield Flashcards (`src/data/practice.ts`).** Added helper `hist13Card` and deck `"history-1-3"` containing 16 comprehensive flashcards testing high-frequency MoEYS Bac II historical facts.
-- **Strict Quiz Restriction Respected.** No quiz authored for Lesson 3 in accordance with the user's directive.
-- **Updated History Study Path (`src/features/lessons/sessions.ts`).** Authored 5 authentic section titles for `SUBJECT_SESSIONS.history[0].lessons[2]`.
-- **Verification.** Passed `npm run check:digits` (0 Khmer numerals across all 289 files), `npm run lint` (0 errors), `npx tsc --noEmit` (0 errors), and `npm run build` (clean 10.85s production build).
-
-## 29 Sep 2026 — Practice Quiz Tab Gated to Math Only, Non-Math Subjects Set to "Coming Soon"
-
-Landed in commit `da2c88a`. **No database step needed.**
-
-**Why.** Restrict the Practice Quiz mode to active quiz subjects (Math only) as requested by the user, while preserving all existing quiz content in `data/` and `features/practice/quiz-path.ts` without deletion for future release. Moving forward, newly processed textbook lessons will focus solely on flashcard decks. All other subjects on the Practice Quiz tab (Physics, History, Biology, Chemistry, Khmer, Foreign Language) now display "ឆាប់ៗនេះ" (Coming soon) and cannot be opened or touched by students.
-
-**What changed.**
-
-- **Introduced `ACTIVE_QUIZ_SUBJECTS` Policy in `features/practice/practice.ts`.** Defined `ACTIVE_QUIZ_SUBJECTS = ["math"]` and exported `isQuizSubjectActive(subjectId)`. Updated `practiceLessonsFor` and `readyQuizSectionCount` to return zero counts when a subject's quizzes are not in the active set.
-- **Updated `PracticeSubjectCard` (`features/practice/components/practice-subject-card.tsx`).** Non-active quiz subjects (including Physics and History) display the dimmed "ឆាប់ៗនេះ" (Coming soon) badge and are completely non-interactive (no link, no touch action). Only Math shows its active section count ("5 ផ្នែក") and remains interactive.
-- **Enforced Route Guards (`pages/practice-subject.tsx` & `pages/practice-run.tsx`).** Any direct URL navigation to `/practice/quiz/:subjectId` or `/practice/quiz/:subjectId/:lessonRef` for non-active quiz subjects immediately redirects to `/practice`.
-- **Filtered Study Feed (`features/home/study-feed.ts`).** Quizzes from non-active subjects are excluded from Home's "continue where you left off" study feed.
-- **Preserved Existing Quiz Assets.** All authored quizzes (History Lessons 1 & 2, Physics path template) remain intact in `src/data/quizzes/` and `src/data/practice.ts` for future activation.
-- **Verification.** Passed `npm run check:digits` (0 Khmer numerals across all 289 files), `npm run lint` (0 errors), `npx tsc --noEmit` (0 errors), and `npm run build` (clean 12.87s production build).
-
-## 29 Sep 2026 — Grade 12 History Lesson 2 (Sangkum Reastr Niyum 1955-1970) OCR, KruAI RAG Grounding & Practice Quiz/Flashcards
-
-Landed in commit `da2c88a`. **No database step needed.**
-
-**Why.** Process Lesson 2 ("របបសង្គមរាស្ត្រនិយម (1955-1970)" / Sangkum Reastr Niyum) from the official MoEYS Grade 12 History Summary textbook (Book pp. 25–31, PDF pp. 31–38). Ground KruAI's retrieval-augmented generation (RAG) system with authentic MoEYS facts on King Norodom Sihanouk's abdication, the creation of Sangkum Reastr Niyum, the National Congress (សមាជជាតិ), neutrality foreign policy, the 1960 Head of State status, infrastructure/education achievements, and factors leading to the regime's fall. Author 16 official practice flashcards and a 12-question Bac II multiple-choice quiz with balanced answer distribution, and wire the authentic section titles into the History study path.
-
-**What changed.**
-
-- **Rendered and Transcribed Lesson 2 (Book pp. 25–31).** Rendered 9 high-resolution page scans (`p31.png` to `p39.png`) with zero external OCR API costs using `scripts/pdf-to-png.mjs`. Transcribed complete, structured notes into `sources/ocr/history/chapter2-sangkum-reastr-niyum.md`:
-  - Part I: Creation of Sangkum Reastr Niyum (1947 constitutional context, King Sihanouk's abdication on March 3, 1955 to father Norodom Suramarit, creation of Sangkum on March 23, 1955, landslide Sept 11, 1955 election >83% & 91 seats, transition to single-party system).
-  - Part II: Factors of public trust (Sihanouk's popularity as Father of Independence, grassroots organization at village/commune/district/province levels, prominent figures Sim Var, Son Sann, Norindeth, Yem Sambaur, solid domestic financial support).
-  - Part III: National Congress (សមាជជាតិ direct democracy 2x/year at Veal Mean, constitutional status, anti-corruption, Khmer as official language, national assembly oversight, women's full voting rights on Jan 6, 1958).
-  - Part IV: Neutrality foreign policy (1954 Geneva foundation, March 18, 1955 Nehru declaration on peaceful coexistence, April 18–24, 1955 Bandung Conference with Zhou Enlai & Pham Van Dong, UN entry Dec 14, 1955, SEATO rejection, 15 years of peace vs Cold War deterioration with US rightists, Thai support for Khmer Serei, South Vietnam border incursions, North Vietnam/Viet Cong sanctuaries, March 18, 1970 coup by Lon Nol & Sirik Matak).
-  - Part V: Prince Sihanouk as Head of State (April 3, 1960 death of King Suramarit, Regency Council under Sisowath Monireth, June 5, 1960 referendum 99.8%, Kep speech, special constitutional amendment creating "Head of State" without being King, Queen Kossamak as throne symbol).
-  - Part VI: Sangkum achievements (Agriculture/irrigation; Sihanoukville port & NR4 & railway line 2 & Chroy Changvar Bridge & Pochentong/Siem Reap airports; Nov 1963 nationalization with SONEXIM, SORAPHA, SONACRIM, Crédit National bank; state factories; Olympic Stadium by Vann Molyvann; education, healthcare with Kantha Bopha, Preah Kossamak; reasons for economic/political decline).
-- **Grounded KruAI RAG Retrieval.** Integrated 6 comprehensive knowledge sections into `server/textbook-search.ts` under `HISTORY_CH2_SECTIONS` and combined into `ALL_HISTORY_SECTIONS`:
-  - `tb:hist:sangkum:ch2:creation-and-election`: Creation of Sangkum, abdication, and 1955 elections.
-  - `tb:hist:sangkum:ch2:national-congress`: National Congress direct democracy, achievements, and women's voting rights.
-  - `tb:hist:sangkum:ch2:neutrality-foreign-policy`: Neutrality foreign policy, Nehru pact, Bandung conference, and UN membership.
-  - `tb:hist:sangkum:ch2:head-of-state-1960`: 1960 succession crisis, referendum, and constitutional amendment.
-  - `tb:hist:sangkum:ch2:achievements-infrastructure-economy`: Economic policies, nationalization, infrastructure, industries, and education.
-  - `tb:hist:sangkum:ch2:decline-and-1970-coup`: Cold War pressures, Viet Cong presence, economic issues, and March 18, 1970 coup.
-- **Updated History Subject Path.** In `src/features/lessons/sessions.ts`, updated `SUBJECT_SESSIONS.history[0].lessons[1]` with 5 authentic section titles: `"ការបង្កើតរបបសង្គមរាស្ត្រនិយម"`, `"សមាជជាតិ និងលទ្ធិប្រជាធិបតេយ្យផ្ទាល់"`, `"នយោបាយការបរទេសអព្យាក្រឹត"`, `"ការឡើងកាន់តំណែងជាប្រមុខរដ្ឋ 1960"`, `"សមិទ្ធផលសំខាន់ៗ និងការដួលរលំនៃរបប"`.
-- **Authored 16 High-Yield Flashcards.** In `src/data/practice.ts`, created the `history-1-2` flashcard deck covering all key milestones, dates, policies, and concepts.
-- **Authored 12-Question Bac II Practice Quiz.** Created `src/data/quizzes/history-1-2.ts` and registered it under `PRACTICE_QUIZZES["history-1-2"]` and `PRACTICE_QUIZZES["history-1-2-1"]`. Correct answer choices are evenly distributed at 25% each across all 4 positions (options 0, 1, 2, 3 / ក, ខ, គ, ឃ).
-- **Verification.** Passed `npm run check:digits` (0 Khmer numerals across all 289 files), zero em dashes in student-facing strings, `npm run lint` (0 errors), `npx tsc --noEmit` (0 errors), and `npm run build` (clean 12.04s production build).
-
-## 29 Sep 2026 — Grade 12 History Lesson 1 (French Protectorate 1863-1953) OCR, KruAI RAG Grounding & Practice Quiz/Flashcards
-
-Landed in commit `da2c88a`. **No database step needed.**
-
-**Why.** Launch the Grade 12 History curriculum for BrachNha starting from Lesson 1 ("ប្រទេសកម្ពុជាក្រោមអាណាព្យាបាលបារាំង (1863-1953)" / Cambodia under the French Protectorate) in the official MoEYS Grade 12 History Summary textbook (Book pp. 5–23, PDF pp. 11–29). Ground KruAI's retrieval-augmented generation (RAG) system with authentic MoEYS historical facts, treaties, dates, and royal campaigns, author 16 official practice flashcards and a 12-question Bac II multiple-choice quiz with balanced answer distribution, and wire the History path into the lessons hub.
-
-**What changed.**
-
-- **Rendered and Transcribed Lesson 1 (Book pp. 5–23).** Rendered 27 high-resolution page scans (`p05.png` to `p31.png`) with zero external OCR API costs using the local renderer `scripts/pdf-to-png.mjs`. Transcribed complete, structured notes into `sources/ocr/history/chapter1-french-protectorate.md`:
-  - 4 Kings of the Protectorate period (Norodom, Sisowath, Sisowath Monivong, Norodom Sihanouk).
-  - Part I: Quest for French Protection (King Ang Duong letters of 1853/1856 to Napoleon III, Montigny mission, French strategic and commercial motives in Indochina).
-  - Part II: Foundation of Protectorate (Treaty of Aug 11, 1863, Franco-Siamese Treaty of July 15, 1867 ceding Battambang/Siem Reap, Convention of June 17, 1884 forced by Gov Thomson, 1884–1887 Insurrection led by Prince Sivotha, Kralahom Kong & Pisnouk Lauk Chhouk, 1886 Compromise, Royal Ordinance of July 11, 1897 putting Ducos as head of Council of Ministers, early Franco-Cambodian schools, police, Ket Mealea hospital).
-  - Part III: Evolution of the Protectorate 1900–1945 (1904 & 1907 Franco-Siamese treaties restoring Koh Kong, Melouprey, Battambang, Siem Reap & Sisophon, EFEO Angkor temple conservation, 1911 administrative & education reforms, pagoda schools, Pali High School, April 18, 1925 Bardez assassination at Krang Leav, 1930 Buddhist Institute, 1942 Umbrella Demonstration).
-  - Part IV: Final Phase & Independence 1945–1953 (March 9, 1945 Japanese coup & March 13 first independence proclamation, 1946 Modus Vivendi, 1947 Constitution, armed Khmer Issarak movements, King Norodom Sihanouk's 1953 Royal Crusade for Independence, Nov 9, 1953 power transfer, July 21, 1954 Geneva Conference).
-  - Part V: Positive vs Negative Impacts of the French Protectorate (territorial integrity saved from Siam/Annam, temple conservation, Preah Vihear 1908 map, modern education/health vs loss of Kampuchea Krom June 4, 1949 and Koh Tral Jan 31, 1939, heavy tax burden, forced labor and WWI conscription).
-- **Grounded KruAI RAG Retrieval.** Integrated 7 comprehensive knowledge chunks in `server/textbook-search.ts` under `HISTORY_CH1_SECTIONS` and exported `searchHistoryTextbook()`:
-  - `tb:hist:protectorate:ch1:kings-timeline`: The 4 Kings, key milestones, and timeline.
-  - `tb:hist:protectorate:ch1:ang-duong-search`: King Ang Duong letters (1853, 1856) and French motives.
-  - `tb:hist:protectorate:ch1:treaties-1863-1884`: Treaties of 1863, 1867, and 1884.
-  - `tb:hist:protectorate:ch1:rebellion-and-1897`: 1884–1887 Insurrection, 1886 compromise, and 1897 Ducos ordinance.
-  - `tb:hist:protectorate:ch1:territory-bardez-nationalism`: 1904 & 1907 territorial recovery, 1925 Bardez incident, and 1930 Buddhist Institute.
-  - `tb:hist:protectorate:ch1:independence-crusade-1953`: 1945 Japanese coup, Khmer Issarak, 1953 Royal Crusade, and 1954 Geneva Conference.
-  - `tb:hist:protectorate:ch1:positive-negative-impacts`: Detailed positive vs negative outcomes of French rule.
-  - Connected `searchHistoryTextbook()` into `server/chat-handler.ts` with subject query routing.
-- **Configured History Subject Path & Curriculum Syllabus.** In `src/features/lessons/sessions.ts`, registered History under `PATH_TAB` (`"all"`) and configured `SUBJECT_SESSIONS.history` with Chapter 1 ("ប្រវត្តិសាស្រ្តនៃប្រទេសកម្ពុជា") containing Lesson 1 and reserved nodes for Lessons 2 through 6.
-- **Authored 16 High-Yield Flashcards.** In `src/data/practice.ts`, created the `history-1-1` flashcard deck covering all core definitions, treaties, dates, key historical figures, and exam questions.
-- **Authored 12-Question Bac II Practice Quiz.** Created `src/data/quizzes/history-1-1.ts` and registered it under `PRACTICE_QUIZZES["history-1-1"]` and `PRACTICE_QUIZZES["history-1-1-1"]`. Correct answer choices are evenly distributed at 25% each across all 4 positions (options 0, 1, 2, 3 / ក, ខ, គ, ឃ).
-- **Verification.** Passed `npm run check:digits` (0 Khmer numerals across all 288 files), zero em dashes in student-facing strings, `npm run lint` (0 errors), `npx tsc --noEmit` (0 errors), and `npm run build` (clean 8.11s production build).
-
-## 29 Sep 2026 — Biology Chapter 5 (ADN, Gene Expression & Biotechnology) OCR, KruAI RAG Grounding & 24 Flashcards
-
-*Not committed yet.* **No database step needed.**
-
-**Why.** Transcribe the complete Chapter 5 ("ព័ត៌មានសេនេទិច និងការសំដែងនៃសែន" / Genetic Information and Gene Expression) from the official MoEYS Grade 12 Biology textbook summary (Book pp. 31–50, PDF pp. 31–50) encompassing all 3 lessons. Expand KruAI's retrieval-augmented generation (RAG) knowledge base to answer student questions on DNA structure, replication, transcription, translation, and genetic engineering, and author 24 official bilingual practice flashcards with updated curriculum syllabus nodes.
-
-**What changed.**
-
-- **Rendered and Transcribed Chapter 5 (Book pp. 31–50).** Rendered 20 high-resolution page scans (`p31.png` through `p50.png`) and authored 3 comprehensive Markdown transcriptions in `sources/ocr/biology-summary/chapter5/`:
-  - `lesson1-dna-genetic-info.md` (pp. 31–39): Chemical nature of genetic info, Griffith (1928), Avery (1944), Hershey & Chase (1952) experiments, nucleotide structure & Chargaff rules ($A=T, G=C$), Watson & Crick (1953) double helix model, semi-conservative replication mechanism (Meselson & Stahl 1958), S phase cell cycle role, comprehensive formulas ($L, N, M, H, C$), and 5 fully worked practice problems.
-  - `lesson2-gene-expression.md` (pp. 40–46): Beadle & Tatum (1941) "one gene one enzyme" hypothesis, structural comparison between DNA and RNA, 3 functional RNA types (ARNm, ARNt, ARNr), RNA polymerase transcription stages (initiation, elongation, termination), the 64-codon genetic code dictionary, translation steps, polysomes, and gene expression regulation.
-  - `lesson3-biotechnology.md` (pp. 47–50): Selection & hybridization, heterosis (hybrid vigor), inbreeding vs outbreeding, micropropagation of plant tissue cultures (4 steps), identical twins & nuclear transfer cloning (Dolly), polyploidy induction with colchicine, recombinant DNA technology (restriction enzymes, ligase, vectors), 5-step human insulin production in *E. coli*, and agricultural/medical applications.
-- **Grounded KruAI RAG Retrieval.** Integrated 5 high-density knowledge sections into `server/textbook-search.ts` under `BIOLOGY_CH5_SECTIONS`:
-  - `tb:bio:ch5:dna-structure-chargaff`: Griffith/Hershey-Chase experiments, nucleotide structure, Chargaff rules, and Watson-Crick double helix.
-  - `tb:bio:ch5:dna-replication-cell-cycle`: Semi-conservative replication mechanism, replication fork enzymes, and S phase DNA doubling.
-  - `tb:bio:ch5:transcription-arn-types`: DNA vs RNA table, ARNm/ARNt/ARNr roles, and RNA polymerase transcription.
-  - `tb:bio:ch5:genetic-code-translation`: 64 codons (AUG start, UAA/UAG/UGA stop), ribosome A/P sites, 3-step translation, and polysomes.
-  - `tb:bio:ch5:biotechnology-cloning-gmo`: Heterosis, plant micropropagation, animal cloning, polyploidy/colchicine, and recombinant DNA insulin production.
-- **Authored 24 Practice Flashcards (3 Decks).** Added official curriculum flashcard decks in `src/data/practice.ts`:
-  - `biology-5-1` (8 cards): DNA genetic nature, Griffith transformation, Hershey-Chase bacteriophage proof, nucleotide anatomy, Chargaff base pairing, double helix geometry, semi-conservative replication, and S-phase cell cycle role.
-  - `biology-5-2` (8 cards): Beadle-Tatum hypothesis, DNA vs RNA differences, 3 RNA types, transcription stages, triplet codon rules, 64-codon genetic dictionary, translation initiation/elongation/termination, and polysomes.
-  - `biology-5-3` (8 cards): Artificial hybridization and heterosis, inbreeding vs outbreeding, cloning definition, plant tissue micropropagation steps, identical twins, polyploidy and colchicine, recombinant DNA technology steps, and human insulin production in *E. coli*.
-- **Updated Curriculum Lesson Sessions.** In `src/features/lessons/sessions.ts`, configured authentic lesson syllabus titles for Chapter 5 Lesson 1, Lesson 2, and Lesson 3.
-- **Verification.** Passed `npm run check:digits` (0 Khmer numerals across 287 files), zero em dashes in student-facing strings, `npm run lint` (0 errors), `npx tsc --noEmit` (0 errors), and `npm run build` (clean 12.91s build).
-
-## 29 Sep 2026 — Mathematics Chapter 1 & 2 Practice Quizzes (50 Questions) & Quiz Path Integration
-
-*Not committed yet.* **No database step needed.**
-
-**Why.** Following OCR digitization of Mathematics Chapter 1 (Limits) and Chapter 2 (Derivatives & Primitives), author and wire complete practice quizzes into the Mimo-style Quiz Path so students can immediately practice and test their mastery of both chapters. Also conduct a comprehensive orthography and terminology audit across recently added decks and quizzes.
-
-**What changed.**
-
-- **Audited and Fixed Khmer Orthography in Biology Flashcards.** Corrected multiple spelling inconsistencies in `src/data/practice.ts` (`biology-1-2`):
-  - Standardized "លំអង" to official MoEYS "លម្អង" ("ដំណើរលម្អង", "ប្លោកលម្អង", "គ្រាប់លម្អង", "បំពង់លម្អង").
-  - Fixed French loanword for nucleus from phonetic "ញ៉្វៃយ៉ូ" to standard MoEYS Biology "ណ្វៃយ៉ូ" across cards 11, 12, 13, and 14.
-  - Aligned Cotyledon spelling to MoEYS textbook "កូទីលេដូន" in card 15.
-- **Authored 4 New Mathematics Quizzes (40 Questions + 160 Drill/Foundation Items).** Built complete curriculum-aligned quizzes covering all key MoEYS Bac II techniques with step-by-step solutions, common misconception notes, similar drills, and foundation exercises:
-  - `math-1-1-2` (10 questions): លីមីតនៃអនុគមន៍ត្រីកោណមាត្រ និងអិចស្ប៉ូណង់ស្យែល (Trigonometric, Exponential & Logarithmic limits).
-  - `math-1-1-3` (10 questions): អាស៊ឹមតូត និងភាពជាប់នៃអនុគមន៍ (Vertical, horizontal, and oblique asymptotes, and continuity).
-  - `math-1-2-1` (10 questions): ដេរីវេនៃអនុគមន៍ (Polynomial, power, radical, product, quotient, trig, exp, ln derivatives and kinematics).
-  - `math-1-2-2` (10 questions): ព្រីមីទីវនៃអនុគមន៍ (Power, sqrt, inverse square, trig, exp, log primitives, initial conditions, and partial fractions).
-- **Wired Quizzes into Practice Hub & Quiz Path.**
-  - Added all 4 new quizzes to `PRACTICE_QUIZZES` in `src/data/practice.ts`.
-  - Updated `MATH_LESSONS` in `src/features/practice/quiz-path.ts` with real section titles for Lesson 1 and Lesson 2.
-  - Upgraded `quizLesson()` so that lessons with defined curriculum sections render only their authentic sections, bringing Math ready quiz sections from 1 to 5.
-- **Verification.** Passed `npm run check:digits` (0 Khmer numerals across 287 files), `npm run check:quiz` (50 questions across 5 quizzes, 2627 typeset math strings, 0 errors), `npx tsc --noEmit` (clean), and `npm run lint` (0 errors).
-
-## 29 Sep 2026 — Mathematics Chapter 2 (Derivatives & Primitives) OCR, KruAI RAG Grounding & Flashcard Typo Fixes
-
-*Not committed yet.* **No database step needed.**
-
-**Why.** Continue digitizing the official MoEYS Grade 12 Mathematics Summary textbook, expand KruAI's math retrieval grounding beyond Chapter 1 (Limits) into Chapter 2 (Derivatives & Primitives), and fix OCR transcription errors across Biology flashcards.
-
-**What changed.**
-
-- **Audited and Fixed Khmer Terminology Errors in Flashcards.** Corrected multiple OCR-introduced transcription errors in `src/data/practice.ts` (`biology-1-1`):
-  - Fixed misread words: "កោនញញោល" → "កោនឈ្មោល" (male cone), "ផលិតលង" / "គ្រាប់លងផ្កា" → "ផលិតគ្រាប់លម្អង" / "គ្រាប់លម្អង" (pollen grains), "ជាស្រុក" → "ជាស្រកា" (scale-like leaves), "សត្វកកេវ" → "សត្វកកេរ" (rodents), "ក្សេត្រូពិច" → "ក្បែរត្រូពិច" (subtropics), "ដើមឆ្កាត" → "ដើមត្នោត" (palm-like tree), "ស្លឹកទុំ" → "ស្លឹកដុំ" (terminal cluster of leaves), and "ប្រង់" / "ស៊ីណេគូតី" → "ប្រដឺ ឬស៊ីកាដ" / "ស៊ីណេតូភីត".
-  - Cleaned up arrow symbols in `biology-1-2` double fertilization reactions from ASCII `->` to `→`.
-- **Rendered and Transcribed Chapter 2 (Derivatives & Primitives).** Rendered PDF pages 22 to 33 (Book pages 19 to 30) of `Math summary.pdf` to high-resolution PNGs and transcribed the entire chapter into `sources/ocr/Math summary/chapter2-derivatives-primitives.md`. Contains all derivative and primitive rules plus 13 authentic worked exercises with full steps.
-- **KruAI Math RAG Knowledge Expanded.** In `server/textbook-search.ts`, integrated 6 new structured knowledge modules into `ALL_MATH_SECTIONS`:
-  - `tb:math:derivatives:ch2:basic-rules`: Basic rules, product, quotient, composite, roots, and powers.
-  - `tb:math:derivatives:ch2:trig-derivatives`: Trigonometric derivatives, higher-order derivatives, and $n$-th derivative formulas.
-  - `tb:math:derivatives:ch2:exp-log-derivatives`: Exponential and natural logarithmic derivatives.
-  - `tb:math:derivatives:ch2:kinematics-applications`: Physical motion applications (velocity $v(t) = s'(t)$ and acceleration $a(t) = v'(t)$).
-  - `tb:math:primitives:ch2:elementary-forms`: Elementary primitives and power forms ($u^n u'$, $u'/\sqrt{u}$).
-  - `tb:math:primitives:ch2:log-exp-forms`: Logarithmic and exponential primitive forms ($u'/u$ and $u' e^u$).
-- **Verified Retrieval & Formatting Standards.** Total math textbook chunks increased to 16. Verified query matching for trigonometric derivatives, exponential derivatives, and primitives. Passed `npm run check:digits` (all Latin digits 0-9), `npm run check:quiz`, and `npx tsc -b`.
-
-## 29 Sep 2026 — Generated Mock Exams: Math and Biology retired to Coming Soon
-
-*Not committed yet.* **No database step needed.**
-
-**Why.** Retire the old prototype Math and Biology questions from the "វិញ្ញាសារបង្កើតថ្មី" (Newly Generated Papers) tab, setting all subjects into a consistent "ឆាប់ៗនេះ" (Coming Soon) state pending authentic newly-generated exam papers.
-
-**What changed.**
-
-- **Emptied `GENERATED_EXAM_QUESTIONS`.** In `src/data/generated-exams.ts`, removed the fallback derivation from the old `MOCK_QS` set. Math and Biology now display the "ឆាប់ៗនេះ" badge and inline preparation notice identical to all other subjects.
-- **Audited Game & Practice fallbacks.** Verified that `src/data/game-questions.ts` maintains its full standalone questions for math, history, chemistry, and biology, so multiplayer and single-player games remain unaffected.
-- **Verification standard.** `npm run check:digits`, `npm run lint`, and `npx tsc -b` all passed with 0 errors.
-
-## 29 Sep 2026 — Biology: Chapter 1 Lesson 2 (Angiosperms) Q&A OCR, KruAI RAG Grounding & Flashcards
-
-*Not committed yet.* **No database step needed.**
-
-**Why.** Digitize and ground the complete official Grade 12 Biology Q&A curriculum for Chapter 1, Lesson 2 (អង់ស្យូស្ពែម / Angiosperms) into KruAI's textbook knowledge retrieval base and author an interactive 16-card practice deck directly aligned with official Bac II exam questions.
-
-**What changed.**
-
-- **OCR & Transcription of Chapter 1 Lesson 2.** Extracted Book pages 6 to 17 (12 pages) from the official `ជីវវិទ្យា - ធូ ភន biology qna.pdf` textbook, capturing the full theoretical summary and all 44 authentic exam Q&As into `sources/ocr/biology-qna/chapter1-lesson2-angiosperms.md`.
-- **KruAI RAG Grounding Added.** In `server/textbook-search.ts`, integrated 3 rich knowledge chunks into `BIOLOGY_CH1_SECTIONS`:
-  - `tb:bio:ch1:micro-mega-sporogenesis`: Microsporogenesis, megasporogenesis, pollen grain vs male gamete, and ovule vs female gamete distinctions.
-  - `tb:bio:ch1:lifecycle-alternation`: Alternation of generations, diploid sporophyte (2n) vs haploid gametophyte (n), meiosis and fertilization transitions, and embryo/endosperm roles.
-  - `tb:bio:ch1:angiosperm-high-yield-qna`: Real Bac II questions including palm/maize cross-pollination, 6-petal monocot flower anatomy, dicot leaf 3-tissue layer cross section, cambium growth tissue function, and artificial pollination methods.
-- **16-Card Biology Practice Deck.** In `src/data/practice.ts`, added a dedicated 16-flashcard deck for `biology-1-2` covering flower organ structure, male/female sporogenesis, double fertilization products ($2n$ zygote and $3n$ endosperm), fruit/seed development, and monocot vs dicot anatomical contrasts.
-- **Curriculum Catalog Updated.** In `src/features/lessons/sessions.ts`, added the 4 core section titles under Biology Chapter 1 Lesson 2 so students can browse syllabus topics clearly.
-- **Strict Latin Digits & Style Rules.** Verified all numbers are in Latin digits (0-9) and no em dashes exist in student-facing prose (`npm run check:digits` passed).
-
-## 29 Sep 2026 — 2-Day Bac II Simulation corrected to official 7-subject MoEYS Science Track schedule and score matrix
-
-*Not committed yet.* **No database step needed.**
-
-**Why.** Ensure the 2-Day Bac II Simulation accurately mirrors the official Ministry of Education, Youth and Sport (MoEYS) Grade 12 Science Track examination timetable and grading scale from `score.jpg`.
-
-**What changed.**
-
-- **Updated from 6 to 7 subjects.** The exam simulation now includes all 7 official Science Track subjects: History, Biology, Chemistry, Foreign Language (Day 1), and Khmer Literature, Physics, Mathematics (Day 2).
-- **Official 2-Day Timetable Schedule.**
-  - **Day 1 (4 subjects · 250 pts):**
-    - Morning 1: History (ប្រវត្តិវិទ្យា) 07:30 - 08:30 (60 min) · 50 pts
-    - Morning 2: Biology (ជីវវិទ្យា) 09:00 - 10:30 (90 min) · 75 pts
-    - Afternoon 1: Chemistry (គីមីវិទ្យា) 14:00 - 15:30 (90 min) · 75 pts
-    - Afternoon 2: Foreign Language (ភាសាបរទេស) 16:00 - 17:00 (60 min) · 50 pts
-  - **Day 2 (3 subjects · 275 pts):**
-    - Morning 1: Khmer Literature (អក្សរសាស្ត្រខ្មែរ) 07:30 - 09:00 (90 min) · 75 pts
-    - Morning 2: Physics (រូបវិទ្យា) 09:30 - 11:00 (90 min) · 75 pts
-    - Afternoon: Mathematics (គណិតវិទ្យា) 14:00 - 16:30 (150 min) · 125 pts
-- **Official MoEYS Grade Scale Matrix.** Added a dedicated scoring matrix card derived directly from `score.jpg` displaying the 475 base points breakdown for Grade determination: Grade A (≥ 427 pts / 90%), Grade B (≥ 380 pts / 80%), Grade C (≥ 332 pts / 70%), Grade D (≥ 285 pts / 60%), and Grade E (≥ 237 pts / 50% passing threshold), with Foreign Language (50 pts) documented as an additional subject.
-- **Updated Hub Card & Readiness Dialog.** `/exam` now highlights "2 ថ្ងៃពេញ 7 មុខវិជ្ជា", and the pre-exam readiness modal begins on Day 1 Session 1 with History (ប្រវត្តិវិទ្យា).
-- **Latin Digits Standard.** All 283 files verified with `npm run check:digits`.
-
-## 29 Sep 2026 — Three welcome screens before sign-in
-
-Commit `74c4fb4`. **No database step needed.**
-
-**Why.** A new student's first sight of the app was the sign-in screen. Before we ask them
-for anything, we now show three short screens about why science is a good choice.
-
-**What changed.**
-
-- **Three screens, in Khmer:** more opportunities (university and scholarships), more paths
-  after grade 12 (IT, engineering, AI and data, health and medicine), and science as more
-  than formulas. Each one has its own picture and colour.
-- **Move through them** with the big button, by swiping left and right, with the arrow keys
-  on a laptop, or by tapping the dots. There is a back button from screen 2, and a
-  **រំលង (skip)** link at the top for anyone who wants to go straight in.
-- **Shown once per phone or computer.** After the last button it goes to the usual sign-in
-  screen and does not come back, not even after logging out.
-- **Who does NOT see it:** anyone already using the app (signed in, a guest, or with a name
-  saved), and anyone who opened the link inside Telegram or Messenger. They still get the
-  "open in your browser" screen first, and see the welcome screens there instead.
-
-**What to re-test.**
-
-- In a fresh browser or a private window, open the site: the three screens come first, then
-  sign-in. Reload, and they should not show again.
-- On a phone, swipe between the screens, and try the smallest phone you have. A long screen
-  should scroll, with the text fading at the bottom rather than being cut off.
-- Try both light and dark mode.
-
-## 29 Sep 2026 — KruAI says hello
-
-Commit `5e3f6be`. **No database step needed.**
-
-**Why.** New students did not know that the round bot button in the corner is KruAI, the
-study helper they can ask questions.
-
-**What changed.**
-
-- About a second after the app opens, a small bubble pops out beside the KruAI button:
-  **"សួស្តី! តើមានអ្វីអាចឱ្យខ្ញុំជួយបាន?"** (or "Hi! What can I help you with?" in English).
-- Tapping the bubble opens KruAI, just like tapping the button. Guests get the sign-in
-  prompt, as before.
-- It disappears by itself after 10 seconds, or straight away with the small ×.
-- Once a student has found KruAI (tapped it, or closed the bubble), it never shows again on
-  that phone or computer. If they just ignore it, it shows on up to 3 visits and then stops.
-- It never appears on the welcome, sign-in or survey screens, or during exams.
-
-**What to re-test.**
-
-- Open the app fresh on a phone: the bubble appears next to the bot button and is readable.
-- Tap ×, reload: it does not come back.
-- On Home, the bot button looks fully bright while the bubble is showing.
-
-## 28 Sep 2026 — The Math path is four lessons now
-
-Commit `1e423d5`. **No database step needed.**
-
-**Why.** The Math foundation path showed a single lesson, which said the whole foundation
-review is one lesson long. It is not.
-
-**What changed.**
-
-- **Four lessons instead of one.** មេរៀនទី 1 keeps its six named sections (three of them
-  written so far). មេរៀនទី 2, 3 and 4 have five sections each. The path is 21 circles now
-  instead of 6, and the counter at the top reads 0/21.
-- **The new lessons and their sections have NO names, on purpose.** The banner just reads
-  "មេរៀនទី 2" and each circle shows only its number. Making up Khmer lesson names would put
-  invented curriculum in front of a student, which is the one thing the app does not do.
-  **Send me the real names whenever you have them** and they drop straight in.
-- **The section numbers lost their leading "1.".** They read 1.1, 1.2 … 2.1, 2.2 … 4.5 rather
-  than 1.1.1, 1.2.1 and so on. That first number was a chapter number, and this path has no
-  chapters, so it referred to something the student never sees. The Bac II quiz paths already
-  did it this way; the Study path was the odd one out.
-
-**Nothing was lost.** Only the number shown on screen changed. Each section's internal id is
-untouched, so finished work stays finished and the three written lessons still open normally.
-
-**What to re-test.** Study → Math → មូលដ្ឋានគ្រឹះ. Scroll the whole path: four lesson
-banners, the first three circles open, everything else labelled "coming soon".
-
-## 28 Sep 2026 — "Coming soon" on every circle that is not written yet
-
-Commit `57e0167`. **No database step needed.**
-
-**Why.** You pointed at circles 1.1.4 and 1.1.5 on the Math path: full colour, a play
-symbol, and nothing at all when you tap them. Nothing on screen said the lesson was not
-written yet, so the only way to find out was to tap and get silence.
-
-**What changed.**
-
-- **Every circle with no lesson behind it now carries a “ឆាប់ៗនេះ” label.** Both kinds of
-  path: the round circles on Study (Math, Biology and the rest) and the square badges on the
-  Bac II quiz paths. The circle keeps its colour on purpose, because a whole path of greyed-out
-  shapes reads as “you cannot have this” rather than “this is coming”. It still does nothing
-  when tapped, which is correct: the label is there so you know that before tapping.
-- **Screen readers are told too.** A locked circle used to be announced exactly like a playable
-  one.
-
-**I checked the rest of the app for the same problem and found none.** Subject tiles, practice
-subject tiles, practice lesson rows, exam paper cards, the side menu rows and the video
-placeholder all already say it. The Bac II simulation card is no longer a placeholder at all,
-so it correctly says nothing.
-
-**Also fixed: six more of the dashes.** Yesterday's sweep only searched one of the three ways
-text is written in the code, so six were missed, including **two inside KruAI's instructions**.
-That last one matters more than it sounds: the AI copies the punctuation style of its own
-instructions into the answers students read, so a dash there reproduces itself every time it
-replies.
-
-**What to re-test.** Study → any subject → scroll down the path. Circles with no lesson yet
-should be labelled. Then Practice → Quiz → Math, where every square except the first is not
-written yet.
-
-## 28 Sep 2026 — Math lesson 1.3 (Decimals), and two writing rules
-
-Commit `dab914e`. **No database step needed.**
-
-**Why.** Third section of the Math foundation lesson, plus two rules you asked for about how
-every piece of text in the app is written.
-
-**Math 1.3: ទសភាគ និងការបម្លែង is live** at circle 1.1.3. What a decimal is and place
-value, converting between decimals, fractions and percentages both ways, adding, subtracting,
-multiplying and dividing decimals, your three tips, the method, the key points and the five
-common mistakes. Your ten exercises are in, split 5 on screen 1 (the conversions, which your
-tips teach) and 5 on screen 2 (the arithmetic, which needs the rules on that screen). **All ten
-of your answers were correct and no two options clashed**, unlike the fractions set. It has the
-same video placeholder as 1.2, with no recording behind it yet.
-
-**Your content arrived mostly in English this time**, so it was translated: the headings, the
-steps, the shortcuts and the question stems (“Convert 0.5 to a fraction” and so on) are all
-Khmer now. The maths, the examples and the answers are exactly yours. The column addition
-showing how to line up the decimal point survived as a proper aligned sum, which took a little
-care because the app collapses plain spaces.
-
-**Rule 1: no dashes like this one in anything a student reads.** 55 were rewritten across the
-app, each with whatever fitted: a full stop between two sentences, a Khmer colon before an
-explanation, or brackets around an aside. Nine are left and they are not sentences at all: they
-are the dash shown where a score or a grade does not exist yet. Tell me what you want in that
-spot (a hyphen, a zero, or nothing) and I will change those too.
-
-**Rule 2: student-visible Khmer stays Khmer.** “Tip 1”, “GCD”, “vs”, “Keep Change Flip”,
-“Algebra” and “Limit” are Khmer now. Three things deliberately stay in English: science terms
-a student meets on the exam paper, written Khmer-first with the English in brackets, like
-ខួរធំ (Cerebrum) and pH; product words you chose earlier, like XP, Streak and KruAI; and the
-English exam paper itself, plus the words a phone shows, like “Add to Home Screen”.
-
-**Both rules are written into the developer notes**, so anything written from now on follows
-them. Note that nothing checks them automatically, unlike the Latin-digits rule, so they depend
-on being written correctly the first time.
-
-**What to re-test.** Study → Math → មូលដ្ឋានគ្រឹះ → third circle, both screens. And read a few
-screens elsewhere in the app (Home, Progress, the Game) to check nothing reads oddly after the
-punctuation change.
-
-## 28 Sep 2026 — Math lesson 1.2: Fractions
-
-Commit `dab914e`. **No database step needed.**
-
-**Why.** Second section of the Math foundation lesson. The first circle on the Math path was
-the only one open; the second one is now written too.
-
-**What changed.**
-
-- **ប្រភាគ និងការសម្រួលប្រភាគ is live** at circle 1.1.2, written from the content you sent:
-  what a fraction is, equivalent fractions, simplifying with the GCD, adding, subtracting,
-  multiplying, dividing, and mixed numbers — plus your three tips, the four-step method, the
-  key points and the four common mistakes.
-- **All the fraction notation displays properly** — over a hundred fractions, the boxed answer,
-  the "not equal" sign and the arrows. Checked at phone and laptop size, light and dark.
-- **A video placeholder**, like Biology's: the poster, the play symbol and the player frame,
-  with nothing behind it yet. It shows no running time, because stating one for a video that
-  has not been recorded would be claiming something untrue.
-- **"ឆាប់ៗនេះ" now appears on any video placeholder** — this section AND Biology. A student
-  can now see there is no video yet without tapping to find out. The placeholder still does
-  nothing when tapped, on purpose: it says what it is instead of pretending to be a button.
-- **Your 15 exercises are in**, split 7 on screen 1 and 8 on screen 2. Screen 1 gets
-  simplifying, multiplying and dividing — the three your Tips demonstrate. Screen 2 gets
-  adding/subtracting with unlike denominators, mixed numbers and the algebra ones, because
-  those need the written rules that are on screen 2.
-
-**I found five questions with two options that are the same answer — you spotted two.**
-
-- **Q5 and Q11** had the same option printed twice, which you flagged.
-- **Q14** had the same one twice too (A and D were both the same expression).
-- **Q8** offered `6/9` and `2/3`, which are the same number written two ways.
-- **Q6 was the dangerous one.** It offered `1/2` and `2/4` — the same number, and `1/2` was the
-  correct answer. A student choosing `2/4` would have been **right and marked wrong**.
-
-Each duplicate was replaced with a wrong answer that comes from a real mistake, so the question
-still teaches something. All 15 of your answers were correct. I also spread the correct answers
-evenly across the four positions — in the order you sent them, 14 of 15 sat on A or B and none
-on D.
-
-**What to re-test.** Study → Math → មូលដ្ឋានគ្រឹះ → second circle. Read the Khmer: it was
-transcribed from what you sent, not rewritten, but the section numbers were changed from Khmer
-numerals to 2.1, 2.2 … because the whole app uses Latin digits for numbers a student sees, and
-the fractions were all written in one consistent style.
-
-**Still to come.** No video for this section — send a link and the placeholder becomes a real
-player.
-
-**Getting heavier, and worth acting on before long.** The file Home loads on first open (all
-written lesson content) went from 60 KB to 75 KB with just this one section added — the growth
-predicted in the previous entry, now measurable. It is not slow yet. It will be.
-
-## 28 Sep 2026 — The lesson videos play, and Math lesson 1.1 is live
-
-Commit `698aad7`. **No database step needed.**
-
-**Why.** The video box at the top of a section was a picture of a player — your illustration
-with a play button drawn on it, and nothing happened when you tapped it, because there was no
-recording yet. There is one now. Separately, the whole Math foundation path was locked, so a
-student who tapped Math found six greyed-out circles and nothing to do.
-
-**What changed.**
-
-- **The play button really plays.** Tapping it starts the video, in one tap, inside the lesson
-  screen. The videos are hosted on YouTube as **unlisted** — not searchable, not public, only
-  reachable from inside the app.
-- **Nothing is downloaded from YouTube until you tap play.** This matters more than it sounds:
-  a normal YouTube embed starts downloading roughly a megabyte the moment the page opens, for
-  every student, whether or not they watch. Here the page opens with just our own small picture,
-  and YouTube is contacted only when a student actually asks for the video. Checked and
-  confirmed: zero contact with Google before the tap.
-- **The video picks its own quality.** A student on a slow connection gets a smaller version
-  automatically instead of waiting for it to buffer. That was the main reason for using YouTube
-  rather than putting video files on our own server.
-- **Math · ជំពូក 1 · មេរៀនទី 1 · ផ្នែកទី 1 — វិន័យនៃសញ្ញា is written and open.** The first circle
-  on the Math path is now tappable. It has the video, the lesson in two screens, worked
-  examples, tips, the key points, and the four mistakes students usually make with signs.
-- **Formulas and tables now display properly inside lesson content.** They used to come out as
-  raw code (`$$ (+3)+(+5)=+8 $$`). Maths lessons need this; it changes nothing for the biology
-  sections, which have no formulas.
-
-**What to re-test.**
-
-1. Study → Math → មូលដ្ឋានគ្រឹះ → tap the first circle (1.1.1).
-2. Tap the video. It should start playing on **one** tap, and stay inside the lesson screen
-   rather than jumping to full screen.
-3. Check the formulas and the plus/minus table on screen 2 look right, at phone size and in
-   dark mode.
-4. Read the Khmer. **It was transcribed from what you supplied, not rewritten** — but the
-   section numbers were changed from Khmer numerals to 1.1, 1.2, 1.3, 1.4, because the whole app
-   uses Latin digits for every number a student sees.
-
-**The exercises.**
-
-- **All 15 are in, split across the two screens.** Screen 1 gets Parts A and B (adding and
-  subtracting signed numbers, 8 questions). Screen 2 gets Parts C and D (multiply/divide and
-  the mixed ones, 7 questions). **The split is not arbitrary** — the plus/minus times table is
-  printed on screen 2, so asking multiplication on screen 1 would be asking before teaching.
-  Each screen needs its own questions answered before it will move on.
-- **Every answer explains itself immediately** — the wrong one in pink, the right one in green,
-  and the rule underneath, exactly the "show them where they went wrong" shape you asked for.
-- **I found two mistakes in your answer key and fixed them.** Q13 `-5+8-(-3)` is 6 and the key
-  said option C, but C was 10 — 6 was option B. Q15 `(-24)÷(-6)-5` is **-1**, not 1: that one
-  had the letter AND the value wrong. All 15 were recomputed, not trusted.
-- **I also reshuffled the options.** In the order you sent them the right answer was option B
-  on 8 of the 15 — students spot that in a week and start guessing B. They are now spread
-  evenly across ក./ខ./គ./ឃ., and each screen is balanced on its own. Only the ORDER changed;
-  every option value is yours.
-
-**Also fixed, and it affected every lesson, not just math.** Moving to the next screen used to
-leave you scrolled at the BOTTOM of the new screen — so after a long screen you would press
-Continue and see a footer, with the new content off-screen above you. It looked like the screen
-had failed to load. Every screen now opens at the top: the section flow, the lesson flow, the
-practice quiz, the Game battle and the flashcard review. (The past-paper exam already did this;
-the other five were simply never given it.)
-
-**Known and expected.**
-
-- **Inside Telegram or Messenger's built-in browser the video may need a second tap.** Those
-  apps can refuse to auto-start a video and there is nothing any website can do about it. The
-  student just taps YouTube's own play button; nothing is stuck.
-- **Worth checking on a real phone**, in Telegram, on a real mobile connection. Everything above
-  was verified on a computer, which cannot prove how Telegram's browser behaves.
-
-**One thing to look at separately, not caused by this change.** Home now loads all written
-lesson content on first open — 60 KB today — because the new "Continue learning" list reads the
-content catalogue to build itself. It grows with every lesson we write, so it is worth fixing
-before there are many. Nothing is broken; the app just starts a little heavier than it needs to.
-
-## 28 Sep 2026 — Home: "Continue Learning" and Missions You Have to Earn
-
-Commit `53eb58f`. **No database step needed.**
-
-**Why.** Home's Study list still showed the old lessons from the first version of the app,
-none of the new content (biology sections, flashcard decks, the math quiz, past papers). And a
-mission could be ticked just by tapping it, so the XP and the streak didn't mean anything.
-
-**What changed.**
-- **The Study card is now "Continue learning".** It shows up to 5 things to do next, built from
-  the content that really exists: lessons, flashcard decks, quizzes and past papers. It puts
-  first the flashcard decks you started, then decks that are due for review, then the next
-  unfinished thing in each subject you've been studying. Adding new content makes it show up
-  here automatically.
-- **A new student sees "Recommended for you"** instead: the first lesson, deck and quiz of each
-  subject, starting with the subjects they marked as weak in the survey.
-- **Missions only tick when the work is done.** Tapping a mission now opens where to do it:
-  - Complete a lesson → finish a lesson.
-  - Practice quiz → finish a quiz.
-  - Study flashcards → finish a flashcard review.
-  - Daily challenge → finish a Game battle or an exam.
-
-  The Roadmap's "Done" button was removed for the same reason.
-
-**What to re-test.**
-- A brand-new account: Home should say "Recommended for you".
-- After finishing a section: it should say "Continue learning", and "Complete a lesson" should
-  be ticked.
-- Tapping a mission should never tick it.
-
-## 28 Sep 2026 — The Signature Box Now Says "Sign Here"
-
-Commit `53eb58f`. **No database step needed.**
-
-**Why.** On the commitment screen, the signature box was an empty dark rectangle. Most students
-did not know they were meant to draw their signature in it.
-
-**What changed.** The empty box now shows **"សូមចុះហត្ថលេខា"** (English: "Sign here") in the
-middle, with a small pen icon. The text disappears as soon as the student starts drawing, and
-comes back if they tap **Clear**.
-
-**What to re-test.** Open the commitment pledge and check the text is in the middle of the box.
-Draw in it (the text should disappear), then tap Clear (it should come back).
-
-## 28 Sep 2026 — BrachNha Can Be Installed on the Home Screen
-
-Commit `c3c8f6e`. **No database step needed.**
-
-**Why.** Students open BrachNha from a link every time. Installing it puts the BrachNha icon on
-their phone's home screen, like a normal app. It opens full screen, with no browser bar.
-
-**What changed.**
-- **A pop-up offers to install the app** at two moments:
-  - **When the app opens.** If the student taps "Not now", it stays away for 3 days, so it
-    doesn't appear on every visit.
-  - **After they finish their first lesson.** This one appears once per phone. It waits until
-    they leave the lesson screen. It never appears in the middle of a lesson or an exam.
-- **Android (Chrome):** the pop-up has an **Install** button. Tapping it opens the phone's own
-  install screen.
-- **iPhone:** Apple doesn't let websites show an install button, so the pop-up shows the two
-  steps instead: tap **Share**, then **Add to Home Screen**.
-- **Inside Telegram or Messenger** nothing appears. Installing isn't possible there.
-- **New home-screen icon**, made from the BrachNha logo.
-- **If the installed app is opened with no internet**, it shows a short "You're offline, try
-  again" page instead of the browser's error page.
-
-**This is not connected to Google sign-in** and doesn't go through any Google review.
-
-**Please re-test on a real phone after this is deployed** (it can't be tested on localhost):
-1. Android Chrome: open the site and wait about 2 seconds. The pop-up should appear. Tap
-   **Install**. The BrachNha icon should appear on the home screen and open full screen.
-2. iPhone Safari: the pop-up should show the Share → Add to Home Screen steps. Follow them and
-   check the icon.
-3. Finish a lesson and leave the lesson screen. The "Nice work — lesson done!" pop-up should
-   appear once. It should not appear again after the next lesson.
-4. Open the installed app with Wi-Fi and mobile data off. You should see the offline page.
-
-## 28 Sep 2026 — KruAI: Privacy Fix, Faster Fallback Between Keys, Cleaner Textbook Lookup
-
-Commit `c3c8f6e`. **No database step needed.** No change to how the chat looks.
-
-**Why.** A review of the KruAI chatbot after the switch to several free API keys found:
-- **A privacy problem.** KruAI remembered its answers and handed the same answer to the next
-  student who typed the same words. But every answer is written for one student: it can use
-  their name, their weak subjects and their exam average. So student B could get an answer
-  addressed to student A. Short follow-ups like "why?" were also replayed into other people's
-  conversations, where they made no sense.
-- **Slow answers when a key ran out.** When one of the free keys has used up its daily limit,
-  Google sometimes waits about 30 seconds before saying so. Every few questions a student was
-  left staring at an empty bubble for half a minute.
-- **Wrong ready-made answers.** Some prepared answers were triggered too easily. For example,
-  "which part of the brain stem controls breathing" got the general "three parts of the brain"
-  answer.
-- **Unrelated textbook pages in the background.** Even "hi" pulled textbook pages into what
-  KruAI reads before answering, which slows it down and can pull the answer off topic.
-
-**What changed.**
-- The memory of past answers is **removed**. Each student gets an answer written for them.
-  The hand-written answers (for example mitosis vs meiosis, or Mendel's laws) are kept. They
-  are only used for the first question in a chat, only when the question is really that
-  question, and only for signed-in students.
-- When a key is out of quota or slow, KruAI now gives up on it after 10 seconds, tries the
-  next key, and skips the tired key for the next few minutes. In testing, the worst wait went
-  from about 33 seconds to about 13, and every question after that answered in about 2 seconds.
-- A broken key is skipped straight away instead of being tried again with every model.
-- If a student closes the chat mid-answer, KruAI stops generating it (this saves quota).
-- The textbook lookup now only pulls a page when the question actually names its topic.
-
-**Worth deciding (not a code change).** On Google's free tier, what students type may be
-used by Google to improve its products and may be read by reviewers. KruAI's instructions
-include the student's name and study profile. Also, spreading use across several free
-accounts to get more free quota may go against Google's usage terms. Worth reading Google's
-current Gemini API terms before using KruAI in a real classroom.
-
-**What to re-test.**
-1. Sign in, open KruAI and ask "compare mitosis and meiosis". A table answer appears instantly.
-2. Ask the same thing again as a follow-up in the same chat. KruAI writes a fresh answer.
-3. Ask a few normal questions. Answers should start within a couple of seconds.
-
-## 28 Sep 2026 — Fix Chemistry KaTeX Formula Formatting & Expand check:quiz Verification to Game Questions
-
-Commit `pending`. **No database step needed.**
-
-**Why.** When reviewing Chemistry questions in Game Mode (e.g. Question 6 on buffer solutions), formulas were rendering as broken raw LaTeX code (such as `$pH = pK_a + \log\frac{[\text{បាស}]}{[\text{អាស៊ីត}]}$`) rather than typeset math. KaTeX fonts lack Khmer glyph coverage, so `src/utils/math-render.ts` deliberately skips rendering any `$…$` math segment containing Khmer characters to prevent rendering tofu boxes. Additionally, `scripts/check-quiz.mjs` was only checking practice quizzes and past papers, allowing broken math formulas in `GAME_QUESTIONS` to slip past automated checks.
-
-**What changed.**
-- **Chemistry Formula Normalization (`src/data/game-questions.ts`):**
-  - **Henderson-Hasselbalch Buffer Equation (Medium Q4):** Replaced Khmer terms inside LaTeX math delimiters with standard chemical notation `$pH = pK_a + \log\frac{[\text{Base}]}{[\text{Acid}]}$` and $\frac{[\text{Base}]}{[\text{Acid}]} = 1$, keeping the Khmer explanation cleanly in adjacent prose so KaTeX typesets the fractions, logs, and subscripts properly.
-  - **Chemical Equilibrium & Heat (Basic Q5):** Fixed `$A_{(g)} + B_{(g)} \rightleftharpoons C_{(g)} + \text{កម្តៅ}$` by placing `+ កម្តៅ` outside math delimiters (`$A_{(g)} + B_{(g)} \rightleftharpoons C_{(g)}$ + កម្តៅ`), preventing split math segments with dangling operators.
-  - **Reaction Rate & Equilibrium (Hard Q2, Q6, Q9):** Removed Khmer subscripts inside LaTeX (`v_{\text{បំបាត់}}`, `n_{\text{ឧស្ម័នផល}}`, `n_{\text{សាប៊ូ}}`) and replaced them with standard symbols (`$v$`, `$n_{\text{products}} - n_{\text{reactants}}$`, `$n = 3 \times n_{\text{triglyceride}}$`) while providing the Khmer definitions directly in the explanation sentences.
-- **Mathematics Past Papers Formula Fix (`src/data/papers/math-2025.ts`):**
-  - Moved Khmer terms out of math delimiters in `g11` options and explanation (`$S = 10\ln 2 - 6\ln 3$ ឯកតាផ្ទៃ`).
-- **Expanded Verification Harness (`scripts/check-quiz.mjs`):**
-  - Added full test coverage for all 120 questions across all 4 subjects in `src/data/game-questions.ts` (Mathematics, Biology, History, Chemistry).
-  - `npm run check:quiz` now verifies every question stem (`q.en`, `q.km`), explanation, option text, option uniqueness, and correct option key across both quizzes, past papers, and game matches.
-
-**What to re-test.**
-1. Open Game mode and play or review Chemistry match questions (e.g. buffer solution question, equilibrium questions).
-2. Verify that the Henderson-Hasselbalch equation and all reaction rate / equilibrium formulas render crisply with proper mathematical formatting (fractions, logarithmic bases, subscripts) rather than raw LaTeX syntax.
-
-## 28 Sep 2026 — Grade 12 Mathematics: Chapter 1 (Limits) OCR & KruAI RAG Grounding
-
-Commit `pending`. **No database step needed.**
-
-**Why.** Grade 12 Mathematics carries the highest weight in the Bac II National Examination. To equip KruAI with authoritative textbook explanations and worked problem solutions for **Chapter 1: Limits of Functions**, we transcribed the official MoEYS Grade 12 Mathematics summary textbook (`Math summary.pdf`, Book pp. 3–18) and connected it to KruAI's real-time retrieval grounding (RAG).
-
-**What changed.**
-- **High-Fidelity MoEYS Mathematics Transcription (`sources/ocr/Math summary/chapter1-limits.md`):**
-  - Rendered high-resolution pages locally (PDF pp. 6–21) without consuming AI API quota.
-  - Transcribed all foundational definitions, operation limit rules, indeterminate form removal techniques, composite function limits, squeeze theorem, trigonometric limits, exponential limits, and natural logarithm limits.
-  - Transcribed all 19 model Bac II exercise solutions with step-by-step LaTeX formulas, conjugate multiplier expansions, and factorization methods.
-- **KruAI Math RAG Knowledge Grounding (`server/textbook-search.ts`, `server/chat-handler.ts`):**
-  - Created 10 structured textbook knowledge modules covering operational rules, indeterminate forms, trigonometric limits, exponential/logarithmic limits, and worked Bac II exercises.
-  - Implemented `searchMathTextbook()` with multi-keyword matching for Khmer and English mathematical terms.
-  - Wired KruAI's streaming chat endpoint to automatically retrieve up to 3 relevant MoEYS textbook excerpts when students ask math questions, ensuring responses adhere strictly to the MoEYS exam criteria and step-by-step layout.
-
-**How to test.**
-1. Open KruAI mentor chat and ask a question about limits in Khmer or English, e.g., "របៀបគណនាលីមីតរាង 0/0 ដែលមានរ៉ាឌីកាល់" or "How to solve limit (sqrt(x+1)-2)/(x-3) as x approaches 3". Verify that KruAI replies with the MoEYS step-by-step structure and cites the textbook method.
-
-
-## 28 Sep 2026 — Game Mode: Biology Hard Questions Added (Complete 30-Question Biology Pool)
-
-Commit `pending`. **No database step needed.**
-
-**Why.** To complete the full three difficulty tiers (Basic, Medium, Hard) for Biology in Game mode (`/game`), 10 advanced Grade 12 Bac II calculation and mechanism questions were authored for the **Hard** difficulty tier. The authored Biology pool now reaches a full 30 questions (10 Basic, 10 Medium, 10 Hard), joining Mathematics, History, and Chemistry with complete competition pools.
-
-**What changed.**
-- **Authored 10 Biology Hard Competition Questions ([`src/data/game-questions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/game-questions.ts)):**
-  - Covers quantitative calculations, molecular genetics, and complex physiological mechanisms:
-    - **DNA Quantitative Calculations (សំណួរទី 1):** Calculating total nucleotides ($N = \frac{2L}{3.4} = 3000$) and hydrogen bonds ($H = 2A + 3G = 3900$) using Chargaff's rules from DNA length $L = 5100\text{ Å}$ and $A = 600$.
-    - **Translation & Polypeptide Assembly (សំណួរទី 2):** Calculating amino acid count ($298$) and peptide bonds ($297$) from a 900-nucleotide mRNA chain accounting for stop codon elimination and N-terminal methionine excision.
-    - **Semi-Conservative DNA Replication (សំណួរទី 3):** Meselson-Stahl $^{15}\text{N}/^{14}\text{N}$ isotope ratio calculation yielding a $1:3$ ratio of hybrid to light DNA molecules after 3 replication generations.
-    - **Action Potential Ion Fluxes (សំណួរទី 4):** Voltage-gated $Na^+$ channel opening triggering depolarization ($+30\text{ mV}$) followed by $Na^+$ channel inactivation and voltage-gated $K^+$ efflux driving repolarization.
-    - **Resting Potential & Ion Pump (សំណួរទី 5):** Maintenance of $-70\text{ mV}$ resting membrane potential via electrogenic $Na^+/K^+$ ATPase pump exporting $3\text{ Na}^+$ and importing $2\text{ K}^+$ per ATP consumed.
-    - **Angiosperm Double Fertilization (សំណួរទី 6):** Ploidy deductions for the two simultaneous fertilizations: first sperm ($n$) fusing with egg ($n$) to form diploid zygote ($2n$); second sperm ($n$) fusing with central polar nuclei ($2n$) to form triploid endosperm ($3n$).
-    - **Endocrine Axis & Negative Feedback (សំណួរទី 7):** Elevated thyroxine ($T_3, T_4$) acting on the hypothalamus (reducing TRH) and anterior pituitary (inhibiting TSH) to restore homeostatic levels.
-    - **Enzyme Inhibition Mechanisms (សំណួរទី 8):** Distinguishing competitive inhibitors (binding active site, reversible with excess substrate) from non-competitive inhibitors (binding allosteric site, altering active site conformation).
-    - **Mendelian Blood Group Inheritance (សំណួរទី 9):** Cross between heterozygous type A ($I^A i$) and type B ($I^B i$) parents yielding a $25\%$ ($1/4$) probability of having a type O ($ii$) child.
-    - **Sex-Linked Inheritance (សំណួរទី 10):** Hemophilia carrier mother ($X^H X^h$) and normal father ($X^H Y$) offspring probability, yielding a $50\%$ chance that a male child inherits the disease ($X^h Y$).
-- **Strict Compliance:**
-  - **Authentic Khmer Curriculum:** Questions written in natural Khmer without English translations, keeping `en` and `km` aligned.
-  - **Latin Digits Only (0-9):** Strict compliance with `scripts/check-digits.mjs` (0 Khmer numerals across all 270 files).
-  - **Balanced Option Distribution:** Correct answers distributed evenly (3 `ក`, 2 `ខ`, 3 `គ`, 2 `ឃ`), avoiding clustering on option 1.
-
-## 28 Sep 2026 — Game Mode: Biology Medium Questions Added (20 Biology Questions Authored)
-
-Commit `pending`. **No database step needed.**
-
-**Why.** To expand the Biology competition pool in Game mode (`/game`), 10 Grade 12 Bac II competition questions were authored for the **Medium** difficulty tier. Combined with the 10 Basic questions, the Biology pool now stands at 20 authentic curriculum questions.
-
-**What changed.**
-- **Authored 10 Biology Medium Competition Questions ([`src/data/game-questions.ts`](file:///e:/Kru%20AI/Brachnha-v2/src/data/game-questions.ts)):**
-  - Covers conceptual mechanisms, comparisons, and physiological processes from MoEYS Chapters 1–4:
-    - **Plant Anatomy & Monocots vs Dicots (សំណួរទី 1):** Ring vascular bundle arrangement, net-like venation, 2 cotyledons, and taproot system distinguishing dicotyledons.
-    - **Stomatal Mechanisms (សំណួរទី 2):** Osmotic opening of stomata powered by active $K^+$ ion influx into guard cells making them turgid.
-    - **Tropisms & Auxin Distribution (សំណួរទី 3):** Unilateral light causing auxin relocation to the shaded side, promoting faster cell elongation and positive phototropic curvature.
-    - **Spinal Reflex Arc (សំណួរទី 4):** 5-step sequence of neural transmission (Receptor $\rightarrow$ Sensory neuron $\rightarrow$ Spinal cord interneuron $\rightarrow$ Motor neuron $\rightarrow$ Effector muscle).
-    - **Autonomic Nervous System (សំណួរទី 5):** Sympathetic "fight-or-flight" physiological shifts (pupil dilation, elevated heart rate, bronchial dilation, inhibited digestion).
-    - **Sensory Accommodation (សំណួរទី 6):** Ciliary muscle contraction and ligament relaxation causing the lens to thicken for near focus.
-    - **Endocrine Calcium Homeostasis (សំណួរទី 7):** Antagonistic actions of Calcitonin (lowers blood $Ca^{2+}$) and Parathyroid Hormone / PTH (elevates blood $Ca^{2+}$).
-    - **Hormone Signaling Mechanisms (សំណួរទី 8):** Lipid-soluble steroid hormones directly diffusing across the plasma membrane to intracellular receptors vs. water-soluble peptide hormones requiring cell-surface receptors.
-    - **Protein Higher-Order Structures (សំណួរទី 9):** Hydrogen bonds between $>\text{C}=\text{O}$ and $-\text{NH}-$ of the polypeptide backbone stabilizing $\alpha$-helices and $\beta$-pleated sheets in secondary structure.
-    - **Enzyme Kinetics & Denaturation (សំណួរទី 10):** Thermal disruption of hydrogen bonds above optimum temperature causing active site loss (denaturation).
-- **Strict Compliance:**
 ... [truncated for diff preview]
