@@ -16,6 +16,55 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 25 Nov 2026: Limits of Functions (Khem Putthy) Batches 25 to 32: Lesson 5 Parts 6 to 13 & References (100% Book Complete)
+
+Commit: pending. **No database step needed.**
+
+Completed 100% OCR digitization and strict blind visual auditing of Grade 12 Math `sources/textbooks/math/លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី.pdf` across all 293 PDF pages (`p001.png` to `p293.png`, 33 tracked OCR files in `sources/ocr/math/លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី/STATUS.md`), finishing Lesson 5 Parts 6 to 13 and `ឯកសារយោង` (`p219.png` to `p293.png`, Book pp. 73 to 147):
+- **Batch 25 (`p219.png` to `p228.png`, Book pp. 73 to 82)**: `lesson5-solutions-part6.md` (`ដំណោះស្រាយលំហាត់ទី 9 អ.` to `12 ឋ.`); blind audit restored printed `ឫសការ៉េ` (`p224.png`) and removed the false erratum note.
+- **Batch 26 (`p229.png` to `p238.png`, Book pp. 83 to 92)**: `lesson5-solutions-part7.md` (`ដំណោះស្រាយលំហាត់ទី 12 ឌ.` to `15 ន.`); blind audit confirmed 0 discrepancies across all 10 pages.
+- **Batch 27 (`p239.png` to `p248.png`, Book pp. 93 to 102)**: `lesson5-solutions-part8.md` (`ដំណោះស្រាយលំហាត់ទី 16 ក.` to `17 ឍ.`); blind audit preserved verbatim printed typo `រុាងមិនកំណត់` in `16 ម.` (`p243.png`) with an erratum note.
+- **Batch 28 (`p249.png` to `p258.png`, Book pp. 103 to 112)**: `lesson5-solutions-part9.md` (`ដំណោះស្រាយលំហាត់ទី 17 ណ.` to `19` intro); blind audit confirmed 0 discrepancies across all 10 pages.
+- **Batch 29 (`p259.png` to `p268.png`, Book pp. 113 to 122)**: `lesson5-solutions-part10.md` (`ដំណោះស្រាយលំហាត់ទី 19 ក.` to `21 ញ.`); blind audit added an erratum note for the omitted limit argument in `19 ឋ.` (`p261.png`).
+- **Batch 30 (`p269.png` to `p277.png`, Book pp. 123 to 131)**: `lesson5-solutions-part11.md` (`ដំណោះស្រាយលំហាត់ទី 21 ដ.` to `25`); blind audit restored printed spacing `(ឬសាកឫស គឺ -1)` (`p269.png`) and refined the clipping/overlap note on `p271.png` (`21 ព.` / `ភ.`).
+- **Batch 31 (`p278.png` to `p285.png`, Book pp. 132 to 139)**: `lesson5-solutions-part12.md` (`ដំណោះស្រាយលំហាត់ទី 26` to `33`); blind audit confirmed 0 discrepancies across all 8 pages.
+- **Batch 32 (`p286.png` to `p293.png`, Book pp. 140 to 147)**: `lesson5-solutions-part13-refs.md` (`ដំណោះស្រាយលំហាត់ទី 34` to `39`, blank separator `p292.png`, and `ឯកសារយោង` `1.` to `3.`); blind audit confirmed 0 discrepancies across all 8 pages.
+- **Verification**: Ran full verification suite: `node scripts/ocr-check.mjs "sources/ocr/math/លីមីតនៃអនុគមន៍_ខែម_ពុទ្ធី"` (`34 pages checked, 0 to look at by hand.`), `npm run check:digits`, `npm run check:content`, `npx oxlint`, `npx tsc -b`, and `npm test`. `KruAI RAG in textbook-search.ts`: `NO (OCR only)`.
+
+
+## 25 Nov 2026: 2014 Bac II Past Exam Papers Session 2 (2014-second.pdf) Batch 5: Biology
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 5 of MoEYS 2014 Bac II Session 2 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-second.pdf` (`p15.png` to `p17.png`, book pp. 36–38):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2014-second/05-biology.md`, covering all 8 Biology exam questions (`I.`–`VIII.`: sweat glands, antibiotics, parathyroid glands, why pollen grains are not male gametes, DNA replication significance, $\text{ARN}_t$ role in protein synthesis, human DNA length $1020\text{ mm}$ & supercoiling, and DNA replication free nucleotides, base counts, & $\text{ARN}_m$ count) and their full official solutions (`កំណែជីវវិទ្យា`), keeping all Khmer units/labels outside KaTeX math mode.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p15.png`–`p17.png`, moving the `2 - 3 ភាគពាន់មីលីម៉ែត្រ` range out of `$...$` on `p15.png`, verifying all boxed results, exponents, subscripts, empty right column on `p17.png`, and print-typo notes (`AND(ADN)`, `4 - 1`, shifted box border), and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-second"` and `npm run check:digits`.
+
+
+## 25 Nov 2026: 2014 Bac II Past Exam Papers Session 2 (2014-second.pdf) Batch 4: Chemistry
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 4 of MoEYS 2014 Bac II Session 2 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-second.pdf` (`p12.png` to `p14.png`, book pp. 33–35):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2014-second/04-chemistry.md`, covering all 6 Chemistry exam questions (`I.`–`VI.`: primary/secondary/tertiary amine formulas, pressure effect on gas reaction rate, $\text{BaCl}_2 + \text{Na}_2\text{SO}_4$ ionic/net ionic equations, $\text{HCl} + \text{NaOH}$ titration molarity, $\text{HCl}$ `pH` / `pOH` / $[\text{H}_3\text{O}^+]$ / $[\text{OH}^-]$, and $\text{H}_2\text{O}_2 + 2\text{H}^+ + 2\text{I}^-$ kinetics data table & average rates) and their complete multi-method official solutions (`កំណែគីមីវិទ្យា`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p12.png`–`p14.png`, restoring the period in `ថ្នាក់ទីI.` (`p12.png`), removing an inserted `ដែល` in `VI.1.` (`p14.png`), verifying the kinetics table, tertiary amine diagrams, and print-typo notes (`សូដ្យូមស៊ីលផាត`, `Ba^+`, `0.3338M`, `= pOH = 11`, `21^-`), and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-second"` and `npm run check:digits`.
+
+
+## 25 Nov 2026: 2014 Bac II Past Exam Papers Session 2 (2014-second.pdf) Batch 3: Physics
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 3 of MoEYS 2014 Bac II Session 2 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-second.pdf` (`p09.png` to `p11.png`, book pp. 30–32):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2014-second/03-physics.md`, covering all 6 Physics exam questions (`I.`–`VI.`: First Law of Thermodynamics, oxygen tank ideal gas volume, internal energy change $\Delta U$, gasoline engine efficiency & work, magnetic force between parallel currents, and electron motion in a uniform magnetic field) and their complete official solutions (`កំណែរូបវិទ្យា`), plus the parallel-wires force diagram description (`V.1.`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p09.png`–`p11.png`, merging the wrapped `$\mu_0 = 4\pi \times 10^{-7}\text{T}\cdot\text{m/A}$ ។` inline on `p09.png`, verifying all signs/exponents/units (keeping `ជុំ/s` outside math mode) and preserved print-typo notes (`វិញ្ញាសារវិទ្យា`, `W_M = Q_h + Q_c`, `VI. 2.` misnumbering), and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-second"` and `npm run check:digits`.
+
+
 ## 25 Nov 2026: 2014 Bac II Past Exam Papers Session 2 (2014-second.pdf) Batch 2: Mathematics
 
 Commit: pending. **No database step needed.**
@@ -101,7 +150,7 @@ Commit: pending. **No database step needed.**
 
 Digitized and audited Batch 4 of MoEYS 2014 Bac II Session 1 Science Track exam compilation `sources/textbooks/Past Exam Papers/2014-first.pdf` (`p13.png` to `p16.png`, book pp. 12–15):
 - **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2014-first/04-chemistry.md`, covering all 6 Chemistry exam questions (`I.`–`VI.`: organic structural formulas, $\text{CaCO}_3 + \text{HCl}$ ionic/net ionic equations, $\text{H}_2\text{SO}_4$ molarity from density & mass percent, dilution molarity, $\text{Zn} + \text{HCl}$ redox proof, and 3 kinetic factors for $\text{H}_2$ production) and their complete multi-method official solutions (`កំណែគីមីវិទ្យា`).
-- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p13.png`–`p16.png`, re-aligning the ASCII redox oxidation-number bracket diagram over `2HCl`, `ZnCl2`, and `H2` (`V.`, `p15.png`), adding a print-error note for `អេឡិចត្រកុ` (`p15.png`), verifying all multi-method molarity/dilution calculations, uppercase `(S)` / `\ell` notations, and print-typo notes (`ស្វិត`, `C = 2.26 mol·L^-1`, `10^-4 mol`, `ទៅ O ពី +I ទៅ O`), and updating `STATUS.md`.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p13.png`–`p16.png`, fixing `\text{CaCO}_3(\text{s})` → `\text{CaCO}_3(\text{S})` in `II.1.` (`p13.png`) to match the literal uppercase `(S)` printed on the scan, clarifying the `I.4.` phenyl ethanoate ring diagram note, verifying all multi-method calculations, redox bracket diagram, and print-typo notes (`ស្វិត`, `C = 2.26 mol·L^-1`, `10^-4 mol`, `ទៅ 0 ពី 0`), and updating `STATUS.md`.
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only).
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2014-first"` and `npm run check:digits`.
 
