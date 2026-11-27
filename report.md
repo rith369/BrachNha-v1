@@ -16,6 +16,19 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 27 Nov 2026: Derivative Functions (ដេរីវេអនុគមន៍ · Prek Leap NGSPL 2026) Batches 1 to 18 (100% Complete, OCR & Audit)
+
+Commit: Pending. **No database step needed.**
+
+Rendered all 141 PDF pages (`p001.png`–`p141.png`) and completed verbatim OCR digitization and strict page-by-page blind visual auditing for `sources/textbooks/math/ដេរីវេអនុគមន៍.pdf` (Prek Leap High School · សេង ធារ៉ុន · NGSPL 2026) in `sources/ocr/math/ដេរីវេអនុគមន៍/`, bringing all 18 files to **100% OCR Written and 100% OCR Audited**:
+- **Front Matter (`p001`–`p006`)**: `front-matter.md` (cover, preface, credits, blank `p004.png`, TOC `មាតិកា`), verifying `សេង ធារ៉ុន` and TOC `ម៉ាជីណាល` vs `ម៉ាឌីណាល` spellings against the scans.
+- **Section 1 Derivatives (`p007`–`p076`)**: `section1-derivatives-part1.md` through `section1-derivatives-part9.md` (theory `1.1`–`1.5.2`, `រំលឹក`, `កម្រងលំហាត់បន្ថែម` Ex. 1–20, full solutions Ex. 1–21c, and blank `p076.png`), removing unprinted `៖` colons in Parts 1–2, fixing `វិធីទី1៖`/`វិធីទី2៖` spacing in Part 5, and documenting printed derivative-order mismatches and answer typos inline.
+- **Section 2 Applications (`p077`–`p110`)**: `section2-applications-part1.md` through `section2-applications-part4.md` (sections `2.1`–`2.3.2`, Ex. 1–30 with full solutions, geometric/tank/cone/pyramid diagrams described in Khmer prose, and variation/sign tables), restoring `x_o`, `ប្រលេឡូពីប៉ែតកែង`, and `នៃ` during blind audit.
+- **Section 3 Other Applications & Back Cover (`p111`–`p141`)**: `section3-other-apps-part1.md` through `section3-other-apps-part4.md` (sections `3.1`–`3.7.3`, curve diagram descriptions on `p111.png`, Ex. 1–14 with full solutions, and closing decorative back cover `p141.png`), restoring printed `៖`, `៛`, `81`, `ម៉ាឧីណាល` (`p115`–`p117`) vs `ម៉ាជីណាល` (`p118`–`p141`) during blind audit.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added to `server/textbook-search.ts`, and no quizzes/flashcards created.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/math/ដេរីវេអនុគមន៍"`, `npm run check:digits`, `npm run check:content`, `npx oxlint`, `npx tsc -b`, and `npm test`.
+
+
 ## 27 Nov 2026: Complex Numbers (ចំនួនកុំផ្លិច · Prek Leap NGSPL 2026) Batches 5 to 18 (100% Complete, OCR & Audit)
 
 Commit: Pending. **No database step needed.**
