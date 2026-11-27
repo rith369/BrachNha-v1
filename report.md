@@ -42,6 +42,50 @@ Digitized and strictly blind-audited all 4 batches (all 12 PDF pages, `Page:1` t
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/physics/2025រូបមន្តសង្ខេបថ្នាក់ទី១២"`, `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
 
 
+## 27 Nov 2026: 2016 Bac II Past Exam Papers (2016.pdf) Batch 8: English (100% Book Complete)
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 8 of MoEYS 2016 Bac II Science Track exam compilation `sources/textbooks/Past Exam Papers/2016.pdf` (`p24.png`, book p. 86), completing **100% OCR Written and 100% OCR Audited** across all 24 PDF pages (`01-cover-and-khmer.md` through `08-english.md`):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2016/08-english.md`, covering the complete English exam (`ប្រធាន`: `I. Reading.` 11-gap `A friend in the rain` cloze with 11-word box, `II. Grammar.` 5 MCQs, `III. Vocabulary.` 5 MCQs, `IV. Writing.` essay prompt) and official key (`កំណែភាសាអង់គ្លេស`), preserving literal print quirks with editorial notes.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit of `p24.png`, adding the missing space after `/` in the running header (`ថ្នាក់វិទ្យាសាស្ត្រសង្គម/ ថ្នាក់វិទ្យាសាស្ត្រ`), verifying all 11 reading box words, 11 gaps, 48 MCQ options, answer keys, and preserved print quirks (`(1)tennis`, `foget`, duplicate `4.` in Grammar, `to........`, `“ life in the countryside”`, `5 - c range`), and updating `STATUS.md` to 100% complete (`8/8` sections `OCR Written: YES`, `OCR Audited: YES`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only across all 8 sections; no existing `2016` chunks in `server/textbook-search.ts`).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2016"` (`9 pages checked, 0 to look at by hand.`) and `npm run check:digits`.
+
+
+## 27 Nov 2026: 2016 Bac II Past Exam Papers (2016.pdf) Batch 7: French
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 7 of MoEYS 2016 Bac II Science Track exam compilation `sources/textbooks/Past Exam Papers/2016.pdf` (`p23.png`, book p. 85):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2016/07-french.md`, covering the complete French exam (`ប្រធាន`: `I. compréhension écrite`, `II. Vocabulaire`, `III. Grammaire` `A.`/`B.`, `IV. Expression écrite`) and official key (`កំណែភាសាបារាំង` + 5-item essay rubric).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit of `p23.png`, verifying all 30 numbered items/answers, French accents/ligatures (`sœur`), underlines (`<u>mer</u>`, `<u>ne</u>`, `<u>ni</u>`), italic `*sans*`, and preserved literal print quirks (`វិញ្ញាសា: បារាំង`, `compréhension écrite`, `Pendent`, `......mais`, `coquillage` vs `coquillages`, `Ni paul ni Marie`), and updating `STATUS.md` (0 discrepancies).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2016"` and `npm run check:digits`.
+
+
+## 27 Nov 2026: 2016 Bac II Past Exam Papers (2016.pdf) Batch 6: History
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 6 of MoEYS 2016 Bac II Science Track exam compilation `sources/textbooks/Past Exam Papers/2016.pdf` (`p20.png` to `p22.png`, book pp. 82–84):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2016/06-history.md`, covering all 5 History exam questions (`I.`–`V.`: Khmer Dictionary compiler Chuon Nath, positive & negative impacts of the French Protectorate 1863–1953, Sangkum Reastr Niyum achievements 1955–1970, causes of the 1970–1975 civil war, and social/economic/political consequences of the war) and their full official scoring key (`កំណែប្រវត្តិវិទ្យា`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p20.png`–`p22.png`, verifying all 53 bullets/sub-bullets, dates, blank right column on `p22.png`, and preserved literal print quirks (`60នាទី នាទី`, `ទន្លេរពៅ`, `- 1947`, `ប្រាសាទប្រាសាទព្រះវិហារ`, `បារក្រចៅ`, `វិស័យគមនាគម`, `កុប្បកម្មពេញផ្ទៃ`), and updating `STATUS.md` (0 discrepancies).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2016"` and `npm run check:digits`.
+
+
+## 27 Nov 2026: 2016 Bac II Past Exam Papers (2016.pdf) Batch 5: Biology
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 5 of MoEYS 2016 Bac II Science Track exam compilation `sources/textbooks/Past Exam Papers/2016.pdf` (`p17.png` to `p19.png`, book pp. 79–81):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2016/05-biology.md`, covering all 8 Biology exam questions (`I.`–`VIII.`: leaf tissue layers, enzyme catalytic activity, invertebrate vs. vertebrate nervous system comparison table, genetic engineering benefits for crops, DNA semiconservative replication fidelity, hormone target-cell receptors, DNA nucleotide percentages / length $102\ \mu\text{m}$ / hydrogen bonds $780\,000$, and gene-to-$\text{ARN}_m$ base calculation) and their full official solutions (`កំណែជីវវិទ្យា`), keeping all Khmer units/labels outside KaTeX math mode.
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p17.png`–`p19.png`, fixing the Khmer subscript in `បណ្តូរ` → `បណ្ដូរ` (`p17.png`), verifying the comparison table, boxed results, and preserved print-typo notes (`សេរីរស់ទៅបំពេញ`, `ធ្នួល`, `50% + %C`, `0.34mn`, `នុយក្លេនីមួយៗ`, `400/2 - 800 = 1200`, `1200/2 = 1200/2`), and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2016"` and `npm run check:digits`.
+
+
 ## 27 Nov 2026: 2016 Bac II Past Exam Papers (2016.pdf) Batch 4: Chemistry
 
 Commit: pending. **No database step needed.**
