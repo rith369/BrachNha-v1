@@ -16,6 +16,41 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 27 Nov 2026: Grade 12 Physics Formula Summary (2025រូបមន្តសង្ខេបថ្នាក់ទី១២.pdf, Chou Chamnan): Batches 1 to 4 (100% Complete, OCR & Audit)
+
+Commit: Pending. **No database step needed.**
+
+Digitized and strictly blind-audited all 4 batches (all 12 PDF pages, `Page:1` to `Page:12`) of the Grade 12 Bac II Physics Formula Summary (`sources/textbooks/physics/2025រូបមន្តសង្ខេបថ្នាក់ទី១២.pdf`, Angkor High School, by Chou Chamnan) in `sources/ocr/physics/2025រូបមន្តសង្ខេបថ្នាក់ទី១២/`, achieving **100% OCR Written and 100% OCR Audited**:
+- **Batch 1 (`p01.png` to `p03.png`)**: Lesson 1 (`ទ្រឹស្ដីស៊ីនេទិចនៃឧស្ម័ន`), Lesson 2 (`ច្បាប់ទីមួយទែម៉ូឌីណាមិច`), and Lesson 3 (`ម៉ាស៊ីន`) in `batch-01-lessons-1-to-3.md`. Blind audit verified all formulas, diagrams, and legend columns across all 3 pages (`0` discrepancies).
+- **Batch 2 (`p04.png` to `p05.png`)**: Lesson 4 (`គោលការណ៍តម្រួតនៃរលក និងរលកជញ្ជ្រាំ`) and Lesson 5 (`អាំងទែផេរ៉ង់ និងឌីប្រាក់ស្យុង`) in `batch-02-lessons-4-to-5.md`. Blind audit corrected 2 Khmer subscript/spelling misreads on `p05.png` (`រន្ធះ` to `រង្វះ` in prose and `ពិសោធរង្វះយុង`).
+- **Batch 3 (`p06.png` to `p09.png`)**: Lesson 6 (`ដែន និងកម្លាំងម៉ាញេទិច`), Lesson 7 (`អាំងឌុចស្យុងអេឡិចត្រូម៉ាញេទិច`), and Lesson 8 (`អូតូអាំងឌុចស្យុង`) in `batch-03-lessons-6-to-8.md`. Blind audit fixed 4 discrepancies (`\ell = Nd` to `\ell = nd` on `p06.png`, `ស្នៀរ៉ាល់` to `ស្ពៀរ៉ាល់` on `p07.png`, `គូ s` to `តូ s` and spacing in `ឬ ជុំ/s` on `p09.png`).
+- **Batch 4 (`p10.png` to `p12.png`)**: Lesson 9 (`សៀគ្វីចរន្តឆ្លាស់`, series/parallel RLC, resonance, power factor, transformers) and Appendix (`វិធីបំបែកខ្នាតតាមម្រាមដៃ`, SI prefixes, exponents, square root approximation, significant figures, squares `1^2` to `15^2`) in `batch-04-lesson-9-and-appendix.md`. Blind audit fixed 2 discrepancies (`$I_C` to `$i_C` on `p10.png` and hand-diagram arrow direction labels on `p12.png`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added to `server/textbook-search.ts`.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/physics/2025រូបមន្តសង្ខេបថ្នាក់ទី១២"`, `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
+## 25 Nov 2026: 2016 Bac II Past Exam Papers (2016.pdf) Batch 3: Physics
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 3 of MoEYS 2016 Bac II Science Track exam compilation `sources/textbooks/Past Exam Papers/2016.pdf` (`p10.png` to `p11.png`, book pp. 72–73):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2016/03-physics.md`, covering all 7 Physics exam questions (`I.`–`VII.`: thermodynamic system definition, magnetic pole field lines, oxygen ideal-gas volume, capacitor stored energy, $\Delta U$ in three processes, heat engine work/rejected heat, and solenoid magnetic field & wire length) and their full official solutions (`កំណែរូបវិទ្យា`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p10.png`–`p11.png`, verifying all 42 physics equation/value lines, `ស្ពៀ`/`ថេរ` kept outside math mode, and preserved literal print quirks (`40%គណនា`, `Q > O`/`W > O`, `W_M = 2000 - 800 = 1200J` printed for `Q_c`, `\mu_o`, missing `T`), and updating `STATUS.md` (0 discrepancies).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2016"` and `npm run check:digits`.
+
+
+## 25 Nov 2026: 2016 Bac II Past Exam Papers (2016.pdf) Batch 2: Mathematics
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 2 of MoEYS 2016 Bac II Science Track exam compilation `sources/textbooks/Past Exam Papers/2016.pdf` (`p04.png` to `p09.png`, book pp. 66–71):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2016/02-mathematics.md`, covering all 7 exam parts (`I.`–`VII.`: limits, complex numbers & $Z^3$, definite integrals, probability, ellipse equation/graph & 3D parallelogram, second-order ODE $y''+2y'-3y=0$, and $f(x)=x+2-\frac{4e^x}{e^x+3}$ variation, tangents, & graph) and their complete official solutions (`កំណែគណិតវិទ្យា`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across all 6 pages (`p04.png`–`p09.png`), restoring the missing `។` in `VII.2.ក` (`p04.png`) and matching italic `$R$` in `VII.4.ខ` (`p08.png`), verifying all variation/sign/value tables, ellipse & curve graph descriptions, and preserved print-typo notes (`(1ne=1)`, `N3, 5, 6)`, `[-2\ln 1x1 + \frac{2}{x}]`, `(0,1)/(2,\frac{3}{4})`), and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2016"` and `npm run check:digits`.
+
+
 ## 25 Nov 2026: 2016 Bac II Past Exam Papers (2016.pdf) Batch 1: Cover & Khmer Literature
 
 Commit: pending. **No database step needed.**
