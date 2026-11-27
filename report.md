@@ -16,6 +16,19 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 27 Nov 2026: Complex Numbers (ចំនួនកុំផ្លិច · Prek Leap NGSPL 2026) Batches 5 to 18 (100% Complete, OCR & Audit)
+
+Commit: Pending. **No database step needed.**
+
+Completed OCR digitization and strict page-by-page blind visual auditing for all remaining 116 pages (`p031.png` to `p146.png`, plus finishing the blind audit of `p058.png`–`p066.png`) of `sources/textbooks/math/ចំនួនកុំផ្លិច.pdf` (Prek Leap High School · សេង ផារ៉ុន · NGSPL 2026) in `sources/ocr/math/ចំនួនកុំផ្លិច/`, bringing the entire 146-page textbook across all 18 files to **100% OCR Written and 100% OCR Audited**:
+- **Section 2 Trigonometric Form (`p031`–`p066`)**: Transcribed and audited `section2-trigonometric-form-part1.md` (`2.1`–`2.5`, 0 fixes), `section2-trigonometric-form-part2.md` (`2.6`, Ex. 1–25, Sol. 1–2n; restored 5 `ឲ្យ` and 24 `ដូច្នេះ៖` colons), `section2-trigonometric-form-part3.md` (Sol. 2o–11b; restored `ឲ្យ` and `នោះ៖`/`ដូច្នេះ៖`/`ដូចនេះ៖` colons), and `section2-trigonometric-form-part4.md` (Sol. 11b–26c; restored 3 `ឲ្យ` spellings on `p063`).
+- **Section 3 Powers & Roots (`p067`–`p072`)**: Transcribed and audited `section3-powers-roots.md` (De Moivre `3.1`, $n$-th roots `3.2`, pentagon & square Argand diagram descriptions on `p071`, `កម្រងលំហាត់បន្ថែម` Ex. 1–6 intro; removed stray backticks around `$=$` in an erratum note).
+- **Practice & Bac II Exercises (`p073`–`p080`)**: Transcribed and audited `practice-exercises.md` (Ex. 6a–70 and Bac II `2026`–`2014` Ex. 1–13; 0 discrepancies, printed errata preserved verbatim with notes).
+- **Practice & Bac II Solutions (`p081`–`p146`)**: Transcribed and audited `practice-solutions-part1.md` through `practice-solutions-part8.md` (Ex. 1–70 full solutions, Bac II Ex. 1–13 solutions, and decorative back cover `p146.png`), fixing `\bar{z}_1 \cdot \bar{z}_2` in Part 3 Ex. 31a, restoring 2 `នោះ៖` colons + `ស្វ័យគុណធរណីមាត្រ` typo note in Part 4, unindenting 2 lines on `p134` in Part 7, and restoring `ប៉ែតដែលជាចំនួនគត់វិជ្ជមាន` in Part 8 (`p144` Ex. 12b).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added to `server/textbook-search.ts`, and no quizzes/flashcards created.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/math/ចំនួនកុំផ្លិច"`, `npm run check:digits`, `npm run check:content`, `npx oxlint`, `npx tsc -b`, and `npm test`.
+
+
 ## 27 Nov 2026: Grade 12 Physics Formula Summary (2025រូបមន្តសង្ខេបថ្នាក់ទី១២.pdf, Chou Chamnan): Batches 1 to 4 (100% Complete, OCR & Audit)
 
 Commit: Pending. **No database step needed.**
@@ -27,6 +40,17 @@ Digitized and strictly blind-audited all 4 batches (all 12 PDF pages, `Page:1` t
 - **Batch 4 (`p10.png` to `p12.png`)**: Lesson 9 (`សៀគ្វីចរន្តឆ្លាស់`, series/parallel RLC, resonance, power factor, transformers) and Appendix (`វិធីបំបែកខ្នាតតាមម្រាមដៃ`, SI prefixes, exponents, square root approximation, significant figures, squares `1^2` to `15^2`) in `batch-04-lesson-9-and-appendix.md`. Blind audit fixed 2 discrepancies (`$I_C` to `$i_C` on `p10.png` and hand-diagram arrow direction labels on `p12.png`).
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added to `server/textbook-search.ts`.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/physics/2025រូបមន្តសង្ខេបថ្នាក់ទី១២"`, `npm run check:digits`, `npx oxlint`, and `npx tsc -b`.
+
+
+## 27 Nov 2026: 2016 Bac II Past Exam Papers (2016.pdf) Batch 4: Chemistry
+
+Commit: pending. **No database step needed.**
+
+Digitized and audited Batch 4 of MoEYS 2016 Bac II Science Track exam compilation `sources/textbooks/Past Exam Papers/2016.pdf` (`p12.png` to `p16.png`, book pp. 74–78):
+- **Textbook OCR**: Transcribed word-for-word into `sources/ocr/2016/04-chemistry.md`, covering all 5 Chemistry exam questions (`I.`–`V.`: $\text{Fe} + \text{HCl}$ kinetic factors, $\text{AlCl}_3$ & $\text{Na}_2\text{SO}_4$ dissociation ion moles, $\text{Mg} + \text{HNO}_3$ stoichiometry, primary/secondary/tertiary alcohols & amides & esters with structural diagrams, and $\text{NaOH}$ / $\text{HNO}_3$ / $\text{HCl}$ $\text{pH}$ & concentration problems) and their complete multi-method official solutions (`កំណែគីមីវិទ្យា`).
+- **Strict Blind Visual Audit**: Completed line-by-line visual audit across `p12.png`–`p16.png`, restoring verbatim print typo `មាខ` (`V.3.`, `p12.png`) with an editorial note, verifying all 11 organic structural blocks, equations (`\xrightarrow{\text{H}_2\text{O}}`), blank right column on `p16.png`, and preserved print-typo notes (`ស៊ីលផាត`, `12 \times 2`, `moL`, `H_30^+`), and updating `STATUS.md`.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only).
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/2016"` and `npm run check:digits`.
 
 
 ## 25 Nov 2026: 2016 Bac II Past Exam Papers (2016.pdf) Batch 3: Physics
