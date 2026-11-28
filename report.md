@@ -30,6 +30,19 @@ Rendered all 123 PDF pages (`p001.png`–`p123.png`) and completed verbatim OCR 
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/history/mock exam and old paper moeys"` (`23 pages checked, 0 to look at by hand.`), `npm run check:digits`, `npm run check:content`, `npx oxlint`, and `npx tsc -b`.
 
 
+## 28 Nov 2026: Conics (កោនិច / កោណនិច · Prek Leap NGSPL 2026) Batches 1 to 10 (100% Complete, OCR & Audit)
+
+Commit: Pending. **No database step needed.**
+
+Rendered all 89 PDF pages (`p01.png`–`p89.png`) and completed verbatim OCR digitization and strict page-by-page blind visual auditing for `sources/textbooks/math/កោនិច.pdf` (Prek Leap High School · សេង ធារ៉ុន · NGSPL 2026) in `sources/ocr/math/កោនិច/`, bringing all 10 files to **100% OCR Written and 100% OCR Audited**:
+- **Front Matter (`p01`–`p06`)**: `front-matter.md` (cover `កោណនិច`, preface `កោនិច`, credits, blank `p04.png`, TOC `មាតិកា`, blank `p06.png`).
+- **Chapter 1 Parabola (`p07`–`p32`)**: `ch1-parabola-part1.md` through `ch1-parabola-part3.md` (`1.1`–`1.3.1`, standard equations, worked examples, extra exercises `1`–`14`, solutions `1`–`13`, curve descriptions, and inline notes for printed textbook typos), fixing `ង.` badge on `p16.png`, `(10 សីហា 2026 ទី)` on `p20.png`, diagram color descriptions on `p08.png`, and trailing `៖` on `p30.png` during blind audit.
+- **Chapter 2 Ellipse (`p33`–`p64`)**: `ch2-ellipse-part1.md` through `ch2-ellipse-part3.md` (`2.1`–`2.3.1`, standard equations, worked examples, extra exercises `1`–`25`, solutions `1`–`24`, curve descriptions, and inline textbook erratum notes), fixing display math `$$` line breaks and `;` punctuation in Exercise `13a` during blind audit.
+- **Chapter 3 Hyperbola & Back Cover (`p65`–`p89`)**: `ch3-hyperbola-part1.md` through `ch3-hyperbola-part3.md` (`3.1`–`3.3.2`, standard equations, asymptotes, worked examples, extra exercises `1`–`7`, solutions `1`–`7`, curve descriptions, inline erratum notes, and decorative back cover `p89.png`), reformatting display math `$$` delimiters in Part 3 during blind audit.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added to `server/textbook-search.ts`, and no quizzes/flashcards created.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/math/កោនិច"`, `npm run check:digits`, `npm run check:content`, `npx oxlint`, `npx tsc -b`, and `npm test`.
+
+
 ## 28 Nov 2026: Continuity of Functions (ភាពជាប់នៃអនុគមន៍ · Prek Leap NGSPL 2027) Batches 1 to 4 (100% Complete, OCR & Audit)
 
 Commit: Pending. **No database step needed.**
@@ -90,6 +103,10 @@ Digitized and blind-audited `2018.pdf` batches 1 to 3 into `sources/ocr/2018/`, 
   - Batch 1 (`p01` to `p03`): Cover & Khmer Literature (`01-cover-and-khmer.md`). **KruAI RAG: NO (OCR only)**. Verified `ocr-check.mjs` and `check:digits` clean.
   - Batch 2 (`p04` to `p09`): Mathematics (`02-mathematics.md`, problems + solutions `I.` to `VII.`, ellipse graph, variation table, auxiliary tables and curve description). **KruAI RAG: NO (OCR only)**. Verified `ocr-check.mjs` and `check:digits` clean.
   - Batch 3 (`p10` to `p12`): Physics (`03-physics.md`, problems + solutions `I.` to `VI.`). **KruAI RAG: NO (OCR only)**. Verified `ocr-check.mjs` and `check:digits` clean.
+  - Batch 4 (`p13` to `p16`): Chemistry (`04-chemistry.md`): blocked by Gemini content filter (`NO (blocked by filter)`). **KruAI RAG: NO (OCR only)**.
+  - Batch 5 (`p17` to `p20`): Biology (`05-biology.md`, problems + solutions `I.` to `VII.`). **KruAI RAG: NO (OCR only)**. Verified `ocr-check.mjs` and `check:digits` clean.
+  - Batch 6 (`p21` to `p23`): History (`06-history.md`, problems + solutions `I.` to `V.`). **KruAI RAG: NO (OCR only)**. Verified `ocr-check.mjs` and `check:digits` clean.
+  - Batch 7 (`p24` to `p25`): French (`07-french.md`, problems + answer keys `I.` to `IV.`). **KruAI RAG: NO (OCR only)**. Verified `ocr-check.mjs` and `check:digits` clean.
 
 ## 27 Nov 2026: 2017 Bac II Science Exam Papers (`2017.pdf`): Batches 1 to 8 (100% Complete, OCR & Audit)
 
