@@ -95,18 +95,19 @@ Completed OCR digitization and strict page-by-page blind visual auditing for all
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/math/ចំនួនកុំផ្លិច"`, `npm run check:digits`, `npm run check:content`, `npx oxlint`, `npx tsc -b`, and `npm test`.
 
 
-## 28 Nov 2026: 2018 Bac II Science Exam Papers (`2018.pdf`): Batches 1 to 3 (OCR & Audit Progress)
+## 28 Nov 2026: 2018 Bac II Science Exam Papers (`2018.pdf`): Batches 1 to 3 and 5 to 8 Complete (Batch 4 Blocked by Filter)
 
-Digitized and blind-audited `2018.pdf` batches 1 to 3 into `sources/ocr/2018/`, and created `sources/ocr/2018/STATUS.md` covering all 26 pages across 8 sections (`KruAI RAG: NO (OCR only)` for all sections; zero new RAG chunks added per OCR-only scope).
+Digitized and blind-audited 7 of 8 sections (`22` of `26` pages; book pages 1 to 11 and 16 to 25 plus cover) of `sources/textbooks/Past Exam Papers/2018.pdf` into `sources/ocr/2018/`, with `sources/ocr/2018/STATUS.md` tracking all 8 sections (`KruAI RAG: NO (OCR only)` for every section; zero new RAG chunks added per OCR-only scope).
 
-- **Completed so far:**
-  - Batch 1 (`p01` to `p03`): Cover & Khmer Literature (`01-cover-and-khmer.md`). **KruAI RAG: NO (OCR only)**. Verified `ocr-check.mjs` and `check:digits` clean.
-  - Batch 2 (`p04` to `p09`): Mathematics (`02-mathematics.md`, problems + solutions `I.` to `VII.`, ellipse graph, variation table, auxiliary tables and curve description). **KruAI RAG: NO (OCR only)**. Verified `ocr-check.mjs` and `check:digits` clean.
-  - Batch 3 (`p10` to `p12`): Physics (`03-physics.md`, problems + solutions `I.` to `VI.`). **KruAI RAG: NO (OCR only)**. Verified `ocr-check.mjs` and `check:digits` clean.
+- **Completed and status:**
+  - Batch 1 (`p01` to `p03`): Cover & Khmer Literature (`01-cover-and-khmer.md`). **KruAI RAG: NO (OCR only)**.
+  - Batch 2 (`p04` to `p09`): Mathematics (`02-mathematics.md`, problems + solutions `I.` to `VII.`, ellipse graph, variation table, auxiliary tables and curve description). **KruAI RAG: NO (OCR only)**.
+  - Batch 3 (`p10` to `p12`): Physics (`03-physics.md`, problems + solutions `I.` to `VI.`). **KruAI RAG: NO (OCR only)**.
   - Batch 4 (`p13` to `p16`): Chemistry (`04-chemistry.md`): blocked by Gemini content filter (`NO (blocked by filter)`). **KruAI RAG: NO (OCR only)**.
-  - Batch 5 (`p17` to `p20`): Biology (`05-biology.md`, problems + solutions `I.` to `VII.`). **KruAI RAG: NO (OCR only)**. Verified `ocr-check.mjs` and `check:digits` clean.
-  - Batch 6 (`p21` to `p23`): History (`06-history.md`, problems + solutions `I.` to `V.`). **KruAI RAG: NO (OCR only)**. Verified `ocr-check.mjs` and `check:digits` clean.
-  - Batch 7 (`p24` to `p25`): French (`07-french.md`, problems + answer keys `I.` to `IV.`). **KruAI RAG: NO (OCR only)**. Verified `ocr-check.mjs` and `check:digits` clean.
+  - Batch 5 (`p17` to `p20`): Biology (`05-biology.md`, problems + solutions `I.` to `VII.`). **KruAI RAG: NO (OCR only)**.
+  - Batch 6 (`p21` to `p23`): History (`06-history.md`, problems + solutions `I.` to `V.`). **KruAI RAG: NO (OCR only)**.
+  - Batch 7 (`p24` to `p25`): French (`07-french.md`, problems + answer keys `I.` to `IV.`). **KruAI RAG: NO (OCR only)**.
+  - Batch 8 (`p26`): English (`08-english.md`, problems + answer keys `I.` to `IV.`). **KruAI RAG: NO (OCR only)**.
 
 ## 27 Nov 2026: 2017 Bac II Science Exam Papers (`2017.pdf`): Batches 1 to 8 (100% Complete, OCR & Audit)
 
