@@ -16,6 +16,19 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 28 Nov 2026: Continuity of Functions (ភាពជាប់នៃអនុគមន៍ · Prek Leap NGSPL 2027) Batches 1 to 4 (100% Complete, OCR & Audit)
+
+Commit: Pending. **No database step needed.**
+
+Rendered all 36 PDF pages (`p01.png`–`p36.png`) and completed verbatim OCR digitization and strict page-by-page blind visual auditing for `sources/textbooks/math/ភាពជាប់នៃអនុគមន៍.pdf` (Prek Leap High School · សេង ធារ៉ុន · NGSPL 2027) in `sources/ocr/math/ភាពជាប់នៃអនុគមន៍/`, bringing all 4 files to **100% OCR Written and 100% OCR Audited**:
+- **Front Matter (`p01`–`p06`)**: `front-matter.md` (cover, preface, credits, blank `p04.png`, TOC `មាតិកា`, blank `p06.png`), restoring `អនុវត្តន៍ : ` on row `1.5` of the TOC during blind audit.
+- **Part 1 (`p07`–`p16`)**: `continuity-part1.md` (sections `1.1`–`1.5`, continuity at a point, properties, continuity on an interval, composite functions, continuous extensions, curve descriptions, and inline notes for printed textbook typos).
+- **Part 2 (`p17`–`p26`)**: `continuity-part2.md` (section `1.5.1` Intermediate Value Theorem with 3 graph descriptions, exercises `1`–`14`, and solutions `1`–`5`).
+- **Part 3 (`p27`–`p36`)**: `continuity-part3.md` (solutions `6`–`14`, piecewise graph description on `p35.png`, and decorative back cover `p36.png`).
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added to `server/textbook-search.ts`, and no quizzes/flashcards created.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/math/ភាពជាប់នៃអនុគមន៍"`, `npm run check:digits`, `npm run check:content`, `npx oxlint`, `npx tsc -b`, and `npm test`.
+
+
 ## 28 Nov 2026: Functions (អនុគមន៍ / អនុគមន៏ · Prek Leap NGSPL 2027) Batches 1 to 30 (100% Complete, OCR & Audit)
 
 Commit: Pending. **No database step needed.**
@@ -54,6 +67,13 @@ Completed OCR digitization and strict page-by-page blind visual auditing for all
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added to `server/textbook-search.ts`, and no quizzes/flashcards created.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/math/ចំនួនកុំផ្លិច"`, `npm run check:digits`, `npm run check:content`, `npx oxlint`, `npx tsc -b`, and `npm test`.
 
+
+## 28 Nov 2026: 2018 Bac II Science Exam Papers (`2018.pdf`): Batch 1 (OCR & Audit Progress)
+
+Digitized and blind-audited `2018.pdf` batch 1 into `sources/ocr/2018/`, and created `sources/ocr/2018/STATUS.md` covering all 26 pages across 8 sections (`KruAI RAG: NO (OCR only)` for all sections; zero new RAG chunks added per OCR-only scope).
+
+- **Completed so far:**
+  - Batch 1 (`p01` to `p03`): Cover & Khmer Literature (`01-cover-and-khmer.md`). **KruAI RAG: NO (OCR only)**. Verified `ocr-check.mjs` and `check:digits` clean.
 
 ## 27 Nov 2026: 2017 Bac II Science Exam Papers (`2017.pdf`): Batches 1 to 8 (100% Complete, OCR & Audit)
 
