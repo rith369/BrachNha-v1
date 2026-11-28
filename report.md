@@ -16,6 +16,19 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 28 Nov 2026: Functions (អនុគមន៍ / អនុគមន៏ · Prek Leap NGSPL 2027) Batches 1 to 30 (100% Complete, OCR & Audit)
+
+Commit: Pending. **No database step needed.**
+
+Rendered all 262 PDF pages (`p001.png`–`p262.png`) and completed verbatim OCR digitization and strict page-by-page blind visual auditing for `sources/textbooks/math/អនុគមន៏.pdf` (Prek Leap High School · សេង ធារ៉ុន · NGSPL 2027) in `sources/ocr/math/អនុគមន៏/`, bringing all 30 files to **100% OCR Written and 100% OCR Audited**:
+- **Front Matter (`p001`–`p004`)**: `front-matter.md` (cover with `Functoin` typo preserved and noted, blank `p002.png`, TOC `មាតិកា`), verifying `អនុគមន៍` vs `អ៊ិចស្ប៉ូ` glyphs during blind audit.
+- **Chapter 1 Rational Functions (`p005`–`p074`)**: `ch1-rational-part1.md` through `ch1-rational-part8.md` (`1.1`–`1.3`, asymptotes, polynomial long divisions, curve studies/graphs, variation tables, and parameter problems), fixing `៖` colons, `ឫស` vs `ឬស`, CommonMark indentation on `p039`, and `ជាសមីការដឺក្រេទី 2` on `p070` during blind audit.
+- **Chapter 2 Exponential Functions (`p075`–`p146`)**: `ch2-exponential-part1.md` through `ch2-exponential-part8.md` (`2.1`–`2.5`, number $e$, derivatives, curve studies/graphs, compound interest & growth applications, and `កម្រងលំហាត់បន្ថែម` Ex. 1–18), restoring `អិចស្ប៉ូណង់ស្យែល`, `អូដកូណាល់`, `បន្ទាត់បន្តាត់ប៉ះ`, `ថ្លៃ`, `អ័ក្យ`, `ផ្ទៃប្លង់`, and `ឬស` verbatim with erratum notes during blind audit.
+- **Chapter 3 Logarithmic Functions & Back Cover (`p147`–`p262`)**: `ch3-logarithm-part01.md` through `ch3-logarithm-part13.md` (`3.1`–`3.6`, equations/inequalities, curve studies/graphs, Bac II 2014–2026 Science & Social exam problems and solutions, variation table on `p261`, and decorative back cover `p262.png`), fixing `ឱ្យ`, `ដូចនេះ`/`ដូច្នេះ` colons, Ex. 7 variation-table alignment (`p182`), and removing a Thai character on `p210` during blind audit.
+- **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added to `server/textbook-search.ts`, and no quizzes/flashcards created.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/math/អនុគមន៏"`, `npm run check:digits`, `npm run check:content`, `npx oxlint`, `npx tsc -b`, and `npm test`.
+
+
 ## 27 Nov 2026: Derivative Functions (ដេរីវេអនុគមន៍ · Prek Leap NGSPL 2026) Batches 1 to 18 (100% Complete, OCR & Audit)
 
 Commit: Pending. **No database step needed.**
@@ -41,6 +54,20 @@ Completed OCR digitization and strict page-by-page blind visual auditing for all
 - **KruAI RAG Status**: KruAI RAG: NO (OCR only). No new RAG chunks added to `server/textbook-search.ts`, and no quizzes/flashcards created.
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/math/ចំនួនកុំផ្លិច"`, `npm run check:digits`, `npm run check:content`, `npx oxlint`, `npx tsc -b`, and `npm test`.
 
+
+## 27 Nov 2026: 2017 Bac II Science Exam Papers (`2017.pdf`): Batches 1 to 8 (100% Complete, OCR & Audit)
+
+Digitized and blind-audited all 23 pages of `sources/textbooks/Past Exam Papers/2017.pdf` (book pages 87 to 108 plus cover) into `sources/ocr/2017/`, with `sources/ocr/2017/STATUS.md` tracking all 8 sections (`KruAI RAG: NO (OCR only)` for every section; zero new RAG chunks added per OCR-only scope).
+
+- **Completed sections:**
+  - Batch 1 (`p01` to `p03`): Cover & Khmer Literature (`01-cover-and-khmer.md`). **KruAI RAG: NO (OCR only)**.
+  - Batch 2 (`p04` to `p09`): Mathematics (`02-mathematics.md`, problems + solutions `I.` to `VII.`, variation table, hyperbola and exponential curve descriptions). **KruAI RAG: NO (OCR only)**.
+  - Batch 3 (`p10` to `p11`): Physics (`03-physics.md`, problems + solutions `I.` to `VII.`). **KruAI RAG: NO (OCR only)**.
+  - Batch 4 (`p12` to `p14`): Chemistry (`04-chemistry.md`, problems + solutions `I.` to `V.`). **KruAI RAG: NO (OCR only)**.
+  - Batch 5 (`p15` to `p17`): Biology (`05-biology.md`, problems + solutions `I.` to `VIII.`). **KruAI RAG: NO (OCR only)**.
+  - Batch 6 (`p18` to `p20`): History (`06-history.md`, problems + solutions `I.` to `V.`). **KruAI RAG: NO (OCR only)**.
+  - Batch 7 (`p21` to `p22`): French (`07-french.md`, problems + answer keys `I.` to `IV.`). **KruAI RAG: NO (OCR only)**.
+  - Batch 8 (`p23`): English (`08-english.md`, problems + answer keys `I.` to `IV.`). **KruAI RAG: NO (OCR only)**.
 
 ## 27 Nov 2026: Grade 12 Physics Formula Summary (2025រូបមន្តសង្ខេបថ្នាក់ទី១២.pdf, Chou Chamnan): Batches 1 to 4 (100% Complete, OCR & Audit)
 
