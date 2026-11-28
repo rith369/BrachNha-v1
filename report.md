@@ -16,6 +16,20 @@ Each entry lists the commit it landed in, so you can match it to a version of th
 > record of the order things happened, not as something you can look up.
 
 
+## 28 Nov 2026: History Past Exams & Mock Exams (MoEYS 2014–2020) Batches 0 to 21 (100% Complete, OCR & Audit)
+
+Commit: Pending. **No database step needed.**
+
+Rendered all 123 PDF pages (`p001.png`–`p123.png`) and completed verbatim OCR digitization and strict page-by-page blind visual auditing for `sources/textbooks/history/mock exam and old paper moeys.pdf` (MoEYS Volunteer Student Team Compilation: *កម្រងវិញ្ញាសា និងអត្រាកំណែ ប្រវត្តិវិទ្យា ថ្នាក់ទី 12*, Science & Social Science Tracks) in `sources/ocr/history/mock exam and old paper moeys/`, bringing all 22 batches (`23` `.md` files including `STATUS.md`) to **100% OCR Written and 100% OCR Audited**:
+- **Front Matter (`p001`–`p005`, Batch 0)**: `00-front-matter.md` (cover, preface `អារម្ភកថា`, compiler list `ឈ្មោះអ្នករៀបរៀង`, Table of Contents `មាតិកា`, and Part 1 divider), preserving printed TOC anomalies (`2914`, missing `2.1`, duplicate `2.2.4`/`ទី2` entries) with inline notes and restoring `ឯកសារពិគ្រោះ៖` during audit.
+- **Part 1.1 Science Track Past Exams 2014–2019 (`p006`–`p033`, Batches 1–5)**: `part1-1-science-2014-2015.md` (`04 Aug 2014` & `24 Aug 2015`), `part1-1-science-2016.md` (`22 Aug 2016`), `part1-1-science-2017.md` (`21 Aug 2017`), `part1-1-science-2018.md` (`20 Aug 2018`), and `part1-1-science-2019.md` (`20/19 Aug 2019`), restoring omitted words/syllables (`ការពារទឹកដី`, `ការកាន់កាប់របប`) and printed typo notes across blind audits.
+- **Part 1.2 Social Science Track Past Exams 2014–2019 (`p034`–`p069`, Batches 6–11)**: `part1-2-social-2014.md` (`04 Aug 2014` Session 1 & `13 Oct 2014` Session 2, noting TOC listed p. 28 instead of p. 29), `part1-2-social-2015.md` (`24 Aug 2015`, including blank `p043.png` and Q5 key on `p046.png`), `part1-2-social-2016.md` (`22 Aug 2016`), `part1-2-social-2017.md` (`21 Aug 2017`), `part1-2-social-2018.md` (`20 Aug 2018`), and `part1-2-social-2019.md` (`19 Aug 2019`), fixing OCR misreads (`ប្រាសាទភីមែ`), missing `ពី` in headings, unbulleted `(មានមតិផ្សេងទៀត)` placement, and Khmer spelling/typo notes.
+- **Part 2.2 Science Track Mock Exams 1–5 (`p070`–`p093`, Batches 12–16)**: `part2-2-science-mock1.md` (with Part 2 divider `p070.png`), `part2-2-science-mock2.md`, `part2-2-science-mock3.md`, `part2-2-science-mock4.md` (preserving printed Q2/Q3 swap), and `part2-2-science-mock5.md`, checking and annotating printed date/spelling quirks (`ឆ្នាំ2007`, `បារីដ`, `ថ្ងៃទី13`).
+- **Part 2.3 Social Science Track Mock Exams 1–5 & Part 3 References (`p094`–`p123`, Batches 17–21)**: `part2-3-social-mock1.md` (with Social Track divider `p094.png`), `part2-3-social-mock2.md`, `part2-3-social-mock3.md`, `part2-3-social-mock4.md`, and `part2-3-social-mock5-and-refs.md` (concluding with `ឯកសារពិគ្រោះ` on `p123.png`), fixing `រកខ្យល់`, `ការចរចាររវាង`, `ប្រភពទី4`, `អព្យាក្រឹត្យ`, `វស័យ`, and `សិទ្ធសេរីភាព` during blind audits.
+- **KruAI RAG Status**: `NO (OCR only)` across all 22 batches (Cambodian history topics are already grounded in `HISTORY_CH1`–`CH6` & `HISTORY_OVERVIEW_SECTIONS` in `server/textbook-search.ts`, and earlier 2014–2016 papers exist under `sources/ocr/2014-first`..`2016`). No new RAG chunks or quizzes/flashcards created.
+- **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/history/mock exam and old paper moeys"` (`23 pages checked, 0 to look at by hand.`), `npm run check:digits`, `npm run check:content`, `npx oxlint`, and `npx tsc -b`.
+
+
 ## 28 Nov 2026: Continuity of Functions (ភាពជាប់នៃអនុគមន៍ · Prek Leap NGSPL 2027) Batches 1 to 4 (100% Complete, OCR & Audit)
 
 Commit: Pending. **No database step needed.**
@@ -68,12 +82,14 @@ Completed OCR digitization and strict page-by-page blind visual auditing for all
 - **Verification**: Verified with `node scripts/ocr-check.mjs "sources/ocr/math/ចំនួនកុំផ្លិច"`, `npm run check:digits`, `npm run check:content`, `npx oxlint`, `npx tsc -b`, and `npm test`.
 
 
-## 28 Nov 2026: 2018 Bac II Science Exam Papers (`2018.pdf`): Batch 1 (OCR & Audit Progress)
+## 28 Nov 2026: 2018 Bac II Science Exam Papers (`2018.pdf`): Batches 1 to 3 (OCR & Audit Progress)
 
-Digitized and blind-audited `2018.pdf` batch 1 into `sources/ocr/2018/`, and created `sources/ocr/2018/STATUS.md` covering all 26 pages across 8 sections (`KruAI RAG: NO (OCR only)` for all sections; zero new RAG chunks added per OCR-only scope).
+Digitized and blind-audited `2018.pdf` batches 1 to 3 into `sources/ocr/2018/`, and created `sources/ocr/2018/STATUS.md` covering all 26 pages across 8 sections (`KruAI RAG: NO (OCR only)` for all sections; zero new RAG chunks added per OCR-only scope).
 
 - **Completed so far:**
   - Batch 1 (`p01` to `p03`): Cover & Khmer Literature (`01-cover-and-khmer.md`). **KruAI RAG: NO (OCR only)**. Verified `ocr-check.mjs` and `check:digits` clean.
+  - Batch 2 (`p04` to `p09`): Mathematics (`02-mathematics.md`, problems + solutions `I.` to `VII.`, ellipse graph, variation table, auxiliary tables and curve description). **KruAI RAG: NO (OCR only)**. Verified `ocr-check.mjs` and `check:digits` clean.
+  - Batch 3 (`p10` to `p12`): Physics (`03-physics.md`, problems + solutions `I.` to `VI.`). **KruAI RAG: NO (OCR only)**. Verified `ocr-check.mjs` and `check:digits` clean.
 
 ## 27 Nov 2026: 2017 Bac II Science Exam Papers (`2017.pdf`): Batches 1 to 8 (100% Complete, OCR & Audit)
 
